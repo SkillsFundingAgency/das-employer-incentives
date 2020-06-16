@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.Web", "SFA.DAS.EmployerIncentives.Web\SFA.DAS.EmployerIncentives.Web.csproj", "{04C1F00F-155C-465D-AAE1-173C660AF854}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Web", "SFA.DAS.EmployerIncentives.Web\SFA.DAS.EmployerIncentives.Web.csproj", "{04C1F00F-155C-465D-AAE1-173C660AF854}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.UnitTests", "SFA.DAS.EmployerIncentives.UnitTests\SFA.DAS.EmployerIncentives.UnitTests.csproj", "{6AE6518F-62C0-4F32-9113-3F0B9680E2BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3FC8FBD6-82B9-4092-94D7-5E0B4A920DA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +19,16 @@ Global
 		{04C1F00F-155C-465D-AAE1-173C660AF854}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04C1F00F-155C-465D-AAE1-173C660AF854}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04C1F00F-155C-465D-AAE1-173C660AF854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AE6518F-62C0-4F32-9113-3F0B9680E2BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AE6518F-62C0-4F32-9113-3F0B9680E2BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AE6518F-62C0-4F32-9113-3F0B9680E2BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AE6518F-62C0-4F32-9113-3F0B9680E2BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6AE6518F-62C0-4F32-9113-3F0B9680E2BE} = {3FC8FBD6-82B9-4092-94D7-5E0B4A920DA0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3E3FB6-A534-4F3A-AC5E-BD27EF68874D}
