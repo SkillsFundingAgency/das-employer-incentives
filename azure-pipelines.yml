@@ -1,0 +1,82 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - "*"
+  
+workspace:
+  clean: all
+  
+variables:
+- name: SolutionBaseName
+  value: 'SFA.DAS.EmployerIncentives.Web'
+- name: BuildPlatform
+  value : 'any cpu'
+- name: BuildConfiguration
+  value: 'release'
+- group: 'Prod Management Resources'
+
+resources:
+  repositories:
+  - repository: self
+  - repository: das-platform-building-blocks
+    type: github
+    name: SkillsFundingAgency/das-platform-building-blocks
+    ref: refs/heads/master
+    endpoint: 'GitHub (SFA)'
+
+pool:
+  name: 'DAS - Continuous Integration'
+  demands: 
+  - msbuild
+  - visualstudio
+    
+steps:
+- task: UseGitVersion@5
+  inputs:
+    versionSpec: 5.x
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: 'src/**/*.csproj'
+    noCache: true
+
+- task: DotNetCoreCLI@2
+  displayName: Build UnitTests
+  inputs:
+    command: 'build'
+    projects: 'src/**/*.UnitTests.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+ 
+- task: DotNetCoreCLI@2
+  displayName: UnitTest
+  inputs:
+    command: test
+    projects: 'src/**/*.UnitTests.csproj'
+    arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
+
+- template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish - dotnet publish application $(SolutionBaseName)'
+  inputs:
+    command: 'publish'
+    projects: 'src/$(SolutionBaseName).Web/$(SolutionBaseName).Web.csproj'
+    arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
+    publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+  inputs:
+    Contents: |
+      azure\**
+    TargetFolder: '$(build.artifactstagingdirectory)/publish'
+    OverWrite: true
+ 
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    targetPath: $(build.artifactstagingdirectory)/publish
+    artifactName: drop
