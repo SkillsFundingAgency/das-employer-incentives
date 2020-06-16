@@ -9,7 +9,7 @@ workspace:
   
 variables:
 - name: SolutionBaseName
-  value: 'SFA.DAS.EmployerIncentives.Web'
+  value: 'SFA.DAS.EmployerIncentives'
 - name: BuildPlatform
   value : 'any cpu'
 - name: BuildConfiguration
