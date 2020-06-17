@@ -2,10 +2,10 @@
 {
     public class AddLegalEntityCommand : ICommand
     {
-        public int LegalentityId {get; private set;}
+        public long LegalentityId {get; private set;}
 
-        public AddLegalEntityCommand(int legalentityId)
-        {
+        public AddLegalEntityCommand(long legalentityId)
+        {            
             LegalentityId = legalentityId;
         }
     }
