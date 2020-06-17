@@ -4,7 +4,6 @@ using NLog.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Infrastructure.Logging;
 using Microsoft.Azure.WebJobs.Host.Config;
 using NServiceBus;
-using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.NServiceBus.AzureFunction.Configuration;
 using SFA.DAS.NServiceBus.AzureFunction.Hosting;
 
