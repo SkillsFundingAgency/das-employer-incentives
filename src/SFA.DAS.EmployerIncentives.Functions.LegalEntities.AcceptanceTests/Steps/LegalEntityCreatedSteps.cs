@@ -16,7 +16,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [Given(@"I have a legal entity that is not in the database")]
         public void GivenIHaveALegalEntityThatIsNew()
         {
-            Assert.Inconclusive("Not yet implemented");
+            if (_testData == null)
+            {
+                Assert.Inconclusive("Not yet implemented");
+            }
         }
 
         [Given(@"I have a legal entity that is already in the database")]

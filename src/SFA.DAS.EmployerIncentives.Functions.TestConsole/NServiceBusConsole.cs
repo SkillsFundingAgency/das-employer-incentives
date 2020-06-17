@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
             var endpointInstance = await Endpoint.Start(endpointConfiguration)
                 .ConfigureAwait(false);
 
-            var command = string.Empty;
+            string command;
 
             do
             {

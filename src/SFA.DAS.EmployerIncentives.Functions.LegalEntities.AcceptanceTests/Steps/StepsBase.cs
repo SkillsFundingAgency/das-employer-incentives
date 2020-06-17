@@ -15,7 +15,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [BeforeScenario()]
         public void InitialiseTestDatabaseData()
         {
-            Assert.Inconclusive("Not yet implemented");
+            if (_testContext == null)
+            {
+                Assert.Inconclusive("Not yet implemented");
+            }
         }
     }
 }
