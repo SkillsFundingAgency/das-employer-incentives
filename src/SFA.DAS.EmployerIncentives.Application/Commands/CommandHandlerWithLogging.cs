@@ -21,13 +21,13 @@ namespace SFA.DAS.EmployerIncentives.Application.Commands
         {   
             try
             {
-                _log.LogInformation($"Start handle {typeof(T)} command");
+                _log.LogInformation($"Start handle '{typeof(T)}' command");
                 await _handler.Handle(command);
-                _log.LogInformation($"End handle {typeof(T)} command");
+                _log.LogInformation($"End handle '{typeof(T)}' command");
             }
             catch(Exception ex)
             {
-                _log.LogError(ex, $"Error handling {typeof(T)} command");
+                _log.LogError(ex, $"Error handling '{typeof(T)}' command");
                 throw;
             }
         }
