@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
 
-            var config = new ConfigurationBuilder()
+            new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .AddAzureTableStorage(options =>
                 {   

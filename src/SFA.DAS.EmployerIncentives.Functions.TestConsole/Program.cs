@@ -9,6 +9,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 {
     class Program
     {
+        protected Program() { }
+
         static void Main(string[] args)
         {
             Run(args).Wait();

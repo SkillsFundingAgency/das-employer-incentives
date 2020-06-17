@@ -1,4 +1,5 @@
-﻿using TechTalk.SpecFlow;
+﻿using NUnit.Framework;
+using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
 {
@@ -13,7 +14,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         
         [BeforeScenario()]
         public void InitialiseTestDatabaseData()
-        {           
+        {
+            Assert.Inconclusive("Not yet implemented");
         }
     }
 }
