@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="AddLegalEntity\Services\" />
-    <Folder Include="AddLegalEntity\Validators\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,7 +6,29 @@ namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
     {
         public Task<ValidationResult> Validate(AddLegalEntityCommand item)
         {
-            return Task.FromResult(new ValidationResult());
+            var result = new ValidationResult();
+
+            if (item.AccountId == default)
+            {
+                result.AddError("AccountId", "Is not set");
+            }
+
+            if (item.LegalEntityId == default)
+            {
+                result.AddError("LegalEntityId", "Is not set");
+            }
+
+            if (item.AccountLegalEntityId == default)
+            {
+                result.AddError("AccountLegalEntityId", "Is not set");
+            }
+
+            if (string.IsNullOrEmpty(item.Name))
+            {
+                result.AddError("Name", "Is not set");
+            }
+
+            return Task.FromResult(result);
         }
     }
 }
