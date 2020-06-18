@@ -28,9 +28,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
             {
                 var message = new AddedLegalEntityEvent
                 {
-                    AccountId = 1
+                    AccountId = 2,
+                    AccountLegalEntityId = 2,
+                    LegalEntityId = 3,
+                    OrganisationName = "Org name"
                 };
-
 
                 await endpointInstance.Publish(message);
 

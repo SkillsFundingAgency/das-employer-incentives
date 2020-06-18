@@ -7,7 +7,11 @@ using Microsoft.Extensions.Logging;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Application.Commands;
 using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Application.Persistence;
+using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.Entities;
 using SFA.DAS.EmployerIncentives.Infrastructure;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.IO;
 
@@ -23,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
 
-            new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .AddAzureTableStorage(options =>
                 {   
@@ -45,10 +49,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             else
             {
                 builder.Services.AddNServiceBus(logger);
-            }            
+            }
+
+            builder.Services.AddOptions();
+            builder.Services.Configure<FunctionSettings>(config.GetSection("FunctionSettings"));
 
             builder.Services.AddTransient<ICommandHandler<AddLegalEntityCommand>, AddLegalEntityCommandHandler>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithLogging<AddLegalEntityCommand>>();
+
+            builder.Services.AddTransient<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
+            builder.Services.AddTransient<IDomainRepository<long, Account>, AccountDomainRepository>();
+
+            builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();
+            
         }
     }
 }

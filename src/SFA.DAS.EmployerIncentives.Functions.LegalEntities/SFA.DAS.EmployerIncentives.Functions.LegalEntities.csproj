@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Application\SFA.DAS.EmployerIncentives.Application.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data\SFA.DAS.EmployerIncentives.Data.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>

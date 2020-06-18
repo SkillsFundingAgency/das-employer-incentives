@@ -14,8 +14,4 @@
     <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Configuration\" />
-  </ItemGroup>
-
 </Project>

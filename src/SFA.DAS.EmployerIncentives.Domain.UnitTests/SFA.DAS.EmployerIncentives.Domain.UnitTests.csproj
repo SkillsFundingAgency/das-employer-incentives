@@ -19,11 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AddLegalEntity\Services\" />
-    <Folder Include="AddLegalEntity\Validators\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Application\SFA.DAS.EmployerIncentives.Application.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Domain\SFA.DAS.EmployerIncentives.Domain.csproj" />
   </ItemGroup>
 </Project>

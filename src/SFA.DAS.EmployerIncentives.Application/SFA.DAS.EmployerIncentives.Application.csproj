@@ -9,4 +9,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data\SFA.DAS.EmployerIncentives.Data.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Domain\SFA.DAS.EmployerIncentives.Domain.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

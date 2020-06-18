@@ -20,7 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
         [FunctionName("HandleAddedLegalEntityEvent")]
         public async Task Run([NServiceBusTrigger(Endpoint = QueueNames.LegalEntityAdded)] AddedLegalEntityEvent message)
         {
-            await _handler.Handle(new AddLegalEntityCommand(message.LegalEntityId));
+            await _handler.Handle(new AddLegalEntityCommand(
+                message.AccountId,
+                message.LegalEntityId,
+                message.OrganisationName, 
+                message.AccountLegalEntityId));
         }
     }
 }
