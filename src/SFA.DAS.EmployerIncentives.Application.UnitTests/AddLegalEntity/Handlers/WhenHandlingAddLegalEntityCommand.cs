@@ -88,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
             var command = _fixture.Create<AddLegalEntityCommand>();
             _mockDomainRespository
                 .Setup(m => m.Find(command.AccountId))
-                .ReturnsAsync(Account.Create(new AccountModel()));
+                .ReturnsAsync(Account.Create(new AccountModel { Id = 1 }));
 
             //Act
             await _sut.Handle(command);

@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Data;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Entities
 {
@@ -20,6 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.Entities
 
         public static LegalEntity Create(ILegalEntityModel model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (model.Id == default) throw new ArgumentException("Id is not set", nameof(model));
             return new LegalEntity(model.Id, model);
         }
 

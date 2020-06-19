@@ -3,13 +3,13 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Entities
 {
-    public abstract class Entity<EntityId, EntityModel>  where EntityModel : IEntityModel<EntityId>
+    public abstract class Entity<IdType, EntityModel>  where EntityModel : IEntityModel<IdType>
     {
-        public EntityId Id => Model.Id;
+        public IdType Id => Model.Id;
         protected EntityModel Model { get; set; }
         public bool IsNew { get; protected set; }
 
-        protected Entity(EntityId id, EntityModel model, bool isNew)
+        protected Entity(IdType id, EntityModel model, bool isNew)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             Model = model;

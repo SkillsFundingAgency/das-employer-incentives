@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Data;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Entities
 {
@@ -16,6 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.Entities
 
         public static Account Create(IAccountModel model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (model.Id == default) throw new ArgumentException("Id is not set", nameof(model));
             return new Account(model.Id, model);
         }
 
