@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Data.Tables
 {
-    [Table("dbo.Accounts")]
+    [Table("Accounts")]
     public class Account
     {
         [ExplicitKey]
