@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
         }
 
         [Test]
-        public async Task Then_the_entity_is_persisted_by_the_data_layer()
+        public async Task Then_a_new_entity_is_persisted_by_the_data_layer()
         {
             //Arrange
             var entity = _fixture.Create<Account>();
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
             await _sut.Save(entity);
 
             //Assert
-            Assert.Inconclusive();            
+            _mockAccountDataRepository.Verify(m => m.Add(entity.GetModel()), Times.Once);
         }
     }
 }
