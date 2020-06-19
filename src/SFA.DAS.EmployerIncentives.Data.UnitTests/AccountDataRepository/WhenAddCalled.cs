@@ -5,7 +5,11 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Domain.Data;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using static SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers.SqlHelper;
 
@@ -42,7 +46,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         public async Task Then_the_account_is_added_to_the_data_store()
         {
             // Arrange
-            var testAccount = _fixture.Build<AccountModel>().With(f => f.LegalEntityModel, _fixture.Create<LegalEntityModel>()).Create();
+            var testLegalEntity = _fixture.Create<LegalEntityModel>();
+            var testAccount = _fixture
+                .Build<AccountModel>()
+                .With(f => f.LegalEntityModels, new List<ILegalEntityModel> { testLegalEntity })
+                .Create();
+
             (await _sut.Find(testAccount.Id)).Should().BeNull();
 
             // Act
@@ -52,9 +61,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             // Assert
             account.Should().NotBeNull();
             account.Id.Should().Be(testAccount.Id);
-            account.AccountLegalEntityId.Should().Be(testAccount.AccountLegalEntityId);
-            account.LegalEntityModel.Id.Should().Be(testAccount.LegalEntityModel.Id);
-            account.LegalEntityModel.Name.Should().Be(testAccount.LegalEntityModel.Name);
+            var legalEntity = account.LegalEntityModels.Single();
+            legalEntity.Id.Should().Be(testLegalEntity.Id);
+            legalEntity.Name.Should().Be(testLegalEntity.Name);
+            legalEntity.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
         }
     }
 }

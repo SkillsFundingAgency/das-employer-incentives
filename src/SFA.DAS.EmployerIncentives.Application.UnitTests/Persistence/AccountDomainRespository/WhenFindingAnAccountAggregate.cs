@@ -5,6 +5,9 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Data;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
@@ -43,21 +46,26 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
         public async Task Then_the_account_is_returned_when_it_exists()
         {
             //Arrange
-            var accountModel = _fixture.Build<AccountModel>().With(f => f.LegalEntityModel, _fixture.Create<LegalEntityModel>()).Create();
+            var testLegalEntity = _fixture.Create<LegalEntityModel>();
+            var testAccount = _fixture
+                .Build<AccountModel>()
+                .With(f => f.LegalEntityModels, new Collection<ILegalEntityModel> { testLegalEntity })
+                .Create();
 
-            _mockAccountDataRepository
-                .Setup(m => m.Find(accountModel.Id))
-                .ReturnsAsync(accountModel);
+              _mockAccountDataRepository
+                .Setup(m => m.Find(testAccount.Id))
+                .ReturnsAsync(testAccount);
 
             //Act
-            var account = await _sut.Find(accountModel.Id);
+            var account = await _sut.Find(testAccount.Id);
 
             //Assert
             account.Should().NotBeNull();
-            account.Id.Should().Be(accountModel.Id);
-            account.AccountLegalEntityId.Should().Be(accountModel.AccountLegalEntityId);
-            account.LegalEntity.Id.Should().Be(accountModel.LegalEntityModel.Id);
-            account.LegalEntity.Name.Should().Be(accountModel.LegalEntityModel.Name);
+            account.Id.Should().Be(testAccount.Id);
+            var legalEntity = account.LegalEntities.Single();
+            legalEntity.Id.Should().Be(testLegalEntity.Id);
+            legalEntity.Name.Should().Be(testLegalEntity.Name);
+            legalEntity.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
         }
 
         [Test]

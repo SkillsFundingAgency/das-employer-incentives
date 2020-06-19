@@ -7,6 +7,8 @@ using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using static SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers.SqlHelper;
 
@@ -45,7 +47,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         {
             // Arrange
             var testAccount = _fixture.Create<Account>();
-            await _sut.Add(testAccount.Map());
+            var accounts = new List<Account> { testAccount };
+            await _sut.Add((new List<Account> { _fixture.Create<Account>() }).MapSingle());
+            await _sut.Add(accounts.MapSingle());
+            await _sut.Add((new List<Account> { _fixture.Create<Account>() }).MapSingle());
 
             // Act
             var account = await _sut.Find(testAccount.Id);
@@ -53,9 +58,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             // Assert
             account.Should().NotBeNull();
             account.Id.Should().Be(testAccount.Id);
-            account.AccountLegalEntityId.Should().Be(testAccount.AccountLegalEntityId);
-            account.LegalEntityModel.Id.Should().Be(testAccount.LegalEntityId);
-            account.LegalEntityModel.Name.Should().Be(testAccount.LegalEntityName);
+            var legalEntity = account.LegalEntityModels.Single();
+            legalEntity.Id.Should().Be(testAccount.LegalEntityId);
+            legalEntity.Name.Should().Be(testAccount.LegalEntityName);
+            legalEntity.AccountLegalEntityId.Should().Be(testAccount.AccountLegalEntityId);
         }
 
         [Test]

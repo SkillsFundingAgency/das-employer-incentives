@@ -8,7 +8,10 @@ using SFA.DAS.EmployerIncentives.Application.Exceptions;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Data;
 using SFA.DAS.EmployerIncentives.Domain.Entities;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.NServiceBus;
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handlers
@@ -78,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
             await _sut.Handle(command);
 
             //Assert
-            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.LegalEntity.Id == command.LegalEntityId)), Times.Once);
+            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Once);
         }
 
         [Test]
@@ -88,13 +91,13 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
             var command = _fixture.Create<AddLegalEntityCommand>();
             _mockDomainRespository
                 .Setup(m => m.Find(command.AccountId))
-                .ReturnsAsync(Account.Create(new AccountModel { Id = 1 }));
+                .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<ILegalEntityModel>() }));
 
             //Act
             await _sut.Handle(command);
 
             //Assert
-            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.LegalEntity.Id == command.LegalEntityId)), Times.Never);
+            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
         }
     }
 }

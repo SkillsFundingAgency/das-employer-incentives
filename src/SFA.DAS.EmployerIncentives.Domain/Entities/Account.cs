@@ -2,17 +2,20 @@
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System;
+using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Domain.Map;
+using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Entities
 {
     public class Account : AggregateRoot<long, IAccountModel>
-    {
-        public LegalEntity LegalEntity => LegalEntity.Create(Model.LegalEntityModel);
-        public long AccountLegalEntityId => Model.AccountLegalEntityId;
-
+    {   
+        public IReadOnlyCollection<LegalEntity> LegalEntities => Model.LegalEntityModels.Map().ToList().AsReadOnly();
+     
         public static Account New(long id)
         {
-            return new Account(id, new AccountModel(), true);
+            return new Account(id, new AccountModel() { LegalEntityModels = new Collection<ILegalEntityModel>() } , true);
         }
 
         public static Account Create(IAccountModel model)
@@ -23,18 +26,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.Entities
         }
 
         public void AddLegalEntity(long accountLegalEntityId, LegalEntity legalEntity)
-        {
-            if (Model.LegalEntityModel != null)
+        {   
+            if (Model.LegalEntityModels.Any(i => i.AccountLegalEntityId.Equals(accountLegalEntityId)))
             {
                 throw new InvalidMethodCallException("Legal entity has already been set up");
             }
 
-            Model.AccountLegalEntityId = accountLegalEntityId;
-            Model.LegalEntityModel = legalEntity.GetModel();
+            Model.LegalEntityModels.Add(new LegalEntityModel { Id = legalEntity.Id, Name = legalEntity.Name, AccountLegalEntityId = accountLegalEntityId });
         }
 
         private Account(long id, IAccountModel model, bool isNew = false) : base(id, model, isNew)
-        {
+        {            
         }
     }
 }

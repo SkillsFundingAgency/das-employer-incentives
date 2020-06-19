@@ -5,6 +5,7 @@ namespace SFA.DAS.EmployerIncentives.Data
 {
     public interface IAccountDataRepository
     {
+        Task Update(IAccountModel account);
         Task Add(IAccountModel account);
         Task<IAccountModel> Find(long accountId);
     }

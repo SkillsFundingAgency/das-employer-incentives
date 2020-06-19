@@ -1,34 +1,41 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Domain.Data;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
-{
+{  
     public static class AccountExtensions
     {
-        public static Account Map(this IAccountModel accountProperties)
+        public static IEnumerable<Account> Map(this IAccountModel model)
         {
-            return new Account
-            {
-                Id = accountProperties.Id,
-                AccountLegalEntityId = accountProperties.AccountLegalEntityId,
-                LegalEntityId = accountProperties.LegalEntityModel.Id,
-                LegalEntityName = accountProperties.LegalEntityModel.Name
-            };
+            var accounts = new List<Account>();
+            model.LegalEntityModels.ToList().ForEach(i =>
+                                                        accounts.Add(new Account
+                                                        {
+                                                            Id = model.Id,
+                                                            AccountLegalEntityId = i.AccountLegalEntityId,
+                                                            LegalEntityId = i.Id,
+                                                            LegalEntityName = i.Name
+                                                        }
+            ));
+
+            return accounts;
         }
 
-        public static IAccountModel Map(this Account account)
-        {
-            return new AccountModel
+         public static IAccountModel MapSingle(this IEnumerable<Account> accounts)
+        {   
+            if (!accounts.Any() || (accounts.Count(s => s.Id == accounts.First().Id) != accounts.Count()))
             {
-                Id = account.Id,                
-                AccountLegalEntityId = account.AccountLegalEntityId,
-                LegalEntityModel = new LegalEntityModel
-                {
-                    Id = account.LegalEntityId,
-                    Name = account.LegalEntityName
-                }
-            };
+                return null;
+            }
+
+            var model = new AccountModel { Id = accounts.First().Id, LegalEntityModels = new Collection<ILegalEntityModel>() };
+            accounts.ToList().ForEach(i => model.LegalEntityModels.Add(new LegalEntityModel { Id = i.LegalEntityId, AccountLegalEntityId = i.AccountLegalEntityId, Name = i.LegalEntityName }));
+
+            return model;
         }
     }
 }

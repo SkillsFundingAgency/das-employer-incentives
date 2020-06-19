@@ -7,6 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Tables
     {
         [ExplicitKey]
         public long Id { get; set; }
+        [ExplicitKey]
         public long AccountLegalEntityId { get; set; }
         public long LegalEntityId { get; set; }
         public string LegalEntityName { get; set; }

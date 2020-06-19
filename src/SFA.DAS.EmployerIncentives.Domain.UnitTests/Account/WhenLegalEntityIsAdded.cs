@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Domain.Data;
 using SFA.DAS.EmployerIncentives.Domain.Entities;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using System;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
 {
@@ -22,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
         }
 
         [Test]
-        public void Then_the_legalEntity_is_set()
+        public void Then_the_legalEntity_is_added()
         {
             // Arrange
             var legalEntity = LegalEntity.Create(_fixture.Create<LegalEntityModel>());
@@ -31,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
             _sut.AddLegalEntity(_fixture.Create<long>(), legalEntity);
 
             // Assert
-            _sut.LegalEntity.Should().Be(legalEntity);
+            _sut.LegalEntities.Single().Id.Should().Be(legalEntity.Id);
         }
 
         [Test]
@@ -44,20 +45,37 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
             _sut.AddLegalEntity(accountLegalEntityId, LegalEntity.Create(_fixture.Create<LegalEntityModel>()));
 
             // Assert
-            _sut.AccountLegalEntityId.Should().Be(accountLegalEntityId);
+            _sut.LegalEntities.Single().AccountLegalEntityId.Should().Be(accountLegalEntityId);
         }
 
         [Test]
-        public void Then_an_InvalidMethodCallException_is_raised_if_the_legalEntity_has_already_been_set()
+        public void Then_an_InvalidMethodCallException_is_raised_if_the_same_legalEntity_has_already_been_added()
         {
             // Arrange
-            _sut.AddLegalEntity(_fixture.Create<long>(), LegalEntity.Create( _fixture.Create<LegalEntityModel>()));
+            var acountLegalEntity = _fixture.Create<long>();
+            _sut.AddLegalEntity(acountLegalEntity, LegalEntity.Create( _fixture.Create<LegalEntityModel>()));
 
             // Act
-            Action action = () => _sut.AddLegalEntity(_fixture.Create<long>(), LegalEntity.Create(_fixture.Create<LegalEntityModel>()));
+            Action action = () => _sut.AddLegalEntity(acountLegalEntity, LegalEntity.Create(_fixture.Create<LegalEntityModel>()));
 
             //Assert
             action.Should().Throw<InvalidMethodCallException>().WithMessage("Legal entity has already been set up");
+        }
+
+        [Test]
+        public void Then_the_legalEntity_is_added_if_it_is_different_to_a_previously_added_one()
+        {
+            // Arrange
+            var firstLegalEntity = LegalEntity.Create(_fixture.Create<LegalEntityModel>());            
+            _sut.AddLegalEntity(firstLegalEntity.AccountLegalEntityId, firstLegalEntity);
+
+            var secondLegalEntity = LegalEntity.Create(_fixture.Build<LegalEntityModel>().With(f => f.Id, firstLegalEntity.Id + 1).With(f => f.AccountLegalEntityId, firstLegalEntity.AccountLegalEntityId + 1).Create());
+            
+            // Act
+            _sut.AddLegalEntity(secondLegalEntity.AccountLegalEntityId, secondLegalEntity);
+
+            // Assert
+            _sut.LegalEntities.Should().Contain(new [] { firstLegalEntity , secondLegalEntity});
         }
     }
 }

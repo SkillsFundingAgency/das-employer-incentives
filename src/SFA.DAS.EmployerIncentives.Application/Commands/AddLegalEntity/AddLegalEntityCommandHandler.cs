@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Application.Exceptions;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Entities;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
@@ -27,14 +28,20 @@ namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
                 throw new InvalidRequestException(validationResult.ValidationDictionary);
             }
 
-            if (await _domainRepository.Find(command.AccountId) != null)
+            var account = await _domainRepository.Find(command.AccountId);
+            if (account != null) 
             {
-                return; // already created
+                if (account.LegalEntities.Any(l => l.AccountLegalEntityId == command.AccountLegalEntityId))
+                {
+                    return; // already created
+                }
+            }
+            else
+            {
+                account = Account.New(command.AccountId);
             }
 
-            var account = Account.New(command.AccountId);            
-            var legalEntity = LegalEntity.New(command.LegalEntityId, command.Name);
-            account.AddLegalEntity(command.AccountLegalEntityId, legalEntity);
+            account.AddLegalEntity(command.AccountLegalEntityId, LegalEntity.New(command.LegalEntityId, command.Name));
 
             await _domainRepository.Save(account);
         }

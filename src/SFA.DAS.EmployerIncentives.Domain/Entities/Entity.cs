@@ -48,7 +48,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Entities
             {
                 int hash = 13;
                 hash = (hash * 7) + (Id is object ? Id.GetHashCode() : 0);
-                hash = (hash * 7) + (Model is object ? Model.GetHashCode() : 0);
                 return hash;
             }
         }

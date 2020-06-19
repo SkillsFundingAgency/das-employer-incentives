@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Application.Persistence
                 return _accountDataRepository.Add(aggregate.GetModel());
             }
 
-            return Task.CompletedTask;
+            return _accountDataRepository.Update(aggregate.GetModel());
         }
     }
   
