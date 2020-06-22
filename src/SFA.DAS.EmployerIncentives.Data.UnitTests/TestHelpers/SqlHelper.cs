@@ -8,7 +8,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
     public static class SqlHelper
     {
-        const string DatabasePackageLocation = @"C:\repos\SFA\das-employer-incentives\src\SFA.DAS.EmployerIncentives.Database\bin\Debug\SFA.DAS.EmployerIncentives.Database.dacpac";
+        static readonly string DatabasePackageLocation = Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Database\bin\Debug\SFA.DAS.EmployerIncentives.Database.dacpac");
+
         public class DatabaseProperties
         {
             public string ConnectionString { get; }
