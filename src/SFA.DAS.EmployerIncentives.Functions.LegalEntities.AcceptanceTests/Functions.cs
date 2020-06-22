@@ -60,11 +60,5 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
                       
             _context.FunctionsHost = await host.StartAsync();
         }
-
-        [AfterScenario()]
-        public void CleanUpFunctions()
-        {
-            _context.FunctionsHost.Dispose();
-        }
     }
 }

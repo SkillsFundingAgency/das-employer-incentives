@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
             }
             SqlHelper.DeleteTestDatabase(_context.DatabaseProperties);
             Directory.Delete(_context.TestDirectory.FullName, true);
+            _context.FunctionsHost.Dispose();
         }
     }
 }

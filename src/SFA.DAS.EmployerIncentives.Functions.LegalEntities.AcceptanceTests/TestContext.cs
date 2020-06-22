@@ -11,13 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
     {
         public DirectoryInfo TestDirectory { get; set; }
 
-        public TestData TestData {get; set;}
-
         public SqlHelper.DatabaseProperties DatabaseProperties { get; set; }
 
         public TestMessageBus TestMessageBus { get; set; }
-
-        public IServiceProvider ServiceProvider { get; set; }
 
         public IHost FunctionsHost { get; set; }
 
