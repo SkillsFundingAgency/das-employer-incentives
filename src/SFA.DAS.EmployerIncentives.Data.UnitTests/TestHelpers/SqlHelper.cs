@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
             dbName = Guid.NewGuid().ToString();
             dbFile = new FileInfo(Path.Combine(testDirectory.FullName, $"{dbName}.mdf"));
+            // TODO: publish the db from the databse project
             File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "SFA.DAS.EmployerIncentives.mdf"), dbFile.ToString());
             connectionString = $"AttachDbFilename={Path.Combine(testDirectory.FullName, $"{dbName}.mdf")};Trusted_Connection=Yes;";
 
