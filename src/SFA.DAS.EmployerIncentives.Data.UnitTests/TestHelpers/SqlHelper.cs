@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using Microsoft.SqlServer.Dac;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
     public static class SqlHelper
     {
+        const string DatabasePackageLocation = @"C:\repos\SFA\das-employer-incentives\src\SFA.DAS.EmployerIncentives.Database\bin\Debug\SFA.DAS.EmployerIncentives.Database.dacpac";
         public class DatabaseProperties
         {
             public string ConnectionString { get; }
@@ -16,23 +18,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                 ConnectionString = connectionString;
             }
         }
-
         public static DatabaseProperties CreateTestDatabase(DirectoryInfo testDirectory = null)
         {
-            if(testDirectory == null)
-            {
-                testDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-            }
+            string dbName = Guid.NewGuid().ToString();
+            string connectionString = $"Data Source=.;Initial Catalog={dbName};Integrated Security=True;Pooling=False;Connect Timeout=30";
 
-            FileInfo dbFile;
-            string connectionString;
-            string dbName;
-
-            dbName = Guid.NewGuid().ToString();
-            dbFile = new FileInfo(Path.Combine(testDirectory.FullName, $"{dbName}.mdf"));
-            // TODO: publish the db from the databse project
-            File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "SFA.DAS.EmployerIncentives.mdf"), dbFile.ToString());
-            connectionString = $"AttachDbFilename={Path.Combine(testDirectory.FullName, $"{dbName}.mdf")};Trusted_Connection=Yes;";
+            Publish(connectionString, dbName);
 
             using (var dbConnection = new SqlConnection(connectionString))
             {
@@ -84,6 +75,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 #pragma warning disable S108 // Nested blocks of code should not be left empty
             catch { }
 #pragma warning restore S108 // Nested blocks of code should not be left empty
+        }
+        private static void Publish(string connectionString, string dbName)
+        {
+            var dbPackage = DacPackage.Load(DatabasePackageLocation);
+            var services = new DacServices(connectionString);
+            services.Deploy(dbPackage, dbName);
         }
     }
 }
