@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
-namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
+namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bindings
 {
     [Binding]
     public class TestCleanUp

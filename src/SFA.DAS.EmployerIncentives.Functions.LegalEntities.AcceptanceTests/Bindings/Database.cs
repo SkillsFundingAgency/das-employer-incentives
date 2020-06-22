@@ -1,7 +1,7 @@
 ﻿using TechTalk.SpecFlow;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 
-namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
+namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bindings
 {
     [Binding]
     [Scope(Tag = "database")]

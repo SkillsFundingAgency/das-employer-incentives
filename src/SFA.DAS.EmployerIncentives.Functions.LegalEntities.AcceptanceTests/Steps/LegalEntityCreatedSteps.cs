@@ -5,7 +5,10 @@ using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerAccounts.Messages.Events;
 using SFA.DAS.EmployerIncentives.Data.Tables;
+using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
+using System;
 using System.Data.SqlClient;
+using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -17,11 +20,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
     {
         private readonly TestContext _testContext;
         private readonly Account _testAccount;
+        private bool hasCompleted = false;
+        private bool hasTimedOut = false;        
 
         public LegalEntityCreatedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _testAccount = _testContext.Fixture.Create<Account>();
+            _testContext.CommandHandlerHooks = new CommandHandlerHooks
+            {
+                OnHandlerEnd = (command) => { hasCompleted = true; }
+            };
         }
 
         [Given(@"I have a legal entity that is not in the database")]
@@ -69,10 +78,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             };
 
             await  _testContext.TestMessageBus.Publish(message);
-
-            await Task.Delay(1000); // TODO: hook into handler start  and completion
+            await WaitForHandlerCompletion();
         }
-        
+                
+        private void HasTimedOut(object state)
+        {
+            hasTimedOut = true;
+        }
+        private async Task WaitForHandlerCompletion()
+        {
+            hasTimedOut = false;
+            using (Timer timer = new Timer(new TimerCallback(HasTimedOut), null, 30000, Timeout.Infinite))
+            {
+                while (!hasCompleted && !hasTimedOut)
+                {
+                    await Task.Delay(100);
+                }
+            }
+            if (hasTimedOut)
+            {
+                Assert.Fail("Test timed out waiting for handler to complete");
+            }
+        }
+
         [Then(@"the legal entity should be available")]
         public async Task ThenTheLegalEntityShouldBeAvailable()
         {

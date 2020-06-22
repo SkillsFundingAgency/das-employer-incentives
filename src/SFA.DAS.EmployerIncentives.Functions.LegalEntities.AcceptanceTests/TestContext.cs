@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using Microsoft.Extensions.Hosting;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
+using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.TestConsole;
 using System;
 using System.IO;
@@ -18,6 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
         public IHost FunctionsHost { get; set; }
 
         public Fixture Fixture { get; set; }
+
+        public CommandHandlerHooks CommandHandlerHooks { get; set; }
 
         public TestContext()
         {

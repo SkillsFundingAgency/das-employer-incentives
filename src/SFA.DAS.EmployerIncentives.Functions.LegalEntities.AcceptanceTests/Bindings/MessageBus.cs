@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Functions.TestConsole;
 using System.IO;
 
-namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
+namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bindings
 {
     [Binding]
     [Scope(Tag = "messageBus")]
