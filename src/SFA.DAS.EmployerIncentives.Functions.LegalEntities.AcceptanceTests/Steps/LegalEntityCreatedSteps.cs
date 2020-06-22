@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
 
             await  _testContext.TestMessageBus.Publish(message);
 
-            await Task.Delay(2000); // TODO: hook into handler start  and completion
+            await Task.Delay(1000); // TODO: hook into handler start  and completion
         }
         
         [Then(@"the legal entity should be available")]
