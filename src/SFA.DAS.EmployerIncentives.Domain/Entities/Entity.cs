@@ -1,6 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System;
-using System.Dynamic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Entities
 {

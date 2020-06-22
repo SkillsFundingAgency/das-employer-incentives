@@ -106,7 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
         {
             _container = _client.GetContainerReference(_containerName);
             await _container.CreateIfNotExistsAsync();
-            _renewTimer = new Timer(RenewLeases, null, RenewInterval, RenewInterval);
+            _renewTimer = new Timer(async o => await RenewLeases(o), null, RenewInterval, RenewInterval);
         }
 
         public Task Stop()
@@ -120,14 +120,16 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
             return Task.CompletedTask;
         }
 
-        private async void RenewLeases(object state)
+        private async Task RenewLeases(object state)
         {
-            if (_mutex.WaitOne())
+            if (state == null && _mutex.WaitOne())
             {
                 try
                 {
                     foreach (var entry in _locks)
+                    {
                         await RenewLock(entry);
+                    }
                 }
                 catch (Exception ex)
                 {

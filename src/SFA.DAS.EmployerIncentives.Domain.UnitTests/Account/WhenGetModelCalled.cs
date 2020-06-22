@@ -4,9 +4,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.Data;
 using SFA.DAS.EmployerIncentives.Domain.Entities;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
 {

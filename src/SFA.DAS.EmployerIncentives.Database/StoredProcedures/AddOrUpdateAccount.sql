@@ -2,7 +2,7 @@
 	@Id						BIGINT,
 	@AccountLegalEntityId	BIGINT,
 	@LegalEntityId			BIGINT,
-	@LegalentityName		VARCHAR(MAX)
+	@LegalEntityName		VARCHAR(MAX)
 AS
 BEGIN
 	SET NOCOUNT ON;
