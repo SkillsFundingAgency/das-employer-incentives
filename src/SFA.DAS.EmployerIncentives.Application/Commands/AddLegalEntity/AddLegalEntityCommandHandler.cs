@@ -8,30 +8,19 @@ namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
 {
     public class AddLegalEntityCommandHandler : ICommandHandler<AddLegalEntityCommand>
     {
-        private readonly IValidator<AddLegalEntityCommand> _validator;
         private readonly IDomainRepository<long, Account> _domainRepository;
 
-        public AddLegalEntityCommandHandler(
-            IValidator<AddLegalEntityCommand> validator,
-            IDomainRepository<long, Account> domainRepository)
+        public AddLegalEntityCommandHandler(IDomainRepository<long, Account> domainRepository)
         {
-            _validator = validator;
             _domainRepository = domainRepository;
         }
 
         public async Task Handle(AddLegalEntityCommand command)
         {
-            var validationResult = await _validator.Validate(command);
-
-            if (!validationResult.IsValid())
-            {
-                throw new InvalidRequestException(validationResult.ValidationDictionary);
-            }
-
             var account = await _domainRepository.Find(command.AccountId);
             if (account != null) 
             {
-                if (account.LegalEntities.Any(l => l.AccountLegalEntityId == command.AccountLegalEntityId))
+                if (account.ContainsAccountLegalEntityId(command.AccountLegalEntityId))
                 {
                     return; // already created
                 }

@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using TechTalk.SpecFlow;
+﻿using AutoFixture;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
 {
@@ -10,15 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         public StepsBase(TestContext testContext)
         {
             _testContext = testContext;
+            _testContext.Fixture = _testContext.Fixture ?? new Fixture();
         }        
-        
-        [BeforeScenario()]
-        public void InitialiseTestDatabaseData()
-        {
-            if (_testContext == null)
-            {
-                Assert.Inconclusive("Not yet implemented");
-            }
-        }
     }
 }

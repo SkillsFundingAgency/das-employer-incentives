@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Commands;
+using SFA.DAS.EmployerIncentives.Application.Decorators;
 using System;
 using System.Threading.Tasks;
 

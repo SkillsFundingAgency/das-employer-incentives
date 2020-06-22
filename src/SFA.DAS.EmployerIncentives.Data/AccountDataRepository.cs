@@ -8,7 +8,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data.Map;
-using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -53,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Data
         {
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
-                await dbConnection.InsertAsync<IEnumerable<Account>>(account.Map());
+                await dbConnection.InsertAsync(account.Map());
             }
         }
 

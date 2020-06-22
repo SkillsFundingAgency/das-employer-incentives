@@ -45,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
             _sut.AddLegalEntity(accountLegalEntityId, LegalEntity.Create(_fixture.Create<LegalEntityModel>()));
 
             // Assert
-            _sut.LegalEntities.Single().AccountLegalEntityId.Should().Be(accountLegalEntityId);
+            _sut.GetModel().LegalEntityModels.Single().AccountLegalEntityId.Should().Be(accountLegalEntityId);
         }
 
         [Test]
@@ -59,20 +59,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
             Action action = () => _sut.AddLegalEntity(acountLegalEntity, LegalEntity.Create(_fixture.Create<LegalEntityModel>()));
 
             //Assert
-            action.Should().Throw<InvalidMethodCallException>().WithMessage("Legal entity has already been set up");
+            action.Should().Throw<InvalidMethodCallException>().WithMessage("Legal entity has already been added");
         }
 
         [Test]
         public void Then_the_legalEntity_is_added_if_it_is_different_to_a_previously_added_one()
         {
             // Arrange
-            var firstLegalEntity = LegalEntity.Create(_fixture.Create<LegalEntityModel>());            
-            _sut.AddLegalEntity(firstLegalEntity.AccountLegalEntityId, firstLegalEntity);
+            var firstAccountLegalEntityId = _fixture.Create<long>();
+            var firstLegalEntity = LegalEntity.Create(_fixture.Build<LegalEntityModel>().With(f => f.AccountLegalEntityId, firstAccountLegalEntityId).Create());
+            
+            _sut.AddLegalEntity(firstAccountLegalEntityId, firstLegalEntity);
 
-            var secondLegalEntity = LegalEntity.Create(_fixture.Build<LegalEntityModel>().With(f => f.Id, firstLegalEntity.Id + 1).With(f => f.AccountLegalEntityId, firstLegalEntity.AccountLegalEntityId + 1).Create());
+            var secondAccountLegalEntityId = firstAccountLegalEntityId + 1;
+            var secondLegalEntity = LegalEntity.Create(_fixture.Build<LegalEntityModel>().With(f => f.Id, firstLegalEntity.Id + 1).With(f => f.AccountLegalEntityId, secondAccountLegalEntityId).Create());
             
             // Act
-            _sut.AddLegalEntity(secondLegalEntity.AccountLegalEntityId, secondLegalEntity);
+            _sut.AddLegalEntity(secondAccountLegalEntityId, secondLegalEntity);
 
             // Assert
             _sut.LegalEntities.Should().Contain(new [] { firstLegalEntity , secondLegalEntity});

@@ -7,7 +7,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Entities
     public class LegalEntity : Entity<long, ILegalEntityModel>
     {
         public string Name => Model.Name;
-        public long AccountLegalEntityId=> Model.AccountLegalEntityId;
 
         public static LegalEntity New(long id, string name)
         {            

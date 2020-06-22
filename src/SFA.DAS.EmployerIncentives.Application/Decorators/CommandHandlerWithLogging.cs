@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Application.Commands;
 
-namespace SFA.DAS.EmployerIncentives.Application.Commands
+namespace SFA.DAS.EmployerIncentives.Application.Decorators
 {
     public class CommandHandlerWithLogging<T> : ICommandHandler<T> where T : ICommand
     {

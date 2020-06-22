@@ -4,14 +4,17 @@ using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Application.Commands;
 using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Application.Decorators;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Entities;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.IO;
 
@@ -53,15 +56,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
 
             builder.Services.AddOptions();
             builder.Services.Configure<FunctionSettings>(config.GetSection("FunctionSettings"));
+            builder.Services.Configure<RetryPolicies>(config.GetSection("RetryPolicies"));
 
-            builder.Services.AddTransient<ICommandHandler<AddLegalEntityCommand>, AddLegalEntityCommandHandler>();
+            builder.Services.AddSingleton<IDistributedLockProvider, AzureDistributedLockProvider>(s => 
+                new AzureDistributedLockProvider(
+                    s.GetRequiredService<IOptions<FunctionSettings>>(), 
+                    s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
+                    "employer-incentives-distributed-locks"));
+            builder.Services.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
+            builder.Services.AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
+
+            builder.Services.AddTransient<ICommandHandler<AddLegalEntityCommand>, AddLegalEntityCommandHandler>();         
+            builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithDistributedLock<AddLegalEntityCommand>>();
+            builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithRetry<AddLegalEntityCommand>>();
+            builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithValidator<AddLegalEntityCommand>>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithLogging<AddLegalEntityCommand>>();
 
-            builder.Services.AddTransient<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
             builder.Services.AddTransient<IDomainRepository<long, Account>, AccountDomainRepository>();
 
-            builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();
-            
+            builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();            
         }
     }
 }

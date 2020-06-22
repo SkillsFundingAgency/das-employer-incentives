@@ -17,16 +17,21 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             }
         }
 
-        public static DatabaseProperties CreateTestDatabase()
+        public static DatabaseProperties CreateTestDatabase(DirectoryInfo testDirectory = null)
         {
+            if(testDirectory == null)
+            {
+                testDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+            }
+
             FileInfo dbFile;
             string connectionString;
             string dbName;
 
             dbName = Guid.NewGuid().ToString();
-            dbFile = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), $"{dbName}.mdf"));
+            dbFile = new FileInfo(Path.Combine(testDirectory.FullName, $"{dbName}.mdf"));
             File.Copy(Path.Combine(Directory.GetCurrentDirectory(), "SFA.DAS.EmployerIncentives.mdf"), dbFile.ToString());
-            connectionString = $"AttachDbFilename={Path.Combine(Directory.GetCurrentDirectory(), $"{dbName}.mdf")};Trusted_Connection=Yes;";
+            connectionString = $"AttachDbFilename={Path.Combine(testDirectory.FullName, $"{dbName}.mdf")};Trusted_Connection=Yes;";
 
             using (var dbConnection = new SqlConnection(connectionString))
             {

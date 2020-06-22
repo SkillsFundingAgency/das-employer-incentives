@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 {
-    class Program
+    public class Program
     {
         protected Program() { }
 

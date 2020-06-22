@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+     <PackageReference Include="AutoFixture" Version="4.11.0" />
+     <PackageReference Include="Dapper" Version="2.0.35" />
      <PackageReference Include="Moq" Version="4.14.2" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
@@ -18,7 +20,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.LegalEntities\SFA.DAS.EmployerIncentives.Functions.LegalEntities.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.TestConsole\SFA.DAS.EmployerIncentives.Functions.TestConsole.csproj" />
   </ItemGroup>
 
 
