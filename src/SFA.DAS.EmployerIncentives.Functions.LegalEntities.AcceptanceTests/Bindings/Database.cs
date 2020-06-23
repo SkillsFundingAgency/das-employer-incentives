@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
         [BeforeScenario()]
         public void InitialiseDatabase()
         {
-            _context.DatabaseProperties = SqlHelper.CreateTestDatabase(_context.TestDirectory);
+            _context.SqlDatabase = new SqlDatabase();
         }
     }
 }

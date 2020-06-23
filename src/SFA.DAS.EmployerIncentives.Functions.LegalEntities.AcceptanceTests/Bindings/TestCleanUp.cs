@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
             {
                 await _context.TestMessageBus.Stop();
             }
-            SqlHelper.DeleteTestDatabase(_context.DatabaseProperties);
+            _context.SqlDatabase.Dispose();
             Directory.Delete(_context.TestDirectory.FullName, true);
             _context.FunctionsHost.Dispose();
         }

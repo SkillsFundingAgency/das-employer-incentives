@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [Given(@"I have a legal entity that is not in the database")]
         public async Task GivenIHaveALegalEntityThatIsNotInTheDatabase()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccount.Id,  _testAccount.AccountLegalEntityId});
@@ -48,22 +48,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [Given(@"I have a legal entity that is already in the database")]
         public async Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_testAccount);
             }
         }
 
-        [Given(@"I have an invalid legal entity that is new")]
-        public void GivenIHaveAnInvalidLegalEntityThatIsNew()
-        {
-            _testAccount.LegalEntityName = "";
-        }
-
         [Given(@"I have a legal entity that is invalid")]
         public void GivenIHaveALegalEntityThatIsInvalid()
         {
-            Assert.Inconclusive("Not yet implemented");
+            _testAccount.LegalEntityName = "";
         }
 
         [When(@"added legal entity event is triggered")]
@@ -104,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [Then(@"the legal entity should be available")]
         public async Task ThenTheLegalEntityShouldBeAvailable()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccount.Id, _testAccount.AccountLegalEntityId});
@@ -117,7 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [Then(@"the legal entity should not be available")]
         public async Task ThenTheLegalEntityShouldNotBeAvailable()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccount.Id, _testAccount.AccountLegalEntityId });

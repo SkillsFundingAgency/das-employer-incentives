@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
               {
                   s.Configure<FunctionSettings>(a =>
                   {
-                      a.DbConnectionString = _context.DatabaseProperties.ConnectionString;
+                      a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
                       a.DistributedLockStorage = "UseDevelopmentStorage=true";
                   });
                   s.Configure<RetryPolicies>(a =>

@@ -185,7 +185,7 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 18
- testRunner.Given("I have an invalid legal entity that is new", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("I have a legal entity that is invalid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 19
  testRunner.When("added legal entity event is triggered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

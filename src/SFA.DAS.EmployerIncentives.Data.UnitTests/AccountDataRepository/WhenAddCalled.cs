@@ -10,7 +10,6 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers.SqlHelper;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
 {
@@ -19,18 +18,18 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         private AccountDataRepository _sut;
         private Fixture _fixture;
         private Mock<IOptions<FunctionSettings>> _mockOptions;
-        private DatabaseProperties _dbProperties;
+        private SqlDatabase _sqlDb;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _dbProperties = SqlHelper.CreateTestDatabase();
+            _sqlDb = new SqlDatabase();
 
             _mockOptions = new Mock<IOptions<FunctionSettings>>();
             _mockOptions
                 .Setup(m => m.Value)
-                .Returns(new FunctionSettings { DbConnectionString = $"{_dbProperties.ConnectionString}" });
+                .Returns(new FunctionSettings { DbConnectionString = $"{_sqlDb.DatabaseInfo.ConnectionString}" });
 
             _sut = new AccountDataRepository(_mockOptions.Object);
         }
@@ -38,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         [TearDown]
         public void CleanUp()
         {
-            SqlHelper.DeleteTestDatabase(_dbProperties);
+            _sqlDb.Dispose();
          }
 
         [Test]
