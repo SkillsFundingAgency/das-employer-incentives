@@ -1,10 +1,7 @@
-﻿namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
-{
-    public interface ILockIdentifier
-    {
-        string LockId { get;}
-    }
+﻿using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
+namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
+{    
     public class AddLegalEntityCommand : ICommand, ILockIdentifier
     {
         public long AccountId { get; private set; }

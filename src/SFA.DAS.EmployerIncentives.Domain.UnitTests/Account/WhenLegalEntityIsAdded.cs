@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
             Action action = () => _sut.AddLegalEntity(acountLegalEntity, LegalEntity.Create(_fixture.Create<LegalEntityModel>()));
 
             //Assert
-            action.Should().Throw<InvalidMethodCallException>().WithMessage("Legal entity has already been added");
+            action.Should().Throw<LegalEntityAlreadyExistsException>().WithMessage("Legal entity has already been added");
         }
 
         [Test]

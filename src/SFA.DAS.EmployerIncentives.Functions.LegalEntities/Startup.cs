@@ -55,12 +55,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             }
 
             builder.Services.AddOptions();
-            builder.Services.Configure<FunctionSettings>(config.GetSection("FunctionSettings"));
+            builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
             builder.Services.Configure<RetryPolicies>(config.GetSection("RetryPolicies"));
 
             builder.Services.AddSingleton<IDistributedLockProvider, AzureDistributedLockProvider>(s => 
                 new AzureDistributedLockProvider(
-                    s.GetRequiredService<IOptions<FunctionSettings>>(), 
+                    s.GetRequiredService<IOptions<ApplicationSettings>>(), 
                     s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
                     "employer-incentives-distributed-locks"));
             builder.Services.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();

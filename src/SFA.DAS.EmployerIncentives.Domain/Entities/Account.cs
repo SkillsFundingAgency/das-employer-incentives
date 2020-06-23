@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Entities
         {   
             if (Model.LegalEntityModels.Any(i => i.AccountLegalEntityId.Equals(accountLegalEntityId)))
             {
-                throw new InvalidMethodCallException("Legal entity has already been added");
+                throw new LegalEntityAlreadyExistsException("Legal entity has already been added");
             }
 
             Model.LegalEntityModels.Add(new LegalEntityModel { Id = legalEntity.Id, Name = legalEntity.Name, AccountLegalEntityId = accountLegalEntityId });

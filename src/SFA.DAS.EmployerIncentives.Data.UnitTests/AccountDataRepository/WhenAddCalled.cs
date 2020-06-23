@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
     {
         private AccountDataRepository _sut;
         private Fixture _fixture;
-        private Mock<IOptions<FunctionSettings>> _mockOptions;
+        private Mock<IOptions<ApplicationSettings>> _mockOptions;
         private SqlDatabase _sqlDb;
 
         [SetUp]
@@ -26,10 +26,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             _fixture = new Fixture();
             _sqlDb = new SqlDatabase();
 
-            _mockOptions = new Mock<IOptions<FunctionSettings>>();
+            _mockOptions = new Mock<IOptions<ApplicationSettings>>();
             _mockOptions
                 .Setup(m => m.Value)
-                .Returns(new FunctionSettings { DbConnectionString = $"{_sqlDb.DatabaseInfo.ConnectionString}" });
+                .Returns(new ApplicationSettings { DbConnectionString = $"{_sqlDb.DatabaseInfo.ConnectionString}" });
 
             _sut = new AccountDataRepository(_mockOptions.Object);
         }

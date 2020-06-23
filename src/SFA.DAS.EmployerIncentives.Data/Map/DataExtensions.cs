@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
 {  
-    public static class AccountExtensions
+    public static class DataExtensions
     {
         public static IEnumerable<Account> Map(this IAccountModel model)
         {

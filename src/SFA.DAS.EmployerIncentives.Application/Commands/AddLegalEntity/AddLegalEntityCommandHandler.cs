@@ -1,7 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Application.Exceptions;
-using SFA.DAS.EmployerIncentives.Application.Persistence;
+﻿using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Entities;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity

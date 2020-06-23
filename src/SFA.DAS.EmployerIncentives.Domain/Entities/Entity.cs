@@ -15,14 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Entities
             Model = model;
             Model.Id = id;
             IsNew = isNew;
-        }
-
-        #region for persisting objects
-        public EntityModel GetModel()
-        {
-            return Model;
-        }
-        #endregion
+        }       
 
         public override bool Equals(object obj)
         {

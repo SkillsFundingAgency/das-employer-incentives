@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Map
 {    
-    public static class LegalEntityExtensions
+    public static class DomainExtensions
     {
         public static IEnumerable<LegalEntity> Map(this IEnumerable<ILegalEntityModel> models)
         {

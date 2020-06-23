@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Data
     public class AccountDataRepository : IAccountDataRepository
     {
         private readonly string _dbConnectionString;
-        public AccountDataRepository(IOptions<FunctionSettings> options)
+        public AccountDataRepository(IOptions<ApplicationSettings> options)
         {
             _dbConnectionString = options?.Value.DbConnectionString;
         }
