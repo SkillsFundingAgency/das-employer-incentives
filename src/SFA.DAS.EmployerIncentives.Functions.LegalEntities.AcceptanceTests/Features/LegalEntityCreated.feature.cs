@@ -39,8 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Fea
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "LegalEntityCreated", "\tWhen a legal entity has been created\r\n\tI want it to be available to Employer Inc" +
-                    "entives", ProgrammingLanguage.CSharp, new string[] {
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "LegalEntityCreated", "\tWhen a legal entity has been added to an account\r\n\tThen is is available in Emplo" +
+                    "yer Incentives", ProgrammingLanguage.CSharp, new string[] {
                         "database",
                         "messageBus"});
             testRunner.OnFeatureStart(featureInfo);
@@ -81,11 +81,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Fea
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("A new legal entity is stored in Employer Inventives")]
-        public virtual void ANewLegalEntityIsStoredInEmployerInventives()
+        [NUnit.Framework.DescriptionAttribute("A legal entity is added to an account")]
+        public virtual void ALegalEntityIsAddedToAnAccount()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A new legal entity is stored in Employer Inventives", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity is added to an account", null, ((string[])(null)));
 #line 7
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -107,24 +107,26 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 8
- testRunner.Given("I have a legal entity that is not stored in Employer Inventives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("the legal entity is not stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 9
  testRunner.When("the legal entity is added to an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 10
- testRunner.Then("the legal entity should be stored in Employer Inventives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the legal entity should be stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("A legal entity is already stored in Employer Inventives")]
-        public virtual void ALegalEntityIsAlreadyStoredInEmployerInventives()
+        [NUnit.Framework.DescriptionAttribute("A legal entity associated to an account and already stored in Employer Incentives" +
+            " is added to an account")]
+        public virtual void ALegalEntityAssociatedToAnAccountAndAlreadyStoredInEmployerIncentivesIsAddedToAnAccount()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity is already stored in Employer Inventives", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity associated to an account and already stored in Employer Incentives" +
+                    " is added to an account", null, ((string[])(null)));
 #line 12
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -146,24 +148,24 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 13
- testRunner.Given("I have a legal entity that is already stored in Employer Inventives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("the legal entity is already stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 14
  testRunner.When("the legal entity is added to an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 15
- testRunner.Then("the legal entity should be stored in Employer Inventives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the legal entity should be stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("An invalid legal entity is not stored in Employer Inventives")]
-        public virtual void AnInvalidLegalEntityIsNotStoredInEmployerInventives()
+        [NUnit.Framework.DescriptionAttribute("A legal entity that is not valid in Employer Incentives is added to an account")]
+        public virtual void ALegalEntityThatIsNotValidInEmployerIncentivesIsAddedToAnAccount()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("An invalid legal entity is not stored in Employer Inventives", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity that is not valid in Employer Incentives is added to an account", null, ((string[])(null)));
 #line 17
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -185,13 +187,13 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 18
- testRunner.Given("I have a legal entity that is not valid in Employer Inventives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("the legal entity is not valid for Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 19
  testRunner.When("the legal entity is added to an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 20
- testRunner.Then("the legal entity should not be stored in Employer Inventives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the legal entity should not be stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             };
         }
 
-        [Given(@"I have a legal entity that is not stored in Employer Inventives")]
+        [Given(@"the legal entity is not stored in Employer Incentives")]
         public async Task GivenIHaveALegalEntityThatIsNotInTheDatabase()
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             }
         }
 
-        [Given(@"I have a legal entity that is already stored in Employer Inventives")]        
+        [Given(@"the legal entity is already stored in Employer Incentives")]
         public async Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             }
         }
 
-        [Given(@"I have a legal entity that is not valid in Employer Inventives")]
+        [Given(@"the legal entity is not valid for Employer Incentives")]
         public void GivenIHaveALegalEntityThatIsInvalid()
         {
             _testAccount.LegalEntityName = "";
@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             await WaitForHandlerCompletion();
         }
 
-        [Then(@"the legal entity should be stored in Employer Inventives")]
+        [Then(@"the legal entity should be stored in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldBeAvailable()
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
@@ -87,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             }
         }                
 
-        [Then(@"the legal entity should not be stored in Employer Inventives")]
+        [Then(@"the legal entity should not be stored in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldNotBeAvailable()
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
@@ -106,7 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         private async Task WaitForHandlerCompletion()
         {
             hasTimedOut = false;
-            using (Timer timer = new Timer(new TimerCallback(HasTimedOut), null, 30000, Timeout.Infinite))
+            using (Timer timer = new Timer(new TimerCallback(HasTimedOut), null, 3000, Timeout.Infinite))
             {
                 while (!hasCompleted && !hasTimedOut)
                 {
