@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -15,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
         }
 
         [AfterScenario()]
-        public async Task CleanUpMessageBus()
+        public async Task CleanUp()
         {
             if (_context.TestMessageBus.IsRunning)
             {
