@@ -6,7 +6,6 @@ using NUnit.Framework;
 using SFA.DAS.EmployerAccounts.Messages.Events;
 using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
-using System;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
