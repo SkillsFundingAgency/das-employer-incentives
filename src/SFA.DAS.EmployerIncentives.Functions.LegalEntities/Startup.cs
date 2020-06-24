@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithValidator<AddLegalEntityCommand>>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithLogging<AddLegalEntityCommand>>();
             
-            builder.Services.AddTransient<AccountDomainRepository>();
+            builder.Services.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
 
             builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();
         }

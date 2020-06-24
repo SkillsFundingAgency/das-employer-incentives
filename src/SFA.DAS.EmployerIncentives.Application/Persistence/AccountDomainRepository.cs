@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.Persistence
 {
-    public class AccountDomainRepository : IDomainRepository<long, Account>
+    public class AccountDomainRepository : IAccountDomainRepository
     {
         private readonly IAccountDataRepository _accountDataRepository;
+
         public AccountDomainRepository(IAccountDataRepository accountDataRepository)
         {
             _accountDataRepository = accountDataRepository;

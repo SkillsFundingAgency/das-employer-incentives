@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
 {
     public class AddLegalEntityCommandHandler : ICommandHandler<AddLegalEntityCommand>
     {
-        private readonly AccountDomainRepository _domainRepository;
+        private readonly IAccountDomainRepository _domainRepository;
 
-        public AddLegalEntityCommandHandler(AccountDomainRepository domainRepository)
+        public AddLegalEntityCommandHandler(IAccountDomainRepository domainRepository)
         {
             _domainRepository = domainRepository;
         }

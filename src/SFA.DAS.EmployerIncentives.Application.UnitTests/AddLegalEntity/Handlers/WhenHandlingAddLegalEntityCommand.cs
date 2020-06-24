@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
     public class WhenHandlingAddLegalEntityCommand
     {
         private AddLegalEntityCommandHandler _sut;
-        private Mock<AccountDomainRepository> _mockDomainRespository;
+        private Mock<IAccountDomainRepository> _mockDomainRespository;
         
         private Fixture _fixture;
 
@@ -22,8 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
         {
             _fixture = new Fixture();
 
-            _mockDomainRespository = new Mock<AccountDomainRepository>();
-
+            _mockDomainRespository = new Mock<IAccountDomainRepository>();
+            
             _sut = new AddLegalEntityCommandHandler(_mockDomainRespository.Object);
         }
 
