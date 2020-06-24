@@ -36,7 +36,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
                 throw new LegalEntityAlreadyExistsException("Legal entity has already been added");
             }
 
-            Model.LegalEntityModels.Add(new LegalEntityModel { Id = legalEntity.Id, Name = legalEntity.Name, AccountLegalEntityId = accountLegalEntityId });
+            var legalEntityModel = legalEntity.GetModel();
+            legalEntityModel.AccountLegalEntityId = accountLegalEntityId;
+            Model.LegalEntityModels.Add(legalEntityModel);
         }
 
         private Account(long id, AccountModel model, bool isNew = false) : base(id, model, isNew)
