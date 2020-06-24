@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
+[assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
 {
     [Binding]
