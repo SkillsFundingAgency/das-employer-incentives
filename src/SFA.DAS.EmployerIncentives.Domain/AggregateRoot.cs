@@ -1,8 +1,7 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Entities;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+﻿using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Domain
-{  
+{
     public abstract class AggregateRoot<IdType, EntityModel> : Entity<IdType, EntityModel>, IAggregateRoot where EntityModel : IEntityModel<IdType>
     {
         protected AggregateRoot(IdType id, EntityModel properties, bool isNew) : base(id, properties, isNew) { }

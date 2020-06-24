@@ -1,12 +1,12 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Data;
+﻿using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Domain.Map;
-using System.Linq;
 using System.Collections.ObjectModel;
+using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Domain.Entities
+namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
     public sealed class Account : AggregateRoot<long, AccountModel>
     {   

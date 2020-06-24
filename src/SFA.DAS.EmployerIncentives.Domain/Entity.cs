@@ -1,7 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Domain.Entities
+namespace SFA.DAS.EmployerIncentives.Domain
 {
     public abstract class Entity<IdType, EntityModel>  where EntityModel : IEntityModel<IdType>
     {

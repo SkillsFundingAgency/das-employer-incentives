@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
-using SFA.DAS.EmployerIncentives.Domain.Data;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Collections.Generic;
 using System.Linq;

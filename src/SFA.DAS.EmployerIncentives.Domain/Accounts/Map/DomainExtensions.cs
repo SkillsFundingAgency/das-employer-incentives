@@ -1,10 +1,9 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
+﻿using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Domain.Map
-{    
+namespace SFA.DAS.EmployerIncentives.Domain.Accounts.Map
+{
     public static class DomainExtensions
     {
         public static IEnumerable<LegalEntity> Map(this IEnumerable<LegalEntityModel> models)

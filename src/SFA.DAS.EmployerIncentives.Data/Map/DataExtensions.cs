@@ -1,11 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.Tables;
-using SFA.DAS.EmployerIncentives.Domain.Data;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
-{  
+{
     public static class DataExtensions
     {
         public static IEnumerable<Account> Map(this AccountModel model)

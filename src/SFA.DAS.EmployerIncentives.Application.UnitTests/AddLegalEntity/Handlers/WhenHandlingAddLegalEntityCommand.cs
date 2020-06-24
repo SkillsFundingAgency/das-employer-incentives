@@ -3,8 +3,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
-using SFA.DAS.EmployerIncentives.Domain.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 

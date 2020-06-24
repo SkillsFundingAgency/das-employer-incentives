@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
-namespace SFA.DAS.EmployerIncentives.Domain.Data
+namespace SFA.DAS.EmployerIncentives.Domain.Accounts.Models
 {
     public class LegalEntityModel : IEntityModel<long>
     {

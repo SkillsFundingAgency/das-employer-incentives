@@ -1,8 +1,8 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using System;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
 {
     public class WhenLegalEntityIsAdded
     {
-        private Domain.Entities.Account _sut;
+        private Account _sut;
         private Fixture _fixture;
 
         [SetUp]
@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
         {
             _fixture = new Fixture();
 
-            _sut = Domain.Entities.Account.New(_fixture.Create<long>());
+            _sut = Account.New(_fixture.Create<long>());
         }
 
         [Test]

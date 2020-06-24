@@ -1,7 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Collections.Generic;
 
-namespace SFA.DAS.EmployerIncentives.Domain.Data
+namespace SFA.DAS.EmployerIncentives.Domain.Accounts.Models
 {
     public class AccountModel : IEntityModel<long>
     {

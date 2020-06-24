@@ -1,7 +1,7 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Data;
+﻿using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Domain.Entities
+namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
     public sealed class LegalEntity : Entity<long, LegalEntityModel>
     {

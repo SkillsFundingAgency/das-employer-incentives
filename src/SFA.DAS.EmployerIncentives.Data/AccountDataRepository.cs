@@ -1,13 +1,13 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Options;
+using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Tables;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.Map;
-using SFA.DAS.EmployerIncentives.Domain.Data;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {

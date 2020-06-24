@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Data;
+﻿using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data

@@ -11,7 +11,6 @@ using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Application.Decorators;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
