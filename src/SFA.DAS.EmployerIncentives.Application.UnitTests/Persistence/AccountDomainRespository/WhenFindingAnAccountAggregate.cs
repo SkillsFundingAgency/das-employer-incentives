@@ -4,8 +4,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Domain.Data;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
             var testLegalEntity = _fixture.Create<LegalEntityModel>();
             var testAccount = _fixture
                 .Build<AccountModel>()
-                .With(f => f.LegalEntityModels, new Collection<ILegalEntityModel> { testLegalEntity })
+                .With(f => f.LegalEntityModels, new Collection<LegalEntityModel> { testLegalEntity })
                 .Create();
 
               _mockAccountDataRepository

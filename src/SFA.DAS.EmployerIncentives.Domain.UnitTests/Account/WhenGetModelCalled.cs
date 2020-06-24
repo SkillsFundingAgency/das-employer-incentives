@@ -1,9 +1,8 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.ObjectModel;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
@@ -24,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
             // Arrange            
             var initialisedModel = _fixture
                 .Build<AccountModel>()
-                .With(f => f.LegalEntityModels, new Collection<ILegalEntityModel> { _fixture.Create<LegalEntityModel>(), _fixture.Create<LegalEntityModel>()})
+                .With(f => f.LegalEntityModels, new Collection<LegalEntityModel> { _fixture.Create<LegalEntityModel>(), _fixture.Create<LegalEntityModel>()})
                 .Create();
 
             var sut = Account.Create(initialisedModel);

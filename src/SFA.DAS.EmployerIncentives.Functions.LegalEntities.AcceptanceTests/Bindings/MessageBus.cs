@@ -20,8 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
         public Task InitialiseMessageBus()
         {
             _context.TestMessageBus = new TestMessageBus();
-            return _context.TestMessageBus.Start(new DirectoryInfo(Path.Combine(_context.TestDirectory.FullName, ".learningtransport")));
-            
+            return _context.TestMessageBus.Start(new DirectoryInfo(Path.Combine(_context.TestDirectory.FullName, ".learningtransport")));            
         }
     }
 }

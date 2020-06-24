@@ -3,7 +3,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence

@@ -6,41 +6,40 @@ using Microsoft.SqlServer.Dac;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
-    public static class SqlHelper
+    public class SqlDatabase : IDisposable
     {
-        static readonly string DatabasePackageLocation = Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Database\bin\Debug\SFA.DAS.EmployerIncentives.Database.dacpac");
+        private bool isDisposed;
 
-        public class DatabaseProperties
+        public DatabaseInfo DatabaseInfo { get; private set; }
+
+        public SqlDatabase()
         {
-            public string ConnectionString { get; }
-
-            public DatabaseProperties(string connectionString)
-            {
-                ConnectionString = connectionString;
-            }
+            DatabaseInfo = new DatabaseInfo();
+            DatabaseInfo.SetPackageLocation(Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Database\bin\Debug\SFA.DAS.EmployerIncentives.Database.dacpac"));
+            
+            CreateTestDatabase();
         }
-        public static DatabaseProperties CreateTestDatabase(DirectoryInfo testDirectory = null)
+        
+        private void CreateTestDatabase()
         {
-            string dbName = Guid.NewGuid().ToString();
-            string connectionString = $"Data Source=.;Initial Catalog={dbName};Integrated Security=True;Pooling=False;Connect Timeout=30";
+            DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
+            DatabaseInfo.SetConnectionString($"Data Source=.;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");
 
-            Publish(connectionString, dbName);
+            Publish();
 
-            using (var dbConnection = new SqlConnection(connectionString))
+            using (var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString))
             {
                 dbConnection.Open();
                 dbConnection.Close();
             }
-
-            return new DatabaseProperties(connectionString);
         }
 
-        public static void DeleteTestDatabase(DatabaseProperties databaseProperties)
+        private void DeleteTestDatabase()
         {
             try
             {
                 var files = new List<string>();
-                using (var dbConn = new SqlConnection(databaseProperties.ConnectionString))
+                using (var dbConn = new SqlConnection(DatabaseInfo.ConnectionString))
                 {
                     using (var cmd = new SqlCommand($"SELECT DB_NAME()", dbConn))
                     {
@@ -77,11 +76,29 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             catch { }
 #pragma warning restore S108 // Nested blocks of code should not be left empty
         }
-        private static void Publish(string connectionString, string dbName)
+        private void Publish()
         {
-            var dbPackage = DacPackage.Load(DatabasePackageLocation);
-            var services = new DacServices(connectionString);
-            services.Deploy(dbPackage, dbName);
+            var dbPackage = DacPackage.Load(DatabaseInfo.PackageLocation);
+            var services = new DacServices(DatabaseInfo.ConnectionString);
+            services.Deploy(dbPackage, DatabaseInfo.DatabaseName);
+        }
+        
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (isDisposed) return;
+
+            if (disposing)
+            {
+                DeleteTestDatabase();
+            }
+
+            isDisposed = true;
         }
     }
 }

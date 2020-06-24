@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
     {
         public DirectoryInfo TestDirectory { get; set; }
 
-        public SqlHelper.DatabaseProperties DatabaseProperties { get; set; }
+        public SqlDatabase SqlDatabase { get; set; }
 
         public TestMessageBus TestMessageBus { get; set; }
 

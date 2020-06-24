@@ -11,7 +11,6 @@ using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Application.Decorators;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -55,12 +54,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             }
 
             builder.Services.AddOptions();
-            builder.Services.Configure<FunctionSettings>(config.GetSection("FunctionSettings"));
+            builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
             builder.Services.Configure<RetryPolicies>(config.GetSection("RetryPolicies"));
 
             builder.Services.AddSingleton<IDistributedLockProvider, AzureDistributedLockProvider>(s => 
                 new AzureDistributedLockProvider(
-                    s.GetRequiredService<IOptions<FunctionSettings>>(), 
+                    s.GetRequiredService<IOptions<ApplicationSettings>>(), 
                     s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
                     "employer-incentives-distributed-locks"));
             builder.Services.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
@@ -71,10 +70,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithRetry<AddLegalEntityCommand>>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithValidator<AddLegalEntityCommand>>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithLogging<AddLegalEntityCommand>>();
+            
+            builder.Services.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
 
-            builder.Services.AddTransient<IDomainRepository<long, Account>, AccountDomainRepository>();
-
-            builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();            
+            builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();
         }
     }
 }

@@ -3,9 +3,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
-using SFA.DAS.EmployerIncentives.Domain.Data;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -14,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
     public class WhenHandlingAddLegalEntityCommand
     {
         private AddLegalEntityCommandHandler _sut;
-        private Mock<IDomainRepository<long, Account>> _mockDomainRespository;
+        private Mock<IAccountDomainRepository> _mockDomainRespository;
         
         private Fixture _fixture;
 
@@ -23,8 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
         {
             _fixture = new Fixture();
 
-            _mockDomainRespository = new Mock<IDomainRepository<long, Account>>();
-
+            _mockDomainRespository = new Mock<IAccountDomainRepository>();
+            
             _sut = new AddLegalEntityCommandHandler(_mockDomainRespository.Object);
         }
 
@@ -48,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
             var command = _fixture.Create<AddLegalEntityCommand>();
             _mockDomainRespository
                 .Setup(m => m.Find(command.AccountId))
-                .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<ILegalEntityModel>() }));
+                .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<LegalEntityModel>() }));
 
             //Act
             await _sut.Handle(command);

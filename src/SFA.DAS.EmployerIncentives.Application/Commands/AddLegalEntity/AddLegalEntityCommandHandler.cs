@@ -1,16 +1,14 @@
-﻿using SFA.DAS.EmployerIncentives.Application.Exceptions;
-using SFA.DAS.EmployerIncentives.Application.Persistence;
-using SFA.DAS.EmployerIncentives.Domain.Entities;
-using System.Linq;
+﻿using SFA.DAS.EmployerIncentives.Application.Persistence;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
 {
     public class AddLegalEntityCommandHandler : ICommandHandler<AddLegalEntityCommand>
     {
-        private readonly IDomainRepository<long, Account> _domainRepository;
+        private readonly IAccountDomainRepository _domainRepository;
 
-        public AddLegalEntityCommandHandler(IDomainRepository<long, Account> domainRepository)
+        public AddLegalEntityCommandHandler(IAccountDomainRepository domainRepository)
         {
             _domainRepository = domainRepository;
         }

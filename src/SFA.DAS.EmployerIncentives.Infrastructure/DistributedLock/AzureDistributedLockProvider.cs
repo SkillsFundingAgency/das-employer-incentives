@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
         private TimeSpan RenewInterval => TimeSpan.FromSeconds(45);
 
         public AzureDistributedLockProvider(
-            IOptions<FunctionSettings> options,
+            IOptions<ApplicationSettings> options,
             ILogger<AzureDistributedLockProvider> log,
             string containerName)
         {

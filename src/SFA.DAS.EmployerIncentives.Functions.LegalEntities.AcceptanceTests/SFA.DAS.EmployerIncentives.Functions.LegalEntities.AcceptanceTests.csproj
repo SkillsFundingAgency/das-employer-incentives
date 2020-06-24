@@ -37,5 +37,4 @@
     <Content Include="Features\LegalEntityCreated.feature" />
   </ItemGroup>     
 
-
 </Project>

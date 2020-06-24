@@ -6,12 +6,12 @@ using NUnit.Framework;
 using SFA.DAS.EmployerAccounts.Messages.Events;
 using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
-using System;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
+[assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
 {
     [Binding]
@@ -33,10 +33,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             };
         }
 
-        [Given(@"I have a legal entity that is not in the database")]
+        [Given(@"the legal entity is not stored in Employer Incentives")]
         public async Task GivenIHaveALegalEntityThatIsNotInTheDatabase()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccount.Id,  _testAccount.AccountLegalEntityId});
@@ -45,28 +45,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             }
         }
 
-        [Given(@"I have a legal entity that is already in the database")]
+        [Given(@"the legal entity is already stored in Employer Incentives")]
         public async Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_testAccount);
             }
         }
 
-        [Given(@"I have an invalid legal entity that is new")]
-        public void GivenIHaveAnInvalidLegalEntityThatIsNew()
+        [Given(@"the legal entity is not valid for Employer Incentives")]
+        public void GivenIHaveALegalEntityThatIsInvalid()
         {
             _testAccount.LegalEntityName = "";
         }
 
-        [Given(@"I have a legal entity that is invalid")]
-        public void GivenIHaveALegalEntityThatIsInvalid()
-        {
-            Assert.Inconclusive("Not yet implemented");
-        }
-
-        [When(@"added legal entity event is triggered")]
+        [When(@"the legal entity is added to an account")]
         public async Task WhenAddedLegalEntityEventIsTriggered()
         {
             var message = new AddedLegalEntityEvent
@@ -80,31 +74,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             await  _testContext.TestMessageBus.Publish(message);
             await WaitForHandlerCompletion();
         }
-                
-        private void HasTimedOut(object state)
-        {
-            hasTimedOut = true;
-        }
-        private async Task WaitForHandlerCompletion()
-        {
-            hasTimedOut = false;
-            using (Timer timer = new Timer(new TimerCallback(HasTimedOut), null, 30000, Timeout.Infinite))
-            {
-                while (!hasCompleted && !hasTimedOut)
-                {
-                    await Task.Delay(100);
-                }
-            }
-            if (hasTimedOut)
-            {
-                Assert.Fail("Test timed out waiting for handler to complete");
-            }
-        }
 
-        [Then(@"the legal entity should be available")]
+        [Then(@"the legal entity should be stored in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldBeAvailable()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccount.Id, _testAccount.AccountLegalEntityId});
@@ -114,15 +88,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             }
         }                
 
-        [Then(@"the legal entity should not be available")]
+        [Then(@"the legal entity should not be stored in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldNotBeAvailable()
         {
-            using (var dbConnection = new SqlConnection(_testContext.DatabaseProperties.ConnectionString))
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccount.Id, _testAccount.AccountLegalEntityId });
 
                 account.Should().HaveCount(0);
+            }
+        }
+
+        private void HasTimedOut(object state)
+        {
+            hasTimedOut = true;
+        }
+        private async Task WaitForHandlerCompletion()
+        {
+            hasTimedOut = false;
+            using (Timer timer = new Timer(new TimerCallback(HasTimedOut), null, 3000, Timeout.Infinite))
+            {
+                while (!hasCompleted && !hasTimedOut)
+                {
+                    await Task.Delay(100);
+                }
+            }
+            if (hasTimedOut)
+            {
+                Assert.Fail("Test timed out waiting for handler to complete");
             }
         }
     }

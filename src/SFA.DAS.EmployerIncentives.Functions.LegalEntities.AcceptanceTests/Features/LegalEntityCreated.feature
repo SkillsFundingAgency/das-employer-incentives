@@ -1,20 +1,20 @@
 ﻿@database
 @messageBus
 Feature: LegalEntityCreated
-	In order know when a legal entity has been created
-	I want to be shown when its available
+	When a legal entity has been added to an account
+	Then is is available in Employer Incentives
 
-Scenario: A new legal entity has been created
-	Given I have a legal entity that is not in the database
-	When added legal entity event is triggered
-	Then the legal entity should be available
+Scenario: A legal entity is added to an account
+	Given the legal entity is not stored in Employer Incentives
+	When the legal entity is added to an account
+	Then the legal entity should be stored in Employer Incentives
 
-Scenario: A new legal entity has already been created
-	Given I have a legal entity that is already in the database
-	When added legal entity event is triggered
-	Then the legal entity should be available
+Scenario: A legal entity associated to an account and already stored in Employer Incentives is added to an account
+	Given the legal entity is already stored in Employer Incentives
+	When the legal entity is added to an account
+	Then the legal entity should be stored in Employer Incentives
 
-Scenario: An invalid legal entity event has been added
-	Given I have an invalid legal entity that is new
-	When added legal entity event is triggered
-	Then the legal entity should not be available
+Scenario: A legal entity that is not valid in Employer Incentives is added to an account
+	Given the legal entity is not valid for Employer Incentives
+	When the legal entity is added to an account
+	Then the legal entity should not be stored in Employer Incentives
