@@ -4,6 +4,14 @@
 <head>
 
     <environment exclude="Development">
+        <!-- Data Layer  -->
+        <script>
+            dataLayer = [{
+                'vpv': '@Context.Request.Path'
+            }];
+        </script>
+        <!-- End Data Layer  -->
+
         <!-- Google Tag Manager -->
         <script>
             (function (w, d, s, l, i) {
