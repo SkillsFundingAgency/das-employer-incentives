@@ -5,7 +5,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Domain.Data;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             var testLegalEntity = _fixture.Create<LegalEntityModel>();
             var testAccount = _fixture
                 .Build<AccountModel>()
-                .With(f => f.LegalEntityModels, new List<ILegalEntityModel> { testLegalEntity })
+                .With(f => f.LegalEntityModels, new List<LegalEntityModel> { testLegalEntity })
                 .Create();
 
             (await _sut.Find(testAccount.Id)).Should().BeNull();

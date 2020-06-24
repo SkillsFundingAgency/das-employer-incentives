@@ -1,11 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Interfaces;
-using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Data
 {
-    public class AccountModel : IAccountModel
+    public class LegalEntityModel : IEntityModel<long>
     {
         public long Id { get; set; }
-        public ICollection<ILegalEntityModel> LegalEntityModels { get; set; }
+        public long AccountLegalEntityId { get; set; }
+        public string Name { get; set; }
     }
 }

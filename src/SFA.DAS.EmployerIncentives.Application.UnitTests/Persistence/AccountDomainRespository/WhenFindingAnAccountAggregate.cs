@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
             var testLegalEntity = _fixture.Create<LegalEntityModel>();
             var testAccount = _fixture
                 .Build<AccountModel>()
-                .With(f => f.LegalEntityModels, new Collection<ILegalEntityModel> { testLegalEntity })
+                .With(f => f.LegalEntityModels, new Collection<LegalEntityModel> { testLegalEntity })
                 .Create();
 
               _mockAccountDataRepository

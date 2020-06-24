@@ -2,12 +2,12 @@
 using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Data.Tables;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data.Map;
+using SFA.DAS.EmployerIncentives.Domain.Data;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             _dbConnectionString = options?.Value.DbConnectionString;
         }
 
-        public async Task Update(IAccountModel account)
+        public async Task Update(AccountModel account)
         {
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
         }
 
-        public async Task Add(IAccountModel account)
+        public async Task Add(AccountModel account)
         {
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
         }
 
-        public async Task<IAccountModel> Find(long accountId)
+        public async Task<AccountModel> Find(long accountId)
         {
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {

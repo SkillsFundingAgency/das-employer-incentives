@@ -5,7 +5,6 @@ using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Data;
 using SFA.DAS.EmployerIncentives.Domain.Entities;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -48,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
             var command = _fixture.Create<AddLegalEntityCommand>();
             _mockDomainRespository
                 .Setup(m => m.Find(command.AccountId))
-                .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<ILegalEntityModel>() }));
+                .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<LegalEntityModel>() }));
 
             //Act
             await _sut.Handle(command);
