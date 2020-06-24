@@ -2,6 +2,29 @@
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
 <head>
+
+    <environment exclude="Development">
+        <!-- Google Tag Manager -->
+        <script>
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    'gtm.start':
+                        new Date().getTime(),
+                    event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l !== 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-MMR39G8');
+        </script>
+        <!-- End Google Tag Manager -->
+    </environment>
+
     <meta charset="utf-8" />
     <title>@(ViewData["Title"] ?? "GOV.UK - The best place to find government services and information")</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,6 +48,14 @@
     <script>
             document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
     </script>
+
+    <environment exclude="Development">
+        <!-- Google Tag Manager (noscript) -->
+        <noscript>
+            <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MMR39G8" height="0" width="0" style="display: none; visibility: hidden"></iframe>
+        </noscript>
+        <!-- End Google Tag Manager (noscript) -->
+    </environment>
 
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
@@ -124,12 +155,12 @@
         </div>
     </footer>
 
-    <script src="libs/govuk-frontend/all.js"></script>
-    <script src="libs/jquery/jquery.min.js"></script>
-    <script src="js/das-all.js"></script>
-    <script src="libs/accessible-autocomplete/accessible-autocomplete.min.js"></script>
-    <script src="js/app.min.js"></script>
-    <script src="/js/site.js" no-cdn></script>
+    <script src="/libs/govuk-frontend/all.js"></script>
+    <script src="/libs/jquery/jquery.min.js"></script>
+    <script src="/js/das-all.js"></script>
+    <script src="/js/app.min.js"></script>
+    <!-- <script src="libs/accessible-autocomplete/accessible-autocomplete.min.js"></script> -->
+    <!-- <script src="js/app.min.js"></script> -->
     <script>
             window.GOVUKFrontend.initAll();
             window.DASFrontend.initAll();
