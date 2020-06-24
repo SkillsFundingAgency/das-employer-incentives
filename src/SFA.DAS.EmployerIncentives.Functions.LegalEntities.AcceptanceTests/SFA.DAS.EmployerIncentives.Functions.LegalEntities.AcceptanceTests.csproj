@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+     <PackageReference Include="AutoFixture" Version="4.11.0" />
+     <PackageReference Include="Dapper" Version="2.0.35" />
+     <PackageReference Include="Moq" Version="4.14.2" />
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="SpecFlow" Version="3.1.97" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.97" />
+    <PackageReference Include="SpecFlow.NUnit" Version="3.1.97" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.LegalEntities\SFA.DAS.EmployerIncentives.Functions.LegalEntities.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.TestConsole\SFA.DAS.EmployerIncentives.Functions.TestConsole.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\LegalEntityCreated.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>LegalEntityCreated.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Features\LegalEntityCreated.feature" />
+  </ItemGroup>     
+
+</Project>
