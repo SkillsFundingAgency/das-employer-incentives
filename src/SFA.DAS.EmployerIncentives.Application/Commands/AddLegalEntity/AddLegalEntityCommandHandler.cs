@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
             var account = await _domainRepository.Find(command.AccountId);
             if (account != null) 
             {
-                if (account.ContainsAccountLegalEntityId(command.AccountLegalEntityId))
+                if (account.GetLegalEntity(command.AccountLegalEntityId) != null)
                 {
                     return; // already created
                 }

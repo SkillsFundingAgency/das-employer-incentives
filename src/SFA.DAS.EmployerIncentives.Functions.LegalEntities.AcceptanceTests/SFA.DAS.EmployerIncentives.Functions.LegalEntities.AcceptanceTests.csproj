@@ -35,6 +35,10 @@
 
   <ItemGroup>
     <Content Include="Features\LegalEntityCreated.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Include="Features\LegalEntityDeleted.feature" />
   </ItemGroup>     
 
 </Project>

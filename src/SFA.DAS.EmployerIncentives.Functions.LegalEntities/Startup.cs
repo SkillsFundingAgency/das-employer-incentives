@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Application.Commands;
 using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Application.Decorators;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
@@ -61,18 +62,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
                 new AzureDistributedLockProvider(
                     s.GetRequiredService<IOptions<ApplicationSettings>>(), 
                     s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
-                    "employer-incentives-distributed-locks"));
-            builder.Services.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
+                    "employer-incentives-distributed-locks"));            
             builder.Services.AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
 
+            builder.Services.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
             builder.Services.AddTransient<ICommandHandler<AddLegalEntityCommand>, AddLegalEntityCommandHandler>();         
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithDistributedLock<AddLegalEntityCommand>>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithRetry<AddLegalEntityCommand>>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithValidator<AddLegalEntityCommand>>();
             builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithLogging<AddLegalEntityCommand>>();
-            
-            builder.Services.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
 
+            builder.Services.AddSingleton<IValidator<RemoveLegalEntityCommand>, RemoveLegalEntityCommandValidator>();
+            builder.Services.AddTransient<ICommandHandler<RemoveLegalEntityCommand>, RemoveLegalEntityCommandHandler>();
+            builder.Services.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithDistributedLock<RemoveLegalEntityCommand>>();
+            builder.Services.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithRetry<RemoveLegalEntityCommand>>();
+            builder.Services.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithValidator<RemoveLegalEntityCommand>>();
+            builder.Services.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithLogging<RemoveLegalEntityCommand>>();
+
+            builder.Services.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
             builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();
         }
     }

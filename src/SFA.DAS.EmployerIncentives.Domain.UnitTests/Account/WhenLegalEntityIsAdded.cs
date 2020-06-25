@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
         }
 
         [Test]
-        public void Then_an_InvalidMethodCallException_is_raised_if_the_same_legalEntity_has_already_been_added()
+        public void Then_an_LegalEntityAlreadyExistsException_is_raised_if_the_same_legalEntity_has_already_been_added()
         {
             // Arrange
             var acountLegalEntity = _fixture.Create<long>();

@@ -6,28 +6,22 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "LegalEntityCreated")]
-    public class LegalEntityCreatedSteps : StepsBase
+    [Scope(Feature = "LegalEntityDeleted")]
+    public class LegalEntityDeletedSteps : StepsBase
     {
         private readonly TestContext _testContext;
         private readonly Account _testAccount;
 
-        public LegalEntityCreatedSteps(TestContext testContext) : base(testContext)
+        public LegalEntityDeletedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _testAccount = _testContext.TestData.GetOrCreate<Account>();
         }
 
-        [Given(@"the legal entity is not valid for Employer Incentives")]
-        public void GivenIHaveALegalEntityThatIsInvalid()
+        [When(@"a legal entity is removed from an account")]
+        public async Task WhenALegalEntityIsRemovedFromAnAccount()
         {
-            _testAccount.LegalEntityName = "";
-        }
-
-        [When(@"the legal entity is added to an account")]
-        public async Task WhenAddedLegalEntityEventIsTriggered()
-        {
-            var message = new AddedLegalEntityEvent
+            var message = new RemovedLegalEntityEvent
             {
                 AccountId = _testAccount.Id,
                 AccountLegalEntityId = _testAccount.AccountLegalEntityId,
@@ -36,6 +30,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             };
 
             await _testContext.WaitForHandler(async () => await _testContext.TestMessageBus.Publish(message));
-        }
+        }     
     }
 }
