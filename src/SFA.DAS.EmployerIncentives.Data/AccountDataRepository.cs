@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -21,38 +22,30 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         public async Task Update(AccountModel account)
         {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
                 await dbConnection.OpenAsync();
-                using (var transaction = dbConnection.BeginTransaction())
+                foreach (var item in account.Map())
                 {
-                    try
-                    {
-                        foreach (var item in account.Map())
-                        {
-                            await dbConnection.ExecuteAsync(
-                                "AddOrUpdateAccount",
-                                new { item.Id, item.AccountLegalEntityId, item.LegalEntityId, item.LegalEntityName },
-                                transaction: transaction,
-                                commandType: CommandType.StoredProcedure);
-                        }
-                        transaction.Commit();
-                        dbConnection.Close();
-                    }
-
-                    catch
-                    {
-                        transaction.Rollback();
-                    }
+                    await dbConnection.ExecuteAsync(
+                        "AddOrUpdateAccount",
+                        new { item.Id, item.AccountLegalEntityId, item.LegalEntityId, item.LegalEntityName },
+                        commandType: CommandType.StoredProcedure);
                 }
+
+                scope.Complete();
             }
         }
 
         public async Task Add(AccountModel account)
         {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
+                await dbConnection.OpenAsync();
                 await dbConnection.InsertAsync(account.Map());
+                scope.Complete();
             }
         }
 
