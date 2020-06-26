@@ -14,6 +14,7 @@ using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Web.Filters;
 using SFA.DAS.EmployerIncentives.Web.Infrastructure.Configuration;
 using SFA.DAS.Authorization.DependencyResolution.Microsoft;
+using SFA.DAS.EmployerIncentives.Spike.Api.Client;
 
 namespace SFA.DAS.EmployerIncentives.Web
 {
@@ -111,6 +112,9 @@ namespace SFA.DAS.EmployerIncentives.Web
 
             services.AddApplicationInsightsTelemetry();
             services.AddAntiforgery(options => options.Cookie = new CookieBuilder() { Name = ".EmployerIncentives.AntiForgery", HttpOnly = false });
+
+            services.AddTransient<ISimpleApiClientFactory, SimpleApiClientFactory>();
+            services.AddTransient(x=> x.GetService<ISimpleApiClientFactory>().CreateClient());
 
             /* if (!_environment.IsDevelopment())
             {

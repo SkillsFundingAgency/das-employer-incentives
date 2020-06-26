@@ -18,4 +18,9 @@
     <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.21" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Spike.Api.Client.Types\SFA.DAS.EmployerIncentives.Spike.Api.Client.Types.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Spike.Api.Client\SFA.DAS.EmployerIncentives.Spike.Api.Client.csproj" />
+  </ItemGroup>
+
 </Project>
