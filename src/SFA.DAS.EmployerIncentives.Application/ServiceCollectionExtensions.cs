@@ -13,7 +13,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 namespace SFA.DAS.EmployerIncentives.Application
 {
     public static class ServiceCollectionExtensions
-    {
+    {       
         public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IDistributedLockProvider, AzureDistributedLockProvider>(s =>
@@ -25,20 +25,25 @@ namespace SFA.DAS.EmployerIncentives.Application
 
             serviceCollection.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
             serviceCollection.AddTransient<ICommandHandler<AddLegalEntityCommand>, AddLegalEntityCommandHandler>();
-            serviceCollection.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithDistributedLock<AddLegalEntityCommand>>();
-            serviceCollection.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithRetry<AddLegalEntityCommand>>();
-            serviceCollection.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithValidator<AddLegalEntityCommand>>();
-            serviceCollection.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithLogging<AddLegalEntityCommand>>();
 
             serviceCollection.AddSingleton<IValidator<RemoveLegalEntityCommand>, RemoveLegalEntityCommandValidator>();
             serviceCollection.AddTransient<ICommandHandler<RemoveLegalEntityCommand>, RemoveLegalEntityCommandHandler>();
-            serviceCollection.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithDistributedLock<RemoveLegalEntityCommand>>();
-            serviceCollection.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithRetry<RemoveLegalEntityCommand>>();
-            serviceCollection.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithValidator<RemoveLegalEntityCommand>>();
-            serviceCollection.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithLogging<RemoveLegalEntityCommand>>();
+
+            serviceCollection.AddCommandHandlerDecorators();
 
             serviceCollection.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
             serviceCollection.AddTransient<IAccountDataRepository, AccountDataRepository>();
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddCommandHandlerDecorators(this IServiceCollection serviceCollection)        
+        {
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 
             return serviceCollection;
         }

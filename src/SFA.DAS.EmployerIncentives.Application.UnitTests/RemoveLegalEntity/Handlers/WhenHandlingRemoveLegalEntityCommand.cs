@@ -87,21 +87,5 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             //Assert
             _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
         }
-
-        //[Test]
-        //public async Task Then_the_account_changes_are_persisted_to_the_domain_repository()
-        //{
-        //    //Arrange
-        //    var command = _fixture.Create<RemoveLegalEntityCommand>();
-        //    _mockDomainRespository
-        //        .Setup(m => m.Find(command.AccountId))
-        //        .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<LegalEntityModel>() { _fixture.Create<LegalEntityModel>() } }));
-
-        //    //Act
-        //    await _sut.Handle(command);
-
-        //    //Assert
-        //    _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
-        //}
     }
 }
