@@ -16,11 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Application
     {       
         public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<IDistributedLockProvider, AzureDistributedLockProvider>(s =>
-               new AzureDistributedLockProvider(
-                   s.GetRequiredService<IOptions<ApplicationSettings>>(),
-                   s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
-                   "employer-incentives-distributed-locks"));
+            serviceCollection.AddDistributedLockProvider();
             serviceCollection.AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
 
             serviceCollection.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
@@ -44,6 +40,17 @@ namespace SFA.DAS.EmployerIncentives.Application
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddDistributedLockProvider(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<IDistributedLockProvider, AzureDistributedLockProvider>(s =>
+               new AzureDistributedLockProvider(
+                   s.GetRequiredService<IOptions<ApplicationSettings>>(),
+                   s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
+                   "employer-incentives-distributed-locks"));
 
             return serviceCollection;
         }
