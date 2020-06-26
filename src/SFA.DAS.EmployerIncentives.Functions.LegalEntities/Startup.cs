@@ -4,18 +4,10 @@ using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Application;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
-using SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity;
-using SFA.DAS.EmployerIncentives.Application.Decorators;
-using SFA.DAS.EmployerIncentives.Application.Persistence;
-using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.IO;
 
@@ -28,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
         {
             builder.Services.AddNLog();
 
-            var serviceProvider = builder.Services.BuildServiceProvider();
+            var serviceProvider = builder.Services.BuildServiceProvider();            
             var configuration = serviceProvider.GetService<IConfiguration>();
 
             var config = new ConfigurationBuilder()
