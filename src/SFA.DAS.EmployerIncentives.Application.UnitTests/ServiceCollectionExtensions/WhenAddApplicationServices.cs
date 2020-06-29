@@ -37,21 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.ServiceCollectionExte
             var host = _hostBuilder.ConfigureServices(c => c.AddApplicationServices()).Build();
 
             //Assert
-            var loggingHandler = host.Services.GetService<ICommandHandler<AddLegalEntityCommand>>();
-            loggingHandler.Should().NotBeNull();
-            loggingHandler.Should().BeOfType(typeof(CommandHandlerWithLogging<AddLegalEntityCommand>));
-
-            var validatorHandler = GetChildHandler<CommandHandlerWithValidator<AddLegalEntityCommand>, AddLegalEntityCommand>(loggingHandler);
-            validatorHandler.Should().NotBeNull();
-            
-            var retryHandler = GetChildHandler<CommandHandlerWithRetry<AddLegalEntityCommand>, AddLegalEntityCommand>(validatorHandler);
-            retryHandler.Should().NotBeNull();
-
-            var lockHandler = GetChildHandler<CommandHandlerWithDistributedLock<AddLegalEntityCommand>, AddLegalEntityCommand>(retryHandler);
-            lockHandler.Should().NotBeNull();
-
-            var handler = GetChildHandler<AddLegalEntityCommandHandler, AddLegalEntityCommand>(lockHandler);
-            handler.Should().NotBeNull();
+            HandlerShouldBeSetUp<RemoveLegalEntityCommand, RemoveLegalEntityCommandHandler>(host);
         }
 
         [Test]
@@ -61,23 +47,29 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.ServiceCollectionExte
             var host = _hostBuilder.ConfigureServices(c => c.AddApplicationServices()).Build();
 
             //Assert
-            var loggingHandler = host.Services.GetService<ICommandHandler<RemoveLegalEntityCommand>>();
-            loggingHandler.Should().NotBeNull();
-            loggingHandler.Should().BeOfType(typeof(CommandHandlerWithLogging<RemoveLegalEntityCommand>));
-
-            var validatorHandler = GetChildHandler<CommandHandlerWithValidator<RemoveLegalEntityCommand>, RemoveLegalEntityCommand>(loggingHandler);
-            validatorHandler.Should().NotBeNull();
-
-            var retryHandler = GetChildHandler<CommandHandlerWithRetry<RemoveLegalEntityCommand>, RemoveLegalEntityCommand>(validatorHandler);
-            retryHandler.Should().NotBeNull();
-
-            var lockHandler = GetChildHandler<CommandHandlerWithDistributedLock<RemoveLegalEntityCommand>, RemoveLegalEntityCommand>(retryHandler);
-            lockHandler.Should().NotBeNull();
-
-            var handler = GetChildHandler<RemoveLegalEntityCommandHandler, RemoveLegalEntityCommand>(lockHandler);
-            handler.Should().NotBeNull();
+            HandlerShouldBeSetUp<AddLegalEntityCommand, AddLegalEntityCommandHandler>(host);
         }
 
+        private void HandlerShouldBeSetUp<TCommand, IHandler>(IHost host) where TCommand : ICommand where IHandler : ICommandHandler<TCommand>
+        {
+            var outerHandler = host.Services.GetService<ICommandHandler<TCommand>>();
+
+            outerHandler.Should().NotBeNull();
+            outerHandler.Should().BeOfType(typeof(CommandHandlerWithLogging<TCommand>));
+
+            var validatorHandler = GetChildHandler<CommandHandlerWithValidator<TCommand>, TCommand>(outerHandler);
+            validatorHandler.Should().NotBeNull();
+
+            var retryHandler = GetChildHandler<CommandHandlerWithRetry<TCommand>, TCommand>(validatorHandler);
+            retryHandler.Should().NotBeNull();
+
+            var lockHandler = GetChildHandler<CommandHandlerWithDistributedLock<TCommand>, TCommand>(retryHandler);
+            lockHandler.Should().NotBeNull();
+
+            var handler = GetChildHandler<IHandler, TCommand>(lockHandler);
+            handler.Should().NotBeNull();
+        }
+        
         private static T GetChildHandler<T, T2>(ICommandHandler<T2> parent) where T2 : ICommand
         {
             var flags = BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.NonPublic;
