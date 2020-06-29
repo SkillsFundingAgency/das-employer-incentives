@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
-using SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Application.Decorators;
 using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
@@ -19,13 +17,19 @@ namespace SFA.DAS.EmployerIncentives.Application
             serviceCollection.AddDistributedLockProvider();
             serviceCollection.AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
 
-            serviceCollection.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
-            serviceCollection.AddTransient<ICommandHandler<AddLegalEntityCommand>, AddLegalEntityCommandHandler>();
+            // set up the command handlers and command validators
+            serviceCollection.Scan(scan =>
+            {
+                scan.FromAssembliesOf(typeof(ICommandHandler<>))
+                    .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
+                    .AsImplementedInterfaces()
+                    .WithTransientLifetime()
 
-            serviceCollection.AddSingleton<IValidator<RemoveLegalEntityCommand>, RemoveLegalEntityCommandValidator>();
-            serviceCollection.AddTransient<ICommandHandler<RemoveLegalEntityCommand>, RemoveLegalEntityCommandHandler>();
-
-            serviceCollection.AddCommandHandlerDecorators();
+                    .AddClasses(classes => classes.AssignableTo(typeof(IValidator<>)))
+                    .AsImplementedInterfaces()
+                    .WithSingletonLifetime();
+            })
+            .AddCommandHandlerDecorators();
 
             serviceCollection.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
             serviceCollection.AddTransient<IAccountDataRepository, AccountDataRepository>();
