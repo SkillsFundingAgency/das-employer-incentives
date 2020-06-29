@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
 {    
-    public class AddLegalEntityCommand : ICommand, ILockIdentifier
+    public class AddLegalEntityCommand : ILockIdentifier, ICommand
     {
         public long AccountId { get; private set; }
         public long LegalEntityId { get; private set; }
