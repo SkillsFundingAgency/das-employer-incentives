@@ -1,5 +1,6 @@
-﻿using AutoFixture;
+﻿using NUnit.Framework;
 
+[assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
 {
     public class StepsBase
@@ -9,7 +10,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         public StepsBase(TestContext testContext)
         {
             _testContext = testContext;
-            _testContext.Fixture = _testContext.Fixture ?? new Fixture();
         }        
     }
 }

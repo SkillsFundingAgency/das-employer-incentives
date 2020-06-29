@@ -29,5 +29,13 @@ BEGIN
 			@LegalEntityName
 		)
 	END
+	ELSE
+	BEGIN
+		UPDATE Accounts
+		SET	LegalEntityId	= @LegalEntityId,
+			LegalEntityName = @LegalEntityName
+		WHERE Id = @Id 
+		AND AccountLegalEntityId = @AccountLegalEntityId		
+	END
 END
 GO

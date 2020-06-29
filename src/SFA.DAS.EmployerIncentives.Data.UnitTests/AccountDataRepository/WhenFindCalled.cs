@@ -1,13 +1,14 @@
 ﻿using AutoFixture;
+using Dapper;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,6 +32,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
                 .Setup(m => m.Value)
                 .Returns(new ApplicationSettings { DbConnectionString = $"{_sqlDb.DatabaseInfo.ConnectionString}" });
 
+            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
+            {
+                dbConnection.ExecuteAsync("TRUNCATE TABLE Accounts");
+            }
+
             _sut = new AccountDataRepository(_mockOptions.Object);
         }
 
@@ -45,10 +51,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         {
             // Arrange
             var testAccount = _fixture.Create<Account>();
-            var accounts = new List<Account> { testAccount };
-            await _sut.Add((new List<Account> { _fixture.Create<Account>() }).MapSingle());
-            await _sut.Add(accounts.MapSingle());
-            await _sut.Add((new List<Account> { _fixture.Create<Account>() }).MapSingle());
+            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
+            {
+                await dbConnection.InsertAsync(testAccount);
+            }
 
             // Act
             var account = await _sut.Find(testAccount.Id);
