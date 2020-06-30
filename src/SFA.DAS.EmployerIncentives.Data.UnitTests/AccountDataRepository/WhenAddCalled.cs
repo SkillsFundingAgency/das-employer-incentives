@@ -1,12 +1,15 @@
 ﻿using AutoFixture;
+using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,6 +33,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
                 .Setup(m => m.Value)
                 .Returns(new ApplicationSettings { DbConnectionString = $"{_sqlDb.DatabaseInfo.ConnectionString}" });
 
+            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
+            {
+                dbConnection.ExecuteAsync("TRUNCATE TABLE Accounts");
+            }
+
             _sut = new AccountDataRepository(_mockOptions.Object);
         }
 
@@ -49,19 +57,20 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
                 .With(f => f.LegalEntityModels, new List<LegalEntityModel> { testLegalEntity })
                 .Create();
 
-            (await _sut.Find(testAccount.Id)).Should().BeNull();
-
             // Act
             await _sut.Add(testAccount);
-            var account = await _sut.Find(testAccount.Id);
 
             // Assert
-            account.Should().NotBeNull();
-            account.Id.Should().Be(testAccount.Id);
-            var legalEntity = account.LegalEntityModels.Single();
-            legalEntity.Id.Should().Be(testLegalEntity.Id);
-            legalEntity.Name.Should().Be(testLegalEntity.Name);
-            legalEntity.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
+            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
+            {
+                var accounts = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts");
+
+                var storedAccount = accounts.Single();
+                storedAccount.Id.Should().Be(testAccount.Id);
+                storedAccount.LegalEntityId.Should().Be(testLegalEntity.Id);
+                storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
+                storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
+            }
         }
     }
 }

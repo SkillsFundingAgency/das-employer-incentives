@@ -1,25 +1,22 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
-namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
-{    
-    public class AddLegalEntityCommand : ILockIdentifier, ICommand
+namespace SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity
+{
+    public class RemoveLegalEntityCommand : ICommand, ILockIdentifier
     {
         public long AccountId { get; private set; }
         public long LegalEntityId { get; private set; }
-        public string Name { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string LockId { get => $"{nameof(Account)}_{AccountId}"; }
 
-        public AddLegalEntityCommand(
+        public RemoveLegalEntityCommand(
             long accountId,
             long legalEntityId,
-            string name,
             long accountLegalEntityId)
         {
             AccountId = accountId;
             LegalEntityId = legalEntityId;
-            Name = name;
             AccountLegalEntityId = accountLegalEntityId;
         }
     }
