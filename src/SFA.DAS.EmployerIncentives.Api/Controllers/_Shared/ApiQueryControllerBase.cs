@@ -9,17 +9,19 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [Produces("application/json")]
     public abstract class ApiQueryControllerBase
     {
-        private readonly IQueryProvider _queryProvider;
+        private readonly IQueryDispatcher _queryDispatcher;
 
-        protected ApiQueryControllerBase(IQueryProvider queryProvider)
+        protected ApiQueryControllerBase(IQueryDispatcher queryDispatcher)
         {
-            _queryProvider = queryProvider;
+            _queryDispatcher = queryDispatcher;
         }
 
   
-        protected async Task<TResponse> QueryAsync<TResponse, TQuery>(TQuery query) where TQuery : IQuery
+        protected async Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TQuery : IQuery<TResult>
         {
-            return await _queryProvider.Execute<TResponse, TQuery>(query);
+            var response = await _queryDispatcher.SendAsync<TQuery, TResult>(query);
+
+            return response;
         }
     }
 }

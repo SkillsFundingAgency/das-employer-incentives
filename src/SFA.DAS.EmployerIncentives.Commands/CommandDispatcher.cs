@@ -14,19 +14,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
             _serviceProvider = serviceProvider;
         }
 
-        public Task<TResponse> Send<TResponse, TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken)) where TCommand : ICommand
+        public async Task SendAsync<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
         {
-            var handler = _serviceProvider.GetService<ICommandHandler<TCommand>>();
-
-            return handler.Handle<TResponse>(command);
-        }        
-        
-        
-        public Task Send<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken)) where TCommand : ICommand
-        {
-            var handler = _serviceProvider.GetService<ICommandHandler<TCommand>>();
-
-            return handler.Handle(command);
+            var service = _serviceProvider.GetService<ICommandHandler<T>>();
+            await service.HandleAsync(command);
         }
     }
 }

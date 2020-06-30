@@ -4,7 +4,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
     public class SampleQueryController : ApiQueryControllerBase
     {
-        public SampleQueryController(IQueryProvider queryProvider) : base(queryProvider)
+        public SampleQueryController(IQueryDispatcher queryDispatcher) : base(queryDispatcher)
         {
             // HTTP GET methods only
         }

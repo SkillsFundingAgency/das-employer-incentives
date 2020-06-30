@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.EmployerIncentives.Queries
 {
-    public interface IQuery
+    public interface IQuery<TResult>
     {
     }
 }
