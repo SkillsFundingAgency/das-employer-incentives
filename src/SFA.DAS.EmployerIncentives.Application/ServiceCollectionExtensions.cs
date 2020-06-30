@@ -34,6 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Application
             serviceCollection.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
             serviceCollection.AddTransient<IAccountDataRepository, AccountDataRepository>();
 
+            serviceCollection.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+
             return serviceCollection;
         }
 
