@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         protected async Task SendCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
-            await _commandDispatcher.SendAsync(command);
+            await _commandDispatcher.Send(command);
         }
     }
 }
