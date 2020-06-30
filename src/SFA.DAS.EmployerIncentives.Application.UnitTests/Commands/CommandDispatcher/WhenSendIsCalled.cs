@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Commands;
 using SFA.DAS.EmployerIncentives.Application.Exceptions;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispatcher
@@ -44,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispa
         }
 
         [Test]
-        public async Task Then_the_command_is_handled_by_the_matching_handler()
+        public async Task Then_the_matching_command_handler_is_retrived_from_the_service_provider()
         {
             //Arrange
             var command = _fixture.Create<TestCommand>();
@@ -54,6 +55,30 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispa
 
             //Assert
             _mockServiceProvider.Verify(m => m.GetService(typeof(ICommandHandler<TestCommand>)), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_handled_by_the_matching_handler()
+        {
+            //Arrange
+            var command = _fixture.Create<TestCommand>();
+            bool isHandled = false;
+            var mockHandler = new Mock<ICommandHandler<TestCommand>>();
+
+            _mockServiceProvider.Setup(m => m.GetService(typeof(ICommandHandler<TestCommand>)))
+               .Returns(mockHandler.Object);
+
+            mockHandler.Setup(m => m.Handle(command, It.IsAny<CancellationToken>()))
+                .Callback(() =>
+                {
+                    isHandled = true;
+                });
+
+            //Act
+            await _sut.Send(command);
+
+            //Assert
+            isHandled.Should().BeTrue();
         }
 
         [Test]
