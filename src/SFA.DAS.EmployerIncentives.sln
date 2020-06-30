@@ -35,15 +35,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Api", "SFA.DAS.EmployerIncentives.API\SFA.DAS.EmployerIncentives.Api.csproj", "{C0764355-230B-42B7-B1C3-653B353E887C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.Messages", "SFA.DAS.EmployerIncentives.Messages\SFA.DAS.EmployerIncentives.Messages.csproj", "{6ACE41EA-D09D-45BC-BB65-05278EAAC64F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Messages", "SFA.DAS.EmployerIncentives.Messages\SFA.DAS.EmployerIncentives.Messages.csproj", "{6ACE41EA-D09D-45BC-BB65-05278EAAC64F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Commands", "SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj", "{E0017FB2-E41D-435D-977E-F5FA9DB6A504}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Queries", "SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj", "{8F49309A-D865-400A-B1C1-BB41D0F60FEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.Commands.UnitTests", "tests\SFA.DAS.EmployerIncentives.Commands.UnitTests\SFA.DAS.EmployerIncentives.Commands.UnitTests.csproj", "{601063FE-6ABE-4ED7-8E47-BB3EE1E9B9F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Commands.UnitTests", "tests\SFA.DAS.EmployerIncentives.Commands.UnitTests\SFA.DAS.EmployerIncentives.Commands.UnitTests.csproj", "{601063FE-6ABE-4ED7-8E47-BB3EE1E9B9F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.Queries.UnitTests", "tests\SFA.DAS.EmployerIncentives.Queries.UnitTests\SFA.DAS.EmployerIncentives.Queries.UnitTests.csproj", "{D8BED249-F5E6-4EC0-B98C-2ECCD5B6A429}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Queries.UnitTests", "tests\SFA.DAS.EmployerIncentives.Queries.UnitTests\SFA.DAS.EmployerIncentives.Queries.UnitTests.csproj", "{D8BED249-F5E6-4EC0-B98C-2ECCD5B6A429}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Api.UnitTests", "tests\SFA.DAS.EmployerIncentives.Api.UnitTests\SFA.DAS.EmployerIncentives.Api.UnitTests.csproj", "{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +127,10 @@ Global
 		{D8BED249-F5E6-4EC0-B98C-2ECCD5B6A429}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8BED249-F5E6-4EC0-B98C-2ECCD5B6A429}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8BED249-F5E6-4EC0-B98C-2ECCD5B6A429}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,6 +144,7 @@ Global
 		{09DA20FD-4B12-48C5-B636-55829BAF274C} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 		{601063FE-6ABE-4ED7-8E47-BB3EE1E9B9F4} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 		{D8BED249-F5E6-4EC0-B98C-2ECCD5B6A429} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
+		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3E3FB6-A534-4F3A-AC5E-BD27EF68874D}
