@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api
         {
             services.AddControllers();
             services.AddApplicationInsightsTelemetry();
+            services.AddHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
