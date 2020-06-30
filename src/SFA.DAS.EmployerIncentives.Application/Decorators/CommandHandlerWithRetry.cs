@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Application.Commands;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.Decorators
@@ -16,9 +17,9 @@ namespace SFA.DAS.EmployerIncentives.Application.Decorators
             _policies = policies;
         }
 
-        public Task Handle(T command)
+        public Task Handle(T command, CancellationToken cancellationToken = default)
         {
-            return _policies.LockRetryPolicy.ExecuteAsync(() => _handler.Handle(command));
+            return _policies.LockRetryPolicy.ExecuteAsync((cancellationToken) => _handler.Handle(command, cancellationToken), cancellationToken);
         }
     }
 }

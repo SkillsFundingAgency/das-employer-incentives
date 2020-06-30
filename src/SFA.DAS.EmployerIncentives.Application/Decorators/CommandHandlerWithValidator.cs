@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Application.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Application.Decorators
@@ -16,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Application.Decorators
             _validator = validator;
         }
 
-        public async Task Handle(T command)
+        public async Task Handle(T command, CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.Validate(command);
 
@@ -32,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Application.Decorators
                 throw new Exceptions.InvalidRequestException(validationResult.ValidationDictionary);
             }
  
-            await _handler.Handle(command);
+            await _handler.Handle(command, cancellationToken);
            
         }
     }

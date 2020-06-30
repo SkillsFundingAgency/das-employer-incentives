@@ -6,6 +6,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Application.Commands;
 using SFA.DAS.EmployerIncentives.Application.Decorators;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandlerWithLogging
@@ -65,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             await _sut.Handle(command);
 
             //Assert
-            _mockHandler.Verify(m => m.Handle(command), Times.Once);
+            _mockHandler.Verify(m => m.Handle(command, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -76,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             var exception = new Exception();
 
             _mockHandler
-                .Setup(m => m.Handle(command))
+                .Setup(m => m.Handle(command, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 
             //Act
@@ -95,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             var errorMessage = _fixture.Create<string>();
 
             _mockHandler
-                .Setup(m => m.Handle(command))
+                .Setup(m => m.Handle(command, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception(errorMessage));
 
             //Act

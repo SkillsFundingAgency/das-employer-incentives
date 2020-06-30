@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Application.Commands;
+using System.Threading;
 
 namespace SFA.DAS.EmployerIncentives.Application.Decorators
 {
@@ -18,12 +19,12 @@ namespace SFA.DAS.EmployerIncentives.Application.Decorators
             _log = log;
         }
 
-        public async Task Handle(T command)
+        public async Task Handle(T command, CancellationToken cancellationToken = default)
         {   
             try
             {
                 _log.LogInformation($"Start handle '{typeof(T)}' command");
-                await _handler.Handle(command);
+                await _handler.Handle(command, cancellationToken);
                 _log.LogInformation($"End handle '{typeof(T)}' command");
             }
             catch(Exception ex)

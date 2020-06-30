@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Application.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
@@ -13,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
             _domainRepository = domainRepository;
         }
 
-        public async Task Handle(AddLegalEntityCommand command)
+        public async Task Handle(AddLegalEntityCommand command, CancellationToken cancellationToken = default)
         {
             var account = await _domainRepository.Find(command.AccountId);
             if (account != null) 
