@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests
 
 
         [Test]
-        public void CommandDispatcher_Handles_SampleCommand()
+        public void Then_Can_Handle_SampleCommand()
         {
             var host = _hostBuilder.Build();
 
@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests
             dispatcher.Should().NotBeNull();
             dispatcher.Should().BeOfType(typeof(CommandDispatcher));
 
-            var result = dispatcher.SendAsync(new SampleCommand());
+            var result = dispatcher.Send(new SampleCommand());
 
             result.Should().NotBeNull();
             result.Status.Should().Be(TaskStatus.RanToCompletion);
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests
 
         public class SampleCommandHandler : ICommandHandler<SampleCommand>
         {
-            public Task HandleAsync(SampleCommand command)
+            public Task Handle(SampleCommand command)
             {
                 return Task.CompletedTask;
 

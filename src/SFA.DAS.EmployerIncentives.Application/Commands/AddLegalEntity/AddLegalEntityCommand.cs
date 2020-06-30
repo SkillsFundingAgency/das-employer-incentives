@@ -3,7 +3,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity
 {    
-    public class AddLegalEntityCommand : ILockIdentifier, ICommand
+    public class AddLegalEntityCommand : ICommand, ILockIdentifier
     {
         public long AccountId { get; private set; }
         public long LegalEntityId { get; private set; }

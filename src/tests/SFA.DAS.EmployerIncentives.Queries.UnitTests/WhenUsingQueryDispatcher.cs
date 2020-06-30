@@ -11,10 +11,12 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests
     public class WhenUsingQueryDispatcher
     {
         private IHostBuilder _hostBuilder;
+        private IQueryDispatcher _dispatcher;
 
         [SetUp]
         public void Arrange()
         {
+            // Arrange
             _hostBuilder = new HostBuilder()
                 .ConfigureServices(services =>
                 {
@@ -31,31 +33,30 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests
                     }
 
                 });
+
+            var host = _hostBuilder.Build();
+
+            _dispatcher = host.Services.GetService<IQueryDispatcher>();
         }
 
         [Test]
-        public void QueryDispatcher_CanHandle_SampleQuery()
+        public void Then_Can_Handle_SampleQuery()
         {
-            var host = _hostBuilder.Build();
+            // Act 
+            var result = _dispatcher.Send<SampleQuery, bool>(new SampleQuery());
 
-            var dispatcher = host.Services.GetService<IQueryDispatcher>();
-
-            dispatcher.Should().NotBeNull();
-            dispatcher.Should().BeOfType(typeof(QueryDispatcher));
-
-            var result = dispatcher.SendAsync<SampleQuery, bool>(new SampleQuery());
-
-            result.Should().NotBeNull();
+            // Assert
             result.Result.Should().BeTrue();
         }
     }
+
     public class SampleQuery : IQuery<bool>
     {
     }
 
     public class SampleQueryHandler : IQueryHandler<SampleQuery, bool>
     {
-        public Task<bool> HandleAsync(SampleQuery query)
+        public Task<bool> Handle(SampleQuery query)
         {
             return Task.FromResult(true);
         }
