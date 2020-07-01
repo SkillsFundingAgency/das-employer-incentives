@@ -14,12 +14,18 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
         public SqlDatabase()
         {
+            string environment;
+#if DEBUG
+       environment = "debug";
+#else
+       environment = "release";
+#endif
             DatabaseInfo = new DatabaseInfo();
-            DatabaseInfo.SetPackageLocation(Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Database\bin\Debug\SFA.DAS.EmployerIncentives.Database.dacpac"));
-            
+            DatabaseInfo.SetPackageLocation(Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\{environment}\\SFA.DAS.EmployerIncentives.Database.dacpac"));
+
             CreateTestDatabase();
         }
-        
+
         private void CreateTestDatabase()
         {
             DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
