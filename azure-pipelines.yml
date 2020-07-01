@@ -68,6 +68,12 @@ stages:
     - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
 
     - task: DotNetCoreCLI@2
+      displayName: Build $(SolutionBaseName).Messages
+      inputs:
+        command: 'build'
+        projects: src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+    - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
       inputs:
         command: pack
