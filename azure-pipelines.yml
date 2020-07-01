@@ -43,18 +43,23 @@ steps:
     projects: 'src/**/*.csproj'
     noCache: true
 
+##TO DO: remove exclusion for '!src/**/*.Data.UnitTests.csproj' when MSBuild on Windows agents is updated to a version later than 16.0
 - task: DotNetCoreCLI@2
   displayName: Build UnitTests
   inputs:
     command: 'build'
-    projects: 'src/**/*.UnitTests.csproj'
+    projects: |
+      'src/**/*.UnitTests.csproj'
+      '!src/**/*.Data.UnitTests.csproj'
     arguments: '--configuration $(buildConfiguration) --no-restore'
  
 - task: DotNetCoreCLI@2
   displayName: UnitTest
   inputs:
     command: test
-    projects: 'src/**/*.UnitTests.csproj'
+    projects: |
+      'src/**/*.UnitTests.csproj'
+      '!src/**/*.Data.UnitTests.csproj'
     arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
 - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
