@@ -49,8 +49,8 @@ steps:
   inputs:
     command: 'build'
     projects: |
-      'src/**/*.UnitTests.csproj'
-      '!src/**/*.Data.UnitTests.csproj'
+      src/**/*.UnitTests.csproj
+      !src/**/*.Data.UnitTests.csproj
     arguments: '--configuration $(buildConfiguration) --no-restore'
  
 - task: DotNetCoreCLI@2
@@ -58,8 +58,8 @@ steps:
   inputs:
     command: test
     projects: |
-      'src/**/*.UnitTests.csproj'
-      '!src/**/*.Data.UnitTests.csproj'
+      src/**/*.UnitTests.csproj
+      !src/**/*.Data.UnitTests.csproj
     arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
 - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
