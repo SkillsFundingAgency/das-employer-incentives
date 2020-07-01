@@ -28,9 +28,8 @@ resources:
 pool:
   name: 'DAS - Continuous Integration'
   demands: 
-  - msbuild
-  - visualstudio
-  - Agent.OS -equals Windows_NT
+  - dotnet
+  - Agent.OS -equals Linux
     
 steps:
 - task: UseGitVersion@5
