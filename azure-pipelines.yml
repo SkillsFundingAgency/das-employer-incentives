@@ -4,9 +4,6 @@ trigger:
     include:
       - "*"
   
-workspace:
-  clean: all
-  
 variables:
 - name: SolutionBaseName
   value: 'SFA.DAS.EmployerIncentives'
@@ -35,6 +32,8 @@ stages:
       demands: 
         - dotnet
         - Agent.OS -equals Linux
+    workspace:
+      clean: all
     steps:
     - task: UseGitVersion@5
       inputs:
