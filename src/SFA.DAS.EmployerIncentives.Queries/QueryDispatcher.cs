@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.EmployerIncentives.Queries.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Queries
 {
@@ -13,13 +14,16 @@ namespace SFA.DAS.EmployerIncentives.Queries
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<TResult> Send<TQuery, TResult>(TQuery query) where TQuery : IQuery<TResult>
+        public Task<TResult> Send<TQuery, TResult>(TQuery query) where TQuery : IQuery
         {
-            var service = this._serviceProvider.GetService<IQueryHandler<TQuery, TResult>>();
-            
-            // TODO: add null-check
+            var service = _serviceProvider.GetService<IQueryHandler<TQuery, TResult>>();
 
-            return await service.Handle(query);
+            if (service == null)
+            {
+                throw new QueryDispatcherException($"Unable to dispatch query '{query.GetType().Name}'. No matching handler found.");
+            }
+
+            return service.Handle(query);
         }
     }
 }

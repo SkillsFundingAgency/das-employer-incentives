@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Account;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -18,9 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             var request = new GetLegalEntitiesRequest(accountId);
 
-            var res = await QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
+            var response = await QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
             
-            return res;
+            return response;
         }
     }
 }

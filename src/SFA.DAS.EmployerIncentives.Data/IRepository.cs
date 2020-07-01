@@ -9,8 +9,8 @@
 //{
 //    public interface IRepository<TEntity> : IReadonlyRepository<TEntity> where TEntity : IAggregateRoot, IDisposable
 //    {
-//        Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> predicate);
-//        Task<IEnumerable<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate);
+//        Task<TEntity> Get(Expression<Func<TEntity, bool>> predicate);
+//        Task<IEnumerable<TEntity>> GetList(Expression<Func<TEntity, bool>> predicate);
 //        IQueryable<TEntity> Queryable(Expression<Func<TEntity, bool>> predicate);
 //        void Add(TEntity entity);
 //        void AddRange(IEnumerable<TEntity> entities);

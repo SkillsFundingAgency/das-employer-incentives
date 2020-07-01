@@ -3,7 +3,7 @@
 namespace SFA.DAS.EmployerIncentives.Data.Tables
 {
     [Table("Accounts")]
-    public class Account
+    public class AccountTable
     {
         [ExplicitKey]
         public long Id { get; set; }

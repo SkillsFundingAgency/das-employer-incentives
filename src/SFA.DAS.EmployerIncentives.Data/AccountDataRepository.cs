@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
                 await dbConnection.OpenAsync();
-                var existing = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id", new { account.Id });
+                var existing = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts WHERE Id = @Id", new { account.Id });
 
                 foreach (var item in existing)
                 {
@@ -64,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Data
         {
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
-                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id", new { Id = accountId });
+                var account = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts WHERE Id = @Id", new { Id = accountId });
                 return account?.MapSingle();                
             }
         }
