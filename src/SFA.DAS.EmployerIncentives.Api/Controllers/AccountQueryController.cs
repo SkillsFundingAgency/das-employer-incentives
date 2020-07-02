@@ -14,11 +14,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpGet("/accounts/{accountId}/LegalEntities")]
-        public async Task<GetLegalEntitiesResponse> GetLegalEntities(long accountId)
+        public Task<GetLegalEntitiesResponse> GetLegalEntities(long accountId)
         {
             var request = new GetLegalEntitiesRequest(accountId);
 
-            var response = await QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
+            var response = QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
             
             return response;
         }

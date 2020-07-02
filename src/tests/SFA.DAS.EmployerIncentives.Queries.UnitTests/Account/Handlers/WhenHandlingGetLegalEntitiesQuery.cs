@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
         {
             //Arrange
             var query = _fixture.Create<GetLegalEntitiesRequest>();
-            var data = _fixture.CreateMany<LegalEntityDto>().ToArray();
+            var data = _fixture.CreateMany<LegalEntityDto>().ToList();
             var expected = new GetLegalEntitiesResponse
             {
                 LegalEntities = data

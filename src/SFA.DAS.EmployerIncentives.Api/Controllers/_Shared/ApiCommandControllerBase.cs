@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Commands;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -16,9 +16,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             _commandDispatcher = commandDispatcher;
         }
 
-        protected async Task SendCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
+        protected Task SendCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
-            await _commandDispatcher.Send(command);
+            return _commandDispatcher.Send(command);
         }
     }
 }
