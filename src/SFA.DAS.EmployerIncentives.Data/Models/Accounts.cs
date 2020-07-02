@@ -1,13 +1,8 @@
-﻿using Dapper.Contrib.Extensions;
-
-namespace SFA.DAS.EmployerIncentives.Data.Tables
+﻿namespace SFA.DAS.EmployerIncentives.Data.Models
 {
-    [Table("Accounts")]
-    public class Account
+    public partial class Accounts
     {
-        [ExplicitKey]
         public long Id { get; set; }
-        [ExplicitKey]
         public long AccountLegalEntityId { get; set; }
         public long LegalEntityId { get; set; }
         public string LegalEntityName { get; set; }

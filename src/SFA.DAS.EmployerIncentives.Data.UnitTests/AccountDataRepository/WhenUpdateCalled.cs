@@ -1,4 +1,8 @@
-﻿using AutoFixture;
+﻿using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoFixture;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
@@ -9,16 +13,12 @@ using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
     public class WhenUpdateCalled
     {
-        private AccountDataRepository _sut;
+        private Data.AccountDataRepository _sut;
         private Fixture _fixture;
         private Mock<IOptions<ApplicationSettings>> _mockOptions;
         private SqlDatabase _sqlDb;
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
                 dbConnection.ExecuteAsync("TRUNCATE TABLE Accounts");
             }
 
-            _sut = new AccountDataRepository(_mockOptions.Object);
+            _sut = new Data.AccountDataRepository(_mockOptions.Object);
         }
 
         [TearDown]
@@ -64,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             // Assert
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
-                var accounts = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts");
+                var accounts = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts");
 
                 var storedAccount = accounts.Single();
                 storedAccount.Id.Should().Be(testAccount.Id);
@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         public async Task Then_the_account_is_updated_if_it_already_exists()
         {
             // Arrange
-            var testAccount = _fixture.Create<Account>();
+            var testAccount = _fixture.Create<AccountTable>();
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(testAccount);
@@ -102,7 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             // Assert
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
-                var accounts = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts");
+                var accounts = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts");
 
                 var addedAccount = accounts.Single(l => l.Id == testAccount.Id && l.AccountLegalEntityId == testAccount.AccountLegalEntityId);
                 addedAccount.LegalEntityId.Should().Be(testAccount.LegalEntityId);
@@ -114,8 +114,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         public async Task Then_the_matching_account_row_is_deleted_if_it_already_exists()
         {
             // Arrange
-            var testAccount = _fixture.Create<Account>();
-            var testAccount2 = _fixture.Build<Account>().With(a => a.Id, testAccount.Id).Create();
+            var testAccount = _fixture.Create<AccountTable>();
+            var testAccount2 = _fixture.Build<AccountTable>().With(a => a.Id, testAccount.Id).Create();
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(testAccount);
@@ -140,7 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             // Assert
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
-                var accounts = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts");
+                var accounts = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts");
 
                 accounts.Count().Should().Be(1);
                 var addedAccount = accounts.Single(l => l.Id == testAccount.Id && l.AccountLegalEntityId == testAccount.AccountLegalEntityId);
@@ -153,7 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         public async Task Then_the_account_is_deleted_if_all_legal_entities_are_deleted()
         {
             // Arrange
-            var testAccount = _fixture.Create<Account>();
+            var testAccount = _fixture.Create<AccountTable>();
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(testAccount);
@@ -169,7 +169,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             // Assert
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
-                var accounts = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts");
+                var accounts = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts");
 
                 accounts.Count().Should().Be(0);
             }

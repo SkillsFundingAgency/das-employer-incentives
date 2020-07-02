@@ -10,12 +10,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
     public class LegalEntityDeletedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private readonly Account _testAccount;
+        private readonly AccountTable _testAccountTable;
 
         public LegalEntityDeletedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
-            _testAccount = _testContext.TestData.GetOrCreate<Account>();
+            _testAccountTable = _testContext.TestData.GetOrCreate<AccountTable>();
         }
 
         [When(@"a legal entity is removed from an account")]
@@ -23,10 +23,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         {
             var message = new RemovedLegalEntityEvent
             {
-                AccountId = _testAccount.Id,
-                AccountLegalEntityId = _testAccount.AccountLegalEntityId,
-                LegalEntityId = _testAccount.LegalEntityId,
-                OrganisationName = _testAccount.LegalEntityName
+                AccountId = _testAccountTable.Id,
+                AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
+                LegalEntityId = _testAccountTable.LegalEntityId,
+                OrganisationName = _testAccountTable.LegalEntityName
             };
 
             await _testContext.WaitForHandler(async () => await _testContext.TestMessageBus.Publish(message));
