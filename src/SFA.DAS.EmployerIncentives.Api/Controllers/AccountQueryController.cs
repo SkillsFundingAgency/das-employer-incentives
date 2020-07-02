@@ -18,9 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             var request = new GetLegalEntitiesRequest(accountId);
 
-            var response = QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
-            
-            return response;
+            return QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
         }
     }
 }

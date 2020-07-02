@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
 
         public Task<List<LegalEntityDto>> GetList(Expression<Func<LegalEntityDto, bool>> predicate = null)
         {
-            var data = _context.Set<Accounts>()
+            return _context.Set<Accounts>()
                 .Select(x => new LegalEntityDto
                 {
                     AccountId = x.Id,
@@ -28,8 +28,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
                     LegalEntityId = x.LegalEntityId,
                     LegalEntityName = x.LegalEntityName
                 }).Where(predicate).ToListAsync();
-
-            return data;
         }
     }
 }
