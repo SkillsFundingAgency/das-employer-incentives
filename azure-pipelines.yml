@@ -107,3 +107,30 @@ stages:
       inputs:
         targetPath: $(build.artifactstagingdirectory)/publish
         artifactName: drop
+
+- stage: NugetPublish
+  displayName: 'Publish Nuget Package'
+  pool:
+    name: "DAS - Continuous Deployment"
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - job: 'CleanArtifacts'
+    displayName: Clean artifacts directory
+    workspace:
+      clean: all
+  - deployment: 'NugetPush'
+    dependsOn: 'CleanArtifacts'
+    environment: 'Nuget'
+    strategy:
+      runOnce:
+        deploy:
+          steps:            
+          - download: current
+            artifact: NugetPackages
+          - task: NuGetCommand@2
+            displayName: 'NuGet push'
+            inputs:
+              command: push
+              packagesToPush: '$(Pipeline.Workspace)/NugetPackages/*.nupkg;!$(Pipeline.Workspace)/NugetPackages/*.symbols.nupkg'
+              nuGetFeedType: external
+              publishFeedCredentials: 'SFA NuGet'
