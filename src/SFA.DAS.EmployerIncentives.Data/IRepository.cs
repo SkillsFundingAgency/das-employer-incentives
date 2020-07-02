@@ -7,7 +7,7 @@
 
 //namespace SFA.DAS.EmployerIncentives.Data
 //{
-//    public interface IRepository<TEntity> : IReadonlyRepository<TEntity> where TEntity : IAggregateRoot, IDisposable
+//    public interface IRepository<TEntity> : IQueryRepository<TEntity> where TEntity : IAggregateRoot, IDisposable
 //    {
 //        Task<TEntity> Get(Expression<Func<TEntity, bool>> predicate);
 //        Task<IEnumerable<TEntity>> GetList(Expression<Func<TEntity, bool>> predicate);

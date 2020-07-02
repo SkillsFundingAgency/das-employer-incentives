@@ -1,27 +1,27 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Queries.Account;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
 {
     public class WhenHandlingGetLegalEntitiesQueryInvoked
     {
         private GetLegalEntitiesQueryHandler _sut;
-        private Mock<IReadonlyRepository<Domain.Accounts.Account>> _repositoryMock;
-
+        private Mock<IQueryRepository<LegalEntityDto>> _repositoryMock;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _repositoryMock = new Mock<IReadonlyRepository<Domain.Accounts.Account>>();
+            _repositoryMock = new Mock<IQueryRepository<LegalEntityDto>>();
             _sut = new GetLegalEntitiesQueryHandler(_repositoryMock.Object);
         }
 
@@ -30,13 +30,13 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
         {
             //Arrange
             var query = _fixture.Create<GetLegalEntitiesRequest>();
-            var data = _fixture.CreateMany<Domain.Accounts.Account>().ToArray();
+            var data = _fixture.CreateMany<LegalEntityDto>().ToArray();
             var expected = new GetLegalEntitiesResponse
             {
-                LegalEntities = data.ToLegalEntityDto()
+                LegalEntities = data
             };
 
-            _repositoryMock.Setup(x => x.GetList(x => x.Id == query.AccountId)).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.GetList(dto => dto.AccountId == query.AccountId)).ReturnsAsync(data);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);

@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Api.UnitTests", "tests\SFA.DAS.EmployerIncentives.Api.UnitTests\SFA.DAS.EmployerIncentives.Api.UnitTests.csproj", "{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.Abstractions", "SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj", "{0EEA80CE-3EC5-4AD0-AE2B-4FB564057F01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,10 @@ Global
 		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15F25FEB-60DD-4E81-9F69-0B8E6E6DAA3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EEA80CE-3EC5-4AD0-AE2B-4FB564057F01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EEA80CE-3EC5-4AD0-AE2B-4FB564057F01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EEA80CE-3EC5-4AD0-AE2B-4FB564057F01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EEA80CE-3EC5-4AD0-AE2B-4FB564057F01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
