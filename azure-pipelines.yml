@@ -83,10 +83,10 @@ stages:
         packDirectory: $(build.artifactstagingdirectory)/NugetPackages
 
     - task: DotNetCoreCLI@2
-      displayName: 'Publish - dotnet publish application $(SolutionBaseName)'
+      displayName: 'Publish - dotnet publish application $(SolutionBaseName).API'
       inputs:
         command: 'publish'
-        projects: 'src/$(SolutionBaseName).Web/$(SolutionBaseName).Web.csproj'
+        projects: 'src/$(SolutionBaseName).API/$(SolutionBaseName).API.csproj'
         arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
         publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
     - task: CopyFiles@2
