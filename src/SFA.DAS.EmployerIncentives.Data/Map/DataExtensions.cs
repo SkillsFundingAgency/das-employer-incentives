@@ -8,11 +8,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
 {
     public static class DataExtensions
     {
-        public static IEnumerable<Account> Map(this AccountModel model)
+        public static IEnumerable<AccountTable> Map(this AccountModel model)
         {
-            var accounts = new List<Account>();
+            var accounts = new List<AccountTable>();
             model.LegalEntityModels.ToList().ForEach(i =>
-                                                        accounts.Add(new Account
+                                                        accounts.Add(new AccountTable
                                                         {
                                                             Id = model.Id,
                                                             AccountLegalEntityId = i.AccountLegalEntityId,
@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             return accounts;
         }
 
-         public static AccountModel MapSingle(this IEnumerable<Account> accounts)
+         public static AccountModel MapSingle(this IEnumerable<AccountTable> accounts)
         {   
             if (!accounts.Any() || (accounts.Count(s => s.Id == accounts.First().Id) != accounts.Count()))
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using System;
 using System.Runtime.Serialization;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Exceptions

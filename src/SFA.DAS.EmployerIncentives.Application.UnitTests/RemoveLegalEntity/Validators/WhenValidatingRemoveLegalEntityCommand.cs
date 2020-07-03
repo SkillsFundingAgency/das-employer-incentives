@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Validators
