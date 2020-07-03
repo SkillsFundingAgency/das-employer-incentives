@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Queries.Account
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Queries;
+
+namespace SFA.DAS.EmployerIncentives.Queries.Account
 {
     public class GetLegalEntitiesRequest : IQuery
     {

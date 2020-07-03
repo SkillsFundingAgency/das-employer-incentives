@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Queries
+namespace SFA.DAS.EmployerIncentives.Abstractions.Queries
 {
     public interface IQueryDispatcher
     {
