@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SFA.DAS.EmployerIncentives.Queries;
+using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers

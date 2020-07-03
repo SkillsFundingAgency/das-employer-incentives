@@ -3,14 +3,14 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Decorators;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandlerWithLogging
-{    
+{
     public class WhenHandleIsCalled
     {
         private CommandHandlerWithLogging<TestCommand> _sut;

@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Application.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

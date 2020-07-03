@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Configuration.AzureTableStorage;
-using SFA.DAS.EmployerIncentives.Application;
+using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
             builder.Services.Configure<RetryPolicies>(config.GetSection("RetryPolicies"));
 
-            builder.Services.AddApplicationServices();
+            builder.Services.AddCommandServices();
         }
     }
 }

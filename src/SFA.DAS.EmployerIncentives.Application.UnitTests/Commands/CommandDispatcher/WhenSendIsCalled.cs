@@ -2,8 +2,8 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Exceptions;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispa
 {
     public class WhenSendIsCalled
     {
-        private Application.Commands.CommandDispatcher _sut;
+        private EmployerIncentives.Commands.CommandDispatcher _sut;
         private Mock<IServiceProvider> _mockServiceProvider;
         private Mock<ICommandHandler<TestCommand>> _mockTestCommandHandler;
         private Mock<ICommandHandler<TestCommand2>> _mockTestCommand2Handler;
@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispa
             _mockServiceProvider.Setup(m => m.GetService(typeof(ICommandHandler<TestCommand3>)))
                 .Returns(_mockTestCommand3Handler.Object);
 
-            _sut = new Application.Commands.CommandDispatcher(_mockServiceProvider.Object);
+            _sut = new EmployerIncentives.Commands.CommandDispatcher(_mockServiceProvider.Object);
         }
 
         [Test]

@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions;
+using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using System.Threading;
 using System.Threading.Tasks;

@@ -1,10 +1,10 @@
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using SFA.DAS.EmployerAccounts.Messages.Events;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.NServiceBus.AzureFunction.Attributes;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
 {
