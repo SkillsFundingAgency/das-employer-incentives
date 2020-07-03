@@ -29,7 +29,7 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SFA.DAS.EmployerIncentives.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Data.UnitTests", "SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj", "{09DA20FD-4B12-48C5-B636-55829BAF274C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Api", "SFA.DAS.EmployerIncentives.API\SFA.DAS.EmployerIncentives.Api.csproj", "{C0764355-230B-42B7-B1C3-653B353E887C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Api", "SFA.DAS.EmployerIncentives.Api\SFA.DAS.EmployerIncentives.Api.csproj", "{C0764355-230B-42B7-B1C3-653B353E887C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Messages", "SFA.DAS.EmployerIncentives.Messages\SFA.DAS.EmployerIncentives.Messages.csproj", "{6ACE41EA-D09D-45BC-BB65-05278EAAC64F}"
 EndProject
