@@ -3,17 +3,34 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.EmployerIncentives.Commands;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }
 
-        public IConfiguration Configuration { get; }
+            var config = new ConfigurationBuilder()
+                .AddConfiguration(configuration)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddAzureTableStorage(options =>
+                {
+                    options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
+                    options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                    options.EnvironmentName = configuration["Environment"];
+                    options.PreFixConfigurationKeys = false;
+                });
+
+            Configuration = config.Build();
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -22,6 +39,11 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
             services.AddSwaggerGen();
+
+            services.AddOptions();
+            services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
+            services.Configure<RetryPolicies>(Configuration.GetSection("RetryPolicies"));
+            services.AddCommandServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

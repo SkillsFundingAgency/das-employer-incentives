@@ -13,12 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity
             {
                 result.AddError("AccountId", "Is not set");
             }
-
-            if (item.LegalEntityId == default)
-            {
-                result.AddError("LegalEntityId", "Is not set");
-            }
-
+            
             if (item.AccountLegalEntityId == default)
             {
                 result.AddError("AccountLegalEntityId", "Is not set");

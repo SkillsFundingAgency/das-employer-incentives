@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerAccounts.Messages.Events;
-using SFA.DAS.EmployerIncentives.Data.Tables;
+﻿using SFA.DAS.EmployerIncentives.Data.Tables;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -21,15 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [When(@"a legal entity is removed from an account")]
         public async Task WhenALegalEntityIsRemovedFromAnAccount()
         {
-            var message = new RemovedLegalEntityEvent
-            {
-                AccountId = _testAccountTable.Id,
-                AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
-                LegalEntityId = _testAccountTable.LegalEntityId,
-                OrganisationName = _testAccountTable.LegalEntityName
-            };
-
-            await _testContext.WaitForHandler(async () => await _testContext.TestMessageBus.Publish(message));
+            await _testContext.WaitForHandler(async () => await _testContext.ApiClient.DeleteAsync($"/accounts/{_testAccountTable.Id}/legalEntities/{_testAccountTable.AccountLegalEntityId}"));
         }     
     }
 }
