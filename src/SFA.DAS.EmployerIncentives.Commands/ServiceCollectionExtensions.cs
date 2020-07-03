@@ -29,12 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
-            .AddCommandHandlerDecorators();
+            .AddCommandHandlerDecorators()
+            .AddSingleton<ICommandDispatcher, CommandDispatcher>();
 
             serviceCollection.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
             serviceCollection.AddTransient<IAccountDataRepository, AccountDataRepository>();
-
-            serviceCollection.AddSingleton<ICommandDispatcher, CommandDispatcher>();
 
             return serviceCollection;
         }
