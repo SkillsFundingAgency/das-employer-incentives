@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using System;
@@ -24,9 +25,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             return new Account(model.Id, model);
         }
 
-        public bool ContainsAccountLegalEntityId(long accountLegalEntityId)
+        public LegalEntity GetLegalEntity(long accountLegalEntityId)
         {
-            return Model.LegalEntityModels.Any(l => l.AccountLegalEntityId == accountLegalEntityId);
+            var legalEntityModel = Model.LegalEntityModels.SingleOrDefault(l => l.AccountLegalEntityId == accountLegalEntityId);
+            return legalEntityModel == null ? null : LegalEntity.Create(legalEntityModel);
+        }
+
+        public void RemoveLegalEntity(LegalEntity legalEntity)
+        {
+            var accountLegalEntityId = legalEntity.GetModel().AccountLegalEntityId;
+            var legalEntityModel = Model.LegalEntityModels.SingleOrDefault(l => l.AccountLegalEntityId == accountLegalEntityId);
+            if (legalEntityModel != null)
+            {
+                Model.LegalEntityModels.Remove(legalEntityModel);
+            }
         }
 
         public void AddLegalEntity(long accountLegalEntityId, LegalEntity legalEntity)

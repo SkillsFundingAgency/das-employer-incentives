@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Application.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks

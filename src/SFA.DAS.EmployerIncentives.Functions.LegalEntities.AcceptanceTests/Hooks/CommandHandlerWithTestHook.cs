@@ -1,5 +1,6 @@
-﻿using SFA.DAS.EmployerIncentives.Application.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks
@@ -17,12 +18,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hoo
             _hooks = hooks;
         }
 
-        public async Task Handle(T command)
+        public async Task Handle(T command, CancellationToken cancellationToken = default)
         {
             try
             {
                 _hooks.OnHandlerStart?.Invoke(command);
-                await _handler.Handle(command);
+                await _handler.Handle(command, cancellationToken);
             }
             catch (Exception ex)
             {

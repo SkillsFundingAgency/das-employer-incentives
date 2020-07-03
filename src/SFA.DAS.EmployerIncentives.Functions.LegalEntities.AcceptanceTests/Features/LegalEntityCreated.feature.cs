@@ -107,26 +107,26 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 8
- testRunner.Given("the legal entity is not stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("the legal entity is in not Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 9
  testRunner.When("the legal entity is added to an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 10
- testRunner.Then("the legal entity should be stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the legal entity should be available in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("A legal entity associated to an account and already stored in Employer Incentives" +
-            " is added to an account")]
-        public virtual void ALegalEntityAssociatedToAnAccountAndAlreadyStoredInEmployerIncentivesIsAddedToAnAccount()
+        [NUnit.Framework.DescriptionAttribute("A legal entity associated to an account is already available in Employer Incentiv" +
+            "es")]
+        public virtual void ALegalEntityAssociatedToAnAccountIsAlreadyAvailableInEmployerIncentives()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity associated to an account and already stored in Employer Incentives" +
-                    " is added to an account", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity associated to an account is already available in Employer Incentiv" +
+                    "es", null, ((string[])(null)));
 #line 12
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -148,24 +148,26 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 13
- testRunner.Given("the legal entity is already stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("the legal entity is already available in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 14
  testRunner.When("the legal entity is added to an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 15
- testRunner.Then("the legal entity should be stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the legal entity should still be available in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("A legal entity that is not valid in Employer Incentives is added to an account")]
-        public virtual void ALegalEntityThatIsNotValidInEmployerIncentivesIsAddedToAnAccount()
+        [NUnit.Framework.DescriptionAttribute("A legal entity that is not valid in Employer Incentives is not added to an accoun" +
+            "t")]
+        public virtual void ALegalEntityThatIsNotValidInEmployerIncentivesIsNotAddedToAnAccount()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity that is not valid in Employer Incentives is added to an account", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity that is not valid in Employer Incentives is not added to an accoun" +
+                    "t", null, ((string[])(null)));
 #line 17
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -193,7 +195,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("the legal entity is added to an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 20
- testRunner.Then("the legal entity should not be stored in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the legal entity should not be available in Employer Incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -4,16 +4,10 @@ using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Configuration.AzureTableStorage;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
-using SFA.DAS.EmployerIncentives.Application.Decorators;
-using SFA.DAS.EmployerIncentives.Application.Persistence;
-using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.IO;
 
@@ -26,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
         {
             builder.Services.AddNLog();
 
-            var serviceProvider = builder.Services.BuildServiceProvider();
+            var serviceProvider = builder.Services.BuildServiceProvider();            
             var configuration = serviceProvider.GetService<IConfiguration>();
 
             var config = new ConfigurationBuilder()
@@ -57,23 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
             builder.Services.Configure<RetryPolicies>(config.GetSection("RetryPolicies"));
 
-            builder.Services.AddSingleton<IDistributedLockProvider, AzureDistributedLockProvider>(s => 
-                new AzureDistributedLockProvider(
-                    s.GetRequiredService<IOptions<ApplicationSettings>>(), 
-                    s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
-                    "employer-incentives-distributed-locks"));
-            builder.Services.AddSingleton<IValidator<AddLegalEntityCommand>, AddLegalEntityCommandValidator>();
-            builder.Services.AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
-
-            builder.Services.AddTransient<ICommandHandler<AddLegalEntityCommand>, AddLegalEntityCommandHandler>();         
-            builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithDistributedLock<AddLegalEntityCommand>>();
-            builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithRetry<AddLegalEntityCommand>>();
-            builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithValidator<AddLegalEntityCommand>>();
-            builder.Services.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithLogging<AddLegalEntityCommand>>();
-            
-            builder.Services.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
-
-            builder.Services.AddTransient<IAccountDataRepository, AccountDataRepository>();
+            builder.Services.AddCommandServices();
         }
     }
 }

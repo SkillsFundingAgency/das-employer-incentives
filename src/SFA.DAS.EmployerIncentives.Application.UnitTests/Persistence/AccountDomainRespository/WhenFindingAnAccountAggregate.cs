@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Application.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.ObjectModel;
@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
             //Assert
             account.Should().NotBeNull();
             account.Id.Should().Be(testAccount.Id);
-            account.ContainsAccountLegalEntityId(testLegalEntity.AccountLegalEntityId).Should().BeTrue();
+            account.GetLegalEntity(testLegalEntity.AccountLegalEntityId).Should().NotBeNull();
             var legalEntity = account.LegalEntities.Single();
             legalEntity.Id.Should().Be(testLegalEntity.Id);
             legalEntity.Name.Should().Be(testLegalEntity.Name);

@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts.Models

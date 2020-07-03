@@ -7,7 +7,9 @@ using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -21,38 +23,40 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         public async Task Update(AccountModel account)
         {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
                 await dbConnection.OpenAsync();
-                using (var transaction = dbConnection.BeginTransaction())
-                {
-                    try
-                    {
-                        foreach (var item in account.Map())
-                        {
-                            await dbConnection.ExecuteAsync(
-                                "AddOrUpdateAccount",
-                                new { item.Id, item.AccountLegalEntityId, item.LegalEntityId, item.LegalEntityName },
-                                transaction: transaction,
-                                commandType: CommandType.StoredProcedure);
-                        }
-                        transaction.Commit();
-                        dbConnection.Close();
-                    }
+                var existing = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts WHERE Id = @Id", new { account.Id });
 
-                    catch
+                foreach (var item in existing)
+                {
+                    if(!account.LegalEntityModels.Any(i => i.AccountLegalEntityId == item.AccountLegalEntityId))
                     {
-                        transaction.Rollback();
+                        await dbConnection.DeleteAsync(item);
                     }
                 }
+
+                foreach (var item in account.Map())
+                {
+                    await dbConnection.ExecuteAsync(
+                        "AddOrUpdateAccount",
+                        new { item.Id, item.AccountLegalEntityId, item.LegalEntityId, item.LegalEntityName },
+                        commandType: CommandType.StoredProcedure);
+                }
+
+                scope.Complete();
             }
         }
 
         public async Task Add(AccountModel account)
         {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
+                await dbConnection.OpenAsync();
                 await dbConnection.InsertAsync(account.Map());
+                scope.Complete();
             }
         }
 
@@ -60,8 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Data
         {
             using (var dbConnection = new SqlConnection(_dbConnectionString))
             {
-                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id", new { Id = accountId });
-                return account?.MapSingle();
+                var account = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts WHERE Id = @Id", new { Id = accountId });
+                return account?.MapSingle();                
             }
         }
     }

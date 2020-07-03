@@ -2,9 +2,11 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Decorators;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Decorators;
+using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandlerWithValidator
@@ -60,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             Func<Task> action = async () => await _sut.Handle(command);
 
             //Assert
-            action.Should().Throw<Exceptions.InvalidRequestException>();
+            action.Should().Throw<InvalidRequestException>();
         }
 
         [Test]
@@ -79,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             Func<Task> action = async () => await _sut.Handle(command);
 
             //Assert
-            action.Should().Throw<Exceptions.InvalidRequestException>();
+            action.Should().Throw<InvalidRequestException>();
         }
 
         [Test]
@@ -92,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             await _sut.Handle(command);
 
             //Assert
-            _mockHandler.Verify(m => m.Handle(command), Times.Once);
+            _mockHandler.Verify(m => m.Handle(command, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

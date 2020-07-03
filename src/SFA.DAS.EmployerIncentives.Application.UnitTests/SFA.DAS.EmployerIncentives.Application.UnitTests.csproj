@@ -1,10 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="AddLegalEntity\Services\**" />
+    <EmbeddedResource Remove="AddLegalEntity\Services\**" />
+    <None Remove="AddLegalEntity\Services\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
@@ -19,10 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AddLegalEntity\Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Application\SFA.DAS.EmployerIncentives.Application.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj" />
   </ItemGroup>
 </Project>

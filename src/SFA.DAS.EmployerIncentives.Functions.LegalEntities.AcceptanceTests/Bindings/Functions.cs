@@ -2,8 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -59,7 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
                   s.AddNServiceBus(new LoggerFactory().CreateLogger<Functions>(), Path.Combine(_context.TestDirectory.FullName, ".learningtransport"));
                   s.AddTransient(i => _context.CommandHandlerHooks);
                   s.AddTransient<CommandHandlerWithTestHook<AddLegalEntityCommand>, CommandHandlerWithTestHook<AddLegalEntityCommand>>();
+                  
                   s.Decorate<ICommandHandler<AddLegalEntityCommand>, CommandHandlerWithTestHook<AddLegalEntityCommand>>();
+                  s.Decorate<ICommandHandler<RemoveLegalEntityCommand>, CommandHandlerWithTestHook<RemoveLegalEntityCommand>>();
               });
 
             host.UseEnvironment("LOCAL");
