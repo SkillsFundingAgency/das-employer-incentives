@@ -1,9 +1,8 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
-using System;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests

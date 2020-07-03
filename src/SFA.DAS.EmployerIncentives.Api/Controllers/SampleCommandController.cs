@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {

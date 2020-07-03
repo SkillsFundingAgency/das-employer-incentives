@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using System;

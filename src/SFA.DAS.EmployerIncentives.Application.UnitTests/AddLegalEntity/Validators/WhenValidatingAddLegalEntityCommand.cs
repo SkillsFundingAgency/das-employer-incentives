@@ -1,7 +1,8 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Application.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Validators
