@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Web", "SFA.DAS.EmployerIncentives.Web\SFA.DAS.EmployerIncentives.Web.csproj", "{04C1F00F-155C-465D-AAE1-173C660AF854}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{F5215B69-F4EB-492B-ABEE-C02E45468208}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9517C39E-1329-48E8-91A6-4F2B7543837D}"
@@ -59,10 +57,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{04C1F00F-155C-465D-AAE1-173C660AF854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04C1F00F-155C-465D-AAE1-173C660AF854}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04C1F00F-155C-465D-AAE1-173C660AF854}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04C1F00F-155C-465D-AAE1-173C660AF854}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DCCD5E21-0D35-43C2-A67B-626268C0E7D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DCCD5E21-0D35-43C2-A67B-626268C0E7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCCD5E21-0D35-43C2-A67B-626268C0E7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
