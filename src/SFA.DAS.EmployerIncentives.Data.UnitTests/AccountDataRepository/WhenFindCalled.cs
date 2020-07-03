@@ -1,4 +1,7 @@
-﻿using AutoFixture;
+﻿using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoFixture;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
@@ -8,15 +11,12 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
     public class WhenFindCalled
     {
-        private AccountDataRepository _sut;
+        private Data.AccountDataRepository _sut;
         private Fixture _fixture;
         private Mock<IOptions<ApplicationSettings>> _mockOptions;
         private SqlDatabase _sqlDb;
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
                 dbConnection.ExecuteAsync("TRUNCATE TABLE Accounts");
             }
 
-            _sut = new AccountDataRepository(_mockOptions.Object);
+            _sut = new Data.AccountDataRepository(_mockOptions.Object);
         }
 
         [TearDown]
@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
         public async Task Then_the_expected_account_is_returned_if_it_exists()
         {
             // Arrange
-            var testAccount = _fixture.Create<Account>();
+            var testAccount = _fixture.Create<AccountTable>();
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(testAccount);

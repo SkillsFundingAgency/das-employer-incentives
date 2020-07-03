@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
-using SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;

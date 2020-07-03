@@ -1,4 +1,8 @@
-﻿using AutoFixture;
+﻿using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoFixture;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
@@ -8,16 +12,12 @@ using SFA.DAS.EmployerIncentives.Data.Tables;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
     public class WhenAddCalled
     {
-        private AccountDataRepository _sut;
+        private Data.AccountDataRepository _sut;
         private Fixture _fixture;
         private Mock<IOptions<ApplicationSettings>> _mockOptions;
         private SqlDatabase _sqlDb;
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
                 dbConnection.ExecuteAsync("TRUNCATE TABLE Accounts");
             }
 
-            _sut = new AccountDataRepository(_mockOptions.Object);
+            _sut = new Data.AccountDataRepository(_mockOptions.Object);
         }
 
         [TearDown]
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepositoryTests
             // Assert
             using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
             {
-                var accounts = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts");
+                var accounts = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts");
 
                 var storedAccount = accounts.Single();
                 storedAccount.Id.Should().Be(testAccount.Id);

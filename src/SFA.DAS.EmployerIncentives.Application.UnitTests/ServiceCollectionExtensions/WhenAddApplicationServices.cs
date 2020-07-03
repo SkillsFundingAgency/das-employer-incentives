@@ -2,10 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Application.Commands;
-using SFA.DAS.EmployerIncentives.Application.Commands.AddLegalEntity;
-using SFA.DAS.EmployerIncentives.Application.Commands.RemoveLegalEntity;
-using SFA.DAS.EmployerIncentives.Application.Decorators;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands;
+using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.Decorators;
+using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Linq;
 using System.Reflection;
@@ -34,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.ServiceCollectionExte
         public void Then_the_AddLegalEntityCommand_handler_is_configured()
         {
             //Act
-            var host = _hostBuilder.ConfigureServices(c => c.AddApplicationServices()).Build();
+            var host = _hostBuilder.ConfigureServices(c => c.AddCommandServices()).Build();
 
             //Assert
             HandlerShouldBeSetUp<RemoveLegalEntityCommand, RemoveLegalEntityCommandHandler>(host);
@@ -44,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.ServiceCollectionExte
         public void Then_the_RemoveLegalEntityCommand_handler_is_configured()
         {
             //Act
-            var host = _hostBuilder.ConfigureServices(c => c.AddApplicationServices()).Build();
+            var host = _hostBuilder.ConfigureServices(c => c.AddCommandServices()).Build();
 
             //Assert
             HandlerShouldBeSetUp<AddLegalEntityCommand, AddLegalEntityCommandHandler>(host);
