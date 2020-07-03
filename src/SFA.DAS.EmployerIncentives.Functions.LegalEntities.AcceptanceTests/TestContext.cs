@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
-using SFA.DAS.EmployerIncentives.Functions.TestConsole;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,9 +16,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
 
         public SqlDatabase SqlDatabase { get; set; }
 
-        public TestMessageBus TestMessageBus { get; set; }
+        //public TestMessageBus TestMessageBus { get; set; }
 
         public IHost FunctionsHost { get; set; }
+        public HttpClient ApiClient { get; set; }        
 
         public TestData TestData { get; set; }
 
@@ -34,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
                 Directory.CreateDirectory(TestDirectory.FullName);
             }
             TestData = new TestData();
+            CommandHandlerHooks = new CommandHandlerHooks();
         }
 
         public async Task WaitForHandler(
@@ -54,7 +56,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
                 OnHandlerErrored = (ex, command) => { WaitForResult.SetHasErrored(ex); }
             };
 
-            await func();
+            try
+            {
+                await func();
+            }
+            catch(Exception ex)
+            {
+                WaitForResult.SetHasErrored(ex);
+            }
             await WaitForHandlerCompletion(WaitForResult, timeoutInMs);
 
             if(assertOnTimeout)

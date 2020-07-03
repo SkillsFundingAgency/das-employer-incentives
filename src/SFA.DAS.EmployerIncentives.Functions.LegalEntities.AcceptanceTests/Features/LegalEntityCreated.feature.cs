@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Fea
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("LegalEntityCreated")]
     [NUnit.Framework.CategoryAttribute("database")]
-    [NUnit.Framework.CategoryAttribute("messageBus")]
+    [NUnit.Framework.CategoryAttribute("api")]
     public partial class LegalEntityCreatedFeature
     {
         
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Fea
         
         private string[] _featureTags = new string[] {
                 "database",
-                "messageBus"};
+                "api"};
         
 #line 1 "LegalEntityCreated.feature"
 #line hidden
@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Fea
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "LegalEntityCreated", "\tWhen a legal entity has been added to an account\r\n\tThen is is available in Emplo" +
                     "yer Incentives", ProgrammingLanguage.CSharp, new string[] {
                         "database",
-                        "messageBus"});
+                        "api"});
             testRunner.OnFeatureStart(featureInfo);
         }
         

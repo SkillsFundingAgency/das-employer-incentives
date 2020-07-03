@@ -1,5 +1,8 @@
-﻿using SFA.DAS.EmployerAccounts.Messages.Events;
+﻿using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Tables;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -27,15 +30,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [When(@"the legal entity is added to an account")]
         public async Task WhenAddedLegalEntityEventIsTriggered()
         {
-            var message = new AddedLegalEntityEvent
-            {
-                AccountId = _testAccountTable.Id,
-                AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
-                LegalEntityId = _testAccountTable.LegalEntityId,
+            var body = new AddLegalEntityRequest { 
+                AccountLegalEntityId = _testAccountTable.AccountLegalEntityId, 
+                LegalEntityId = _testAccountTable.LegalEntityId, 
                 OrganisationName = _testAccountTable.LegalEntityName
             };
 
-            await _testContext.WaitForHandler(async () => await _testContext.TestMessageBus.Publish(message));
+            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+
+            await _testContext.WaitForHandler(async () => await _testContext.ApiClient.PostAsync($"/accounts/{_testAccountTable.Id}/legalEntities", content));
         }
     }
 }
