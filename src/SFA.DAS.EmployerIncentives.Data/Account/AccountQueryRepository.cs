@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
 
         public Task<List<LegalEntityDto>> GetList(Expression<Func<LegalEntityDto, bool>> predicate = null)
         {
-            return _context.Set<Accounts>()
+            return _context.Set<Models.Account>()
                 .Select(x => new LegalEntityDto
                 {
                     AccountId = x.Id,

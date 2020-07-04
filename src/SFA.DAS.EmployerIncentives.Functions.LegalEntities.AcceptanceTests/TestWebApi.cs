@@ -42,8 +42,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
                 });
 
                 s.AddTransient(i => _context.CommandHandlerHooks);
-
                 s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTestHook<>));
+
+                s.UseTestDb(_context);
+
             });
             builder.ConfigureAppConfiguration(a =>
             {
