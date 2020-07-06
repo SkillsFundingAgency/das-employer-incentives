@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.csproj.DotSettings" />
+  </ItemGroup>
+
+  <ItemGroup>
      <PackageReference Include="AutoFixture" Version="4.11.0" />
      <PackageReference Include="Dapper" Version="2.0.35" />
      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />

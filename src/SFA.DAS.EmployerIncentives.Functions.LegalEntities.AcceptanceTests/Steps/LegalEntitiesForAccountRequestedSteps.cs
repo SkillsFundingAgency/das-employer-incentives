@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Data.Tables;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Queries.Account;
 using System.Net;
 using System.Threading.Tasks;
@@ -19,13 +19,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [Given(@"an account with legal entities is in employer incentives")]
         public async Task GivenAnAccountWithLegalEntitiesIsInEmployerIncentives()
         {
-            var account = TestContext.TestData.GetOrCreate<AccountTable>();
+            var account = TestContext.TestData.GetOrCreate<Account>();
             var request = account.ToAddLegalEntityRequest();
             _accountId = account.Id;
             var (status, _) = await HttpClient.PostValueAsync($"/accounts/{account.Id}/legalEntities", request);
             status.Should().Be(HttpStatusCode.OK);
 
-            account = TestContext.TestData.GetOrCreate<AccountTable>();
+            account = TestContext.TestData.GetOrCreate<Account>();
             request = account.ToAddLegalEntityRequest();
 
             (status, _) = await HttpClient.PostValueAsync($"/accounts/{account.Id}/legalEntities", request);
