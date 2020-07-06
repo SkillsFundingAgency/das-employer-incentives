@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.EmployerIncentives.Abstractions;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
@@ -19,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<ActionResult> AddLegalEntity([FromRoute] long accountId, [FromBody] AddLegalEntityRequest request)
         {
             await SendCommandAsync(new AddLegalEntityCommand(accountId, request.LegalEntityId, request.OrganisationName, request.AccountLegalEntityId));
-            return new CreatedResult($"/accounts/{accountId}/LegalEntities", null);
+            return new CreatedResult($"/accounts/{accountId}/LegalEntities", new LegalEntityDto { AccountId = accountId, AccountLegalEntityId = request.AccountLegalEntityId, LegalEntityId = request.LegalEntityId, LegalEntityName = request.OrganisationName });
         }
 
         [HttpDelete("/accounts/{accountId}/legalEntities/{accountLegalEntityId}")]
