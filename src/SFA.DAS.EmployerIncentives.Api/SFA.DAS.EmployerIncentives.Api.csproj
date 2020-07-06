@@ -21,5 +21,4 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />
   </ItemGroup>
 
-
 </Project>

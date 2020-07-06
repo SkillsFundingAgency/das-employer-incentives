@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api;
-using SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Collections.Generic;
 
@@ -41,11 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
                     a.LockedRetryWaitInMilliSeconds = 0;
                 });
 
-                s.AddTransient(i => _context.CommandHandlerHooks);
-                s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTestHook<>));
-
                 s.UseTestDb(_context);
-
             });
             builder.ConfigureAppConfiguration(a =>
             {

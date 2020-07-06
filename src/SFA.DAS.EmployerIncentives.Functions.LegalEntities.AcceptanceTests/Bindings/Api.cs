@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
         public void InitialiseApi()
         {
             var webApi = new TestWebApi(_context);
-            _context.ApiClient = webApi.CreateClient();
+            _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient());
         }
     }
 }
