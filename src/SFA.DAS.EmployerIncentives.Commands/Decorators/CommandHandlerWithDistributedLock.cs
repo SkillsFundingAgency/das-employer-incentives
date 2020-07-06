@@ -47,6 +47,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
                     await _lockProvider.Stop();
                 }
             }
+            else
+            {
+                await _handler.Handle(command, cancellationToken);
+            }
         }
     }
 }

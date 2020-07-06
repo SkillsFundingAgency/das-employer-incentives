@@ -2,7 +2,8 @@
 {
     public static class QueueNames
     {
-        public const string LegalEntityAdded = "SFA.DAS.EmployerIncentives.Jobs.LegalEntityAdded";
-        public const string RemovedLegalEntity = "SFA.DAS.EmployerIncentives.Jobs.LegalEntityRemoved";
+        public const string LegalEntityAdded = "SFA.DAS.EmployerIncentives.LegalEntityAdded";
+        public const string RefreshLegalEntityAdded = "SFA.DAS.EmployerIncentives.RefreshLegalEntityAdded";
+        public const string RemovedLegalEntity = "SFA.DAS.EmployerIncentives.LegalEntityRemoved";
     }
 }

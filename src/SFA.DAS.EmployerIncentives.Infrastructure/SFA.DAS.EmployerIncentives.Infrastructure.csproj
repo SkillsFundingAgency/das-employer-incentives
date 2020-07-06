@@ -10,6 +10,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.5" />
     <PackageReference Include="NLog" Version="4.7.2" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.6.4" />
+    <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.2933" />
+    <PackageReference Include="SFA.DAS.Http" Version="3.2.32" />
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
     <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.5" />
   </ItemGroup>

@@ -18,9 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
         }
 
         [FunctionName("HandleRemovedLegalEntityEvent")]
-        public async Task Run([NServiceBusTrigger(Endpoint = QueueNames.RemovedLegalEntity)] RemovedLegalEntityEvent message)
+        public Task Run([NServiceBusTrigger(Endpoint = QueueNames.RemovedLegalEntity)] RemovedLegalEntityEvent message)
         {
-            await _handler.Handle(new RemoveLegalEntityCommand(
+            return _handler.Handle(new RemoveLegalEntityCommand(
                 message.AccountId,
                 message.AccountLegalEntityId));
         }

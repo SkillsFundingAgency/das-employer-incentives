@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure
                 {
                     options.EndpointConfiguration = (endpoint) =>
                     {
-                        endpoint.UseTransport<LearningTransport>().StorageDirectory(testStorageDirectory);
+                        endpoint.UseTransport<LearningTransport>().StorageDirectory(testStorageDirectory);                        
                         return endpoint;
                     };
                 }
