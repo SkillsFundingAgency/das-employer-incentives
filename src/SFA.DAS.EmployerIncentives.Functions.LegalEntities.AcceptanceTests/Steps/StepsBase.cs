@@ -1,15 +1,18 @@
-﻿using NUnit.Framework;
+﻿using System.Net.Http;
+using NUnit.Framework;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
 {
     public class StepsBase
     {
-        private readonly TestContext _testContext;
+        protected readonly TestContext TestContext;
+        protected readonly HttpClient HttpClient;
 
         public StepsBase(TestContext testContext)
         {
-            _testContext = testContext;
+            TestContext = testContext;
+            HttpClient = TestContext.ApiClient;
         }        
     }
 }
