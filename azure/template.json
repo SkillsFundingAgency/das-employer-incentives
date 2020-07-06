@@ -2,6 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "apiCustomHostName": {
+            "type": "string",
+            "defaultValue": ""
+        },
         "appServiceAllowedIPs": {
             "type": "array",
             "defaultValue": [
@@ -9,14 +13,10 @@
         },
         "configNames": {
             "type": "string",
-            "defaultValue": "SFA.DAS.EmployerIncentives.Web"
+            "defaultValue": "SFA.DAS.EmployerIncentives.Api"
         },
         "configurationStorageConnectionString": {
             "type": "securestring"
-        },
-        "customHostName": {
-            "type": "string",
-            "defaultValue": ""
         },
         "environmentName": {
             "type": "string"
@@ -42,7 +42,7 @@
         "sharedAppServicePlanResourceGroup": {
             "type": "string"
         },
-        "sharedFrontEndAppServicePlanName": {
+        "sharedBackEndAppServicePlanName": {
             "type": "string"
         },
         "sharedManagementResourceGroup": {
@@ -56,13 +56,13 @@
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
-        "appServiceName": "[concat(variables('resourceNamePrefix'), '-as')]"
+        "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]"
     },
     "resources": [
         {
-            "condition": "[greater(length(parameters('customHostName')), 0)]",
+            "condition": "[greater(length(parameters('apiCustomHostName')), 0)]",
             "apiVersion": "2017-05-10",
-            "name": "app-service-certificate",
+            "name": "api-app-service-certificate",
             "resourceGroup": "[parameters('sharedAppServicePlanResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -86,7 +86,7 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "application-insights",
+            "name": "api-application-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -96,17 +96,17 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('appServiceName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('appServiceName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "app-service",
+            "name": "api-app-service",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -116,10 +116,10 @@
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[variables('appServiceName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     },
                     "appServicePlanName": {
-                        "value": "[parameters('sharedFrontEndAppServicePlanName')]"
+                        "value": "[parameters('sharedBackEndAppServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
                         "value": "[parameters('sharedAppServicePlanResourceGroup')]"
@@ -132,7 +132,7 @@
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('application-insights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('api-application-insights').outputs.InstrumentationKey.value]"
                             },
                             {
                                 "name": "ConfigNames",
@@ -165,10 +165,10 @@
                         ]
                     },
                     "customHostName": {
-                        "value": "[parameters('customHostName')]"
+                        "value": "[parameters('apiCustomHostName')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[if(greater(length(parameters('customHostname')), 0), reference('app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
+                        "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference('app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     },
                     "ipSecurityRestrictions": {
                         "value": "[parameters('appServiceAllowedIPs')]"
@@ -181,9 +181,9 @@
         }
     ],
     "outputs": {
-        "AppServiceName": {
+        "ApiAppServiceName": {
             "type": "string",
-            "value": "[variables('appServiceName')]"
+            "value": "[variables('apiAppServiceName')]"
         }
     }
 }
