@@ -29,7 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Api
                     options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                     options.EnvironmentName = configuration["Environment"];
                     options.PreFixConfigurationKeys = false;
-                });
+                })
+#if DEBUG
+                .AddJsonFile($"appsettings.Development.json", optional: true)
+#endif
+            ;
 
             Configuration = config.Build();
         }
