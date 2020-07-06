@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddCommandServices();
 
             services.AddDbContext<EmployerIncentivesDbContext>((options) => {
-                options.UseSqlServer(Configuration.GetConnectionString("EmployerIncentivesDbContext"));
+                options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
             });
         }
 
