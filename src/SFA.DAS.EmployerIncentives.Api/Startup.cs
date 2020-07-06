@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Commands;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.IO;
 
@@ -27,7 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Api
                     options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                     options.EnvironmentName = configuration["Environment"];
                     options.PreFixConfigurationKeys = false;
-                });
+                })
+#if DEBUG
+                .AddJsonFile($"appsettings.Development.json", optional: true)
+#endif
+            ;
 
             Configuration = config.Build();
         }
@@ -38,12 +44,16 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddControllers();
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen();            
 
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<RetryPolicies>(Configuration.GetSection("RetryPolicies"));
             services.AddCommandServices();
+
+            services.AddDbContext<EmployerIncentivesDbContext>((options) => {
+                options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

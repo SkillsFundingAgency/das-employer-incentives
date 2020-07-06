@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Data.Tables;
+﻿using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -9,12 +9,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
     public class LegalEntityDeletedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private readonly AccountTable _testAccountTable;
+        private readonly Account _testAccountTable;
 
         public LegalEntityDeletedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
-            _testAccountTable = _testContext.TestData.GetOrCreate<AccountTable>();
+            _testAccountTable = _testContext.TestData.GetOrCreate<Account>();
         }
 
         [When(@"a legal entity is removed from an account")]
