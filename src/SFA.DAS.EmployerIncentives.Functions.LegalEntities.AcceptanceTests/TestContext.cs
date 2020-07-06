@@ -13,18 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
     public class TestContext
     {
         public DirectoryInfo TestDirectory { get; set; }
-
         public SqlDatabase SqlDatabase { get; set; }
-
-        //public TestMessageBus TestMessageBus { get; set; }
-
         public IHost FunctionsHost { get; set; }
-        public HttpClient ApiClient { get; set; }        
-
+        public HttpClient ApiClient { get; set; }
         public TestData TestData { get; set; }
-
         public CommandHandlerHooks CommandHandlerHooks { get; set; }
-
         public WaitForResult WaitForResult { get; set; }
 
         public TestContext()
@@ -39,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
         }
 
         public async Task WaitForHandler(
-            Func<Task> func, 
+            Func<Task> func,
             bool assertOnTimeout = true,
             bool assertOnError = false,
             int timeoutInMs = 15000)
@@ -48,11 +41,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
             timeoutInMs = 60000;
 #endif
             WaitForResult = new WaitForResult();
-          
+
             CommandHandlerHooks = new CommandHandlerHooks
             {
                 OnHandlerStart = (command) => { WaitForResult.SetHasStarted(); },
-                OnHandlerEnd = (command) => { WaitForResult.SetHasCompleted(); },                
+                OnHandlerEnd = (command) => { WaitForResult.SetHasCompleted(); },
                 OnHandlerErrored = (ex, command) => { WaitForResult.SetHasErrored(ex); }
             };
 
@@ -60,13 +53,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
             {
                 await func();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 WaitForResult.SetHasErrored(ex);
             }
             await WaitForHandlerCompletion(WaitForResult, timeoutInMs);
 
-            if(assertOnTimeout)
+            if (assertOnTimeout)
             {
                 WaitForResult.HasTimedOut.Should().Be(false, "handler should not have timed out");
             }
@@ -78,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
         }
         private bool hasTimedOut = false;
         private async Task WaitForHandlerCompletion(WaitForResult waitForResult, int timeoutInMs)
-        {         
+        {
             using (Timer timer = new Timer(new TimerCallback(TimedOutCallback), null, timeoutInMs, Timeout.Infinite))
             {
                 while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut)

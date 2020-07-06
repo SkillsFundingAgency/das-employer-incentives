@@ -1,7 +1,6 @@
 ﻿using Dapper;
-using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Data.Tables;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
@@ -12,12 +11,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
     public class LegalEntitySteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private readonly AccountTable _testAccountTable;
+        private readonly Account _testAccountTable;
 
         public LegalEntitySteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
-            _testAccountTable = _testContext.TestData.GetOrCreate<AccountTable>();
+            _testAccountTable = _testContext.TestData.GetOrCreate<Account>();
         }
 
         [Given(@"a legal entity is not available in employer incentives")]
@@ -26,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                var account = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
+                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().BeNullOrEmpty();
@@ -39,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                await dbConnection.InsertAsync(_testAccountTable);
+                await dbConnection.ExecuteAsync("insert into Accounts(id, accountLegalEntityId, legalEntityId, legalentityName) values(@id, @accountLegalEntityId, @legalEntityId, @legalentityName)", _testAccountTable);
             }
         }
 
@@ -50,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                var account = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
+                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().HaveCount(0);
@@ -65,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                var account = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
+                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().HaveCount(1);

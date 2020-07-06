@@ -1,16 +1,11 @@
-﻿using System.Data.SqlClient;
+﻿using AutoFixture;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture;
-using Dapper;
-using Dapper.Contrib.Extensions;
-using FluentAssertions;
-using Microsoft.Extensions.Options;
-using Moq;
-using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Data.Tables;
-using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
@@ -18,43 +13,33 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
     {
         private Data.AccountDataRepository _sut;
         private Fixture _fixture;
-        private Mock<IOptions<ApplicationSettings>> _mockOptions;
-        private SqlDatabase _sqlDb;
+        private EmployerIncentivesDbContext _dbContext;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();            
-            _sqlDb = new SqlDatabase();
 
-            _mockOptions = new Mock<IOptions<ApplicationSettings>>();
-            _mockOptions
-                .Setup(m => m.Value)
-                .Returns(new ApplicationSettings { DbConnectionString = $"{_sqlDb.DatabaseInfo.ConnectionString}" });
+            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
+                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
+            _dbContext = new EmployerIncentivesDbContext(options);
 
-            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
-            {
-                dbConnection.ExecuteAsync("TRUNCATE TABLE Accounts");
-            }
-
-            _sut = new Data.AccountDataRepository(_mockOptions.Object);
+            _sut = new Data.AccountDataRepository(_dbContext);
         }
 
         [TearDown]
         public void CleanUp()
         {
-            _sqlDb.Dispose();
+            _dbContext.Dispose();
         }
 
         [Test]
         public async Task Then_the_expected_account_is_returned_if_it_exists()
         {
             // Arrange
-            var testAccount = _fixture.Create<AccountTable>();
-            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.InsertAsync(testAccount);
-            }
+            var testAccount = _fixture.Create<Models.Account>();
+            _dbContext.Add(testAccount);
+            _dbContext.SaveChanges();
 
             // Act
             var account = await _sut.Find(testAccount.Id);

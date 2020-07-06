@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Data.Tables;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,12 +13,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
     public class LegalEntityCreatedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private readonly AccountTable _testAccountTable;
+        private readonly Account _testAccountTable;
 
         public LegalEntityCreatedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
-            _testAccountTable = _testContext.TestData.GetOrCreate<AccountTable>();
+            _testAccountTable = _testContext.TestData.GetOrCreate<Account>();
         }
 
         [Given(@"the legal entity is not valid for Employer Incentives")]
