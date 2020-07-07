@@ -22,20 +22,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
             var account = TestContext.TestData.GetOrCreate<Account>();
             var request = account.ToAddLegalEntityRequest();
             _accountId = account.Id;
-            var (status, _) = await HttpClient.PostValueAsync($"/accounts/{account.Id}/legalEntities", request);
-            status.Should().Be(HttpStatusCode.OK);
+            await EmployerIncentiveApi.Post($"/accounts/{account.Id}/legalEntities", request);
 
             account = TestContext.TestData.GetOrCreate<Account>();
             request = account.ToAddLegalEntityRequest();
 
-            (status, _) = await HttpClient.PostValueAsync($"/accounts/{account.Id}/legalEntities", request);
-            status.Should().Be(HttpStatusCode.OK);
+            await EmployerIncentiveApi.Post($"/accounts/{account.Id}/legalEntities", request);
         }
 
         [When(@"a client requests the legal entities for the account")]
         public async Task WhenAClientRequestsTheLegalEntitiesForTheAccount()
         {
-            var (status, data) = await HttpClient.GetValueAsync<GetLegalEntitiesResponse>($"/accounts/{_accountId}/LegalEntities");
+            var (status, data) = await EmployerIncentiveApi.Client.GetValueAsync<GetLegalEntitiesResponse>($"/accounts/{_accountId}/LegalEntities");
             
             status.Should().Be(HttpStatusCode.OK);
 

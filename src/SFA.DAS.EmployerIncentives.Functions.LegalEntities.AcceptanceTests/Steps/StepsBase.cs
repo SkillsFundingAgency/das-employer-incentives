@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Steps
