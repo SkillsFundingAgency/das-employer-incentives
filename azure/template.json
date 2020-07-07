@@ -81,7 +81,7 @@
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
-        "databaseName": "[concat(variables('resourceNamePrefix'), '-sql')]",
+        "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
         "storageContainerNames": [ "employer-incentives-distributed-locks" ]
     },
     "resources": [
