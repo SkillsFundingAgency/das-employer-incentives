@@ -18,6 +18,18 @@
         "configurationStorageConnectionString": {
             "type": "securestring"
         },
+        "databaseSkuName": {
+            "type": "string",
+            "defaultValue": "S0"
+        },
+        "databaseTier": {
+            "type": "string",
+            "defaultValue": "Standard"
+        },
+        "elasticPoolName": {
+            "type": "string",
+            "defaultValue": ""
+        },
         "environmentName": {
             "type": "string"
         },
@@ -25,6 +37,12 @@
             "type": "string"
         },
         "keyVaultName": {
+            "type": "string"
+        },
+        "logAnalyticsSubscriptionId": {
+            "type": "string"
+        },
+        "logAnalyticsWorkspaceName": {
             "type": "string"
         },
         "loggingRedisConnectionString": {
@@ -48,6 +66,9 @@
         "sharedManagementResourceGroup": {
             "type": "string"
         },
+        "sharedSqlServerName": {
+            "type": "string"
+        },
         "sharedStorageAccountName": {
             "type": "string"
         },
@@ -60,6 +81,7 @@
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
+        "databaseName": "[concat(variables('resourceNamePrefix'), '-sql')]",
         "storageContainerNames": [ "employer-incentives-distributed-locks" ]
     },
     "resources": [
@@ -209,12 +231,55 @@
             "dependsOn": [
                 "storage-account"
             ]
+        },
+        {
+            "apiVersion": "2018-02-01",
+            "name": "redundancy-sql-database",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedManagementResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'sql-database.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "databaseName": {
+                        "value": "[variables('databaseName')]"
+                    },
+                    "sqlServerName": {
+                        "value": "[parameters('sharedSqlServerName')]"
+                    },
+                    "databaseSkuName": {
+                        "value": "[parameters('databaseSkuName')]"
+                    },
+                    "databaseTier": {
+                        "value": "[parameters('databaseTier')]"
+                    },
+                    "elasticPoolName": {
+                        "value": "[parameters('elasticPoolName')]"
+                    },
+                    "logAnalyticsSubscriptionId": {
+                        "value": "[parameters('logAnalyticsSubscriptionId')]"
+                    },
+                    "logAnalyticsResourceGroup": {
+                        "value": "[parameters('sharedManagementResourceGroup')]"
+                    },
+                    "logAnalyticsWorkspaceName": {
+                        "value": "[parameters('logAnalyticsWorkspaceName')]"
+                    }
+                }
+            }
         }
     ],
     "outputs": {
         "ApiAppServiceName": {
             "type": "string",
             "value": "[variables('apiAppServiceName')]"
+        },
+        "DatabaseName": {
+            "type": "string",
+            "value": "[variables('databaseName')]"
         }
     }
 }
