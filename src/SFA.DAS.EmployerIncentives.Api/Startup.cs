@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Queries;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api
@@ -50,7 +51,9 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<RetryPolicies>(Configuration.GetSection("RetryPolicies"));
+
             services.AddCommandServices();
+            services.AddQueryServices();
 
             services.AddDbContext<EmployerIncentivesDbContext>((options) => {
                 options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
