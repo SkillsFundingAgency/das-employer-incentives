@@ -168,7 +168,7 @@
                         "value": "[parameters('apiCustomHostName')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference('app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
+                        "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference('api-app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     },
                     "ipSecurityRestrictions": {
                         "value": "[parameters('appServiceAllowedIPs')]"
@@ -176,7 +176,7 @@
                 }
             },
             "dependsOn": [
-                "app-service-certificate"
+                "api-app-service-certificate"
             ]
         }
     ],
