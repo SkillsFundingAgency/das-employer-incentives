@@ -40,7 +40,8 @@
             "type": "string"
         },
         "logAnalyticsSubscriptionId": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]"
         },
         "logAnalyticsWorkspaceName": {
             "type": "string"
