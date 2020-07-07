@@ -60,8 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [Then(@"the legal entity should still be available in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldBeAvailableInTheDatabase()
         {
-            _testContext.WaitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{_testContext.WaitForResult.LastException?.Message}'");
-
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",

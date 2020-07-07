@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -74,7 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Api
                 });
             }
 
-            app.UseHttpsRedirection();
+            app.UseHttpsRedirection()
+               .UseApiGlobalExceptionHandler();
 
             app.UseRouting();
 

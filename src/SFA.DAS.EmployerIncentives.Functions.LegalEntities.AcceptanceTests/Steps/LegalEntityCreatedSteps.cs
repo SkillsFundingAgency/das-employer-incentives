@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using System.Net.Http;
-using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -14,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
     {
         private readonly TestContext _testContext;
         private readonly Account _testAccountTable;
+        private HttpStatusCode _expectedResult = HttpStatusCode.Created;
 
         public LegalEntityCreatedSteps(TestContext testContext) : base(testContext)
         {
@@ -25,20 +25,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         public void GivenIHaveALegalEntityThatIsInvalid()
         {
             _testAccountTable.LegalEntityName = "";
+            _expectedResult = HttpStatusCode.BadRequest;
         }
 
         [When(@"the legal entity is added to an account")]
         public async Task WhenAddedLegalEntityEventIsTriggered()
         {
-            var body = new AddLegalEntityRequest { 
-                AccountLegalEntityId = _testAccountTable.AccountLegalEntityId, 
-                LegalEntityId = _testAccountTable.LegalEntityId, 
-                OrganisationName = _testAccountTable.LegalEntityName
-            };
+            await EmployerIncentiveApi.Post(
+                    $"/accounts/{_testAccountTable.Id}/legalEntities",
+                    new AddLegalEntityRequest
+                    {
+                        AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
+                        LegalEntityId = _testAccountTable.LegalEntityId,
+                        OrganisationName = _testAccountTable.LegalEntityName
+                    });
 
-            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-
-            await _testContext.WaitForHandler(async () => await _testContext.ApiClient.PostAsync($"/accounts/{_testAccountTable.Id}/legalEntities", content));
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(_expectedResult);
         }
     }
 }

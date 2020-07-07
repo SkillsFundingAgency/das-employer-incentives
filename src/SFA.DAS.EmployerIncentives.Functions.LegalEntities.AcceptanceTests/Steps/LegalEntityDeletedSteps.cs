@@ -1,4 +1,6 @@
-﻿using SFA.DAS.EmployerIncentives.Data.Models;
+﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -20,7 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
         [When(@"a legal entity is removed from an account")]
         public async Task WhenALegalEntityIsRemovedFromAnAccount()
         {
-            await _testContext.WaitForHandler(async () => await _testContext.ApiClient.DeleteAsync($"/accounts/{_testAccountTable.Id}/legalEntities/{_testAccountTable.AccountLegalEntityId}"));
+            await EmployerIncentiveApi.Delete($"/accounts/{_testAccountTable.Id}/legalEntities/{_testAccountTable.AccountLegalEntityId}");
+            
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
         }     
     }
 }
