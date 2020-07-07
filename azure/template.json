@@ -66,10 +66,16 @@
         "sharedManagementResourceGroup": {
             "type": "string"
         },
+        "sharedSqlServerResourceGroup": {
+            "type": "string"
+        },
         "sharedSqlServerName": {
             "type": "string"
         },
         "sharedStorageAccountName": {
+            "type": "string"
+        },
+        "sharedStorageAccountResourceGroup": {
             "type": "string"
         },
         "version": {
@@ -208,6 +214,7 @@
         {
             "apiVersion": "2017-05-10",
             "name": "[concat('storage-account-container-',variables('storageContainerNames')[copyIndex()])]",
+            "resourceGroup": "[parameters('sharedStorageAccountResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -233,7 +240,7 @@
             "apiVersion": "2018-02-01",
             "name": "redundancy-sql-database",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[parameters('sharedManagementResourceGroup')]",
+            "resourceGroup": "[parameters('sharedSqlServerResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
