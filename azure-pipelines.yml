@@ -122,18 +122,19 @@ stages:
         platform: 'anycpu'
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
-  
+
     - task: CopyFiles@2
       displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
       inputs:
         Contents: |
           src\**\*.dacpac
         TargetFolder: '$(build.artifactstagingdirectory)/publish'
-  
-    - task: PublishBuildArtifacts@1
-      displayName: "Publish Artifact: DACPAC"
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: dacpac'
       inputs:
-        pathtoPublish: "$(build.artifactstagingdirectory)/publish" 
+        targetPath: $(build.artifactstagingdirectory)/publish
+        artifactName: dacpac        
 
 - stage: NugetPublish
   displayName: 'Publish Nuget Package'
