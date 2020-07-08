@@ -58,10 +58,10 @@
         "serviceName": {
             "type": "string"
         },
-        "sharedEnvResourceGroup": {
+        "sharedBackEndAppServicePlanName": {
             "type": "string"
         },
-        "sharedBackEndAppServicePlanName": {
+        "sharedEnvResourceGroup": {
             "type": "string"
         },
         "sharedManagementResourceGroup": {
