@@ -60,7 +60,8 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
              Action act = () =>  _sut.GetLegalEntities(accountId);
 
             // Assert
-            act.Should().Throw<HttpResponseException>();//.Where(x => x.Response.StatusCode == HttpStatusCode.NotFound);
+            act.Should().Throw<HttpResponseException>()
+                .Where(x => x.Response.StatusCode == HttpStatusCode.NotFound);
         }
 
     }
