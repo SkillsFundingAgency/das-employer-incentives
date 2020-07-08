@@ -58,7 +58,7 @@
         "serviceName": {
             "type": "string"
         },
-        "sharedAppServicePlanResourceGroup": {
+        "sharedEnvResourceGroup": {
             "type": "string"
         },
         "sharedBackEndAppServicePlanName": {
@@ -67,16 +67,10 @@
         "sharedManagementResourceGroup": {
             "type": "string"
         },
-        "sharedSqlServerResourceGroup": {
-            "type": "string"
-        },
         "sharedSqlServerName": {
             "type": "string"
         },
         "sharedStorageAccountName": {
-            "type": "string"
-        },
-        "sharedStorageAccountResourceGroup": {
             "type": "string"
         },
         "version": {
@@ -96,7 +90,7 @@
             "condition": "[greater(length(parameters('apiCustomHostName')), 0)]",
             "apiVersion": "2017-05-10",
             "name": "api-app-service-certificate",
-            "resourceGroup": "[parameters('sharedAppServicePlanResourceGroup')]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -155,7 +149,7 @@
                         "value": "[parameters('sharedBackEndAppServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[parameters('sharedAppServicePlanResourceGroup')]"
+                        "value": "[parameters('sharedEnvResourceGroup')]"
                     },
                     "appServiceAppSettings": {
                         "value": [
@@ -215,7 +209,7 @@
         {
             "apiVersion": "2017-05-10",
             "name": "[concat('storage-account-container-',variables('storageContainerNames')[copyIndex()])]",
-            "resourceGroup": "[parameters('sharedStorageAccountResourceGroup')]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -239,9 +233,9 @@
         },
         {
             "apiVersion": "2018-02-01",
-            "name": "redundancy-sql-database",
+            "name": "employer-incentives-sql-database",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[parameters('sharedSqlServerResourceGroup')]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
