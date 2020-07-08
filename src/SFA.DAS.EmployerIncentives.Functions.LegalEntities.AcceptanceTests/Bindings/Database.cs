@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
             _context = context;
         }
 
-        [BeforeScenario()]
+        [BeforeScenario(Order = 1 )]
         public void InitialiseDatabase()
         {
             _context.SqlDatabase = new SqlDatabase();

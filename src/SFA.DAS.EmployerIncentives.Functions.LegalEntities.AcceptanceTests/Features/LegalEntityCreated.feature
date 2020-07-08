@@ -1,5 +1,5 @@
 ﻿@database
-@messageBus
+@api
 Feature: LegalEntityCreated
 	When a legal entity has been added to an account
 	Then is is available in Employer Incentives

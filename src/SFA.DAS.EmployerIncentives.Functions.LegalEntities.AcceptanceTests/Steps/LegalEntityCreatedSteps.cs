@@ -1,5 +1,7 @@
-﻿using SFA.DAS.EmployerAccounts.Messages.Events;
-using SFA.DAS.EmployerIncentives.Data.Tables;
+﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -10,32 +12,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
     public class LegalEntityCreatedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private readonly AccountTable _testAccountTable;
+        private readonly Account _testAccountTable;
+        private HttpStatusCode _expectedResult = HttpStatusCode.Created;
 
         public LegalEntityCreatedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
-            _testAccountTable = _testContext.TestData.GetOrCreate<AccountTable>();
+            _testAccountTable = _testContext.TestData.GetOrCreate<Account>();
         }
 
         [Given(@"the legal entity is not valid for Employer Incentives")]
         public void GivenIHaveALegalEntityThatIsInvalid()
         {
             _testAccountTable.LegalEntityName = "";
+            _expectedResult = HttpStatusCode.BadRequest;
         }
 
         [When(@"the legal entity is added to an account")]
         public async Task WhenAddedLegalEntityEventIsTriggered()
         {
-            var message = new AddedLegalEntityEvent
-            {
-                AccountId = _testAccountTable.Id,
-                AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
-                LegalEntityId = _testAccountTable.LegalEntityId,
-                OrganisationName = _testAccountTable.LegalEntityName
-            };
+            await EmployerIncentiveApi.Post(
+                    $"/accounts/{_testAccountTable.Id}/legalEntities",
+                    new AddLegalEntityRequest
+                    {
+                        AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
+                        LegalEntityId = _testAccountTable.LegalEntityId,
+                        OrganisationName = _testAccountTable.LegalEntityName
+                    });
 
-            await _testContext.WaitForHandler(async () => await _testContext.TestMessageBus.Publish(message));
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(_expectedResult);
         }
     }
 }

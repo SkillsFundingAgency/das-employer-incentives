@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -20,10 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Exceptions
         {
             if (!errorMessages.Any())
             {
-                return "Request is invalid";
+                errorMessages.Add("Request", "Request is invalid");
             }
-
-            return "Request is invalid:\n" + errorMessages.Select(kvp => $"{kvp.Key}: {kvp.Value}").Aggregate((x, y) => $"{x}\n{y}");
+            return JsonConvert.SerializeObject(errorMessages, Formatting.Indented);
         }
     }
 }

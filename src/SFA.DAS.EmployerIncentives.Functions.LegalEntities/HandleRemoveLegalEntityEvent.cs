@@ -22,7 +22,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
         {
             await _handler.Handle(new RemoveLegalEntityCommand(
                 message.AccountId,
-                message.LegalEntityId,
                 message.AccountLegalEntityId));
         }
     }

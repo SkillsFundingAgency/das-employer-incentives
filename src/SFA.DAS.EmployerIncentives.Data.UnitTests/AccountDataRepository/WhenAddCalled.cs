@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using AutoFixture;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture;
-using Dapper;
-using FluentAssertions;
-using Microsoft.Extensions.Options;
-using Moq;
-using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Data.Tables;
-using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
-using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
@@ -19,32 +15,24 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
     {
         private Data.AccountDataRepository _sut;
         private Fixture _fixture;
-        private Mock<IOptions<ApplicationSettings>> _mockOptions;
-        private SqlDatabase _sqlDb;
+        private EmployerIncentivesDbContext _dbContext;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _sqlDb = new SqlDatabase();
 
-            _mockOptions = new Mock<IOptions<ApplicationSettings>>();
-            _mockOptions
-                .Setup(m => m.Value)
-                .Returns(new ApplicationSettings { DbConnectionString = $"{_sqlDb.DatabaseInfo.ConnectionString}" });
+            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
+                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
+            _dbContext = new EmployerIncentivesDbContext(options);
 
-            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
-            {
-                dbConnection.ExecuteAsync("TRUNCATE TABLE Accounts");
-            }
-
-            _sut = new Data.AccountDataRepository(_mockOptions.Object);
+            _sut = new Data.AccountDataRepository(_dbContext);
         }
 
         [TearDown]
         public void CleanUp()
-        {
-            _sqlDb.Dispose();
+        {            
+            _dbContext.Dispose();
          }
 
         [Test]
@@ -61,16 +49,13 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             await _sut.Add(testAccount);
 
             // Assert
-            using (var dbConnection = new SqlConnection(_sqlDb.DatabaseInfo.ConnectionString))
-            {
-                var accounts = await dbConnection.QueryAsync<AccountTable>("SELECT * FROM Accounts");
+            _dbContext.Accounts.Count().Should().Be(1);
 
-                var storedAccount = accounts.Single();
-                storedAccount.Id.Should().Be(testAccount.Id);
-                storedAccount.LegalEntityId.Should().Be(testLegalEntity.Id);
-                storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
-                storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
-            }
+            var storedAccount = _dbContext.Accounts.Single();
+            storedAccount.Id.Should().Be(testAccount.Id);
+            storedAccount.LegalEntityId.Should().Be(testLegalEntity.Id);
+            storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
+            storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);            
         }
     }
 }
