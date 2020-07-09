@@ -1,130 +1,73 @@
-﻿using Newtonsoft.Json;
-using Polly;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Services;
+using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Messages.Events;
-using SFA.DAS.HashingService;
 using SFA.DAS.NServiceBus.Services;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
 {
-    public class RefreshLegalEntitiesCommandHandler
+    public class RefreshLegalEntitiesCommandHandler : ICommandHandler<RefreshLegalEntitiesCommand>
     {
-        public class AccountLegalEntity
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IAccountService _accountService;
+        private readonly IMultiEventPublisher _multiEventPublisher;        
+
+        public RefreshLegalEntitiesCommandHandler(
+            IEventPublisher eventPublisher,
+            IAccountService accountService,
+            IMultiEventPublisher multiEventPublisher)
         {
-            public long AccountId { get; set; }
-            public long AccountLegalEntityId { get; set; }
-            public long LegalEntityId { get; set; }
+            _eventPublisher = eventPublisher;
+            _accountService = accountService;
+            _multiEventPublisher = multiEventPublisher;
         }
-
-        public class LegalEntity
+        public async Task Handle(RefreshLegalEntitiesCommand command, CancellationToken cancellationToken = default)
         {
-            public long LegalEntityId { get; set; }
-            public string Name { get; set; }
-        }
+            var response = await _accountService.GetAccountLegalEntitiesByPage(command.PageNumber, command.PageSize);
 
-        public class PagedModel<T>
-        {
-            public List<T> Data { get; set; }
-            public int Page { get; set; }
-            public int TotalPages { get; set; }
-        }
+            await ProcessLegalEntities(response.Data);
 
-        public interface IAccountService
-        {
-            Task<PagedModel<AccountLegalEntity>> GetAccountLegalEntitiesByPage(int pageNumber, int pageSize = 1000);
-            Task<LegalEntity> GetLegalEntity(long accountId, long legalentityId);
-        }
-
-        public class AccountService : IAccountService
-        {
-            private readonly HttpClient _client;
-            private readonly IHashingService _hashingService;
-
-            public AccountService(
-                HttpClient client,
-                IHashingService hashingService)
+            if (response.Page == 1)
             {
-                _client = client;
-                _hashingService = hashingService;
+                await ProcessOtherPages(response.TotalPages, command.PageSize);
             }
+        }
 
-            public async Task<PagedModel<AccountLegalEntity>> GetAccountLegalEntitiesByPage(int pageNumber, int pageSize = 1000)
+        private async Task ProcessOtherPages(int totalPages, int pageSize)
+        {
+            var messages = new List<RefreshLegalEntitiesEvent>();
+
+            for (int i = 2; i <= totalPages; i++)
             {
-                var response = await _client.GetAsync($"api/accountlegalentities?pageNumber={pageNumber}&pageSize={pageSize}");
-
-                response.EnsureSuccessStatusCode();
-
-                return JsonConvert.DeserializeObject<PagedModel<AccountLegalEntity>>(await response.Content.ReadAsStringAsync());
+                messages.Add(new RefreshLegalEntitiesEvent { PageNumber = i, PageSize = pageSize });
             }
+            
+            await _multiEventPublisher.Publish(messages);
+        }
 
-            public async Task<LegalEntity> GetLegalEntity(long accountId, long legalentityId)
+        private async Task ProcessLegalEntities(List<AccountLegalEntity> accountLegalEntities)
+        {
+            var messages = new List<RefreshLegalEntityEvent>();
+
+            foreach (var accountLegalEntity in accountLegalEntities)
             {
-                var hashedAccountId = _hashingService.HashValue(accountId);
+                var legalEntityResponse = await _accountService.GetLegalEntity(accountLegalEntity.AccountId, accountLegalEntity.LegalEntityId);
 
-                var response = await _client.GetAsync($"api/accounts/{hashedAccountId}/legalEntities/{legalentityId}");
-
-                response.EnsureSuccessStatusCode();
-
-                return JsonConvert.DeserializeObject<LegalEntity>(await response.Content.ReadAsStringAsync());
-            }
-
-            public class RefreshLegalEntitiesCommandHandler : ICommandHandler<RefreshLegalEntitiesCommand>
-            {
-                private readonly IEventPublisher _eventPublisher;
-                private readonly IAccountService _accountService;
-
-                public RefreshLegalEntitiesCommandHandler(
-                    IEventPublisher eventPublisher,
-                    IAccountService accountService)
+                messages.Add(new RefreshLegalEntityEvent
                 {
-                    _eventPublisher = eventPublisher;
-                    _accountService = accountService;
-                }
-
-                public async Task Handle(RefreshLegalEntitiesCommand command, CancellationToken cancellationToken = default)
-                {
-                    var response = await _accountService.GetAccountLegalEntitiesByPage(command.PageNumber, command.PageSize);
-                    //cancellationToken.ThrowIfCancellationRequested();
-
-                    if (response.Page == 1)
-                    {
-                        var tasksToRun = new List<Task>();
-                        var policy = Policy.BulkheadAsync(5, response.TotalPages);
-
-                        for (int i = 2; i <= response.TotalPages; i++)
-                        {
-                            tasksToRun.Add(policy.ExecuteAndCaptureAsync(() => _eventPublisher.Publish(new RefreshLegalEntitiesEvent { PageNumber = i, PageSize = command.PageSize })));
-                        }
-
-                        await Task.WhenAll(tasksToRun);
-                        foreach (var task in tasksToRun)
-                        {
-                            await task;
-                        }
-                    }
-
-                    foreach (var accountLegalEntity in response.Data)
-                    {
-                        //cancellationToken.ThrowIfCancellationRequested();
-
-                        var legalEntityResponse = await _accountService.GetLegalEntity(accountLegalEntity.AccountId, accountLegalEntity.LegalEntityId);
-
-                        await _eventPublisher.Publish(new RefreshLegalEntityEvent
-                        {
-                            AccountId = accountLegalEntity.AccountId,
-                            AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
-                            LegalEntityId = accountLegalEntity.LegalEntityId,
-                            OrganisationName = legalEntityResponse.Name
-                        });
-                    }
-
-                }
-
+                    AccountId = accountLegalEntity.AccountId,
+                    AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
+                    LegalEntityId = accountLegalEntity.LegalEntityId,
+                    OrganisationName = legalEntityResponse.LegalEntity.Name
+                });
             }
+
+            await _multiEventPublisher.Publish(messages);
+
         }
     }
 }
+

@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\LegalEntityDeleted - Copy.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
      <PackageReference Include="AutoFixture" Version="4.11.0" />
      <PackageReference Include="Dapper" Version="2.0.35" />
      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />
@@ -23,6 +27,7 @@
     <PackageReference Include="SpecFlow" Version="3.1.97" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.97" />
     <PackageReference Include="SpecFlow.NUnit" Version="3.1.97" />
+    <PackageReference Include="WireMock.Net" Version="1.2.12" />
   </ItemGroup>
   
   <ItemGroup>
@@ -37,6 +42,10 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LegalEntityCreated.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\LegalEntitiesDataLoadJob.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
   <ItemGroup>
@@ -45,6 +54,12 @@
 
   <ItemGroup>
     <SpecFlowFeatureFiles Include="Features\LegalEntityDeleted.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Features\LegalEntitiesDataLoadJob.feature.cs">
+      <DependentUpon>LegalEntitiesDataLoadJob.feature</DependentUpon>
+    </Compile>
   </ItemGroup>     
 
 </Project>

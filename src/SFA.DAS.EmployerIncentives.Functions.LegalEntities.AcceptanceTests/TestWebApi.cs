@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Api;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.UnitOfWork.Context;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
@@ -38,6 +39,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
                     a.LockedRetryAttempts = 0;
                     a.LockedRetryWaitInMilliSeconds = 0;
                 });
+
+                if (_context.AccountApi != null)
+                {
+                    s.Configure<AccountApi>(a =>
+                    {
+                        a.ApiBaseUrl = _context.AccountApi.BaseAddress;
+                        a.ClientId = "";
+                    });                    
+                }
+
+                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));                
 
                 s.UseTestDb(_context);
             });

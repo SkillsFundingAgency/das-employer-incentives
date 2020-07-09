@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using System;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
@@ -13,14 +14,26 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
             _fixture = new Fixture();
         }
 
-        public T GetOrCreate<T>()
+        public T GetOrCreate<T>(string key = null, Func<T> onCreate = null)
         {
-            if (!_testdata.ContainsKey(nameof(T)))
+            if(key == null)
             {
-                _testdata.Add(nameof(T), _fixture.Create<T>());
+                key = typeof(T).FullName;
             }
 
-            return (T)_testdata[nameof(T)];
+            if (!_testdata.ContainsKey(key))
+            {
+                if (onCreate == null)
+                {
+                    _testdata.Add(key, _fixture.Create<T>());
+                }
+                else
+                {
+                    _testdata.Add(key, onCreate.Invoke());
+                }
+            }
+
+            return (T)_testdata[key];
         }
     }
 }
