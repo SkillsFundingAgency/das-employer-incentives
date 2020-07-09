@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPut("/jobs")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<ActionResult> AddJob([FromBody] JobRequest request)
+        public async Task<IActionResult> AddJob([FromBody] JobRequest request)
         {
             if(request.Type == JobType.RefreshLegalEntities)
             {
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 await SendCommandAsync(new RefreshLegalEntitiesCommand(pageNumber, pageSize));
             }
 
-            return new OkResult();
+            return Ok();
         }
     }
 }

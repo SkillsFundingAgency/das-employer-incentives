@@ -17,16 +17,17 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPost("/accounts/{accountId}/legalEntities")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public async Task<ActionResult> AddLegalEntity([FromRoute] long accountId, [FromBody] AddLegalEntityRequest request)
+        public async Task<IActionResult> AddLegalEntity([FromRoute] long accountId, [FromBody] AddLegalEntityRequest request)
         {
             await SendCommandAsync(new AddLegalEntityCommand(accountId, request.LegalEntityId, request.OrganisationName, request.AccountLegalEntityId));
-            return new CreatedResult($"/accounts/{accountId}/LegalEntities", new LegalEntityDto { AccountId = accountId, AccountLegalEntityId = request.AccountLegalEntityId, LegalEntityId = request.LegalEntityId, LegalEntityName = request.OrganisationName });
+            return Created($"/accounts/{accountId}/LegalEntities", new LegalEntityDto { AccountId = accountId, AccountLegalEntityId = request.AccountLegalEntityId, LegalEntityId = request.LegalEntityId, LegalEntityName = request.OrganisationName });
         }
 
         [HttpDelete("/accounts/{accountId}/legalEntities/{accountLegalEntityId}")]
-        public Task RemoveLegalEntity([FromRoute] long accountId, long accountLegalEntityId)
+        public async Task<IActionResult> RemoveLegalEntity([FromRoute] long accountId, long accountLegalEntityId)
         {
-            return SendCommandAsync(new RemoveLegalEntityCommand(accountId, accountLegalEntityId));
+            await SendCommandAsync(new RemoveLegalEntityCommand(accountId, accountLegalEntityId));
+            return Ok();
         }
     }
 }

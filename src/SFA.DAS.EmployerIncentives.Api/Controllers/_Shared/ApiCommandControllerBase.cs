@@ -7,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public abstract class ApiCommandControllerBase
+    public abstract class ApiCommandControllerBase : ControllerBase
     {
         private readonly ICommandDispatcher _commandDispatcher;
 
