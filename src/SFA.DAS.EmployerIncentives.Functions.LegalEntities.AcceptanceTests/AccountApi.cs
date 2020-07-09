@@ -1,5 +1,4 @@
 ﻿using System;
-using WireMock.RequestBuilders;
 using WireMock.Server;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests

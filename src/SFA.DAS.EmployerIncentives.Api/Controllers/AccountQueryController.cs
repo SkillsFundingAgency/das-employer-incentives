@@ -2,9 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Account;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {

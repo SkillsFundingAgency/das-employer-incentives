@@ -41,8 +41,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddNServiceBusClientUnitOfWork()
                 .AddAccountService();
             
-            //Unable to resolve service for type 'NServiceBus.UniformSession.IUniformSession
-
             // set up the command handlers and command validators
             serviceCollection.Scan(scan =>
             {
