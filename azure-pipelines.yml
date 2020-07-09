@@ -1,0 +1,164 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - "*"
+  
+variables:
+- name: SolutionBaseName
+  value: 'SFA.DAS.EmployerIncentives'
+- name: BuildPlatform
+  value : 'any cpu'
+- name: BuildConfiguration
+  value: 'release'
+- group: 'Prod Management Resources'
+
+resources:
+  repositories:
+  - repository: self
+  - repository: das-platform-building-blocks
+    type: github
+    name: SkillsFundingAgency/das-platform-building-blocks
+    ref: refs/heads/master
+    endpoint: 'GitHub (SFA)'
+
+stages:
+- stage: BuildAndTest
+  displayName: 'Build and Test'
+  jobs:
+  - job: 'BuildAndTest'
+    pool:
+      name: 'DAS - Continuous Integration'
+      demands: 
+        - dotnet
+        - Agent.OS -equals Linux
+    workspace:
+      clean: all
+    steps:
+    - task: UseGitVersion@5
+      inputs:
+        versionSpec: 5.x
+
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: 'src/**/*.csproj'
+        noCache: true
+
+    ##TO DO: remove exclusion for '!src/**/*.Data.UnitTests.csproj' when MSBuild on Windows agents is updated to a version later than 16.0
+    ##TO DO: build the dacpac so that Data.UnitTests can consume it and set agent pool demands to use a Windows agent
+    - task: DotNetCoreCLI@2
+      displayName: Build UnitTests
+      inputs:
+        command: 'build'
+        projects: |
+          src/**/*.UnitTests.csproj
+          !src/**/*.Data.UnitTests.csproj
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+    - task: DotNetCoreCLI@2
+      displayName: UnitTest
+      inputs:
+        command: test
+        projects: |
+          src/**/*.UnitTests.csproj
+          !src/**/*.Data.UnitTests.csproj
+        arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
+
+    - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
+
+    - task: DotNetCoreCLI@2
+      displayName: Build $(SolutionBaseName).Messages
+      inputs:
+        command: 'build'
+        projects: src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet pack'
+      inputs:
+        command: pack
+        packagesToPack: 'src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj'
+        versioningScheme: byEnvVar
+        versionEnvVar: GitVersion.MajorMinorPatch
+        packDirectory: $(build.artifactstagingdirectory)/NugetPackages
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish - dotnet publish application $(SolutionBaseName).API'
+      inputs:
+        command: 'publish'
+        projects: 'src/$(SolutionBaseName).Api/$(SolutionBaseName).Api.csproj'
+        arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
+        publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(build.artifactstagingdirectory)/publish'
+      inputs:
+        Contents: |
+          azure/**
+        TargetFolder: '$(build.artifactstagingdirectory)/publish'
+        OverWrite: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: NugetPackages'
+      inputs:
+        targetPath: $(build.artifactstagingdirectory)/NugetPackages
+        artifactName: NugetPackages
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: drop'
+      inputs:
+        targetPath: $(build.artifactstagingdirectory)/publish
+        artifactName: drop
+
+  - job: 'DACPACBuild'
+    pool:
+      name: 'DAS - Continuous Integration'
+      demands: Agent.OS -equals Windows_NT
+    workspace:
+      clean: all
+    steps:
+    - task: VSBuild@1
+      displayName: 'Build DACPAC'
+      inputs:
+        solution: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
+        platform: 'anycpu'
+        configuration: '$(buildConfiguration)'
+        msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
+
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+      inputs:
+        Contents: |
+          src\**\*.dacpac
+        TargetFolder: '$(build.artifactstagingdirectory)/publish'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: dacpac'
+      inputs:
+        targetPath: $(build.artifactstagingdirectory)/publish
+        artifactName: dacpac        
+
+- stage: NugetPublish
+  displayName: 'Publish Nuget Package'
+  pool:
+    name: "DAS - Continuous Deployment"
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - job: 'CleanArtifacts'
+    displayName: Clean artifacts directory
+    workspace:
+      clean: all
+  - deployment: 'NugetPush'
+    dependsOn: 'CleanArtifacts'
+    environment: 'Nuget'
+    strategy:
+      runOnce:
+        deploy:
+          steps:            
+          - download: current
+            artifact: NugetPackages
+          - task: NuGetCommand@2
+            displayName: 'NuGet push'
+            inputs:
+              command: push
+              packagesToPush: '$(Pipeline.Workspace)/NugetPackages/*.nupkg;!$(Pipeline.Workspace)/NugetPackages/*.symbols.nupkg'
+              nuGetFeedType: external
+              publishFeedCredentials: 'SFA NuGet'

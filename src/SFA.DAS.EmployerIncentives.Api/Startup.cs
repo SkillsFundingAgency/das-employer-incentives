@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
+using SFA.DAS.EmployerIncentives.Queries;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api
@@ -54,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<RetryPolicies>(Configuration.GetSection("RetryPolicies"));
             services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
             services.AddCommandServices();
+            services.AddQueryServices();
 
             services.AddDbContext<EmployerIncentivesDbContext>((options) =>
             {

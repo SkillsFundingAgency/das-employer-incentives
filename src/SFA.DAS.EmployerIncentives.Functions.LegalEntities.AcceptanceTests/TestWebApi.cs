@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
             _config = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
-                    { "ConfigNames", "SFA.DAS.EmployerIncentives.Jobs" }
+                    { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
         }
 
