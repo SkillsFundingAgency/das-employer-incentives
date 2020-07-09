@@ -34,10 +34,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests
                     a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
                     a.DistributedLockStorage = "UseDevelopmentStorage=true";
                 });
-                s.Configure<RetryPolicies>(a =>
+                s.Configure<PolicySettings>(a =>
                 {
-                    a.LockedRetryAttempts = 0;
-                    a.LockedRetryWaitInMilliSeconds = 0;
+                    a.RetryPolicies = new RetryPolicySettings
+                    {
+                        LockedRetryAttempts = 0,
+                        LockedRetryWaitInMilliSeconds = 0
+                    };
                 });
 
                 if (_context.AccountApi != null)

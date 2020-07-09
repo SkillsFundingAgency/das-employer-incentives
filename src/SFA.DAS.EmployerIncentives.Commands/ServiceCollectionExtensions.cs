@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             .AddScoped<ICommandDispatcher, CommandDispatcher>();
 
             serviceCollection
-              .AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
+              .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
             serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();

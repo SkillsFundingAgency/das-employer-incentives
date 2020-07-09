@@ -1,7 +1,6 @@
 ﻿using Polly;
 using SFA.DAS.NServiceBus.Services;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,16 +9,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
     public class MultiEventPublisherWithLimit : IMultiEventPublisher
     {
         private readonly IEventPublisher _eventPublisher;
+        private readonly Policies _policies;
 
-        public MultiEventPublisherWithLimit(IEventPublisher eventPublisher)
+        public MultiEventPublisherWithLimit(
+            IEventPublisher eventPublisher,
+            Policies policies)
         {
             _eventPublisher = eventPublisher;
+            _policies = policies;
         }
 
         public async Task Publish<T>(IEnumerable<T> messages) where T : class
         {
             var tasksToRun = new List<Task<PolicyResult>>();
-            var policy = Policy.BulkheadAsync(100, messages.ToList().Count);
+            var policy = _policies.MultiEventPublishLimiterPolicy;
 
             foreach (var message in messages)
             {

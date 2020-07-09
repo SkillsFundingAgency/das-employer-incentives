@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
-            services.Configure<RetryPolicies>(Configuration.GetSection("RetryPolicies"));
+            services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
             services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
             services.AddCommandServices();
             services.AddQueryServices();
