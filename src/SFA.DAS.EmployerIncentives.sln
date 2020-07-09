@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{19B5E22A-31B8-4F4A-B759-F82B368F81A9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests", "SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests\SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.csproj", "{41F9D3B2-BE56-425A-8057-FE3D4C6AAE33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Api.AcceptanceTests", "SFA.DAS.EmployerIncentives.Api.AcceptanceTests\SFA.DAS.EmployerIncentives.Api.AcceptanceTests.csproj", "{41F9D3B2-BE56-425A-8057-FE3D4C6AAE33}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Domain", "SFA.DAS.EmployerIncentives.Domain\SFA.DAS.EmployerIncentives.Domain.csproj", "{065E407B-F57F-489E-9064-D6AA473F85F5}"
 EndProject
