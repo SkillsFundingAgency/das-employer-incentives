@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SFA.DAS.EmployerIncentives.Api;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.UnitOfWork.Context;
 using System.Collections.Generic;

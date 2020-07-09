@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         private void CreateTestDatabase()
         {
             DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
-            DatabaseInfo.SetConnectionString(@$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");
+            DatabaseInfo.SetConnectionString(@$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");            
 
             Publish();
 
