@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Queries
                         .AsImplementedInterfaces()
                         .WithTransientLifetime();
                 })
-                .AddSingleton<IQueryDispatcher, QueryDispatcher>();
+                .AddScoped<IQueryDispatcher, QueryDispatcher>();
 
             return serviceCollection;
         }
