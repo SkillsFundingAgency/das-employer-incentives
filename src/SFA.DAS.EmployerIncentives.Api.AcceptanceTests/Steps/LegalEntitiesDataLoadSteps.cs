@@ -20,58 +20,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly TestContext _testContext;
         private readonly HttpStatusCode _expectedResult = HttpStatusCode.OK;
 
-        public LegalEntitiesDataLoadSteps(TestContext testContext) : base(testContext) 
+        public LegalEntitiesDataLoadSteps(TestContext testContext) : base(testContext)
         {
-            _testContext = testContext;            
+            _testContext = testContext;
         }
 
         [Given(@"legal entities exist in Managed Apprenticeships")]
         public void GivenLegalEntitiesExistInMa()
         {
-            // set up the paged response
-            for (int i = 1; i < 3; i++)
+            var totalPages = 3;
+
+            for (int pageNumber = 1; pageNumber < totalPages; pageNumber++)
             {
-                var testData = _testContext.TestData.GetOrCreate<PagedModel<AccountLegalEntity>>($"PagedModel<AccountLegalEntity>_{i}");
-                testData.TotalPages = 3;
-                testData.Page = i;
-
-                _testContext.AccountApi.MockServer
-                .Given(
-                        Request
-                        .Create()
-                        .WithPath($"/api/accountlegalentities")
-                        .WithParam("pageNumber", new ExactMatcher($"{i}"))
-                        .UsingGet()
-                        )
-                    .RespondWith(Response.Create()
-                    .WithStatusCode(HttpStatusCode.OK)
-                    .WithHeader("Content-Type", "application/json")
-                    .WithBodyAsJson(testData));
-
-                // set up the repsonses for each legal entity referenced in the paged response
-                foreach (AccountLegalEntity legalEntity in testData.Data)
-                {
-                    _testContext.AccountApi.MockServer
-                    .Given(
-                       Request
-                       .Create()
-                       .WithPath($"/api/accounts/{_testContext.HashingService.HashValue(legalEntity.AccountId)}/legalEntities/{legalEntity.LegalEntityId}")
-                       .UsingGet()
-                       )
-                       .RespondWith(Response.Create()
-                       .WithStatusCode(HttpStatusCode.OK)
-                       .WithHeader("Content-Type", "application/json")
-                       .WithBodyAsJson(new GetLegalEntityResponse
-                       {
-                           LegalEntity = new LegalEntity
-                           {
-                               LegalEntityId = legalEntity.LegalEntityId,
-                               Name = $"Name_{legalEntity.LegalEntityId}"
-                           }
-                       }));
-                }
+                SetUpMockPageResponse(pageNumber, totalPages);
             }
-        }
+        }        
 
         [When(@"a RefreshLegalEntities job is requested")]
         public async Task WhenArefreshLegalEntitiesJobisrequested()
@@ -92,60 +55,129 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the legal entities are available in employer incentives")]
         public void ThenTheLegalEntitiesShouldBeAvailableInEmployerIncentives()
         {
-            for (int i = 1; i < 3; i++)
+            var totalPages = 3;
+
+            for (int pageNumber = 1; pageNumber < totalPages; pageNumber++)
             {
-                var testData = _testContext.TestData.GetOrCreate<PagedModel<AccountLegalEntity>>($"PagedModel<AccountLegalEntity>_{i}");
+                var testData = _testContext.TestData.GetOrCreate<PagedModel<AccountLegalEntity>>($"PagedModel<AccountLegalEntity>_{pageNumber}");
                 testData.Data.Count.Should().Be(3);
 
-                if (i == 1)
+                if (IsFirstPage(pageNumber))
                 {
-                    var requests = _testContext
+                    AssertAccountServiceWasCalledForPageNumber(pageNumber);
+
+                    foreach (AccountLegalEntity legalEntity in testData.Data)
+                    {
+                        AssertAccountServiceWasCalledForLegalEntity(legalEntity);
+                        AssertRefreshLegalEntityWasPublished(legalEntity);
+                    }
+                }
+                else
+                {
+                    AssertRefreshLegalEntitiesEventsWerePublishedForPage(pageNumber);
+                }
+            }
+        }
+
+        private bool IsFirstPage(int pageNumber)
+        {
+            return pageNumber == 1;
+        }
+
+        private void AssertAccountServiceWasCalledForPageNumber(int pageNumber)
+        {
+            var requests = _testContext
                        .AccountApi
                        .MockServer
                        .FindLogEntries(
                            Request
                            .Create()
                            .WithPath(u => u.StartsWith($"/api/accountlegalentities"))
-                           .WithParam("pageNumber", true, new[] { $"{i}" })
+                           .WithParam("pageNumber", true, new[] { $"{pageNumber}" })
                            .UsingGet());
 
-                    requests.AsEnumerable().Count().Should().Be(1);
+            requests.AsEnumerable().Count().Should().Be(1);
+        }
 
-                    foreach (AccountLegalEntity legalEntity in testData.Data)
-                    {
-                        requests = _testContext
+        private void AssertAccountServiceWasCalledForLegalEntity(AccountLegalEntity accountLegalEntity)
+        {
+            var requests = _testContext
                              .AccountApi
                              .MockServer
                              .FindLogEntries(
                                  Request
                                  .Create()
-                                 .WithPath($"/api/accounts/{_testContext.HashingService.HashValue(legalEntity.AccountId)}/legalEntities/{legalEntity.LegalEntityId}")
+                                 .WithPath($"/api/accounts/{_testContext.HashingService.HashValue(accountLegalEntity.AccountId)}/legalEntities/{accountLegalEntity.LegalEntityId}")
                                  .UsingGet());
 
-                        requests.AsEnumerable().Count().Should().Be(1);
-                    }
+            requests.AsEnumerable().Count().Should().Be(1);
+        }      
 
-                    // Assert the RefreshLegalEntity Events were published
-                    var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntityEvent>>();
+        private void AssertRefreshLegalEntityWasPublished(AccountLegalEntity accountLegalEntity)
+        {
+            var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntityEvent>>();
 
-                    foreach (AccountLegalEntity legalEntity in testData.Data)
-                    {
-                        var publishedEvent = publishedEvents.SingleOrDefault(e => e.AccountId == legalEntity.AccountId &&
-                                                     e.AccountLegalEntityId == legalEntity.AccountLegalEntityId &&
-                                                     e.LegalEntityId == legalEntity.LegalEntityId &&
-                                                     e.OrganisationName == $"Name_{legalEntity.LegalEntityId}");
+            var publishedEvent = publishedEvents.SingleOrDefault(e => e.AccountId == accountLegalEntity.AccountId &&
+                                             e.AccountLegalEntityId == accountLegalEntity.AccountLegalEntityId &&
+                                             e.LegalEntityId == accountLegalEntity.LegalEntityId &&
+                                             e.OrganisationName == $"Name_{accountLegalEntity.LegalEntityId}");
 
-                        publishedEvent.Should().NotBeNull();
-                    }
-                }
-                else
-                {
-                    // Assert the RefreshLegalEntitiesEvent page events were published (for pages 2 +)
-                    var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntitiesEvent>>();
-                    var publishedEvent = publishedEvents.SingleOrDefault(e => e.PageNumber == i);                    
-                    publishedEvent.Should().NotBeNull();                    
-                }
+            publishedEvent.Should().NotBeNull();            
+        }
+
+        private void AssertRefreshLegalEntitiesEventsWerePublishedForPage(int pageNumber)
+        {
+            var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntitiesEvent>>();
+            var publishedEvent = publishedEvents.SingleOrDefault(e => e.PageNumber == pageNumber);
+            publishedEvent.Should().NotBeNull();
+        }
+
+        private void SetUpMockPageResponse(int pageNumber, int totalPages)
+        {
+            var testData = _testContext.TestData.GetOrCreate<PagedModel<AccountLegalEntity>>($"PagedModel<AccountLegalEntity>_{pageNumber}");
+            testData.TotalPages = totalPages;
+            testData.Page = pageNumber;
+
+            _testContext.AccountApi.MockServer
+            .Given(
+                    Request
+                    .Create()
+                    .WithPath($"/api/accountlegalentities")
+                    .WithParam("pageNumber", new ExactMatcher($"{pageNumber}"))
+                    .UsingGet()
+                    )
+                .RespondWith(Response.Create()
+                .WithStatusCode(HttpStatusCode.OK)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(testData));
+
+            foreach (AccountLegalEntity legalEntity in testData.Data)
+            {
+                SetUpMockLegalEntityResponse(legalEntity);
             }
+        }
+
+        private void SetUpMockLegalEntityResponse(AccountLegalEntity accountLegalEntity)
+        {
+            _testContext.AccountApi.MockServer
+                    .Given(
+                       Request
+                       .Create()
+                       .WithPath($"/api/accounts/{_testContext.HashingService.HashValue(accountLegalEntity.AccountId)}/legalEntities/{accountLegalEntity.LegalEntityId}")
+                       .UsingGet()
+                       )
+                       .RespondWith(Response.Create()
+                       .WithStatusCode(HttpStatusCode.OK)
+                       .WithHeader("Content-Type", "application/json")
+                       .WithBodyAsJson(new GetLegalEntityResponse
+                       {
+                           LegalEntity = new LegalEntity
+                           {
+                               LegalEntityId = accountLegalEntity.LegalEntityId,
+                               Name = $"Name_{accountLegalEntity.LegalEntityId}"
+                           }
+                       }));
+
         }
     }
 }
