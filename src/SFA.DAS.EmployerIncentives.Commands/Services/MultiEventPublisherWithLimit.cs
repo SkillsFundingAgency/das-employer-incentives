@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
                 var result = await task;
                 if (result.FinalException != null)
                 {
-                    errors.Add(new Exception($"Error publishing {typeof(T).Name} for Message {Newtonsoft.Json.JsonConvert.SerializeObject(result.Context["Message"]) }", result.FinalException));
+                    errors.Add(new Exception($"Error publishing message {typeof(T).Name} with body {Newtonsoft.Json.JsonConvert.SerializeObject(result.Context["Message"]) }", result.FinalException));
                 }
             }
             if (errors.Count > 0)
