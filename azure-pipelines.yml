@@ -81,7 +81,7 @@ stages:
         command: pack
         packagesToPack: 'src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj'
         versioningScheme: byEnvVar
-        versionEnvVar: GitVersion.NuGetVersionV2
+        versionEnvVar: GitVersion.MajorMinorPatch
         packDirectory: $(build.artifactstagingdirectory)/NugetPackages
 
     - task: DotNetCoreCLI@2
