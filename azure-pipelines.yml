@@ -4,6 +4,8 @@ trigger:
     include:
       - "*"
 
+pr: none
+
 variables:
 - name: SolutionBaseName
   value: 'SFA.DAS.EmployerIncentives'
