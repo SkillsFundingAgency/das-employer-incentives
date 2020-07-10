@@ -1,5 +1,5 @@
 ﻿@database
-@messageBus
+@api
 Feature: LegalEntityDeleted
 	When a legal entity has been removed from an account
 	Then is is no longer available in Employer Incentives

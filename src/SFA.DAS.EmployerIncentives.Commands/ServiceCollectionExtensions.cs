@@ -30,10 +30,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .WithSingletonLifetime();
             })
             .AddCommandHandlerDecorators()
-            .AddSingleton<ICommandDispatcher, CommandDispatcher>();
+            .AddScoped<ICommandDispatcher, CommandDispatcher>();
 
-            serviceCollection.AddTransient<IAccountDomainRepository, AccountDomainRepository>();
-            serviceCollection.AddTransient<IAccountDataRepository, AccountDataRepository>();
+            serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
+            serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();            
 
             return serviceCollection;
         }

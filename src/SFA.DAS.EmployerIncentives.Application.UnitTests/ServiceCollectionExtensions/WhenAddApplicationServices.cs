@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Linq;
 using System.Reflection;
@@ -28,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.ServiceCollectionExte
                     {
                         o.DistributedLockStorage = "UseDevelopmentStorage=true";
                     });
+                    c.AddDbContext<EmployerIncentivesDbContext>();
                 });
         }
 

@@ -1,97 +1,119 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "environmentName": {
+        "apiCustomHostName": {
             "type": "string",
-            "metadata": {
-                "description": "Short name of the environment. Used for the reference of the environment in table storage"
-            }
+            "defaultValue": ""
         },
-        "resourceEnvironmentName": {
-            "type": "string",
-            "metadata": {
-                "description": "Short name of the environment. Used for the naming of azure resources"
-            }
-        },
-        "serviceName": {
-            "type": "string",
-            "metadata": {
-                "description": "Short name of the service. Used for the name of resources created"
-            }
-        },
-        "sharedStorageAccountConnectionString": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Name of the connection string for shared storage account"
-            }
-        },
-        "ipSecurityRestrictions": {
+        "appServiceAllowedIPs": {
             "type": "array",
-            "metadata": {
-                "description": "Allowed IP's"
-            },
-            "defaultValue": []
+            "defaultValue": [
+            ]
         },
-        "loggingRedisConnectionString": {
-            "type": "securestring"
+        "configNames": {
+            "type": "string",
+            "defaultValue": "SFA.DAS.EmployerIncentives"
         },
         "configurationStorageConnectionString": {
             "type": "securestring"
         },
-        "appServicePlanSize": {
+        "databaseSkuName": {
             "type": "string",
-            "allowedValues": [
-                "1",
-                "2",
-                "3"
-            ],
-            "metadata": {
-                "description": "The app service plan size"
-            },
-            "defaultValue": "1"
+            "defaultValue": "S0"
         },
-        "appServicePlanInstances": {
-            "type": "int",
-            "metadata": {
-                "description": "Number of the app service plan instance"
-            },
-            "defaultValue": 2
+        "databaseTier": {
+            "type": "string",
+            "defaultValue": "Standard"
+        },
+        "elasticPoolName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "environmentName": {
+            "type": "string"
+        },
+        "keyVaultCertificateName": {
+            "type": "string"
+        },
+        "keyVaultName": {
+            "type": "string"
+        },
+        "logAnalyticsSubscriptionId": {
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]"
+        },
+        "logAnalyticsWorkspaceName": {
+            "type": "string"
+        },
+        "loggingRedisConnectionString": {
+            "type": "securestring"
+        },
+        "loggingRedisKey": {
+            "type": "securestring"
+        },
+        "resourceEnvironmentName": {
+            "type": "string"
+        },
+        "serviceName": {
+            "type": "string"
+        },
+        "sharedBackEndAppServicePlanName": {
+            "type": "string"
+        },
+        "sharedEnvResourceGroup": {
+            "type": "string"
+        },
+        "sharedManagementResourceGroup": {
+            "type": "string"
+        },
+        "sharedSqlServerName": {
+            "type": "string"
+        },
+        "sharedStorageAccountName": {
+            "type": "string"
+        },
+        "version": {
+            "type": "string",
+            "defaultValue": "1.0"
         }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
-        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
-        "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]"
+        "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
+        "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
+        "storageContainerNames": [ "employer-incentives-distributed-locks" ]
     },
     "resources": [
         {
+            "condition": "[greater(length(parameters('apiCustomHostName')), 0)]",
             "apiVersion": "2017-05-10",
-            "name": "worker-app-service-plan",
+            "name": "api-app-service-certificate",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-certificate.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
+                    "keyVaultCertificateName": {
+                        "value": "[parameters('keyVaultCertificateName')]"
                     },
-                    "aspSize": {
-                        "value": "[parameters('appServicePlanSize')]"
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
                     },
-                    "aspInstances": {
-                        "value": "[parameters('appServicePlanInstances')]"
+                    "keyVaultResourceGroup": {
+                        "value": "[parameters('sharedManagementResourceGroup')]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "function-app-insights",
+            "name": "api-application-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -101,53 +123,58 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "function-app",
+            "name": "api-app-service",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'function-app.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "functionAppName": {
-                        "value": "[variables('functionAppName')]"
+                    "appServiceName": {
+                        "value": "[variables('apiAppServiceName')]"
                     },
                     "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
+                        "value": "[parameters('sharedBackEndAppServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[resourceGroup().name]"
+                        "value": "[parameters('sharedEnvResourceGroup')]"
                     },
-                    "ipSecurityRestrictions": {
-                        "value": "[parameters('ipSecurityRestrictions')]"
-                    },
-                    "functionAppAppSettings": {
+                    "appServiceAppSettings": {
                         "value": [
                             {
-                                "name": "AzureWebJobsStorage",
-                                "value": "[parameters('sharedStorageAccountConnectionString')]"
+                                "name": "ASPNETCORE_ENVIRONMENT",
+                                "value": "[toUpper(parameters('environmentName'))]"
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('function-app-insights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('api-application-insights').outputs.InstrumentationKey.value]"
                             },
                             {
-                                "name": "FUNCTIONS_EXTENSION_VERSION",
-                                "value": "~3"
+                                "name": "ConfigNames",
+                                "value": "[parameters('configNames')]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
                             },
                             {
                                 "name": "EnvironmentName",
+                                "value": "[toUpper(parameters('environmentName'))]"
+                            },
+                            {
+                                "name": "Environment",
                                 "value": "[toUpper(parameters('environmentName'))]"
                             },
                             {
@@ -155,31 +182,103 @@
                                 "value": "[parameters('loggingRedisConnectionString')]"
                             },
                             {
-                                "name": "ConfigurationStorageConnectionString",
-                                "value": "[parameters('configurationStorageConnectionString')]"
+                                "name": "LoggingRedisKey",
+                                "value": "[parameters('loggingRedisKey')]"
                             },
                             {
-                                "name": "AppName",
-                                "value": "das-employer-incentives-jobs"
-                            },
-                            {
-                                "name": "FUNCTIONS_WORKER_RUNTIME",
-                                "value": "dotnet"
+                                "name": "Version",
+                                "value": "[parameters('version')]"
                             }
                         ]
+                    },
+                    "customHostName": {
+                        "value": "[parameters('apiCustomHostName')]"
+                    },
+                    "certificateThumbprint": {
+                        "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference('api-app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('appServiceAllowedIPs')]"
                     }
                 }
             },
             "dependsOn": [
-                "function-app-insights",
-                "worker-app-service-plan"
+                "api-app-service-certificate"
             ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "[concat('storage-account-container-',variables('storageContainerNames')[copyIndex()])]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'storage-container.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "storageAccountName": {
+                        "value": "[parameters('sharedStorageAccountName')]"
+                    },
+                    "containerName": {
+                        "value": "[variables('storageContainerNames')[copyIndex()]]"
+                    }
+                }
+            },
+            "copy": {
+                "count": "[length(variables('storageContainerNames'))]",
+                "name": "storageContainerCopy"
+            }
+        },
+        {
+            "apiVersion": "2018-02-01",
+            "name": "employer-incentives-sql-database",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'sql-database.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "databaseName": {
+                        "value": "[variables('databaseName')]"
+                    },
+                    "sqlServerName": {
+                        "value": "[parameters('sharedSqlServerName')]"
+                    },
+                    "databaseSkuName": {
+                        "value": "[parameters('databaseSkuName')]"
+                    },
+                    "databaseTier": {
+                        "value": "[parameters('databaseTier')]"
+                    },
+                    "elasticPoolName": {
+                        "value": "[parameters('elasticPoolName')]"
+                    },
+                    "logAnalyticsSubscriptionId": {
+                        "value": "[parameters('logAnalyticsSubscriptionId')]"
+                    },
+                    "logAnalyticsResourceGroup": {
+                        "value": "[parameters('sharedManagementResourceGroup')]"
+                    },
+                    "logAnalyticsWorkspaceName": {
+                        "value": "[parameters('logAnalyticsWorkspaceName')]"
+                    }
+                }
+            }
         }
     ],
     "outputs": {
-        "FunctionAppName": {
+        "ApiAppServiceName": {
             "type": "string",
-            "value": "[variables('functionAppName')]"
+            "value": "[variables('apiAppServiceName')]"
+        },
+        "DatabaseName": {
+            "type": "string",
+            "value": "[variables('databaseName')]"
         }
     }
 }

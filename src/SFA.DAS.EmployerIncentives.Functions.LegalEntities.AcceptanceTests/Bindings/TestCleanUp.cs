@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bindings
@@ -14,15 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Bin
         }
 
         [AfterScenario()]
-        public async Task CleanUp()
+        public void CleanUp()
         {
-            if (_context.TestMessageBus.IsRunning)
-            {
-                await _context.TestMessageBus.Stop();
-            }
+            _context.EmployerIncentiveApi.Dispose();
             _context.SqlDatabase.Dispose();
             Directory.Delete(_context.TestDirectory.FullName, true);
-            _context.FunctionsHost.Dispose();
         }
     }
 }

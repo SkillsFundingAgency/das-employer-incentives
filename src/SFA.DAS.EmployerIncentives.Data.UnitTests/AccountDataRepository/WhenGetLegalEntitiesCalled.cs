@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         public async Task Then_data_is_fetched_from_database()
         {
             // Arrange
-            var allAccounts = _fixture.CreateMany<Accounts>(10).ToArray();
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
             const long accountId = -1;
 
             allAccounts[0].Id = accountId;

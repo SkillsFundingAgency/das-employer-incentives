@@ -5,11 +5,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities.AcceptanceTests.Ste
 {
     public class StepsBase
     {
-        private readonly TestContext _testContext;
+        protected readonly TestContext TestContext;
+        protected readonly EmployerIncentiveApi EmployerIncentiveApi;
 
         public StepsBase(TestContext testContext)
         {
-            _testContext = testContext;
+            TestContext = testContext;
+            EmployerIncentiveApi = testContext.EmployerIncentiveApi;
         }        
     }
 }

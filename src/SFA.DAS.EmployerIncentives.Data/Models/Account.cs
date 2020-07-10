@@ -1,6 +1,9 @@
-﻿namespace SFA.DAS.EmployerIncentives.Data.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SFA.DAS.EmployerIncentives.Data.Models
 {
-    public partial class Accounts
+    [Table("Accounts")]
+    public partial class Account
     {
         public long Id { get; set; }
         public long AccountLegalEntityId { get; set; }
