@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Account;
 using System.Linq;
@@ -12,8 +13,12 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class AccountQueryController : ApiQueryControllerBase
     {
-        public AccountQueryController(IQueryDispatcher queryDispatcher) : base(queryDispatcher)
+        private readonly ILogger<AccountQueryController> _logger;
+
+        public AccountQueryController(IQueryDispatcher queryDispatcher,
+            ILogger<AccountQueryController> logger) : base(queryDispatcher, logger)
         {
+            _logger = logger;
         }
 
         [HttpGet("/accounts/{accountId}/LegalEntities")]
@@ -21,17 +26,20 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             var request = new GetLegalEntitiesRequest(accountId);
             var response = QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
-            
+
             ThrowIfNotFound(response.Result);
-          
+
             return response;
         }
 
-        private static void ThrowIfNotFound(GetLegalEntitiesResponse response)
+        private void ThrowIfNotFound(GetLegalEntitiesResponse response)
         {
             if (response?.LegalEntities?.Count() > 0) return;
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            var ex = new HttpResponseException(HttpStatusCode.NotFound);
+            _logger.LogError(ex, ErrorMessages.AccountNotFound);
+
+            throw ex;
         }
     }
 }
