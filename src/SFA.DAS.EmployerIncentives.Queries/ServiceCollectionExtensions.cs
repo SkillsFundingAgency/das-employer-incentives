@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.Account;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries.Account;
 
 namespace SFA.DAS.EmployerIncentives.Queries
@@ -28,7 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Queries
                         .AsImplementedInterfaces()
                         .WithTransientLifetime();
                 })
-                .AddSingleton<IQueryDispatcher, QueryDispatcher>();
+                .AddSingleton<IQueryDispatcher, QueryDispatcher>()
+                .AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
 
             return serviceCollection;
         }
