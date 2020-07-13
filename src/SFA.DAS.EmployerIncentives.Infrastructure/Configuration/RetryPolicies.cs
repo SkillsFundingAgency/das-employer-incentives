@@ -11,6 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
     {
         public int LockedRetryWaitInMilliSeconds { get; set; }
         public int LockedRetryAttempts { get; set; }
+
+        public int QueryRetryWaitInMilliSeconds { get; set; }
+        public int QueryRetryAttempts { get; set; }
     }
 
     public class MultiEventPublisherLimitPolicySettings

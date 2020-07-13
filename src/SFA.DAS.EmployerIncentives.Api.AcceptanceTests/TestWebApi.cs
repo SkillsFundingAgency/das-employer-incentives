@@ -38,7 +38,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.RetryPolicies = new RetryPolicySettings
                     {
                         LockedRetryAttempts = 0,
-                        LockedRetryWaitInMilliSeconds = 0
+                        LockedRetryWaitInMilliSeconds = 0,
+                        QueryRetryWaitInMilliSeconds = 0,
+                        QueryRetryAttempts = 0
                     };
                 });
 
