@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public abstract class ApiQueryControllerBase
+    public abstract class ApiQueryControllerBase : ControllerBase
     {
         private readonly IQueryDispatcher _queryDispatcher;
         private readonly ILogger<AccountQueryController> _logger;

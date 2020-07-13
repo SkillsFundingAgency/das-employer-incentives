@@ -16,6 +16,7 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data\SFA.DAS.EmployerIncentives.Data.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Messages\SFA.DAS.EmployerIncentives.Messages.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

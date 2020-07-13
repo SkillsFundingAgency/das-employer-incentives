@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Exceptions;
 using System;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -90,6 +91,28 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Dispatcher
             // Assert
             action.Should().Throw<QueryDispatcherException>()
                 .Where(e => e.Message.StartsWith($"Unable to dispatch query '{query.GetType().Name}'. No matching handler found."));
+        }
+
+        [Test]
+        public void Then_a_QueryException_is_raised_if_query_fails()
+        {
+            // Arrange
+            var query = _fixture.Create<TestQuery1>();
+            var mockHandler = new Mock<IQueryHandler<TestQuery1, string>>();
+            const string expectedMessage = "Unable to execute query 'TestQuery1'.";
+            _mockServiceProvider.Setup(m => m.GetService(typeof(IQueryHandler<TestQuery1, string>))).Returns(mockHandler.Object);
+            var expectedBaseException = new DataException();
+
+            mockHandler.Setup(m => m.Handle(query, It.IsAny<CancellationToken>()))
+                .Callback(() => throw expectedBaseException);
+
+            // Act
+            Action action = () => _sut.Send<TestQuery1, string>(query);
+
+            // Assert
+            action.Should().Throw<QueryException>().Where(e =>
+                e.Message.StartsWith(expectedMessage) &&
+                e.InnerException == expectedBaseException);
         }
     }
 }

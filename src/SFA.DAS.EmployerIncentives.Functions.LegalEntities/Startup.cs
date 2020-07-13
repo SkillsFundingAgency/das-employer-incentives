@@ -50,6 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
             builder.Services.AddOptions();
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
             builder.Services.Configure<RetryPolicies>(config.GetSection("RetryPolicies"));
+            builder.Services.Configure<AccountApi>(config.GetSection("AccountApi"));
 
             builder.Services.AddCommandServices();
         }
