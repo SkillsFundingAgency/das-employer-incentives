@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Exceptions;
+using System;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Queries
 {
@@ -24,7 +24,14 @@ namespace SFA.DAS.EmployerIncentives.Queries
                 throw new QueryDispatcherException($"Unable to dispatch query '{query.GetType().Name}'. No matching handler found.");
             }
 
-            return service.Handle(query);
+            try
+            {
+                return service.Handle(query);
+            }
+            catch (Exception e)
+            {
+                throw new QueryException($"Unable to execute query '{query.GetType().Name}'.", e);
+            }
         }
     }
 }
