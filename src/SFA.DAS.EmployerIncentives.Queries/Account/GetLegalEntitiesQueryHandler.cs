@@ -17,14 +17,14 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account
 
         public async Task<GetLegalEntitiesResponse> Handle(GetLegalEntitiesRequest query, CancellationToken cancellationToken = default)
         {
-             var accounts = await _repository.GetList(account => account.AccountId == query.AccountId);
+            var accounts = await _repository.GetList(account => account.AccountId == query.AccountId);
 
-             var response = new GetLegalEntitiesResponse
-             {
-                 LegalEntities = accounts
-             };
+            var response = new GetLegalEntitiesResponse
+            {
+                LegalEntities = accounts
+            };
 
-             return response;
+            return response;
         }
     }
 }

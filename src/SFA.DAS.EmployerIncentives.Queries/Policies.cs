@@ -1,9 +1,9 @@
-﻿using System;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries.Exceptions;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Queries
 {
