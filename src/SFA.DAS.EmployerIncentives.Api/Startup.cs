@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.EmployerIncentives.Queries;
 using System.IO;
 
@@ -50,14 +52,16 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
-            services.Configure<RetryPolicies>(Configuration.GetSection("RetryPolicies"));
-
+            services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
+            services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
             services.AddCommandServices();
             services.AddQueryServices();
 
-            services.AddDbContext<EmployerIncentivesDbContext>((options) => {
+            services.AddDbContext<EmployerIncentivesDbContext>((options) =>
+            {
                 options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
-            });
+            })
+            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -87,6 +91,11 @@ namespace SFA.DAS.EmployerIncentives.Api
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
             });
+        }
+
+        public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
+        {
+            serviceProvider.StartNServiceBus(Configuration).GetAwaiter().GetResult();
         }
     }
 }

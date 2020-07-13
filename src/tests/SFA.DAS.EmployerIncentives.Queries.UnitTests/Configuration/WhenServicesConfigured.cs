@@ -15,8 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Configuration
             // Arrange
             var inMemorySettings = new Dictionary<string, string>
             {
-                {"RetryPolicies:LockedRetryAttempts", "1"},
-                {"RetryPolicies:LockedRetryWaitInMilliSeconds", "100"},
+                {"PolicySettings:RetryPolicies:QueryRetryAttempts", "1"},
+                {"PolicySettings:RetryPolicies:QueryRetryWaitInMilliSeconds", "100"},
             };
 
             var configuration = new ConfigurationBuilder()
@@ -25,14 +25,14 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Configuration
 
             var services = new ServiceCollection();
             services.AddQueryServices();
-            services.Configure<RetryPolicies>(configuration.GetSection("RetryPolicies"));
+            services.Configure<PolicySettings>(configuration.GetSection("PolicySettings"));
 
             // Act
             var polly = services.BuildServiceProvider().GetService<Policies>();
 
             // Assert
             polly.Should().NotBeNull();
-            polly.LockRetryPolicy.Should().NotBeNull();
+            polly.QueryRetryPolicy.Should().NotBeNull();
         }
     }
 }

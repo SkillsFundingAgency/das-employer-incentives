@@ -2,9 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Account;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -17,21 +15,17 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpGet("/accounts/{accountId}/LegalEntities")]
-        public Task<GetLegalEntitiesResponse> GetLegalEntities(long accountId)
+        public async Task<IActionResult> GetLegalEntities(long accountId)
         {
             var request = new GetLegalEntitiesRequest(accountId);
-            var response = QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
-            
-            ThrowIfNotFound(response.Result);
-          
-            return response;
-        }
+            var response = await QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
 
-        private static void ThrowIfNotFound(GetLegalEntitiesResponse response)
-        {
-            if (response?.LegalEntities?.Count() > 0) return;
+            if(response?.LegalEntities?.Count() > 0)
+            {
+                return Ok(response);
+            }
 
-            throw new HttpResponseException(HttpStatusCode.NotFound);
+            return NotFound();
         }
     }
 }

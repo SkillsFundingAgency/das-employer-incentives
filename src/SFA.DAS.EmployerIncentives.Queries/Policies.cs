@@ -9,17 +9,17 @@ namespace SFA.DAS.EmployerIncentives.Queries
 {
     public class Policies
     {
-        public readonly AsyncRetryPolicy LockRetryPolicy;
+        public readonly AsyncRetryPolicy QueryRetryPolicy;
 
-        public Policies(IOptions<RetryPolicies> settings)
+        public Policies(IOptions<PolicySettings> policySettings)
         {
-            var retryPolicies = settings.Value;
+            var retryPolicies = policySettings.Value?.RetryPolicies;
 
-            LockRetryPolicy = Policy
+            QueryRetryPolicy = Policy
                 .Handle<QueryException>()
                 .WaitAndRetryAsync(
-                    retryPolicies.LockedRetryAttempts,
-                    retryAttempt => TimeSpan.FromMilliseconds(retryPolicies.LockedRetryWaitInMilliSeconds));
+                    retryPolicies.QueryRetryAttempts,
+                    retryAttempt => TimeSpan.FromMilliseconds(retryPolicies.QueryRetryWaitInMilliSeconds));
         }
     }
 }

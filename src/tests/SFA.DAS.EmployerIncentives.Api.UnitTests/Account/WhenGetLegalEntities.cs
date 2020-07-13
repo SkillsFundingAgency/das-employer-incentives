@@ -1,15 +1,13 @@
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Queries.Account;
-using System;
-using System.Net;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
@@ -39,14 +37,15 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                 .ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetLegalEntities(accountId);
+            var actual = await _sut.GetLegalEntities(accountId) as OkObjectResult;
 
             // Assert
-            actual.Should().Be(expected);
+            actual.Should().NotBeNull();
+            actual.Value.Should().Be(expected);
         }
 
         [Test]
-        public void Then_error_returned_for_non_existing_account()
+        public async Task Then_error_returned_for_non_existing_account()
         {
             // Arrange
             const long accountId = 7;
@@ -57,11 +56,10 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                 .ReturnsAsync(expected);
 
             // Act
-             Action act = () =>  _sut.GetLegalEntities(accountId);
+            var actual = await _sut.GetLegalEntities(accountId) as NotFoundResult;
 
             // Assert
-            act.Should().Throw<HttpResponseException>()
-                .Where(x => x.Response.StatusCode == HttpStatusCode.NotFound);
+            actual.Should().NotBeNull();
         }
 
     }

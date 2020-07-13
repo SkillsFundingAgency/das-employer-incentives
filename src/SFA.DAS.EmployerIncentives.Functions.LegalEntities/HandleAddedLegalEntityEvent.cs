@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
 {
-
     public class HandleAddedLegalEntityEvent
     {
         private readonly ICommandDispatcher _commandDispatcher;
@@ -19,9 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.LegalEntities
         }
 
         [FunctionName("HandleAddedLegalEntityEvent")]
-        public async Task Run([NServiceBusTrigger(Endpoint = QueueNames.LegalEntityAdded)] AddedLegalEntityEvent message)
+        public Task Run([NServiceBusTrigger(Endpoint = QueueNames.LegalEntityAdded)] AddedLegalEntityEvent message)
         {
-            await _commandDispatcher.Send(
+            return _commandDispatcher.Send(
                 new AddLegalEntityCommand(
                     message.AccountId,
                     message.LegalEntityId,

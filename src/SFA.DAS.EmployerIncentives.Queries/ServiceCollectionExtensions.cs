@@ -30,8 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Queries
                         .AsImplementedInterfaces()
                         .WithTransientLifetime();
                 })
-                .AddSingleton<IQueryDispatcher, QueryDispatcher>()
-                .AddSingleton(c => new Policies(c.GetService<IOptions<RetryPolicies>>()));
+                .AddScoped<IQueryDispatcher, QueryDispatcher>()
+                .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             return serviceCollection;
         }
