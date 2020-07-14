@@ -4,4 +4,8 @@
     {
         protected AggregateRoot(IdType id, EntityModel properties, bool isNew) : base(id, properties, isNew) { }        
     }
+
+    public abstract class AggregateRoot
+    {
+    }
 }
