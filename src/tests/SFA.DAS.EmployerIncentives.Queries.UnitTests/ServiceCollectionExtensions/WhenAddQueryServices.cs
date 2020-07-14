@@ -35,7 +35,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ServiceCollectionExtensio
                 .ConfigureServices(c =>
                 {
                     c.AddOptions();
-                    c.Configure<ApplicationSettings>(o => { o.DistributedLockStorage = "UseDevelopmentStorage=true"; });
                     c.Configure<PolicySettings>(configuration.GetSection("PolicySettings"));
                     c.AddDbContext<EmployerIncentivesDbContext>();
                 });
