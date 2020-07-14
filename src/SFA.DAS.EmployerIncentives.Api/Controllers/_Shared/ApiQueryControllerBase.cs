@@ -16,7 +16,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             _queryDispatcher = queryDispatcher;
         }
 
-  
         protected Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TQuery : IQuery
         {
             return _queryDispatcher.Send<TQuery, TResult>(query);
