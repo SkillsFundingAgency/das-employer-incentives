@@ -7,7 +7,7 @@ using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprenticeshi
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
-    [Route("eligibleapprenticeships")]
+    [Route("eligible-apprenticeships")]
     [ApiController]
     public class EligibleApprenticeshipsQueryController : ApiQueryControllerBase
     {

@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenIRequestTheEligibilityOfAnApprenticeship()
         {
             var uln = 1234567;
-            var url = $"eligibleapprenticeships/{uln}?startDate=2020-08-01&isApproved=true";
+            var url = $"eligible-apprenticeships/{uln}?startDate=2020-08-01&isApproved=true";
             _apiResult = await EmployerIncentiveApi.Client.GetAsync(url);
         }
 
