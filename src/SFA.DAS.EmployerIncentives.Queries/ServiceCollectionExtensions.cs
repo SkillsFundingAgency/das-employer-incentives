@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain.Services;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.Account;
+using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries.Account;
 using SFA.DAS.EmployerIncentives.Queries.Decorators;
@@ -33,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Queries
                 })
                 .AddQueryHandlerDecorators()
                 .AddScoped<IQueryDispatcher, QueryDispatcher>()
+                .AddScoped<INewApprenticeIncentiveEligibilityService, NewApprenticeIncentiveEligibilityService>()
                 .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             return serviceCollection;

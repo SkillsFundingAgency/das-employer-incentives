@@ -7,7 +7,7 @@ using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprenticeshi
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
-    [Route("api/eligibleapprenticeships")]
+    [Route("eligibleapprenticeships")]
     [ApiController]
     public class EligibleApprenticeshipsQueryController : ApiQueryControllerBase
     {
@@ -15,8 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
         }
 
-        [HttpGet]
-        [Route("{uln}")]
+        [HttpGet("{uln}")]
         public async Task<IActionResult> IsApprenticeshipEligible(long uln, [FromQuery]DateTime startDate, [FromQuery]bool isApproved)
         {
             var request = new GetApprenticeshipEligibilityRequest(new ApprenticeshipDto { UniqueLearnerNumber = uln, StartDate = startDate, IsApproved = isApproved });

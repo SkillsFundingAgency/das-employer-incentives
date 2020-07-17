@@ -39,6 +39,10 @@
 
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\EligibleApprenticeshipRequested.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>EligibleApprenticeshipRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\LegalEntityCreated.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LegalEntityCreated.feature.cs</LastGenOutput>
@@ -58,6 +62,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\EligibleApprenticeshipRequested.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EligibleApprenticeshipRequested.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\LegalEntitiesDataLoadJob.feature.cs">
       <DependentUpon>LegalEntitiesDataLoadJob.feature</DependentUpon>
     </Compile>
