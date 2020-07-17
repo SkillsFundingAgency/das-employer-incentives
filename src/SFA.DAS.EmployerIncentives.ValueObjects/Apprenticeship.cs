@@ -4,10 +4,11 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
 {
     public class Apprenticeship
     {
-        public Apprenticeship(long uniqueLearnerNumber, string name, DateTime dateOfBirth, DateTime startDate, bool isApproved)
+        public Apprenticeship(long uniqueLearnerNumber, string firstName, string lastName, DateTime dateOfBirth, DateTime startDate, bool isApproved)
         {
             UniqueLearnerNumber = uniqueLearnerNumber;
-            Name = name;
+            FirstName = firstName;
+            LastName = lastName;
             DateOfBirth = dateOfBirth;
             StartDate = startDate;
             IsApproved = isApproved;
@@ -16,7 +17,8 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
         }
 
         public long UniqueLearnerNumber { get; }
-        public string Name { get; }
+        public string FirstName { get; }
+        public string LastName { get; }
         public DateTime DateOfBirth { get; }
         public DateTime StartDate { get; }
         public bool IsApproved { get; }

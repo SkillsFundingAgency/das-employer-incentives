@@ -12,8 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.NewApprenticeIncentive.IsA
         public void Then_the_apprenticeship_is_eligible()
         {
             var apprenticeship = new ApprenticeshipBuilder()
-                .WithStartDate(new DateTime(2020, 8, 1))
-                .WithIsApproved(true)
+                .WithValidIncentiveProperties()
                 .Build();
 
             var result = Domain.NewApprenticeIncentive.NewApprenticeIncentive.IsApprenticeshipEligible(apprenticeship);

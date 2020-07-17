@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Builders.ValueObjects
@@ -8,7 +6,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Builders.ValueObjects
     public class ApprenticeshipBuilder
     {
         private long _uniqueLearnerNumber;
-        private string _name;
+        private string _firstName;
+        private string _lastName;
         private DateTime _dateOfBirth;
         private DateTime _startDate;
         private bool _isApproved;
@@ -16,7 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Builders.ValueObjects
         public ApprenticeshipBuilder()
         {
             _uniqueLearnerNumber = 1234567;
-            _name = "Some Learner";
+            _firstName = "Some";
+            _lastName = "Learner";
             _dateOfBirth = DateTime.Now.AddYears(-20);
             _startDate = DateTime.Now.AddYears(-1);
             _isApproved = true;
@@ -34,9 +34,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Builders.ValueObjects
             return this;
         }
 
+        public ApprenticeshipBuilder WithValidIncentiveProperties()
+        {
+            _startDate = new DateTime(2020, 8, 1);
+            _isApproved = true;
+            return this;
+        }
+
         public Apprenticeship Build()
         {
-            return new Apprenticeship(_uniqueLearnerNumber, _name, _dateOfBirth, _startDate, _isApproved);
+            return new Apprenticeship(_uniqueLearnerNumber, _firstName, _lastName, _dateOfBirth, _startDate, _isApproved);
         }
     }
 }
