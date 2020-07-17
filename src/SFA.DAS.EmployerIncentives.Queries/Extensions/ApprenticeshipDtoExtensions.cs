@@ -7,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.Extensions
     {
         internal static Apprenticeship ToApprenticeship(this ApprenticeshipDto dto)
         {
-            return new Apprenticeship(dto.UniqueLearnerNumber, dto.FirstName, dto.LastName, dto.DateOfBirth, dto.StartDate, dto.IsApproved);
+            return new Apprenticeship(dto.UniqueLearnerNumber, dto.StartDate, dto.IsApproved);
         }
     }
 }

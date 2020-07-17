@@ -6,11 +6,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.NewApprenticeIncentive
 {
     public class NewApprenticeIncentive : AggregateRoot
     {
-        private static DateTime _eligibilityStartDate = new DateTime(2020, 8, 1);
+        private static readonly DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
 
         public static bool IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            if (apprenticeship.StartDate < _eligibilityStartDate || !apprenticeship.IsApproved)
+            if (apprenticeship.StartDate < EligibilityStartDate || !apprenticeship.IsApproved)
             {
                 return false;
             }
@@ -18,12 +18,4 @@ namespace SFA.DAS.EmployerIncentives.Domain.NewApprenticeIncentive
             return true;
         }
     }
-
-    /* public class NewApprenticeIncentiveEligibilityService : INewApprenticeIncentiveEligibilityService
-    {
-        public IEnumerable<Apprenticeship.Apprenticeship> GetEligibileApprenticeships(NewApprenticeIncentive incentive, IEnumerable<Apprenticeship.Apprenticeship> apprenticeships)
-        {
-            return apprenticeships.Where(x => incentive.IsApprenticeshipEligible(x));
-        }
-    } */
 }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.UnitTests.Builders.ValueObjects;
-using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeIncentiveEligibilityService
 {
@@ -21,20 +16,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
         }
 
         [Test]
-        public void Then_any_apprentices_which_dont_meet_the_incentive_criteria_are_filtered_out()
+        public void Then_an_ineligible_apprenticeship_returns_false()
         {
-            var apprenticeships = new List<Apprenticeship>
-            {
-                new ApprenticeshipBuilder().WithValidIncentiveProperties().Build(),
-                new ApprenticeshipBuilder().WithIsApproved(false).Build(),
-                new ApprenticeshipBuilder().WithValidIncentiveProperties().Build()
-            };
+            var apprenticeship = new ApprenticeshipBuilder().WithIsApproved(false).Build();
 
-            var result = _sut.GetEligibileApprenticeships(apprenticeships);
+            var result = _sut.IsApprenticeshipEligible(apprenticeship);
 
-            result.Count().Should().Be(2);
-            result.Should().Contain(apprenticeships[0]);
-            result.Should().Contain(apprenticeships[2]);
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_an_eligible_apprenticeship_returns_true()
+        {
+            var apprenticeship = new ApprenticeshipBuilder().WithValidIncentiveProperties().Build();
+
+            var result = _sut.IsApprenticeshipEligible(apprenticeship);
+
+            result.Should().BeTrue();
         }
     }
 }
