@@ -54,6 +54,8 @@ stages:
     ##TO DO: build the dacpac so that Data.UnitTests can consume it and set agent pool demands to use a Windows agent
     - task: DotNetCoreCLI@2
       displayName: Build UnitTests
+      env:
+        MSBUILDSINGLELOADCONTEXT: 1
       inputs:
         command: 'build'
         projects: |
