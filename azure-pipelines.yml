@@ -13,6 +13,8 @@ variables:
   value : 'any cpu'
 - name: BuildConfiguration
   value: 'release'
+- name: MSBUILDSINGLELOADCONTEXT
+  value: 1  
 - group: 'Prod Management Resources'
 
 resources:
