@@ -33,7 +33,7 @@ stages:
       name: 'DAS - Continuous Integration'
       demands:
         - dotnet
-        - Agent.OS -equals Windows_NT
+        - Agent.OS -equals Linux
     workspace:
       clean: all
     steps:
@@ -121,6 +121,14 @@ stages:
     workspace:
       clean: all
     steps:
+    - task: DotNetCoreCLI@2
+      displayName: UnitTest
+      inputs:
+        command: test
+        projects: |          
+          src/**/*.AcceptanceTests.csproj          
+        arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
+
     - task: VSBuild@1
       displayName: 'Build DACPAC'
       inputs:
