@@ -13,8 +13,6 @@ variables:
   value : 'any cpu'
 - name: BuildConfiguration
   value: 'release'
-- name: MSBUILDSINGLELOADCONTEXT
-  value: 1
 - group: 'Prod Management Resources'
 
 resources:
@@ -35,7 +33,7 @@ stages:
       name: 'DAS - Continuous Integration'
       demands:
         - dotnet
-        - Agent.OS -equals Linux
+        - Agent.OS -equals Windows_NT
     workspace:
       clean: all
     steps:
