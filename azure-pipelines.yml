@@ -60,7 +60,6 @@ stages:
         command: 'build'
         projects: |
           src/**/*.UnitTests.csproj
-          src/**/*.AcceptanceTests.csproj
           !src/**/*.Data.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
     - task: DotNetCoreCLI@2
@@ -69,7 +68,6 @@ stages:
         command: test
         projects: |
           src/**/*.UnitTests.csproj
-          src/**/*.AcceptanceTests.csproj
           !src/**/*.Data.UnitTests.csproj
         arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
@@ -123,6 +121,25 @@ stages:
     workspace:
       clean: all
     steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk 3.1'
+      inputs:
+        version: 3.1
+    - task: DotNetCoreCLI@2
+      displayName: Build UnitTests
+      inputs:
+        command: 'build'
+        projects: |
+          src/**/*.AcceptanceTests.csproj
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+    - task: DotNetCoreCLI@2
+      displayName: UnitTest
+      inputs:
+        command: test
+        projects: |
+          src/**/*.AcceptanceTests.csproj
+        arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
+
     - task: VSBuild@1
       displayName: 'Build DACPAC'
       inputs:
