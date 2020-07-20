@@ -32,7 +32,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
-    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.API\SFA.DAS.EmployerIncentives.Api.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Api\SFA.DAS.EmployerIncentives.Api.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
   </ItemGroup>
 
