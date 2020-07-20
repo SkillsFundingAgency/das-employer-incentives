@@ -58,6 +58,7 @@ stages:
         command: 'build'
         projects: |
           src/**/*.UnitTests.csproj
+          src/**/*.AcceptanceTests.csproj
           !src/**/*.Data.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
     - task: DotNetCoreCLI@2
@@ -66,6 +67,7 @@ stages:
         command: test
         projects: |
           src/**/*.UnitTests.csproj
+          src/**/*.AcceptanceTests.csproj
           !src/**/*.Data.UnitTests.csproj
         arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
