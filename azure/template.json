@@ -208,6 +208,29 @@
         },
         {
             "apiVersion": "2017-05-10",
+            "name": "api-app-service-sb-role-assignment",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[reference('api-app-service').outputs.managedServiceIdentityId.value]"
+                    },
+                    "assignmentType": {
+                        "value": "ServiceBusSender"
+                    }
+                }
+            },
+            "dependsOn": [
+                "api-app-service"
+            ]
+        },
+        {
+            "apiVersion": "2017-05-10",
             "name": "[concat('storage-account-container-',variables('storageContainerNames')[copyIndex()])]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
