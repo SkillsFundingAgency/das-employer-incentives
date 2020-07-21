@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _context = context;
 
             _config = new Dictionary<string, string>{
-                    { "EnvironmentName", "LOCAL" },
+                    { "Environment", "LOCAL" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
@@ -50,16 +50,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         a.ApiBaseUrl = _context.AccountApi.BaseAddress;
                         a.ClientId = "";
-                    });                    
+                    });
                 }
 
-                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));                
+                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
 
                 s.UseTestDb(_context);
             });
             builder.ConfigureAppConfiguration(a =>
             {
+                a.Sources.Clear();
                 a.AddInMemoryCollection(_config);
+
+                //a.AddAzureTableStorage(options =>
+                //    {
+                //        options.ConfigurationKeys = _config["ConfigNames"].Split(",");
+                //        options.StorageConnectionString = _config["ConfigurationStorageConnectionString"];
+                //        options.EnvironmentName = _config["Environment"];
+                //        options.PreFixConfigurationKeys = false;
+                //    }
+                //);
             });
             builder.UseEnvironment("LOCAL");
         }
