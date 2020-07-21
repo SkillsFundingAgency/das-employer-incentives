@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks
         [BeforeTestRun]
         public static async Task StartAzureStorageEmulator()
         {
+#if DEBUG
             var azureStorageEmulatorExe =
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\..\start_azure_storage_emulator.cmd");
             var process = new Process
@@ -29,8 +30,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks
 
             process.Start();
 
+#endif
             var storageAccount = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
-            var client = storageAccount.CreateCloudTableClient();            
+            var client = storageAccount.CreateCloudTableClient();
             var table = client.GetTableReference("Configuration");
             await table.CreateIfNotExistsAsync();
             await table.ExecuteAsync(TableOperation.InsertOrReplace(new Config()));
@@ -38,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks
 
         private class Config : ITableEntity
         {
-            public string PartitionKey { get; set; }            
+            public string PartitionKey { get; set; }
             public string RowKey { get; set; }
             public DateTimeOffset Timestamp { get; set; }
             public string ETag { get; set; }
