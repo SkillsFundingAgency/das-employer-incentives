@@ -67,6 +67,9 @@
         "sharedManagementResourceGroup": {
             "type": "string"
         },
+        "sharedServiceBusName": {
+            "type": "string"
+        },
         "sharedSqlServerName": {
             "type": "string"
         },
@@ -210,6 +213,7 @@
             "apiVersion": "2017-05-10",
             "name": "api-app-service-sb-role-assignment",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -222,6 +226,9 @@
                     },
                     "assignmentType": {
                         "value": "ServiceBusSender"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
                     }
                 }
             },
