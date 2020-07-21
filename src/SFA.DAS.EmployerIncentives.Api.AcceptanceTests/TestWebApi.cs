@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.UnitOfWork.Context;
 using System.Collections.Generic;
 
@@ -54,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 }
 
                 s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
+                s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.UseTestDb(_context);
             });
@@ -62,14 +64,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 a.Sources.Clear();
                 a.AddInMemoryCollection(_config);
 
-                //a.AddAzureTableStorage(options =>
-                //    {
-                //        options.ConfigurationKeys = _config["ConfigNames"].Split(",");
-                //        options.StorageConnectionString = _config["ConfigurationStorageConnectionString"];
-                //        options.EnvironmentName = _config["Environment"];
-                //        options.PreFixConfigurationKeys = false;
-                //    }
-                //);
             });
             builder.UseEnvironment("LOCAL");
         }
