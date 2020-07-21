@@ -10,8 +10,9 @@ using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.EmployerIncentives.Queries;
+using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
+using System;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api
@@ -26,19 +27,21 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             var config = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddAzureTableStorage(options =>
+                .SetBasePath(Directory.GetCurrentDirectory());
+
+            if (!configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
+            {
+                config.AddAzureTableStorage(options =>
                 {
                     options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
                     options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                     options.EnvironmentName = configuration["Environment"];
                     options.PreFixConfigurationKeys = false;
-                })
+                });
+            }
 #if DEBUG
-                .AddJsonFile($"appsettings.Development.json", optional: true)
+            config.AddJsonFile($"appsettings.Development.json", optional: true);
 #endif
-            ;
-
             Configuration = config.Build();
         }
 
@@ -48,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddControllers();
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
-            services.AddSwaggerGen();            
+            services.AddSwaggerGen();
 
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
