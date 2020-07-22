@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.ValueObjects\SFA.DAS.EmployerIncentives.ValueObjects.csproj" />
+    <Folder Include="Domain\Services\" />
   </ItemGroup>
 
 </Project>

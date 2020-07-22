@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain.Services;
-using SFA.DAS.EmployerIncentives.ValueObjects;
+﻿using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Services
 {

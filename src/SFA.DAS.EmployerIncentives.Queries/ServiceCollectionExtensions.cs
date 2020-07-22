@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain.Services;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.Account;
