@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.UnitOfWork.Context;
 using System.Collections.Generic;
 
@@ -18,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _context = context;
 
             _config = new Dictionary<string, string>{
-                    { "EnvironmentName", "LOCAL" },
+                    { "Environment", "LOCAL" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
@@ -50,15 +51,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         a.ApiBaseUrl = _context.AccountApi.BaseAddress;
                         a.ClientId = "";
-                    });                    
+                    });
                 }
 
-                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));                
+                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
+                s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.UseTestDb(_context);
             });
             builder.ConfigureAppConfiguration(a =>
             {
+                a.Sources.Clear();
                 a.AddInMemoryCollection(_config);
             });
             builder.UseEnvironment("LOCAL");

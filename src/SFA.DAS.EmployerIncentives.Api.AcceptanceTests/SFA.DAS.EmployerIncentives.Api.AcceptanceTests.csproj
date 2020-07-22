@@ -43,4 +43,8 @@
     <SpecFlowFeatureFiles Include="Features\LegalEntitiesForAccountRequested.feature" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Hooks\" />
+  </ItemGroup>
+
 </Project>
