@@ -6,7 +6,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
     {
         public bool IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            return NewApprenticeIncentive.NewApprenticeIncentive.IsApprenticeshipEligible(apprenticeship);
+            var incentive = new NewApprenticeIncentive();
+            return incentive.IsApprenticeshipEligible(apprenticeship);
         }
     }
 }

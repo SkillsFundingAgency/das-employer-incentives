@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.UnitTests.Builders.ValueObjects;
+using SFA.DAS.EmployerIncentives.UnitTests.Builders.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeIncentiveEligibilityService
 {

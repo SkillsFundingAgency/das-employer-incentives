@@ -1,7 +1,7 @@
 ﻿using System;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
-namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Builders.ValueObjects
+namespace SFA.DAS.EmployerIncentives.UnitTests.Builders.ValueObjects
 {
     public class ApprenticeshipBuilder
     {
