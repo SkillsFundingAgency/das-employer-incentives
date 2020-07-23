@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Include="Features\EligibleApprenticeshipRequested.feature" />
     <SpecFlowFeatureFiles Include="Features\LegalEntityCreated.feature" />
     <SpecFlowFeatureFiles Include="Features\LegalEntityDeleted.feature" />
     <SpecFlowFeatureFiles Include="Features\LegalEntitiesDataLoadJob.feature" />

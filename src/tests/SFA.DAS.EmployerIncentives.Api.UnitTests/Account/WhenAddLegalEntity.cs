@@ -10,6 +10,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {

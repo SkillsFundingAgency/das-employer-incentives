@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Services\" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
