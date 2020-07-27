@@ -1,10 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Account\Queries\**" />
+    <EmbeddedResource Remove="Account\Queries\**" />
+    <None Remove="Account\Queries\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
@@ -20,10 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Account\Queries\" />
   </ItemGroup>
 
 </Project>

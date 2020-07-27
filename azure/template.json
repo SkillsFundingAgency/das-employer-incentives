@@ -67,6 +67,9 @@
         "sharedManagementResourceGroup": {
             "type": "string"
         },
+        "sharedServiceBusName": {
+            "type": "string"
+        },
         "sharedSqlServerName": {
             "type": "string"
         },
@@ -204,6 +207,33 @@
             },
             "dependsOn": [
                 "api-app-service-certificate"
+            ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "api-app-service-sb-role-assignment",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[reference('api-app-service').outputs.managedServiceIdentityId.value]"
+                    },
+                    "assignmentType": {
+                        "value": "ServiceBusSender"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "api-app-service"
             ]
         },
         {

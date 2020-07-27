@@ -3,13 +3,15 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.Account;
+using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries.Account;
+using SFA.DAS.EmployerIncentives.Queries.Decorators;
 
 namespace SFA.DAS.EmployerIncentives.Queries
 {
     public static class ServiceCollectionExtensions
-    {       
+    {
         public static IServiceCollection AddQueryServices(this IServiceCollection serviceCollection)
         {
             serviceCollection
@@ -30,10 +32,23 @@ namespace SFA.DAS.EmployerIncentives.Queries
                         .AsImplementedInterfaces()
                         .WithTransientLifetime();
                 })
+                .AddQueryHandlerDecorators()
                 .AddScoped<IQueryDispatcher, QueryDispatcher>()
+                .AddScoped<INewApprenticeIncentiveEligibilityService, NewApprenticeIncentiveEligibilityService>()
                 .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             return serviceCollection;
         }
+
+
+        public static IServiceCollection AddQueryHandlerDecorators(this IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerWithRetry<,>))
+                .Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerWithLogging<,>));
+
+            return serviceCollection;
+        }
+
     }
 }

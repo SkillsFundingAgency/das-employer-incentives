@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Queries.Account;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
 {

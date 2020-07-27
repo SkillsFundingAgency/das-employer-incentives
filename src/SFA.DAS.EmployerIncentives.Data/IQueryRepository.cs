@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {

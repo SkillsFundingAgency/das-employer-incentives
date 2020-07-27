@@ -1,9 +1,9 @@
-﻿using System;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries.Exceptions;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Queries
 {
@@ -13,13 +13,13 @@ namespace SFA.DAS.EmployerIncentives.Queries
 
         public Policies(IOptions<PolicySettings> policySettings)
         {
-            var retryPolicies = policySettings.Value?.RetryPolicies;
+            var retryPolicies = policySettings?.Value?.RetryPolicies;
 
             QueryRetryPolicy = Policy
                 .Handle<QueryException>()
                 .WaitAndRetryAsync(
-                    retryPolicies.QueryRetryAttempts,
-                    retryAttempt => TimeSpan.FromMilliseconds(retryPolicies.QueryRetryWaitInMilliSeconds));
+                    retryPolicies?.LockedRetryAttempts ?? 3,
+                    retryAttempt => TimeSpan.FromMilliseconds(retryPolicies?.LockedRetryWaitInMilliSeconds ?? 5000));
         }
     }
 }

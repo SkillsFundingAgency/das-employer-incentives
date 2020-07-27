@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {

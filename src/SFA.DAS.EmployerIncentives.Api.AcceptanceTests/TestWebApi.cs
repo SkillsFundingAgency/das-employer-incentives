@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _context = context;
 
             _config = new Dictionary<string, string>{
-                    { "EnvironmentName", "LOCAL" },
+                    { "Environment", "LOCAL" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         a.ApiBaseUrl = _context.AccountApi.BaseAddress;
                         a.ClientId = "";
-                    });                    
+                    });
                 }
 
                 s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
@@ -61,6 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             });
             builder.ConfigureAppConfiguration(a =>
             {
+                a.Sources.Clear();
                 a.AddInMemoryCollection(_config);
             });
             builder.UseEnvironment("LOCAL");

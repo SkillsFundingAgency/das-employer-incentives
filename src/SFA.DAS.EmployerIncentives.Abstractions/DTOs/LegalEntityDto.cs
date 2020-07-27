@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.EmployerIncentives.Abstractions
+﻿namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
 {
     public class LegalEntityDto
     {
