@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 await SendCommandAsync(new RefreshLegalEntitiesCommand(pageNumber, pageSize));
             }
 
-            return Ok();
+            return NoContent();
         }
     }
 }

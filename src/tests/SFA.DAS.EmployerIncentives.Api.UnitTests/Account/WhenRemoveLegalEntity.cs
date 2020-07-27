@@ -49,14 +49,14 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         }
 
         [Test]
-        public async Task Then_an_OK_response_is_returned()
+        public async Task Then_a_NoContent_response_is_returned()
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
             var accountId = _fixture.Create<long>();
 
             // Act
-            var actual = await _sut.RemoveLegalEntity(accountId, accountLegalEntityId) as OkResult;
+            var actual = await _sut.RemoveLegalEntity(accountId, accountLegalEntityId) as NoContentResult;
 
             // Assert
             actual.Should().NotBeNull();

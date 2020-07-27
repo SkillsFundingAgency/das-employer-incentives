@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> RemoveLegalEntity([FromRoute] long accountId, long accountLegalEntityId)
         {
             await SendCommandAsync(new RemoveLegalEntityCommand(accountId, accountLegalEntityId));
-            return Ok();
+            return NoContent();
         }
     }
 }

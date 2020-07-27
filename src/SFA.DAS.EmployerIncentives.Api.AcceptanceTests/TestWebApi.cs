@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.UnitOfWork.Context;
 using System.Collections.Generic;
 
@@ -53,7 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });                    
                 }
 
-                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));                
+                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
+                s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.UseTestDb(_context);
             });
