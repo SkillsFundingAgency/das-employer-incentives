@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class LegalEntitiesDataLoadSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private readonly HttpStatusCode _expectedResult = HttpStatusCode.OK;
+        private readonly HttpStatusCode _expectedResult = HttpStatusCode.NoContent;
 
         public LegalEntitiesDataLoadSteps(TestContext testContext) : base(testContext)
         {

@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             await EmployerIncentiveApi.Delete($"/accounts/{_testAccountTable.Id}/legalEntities/{_testAccountTable.AccountLegalEntityId}");
             
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }     
     }
 }

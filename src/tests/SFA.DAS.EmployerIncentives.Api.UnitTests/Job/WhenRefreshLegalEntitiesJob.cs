@@ -71,13 +71,13 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
         }
 
         [Test]
-        public async Task Then_an_Ok_response_is_returned()
+        public async Task Then_a_NoContent_response_is_returned()
         {
             // Arrange
             var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.RefreshLegalEntities).Create();
 
             // Act
-            var actual = await _sut.AddJob(request) as OkResult;
+            var actual = await _sut.AddJob(request) as NoContentResult;
 
             // Assert
             actual.Should().NotBeNull();

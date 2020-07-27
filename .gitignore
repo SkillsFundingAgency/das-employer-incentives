@@ -281,4 +281,4 @@ SonarQube.Analysis.xml
 **/*.slconfig
 
 #Test generated nservicebus queues
-#**/.learningtransport/**
+**/.learningtransport/**
