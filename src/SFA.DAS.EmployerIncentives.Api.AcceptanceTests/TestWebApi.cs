@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _context = context;
 
             _config = new Dictionary<string, string>{
-                    { "Environment", "LOCAL" },
+                    { "EnvironmentName", "LOCAL" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
