@@ -9,6 +9,7 @@ using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
@@ -48,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddNLog();
             services.AddControllers();
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
