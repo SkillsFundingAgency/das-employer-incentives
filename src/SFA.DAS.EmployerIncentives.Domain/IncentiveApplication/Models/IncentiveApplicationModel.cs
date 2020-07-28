@@ -7,6 +7,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models
 {
     public class IncentiveApplicationModel : IEntityModel<Guid>
     {
+        public IncentiveApplicationModel()
+        {
+            ApprenticeshipModels = new List<ApprenticeshipModel>();
+        }
+
         public Guid Id { get; set; }
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
