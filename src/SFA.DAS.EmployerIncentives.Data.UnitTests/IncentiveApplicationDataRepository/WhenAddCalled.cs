@@ -7,7 +7,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepository
@@ -58,6 +57,37 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedAccount.DateSubmitted.Should().Be(testApplication.DateSubmitted);
             storedAccount.Status.Should().Be(testApplication.Status);
             storedAccount.SubmittedBy.Should().Be(testApplication.SubmittedBy);
+        }
+
+        [Test]
+        public async Task Then_the_application_apprenticeships_are_added_to_the_data_store()
+        {
+            var testApprenticeship = _fixture.Create<ApprenticeshipModel>();
+
+            // Arrange
+            var testApplication = _fixture
+                .Build<IncentiveApplicationModel>()
+                .With(f => f.ApprenticeshipModels, new List<ApprenticeshipModel> { testApprenticeship })
+                .Create();
+
+            // Act
+            await _sut.Add(testApplication);
+
+            // Assert
+            _dbContext.ApplicationApprenticeships.Count().Should().Be(1);
+
+            var storedApplication = _dbContext.Applications.Single();
+            storedApplication.Apprenticeships.Count().Should().Be(1);
+            var storedApprenticeship = storedApplication.Apprenticeships.Single();
+            storedApprenticeship.Id.Should().Be(testApprenticeship.Id);
+            storedApprenticeship.FirstName.Should().Be(testApprenticeship.FirstName);
+            storedApprenticeship.LastName.Should().Be(testApprenticeship.LastName);
+            storedApprenticeship.ApprenticeshipEmployerTypeOnApproval.Should().Be(testApprenticeship.ApprenticeshipEmployerTypeOnApproval);
+            storedApprenticeship.ApprenticeshipId.Should().Be(testApprenticeship.ApprenticeshipId);
+            storedApprenticeship.DateOfBirth.Should().Be(testApprenticeship.DateOfBirth);
+            storedApprenticeship.IncentiveApplicationId.Should().Be(storedApplication.Id);
+            storedApprenticeship.PlannedStartDate.Should().Be(testApprenticeship.PlannedStartDate);
+            storedApprenticeship.Uln.Should().Be(testApprenticeship.Uln);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+﻿using System;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -48,8 +49,25 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 SubmittedBy = model.SubmittedBy,
                 DateCreated = model.DateCreated,
                 AccountId = model.AccountId,
-                AccountLegalEntityId = model.AccountLegalEntityId
+                AccountLegalEntityId = model.AccountLegalEntityId,
+                Apprenticeships = model.ApprenticeshipModels.Map(model.Id)
             };
+        }
+
+        private static ICollection<Models.IncentiveApplicationApprenticeship> Map(this ICollection<ApprenticeshipModel> models, Guid applicationId)
+        {
+            return models.Select(x => new IncentiveApplicationApprenticeship
+            {
+                Id = x.Id, 
+                IncentiveApplicationId = applicationId, 
+                ApprenticeshipId = x.ApprenticeshipId,
+                FirstName = x.FirstName, 
+                LastName = x.LastName,
+                DateOfBirth = x.DateOfBirth,
+                ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
+                PlannedStartDate = x.PlannedStartDate,
+                Uln = x.Uln
+            }).ToList();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         public async Task Add(IncentiveApplicationModel incentiveApplication)
         {
-            await _dbContext.AddRangeAsync(incentiveApplication.Map());
+            await _dbContext.AddAsync(incentiveApplication.Map());
             await _dbContext.SaveChangesAsync();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -7,6 +8,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
     [Table("IncentiveApplication")]
     public partial class IncentiveApplication
     {
+        public IncentiveApplication()
+        {
+            Apprenticeships = new List<IncentiveApplicationApprenticeship>();
+        }
+
         public Guid Id { get; set; }
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
@@ -14,5 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public IncentiveApplicationStatus Status { get; set; }
         public DateTime DateSubmitted { get; set; }
         public string SubmittedBy { get; set; }
+        public ICollection<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }
     }
 }

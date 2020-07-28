@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -13,5 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models
         public IncentiveApplicationStatus Status { get; set; }
         public DateTime DateSubmitted { get; set; }
         public string SubmittedBy { get; set; }
+        public ICollection<ApprenticeshipModel> ApprenticeshipModels { get; set; }
     }
 }
