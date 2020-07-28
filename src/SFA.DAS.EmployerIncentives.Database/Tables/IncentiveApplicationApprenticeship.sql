@@ -8,5 +8,7 @@
 	[DateOfBirth] DATETIME NOT NULL,
 	[ULN] INT NOT NULL,
 	[PlannedStartDate] DATETIME NOT NULL,
-	[ApprenticeshipEmployerTypeOnApproval] NVARCHAR(50)
+	[ApprenticeshipEmployerTypeOnApproval] NVARCHAR(50),
+	CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
+

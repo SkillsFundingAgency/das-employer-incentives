@@ -14,6 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<IncentiveApplication> Applications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
