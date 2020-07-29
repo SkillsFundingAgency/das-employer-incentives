@@ -50,16 +50,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
 
             foreach (var accountLegalEntity in accountLegalEntities)
             {
-                var legalEntityResponse = await _accountService.GetLegalEntity(accountLegalEntity.AccountId, accountLegalEntity.LegalEntityId);
+                var legalEntity = await _accountService.GetLegalEntity(accountLegalEntity.AccountId, accountLegalEntity.LegalEntityId);
 
-                if (legalEntityResponse.LegalEntity?.Name != null)
+                if (legalEntity != null)
                 {
                     messages.Add(new RefreshLegalEntityEvent
                     {
                         AccountId = accountLegalEntity.AccountId,
                         AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
                         LegalEntityId = accountLegalEntity.LegalEntityId,
-                        OrganisationName = legalEntityResponse.LegalEntity?.Name
+                        OrganisationName = legalEntity.Name
                     });
                 }
             }

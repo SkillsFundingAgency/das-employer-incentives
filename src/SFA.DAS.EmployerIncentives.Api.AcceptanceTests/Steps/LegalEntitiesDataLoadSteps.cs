@@ -169,15 +169,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                        .RespondWith(Response.Create()
                        .WithStatusCode(HttpStatusCode.OK)
                        .WithHeader("Content-Type", "application/json")
-                       .WithBodyAsJson(new GetLegalEntityResponse
+                       .WithBodyAsJson(new LegalEntity
                        {
-                           LegalEntity = new LegalEntity
-                           {
-                               LegalEntityId = accountLegalEntity.LegalEntityId,
-                               Name = $"Name_{accountLegalEntity.LegalEntityId}"
-                           }
+                           LegalEntityId = accountLegalEntity.LegalEntityId,
+                           Name = $"Name_{accountLegalEntity.LegalEntityId}"
                        }));
-
         }
     }
 }
