@@ -63,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();
 
             serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
+            serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
 
             serviceCollection.AddScoped<IMultiEventPublisher, MultiEventPublisherWithLimit>();
 
