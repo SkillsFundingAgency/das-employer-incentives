@@ -1,8 +1,8 @@
 ﻿using System;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
-namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplication
+namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public class Apprenticeship : Entity<Guid, ApprenticeshipModel>
     {

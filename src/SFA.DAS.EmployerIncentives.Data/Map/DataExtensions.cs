@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
 {

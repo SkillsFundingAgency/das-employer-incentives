@@ -2,7 +2,7 @@
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 
-namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models
+namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models
 {
     public class ApprenticeshipModel : IEntityModel<Guid>
     {

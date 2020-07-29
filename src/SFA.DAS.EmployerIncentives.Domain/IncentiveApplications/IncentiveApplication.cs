@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplication
+namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public sealed class IncentiveApplication : AggregateRoot<Guid, IncentiveApplicationModel>
     {

@@ -3,14 +3,15 @@ using System.Linq;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 {
     public class WhenAnApprenticeshipIsAdded
     {
-        private IncentiveApplication.IncentiveApplication _sut;
+        private IncentiveApplication _sut;
         private Fixture _fixture;
 
         [SetUp]
@@ -18,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         {
             _fixture = new Fixture();
 
-            _sut = IncentiveApplication.IncentiveApplication.New(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _sut = new IncentiveApplicationFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>());
         }
 
         [Test]

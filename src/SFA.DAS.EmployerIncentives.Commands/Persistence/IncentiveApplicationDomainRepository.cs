@@ -1,7 +1,7 @@
 ﻿using System;
 using SFA.DAS.EmployerIncentives.Data;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 {

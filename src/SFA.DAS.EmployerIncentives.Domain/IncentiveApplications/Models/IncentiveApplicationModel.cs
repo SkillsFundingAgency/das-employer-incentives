@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models
+namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models
 {
     public class IncentiveApplicationModel : IEntityModel<Guid>
     {

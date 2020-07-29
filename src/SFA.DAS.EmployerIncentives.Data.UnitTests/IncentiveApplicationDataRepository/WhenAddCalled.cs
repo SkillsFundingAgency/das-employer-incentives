@@ -7,7 +7,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepository
 {
