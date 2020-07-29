@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Commands.UnitTests.AutoFixtureCustomizations;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
@@ -20,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.IncentiveApp
         public void Arrange()
         {
             _fixture = new Fixture();
-            _fixture.Register(() => new IncentiveApplicationFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>()));
+            _fixture.Customize(new IncentiveApplicationCustomization());
             
             _mockIncentiveApplicationDataRepository = new Mock<IIncentiveApplicationDataRepository>();
 

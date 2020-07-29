@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         private readonly List<Apprenticeship> _apprenticeships = new List<Apprenticeship>();
         public ReadOnlyCollection<Apprenticeship> Apprenticeships => _apprenticeships.AsReadOnly();
 
-        public static IncentiveApplication New(Guid id, long accountId, long accountLegalEntityId)
+        internal static IncentiveApplication New(Guid id, long accountId, long accountLegalEntityId)
         {
             return new IncentiveApplication(id, new IncentiveApplicationModel { Id = id, AccountId = accountId, AccountLegalEntityId = accountLegalEntityId, DateCreated = DateTime.Now, Status = IncentiveApplicationStatus.InProgress }, true);
         }

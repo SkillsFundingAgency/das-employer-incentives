@@ -5,7 +5,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 {
@@ -26,27 +25,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         public void Then_the_apprenticeship_is_added()
         {
             // Arrange
-            var apprenticeship = Apprenticeship.Create(_fixture.Create<ApprenticeshipModel>());
+            var apprenticeship = _fixture.Create<Apprenticeship>();
 
             // Act
             _sut.AddApprenticeship(apprenticeship);
 
             // Assert
-            _sut.Apprenticeships.Single().Id.Should().Be(apprenticeship.Id);
+            _sut.Apprenticeships.Single().Should().Be(apprenticeship);
         }
 
         [Test]
         public void Then_the_apprenticeship_model_is_set()
         {
             // Arrange
-            var model = _fixture.Create<ApprenticeshipModel>();
-            var apprenticeship = Apprenticeship.Create(model);
+            var apprenticeship = _fixture.Create<Apprenticeship>();
 
             // Act
             _sut.AddApprenticeship(apprenticeship);
 
             // Assert
-            _sut.GetModel().ApprenticeshipModels.Single().Should().Be(model);
+            _sut.GetModel().ApprenticeshipModels.Single().Should().Be(apprenticeship.GetModel());
         }
     }
 }
