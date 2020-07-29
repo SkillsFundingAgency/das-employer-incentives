@@ -3,6 +3,7 @@ using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using AutoFixture;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -16,7 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public LegalEntitySteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
-            _testAccountTable = _testContext.TestData.GetOrCreate<Account>();
+            var fixture = new Fixture();
+            _testAccountTable = _testContext.TestData.GetOrCreate<Account>(null, () => fixture.Build<Account>().With(x => x.HasSignedIncentivesTerms, false).Create());
         }
 
         [Given(@"a legal entity is not available in employer incentives")]
