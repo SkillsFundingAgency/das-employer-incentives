@@ -44,6 +44,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LegalEntityTests
         }
 
         [Test]
+        public void Then_has_signed_incentive_terms_is_false()
+        {
+            // Act
+            var legalEntity = LegalEntity.New(_fixture.Create<long>(), _fixture.Create<string>());
+
+            // Assert
+            legalEntity.HasSignedAgreementTerms.Should().BeFalse();
+        }
+
+        [Test]
         public void Then_errors_if_the_model_is_null()
         {
             // Arrange

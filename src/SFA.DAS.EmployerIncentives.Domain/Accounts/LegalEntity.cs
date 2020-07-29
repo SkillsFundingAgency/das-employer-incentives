@@ -7,12 +7,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
     public sealed class LegalEntity : Entity<long, LegalEntityModel>
     {
         public string Name => Model.Name;
+        public bool HasSignedAgreementTerms => Model.HasSignedAgreementTerms;
 
         public static LegalEntity New(long id, string name)
         {            
             var model = new LegalEntityModel
             {
-                Name = name
+                Name = name,
+                HasSignedAgreementTerms = false
             };
             
             return new LegalEntity(id, model, true);
