@@ -132,7 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Api")
                 .UseErrorQueue()
 #pragma warning restore CS0618 // Type or member is obsolete
-                .UseInstallers()
+                //.UseInstallers()
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
