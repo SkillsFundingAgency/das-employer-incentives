@@ -52,13 +52,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
             {
                 var legalEntityResponse = await _accountService.GetLegalEntity(accountLegalEntity.AccountId, accountLegalEntity.LegalEntityId);
 
-                messages.Add(new RefreshLegalEntityEvent
+                if (legalEntityResponse.LegalEntity?.Name != null)
                 {
-                    AccountId = accountLegalEntity.AccountId,
-                    AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
-                    LegalEntityId = accountLegalEntity.LegalEntityId,
-                    OrganisationName = legalEntityResponse.LegalEntity.Name
-                });
+                    messages.Add(new RefreshLegalEntityEvent
+                    {
+                        AccountId = accountLegalEntity.AccountId,
+                        AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
+                        LegalEntityId = accountLegalEntity.LegalEntityId,
+                        OrganisationName = legalEntityResponse.LegalEntity?.Name
+                    });
+                }
             }
 
             await _multiEventPublisher.Publish(messages);
