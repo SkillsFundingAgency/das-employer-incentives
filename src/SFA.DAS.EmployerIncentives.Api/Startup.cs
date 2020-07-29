@@ -66,7 +66,8 @@ namespace SFA.DAS.EmployerIncentives.Api
             {
                 options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
             })
-            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
+            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
+            .AddNServiceBusClientUnitOfWork();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
