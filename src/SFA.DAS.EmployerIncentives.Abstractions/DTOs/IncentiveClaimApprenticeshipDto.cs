@@ -1,10 +1,9 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 
-namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplication.Models
+namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
 {
-    public class ApprenticeshipModel : IEntityModel<Guid>
+    public class IncentiveClaimApprenticeshipDto
     {
         public Guid Id { get; set; }
         public int ApprenticeshipId { get; set; }

@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public int Uln { get; set; }
+        public long Uln { get; set; }
         public DateTime PlannedStartDate { get; set; }
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
     }
