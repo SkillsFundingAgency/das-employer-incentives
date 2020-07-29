@@ -28,7 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             var config = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
-                .SetBasePath(Directory.GetCurrentDirectory());
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddEnvironmentVariables();
 
             if (!configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -49,7 +50,6 @@ namespace SFA.DAS.EmployerIncentives.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddNLog();
             services.AddControllers();
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
