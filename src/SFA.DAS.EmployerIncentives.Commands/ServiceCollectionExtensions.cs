@@ -27,6 +27,7 @@ using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -64,6 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
+            serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
 
             serviceCollection.AddScoped<IMultiEventPublisher, MultiEventPublisherWithLimit>();
 
