@@ -7,10 +7,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 {    
     public class CreateIncentiveApplicationCommand : ICommand
     {
-        public Guid IncentiveApplicationId { get; private set; }
-        public long AccountId { get; private set; }
-        public long AccountLegalEntityId { get; private set; }
-        public IEnumerable<IncentiveClaimApprenticeshipDto> Apprenticeships { get; private set; }
+        public Guid IncentiveApplicationId { get; }
+        public long AccountId { get; }
+        public long AccountLegalEntityId { get; }
+        public IEnumerable<IncentiveClaimApprenticeshipDto> Apprenticeships { get; }
 
         public CreateIncentiveApplicationCommand(
             Guid incentiveApplicationId,

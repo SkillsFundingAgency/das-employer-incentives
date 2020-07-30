@@ -7,7 +7,6 @@ using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class ApplicationCommandController : ApiCommandControllerBase
     {
