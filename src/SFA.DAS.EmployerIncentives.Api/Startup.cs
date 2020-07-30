@@ -7,10 +7,11 @@ using Microsoft.Extensions.Hosting;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
-using SFA.DAS.EmployerIncentives.Api.Filters;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.Extensions;
+using SFA.DAS.EmployerIncentives.Infrastructure.UnitOfWork;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
@@ -51,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(o => o.Filters.AddUnitOfWorkFilter());
+            services.AddControllers();
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
             services.AddSwaggerGen();
@@ -69,6 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Api
             })
             .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
             .AddNServiceBusClientUnitOfWork();
+
+            services.AddTransient<UnitOfWorkManagerMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -86,15 +89,16 @@ namespace SFA.DAS.EmployerIncentives.Api
                 });
             }
 
+            app.UseUnitOfWork();
+
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
 
-            app.UseRouting();
+            app.UseRouting();            
 
-            app.UseAuthorization();
-
+            app.UseAuthorization();            
             app.UseEndpoints(endpoints =>
-            {
+            {                
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
             });
