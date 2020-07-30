@@ -30,5 +30,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         private LegalEntity(long id, LegalEntityModel model, bool isNew = false) : base(id, model, isNew)
         {
         }
+
+        public void SignedAgreement(int signedAgreementVersion, int minimumRequiredVersion)
+        {
+            if (signedAgreementVersion >= minimumRequiredVersion)
+            {
+                Model.HasSignedAgreementTerms = true;
+            }
+        }
     }
 }
