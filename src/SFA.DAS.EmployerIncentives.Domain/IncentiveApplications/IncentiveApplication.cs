@@ -22,6 +22,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             return new IncentiveApplication(id, new IncentiveApplicationModel { Id = id, AccountId = accountId, AccountLegalEntityId = accountLegalEntityId, DateCreated = DateTime.Now, Status = IncentiveApplicationStatus.InProgress }, true);
         }
 
+        internal static IncentiveApplication Get(Guid id, IncentiveApplicationModel model)
+        {
+            return new IncentiveApplication(id, model);
+        }
+
         private IncentiveApplication(Guid id, IncentiveApplicationModel model, bool isNew = false) : base(id, model, isNew)
         {
         }
@@ -30,6 +35,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
+        }
+
+        public void Submit(DateTime submittedAt, string submittedBy)
+        {
+            Model.Status = IncentiveApplicationStatus.Submitted;
+            Model.DateSubmitted = submittedAt;
+            Model.SubmittedBy = submittedBy;
         }
     }
 }

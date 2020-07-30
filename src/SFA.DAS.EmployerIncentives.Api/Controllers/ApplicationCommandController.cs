@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
+using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -21,6 +22,14 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             await SendCommandAsync(new CreateIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.AccountLegalEntityId, request.Apprenticeships));
             return Created($"/applications/{request.IncentiveApplicationId}", null);
+        }
+
+        [HttpPost("/submit-application")]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        public async Task<IActionResult> SubmitIncentiveApplication([FromBody] SubmitIncentiveApplicationRequest request)
+        {
+            await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedBy));
+            return Ok();
         }
     }
 }

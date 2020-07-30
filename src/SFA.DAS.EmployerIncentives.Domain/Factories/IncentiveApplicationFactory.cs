@@ -27,5 +27,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
             };
             return Apprenticeship.Create(model);
         }
+
+        public IncentiveApplication GetExisting(Guid id, IncentiveApplicationModel model)
+        {
+            return IncentiveApplication.Get(id, model);
+        }
     }
 }
