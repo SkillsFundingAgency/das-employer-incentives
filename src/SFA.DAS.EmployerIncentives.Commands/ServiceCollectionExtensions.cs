@@ -130,9 +130,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
 #pragma warning disable CS0618 // Type or member is obsolete
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Api")
-                .UseErrorQueue()
-#pragma warning restore CS0618 // Type or member is obsolete
-                //.UseInstallers()
+                //.UseErrorQueue()
+#pragma warning restore CS0618 // Type or member is obsolete                
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
@@ -146,8 +145,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
             }
             else
             {
-                endpointConfiguration.UseAzureServiceBusTransport(
-                    configuration["ApplicationSettings:NServiceBusConnectionString"], r => { });
+                endpointConfiguration
+                    //.UseInstallers()
+                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => { });
             }
 
             if (!string.IsNullOrEmpty(configuration["ApplicationSettings:NServiceBusLicense"]))
