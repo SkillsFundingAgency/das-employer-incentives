@@ -9,6 +9,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement
         {
             var result = new ValidationResult();
 
+            if (item.AccountId == default)
+            {
+                result.AddError("AccountId", "Is not set");
+            }
+
             if (item.AccountLegalEntityId == default)
             {
                 result.AddError("AccountLegalEntityId", "Is not set");
