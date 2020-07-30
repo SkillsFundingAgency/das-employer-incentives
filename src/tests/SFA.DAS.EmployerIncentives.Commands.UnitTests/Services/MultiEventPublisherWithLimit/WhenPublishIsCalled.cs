@@ -52,23 +52,23 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.Services
             }            
         }
 
-        //[Test]
-        //public void Then_an_event_that_errors_is_returned_in_an_aggregate_exception()
-        //{
-        //    //Arrange
-        //    var testEvents = _fixture.Create<List<TestEvent>>();
-        //    var errorEvent = _fixture.Create<TestEvent>();
-        //    testEvents.Add(errorEvent);
-        //    _mockEventPublisher
-        //        .Setup(m => m.Publish(errorEvent))
-        //        .ThrowsAsync(new Exception("Test Message"));
+        [Test]
+        public void Then_an_event_that_errors_is_returned_in_an_aggregate_exception()
+        {
+            //Arrange
+            var testEvents = _fixture.Create<List<TestEvent>>();
+            var errorEvent = _fixture.Create<TestEvent>();
+            testEvents.Add(errorEvent);
+            _mockEventPublisher
+                .Setup(m => m.Publish(errorEvent))
+                .ThrowsAsync(new Exception("Test Message"));
 
-        //    // Act
-        //    Func<Task> action = async () => await _sut.Publish(testEvents);
+            // Act
+            Func<Task> action = async () => await _sut.Publish(testEvents);
 
-        //    // Assert
-        //    action.Should().Throw<AggregateException>().Where(e => e.InnerExceptions.Count == 1);
-        //    _mockEventPublisher.Verify(m => m.Publish(It.IsAny<TestEvent>()), Times.Exactly(4));
-        //}
+            // Assert
+            action.Should().Throw<AggregateException>().Where(e => e.InnerExceptions.Count == 1);
+            _mockEventPublisher.Verify(m => m.Publish(It.IsAny<TestEvent>()), Times.Exactly(4));
+        }
     }
 }
