@@ -134,10 +134,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
 #pragma warning restore CS0618 // Type or member is obsolete                
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
-                .UseOutbox(true)
-                .UseServicesBuilder(serviceProvider)
-                .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
-                .UseUnitOfWork();
+                //.UseOutbox(true)
+                .UseServicesBuilder(serviceProvider);
+                //.UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
+                //.UseUnitOfWork();
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
