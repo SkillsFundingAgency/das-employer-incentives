@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
@@ -66,8 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Api
             {
                 options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
             })
-            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
-            .AddNServiceBusClientUnitOfWork();
+            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
+            //.AddNServiceBusClientUnitOfWork();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
