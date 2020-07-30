@@ -128,16 +128,13 @@ namespace SFA.DAS.EmployerIncentives.Commands
             this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Api")
-                //.UseErrorQueue()
-#pragma warning restore CS0618 // Type or member is obsolete                
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
-                //.UseOutbox(true)
-                .UseServicesBuilder(serviceProvider);
-                //.UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
-                //.UseUnitOfWork();
+                .UseOutbox(true)
+                .UseServicesBuilder(serviceProvider)
+                .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
+                .UseUnitOfWork();
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -146,7 +143,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             else
             {
                 endpointConfiguration
-                    //.UseInstallers()
                     .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => { });
             }
 

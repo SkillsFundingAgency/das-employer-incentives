@@ -3,17 +3,17 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
+using SFA.DAS.EmployerIncentives.Api.Filters;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
+using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
 
@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers(o => o.Filters.AddUnitOfWorkFilter());
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
             services.AddSwaggerGen();
@@ -67,8 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Api
             {
                 options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
             })
-            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
-            //.AddNServiceBusClientUnitOfWork();
+            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
+            .AddNServiceBusClientUnitOfWork();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

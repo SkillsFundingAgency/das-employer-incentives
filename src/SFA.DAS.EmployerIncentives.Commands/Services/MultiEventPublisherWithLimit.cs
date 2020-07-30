@@ -22,31 +22,30 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
         public async Task Publish<T>(IEnumerable<T> messages) where T : class
         {
             var tasksToRun = new List<Task<PolicyResult>>();
-            //var policy = _policies.MultiEventPublishLimiterPolicy;
+            var policy = _policies.MultiEventPublishLimiterPolicy;
 
             foreach (var message in messages)
             {
-                await _eventPublisher.Publish(message);
-                //tasksToRun.Add(policy.ExecuteAndCaptureAsync((context) => _eventPublisher.Publish(message),
-                //    new Context("Event", new Dictionary<string, object> { { "Message", message } })
-                //));
+                tasksToRun.Add(policy.ExecuteAndCaptureAsync((context) => _eventPublisher.Publish(message),
+                    new Context("Event", new Dictionary<string, object> { { "Message", message } })
+                ));
             }
 
-            //await Task.WhenAll(tasksToRun);
+            await Task.WhenAll(tasksToRun);
 
-            //var errors = new List<Exception>();
-            //foreach (var task in tasksToRun)
-            //{
-            //    var result = await task;
-            //    if (result.FinalException != null)
-            //    {
-            //        errors.Add(new Exception($"Error publishing message '{typeof(T).Name}' with body {Newtonsoft.Json.JsonConvert.SerializeObject(result.Context["Message"]) }", result.FinalException));
-            //    }
-            //}
-            //if (errors.Count > 0)
-            //{
-            //    throw new AggregateException(errors);
-            //}
+            var errors = new List<Exception>();
+            foreach (var task in tasksToRun)
+            {
+                var result = await task;
+                if (result.FinalException != null)
+                {
+                    errors.Add(new Exception($"Error publishing message '{typeof(T).Name}' with body {Newtonsoft.Json.JsonConvert.SerializeObject(result.Context["Message"]) }", result.FinalException));
+                }
+            }
+            if (errors.Count > 0)
+            {
+                throw new AggregateException(errors);
+            }
         }
     }
 }
