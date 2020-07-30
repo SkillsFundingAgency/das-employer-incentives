@@ -26,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
 
             foreach (var message in messages)
             {
+                await _eventPublisher.Publish(message);
                 tasksToRun.Add(policy.ExecuteAndCaptureAsync((context) => _eventPublisher.Publish(message),
                     new Context("Event", new Dictionary<string, object> { { "Message", message } })
                 ));
