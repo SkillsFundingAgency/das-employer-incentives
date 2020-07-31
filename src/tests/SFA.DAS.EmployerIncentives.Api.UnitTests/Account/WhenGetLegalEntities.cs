@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 
             // Assert
             actual.Should().NotBeNull();
-            actual.Value.Should().Be(expected);
+            actual.Value.Should().Be(expected.LegalEntities);
         }
 
         [Test]
