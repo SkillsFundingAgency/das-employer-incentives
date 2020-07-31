@@ -20,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
         private ApplicationCommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
         private Fixture _fixture;
+        private Guid _applicationId;
 
         [SetUp]
         public void Arrange()
@@ -27,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             _fixture = new Fixture();
             _sut = new ApplicationCommandController(_mockCommandDispatcher.Object);
+            _applicationId = _fixture.Create<Guid>();
         }
 
         [Test]
@@ -36,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             var request = _fixture.Create<SubmitIncentiveApplicationRequest>();
 
             // Act
-            await _sut.SubmitIncentiveApplication(request);
+            await _sut.SubmitIncentiveApplication(_applicationId, request);
 
             // Assert
             _mockCommandDispatcher
@@ -56,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             var request = _fixture.Create<SubmitIncentiveApplicationRequest>();
 
             // Act
-            var result = await _sut.SubmitIncentiveApplication(request) as OkResult;
+            var result = await _sut.SubmitIncentiveApplication(_applicationId, request) as OkResult;
 
             // Assert
             result.Should().NotBeNull();
