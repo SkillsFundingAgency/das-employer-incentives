@@ -51,8 +51,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the application is submitted")]
         public async Task WhenTheApplicationIsSubmitted()
         {
-            var url = $"submit-application";
-            await EmployerIncentiveApi.Post(url, _submitRequest);
+            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
+            await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
         [Then(@"the application status is updated to reflect completion")]
@@ -75,8 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var invalidApplicationId = _fixture.Create<Guid>();
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
-            var url = $"submit-application";
-            await EmployerIncentiveApi.Post(url, _submitRequest);
+            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
+            await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
         [Then(@"the application status is not updated")]
@@ -102,8 +102,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var invalidAccountId = _fixture.Create<long>();
             _submitRequest.AccountId = invalidAccountId;
-            var url = $"submit-application";
-            await EmployerIncentiveApi.Post(url, _submitRequest);
+            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
+            await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
     }
