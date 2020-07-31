@@ -20,6 +20,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
                 result.AddError("AccountId", "Is not set");
             }
 
+            if (item.DateSubmitted == default)
+            {
+                result.AddError("DateSubmitted", "Is not set");
+            }
+
+            if (item.SubmittedBy == default)
+            {
+                result.AddError("SubmittedBy", "Is not set");
+            }
+
             return Task.FromResult(result);
         }      
     }
