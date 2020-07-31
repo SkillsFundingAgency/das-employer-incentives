@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.AccountApi
             return JsonConvert.DeserializeObject<PagedModel<AccountLegalEntity>>(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task<GetLegalEntityResponse> GetLegalEntity(long accountId, long legalentityId)
+        public async Task<LegalEntity> GetLegalEntity(long accountId, long legalentityId)
         {
             var hashedAccountId = _hashingService.HashValue(accountId);
 
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.AccountApi
 
             response.EnsureSuccessStatusCode();
 
-            return JsonConvert.DeserializeObject<GetLegalEntityResponse>(await response.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<LegalEntity>(await response.Content.ReadAsStringAsync());
         }
     }
 }

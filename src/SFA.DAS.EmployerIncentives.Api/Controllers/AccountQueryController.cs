@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
             if(response?.LegalEntities?.Count() > 0)
             {
-                return Ok(response);
+                return Ok(response.LegalEntities);
             }
 
             return NotFound();
