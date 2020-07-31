@@ -13,6 +13,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public long AccountLegalEntityId => Model.AccountLegalEntityId;
         public DateTime DateCreated => Model.DateCreated;
         public IncentiveApplicationStatus Status => Model.Status;
+        public DateTime? DateSubmitted => Model.DateSubmitted;
+        public string SubmittedBy => Model.SubmittedBy;
 
         private readonly List<Apprenticeship> _apprenticeships = new List<Apprenticeship>();
         public ReadOnlyCollection<Apprenticeship> Apprenticeships => _apprenticeships.AsReadOnly();

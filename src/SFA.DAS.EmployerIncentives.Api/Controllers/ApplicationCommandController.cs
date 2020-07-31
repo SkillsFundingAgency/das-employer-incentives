@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
+using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
@@ -28,8 +29,15 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.OK)]
         public async Task<IActionResult> SubmitIncentiveApplication([FromBody] SubmitIncentiveApplicationRequest request)
         {
-            await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedBy));
-            return Ok();
+            try
+            {
+                await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedBy));
+                return Ok();
+            }
+            catch (InvalidRequestException)
+            {
+                return BadRequest();
+            }
         }
     }
 }

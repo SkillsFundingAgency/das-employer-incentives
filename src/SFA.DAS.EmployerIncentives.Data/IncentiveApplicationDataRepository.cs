@@ -35,8 +35,13 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         public async Task Update(IncentiveApplicationModel incentiveApplication)
         {
-            _dbContext.Update(incentiveApplication.Map());
-            await _dbContext.SaveChangesAsync();
+            var model = incentiveApplication.Map();
+            var existingApplication = _dbContext.Applications.FirstOrDefault(x => x.Id == model.Id);
+            if (existingApplication != null)
+            {
+                _dbContext.Entry(existingApplication).CurrentValues.SetValues(model);
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 }

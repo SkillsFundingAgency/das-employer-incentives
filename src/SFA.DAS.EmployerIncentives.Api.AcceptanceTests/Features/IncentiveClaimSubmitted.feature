@@ -1,11 +1,23 @@
-﻿Feature: IncentiveClaimSubmitted
-	In order to avoid silly mistakes
-	As a math idiot
-	I want to be told the sum of two numbers
+﻿@database
+@api
+Feature: IncentiveApplicationSubmitted
+	In order to claim the incentive payment
+	As an employer 
+	I want to submit an incentive claim application
 
-@mytag
-Scenario: Add two numbers
-	Given the first number is 50
-	And the second number is 70
-	When the two numbers are added
-	Then the result should be 120
+Scenario: Incentive Application is submitted
+	Given an employer has entered incentive claim application details
+	When the application is submitted
+	Then the application status is updated to reflect completion
+
+Scenario: Incentive Application is submitted with invalid application id
+	Given an employer has entered incentive claim application details
+	When the invalid application id is submittted
+	Then the application status is not updated
+	And the service responds with an error
+
+Scenario: Incentive Application is submitted with invalid account id
+	Given an employer has entered incentive claim application details
+	When the invalid account id is submittted
+	Then the application status is not updated
+	And the service responds with an error
