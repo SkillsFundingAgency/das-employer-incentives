@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -24,9 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return Created($"/applications/{request.IncentiveApplicationId}", null);
         }
 
-        [HttpPost("/submit-application")]
+        [HttpPatch("/applications/{applicationId}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
-        public async Task<IActionResult> SubmitIncentiveApplication([FromBody] SubmitIncentiveApplicationRequest request)
+        public async Task<IActionResult> SubmitIncentiveApplication(Guid applicationId, [FromBody] SubmitIncentiveApplicationRequest request)
         {
             try
             {
