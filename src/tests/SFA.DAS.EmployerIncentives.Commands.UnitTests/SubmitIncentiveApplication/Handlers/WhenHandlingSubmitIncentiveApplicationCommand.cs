@@ -15,7 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplication
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplication.Handlers
 {
     public class WhenHandlingSubmitIncentiveApplicationCommand
     {
@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             incentiveApplication.DateSubmitted.Should().Be(command.DateSubmitted);
             incentiveApplication.SubmittedBy.Should().Be(command.SubmittedBy);
             _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Once);
-            _mockEventPublisher.Verify(x => x.Publish<EmployerIncentiveClaimSubmittedEvent>(It.IsAny<IEnumerable<EmployerIncentiveClaimSubmittedEvent>>()), Times.Once);
+            _mockEventPublisher.Verify(x => x.Publish(It.IsAny<IEnumerable<EmployerIncentiveClaimSubmittedEvent>>()), Times.Once);
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>());
 
-            IncentiveApplication nullResponse = null;            
+            IncentiveApplication nullResponse = null;
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(nullResponse);
 
