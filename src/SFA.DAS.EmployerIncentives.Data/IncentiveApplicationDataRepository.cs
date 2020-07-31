@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         public async Task<IncentiveApplicationModel> Get(Guid incentiveApplicationId)
         {
-            var incentiveApplication = _dbContext.Applications.AsNoTracking().FirstOrDefault(a => a.Id == incentiveApplicationId);
+            var incentiveApplication = _dbContext.Applications.FirstOrDefault(a => a.Id == incentiveApplicationId);
             if (incentiveApplication != null)
             {
                 return await Task.FromResult(incentiveApplication.Map());
