@@ -5,15 +5,14 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Messages.Events;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplication
@@ -21,8 +20,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
     public class WhenHandlingSubmitIncentiveApplicationCommand
     {
         private SubmitIncentiveApplicationCommandHandler _sut;
-        private Mock<IIncentiveApplicationFactory> _mockDomainFactory;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRespository;
+        private Mock<IMultiEventPublisher> _mockEventPublisher;
 
         private Fixture _fixture;
 
@@ -32,10 +31,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             _fixture = new Fixture();
             _fixture.Customize(new IncentiveApplicationCustomization());
 
-            _mockDomainFactory = new Mock<IIncentiveApplicationFactory>();
             _mockDomainRespository = new Mock<IIncentiveApplicationDomainRepository>();
+            _mockEventPublisher = new Mock<IMultiEventPublisher>();
 
-            _sut = new SubmitIncentiveApplicationCommandHandler(_mockDomainFactory.Object, _mockDomainRespository.Object);
+            _sut = new SubmitIncentiveApplicationCommandHandler(_mockDomainRespository.Object, _mockEventPublisher.Object);
         }
 
         [Test]
@@ -44,9 +43,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>());
-
-            _mockDomainFactory.Setup(x => x.GetExisting(command.IncentiveApplicationId, It.IsAny<IncentiveApplicationModel>()))
-                .Returns(incentiveApplication);
 
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
@@ -59,19 +55,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             incentiveApplication.DateSubmitted.Should().Be(command.DateSubmitted);
             incentiveApplication.SubmittedBy.Should().Be(command.SubmittedBy);
             _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Once);
+            _mockEventPublisher.Verify(x => x.Publish<EmployerIncentiveClaimSubmittedEvent>(It.IsAny<IEnumerable<EmployerIncentiveClaimSubmittedEvent>>()), Times.Once);
         }
 
         [Test]
-        public async Task Then_an_application_with_an_invalid_application_id_is_rejected()
+        public void Then_an_application_with_an_invalid_application_id_is_rejected()
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>());
 
-            IncentiveApplication nullResponse = null;
-            _mockDomainFactory.Setup(x => x.GetExisting(command.IncentiveApplicationId, It.IsAny<IncentiveApplicationModel>()))
-                .Returns(nullResponse);
-
+            IncentiveApplication nullResponse = null;            
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(nullResponse);
 
@@ -84,15 +78,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         }
 
         [Test]
-        public async Task Then_an_application_with_an_invalid_account_id_is_rejected()
+        public void Then_an_application_with_an_invalid_account_id_is_rejected()
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
-
-            IncentiveApplication nullResponse = null;
-            _mockDomainFactory.Setup(x => x.GetExisting(command.IncentiveApplicationId, It.IsAny<IncentiveApplicationModel>()))
-                .Returns(incentiveApplication);
 
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
