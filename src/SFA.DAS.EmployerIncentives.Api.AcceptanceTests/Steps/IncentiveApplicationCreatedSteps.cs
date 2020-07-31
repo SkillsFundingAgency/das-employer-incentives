@@ -27,13 +27,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<CreateIncentiveApplicationRequest>();
         }
 
-        [Given(@"I am applying for the New Apprenticeship Incentive")]
-        public void GivenIAmApplyingForTheNewApprenticeshipIncentive()
+        [Given(@"An employer is applying for the New Apprenticeship Incentive")]
+        public void GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive()
         {
         }
 
-        [When(@"I have selected the apprenticeships for the application")]
-        public async Task WhenIHaveSelectedTheApprenticeshipsForTheApplication()
+        [When(@"They have selected the apprenticeships for the application")]
+        public async Task WhenTheyHaveSelectedTheApprenticeshipsForTheApplication()
         {
             var url = $"applications";
             await EmployerIncentiveApi.Post(url, _request);

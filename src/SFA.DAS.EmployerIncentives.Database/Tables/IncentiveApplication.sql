@@ -5,6 +5,6 @@
 	[AccountLegalEntityId] BIGINT NOT NULL,
 	[DateCreated] DATETIME NOT NULL,
 	[Status] NVARCHAR(50) NOT NULL,
-	[DateSubmitted] DATETIME NULL,
+	[DateSubmitted] DATETIME2 NULL,
 	[SubmittedBy] NVARCHAR(50) NULL
 )

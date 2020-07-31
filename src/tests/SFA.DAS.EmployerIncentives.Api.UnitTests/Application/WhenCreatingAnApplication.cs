@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
         }
 
         [Test]
-        public async Task Then_a_AddLegalEntityCommand_command_is_dispatched()
+        public async Task Then_a_CreateIncentiveApplicationCommand_command_is_dispatched()
         {
             // Arrange
             var request = _fixture.Create<CreateIncentiveApplicationRequest>();
