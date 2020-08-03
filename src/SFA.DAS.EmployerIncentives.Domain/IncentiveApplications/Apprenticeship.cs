@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public DateTime PlannedStartDate => Model.PlannedStartDate;
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval => Model.ApprenticeshipEmployerTypeOnApproval;
 
-        private readonly NewApprenticeIncentive _incentive;
+        private readonly NewApprenticeIncentive _incentive = new NewApprenticeIncentive();
 
         internal static Apprenticeship Create(ApprenticeshipModel model)
         {
@@ -41,7 +41,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)
         {
-            _incentive = new NewApprenticeIncentive();
         }
 
         public double TotalIncentiveAmount => _incentive.CalculateTotalIncentiveAmount(DateOfBirth, PlannedStartDate);

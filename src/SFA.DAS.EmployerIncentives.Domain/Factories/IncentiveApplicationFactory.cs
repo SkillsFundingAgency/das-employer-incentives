@@ -1,6 +1,7 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Factories
 {
