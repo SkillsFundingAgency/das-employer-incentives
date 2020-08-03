@@ -2,6 +2,7 @@
 {
     public enum IncentiveApplicationStatus
     {
-        InProgress
+        InProgress,
+        Submitted
     }
 }
