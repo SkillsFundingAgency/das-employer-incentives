@@ -20,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private Fixture _fixture;
         private HttpStatusCode _expectedResult = HttpStatusCode.Created;
         private CreateIncentiveApplicationRequest _request;
+        private GetApplicationResponse _getApplicationResponse;
 
         public IncentiveApplicationCreatedSteps(TestContext testContext) : base(testContext)
         {
@@ -33,11 +34,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
         }
 
+        [Given(@"An employer has selected the apprenticeships for their application")]
+        public async Task GivenAnEmployerHasSelectedApprenticeships()
+        {
+            await CreateApplication();
+        }
+
         [When(@"They have selected the apprenticeships for the application")]
         public async Task WhenTheyHaveSelectedTheApprenticeshipsForTheApplication()
         {
-            var url = $"applications";
-            await EmployerIncentiveApi.Post(url, _request);
+            await CreateApplication();
+        }
+
+        [When(@"They retrieve the application")]
+        public async Task WhenTheyRetrieveTheApplication()
+        {
+            var url = $"/accounts/{_request.AccountId}/applications/{_request.IncentiveApplicationId}";
+            var (status, data) =
+                await EmployerIncentiveApi.Client.GetValueAsync<GetApplicationResponse>(url);
+
+            _getApplicationResponse = data;
         }
 
         [Then(@"the application is saved")]
@@ -55,17 +71,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
-        [Then(@"the selected apprenticeships are returned for confirmation")]
-        public async Task ThenTheSavedApplicationIsReturned()
+        [Then(@"the selected apprenticeships are returned")]
+        public void ThenTheSavedApplicationIsReturned()
         {
-            var url = $"/accounts/{_request.AccountId}/applications/{_request.IncentiveApplicationId}";
-            var (status, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<GetApplicationResponse>(url);
+            _getApplicationResponse.Should().NotBeNull();
+        }
 
-            status.Should().Be(HttpStatusCode.OK);
-
-            data.Should().NotBeNull();
-
+        private async Task CreateApplication()
+        {
+            var url = $"applications";
+            await EmployerIncentiveApi.Post(url, _request);
         }
     }
 }
