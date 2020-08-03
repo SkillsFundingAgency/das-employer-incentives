@@ -23,6 +23,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             return new Apprenticeship(model.Id, model, false);
         }
 
+        internal Apprenticeship(Guid id, int apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval)
+        {
+            IsNew = false;
+            Model = new ApprenticeshipModel
+            {
+                Id = id,
+                ApprenticeshipId = apprenticeshipId,
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Uln = uln,
+                PlannedStartDate = plannedStartDate,
+                ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval
+            };
+        }
+
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)
         {
             _incentive = new NewApprenticeIncentive();
