@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             _fixture = new Fixture();
             _fixture.Customize(new IncentiveApplicationCustomization());
 
-            _sut = new IncentiveApplicationFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _sut = _fixture.Create<IncentiveApplication>();
         }
 
         [Test]
