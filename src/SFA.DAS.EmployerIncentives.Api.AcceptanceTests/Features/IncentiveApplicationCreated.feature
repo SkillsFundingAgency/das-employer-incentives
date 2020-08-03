@@ -9,8 +9,3 @@ Scenario: Incentive Application is created
 	Given An employer is applying for the New Apprenticeship Incentive
 	When They have selected the apprenticeships for the application
 	Then the application is saved
-
-Scenario: Employer is confirming apprentices
-	Given An employer has selected the apprenticeships for their application
-	When They retrieve the application
-	Then the selected apprenticeships are returned

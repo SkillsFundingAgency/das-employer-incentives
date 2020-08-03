@@ -20,10 +20,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.1.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("IncentiveApplicationCreated")]
+    [NUnit.Framework.DescriptionAttribute("IncentiveApplicationRequested")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
-    public partial class IncentiveApplicationCreatedFeature
+    public partial class IncentiveApplicationRequestedFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -32,15 +32,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "database",
                 "api"};
         
-#line 1 "IncentiveApplicationCreated.feature"
+#line 1 "IncentiveApplicationRequested.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "IncentiveApplicationCreated", "\tIn order to select apprenticeships to apply for an incentive for\r\n\tAs an employe" +
-                    "r\r\n\tI want to know if an apprenticeship is eligible", ProgrammingLanguage.CSharp, new string[] {
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "IncentiveApplicationRequested", "\tIn order to confirm the apprenticeships selected\r\n\tAs an employer\r\n\tI want to re" +
+                    "trieve the details of the saved application", ProgrammingLanguage.CSharp, new string[] {
                         "database",
                         "api"});
             testRunner.OnFeatureStart(featureInfo);
@@ -81,11 +81,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Incentive Application is created")]
-        public virtual void IncentiveApplicationIsCreated()
+        [NUnit.Framework.DescriptionAttribute("Employer is confirming apprentices")]
+        public virtual void EmployerIsConfirmingApprentices()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Incentive Application is created", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer is confirming apprentices", null, ((string[])(null)));
 #line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -107,13 +107,13 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 9
- testRunner.Given("An employer is applying for the New Apprenticeship Incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("An employer has selected the apprenticeships for their application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 10
- testRunner.When("They have selected the apprenticeships for the application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("They retrieve the application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 11
- testRunner.Then("the application is saved", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the selected apprenticeships are returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
