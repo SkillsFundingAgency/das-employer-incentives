@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
 {
     public class WhenAddCalled
     {
-        private Data.IncentiveApplicationDataRepository _sut;
+        private IncentiveApplication.IncentiveApplicationDataRepository _sut;
         private Fixture _fixture;
         private EmployerIncentivesDbContext _dbContext;
 
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
-            _sut = new Data.IncentiveApplicationDataRepository(_dbContext);
+            _sut = new IncentiveApplication.IncentiveApplicationDataRepository(_dbContext);
         }
 
         [TearDown]
@@ -88,6 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedApprenticeship.IncentiveApplicationId.Should().Be(storedApplication.Id);
             storedApprenticeship.PlannedStartDate.Should().Be(testApprenticeship.PlannedStartDate);
             storedApprenticeship.Uln.Should().Be(testApprenticeship.Uln);
+            storedApprenticeship.TotalIncentiveAmount.Should().Be(testApprenticeship.TotalIncentiveAmount);
         }
     }
 }

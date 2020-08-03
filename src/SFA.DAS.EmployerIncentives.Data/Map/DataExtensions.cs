@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
 
         internal static Models.IncentiveApplication Map(this IncentiveApplicationModel model)
         {
-            return new IncentiveApplication
+            return new Models.IncentiveApplication
             {
                 Id = model.Id,
                 Status = model.Status,
@@ -66,11 +66,12 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 DateOfBirth = x.DateOfBirth,
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
-                Uln = x.Uln
+                Uln = x.Uln,
+                TotalIncentiveAmount = x.TotalIncentiveAmount
             }).ToList();
         }
 
-        internal static IncentiveApplicationModel Map(this IncentiveApplication entity)
+        internal static IncentiveApplicationModel Map(this Models.IncentiveApplication entity)
         {
             return new IncentiveApplicationModel
             {
@@ -96,7 +97,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 DateOfBirth = x.DateOfBirth,
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
-                Uln = x.Uln
+                Uln = x.Uln,
+                TotalIncentiveAmount = x.TotalIncentiveAmount
             }).ToList();
         }
     }

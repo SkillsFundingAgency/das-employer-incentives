@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
-namespace SFA.DAS.EmployerIncentives.Data
+namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
     public interface IIncentiveApplicationDataRepository
     {

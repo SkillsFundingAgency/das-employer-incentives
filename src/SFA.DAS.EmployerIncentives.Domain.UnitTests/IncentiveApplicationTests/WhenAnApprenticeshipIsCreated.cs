@@ -7,7 +7,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 {
-    public class WhenCalculatingTheTotalIncentiveAmount
+    public class WhenAnApprenticeshipIsCreated
     {
         private Fixture _fixture;
 
@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         }
 
         [Test]
-        public void Then_the_24_or_under_total_is_returned_if_the_apprentice_is_exactly_24_at_the_start_date()
+        public void Then_the_total_incentive_amount_is_the_24_or_under_total_if_the_apprentice_is_exactly_24_at_the_start_date()
         {
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-25).AddDays(1);
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         }
 
         [Test]
-        public void Then_the_24_or_under_total_is_returned_if_the_apprentice_is_under_24_at_the_start_date()
+        public void Then_the_total_incentive_amount_is_the_24_or_under_total_if_the_apprentice_is_under_24_at_the_start_date()
         {
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-18);
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         }
 
         [Test]
-        public void Then_the_25_or_over_total_is_returned_if_the_apprentice_is_exactly_25_at_the_start_date()
+        public void Then_the_total_incentive_amount_is_the_25_or_over_total_if_the_apprentice_is_exactly_25_at_the_start_date()
         {
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-25);
@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         }
 
         [Test]
-        public void Then_the_25_or_over_total_is_returned_if_the_apprentice_is_over_25_at_the_start_date()
+        public void Then_the_total_incentive_amount_is_the_25_or_over_total_if_the_apprentice_is_over_25_at_the_start_date()
         {
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-26);
