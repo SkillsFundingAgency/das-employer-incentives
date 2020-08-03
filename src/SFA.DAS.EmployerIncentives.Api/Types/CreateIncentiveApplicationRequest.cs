@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.Types
 {
