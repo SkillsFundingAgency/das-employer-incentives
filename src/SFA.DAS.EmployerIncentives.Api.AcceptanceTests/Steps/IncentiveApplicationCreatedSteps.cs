@@ -7,6 +7,7 @@ using AutoFixture;
 using Dapper;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -54,5 +55,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
+        [Then(@"the selected apprenticeships are returned for confirmation")]
+        public async Task ThenTheSavedApplicationIsReturned()
+        {
+            var url = $"/accounts/{_request.AccountId}/applications/{_request.IncentiveApplicationId}";
+            var (status, data) =
+                await EmployerIncentiveApi.Client.GetValueAsync<GetApplicationResponse>(url);
+
+            status.Should().Be(HttpStatusCode.OK);
+
+            data.Should().NotBeNull();
+
+        }
     }
 }

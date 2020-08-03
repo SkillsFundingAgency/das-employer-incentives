@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public long Uln => Model.Uln;
         public DateTime PlannedStartDate => Model.PlannedStartDate;
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval => Model.ApprenticeshipEmployerTypeOnApproval;
-        public double TotalIncentiveAmount => Model.TotalIncentiveAmount;
+        public decimal TotalIncentiveAmount => Model.TotalIncentiveAmount;
 
         internal static Apprenticeship Create(ApprenticeshipModel model)
         {

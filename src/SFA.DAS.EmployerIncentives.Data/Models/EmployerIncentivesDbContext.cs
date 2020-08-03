@@ -29,6 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<IncentiveApplicationApprenticeship>().Property(x => x.ApprenticeshipEmployerTypeOnApproval).HasConversion<int>();
+
             //modelBuilder.Entity<IncentiveApplication>(entity => entity.HasMany<IncentiveApplicationApprenticeship>());
 
             OnModelCreatingPartial(modelBuilder);

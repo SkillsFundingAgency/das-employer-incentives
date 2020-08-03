@@ -5,6 +5,6 @@
         public int ApprenticeshipId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public double TotalIncentiveAmount { get; set; }
+        public decimal TotalIncentiveAmount { get; set; }
     }
 }
