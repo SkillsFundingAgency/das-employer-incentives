@@ -8,3 +8,6 @@
 	[DateSubmitted] DATETIME2 NULL,
 	[SubmittedBy] NVARCHAR(50) NULL
 )
+GO
+CREATE INDEX IX_IncentiveApplication_AccountId ON IncentiveApplication (AccountId)
+GO

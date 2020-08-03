@@ -12,4 +12,6 @@
 	[TotalIncentiveAmount] MONEY NOT NULL, 
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
-
+GO
+CREATE INDEX IX_IncentiveApplicationApprenticeship_ApplicationId ON IncentiveApplicationApprenticeship (IncentiveApplicationId)
+GO

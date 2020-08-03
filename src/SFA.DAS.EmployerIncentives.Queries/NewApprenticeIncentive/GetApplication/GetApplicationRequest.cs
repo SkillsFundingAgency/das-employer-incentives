@@ -5,10 +5,12 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
 {
     public class GetApplicationRequest : IQuery
     {
+        public long AccountId { get; }
         public Guid ApplicationId { get; }
 
-        public GetApplicationRequest(Guid applicationId)
+        public GetApplicationRequest(long accountId, Guid applicationId)
         {
+            AccountId = accountId;
             ApplicationId = applicationId;
         }
     }

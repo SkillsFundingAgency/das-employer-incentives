@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         public Task<IncentiveApplicationDto> Get(Expression<Func<IncentiveApplicationDto, bool>> predicate)
         {
             return _context.Set<Models.IncentiveApplication>()
-                .Select(MapToIncentiveApplicationDto()).SingleAsync(predicate);
+                .Select(MapToIncentiveApplicationDto()).SingleOrDefaultAsync(predicate);
         }
 
         public Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null)

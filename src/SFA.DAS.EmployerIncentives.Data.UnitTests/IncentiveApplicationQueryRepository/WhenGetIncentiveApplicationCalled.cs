@@ -52,5 +52,22 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             //Assert
             actual.Should().BeEquivalentTo(allApplications[1], opts => opts.ExcludingMissingMembers());
         }
+
+        [Test]
+        public async Task Then_null_is_returned_when_the_application_is_not_found()
+        {
+            // Arrange
+            var allApplications = _fixture.CreateMany<Models.IncentiveApplication>(10).ToArray();
+            var applicationId = Guid.NewGuid();
+
+            _context.Applications.AddRange(allApplications);
+            _context.SaveChanges();
+
+            // Act
+            var actual = await _sut.Get(x => x.Id == applicationId);
+
+            //Assert
+            actual.Should().BeNull();
+        }
     }
 }

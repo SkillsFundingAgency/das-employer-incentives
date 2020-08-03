@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var data = _fixture.Create<IncentiveApplicationDto>();
             var expected = new GetApplicationResponse(data);
 
-            _repositoryMock.Setup(x => x.Get(dto => dto.Id == query.ApplicationId)).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
