@@ -15,10 +15,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
         {
             return new Apprenticeship(id, apprenticeshipId, firstName, lastName, dateOfBirth, uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval);
         }
-
-        public IncentiveApplication GetExisting(Guid id, IncentiveApplicationModel model)
-        {
-            return IncentiveApplication.Get(id, model);
-        }
     }
 }

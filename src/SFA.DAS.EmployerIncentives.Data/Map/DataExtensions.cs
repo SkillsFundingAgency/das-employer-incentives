@@ -70,35 +70,5 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 Uln = x.Uln
             }).ToList();
         }
-
-        internal static IncentiveApplicationModel Map(this IncentiveApplication entity)
-        {
-            return new IncentiveApplicationModel
-            {
-                Id = entity.Id,
-                Status = entity.Status,
-                DateSubmitted = entity.DateSubmitted,
-                SubmittedBy = entity.SubmittedBy,
-                DateCreated = entity.DateCreated,
-                AccountId = entity.AccountId,
-                AccountLegalEntityId = entity.AccountLegalEntityId,
-                ApprenticeshipModels = entity.Apprenticeships.Map(entity.Id)
-            };
-        }
-
-        private static ICollection<ApprenticeshipModel> Map(this ICollection<Models.IncentiveApplicationApprenticeship> models, Guid applicationId)
-        {
-            return models.Select(x => new ApprenticeshipModel
-            {
-                Id = x.Id,
-                ApprenticeshipId = x.ApprenticeshipId,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                DateOfBirth = x.DateOfBirth,
-                ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
-                PlannedStartDate = x.PlannedStartDate,
-                Uln = x.Uln
-            }).ToList();
-        }
     }
 }

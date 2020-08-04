@@ -3,7 +3,6 @@ using AutoFixture;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
@@ -13,7 +12,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.IncentiveApp
     {
         private Commands.Persistence.IncentiveApplicationDomainRepository _sut;
         private Mock<IIncentiveApplicationDataRepository> _mockIncentiveApplicationDataRepository;
-        private Mock<IIncentiveApplicationFactory> _mockIncentiveApplicationFactory;
 
         private Fixture _fixture;
 
@@ -24,9 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.IncentiveApp
             _fixture.Customize(new IncentiveApplicationCustomization());
             
             _mockIncentiveApplicationDataRepository = new Mock<IIncentiveApplicationDataRepository>();
-            _mockIncentiveApplicationFactory = new Mock<IIncentiveApplicationFactory>();
 
-            _sut = new Commands.Persistence.IncentiveApplicationDomainRepository(_mockIncentiveApplicationDataRepository.Object, _mockIncentiveApplicationFactory.Object);
+            _sut = new Commands.Persistence.IncentiveApplicationDomainRepository(_mockIncentiveApplicationDataRepository.Object);
         }
 
         [Test]
