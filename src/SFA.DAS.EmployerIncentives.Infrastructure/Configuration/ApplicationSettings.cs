@@ -1,6 +1,4 @@
-﻿using SFA.DAS.EAS.Account.Api.Client;
-
-namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
+﻿namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
     public class ApplicationSettings
     {

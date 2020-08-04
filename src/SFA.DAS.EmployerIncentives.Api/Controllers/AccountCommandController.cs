@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers

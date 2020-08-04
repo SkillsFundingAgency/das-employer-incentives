@@ -14,6 +14,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<IncentiveApplication> Applications { get; set; }
+        public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
                     .IsRequired()
                     .IsUnicode(false);
             });
+
+            //modelBuilder.Entity<IncentiveApplication>(entity => entity.HasMany<IncentiveApplicationApprenticeship>());
 
             OnModelCreatingPartial(modelBuilder);
         }

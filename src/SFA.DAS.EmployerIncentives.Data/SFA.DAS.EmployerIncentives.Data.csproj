@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Domain\SFA.DAS.EmployerIncentives.Domain.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Enums\SFA.DAS.EmployerIncentives.Enums.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
