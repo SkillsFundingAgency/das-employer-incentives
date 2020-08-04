@@ -53,6 +53,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IncentiveApplicationRequested.feature</DependentUpon>
+	</Compile>
+    <Compile Update="Features\LegalEntityAgreementSigned.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -60,6 +65,10 @@
     <SpecFlowFeatureFiles Update="Features\IncentiveApplicationRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveApplicationRequested.feature.cs</LastGenOutput>
+	</SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 

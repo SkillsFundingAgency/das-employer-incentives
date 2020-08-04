@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
             var command = _fixture.Create<AddLegalEntityCommand>();
             _mockDomainRespository
                 .Setup(m => m.Find(command.AccountId))
-                .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<LegalEntityModel>() }));
+                .ReturnsAsync(Account.Create(new AccountModel { Id = command.AccountId, LegalEntityModels = new Collection<LegalEntityModel> { new LegalEntityModel { Id = command.AccountLegalEntityId, AccountLegalEntityId = command.AccountLegalEntityId } } }));
 
             //Act
             await _sut.Handle(command);

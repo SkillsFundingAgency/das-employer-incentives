@@ -56,6 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             storedAccount.LegalEntityId.Should().Be(testLegalEntity.Id);
             storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
             storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
+            storedAccount.HasSignedIncentivesTerms.Should().Be(testLegalEntity.HasSignedAgreementTerms);
         }
 
         [Test]
@@ -68,6 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             _dbContext.Add(_fixture.Create<Models.Account>());
             _dbContext.SaveChanges();
             var newName = testAccount.LegalEntityName + "changed";
+            var newHasSignedTerms = !testAccount.HasSignedIncentivesTerms;
 
             var legalEntities = new List<LegalEntityModel>
             {
@@ -75,7 +77,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
                 {
                     Id = testAccount.LegalEntityId,
                     AccountLegalEntityId = testAccount.AccountLegalEntityId,
-                    Name = newName
+                    Name = newName,
+                    HasSignedAgreementTerms = newHasSignedTerms
                 }
             };
 
@@ -88,6 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             var addedAccount = _dbContext.Accounts.Single(a => a.Id == testAccount.Id && a.AccountLegalEntityId == testAccount.AccountLegalEntityId);
             addedAccount.LegalEntityId.Should().Be(testAccount.LegalEntityId);
             addedAccount.LegalEntityName.Should().Be(newName);
+            addedAccount.HasSignedIncentivesTerms.Should().Be(newHasSignedTerms);
         }
 
         [Test]
@@ -121,7 +125,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             var storedAccount = _dbContext.Accounts.Single(a => a.Id == testAccount.Id && a.AccountLegalEntityId == testAccount.AccountLegalEntityId);
             storedAccount.LegalEntityId.Should().Be(testAccount.LegalEntityId);
-            storedAccount.LegalEntityName.Should().Be(testAccount.LegalEntityName);            
+            storedAccount.LegalEntityName.Should().Be(testAccount.LegalEntityName);
+            storedAccount.HasSignedIncentivesTerms.Should().Be(testAccount.HasSignedIncentivesTerms);
         }
 
         [Test]
