@@ -2,6 +2,7 @@
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
@@ -14,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public long Uln => Model.Uln;
         public DateTime PlannedStartDate => Model.PlannedStartDate;
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval => Model.ApprenticeshipEmployerTypeOnApproval;
+        public decimal TotalIncentiveAmount => Model.TotalIncentiveAmount;
 
         internal static Apprenticeship Create(ApprenticeshipModel model)
         {
@@ -32,7 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 DateOfBirth = dateOfBirth,
                 Uln = uln,
                 PlannedStartDate = plannedStartDate,
-                ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval
+                ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval,
+                TotalIncentiveAmount = new NewApprenticeIncentive().CalculateTotalIncentiveAmount(dateOfBirth, plannedStartDate)
             };
         }
 

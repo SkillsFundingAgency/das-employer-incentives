@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
 {
     public class WhenUpdateCalled
     {
-        private Data.IncentiveApplicationDataRepository _sut;
+        private IncentiveApplication.IncentiveApplicationDataRepository _sut;
         private Fixture _fixture;
         private EmployerIncentivesDbContext _dbContext;
         private IncentiveApplicationModel _testApplication;
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
                 .Build<IncentiveApplicationModel>()
                 .Create();
 
-            _sut = new Data.IncentiveApplicationDataRepository(_dbContext);
+            _sut = new IncentiveApplication.IncentiveApplicationDataRepository(_dbContext);
             await _sut.Add(_testApplication);
         }
 

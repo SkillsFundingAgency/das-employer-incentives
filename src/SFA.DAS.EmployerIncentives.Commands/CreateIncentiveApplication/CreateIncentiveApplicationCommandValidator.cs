@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 {
@@ -32,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             return Task.FromResult(result);
         }
 
-        private void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveClaimApprenticeshipDto> apprenticeships)
+        private void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
         {
             if (apprenticeships == null)
             {
@@ -52,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             }
         }
 
-        private void ValidateApprenticeship(ValidationResult result, IncentiveClaimApprenticeshipDto apprenticeship)
+        private void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
         {
             if (apprenticeship.Id == default)
             {

@@ -7,6 +7,7 @@ using AutoFixture;
 using Dapper;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -19,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private Fixture _fixture;
         private HttpStatusCode _expectedResult = HttpStatusCode.Created;
         private CreateIncentiveApplicationRequest _request;
+        private GetApplicationResponse _getApplicationResponse;
 
         public IncentiveApplicationCreatedSteps(TestContext testContext) : base(testContext)
         {
@@ -53,6 +55,5 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_request.IncentiveApplicationId);
             }
         }
-
     }
 }

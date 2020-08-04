@@ -27,6 +27,7 @@ using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 
 namespace SFA.DAS.EmployerIncentives.Commands

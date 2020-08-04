@@ -18,16 +18,27 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
             _context = context;
         }
 
+        public Task<LegalEntityDto> Get(Expression<Func<LegalEntityDto, bool>> predicate)
+        {
+            return _context.Set<Models.Account>()
+                .Select(AccountToLegalEntityDto()).SingleAsync(predicate);
+        }
+
         public Task<List<LegalEntityDto>> GetList(Expression<Func<LegalEntityDto, bool>> predicate = null)
         {
             return _context.Set<Models.Account>()
-                .Select(x => new LegalEntityDto
-                {
-                    AccountId = x.Id,
-                    AccountLegalEntityId = x.AccountLegalEntityId,
-                    LegalEntityId = x.LegalEntityId,
-                    LegalEntityName = x.LegalEntityName
-                }).Where(predicate).ToListAsync();
+                .Select(AccountToLegalEntityDto()).Where(predicate).ToListAsync();
+        }
+
+        private Expression<Func<Models.Account, LegalEntityDto>> AccountToLegalEntityDto()
+        {
+            return x => new LegalEntityDto
+            {
+                AccountId = x.Id,
+                AccountLegalEntityId = x.AccountLegalEntityId,
+                LegalEntityId = x.LegalEntityId,
+                LegalEntityName = x.LegalEntityName
+            };
         }
     }
 }
