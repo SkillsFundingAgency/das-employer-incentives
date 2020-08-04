@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
 
             // Assert
             actual.Should().NotBeNull();
-            actual.Value.Should().Be(expected);
+            actual.Value.Should().Be(expected.Application);
         }
 
         [Test]

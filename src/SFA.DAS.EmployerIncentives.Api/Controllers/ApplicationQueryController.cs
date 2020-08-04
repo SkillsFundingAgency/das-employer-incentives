@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
             if (response?.Application != null)
             {
-                return Ok(response);
+                return Ok(response.Application);
             }
 
             return NotFound();
