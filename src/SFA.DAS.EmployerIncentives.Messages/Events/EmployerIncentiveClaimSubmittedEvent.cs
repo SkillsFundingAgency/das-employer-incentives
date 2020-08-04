@@ -5,6 +5,6 @@ namespace SFA.DAS.EmployerIncentives.Messages.Events
     public class EmployerIncentiveClaimSubmittedEvent
     {
         public long AccountId { get; set; }
-        public Guid IncentiveClaimApprenticeshipId { get; set; }
+        public Guid IncentiveClaimApplicationId { get; set; }
     }
 }
