@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -33,6 +35,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public async Task Delete(string url)
         {
             Response = await Client.DeleteAsync(url);
+        }
+
+        public async Task Patch<T>(string url, T data)
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            
+            Response = await Client.PatchAsync(url, content);
         }
 
         public void Dispose()
