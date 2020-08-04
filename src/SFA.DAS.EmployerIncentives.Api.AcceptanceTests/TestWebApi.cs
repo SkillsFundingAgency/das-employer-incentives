@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.UnitOfWork.Context;
+using SFA.DAS.UnitOfWork.Managers;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -19,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _context = context;
 
             _config = new Dictionary<string, string>{
-                    { "Environment", "LOCAL" },
+                    { "EnvironmentName", "LOCAL" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
@@ -55,6 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 }
 
                 s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
+                s.AddTransient<IUnitOfWorkManager>(c => new TestUnitOfWorkManager());
+                
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.UseTestDb(_context);

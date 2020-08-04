@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Queries.Account;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "LegalEntitiesForAccountRequested")]
     public class LegalEntitiesForAccountRequestedSteps : StepsBase
     {
-        private GetLegalEntitiesResponse _getLegalEntitiesResponse;
+        private IEnumerable<LegalEntityDto> _getLegalEntitiesResponse;
         private readonly Account _testAccountTable;
 
         public LegalEntitiesForAccountRequestedSteps(TestContext testContext) : base(testContext)
@@ -25,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_testAccountTable.Id}/LegalEntities";
             var (status, data) = 
-                await EmployerIncentiveApi.Client.GetValueAsync<GetLegalEntitiesResponse>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<LegalEntityDto>>(url);
             
             status.Should().Be(HttpStatusCode.OK);
 
@@ -35,8 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the legal entities are returned")]
         public void ThenTheLegalEntitiesAreReturned()
         {
-            _getLegalEntitiesResponse.LegalEntities.Should().NotBeEmpty();
-            _getLegalEntitiesResponse.LegalEntities.First().AccountLegalEntityId.Should()
+            _getLegalEntitiesResponse.Should().NotBeEmpty();
+            _getLegalEntitiesResponse.First().AccountLegalEntityId.Should()
                 .Be(_testAccountTable.AccountLegalEntityId);
         }
 
