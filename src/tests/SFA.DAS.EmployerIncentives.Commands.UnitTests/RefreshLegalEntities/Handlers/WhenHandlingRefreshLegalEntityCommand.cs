@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
 
         private Fixture _fixture;
         private PagedModel<AccountLegalEntity> _pagedData;
-        private GetLegalEntityResponse _getLegalEntityResponse;
+        private LegalEntity _legalEntity;
 
         [SetUp]
         public void Arrange()
@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
             _mockMultiEventPublisher = new Mock<IMultiEventPublisher>();
 
             _pagedData = _fixture.Create<PagedModel<AccountLegalEntity>>();
-            _getLegalEntityResponse = _fixture.Create<GetLegalEntityResponse>();
+            _legalEntity = _fixture.Create<LegalEntity>();
 
             _mockMultiEventPublisher
                 .Setup(m => m.Publish(It.IsAny<List<RefreshLegalEntitiesEvent>>()))
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
 
             _mockAccountService
                 .Setup(m => m.GetLegalEntity(It.IsAny<long>(), It.IsAny<long>()))
-                .ReturnsAsync(_getLegalEntityResponse);
+                .ReturnsAsync(_legalEntity);
 
             _sut = new RefreshLegalEntitiesCommandHandler(_mockAccountService.Object, _mockMultiEventPublisher.Object);
         }
@@ -117,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
             await _sut.Handle(command);
 
             //Assert            
-            _mockMultiEventPublisher.Verify(m => m.Publish(It.Is<List<RefreshLegalEntityEvent>>(events => AssertEvents(events, _getLegalEntityResponse))), Times.Once);
+            _mockMultiEventPublisher.Verify(m => m.Publish(It.Is<List<RefreshLegalEntityEvent>>(events => AssertEvents(events, _legalEntity))), Times.Once);
         }
 
         private bool AssertEvents(List<RefreshLegalEntitiesEvent> events, PagedModel<AccountLegalEntity> pagedData)
@@ -131,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
             return true;
         }
 
-        private bool AssertEvents(List<RefreshLegalEntityEvent> events, GetLegalEntityResponse getLegalEntityResponse)
+        private bool AssertEvents(List<RefreshLegalEntityEvent> events, LegalEntity eventLegalEntity)
         {
             events.Count.Should().Be(3);
             foreach(var legalEntities in _pagedData.Data)
@@ -140,7 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
                 legalEntity.AccountId == legalEntities.AccountId  &&
                 legalEntity.AccountLegalEntityId == legalEntities.AccountLegalEntityId &&
                 legalEntity.LegalEntityId == legalEntities.LegalEntityId &&
-                legalEntity.OrganisationName == getLegalEntityResponse.LegalEntity.Name).Should().BeTrue();
+                legalEntity.OrganisationName == eventLegalEntity.Name).Should().BeTrue();
             }
 
             return true;

@@ -10,8 +10,11 @@ using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.Extensions;
+using SFA.DAS.EmployerIncentives.Infrastructure.UnitOfWork;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
+using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
 
@@ -27,15 +30,16 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             var config = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
-                .SetBasePath(Directory.GetCurrentDirectory());
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddEnvironmentVariables();
 
-            if (!configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
+            if (!configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
             {
                 config.AddAzureTableStorage(options =>
                 {
                     options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
                     options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-                    options.EnvironmentName = configuration["Environment"];
+                    options.EnvironmentName = configuration["EnvironmentName"];
                     options.PreFixConfigurationKeys = false;
                 });
             }
@@ -64,7 +68,10 @@ namespace SFA.DAS.EmployerIncentives.Api
             {
                 options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
             })
-            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
+            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
+            .AddNServiceBusClientUnitOfWork();
+
+            services.AddTransient<UnitOfWorkManagerMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -82,15 +89,16 @@ namespace SFA.DAS.EmployerIncentives.Api
                 });
             }
 
+            app.UseUnitOfWork();
+
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
 
-            app.UseRouting();
+            app.UseRouting();            
 
-            app.UseAuthorization();
-
+            app.UseAuthorization();            
             app.UseEndpoints(endpoints =>
-            {
+            {                
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
             });
