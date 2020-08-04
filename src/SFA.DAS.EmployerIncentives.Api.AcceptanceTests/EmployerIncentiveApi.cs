@@ -27,6 +27,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             Response = await Client.PutValueAsync(url, data);
         }
 
+        public async Task Patch<T>(string url, T data)
+        {
+            Response = await Client.PatchValueAsync(url, data);
+        }
+
         public async Task Delete(string url)
         {
             Response = await Client.DeleteAsync(url);

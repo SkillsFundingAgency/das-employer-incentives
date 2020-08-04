@@ -38,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 else
                 {
                     legalEntity.LegalEntityName = item.LegalEntityName;
+                    legalEntity.HasSignedIncentivesTerms = item.HasSignedIncentivesTerms;
                 }
             }
 

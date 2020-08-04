@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -27,6 +28,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> RemoveLegalEntity([FromRoute] long accountId, long accountLegalEntityId)
         {
             await SendCommandAsync(new RemoveLegalEntityCommand(accountId, accountLegalEntityId));
+            return NoContent();
+        }
+
+        [HttpPatch("/accounts/{accountId}/legalEntities/{accountLegalEntityId}")]
+        public async Task<IActionResult> SignAgreement([FromRoute] long accountId, [FromRoute] long accountLegalEntityId, [FromBody] SignAgreementRequest request)
+        {
+            await SendCommandAsync(new SignLegalEntityAgreementCommand(accountId, accountLegalEntityId, request.AgreementVersion));
             return NoContent();
         }
     }

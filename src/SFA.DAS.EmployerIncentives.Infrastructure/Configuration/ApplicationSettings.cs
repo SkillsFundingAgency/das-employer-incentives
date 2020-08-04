@@ -8,6 +8,7 @@
         public string AllowedHashstringCharacters { get; set; }
         public string Hashstring { get; set; }
         public string NServiceBusConnectionString { get; set; }
-        public string NServiceBusLicense { get; set; }        
+        public string NServiceBusLicense { get; set; }      
+        public virtual int MinimumAgreementVersion { get; set; }
     }
 }
