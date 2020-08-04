@@ -24,6 +24,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             return await client.PutAsync(url, data.GetStringContent());
         }
 
+        public static async Task<HttpResponseMessage> PatchValueAsync<T>(this HttpClient client, string url, T data)
+        {
+            return await client.PatchAsync(url, data.GetStringContent());
+        }
+
         private static async Task<(HttpStatusCode, T)> ProcessResponse<T>(HttpResponseMessage response)
         {
             if (!response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NoContent)

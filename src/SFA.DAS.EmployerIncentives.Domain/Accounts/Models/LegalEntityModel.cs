@@ -7,5 +7,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts.Models
         public long Id { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string Name { get; set; }
+        public bool HasSignedAgreementTerms { get; set; }
     }
 }

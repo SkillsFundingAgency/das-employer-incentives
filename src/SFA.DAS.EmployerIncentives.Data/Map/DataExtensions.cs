@@ -19,7 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             Id = model.Id,
                                                             AccountLegalEntityId = i.AccountLegalEntityId,
                                                             LegalEntityId = i.Id,
-                                                            LegalEntityName = i.Name
+                                                            LegalEntityName = i.Name,
+                                                            HasSignedIncentivesTerms = i.HasSignedAgreementTerms
                                                         }
             ));
 
@@ -34,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             }
 
             var model = new AccountModel { Id = accounts.First().Id, LegalEntityModels = new Collection<LegalEntityModel>() };
-            accounts.ToList().ForEach(i => model.LegalEntityModels.Add(new LegalEntityModel { Id = i.LegalEntityId, AccountLegalEntityId = i.AccountLegalEntityId, Name = i.LegalEntityName }));
+            accounts.ToList().ForEach(i => model.LegalEntityModels.Add(new LegalEntityModel { Id = i.LegalEntityId, AccountLegalEntityId = i.AccountLegalEntityId, Name = i.LegalEntityName, HasSignedAgreementTerms = i.HasSignedIncentivesTerms }));
 
             return model;
         }

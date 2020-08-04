@@ -48,4 +48,19 @@
     <Folder Include="Hooks\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Features\LegalEntityAgreementSigned.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+  </ItemGroup>
+
 </Project>
