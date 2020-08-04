@@ -8,7 +8,10 @@
 	[DateOfBirth] DATETIME2 NOT NULL,
 	[ULN] BIGINT NOT NULL,
 	[PlannedStartDate] DATETIME2 NOT NULL,
-	[ApprenticeshipEmployerTypeOnApproval] NVARCHAR(50),
-	CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
+	[ApprenticeshipEmployerTypeOnApproval] INT NOT NULL,
+	[TotalIncentiveAmount] MONEY NOT NULL, 
+    CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
-
+GO
+CREATE INDEX IX_IncentiveApplicationApprenticeship_ApplicationId ON IncentiveApplicationApprenticeship (IncentiveApplicationId)
+GO

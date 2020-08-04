@@ -1,6 +1,7 @@
 ﻿using System;
 using SFA.DAS.EmployerIncentives.Data;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
+namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands
 {
-    public class IncentiveClaimApprenticeshipDto
+    public class IncentiveApplicationApprenticeshipDto
     {
         public Guid Id { get; set; }
         public int ApprenticeshipId { get; set; }

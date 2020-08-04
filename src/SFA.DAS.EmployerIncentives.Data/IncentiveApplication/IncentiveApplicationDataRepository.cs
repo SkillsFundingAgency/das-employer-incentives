@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
-namespace SFA.DAS.EmployerIncentives.Data
+namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
     public class IncentiveApplicationDataRepository : IIncentiveApplicationDataRepository
     {

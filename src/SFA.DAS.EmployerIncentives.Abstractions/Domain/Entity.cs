@@ -16,6 +16,9 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
             IsNew = isNew;
         }
 
+        protected Entity()
+        { }
+
         #region for persisting objects
         public EntityModel GetModel()
         {
