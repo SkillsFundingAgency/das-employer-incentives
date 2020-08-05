@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
                 LegalEntity = data
             };
 
-            _repositoryMock.Setup(x => x.Get(dto => dto.AccountLegalEntityId == query.AccountLegalEntityId)).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.Get(dto => dto.AccountId == query.AccountId && dto.AccountLegalEntityId == query.AccountLegalEntityId)).ReturnsAsync(data);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);

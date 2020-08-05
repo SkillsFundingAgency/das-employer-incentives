@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity
 
         public async Task<GetLegalEntityResponse> Handle(GetLegalEntityRequest query, CancellationToken cancellationToken = default)
         {
-            var legalEntity = await _repository.Get(account => account.AccountLegalEntityId == query.AccountLegalEntityId);
+            var legalEntity = await _repository.Get(account => account.AccountId == query.AccountId && account.AccountLegalEntityId == query.AccountLegalEntityId);
 
             var response = new GetLegalEntityResponse
             {

@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
         public Task<LegalEntityDto> Get(Expression<Func<LegalEntityDto, bool>> predicate)
         {
             return _context.Set<Models.Account>()
-                .Select(AccountToLegalEntityDto()).SingleAsync(predicate);
+                .Select(AccountToLegalEntityDto()).SingleOrDefaultAsync(predicate);
         }
 
         public Task<List<LegalEntityDto>> GetList(Expression<Func<LegalEntityDto, bool>> predicate = null)
