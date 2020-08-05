@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Account;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
