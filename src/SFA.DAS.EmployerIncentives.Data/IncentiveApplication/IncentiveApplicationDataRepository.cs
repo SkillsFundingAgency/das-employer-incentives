@@ -3,7 +3,6 @@ using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -48,17 +47,6 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
                 await _dbContext.SaveChangesAsync();
             }
-        }
-
-        private static IEnumerable<IncentiveApplicationApprenticeship> RemovedApprenticeships(Models.IncentiveApplication application, Models.IncentiveApplication model)
-        {
-            return application.Apprenticeships.Where(x => !model.Apprenticeships.Select(a => a.Id).Contains(x.Id)).ToList();
-        }
-
-        private static IEnumerable<IncentiveApplicationApprenticeship> AddedApprenticeships(Models.IncentiveApplication application, Models.IncentiveApplication model)
-        {
-            return model.Apprenticeships.Where(a =>
-                !application.Apprenticeships.Select(x => x.Id).Contains(a.Id)).ToList();
         }
     }
 }
