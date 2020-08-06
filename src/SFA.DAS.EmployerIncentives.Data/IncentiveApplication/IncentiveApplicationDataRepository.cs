@@ -43,14 +43,8 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             if (existingApplication != null)
             {
                 _dbContext.Entry(existingApplication).CurrentValues.SetValues(model);
-                foreach (var apprenticeship in RemovedApprenticeships(existingApplication, model))
-                {
-                    _dbContext.Remove(apprenticeship);
-                }
-                foreach (var apprenticeship in AddedApprenticeships(existingApplication, model))
-                {
-                    _dbContext.Add(apprenticeship);
-                }
+                _dbContext.RemoveRange(existingApplication.Apprenticeships);
+                _dbContext.AddRange(model.Apprenticeships);
 
                 await _dbContext.SaveChangesAsync();
             }
