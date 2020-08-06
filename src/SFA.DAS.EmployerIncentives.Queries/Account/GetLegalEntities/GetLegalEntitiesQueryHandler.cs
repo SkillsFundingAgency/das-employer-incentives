@@ -1,10 +1,10 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Queries;
-using SFA.DAS.EmployerIncentives.Data;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using SFA.DAS.EmployerIncentives.Abstractions.Queries;
+using SFA.DAS.EmployerIncentives.Data;
 
-namespace SFA.DAS.EmployerIncentives.Queries.Account
+namespace SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities
 {
     public class GetLegalEntitiesQueryHandler : IQueryHandler<GetLegalEntitiesRequest, GetLegalEntitiesResponse>
     {

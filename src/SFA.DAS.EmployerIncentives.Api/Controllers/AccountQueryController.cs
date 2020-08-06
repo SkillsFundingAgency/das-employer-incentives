@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
-using SFA.DAS.EmployerIncentives.Queries.Account;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -23,6 +24,20 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             if(response?.LegalEntities?.Count() > 0)
             {
                 return Ok(response.LegalEntities);
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("/accounts/{accountId}/LegalEntities/{accountLegalEntityId}")]
+        public async Task<IActionResult> GetLegalEntity(long accountId, long accountLegalEntityId)
+        {
+            var request = new GetLegalEntityRequest(accountId, accountLegalEntityId);
+            var response = await QueryAsync<GetLegalEntityRequest, GetLegalEntityResponse>(request);
+
+            if (response?.LegalEntity != null)
+            {
+                return Ok(response.LegalEntity);
             }
 
             return NotFound();
