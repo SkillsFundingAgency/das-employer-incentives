@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
@@ -31,6 +32,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private IncentiveApplication(Guid id, IncentiveApplicationModel model, bool isNew = false) : base(id, model, isNew)
         {
+            foreach (var apprenticeshipModel in model.ApprenticeshipModels.ToList())
+            {
+                _apprenticeships.Add(Apprenticeship.Create(apprenticeshipModel));
+            }
         }
 
         public void AddApprenticeship(Apprenticeship apprenticeship)
@@ -39,11 +44,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
 
+        public void RemoveApprenticeship(Apprenticeship apprenticeship)
+        {
+            _apprenticeships.Remove(apprenticeship);
+            Model.ApprenticeshipModels.Remove(apprenticeship.GetModel());
+        }
+
         public void Submit(DateTime submittedAt, string submittedBy)
         {
             Model.Status = IncentiveApplicationStatus.Submitted;
             Model.DateSubmitted = submittedAt;
             Model.SubmittedBy = submittedBy;
         }
+
     }
 }

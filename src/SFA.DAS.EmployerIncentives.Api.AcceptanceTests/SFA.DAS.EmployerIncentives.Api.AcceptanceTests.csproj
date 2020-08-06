@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -37,38 +37,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Include="Features\EligibleApprenticeshipRequested.feature" />
-    <SpecFlowFeatureFiles Include="Features\LegalEntityCreated.feature" />
-    <SpecFlowFeatureFiles Include="Features\LegalEntityDeleted.feature" />
-    <SpecFlowFeatureFiles Include="Features\LegalEntitiesDataLoadJob.feature" />
-    <SpecFlowFeatureFiles Include="Features\LegalEntitiesForAccountRequested.feature" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Hooks\" />
+    <Folder Include="Properties\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Features\IncentiveApplicationRequested.feature.cs">
+    <Compile Update="Features\IncentiveApplicationUpdated.feature.cs">
       <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>IncentiveApplicationRequested.feature</DependentUpon>
-	</Compile>
-    <Compile Update="Features\LegalEntityAgreementSigned.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\IncentiveApplicationRequested.feature">
+    <SpecFlowFeatureFiles Update="Features\IncentiveApplicationUpdated.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>IncentiveApplicationRequested.feature.cs</LastGenOutput>
-	</SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
+      <LastGenOutput>IncentiveApplicationUpdated.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 
