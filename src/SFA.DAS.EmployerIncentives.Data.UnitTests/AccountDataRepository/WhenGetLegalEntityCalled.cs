@@ -2,12 +2,12 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data.Account;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             const long accountLegalEntityId = -1;
 
             allAccounts[1].AccountLegalEntityId = accountLegalEntityId;
-            
+
             _context.Accounts.AddRange(allAccounts);
             _context.SaveChanges();
 
@@ -51,7 +51,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             var actual = await _sut.Get(x => x.AccountLegalEntityId == accountLegalEntityId);
 
             //Assert
-            actual.Should().BeEquivalentTo(allAccounts[1], opts => opts.Excluding(x => x.Id));
+            actual.Should().BeEquivalentTo(allAccounts[1], opts =>
+                opts.Excluding(x => x.Id).Excluding(x => x.HasSignedIncentivesTerms));
         }
     }
 }
