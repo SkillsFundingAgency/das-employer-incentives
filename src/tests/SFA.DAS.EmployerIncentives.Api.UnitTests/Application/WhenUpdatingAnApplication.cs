@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             var request = _fixture.Create<UpdateIncentiveApplicationRequest>();
 
             // Act
-            await _sut.UpdateIncentiveApplication(request.IncentiveApplicationId, request);
+            await _sut.UpdateIncentiveApplication(request);
 
             // Assert
             _mockCommandDispatcher
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             var request = _fixture.Create<UpdateIncentiveApplicationRequest>();
 
             // Act
-            var actual = await _sut.UpdateIncentiveApplication(request.IncentiveApplicationId, request) as OkObjectResult;
+            var actual = await _sut.UpdateIncentiveApplication(request) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();

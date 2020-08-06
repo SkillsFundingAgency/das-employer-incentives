@@ -38,18 +38,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
-        public void AddApprenticeship(Apprenticeship apprenticeship)
-        {
-            _apprenticeships.Add(apprenticeship);
-            Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
-        }
-
-        public void RemoveApprenticeship(Apprenticeship apprenticeship)
-        {
-            _apprenticeships.Remove(apprenticeship);
-            Model.ApprenticeshipModels.Remove(apprenticeship.GetModel());
-        }
-
         public void Submit(DateTime submittedAt, string submittedBy)
         {
             Model.Status = IncentiveApplicationStatus.Submitted;
@@ -57,5 +45,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.SubmittedBy = submittedBy;
         }
 
+        public void SetApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
+        {
+            _apprenticeships.Clear();
+            Model.ApprenticeshipModels.Clear();
+            foreach (var a in apprenticeships)
+            {
+                AddApprenticeship(a);
+            }
+        }
+        private void AddApprenticeship(Apprenticeship apprenticeship)
+        {
+            _apprenticeships.Add(apprenticeship);
+            Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
+        }
     }
 }

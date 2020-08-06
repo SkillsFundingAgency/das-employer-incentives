@@ -39,11 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             // Arrange
             var command = _fixture.Create<UpdateIncentiveApplicationCommand>();
             var existingApplication = _fixture.Create<IncentiveApplication>();
-            existingApplication.AddApprenticeship(_fixture.Create<Apprenticeship>());
-            existingApplication.AddApprenticeship(_fixture.Create<Apprenticeship>());
-            existingApplication.AddApprenticeship(_fixture.Create<Apprenticeship>());
-            existingApplication.AddApprenticeship(_fixture.Create<Apprenticeship>());
-            existingApplication.AddApprenticeship(_fixture.Create<Apprenticeship>());
+            existingApplication.SetApprenticeships(_fixture.CreateMany<Apprenticeship>());
 
             _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId)).ReturnsAsync(existingApplication);
 
@@ -51,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             foreach (var apprenticeship in command.Apprenticeships)
             {
                 var apprentice = _fixture.Create<Apprenticeship>();
-                _mockDomainFactory.Setup(x => x.CreateNewApprenticeship(apprenticeship.Id,
+                _mockDomainFactory.Setup(x => x.CreateApprenticeship(apprenticeship.Id,
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval)).Returns(apprentice);

@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
             return IncentiveApplication.New(id, accountId, accountLegalEntityId);
         }
 
-        public Apprenticeship CreateNewApprenticeship(Guid id, int apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval)
+        public Apprenticeship CreateApprenticeship(Guid id, int apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval)
         {
             return new Apprenticeship(id, apprenticeshipId, firstName, lastName, dateOfBirth, uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval);
         }

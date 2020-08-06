@@ -1,8 +1,9 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Extensions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 {
@@ -19,13 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 
         public async Task Handle(CreateIncentiveApplicationCommand command, CancellationToken cancellationToken = default)
         {
-            var incentiveApplication = _domainFactory.CreateNew(command.IncentiveApplicationId, command.AccountId, command.AccountLegalEntityId);
-            foreach (var apprenticeship in command.Apprenticeships)
-            {
-                incentiveApplication.AddApprenticeship(_domainFactory.CreateNewApprenticeship(apprenticeship.Id, apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName, apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate, apprenticeship.ApprenticeshipEmployerTypeOnApproval));
-            }
+            var application = _domainFactory.CreateNew(command.IncentiveApplicationId, command.AccountId, command.AccountLegalEntityId);
+            application.SetApprenticeships(command.Apprenticeships.ToEntities(_domainFactory));
 
-            await _domainRepository.Save(incentiveApplication);
+            await _domainRepository.Save(application);
         }
+
     }
 }

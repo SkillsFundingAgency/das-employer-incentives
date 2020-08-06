@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
+using System;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
-{    
+{
     public class CreateIncentiveApplicationCommand : ICommand
     {
         public Guid IncentiveApplicationId { get; }
