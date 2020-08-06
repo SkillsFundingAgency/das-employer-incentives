@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Queries.Decorators;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ServiceCollectionExtensions
 {
