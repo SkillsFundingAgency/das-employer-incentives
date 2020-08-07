@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
@@ -13,6 +14,9 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.Extensions;
 using SFA.DAS.EmployerIncentives.Infrastructure.UnitOfWork;
 using SFA.DAS.EmployerIncentives.Queries;
+using SFA.DAS.Http;
+using SFA.DAS.Http.TokenGenerators;
+using SFA.DAS.Notifications.Api.Client;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
@@ -61,6 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
             services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
+            services.Configure<NotifyServiceSettings>(Configuration.GetSection("NotifyService"));
             services.AddCommandServices();
             services.AddQueryServices();
 
@@ -72,6 +77,25 @@ namespace SFA.DAS.EmployerIncentives.Api
             .AddNServiceBusClientUnitOfWork();
 
             services.AddTransient<UnitOfWorkManagerMiddleware>();
+
+            services.AddTransient<INotificationsApi>(x => {
+                var notifyServiceConfig = x.GetService<IOptions<NotifyServiceSettings>>()?.Value;
+                var apiConfiguration = new Notifications.Api.Client.Configuration.NotificationsApiClientConfiguration
+                {
+                    ApiBaseUrl = notifyServiceConfig.ApiBaseUrl,
+                    ClientToken = notifyServiceConfig.ClientToken,
+                    ClientId = notifyServiceConfig.ClientId,
+                    ClientSecret = notifyServiceConfig.ClientSecret,
+                    IdentifierUri = notifyServiceConfig.IdentifierUri,
+                    Tenant = notifyServiceConfig.Tenant
+                };
+
+                var httpClient = string.IsNullOrWhiteSpace(apiConfiguration.ClientId)
+                    ? new HttpClientBuilder().WithBearerAuthorisationHeader(new JwtBearerTokenGenerator(apiConfiguration)).Build()
+                    : new HttpClientBuilder().WithBearerAuthorisationHeader(new AzureActiveDirectoryBearerTokenGenerator(apiConfiguration)).Build();
+
+                return new NotificationsApi(httpClient, apiConfiguration);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
