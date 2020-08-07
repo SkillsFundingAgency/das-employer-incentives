@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_the_incentive_application_id_has_a_default_value()
         {
             //Arrange
-            var command = new UpdateIncentiveApplicationCommand(default, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<IEnumerable<IncentiveApplicationApprenticeshipDto>>());
+            var command = new UpdateIncentiveApplicationCommand(default, _fixture.Create<long>(), _fixture.Create<IEnumerable<IncentiveApplicationApprenticeshipDto>>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_the_accountId_has_a_default_value()
         {
             //Arrange
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), default, _fixture.Create<long>(), _fixture.Create<IEnumerable<IncentiveApplicationApprenticeshipDto>>());
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), default, _fixture.Create<IEnumerable<IncentiveApplicationApprenticeshipDto>>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_the_accountLegalEntityId_has_a_default_value()
         {
             //Arrange
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), default, _fixture.Create<IEnumerable<IncentiveApplicationApprenticeshipDto>>());
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), default, _fixture.Create<IEnumerable<IncentiveApplicationApprenticeshipDto>>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_the_apprenticeships_are_not_provided()
         {
             //Arrange
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), default);
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), default);
 
             //Act
             var result = await _sut.Validate(command);
@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_there_are_no_apprenticeships()
         {
             //Arrange
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto>());
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -94,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.Id = default;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -109,7 +109,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.ApprenticeshipId = default;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -124,7 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.FirstName = null;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -139,7 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.FirstName = string.Empty;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -154,7 +154,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.LastName = null;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -169,7 +169,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.LastName = string.Empty;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -184,7 +184,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.DateOfBirth = default;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -199,7 +199,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.Uln = default;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);
@@ -214,7 +214,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
             apprenticeship.PlannedStartDate = default;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act
             var result = await _sut.Validate(command);

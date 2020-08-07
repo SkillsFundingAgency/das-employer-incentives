@@ -22,11 +22,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
                 result.AddError("AccountId", "Is not set");
             }
 
-            if (item.AccountLegalEntityId == default)
-            {
-                result.AddError("AccountLegalEntityId", "Is not set");
-            }
-
             ValidateApprenticeships(result, item.Apprenticeships);
 
             return Task.FromResult(result);

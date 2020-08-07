@@ -6,14 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+    <SpecFlowFeatureFiles Remove="Properties\**" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Bindings\Functions.cs" />
     <Compile Remove="Bindings\MessageBus.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="SFA.DAS.EmployerIncentives.Api.AcceptanceTests.csproj.DotSettings" />
-  </ItemGroup>
-  
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
@@ -38,20 +42,6 @@
 
   <ItemGroup>
     <Folder Include="Hooks\" />
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Features\IncentiveApplicationUpdated.feature.cs">
-      <DesignTime>True</DesignTime>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\IncentiveApplicationUpdated.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>IncentiveApplicationUpdated.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>

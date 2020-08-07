@@ -40,7 +40,6 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
                 .Verify(m => m.Send(It.Is<UpdateIncentiveApplicationCommand>(c =>
                     c.IncentiveApplicationId == request.IncentiveApplicationId &&
                     c.AccountId == request.AccountId &&
-                    c.AccountLegalEntityId == request.AccountLegalEntityId &&
                     c.Apprenticeships == request.Apprenticeships),
                 It.IsAny<CancellationToken>())
                 , Times.Once);

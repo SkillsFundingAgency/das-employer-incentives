@@ -9,18 +9,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
     {
         public Guid IncentiveApplicationId { get; }
         public long AccountId { get; }
-        public long AccountLegalEntityId { get; }
         public IEnumerable<IncentiveApplicationApprenticeshipDto> Apprenticeships { get; }
 
         public UpdateIncentiveApplicationCommand(
             Guid incentiveApplicationId,
             long accountId,
-            long accountLegalEntityId,
             IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
         {
             IncentiveApplicationId = incentiveApplicationId;
             AccountId = accountId;
-            AccountLegalEntityId = accountLegalEntityId;
             Apprenticeships = apprenticeships;
         }
     }

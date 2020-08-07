@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateIncentiveApplication([FromBody] UpdateIncentiveApplicationRequest request)
         {
-            await SendCommandAsync(new UpdateIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.AccountLegalEntityId, request.Apprenticeships));
+            await SendCommandAsync(new UpdateIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.Apprenticeships));
             return Ok($"/applications/{request.IncentiveApplicationId}");
         }
 
