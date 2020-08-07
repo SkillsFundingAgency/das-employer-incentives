@@ -89,21 +89,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         }
 
         [Test]
-        public async Task Then_the_command_is_invalid_when_the_apprenticeship_id_has_a_default_value()
-        {
-            //Arrange
-            var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
-            apprenticeship.Id = default;
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
-
-            //Act
-            var result = await _sut.Validate(command);
-
-            //Assert
-            result.ValidationDictionary.Count.Should().Be(1);
-        }
-
-        [Test]
         public async Task Then_the_command_is_invalid_when_the_apprenticeship_apprenticeshipid_has_a_default_value()
         {
             //Arrange

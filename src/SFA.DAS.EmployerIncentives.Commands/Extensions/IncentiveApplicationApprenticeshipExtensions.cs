@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Extensions
         public static IEnumerable<Apprenticeship> ToEntities(this IEnumerable<IncentiveApplicationApprenticeshipDto> dto, IIncentiveApplicationFactory factory)
         {
             return dto.Select(
-                apprenticeship => factory.CreateApprenticeship(apprenticeship.Id,
+                apprenticeship => factory.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval)

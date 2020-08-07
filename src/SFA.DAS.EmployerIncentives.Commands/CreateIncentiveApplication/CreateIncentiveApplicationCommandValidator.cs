@@ -55,11 +55,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 
         private void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
         {
-            if (apprenticeship.Id == default)
-            {
-                result.AddError("Apprenticeship.Id", "Is not set");
-            }
-
             if (apprenticeship.ApprenticeshipId == default)
             {
                 result.AddError("Apprenticeship.ApprenticeshipId", "Is not set");

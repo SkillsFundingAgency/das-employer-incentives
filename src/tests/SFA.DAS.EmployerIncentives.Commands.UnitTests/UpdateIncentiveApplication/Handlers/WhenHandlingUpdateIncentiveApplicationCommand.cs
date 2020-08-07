@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             foreach (var apprenticeship in command.Apprenticeships)
             {
                 var apprentice = _fixture.Create<Apprenticeship>();
-                _mockDomainFactory.Setup(x => x.CreateApprenticeship(apprenticeship.Id,
+                _mockDomainFactory.Setup(x => x.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval)).Returns(apprentice);

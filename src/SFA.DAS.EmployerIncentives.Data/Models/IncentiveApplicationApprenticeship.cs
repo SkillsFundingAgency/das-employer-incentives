@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
     {
         public Guid Id { get; set; }
         public Guid IncentiveApplicationId { get; set; }
-        public int ApprenticeshipId { get; set; }
+        public long ApprenticeshipId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }

@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
             return Task.FromResult(result);
         }
 
-        private void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
+        private static void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
         {
             if (apprenticeships == null)
             {
@@ -47,13 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
             }
         }
 
-        private void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
+        private static void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
         {
-            if (apprenticeship.Id == default)
-            {
-                result.AddError("Apprenticeship.Id", "Is not set");
-            }
-
             if (apprenticeship.ApprenticeshipId == default)
             {
                 result.AddError("Apprenticeship.ApprenticeshipId", "Is not set");
