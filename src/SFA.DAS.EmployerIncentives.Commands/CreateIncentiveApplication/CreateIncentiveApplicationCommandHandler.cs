@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             var incentiveApplication = _domainFactory.CreateNew(command.IncentiveApplicationId, command.AccountId, command.AccountLegalEntityId);
             foreach (var apprenticeship in command.Apprenticeships)
             {
-                incentiveApplication.AddApprenticeship(_domainFactory.CreateNewApprenticeship(apprenticeship.Id, apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName, apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate, apprenticeship.ApprenticeshipEmployerTypeOnApproval));
+                incentiveApplication.AddApprenticeship(_domainFactory.CreateNewApprenticeship(apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName, apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate, apprenticeship.ApprenticeshipEmployerTypeOnApproval));
             }
 
             await _domainRepository.Save(incentiveApplication);
