@@ -5,7 +5,7 @@ using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 
-namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
+namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplicationFactoryTests
 {
     public class WhenCreatedApprenticeship
     {
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         public void Then_the_id_is_set()
         {
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
 
             // Assert
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var apprenticeshipId = _fixture.Create<long>();
 
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(apprenticeshipId, _fixture.Create<string>(), _fixture.Create<string>(),
+            var apprenticeship = _sut.CreateApprenticeship(apprenticeshipId, _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
 
             // Assert
@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var firstName = _fixture.Create<string>();
 
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(_fixture.Create<long>(), firstName, _fixture.Create<string>(),
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), firstName, _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
 
             // Assert
@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var lastName = _fixture.Create<string>();
 
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), lastName,
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), lastName,
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
 
             // Assert
@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var dateOfBirth = _fixture.Create<DateTime>();
 
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 dateOfBirth, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
 
             // Assert
@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var uln = _fixture.Create<long>();
 
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), uln, _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
 
             // Assert
@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var plannedStartDate = _fixture.Create<DateTime>();
 
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), plannedStartDate, _fixture.Create<ApprenticeshipEmployerType>());
 
             // Assert
@@ -121,7 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var employerType = _fixture.Create<ApprenticeshipEmployerType>();
 
             // Act
-            var apprenticeship = _sut.CreateNewApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), employerType);
 
             // Assert

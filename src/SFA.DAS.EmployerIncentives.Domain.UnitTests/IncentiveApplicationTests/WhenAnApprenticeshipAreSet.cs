@@ -1,15 +1,13 @@
-﻿using System;
-using System.Linq;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 {
-    public class WhenAnApprenticeshipIsAdded
+    public class WhenAnApprenticeshipAreSet
     {
         private IncentiveApplication _sut;
         private Fixture _fixture;
@@ -24,29 +22,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         }
 
         [Test]
-        public void Then_the_apprenticeship_is_added()
+        public void Then_the_apprenticeships_are_added()
         {
             // Arrange
-            var apprenticeship = _fixture.Create<Apprenticeship>();
+            var apprenticeships = _fixture.CreateMany<Apprenticeship>().ToList();
 
             // Act
-            _sut.AddApprenticeship(apprenticeship);
+            _sut.SetApprenticeships(apprenticeships);
 
             // Assert
-            _sut.Apprenticeships.Single().Should().Be(apprenticeship);
+            _sut.Apprenticeships.Should().BeEquivalentTo(apprenticeships);
         }
 
         [Test]
-        public void Then_the_apprenticeship_model_is_set()
+        public void Then_the_apprenticeships_are_replaced()
         {
             // Arrange
-            var apprenticeship = _fixture.Create<Apprenticeship>();
+            var originalApprenticeships = _fixture.CreateMany<Apprenticeship>(5).ToList();
+            _sut.SetApprenticeships(originalApprenticeships);
+            var newApprenticeships = _fixture.CreateMany<Apprenticeship>(2).ToList();
 
             // Act
-            _sut.AddApprenticeship(apprenticeship);
+            _sut.SetApprenticeships(newApprenticeships);
 
             // Assert
-            _sut.GetModel().ApprenticeshipModels.Single().Should().Be(apprenticeship.GetModel());
+            _sut.Apprenticeships.Should().BeEquivalentTo(newApprenticeships);
         }
     }
 }
