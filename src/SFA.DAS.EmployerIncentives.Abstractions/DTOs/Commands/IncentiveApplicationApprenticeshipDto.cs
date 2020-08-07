@@ -5,7 +5,6 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands
 {
     public class IncentiveApplicationApprenticeshipDto
     {
-        public Guid Id { get; set; }
         public int ApprenticeshipId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

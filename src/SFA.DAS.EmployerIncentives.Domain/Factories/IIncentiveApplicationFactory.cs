@@ -8,7 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
     public interface IIncentiveApplicationFactory
     {
         IncentiveApplication CreateNew(Guid id, long accountId, long accountLegalEntityId);
-        Apprenticeship CreateNewApprenticeship(Guid id, int apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval);
+        Apprenticeship CreateNewApprenticeship(int apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval);
         IncentiveApplication GetExisting(Guid id, IncentiveApplicationModel model);
     }
 }
