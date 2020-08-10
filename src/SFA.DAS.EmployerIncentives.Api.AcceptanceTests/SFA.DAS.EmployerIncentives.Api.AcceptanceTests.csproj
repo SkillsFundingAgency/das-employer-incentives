@@ -13,6 +13,10 @@
   <ItemGroup>
     <None Remove="SFA.DAS.EmployerIncentives.Api.AcceptanceTests.csproj.DotSettings" />
   </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\EligibleApprenticeshipRequested - Copy.feature.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
@@ -49,6 +53,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\SendBankDetailsRequiredEmail.feature.cs">
+      <DependentUpon>SendBankDetailsRequiredEmail.feature</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Update="Features\IncentiveApplicationRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -62,6 +70,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\SendBankDetailsRequiredEmail.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>SendBankDetailsRequiredEmail.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\IncentiveApplicationRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveApplicationRequested.feature.cs</LastGenOutput>
