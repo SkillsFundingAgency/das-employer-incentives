@@ -36,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             {
                 Id = x.Id,
                 AccountId = x.AccountId,
+                AccountLegalEntityId = x.AccountLegalEntityId,
                 Apprenticeships = x.Apprenticeships.Select(y => MapToApprenticeshipDto(y))
             };
         }

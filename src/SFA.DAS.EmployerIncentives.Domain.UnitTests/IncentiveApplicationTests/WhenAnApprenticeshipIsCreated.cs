@@ -23,9 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-25).AddDays(1);
 
-            var appenticeship = new IncentiveApplicationFactory().CreateNewApprenticeship(_fixture.Create<Guid>(), _fixture.Create<int>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
+            var apprenticeship = new IncentiveApplicationFactory().CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
 
-            appenticeship.TotalIncentiveAmount.Should().Be(2000);
+            apprenticeship.TotalIncentiveAmount.Should().Be(2000);
         }
 
         [Test]
@@ -34,9 +34,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-18);
 
-            var appenticeship = new IncentiveApplicationFactory().CreateNewApprenticeship(_fixture.Create<Guid>(), _fixture.Create<int>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
+            var apprenticeship = new IncentiveApplicationFactory().CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
 
-            appenticeship.TotalIncentiveAmount.Should().Be(2000);
+            apprenticeship.TotalIncentiveAmount.Should().Be(2000);
         }
 
         [Test]
@@ -45,9 +45,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-25);
 
-            var appenticeship = new IncentiveApplicationFactory().CreateNewApprenticeship(_fixture.Create<Guid>(), _fixture.Create<int>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
+            var apprenticeship = new IncentiveApplicationFactory().CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
 
-            appenticeship.TotalIncentiveAmount.Should().Be(1500);
+            apprenticeship.TotalIncentiveAmount.Should().Be(1500);
         }
 
         [Test]
@@ -56,9 +56,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
             var dateOfBirth = startDate.AddYears(-26);
 
-            var appenticeship = new IncentiveApplicationFactory().CreateNewApprenticeship(_fixture.Create<Guid>(), _fixture.Create<int>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
+            var apprenticeship = new IncentiveApplicationFactory().CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(), dateOfBirth, _fixture.Create<long>(), startDate, ApprenticeshipEmployerType.Levy);
 
-            appenticeship.TotalIncentiveAmount.Should().Be(1500);
+            apprenticeship.TotalIncentiveAmount.Should().Be(1500);
         }
     }
 }

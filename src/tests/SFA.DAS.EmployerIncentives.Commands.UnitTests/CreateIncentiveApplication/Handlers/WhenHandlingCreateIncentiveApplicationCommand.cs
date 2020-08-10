@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplicati
             _mockDomainFactory.Setup(x => x.CreateNew(command.IncentiveApplicationId, command.AccountId, command.AccountLegalEntityId)).Returns(incentiveApplication);
             foreach (var apprenticeship in command.Apprenticeships)
             {
-                _mockDomainFactory.Setup(x => x.CreateNewApprenticeship(apprenticeship.Id,
+                _mockDomainFactory.Setup(x => x.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval)).Returns(_fixture.Create<Apprenticeship>());

@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 
-namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
+namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
 {
-    public class CreateIncentiveApplicationCommandValidator : IValidator<CreateIncentiveApplicationCommand>
+    public class UpdateIncentiveApplicationCommandValidator : IValidator<UpdateIncentiveApplicationCommand>
     {
-        public Task<ValidationResult> Validate(CreateIncentiveApplicationCommand item)
+        public Task<ValidationResult> Validate(UpdateIncentiveApplicationCommand item)
         {
             var result = new ValidationResult();
 
@@ -23,17 +22,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
                 result.AddError("AccountId", "Is not set");
             }
 
-            if (item.AccountLegalEntityId == default)
-            {
-                result.AddError("AccountLegalEntityId", "Is not set");
-            }
-
             ValidateApprenticeships(result, item.Apprenticeships);
 
             return Task.FromResult(result);
         }
 
-        private void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
+        private static void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
         {
             if (apprenticeships == null)
             {
@@ -53,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             }
         }
 
-        private void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
+        private static void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
         {
             if (apprenticeship.ApprenticeshipId == default)
             {

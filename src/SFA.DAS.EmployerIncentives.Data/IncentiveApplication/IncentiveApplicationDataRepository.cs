@@ -1,9 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -24,7 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         public async Task<IncentiveApplicationModel> Get(Guid incentiveApplicationId)
         {
-            var incentiveApplication = _dbContext.Applications.FirstOrDefault(a => a.Id == incentiveApplicationId);
+            var incentiveApplication = _dbContext.Applications
+                .Include(x => x.Apprenticeships)
+                .FirstOrDefault(a => a.Id == incentiveApplicationId);
             if (incentiveApplication != null)
             {
                 return await Task.FromResult(incentiveApplication.Map());
@@ -39,6 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             if (existingApplication != null)
             {
                 _dbContext.Entry(existingApplication).CurrentValues.SetValues(model);
+                _dbContext.RemoveRange(existingApplication.Apprenticeships);
+                _dbContext.AddRange(model.Apprenticeships);
+
                 await _dbContext.SaveChangesAsync();
             }
         }
