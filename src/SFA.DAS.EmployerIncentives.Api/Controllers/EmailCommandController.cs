@@ -15,10 +15,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPost]
-        [Route("bank-details")]
-        public async Task SendBankDetailsEmail([FromBody] SendBankDetailsEmailRequest request)
+        [Route("bank-details-required")]
+        public async Task SendBankDetailRequiredEmail([FromBody] SendBankDetailsEmailRequest request)
         {
-            await SendCommandAsync(new SendBankDetailsEmailCommand(request.AccountId, 
+            await SendCommandAsync(new SendBankDetailsRequiredEmailCommand(request.AccountId, 
                                                                    request.AccountLegalEntityId, 
                                                                    request.EmailAddress,
                                                                    request.AddBankDetailsUrl));

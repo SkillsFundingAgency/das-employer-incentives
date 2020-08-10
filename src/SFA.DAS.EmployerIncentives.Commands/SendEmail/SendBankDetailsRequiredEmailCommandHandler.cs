@@ -11,22 +11,22 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
-    public class SendBankDetailsEmailCommandHandler : ICommandHandler<SendBankDetailsEmailCommand>
+    public class SendBankDetailsRequiredEmailCommandHandler : ICommandHandler<SendBankDetailsRequiredEmailCommand>
     {
         private readonly IMessageSession _messageSession;
         private readonly EmailTemplateSettings _emailTemplates;
-        private readonly ILogger<SendBankDetailsEmailCommandHandler> _logger;
+        private readonly ILogger<SendBankDetailsRequiredEmailCommandHandler> _logger;
         private const string AddBankDetailsUrlToken = "bank details url";
 
-        public SendBankDetailsEmailCommandHandler(IMessageSession messageSession, IOptions<EmailTemplateSettings> emailTemplates, 
-                                                  ILogger<SendBankDetailsEmailCommandHandler> logger)
+        public SendBankDetailsRequiredEmailCommandHandler(IMessageSession messageSession, IOptions<EmailTemplateSettings> emailTemplates, 
+                                                  ILogger<SendBankDetailsRequiredEmailCommandHandler> logger)
         {
             _messageSession = messageSession;
             _emailTemplates = emailTemplates.Value;
             _logger = logger;
         }
 
-        public async Task Handle(SendBankDetailsEmailCommand command, CancellationToken cancellationToken = default)
+        public async Task Handle(SendBankDetailsRequiredEmailCommand command, CancellationToken cancellationToken = default)
         {
             var template = _emailTemplates.BankDetailsRequired;
 

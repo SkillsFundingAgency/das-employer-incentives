@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
-    public class SendBankDetailsEmailCommand : ICommand
+    public class SendBankDetailsRequiredEmailCommand : ICommand
     {
         public long AccountId { get; private set; }
         public long AccountLegalEntityId { get; private set; }
@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 
         public string AddBankDetailsUrl { get; private set; }
 
-        public SendBankDetailsEmailCommand(long accountId, long accountLegalEntityId, string emailAddress, string addBankDetailsUrl)
+        public SendBankDetailsRequiredEmailCommand(long accountId, long accountLegalEntityId, string emailAddress, string addBankDetailsUrl)
         {
             AccountId = accountId;
             AccountLegalEntityId = accountLegalEntityId;

@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
-    public class SendBankDetailsEmailCommandValidator : IValidator<SendBankDetailsEmailCommand>
+    public class SendBankDetailsRequiredEmailCommandValidator : IValidator<SendBankDetailsRequiredEmailCommand>
     {
-        public Task<ValidationResult> Validate(SendBankDetailsEmailCommand item)
+        public Task<ValidationResult> Validate(SendBankDetailsRequiredEmailCommand item)
         {
             var result = new ValidationResult();
 
