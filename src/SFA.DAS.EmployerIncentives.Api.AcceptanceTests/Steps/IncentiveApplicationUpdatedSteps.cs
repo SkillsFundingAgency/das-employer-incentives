@@ -18,7 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class IncentiveApplicationUpdatedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private UpdateIncentiveApplicationRequest _updateRequest;
+        private UpdateIncentiveApplicationRequest _updateApplicationRequest;
+        private CreateIncentiveApplicationRequest _createApplicationRequest;
 
         public IncentiveApplicationUpdatedSteps(TestContext testContext) : base(testContext)
         {
@@ -28,25 +29,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"An employer is applying for the New Apprenticeship Incentive")]
         public async Task GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive()
         {
-            var createRequest = Fixture.Create<CreateIncentiveApplicationRequest>();
+            _createApplicationRequest = Fixture.Create<CreateIncentiveApplicationRequest>();
             const string url = "applications";
-            await EmployerIncentiveApi.Post(url, createRequest);
+            await EmployerIncentiveApi.Post(url, _createApplicationRequest);
 
-            _updateRequest = new UpdateIncentiveApplicationRequest()
-            {
-                IncentiveApplicationId = createRequest.IncentiveApplicationId,
-                Apprenticeships = Fixture.CreateMany<IncentiveApplicationApprenticeshipDto>(4),
-                AccountId = createRequest.AccountId,
-                AccountLegalEntityId = createRequest.AccountLegalEntityId
-            };
-            _updateRequest.Apprenticeships.AddItem(createRequest.Apprenticeships.First());
+
         }
 
         [When(@"They have changed selected apprenticeships for the application")]
         public async Task WhenTheyHaveChangedSelectedApprenticeshipsForTheApplication()
         {
-            var url = $"applications/{_updateRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Put(url, _updateRequest);
+            _updateApplicationRequest = new UpdateIncentiveApplicationRequest()
+            {
+                IncentiveApplicationId = _createApplicationRequest.IncentiveApplicationId,
+                Apprenticeships = Fixture.CreateMany<IncentiveApplicationApprenticeshipDto>(4),
+                AccountId = _createApplicationRequest.AccountId,
+            };
+            _updateApplicationRequest.Apprenticeships.AddItem(_createApplicationRequest.Apprenticeships.First());
+
+            var url = $"applications/{_updateApplicationRequest.IncentiveApplicationId}";
+            await EmployerIncentiveApi.Put(url, _updateApplicationRequest);
         }
 
         [Then(@"the application is updated with new selection of apprenticeships")]
@@ -55,11 +57,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-
-            var query = $"SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = '{ _updateRequest.IncentiveApplicationId}'";
+            var query = $"SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = '{ _updateApplicationRequest.IncentiveApplicationId}'";
             var apprenticeships = dbConnection.Query<IncentiveApplicationApprenticeship>(query).ToList();
 
-            apprenticeships.Should().BeEquivalentTo(_updateRequest.Apprenticeships);
+            apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships);
         }
 
     }
