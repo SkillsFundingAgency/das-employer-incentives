@@ -134,8 +134,8 @@ namespace SFA.DAS.EmployerIncentives.Api
 
         private bool ConfigurationIsLocalOrDev()
         {
-            return Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
+            return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   Configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
