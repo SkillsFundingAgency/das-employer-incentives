@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NServiceBus;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.Notifications.Api.Client;
-using SFA.DAS.Notifications.Api.Types;
+using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,48 +13,34 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
     public class SendBankDetailsEmailCommandHandler : ICommandHandler<SendBankDetailsEmailCommand>
     {
-        private readonly INotificationsApi _notificationsApi;
-        private readonly NotifyServiceSettings _configuration;
+        private readonly IMessageSession _messageSession;
+        private readonly EmailTemplateSettings _emailTemplates;
         private readonly ILogger<SendBankDetailsEmailCommandHandler> _logger;
-        private const string TemplateName = "BankDetailsRequired";
         private const string AddBankDetailsUrlToken = "bank details url";
 
-        public SendBankDetailsEmailCommandHandler(INotificationsApi notificationsApi, IOptions<NotifyServiceSettings> configuration, 
+        public SendBankDetailsEmailCommandHandler(IMessageSession messageSession, IOptions<EmailTemplateSettings> emailTemplates, 
                                                   ILogger<SendBankDetailsEmailCommandHandler> logger)
         {
-            _notificationsApi = notificationsApi;
-            _configuration = configuration.Value;
+            _messageSession = messageSession;
+            _emailTemplates = emailTemplates.Value;
             _logger = logger;
         }
 
         public async Task Handle(SendBankDetailsEmailCommand command, CancellationToken cancellationToken = default)
         {
-            var template = _configuration.EmailTemplates.FirstOrDefault(x => x.Name == TemplateName);
-            if (template == null)
-            {
-                _logger.LogError($"Email template id {TemplateName} not found in configuration)");
-                return;
-            }
+            var template = _emailTemplates.BankDetailsRequired;
 
             var personalisationTokens = new Dictionary<string, string>
             {
                 { AddBankDetailsUrlToken, command.AddBankDetailsUrl }
             };
 
-            var email = new Email
-            {
-                RecipientsAddress = command.EmailAddress,
-                TemplateId = template.TemplateId,
-                ReplyToAddress = template.ReplyToAddress,
-                SystemId = _configuration.SystemId,
-                Subject = template.Subject,
-                Tokens = personalisationTokens
-            };
+            var sendEmailCommand = new SendEmailCommand(template.TemplateId, command.EmailAddress, personalisationTokens);
 
             try
             {
                 _logger.LogInformation($"Sending bank details required email for account id {command.AccountId} legal entity id {command.AccountLegalEntityId}");
-                await _notificationsApi.SendEmail(email);
+                await _messageSession.Send(sendEmailCommand);
             }
             catch (Exception ex)
             {
