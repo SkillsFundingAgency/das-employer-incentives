@@ -17,6 +17,8 @@ using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace SFA.DAS.EmployerIncentives.Api
 {
@@ -57,6 +59,18 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddHealthChecks();
             services.AddSwaggerGen();
 
+            services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
+            services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
+
+            if (!ConfigurationIsLocalOrDev())
+            {
+                var azureAdConfiguration = Configuration
+                    .GetSection("AzureAd")
+                    .Get<AzureActiveDirectoryConfiguration>();
+
+                services.AddAuthentication(azureAdConfiguration);
+            }
+
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
@@ -72,6 +86,15 @@ namespace SFA.DAS.EmployerIncentives.Api
             .AddNServiceBusClientUnitOfWork();
 
             services.AddTransient<UnitOfWorkManagerMiddleware>();
+
+            services
+                .AddMvc(o =>
+                {
+                    if (!ConfigurationIsLocalOrDev())
+                    {
+                        o.Conventions.Add(new AuthorizeControllerModelConvention());
+                    }
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,6 +130,12 @@ namespace SFA.DAS.EmployerIncentives.Api
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
         {
             serviceProvider.StartNServiceBus(Configuration).GetAwaiter().GetResult();
+        }
+
+        private bool ConfigurationIsLocalOrDev()
+        {
+            return Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
