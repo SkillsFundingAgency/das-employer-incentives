@@ -14,9 +14,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
             _messageSession = messageSession;
         }
 
-        public async Task Publish(TCommand command, CancellationToken cancellationToken = default)
+        public Task Publish(TCommand command, CancellationToken cancellationToken = default)
         {
-            await _messageSession.Send(command);
+            return _messageSession.Send(command);
         }
     }
 }

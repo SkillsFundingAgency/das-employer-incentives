@@ -3,8 +3,10 @@ using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.Notifications.Messages.Commands;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -18,12 +20,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private Fixture _fixture;
         private SendBankDetailsEmailRequest _request;
         private string _url;
+        private string _storageDirectory;
 
         public SendBankDetailsRequiredEmailSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-required";
+            var projectDirectory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("bin"));
+            var sourceDirectory = new DirectoryInfo(projectDirectory).Parent;
+            _storageDirectory = Path.Combine(sourceDirectory.FullName, ".learningtransport");
         }
 
         [When(@"a bank details required email is sent for a valid account, legal entity and email address")]
@@ -38,6 +44,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenTheEmployerIsSentAReminderEmailToSupplyTheirBankDetails()
         {
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
+            var mostRecentFile = directoryInfo.GetFiles().OrderByDescending(x => x.CreationTimeUtc).FirstOrDefault();
+            mostRecentFile.Should().NotBeNull();
+
+            var contents = File.ReadAllText(mostRecentFile.FullName, Encoding.UTF8);
+
+            contents.Should().Contain(_request.EmailAddress);
+            contents.Should().Contain(_request.AddBankDetailsUrl);
         }
 
         [When(@"a bank details required email is sent with an invalid email address")]
