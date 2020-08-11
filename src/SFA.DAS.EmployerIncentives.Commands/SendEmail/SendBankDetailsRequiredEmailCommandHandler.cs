@@ -13,17 +13,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
     public class SendBankDetailsRequiredEmailCommandHandler : ICommandHandler<SendBankDetailsRequiredEmailCommand>
     {
-        private readonly IMessageSession _messageSession;
+        private readonly ICommandPublisher<SendEmailCommand> _commandPublisher;
         private readonly EmailTemplateSettings _emailTemplates;
-        private readonly ILogger<SendBankDetailsRequiredEmailCommandHandler> _logger;
         private const string AddBankDetailsUrlToken = "bank details url";
 
-        public SendBankDetailsRequiredEmailCommandHandler(IMessageSession messageSession, IOptions<EmailTemplateSettings> emailTemplates, 
-                                                  ILogger<SendBankDetailsRequiredEmailCommandHandler> logger)
+        public SendBankDetailsRequiredEmailCommandHandler(ICommandPublisher<SendEmailCommand> commandPublisher, 
+                                                          IOptions<EmailTemplateSettings> emailTemplates)
         {
-            _messageSession = messageSession;
+            _commandPublisher = commandPublisher;
             _emailTemplates = emailTemplates.Value;
-            _logger = logger;
         }
 
         public async Task Handle(SendBankDetailsRequiredEmailCommand command, CancellationToken cancellationToken = default)
@@ -37,15 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 
             var sendEmailCommand = new SendEmailCommand(template.TemplateId, command.EmailAddress, personalisationTokens);
 
-            try
-            {
-                _logger.LogInformation($"Sending bank details required email for account id {command.AccountId} legal entity id {command.AccountLegalEntityId}");
-                await _messageSession.Send(sendEmailCommand);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error sending bank details required email to account id {command.AccountId} legal entity id {command.AccountLegalEntityId}");
-            }
+            await _commandPublisher.Publish(sendEmailCommand);           
         }
     }
 }

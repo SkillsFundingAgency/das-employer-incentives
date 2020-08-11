@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NServiceBus;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.Notifications.Messages.Commands;
@@ -16,8 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
     [TestFixture]
     public class WhenHandlingSendBankDetailsRequiredEmailCommand
     {
-        private Mock<IMessageSession> _messageSession;
-        private Mock<ILogger<SendBankDetailsRequiredEmailCommandHandler>> _logger;
+        private Mock<ICommandPublisher<SendEmailCommand>> _commandPublisher;
         private Mock<IOptions<EmailTemplateSettings>> _settings;
         private SendBankDetailsRequiredEmailCommandHandler _sut;
         private EmailTemplateSettings _templates;
@@ -27,12 +27,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
         public void Arrange()
         {
             _fixture = new Fixture();
-            _messageSession = new Mock<IMessageSession>();
-            _logger = new Mock<ILogger<SendBankDetailsRequiredEmailCommandHandler>>();
+            _commandPublisher = new Mock<ICommandPublisher<SendEmailCommand>>();
             _settings = new Mock<IOptions<EmailTemplateSettings>>();
             _templates = new EmailTemplateSettings { BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() } };
             _settings.Setup(x => x.Value).Returns(_templates);
-            _sut = new SendBankDetailsRequiredEmailCommandHandler(_messageSession.Object, _settings.Object, _logger.Object);
+            _sut = new SendBankDetailsRequiredEmailCommandHandler(_commandPublisher.Object, _settings.Object);
         }
 
         [Test]
@@ -45,9 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
             await _sut.Handle(command, new CancellationToken());
 
             // Assert
-            _messageSession.Verify(x => x.Send(It.Is<SendEmailCommand>(x => x.RecipientsAddress == command.EmailAddress &&
+            _commandPublisher.Verify(x => x.Publish(It.Is<SendEmailCommand>(x => x.RecipientsAddress == command.EmailAddress &&
                                                                        x.TemplateId == _templates.BankDetailsRequired.TemplateId &&
-                                                                       x.Tokens.ContainsKey("bank details url")), It.IsAny<SendOptions>()), Times.Once());
+                                                                       x.Tokens.ContainsKey("bank details url")), It.IsAny<CancellationToken>()), Times.Once());
         }
     }
 }

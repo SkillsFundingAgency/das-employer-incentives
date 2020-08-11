@@ -70,6 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IMultiEventPublisher, MultiEventPublisherWithLimit>();
 
+            serviceCollection.AddScoped(typeof(ICommandPublisher<>), typeof(CommandPublisher<>));
+
             return serviceCollection;
         }
 
