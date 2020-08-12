@@ -1,7 +1,13 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Data.SqlClient;
+using FluentAssertions;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture;
+using Dapper;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -11,21 +17,47 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class EligibleApprenticeshipRequestedSteps : StepsBase
     {
         private HttpResponseMessage _apiResult;
+        private long _uln;
+        private IncentiveApplication _incentiveApplication;
+        private IncentiveApplicationApprenticeship _incentiveApprenticeship;
 
         public EligibleApprenticeshipRequestedSteps(TestContext testContext) : base(testContext)
         {
+            _uln = Fixture.Create<long>();
+            _incentiveApplication = Fixture.Build<IncentiveApplication>().Without(x => x.Apprenticeships)
+                .With(x => x.Status, IncentiveApplicationStatus.Submitted).Create();
+            _incentiveApprenticeship =
+                Fixture.Build<IncentiveApplicationApprenticeship>()
+                    .With(x => x.Uln, _uln)
+                    .With(x=>x.IncentiveApplicationId, _incentiveApplication.Id)
+                    .Create();            
+
+            _incentiveApplication.Apprenticeships.Add(_incentiveApprenticeship); 
         }
 
         [Given(@"I am applying for the New Apprenticeship Incentive")]
         public void GivenIAmApplyingForTheNewApprenticeshipIncentive()
         {
+
+        }
+
+        [Given(@"the ULN has been used on a previously submitted Incentive")]
+        public async Task GivenTheULNHasBeenUsedOnAPreviouslySubmittedIncentive()
+        {
+            using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                await dbConnection.ExecuteAsync("insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedBy) values (@id, @accountId, @accountLegalEntityId, @dateCreated, 'Submitted', @dateSubmitted, @submittedBy)", _incentiveApplication);
+                await dbConnection.ExecuteAsync($"insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
+                                                "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
+                                                "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
+                                                "@uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount)", _incentiveApprenticeship);
+            }
         }
 
         [When(@"I request the eligibility of an apprenticeship")]
         public async Task WhenIRequestTheEligibilityOfAnApprenticeship()
         {
-            var uln = 1234567;
-            var url = $"eligible-apprenticeships/{uln}?startDate=2020-08-01&isApproved=true";
+            var url = $"eligible-apprenticeships/{_uln}?startDate=2020-08-01&isApproved=true";
             _apiResult = await EmployerIncentiveApi.Client.GetAsync(url);
         }
 
@@ -35,5 +67,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apiResult.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
+        [Then(@"the status of the apprenticeship is returned as not eligible")]
+        public void ThenTheStatusOfTheApprenticeshipIsReturnedAsNotEligible()
+        {
+            _apiResult.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
     }
 }
