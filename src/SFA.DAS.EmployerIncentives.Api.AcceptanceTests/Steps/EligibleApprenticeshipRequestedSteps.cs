@@ -24,8 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public EligibleApprenticeshipRequestedSteps(TestContext testContext) : base(testContext)
         {
             _uln = Fixture.Create<long>();
-            _incentiveApplication = Fixture.Build<IncentiveApplication>().Without(x => x.Apprenticeships)
-                .With(x => x.Status, IncentiveApplicationStatus.Submitted).Create();
+            _incentiveApplication = Fixture.Build<IncentiveApplication>().Without(x => x.Apprenticeships).Create();
             _incentiveApprenticeship =
                 Fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(x => x.Uln, _uln)
@@ -47,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             return SetupApplicationAndApprenticeship("Submitted");
         }
 
-        [Given(@"the ULN has been used on a previously in progress Incentive")]
+        [Given(@"the ULN has been used on a draft Incentive Application")]
         public Task GivenTheULNHasBeenUsedOnAPreviouslyInProgressIncentive()
         {
             return SetupApplicationAndApprenticeship("InProgress");

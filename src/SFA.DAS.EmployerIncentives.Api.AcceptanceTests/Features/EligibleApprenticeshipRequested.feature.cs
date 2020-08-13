@@ -191,7 +191,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("I am applying for the New Apprenticeship Incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 21
- testRunner.And("the ULN has been used on a previously in progress Incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the ULN has been used on a draft Incentive Application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 22
  testRunner.When("I request the eligibility of an apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
