@@ -11,6 +11,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
     public class IncentiveApplicationQueryRepository : IQueryRepository<IncentiveApplicationDto>
     {
+        private class JoinedObject
+        {
+            public Models.IncentiveApplication Application { get; set; }
+            public Models.Account Account { get; set; }
+        }
+
         private readonly EmployerIncentivesDbContext _context;
 
         public IncentiveApplicationQueryRepository(EmployerIncentivesDbContext context)
@@ -21,23 +27,26 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         public Task<IncentiveApplicationDto> Get(Expression<Func<IncentiveApplicationDto, bool>> predicate)
         {
             return _context.Set<Models.IncentiveApplication>()
+                .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).SingleOrDefaultAsync(predicate);
         }
 
         public Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
         {
             return _context.Set<Models.IncentiveApplication>()
+                .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).Where(predicate).ToListAsync();
         }
 
-        private Expression<Func<Models.IncentiveApplication, IncentiveApplicationDto>> MapToIncentiveApplicationDto()
+        private Expression<Func<JoinedObject, IncentiveApplicationDto>> MapToIncentiveApplicationDto()
         {
             return x => new IncentiveApplicationDto
             {
-                Id = x.Id,
-                AccountId = x.AccountId,
-                AccountLegalEntityId = x.AccountLegalEntityId,
-                Apprenticeships = x.Apprenticeships.Select(y => MapToApprenticeshipDto(y))
+                Id = x.Application.Id,
+                AccountId = x.Application.AccountId,
+                AccountLegalEntityId = x.Application.AccountLegalEntityId,
+                Apprenticeships = x.Application.Apprenticeships.Select(y => MapToApprenticeshipDto(y)),
+                LegalEntityId = x.Account.LegalEntityId
             };
         }
 

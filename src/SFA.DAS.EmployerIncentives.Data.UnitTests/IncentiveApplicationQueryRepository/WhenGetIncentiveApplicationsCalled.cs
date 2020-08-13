@@ -38,12 +38,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
         public async Task Then_data_is_fetched_from_database()
         {
             // Arrange
-            var allApplications = _fixture.CreateMany<Models.IncentiveApplication>(10).ToArray();
+            var account = _fixture.Create<Models.Account>();
+            var allApplications = _fixture.Build<Models.IncentiveApplication>().With(x => x.AccountLegalEntityId, account.AccountLegalEntityId).CreateMany<Models.IncentiveApplication>(10).ToArray();
             const long accountId = -1;
 
             allApplications[0].AccountId = accountId;
             allApplications[3].AccountId = accountId;
 
+            _context.Accounts.Add(account);
             _context.Applications.AddRange(allApplications);
             _context.SaveChanges();
 
