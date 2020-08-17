@@ -5,7 +5,6 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprenticeshipEligibility;
 using SFA.DAS.EmployerIncentives.ValueObjects;
@@ -16,7 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
     {
         private GetApprenticeshipEligibilityQueryHandler _sut;
         private Mock<INewApprenticeIncentiveEligibilityService> _eligibilityService;
-        private Mock<IUlnQueryRepository> _ulnQueryRepository;
         private Fixture _fixture;
 
         [SetUp]
@@ -24,27 +22,23 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             _fixture = new Fixture();
             _eligibilityService = new Mock<INewApprenticeIncentiveEligibilityService>();
-            _ulnQueryRepository = new Mock<IUlnQueryRepository>();
-            _sut = new GetApprenticeshipEligibilityQueryHandler(_eligibilityService.Object, _ulnQueryRepository.Object);
+            _sut = new GetApprenticeshipEligibilityQueryHandler(_eligibilityService.Object);
         }
 
-        [TestCase(true, false, true)]
-        [TestCase(true, true, false)]
-        [TestCase(false, false, false)]
-        [TestCase(false, true, false)]
-        public async Task Then_apprenticeship_eligibility_is_returned(bool isEligible, bool ulnUsed, bool expected)
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Then_apprenticeship_eligibility_is_returned(bool isEligible)
         {
             //Arrange
             var query = _fixture.Create<GetApprenticeshipEligibilityRequest>();
             
-            _eligibilityService.Setup(x => x.IsApprenticeshipEligible(It.Is<Apprenticeship>(y => ApprenticeshipMatchesDto(query.Apprenticeship, y)))).Returns(isEligible);
-            _ulnQueryRepository.Setup(x=>x.UlnAlreadyOnSubmittedIncentiveApplication(query.Apprenticeship.UniqueLearnerNumber)).ReturnsAsync(ulnUsed);
+            _eligibilityService.Setup(x => x.IsApprenticeshipEligible(It.Is<Apprenticeship>(y => ApprenticeshipMatchesDto(query.Apprenticeship, y)))).ReturnsAsync(isEligible);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.IsEligible.Should().Be(expected);
+            result.IsEligible.Should().Be(isEligible);
         }
 
         private bool ApprenticeshipMatchesDto(ApprenticeshipDto dto, Apprenticeship valueObject)

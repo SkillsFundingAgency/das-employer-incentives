@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Data.Apprenticeship
+namespace SFA.DAS.EmployerIncentives.Data
 {
-    public class UlnQueryRepository : IUlnQueryRepository
+    public class UlnValidationService : IUlnValidationService
     {
         private readonly EmployerIncentivesDbContext _context;
 
-        public UlnQueryRepository(EmployerIncentivesDbContext context)
+        public UlnValidationService(EmployerIncentivesDbContext context)
         {
             _context = context;
         }

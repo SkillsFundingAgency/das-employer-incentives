@@ -10,20 +10,17 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprentic
     public class GetApprenticeshipEligibilityQueryHandler : IQueryHandler<GetApprenticeshipEligibilityRequest, GetApprenticeshipEligibilityResponse>
     {
         private readonly INewApprenticeIncentiveEligibilityService _eligibilityService;
-        private readonly IUlnQueryRepository _queryRepository;
 
-        public GetApprenticeshipEligibilityQueryHandler(INewApprenticeIncentiveEligibilityService eligibilityService, IUlnQueryRepository queryRepository)
+        public GetApprenticeshipEligibilityQueryHandler(INewApprenticeIncentiveEligibilityService eligibilityService)
         {
             _eligibilityService = eligibilityService;
-            _queryRepository = queryRepository;
         }
 
         public async Task<GetApprenticeshipEligibilityResponse> Handle(GetApprenticeshipEligibilityRequest query, CancellationToken cancellationToken = default)
         {
             var apprenticeship = query.Apprenticeship.ToApprenticeship();
-            var ulnUsed = await _queryRepository.UlnAlreadyOnSubmittedIncentiveApplication(query.Apprenticeship.UniqueLearnerNumber);
 
-            var isEligible = !ulnUsed && _eligibilityService.IsApprenticeshipEligible(apprenticeship);
+            var isEligible = await _eligibilityService.IsApprenticeshipEligible(apprenticeship);
 
             return new GetApprenticeshipEligibilityResponse(isEligible);
         }

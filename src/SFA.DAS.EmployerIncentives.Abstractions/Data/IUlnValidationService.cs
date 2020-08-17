@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
-    public interface IUlnQueryRepository
+    public interface IUlnValidationService
     {
         Task<bool> UlnAlreadyOnSubmittedIncentiveApplication(long uln);
     }
