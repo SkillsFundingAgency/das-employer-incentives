@@ -105,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var publishedEvent = publishedEvents.SingleOrDefault(e => e.AccountId == accountLegalEntity.AccountId &&
                                              e.AccountLegalEntityId == accountLegalEntity.AccountLegalEntityId &&
                                              e.LegalEntityId == accountLegalEntity.LegalEntityId &&
-                                             e.OrganisationName == $"Name_{accountLegalEntity.LegalEntityId}");
+                                             e.OrganisationName == accountLegalEntity.Name);
 
             publishedEvent.Should().NotBeNull();            
         }
