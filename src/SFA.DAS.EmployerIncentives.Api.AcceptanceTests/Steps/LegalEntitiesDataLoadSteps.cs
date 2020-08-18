@@ -68,7 +68,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
                     foreach (AccountLegalEntity legalEntity in testData.Data)
                     {
-                        AssertAccountServiceWasCalledForLegalEntity(legalEntity);
                         AssertRefreshLegalEntityWasPublished(legalEntity);
                     }
                 }
@@ -98,20 +97,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             requests.AsEnumerable().Count().Should().Be(1);
         }
-
-        private void AssertAccountServiceWasCalledForLegalEntity(AccountLegalEntity accountLegalEntity)
-        {
-            var requests = _testContext
-                             .AccountApi
-                             .MockServer
-                             .FindLogEntries(
-                                 Request
-                                 .Create()
-                                 .WithPath($"/api/accounts/{_testContext.HashingService.HashValue(accountLegalEntity.AccountId)}/legalEntities/{accountLegalEntity.LegalEntityId}")
-                                 .UsingGet());
-
-            requests.AsEnumerable().Count().Should().Be(1);
-        }      
 
         private void AssertRefreshLegalEntityWasPublished(AccountLegalEntity accountLegalEntity)
         {
@@ -150,30 +135,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .WithStatusCode(HttpStatusCode.OK)
                 .WithHeader("Content-Type", "application/json")
                 .WithBodyAsJson(testData));
-
-            foreach (AccountLegalEntity legalEntity in testData.Data)
-            {
-                SetUpMockLegalEntityResponse(legalEntity);
-            }
-        }
-
-        private void SetUpMockLegalEntityResponse(AccountLegalEntity accountLegalEntity)
-        {
-            _testContext.AccountApi.MockServer
-                    .Given(
-                       Request
-                       .Create()
-                       .WithPath($"/api/accounts/{_testContext.HashingService.HashValue(accountLegalEntity.AccountId)}/legalEntities/{accountLegalEntity.LegalEntityId}")
-                       .UsingGet()
-                       )
-                       .RespondWith(Response.Create()
-                       .WithStatusCode(HttpStatusCode.OK)
-                       .WithHeader("Content-Type", "application/json")
-                       .WithBodyAsJson(new LegalEntity
-                       {
-                           LegalEntityId = accountLegalEntity.LegalEntityId,
-                           Name = $"Name_{accountLegalEntity.LegalEntityId}"
-                       }));
         }
     }
 }

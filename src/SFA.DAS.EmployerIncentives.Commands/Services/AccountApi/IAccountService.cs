@@ -5,6 +5,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.AccountApi
     public interface IAccountService
     {
         Task<PagedModel<AccountLegalEntity>> GetAccountLegalEntitiesByPage(int pageNumber, int pageSize = 1000);
-        Task<LegalEntity> GetLegalEntity(long accountId, long legalentityId);
     }
 }
