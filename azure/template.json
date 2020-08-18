@@ -6,7 +6,7 @@
             "type": "string",
             "defaultValue": ""
         },
-        "appServiceAllowedIPs": {
+        "backendAccessRestrictions": {
             "type": "array",
             "defaultValue": [
             ]
@@ -59,6 +59,9 @@
             "type": "string"
         },
         "sharedBackEndAppServicePlanName": {
+            "type": "string"
+        },
+        "sharedBackEndSubnetResourceId": {
             "type": "string"
         },
         "sharedEnvResourceGroup": {
@@ -154,6 +157,9 @@
                     "appServicePlanResourceGroup": {
                         "value": "[parameters('sharedEnvResourceGroup')]"
                     },
+                    "subnetResourceId": {
+                        "value": "[parameters('sharedBackEndSubnetResourceId')]"
+                    },
                     "appServiceAppSettings": {
                         "value": [
                             {
@@ -201,7 +207,7 @@
                         "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference('api-app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     },
                     "ipSecurityRestrictions": {
-                        "value": "[parameters('appServiceAllowedIPs')]"
+                        "value": "[parameters('backendAccessRestrictions')]"
                     }
                 }
             },
