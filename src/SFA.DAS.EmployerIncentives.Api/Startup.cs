@@ -119,7 +119,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             app.UseRouting();            
 
-            app.UseAuthorization();            
+            app.UseAuthentication();
             app.UseEndpoints(endpoints =>
             {                
                 endpoints.MapControllers();
