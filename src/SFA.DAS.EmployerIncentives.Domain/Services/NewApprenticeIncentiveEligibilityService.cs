@@ -14,14 +14,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
         }
         public async Task<bool> IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            if (await _ulnValidationService.UlnAlreadyOnSubmittedIncentiveApplication(
-                apprenticeship.UniqueLearnerNumber))
+            var incentive = new NewApprenticeIncentive();
+            if (!incentive.IsApprenticeshipEligible(apprenticeship))
             {
                 return false;
             }
 
-            var incentive = new NewApprenticeIncentive();
-            return incentive.IsApprenticeshipEligible(apprenticeship);
+            if (await _ulnValidationService.UlnAlreadyOnSubmittedIncentiveApplication(apprenticeship.UniqueLearnerNumber))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
