@@ -26,5 +26,19 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
             return NotFound();
         }
+
+        [HttpGet("/accounts/{accountId}/applications/{applicationId}/accountlegalentity")]
+        public async Task<IActionResult> GetApplicationAccountLegalEntity(long accountId, Guid applicationId)
+        {
+            var request = new GetApplicationRequest(accountId, applicationId);
+            var response = await QueryAsync<GetApplicationRequest, GetApplicationResponse>(request);
+
+            if (response?.Application != null)
+            {
+                return Ok(response.Application.AccountLegalEntityId);
+            }
+
+            return NotFound();
+        }
     }
 }
