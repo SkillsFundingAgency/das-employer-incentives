@@ -7,12 +7,13 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
     public class NewApprenticeIncentive : ValueObject
     {
         private readonly DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
+        private readonly DateTime EligibilityEndDate = new DateTime(2021, 1, 31);
         private const decimal TwentyFiveOrOverIncentiveAmount = 2000;
         private const decimal UnderTwentyFiveIncentiveAmount = 1500;
 
         public bool IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            if (apprenticeship.StartDate < EligibilityStartDate || !apprenticeship.IsApproved)
+            if (IsStartDateWithinSchemeRange(apprenticeship) || !apprenticeship.IsApproved)
             {
                 return false;
             }
@@ -32,6 +33,11 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
             return TwentyFiveOrOverIncentiveAmount;
         }
 
+        private bool IsStartDateWithinSchemeRange(Apprenticeship apprenticeship)
+        {
+            return apprenticeship.StartDate < EligibilityStartDate || apprenticeship.StartDate > EligibilityEndDate;
+        }
+
         private int CalculateAgeAtStartOfApprenticeship(in DateTime apprenticeDateOfBirth, in DateTime plannedStartDate)
         {
             var age = plannedStartDate.Year - apprenticeDateOfBirth.Year;
@@ -44,6 +50,7 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return EligibilityStartDate;
+            yield return EligibilityEndDate;
         }
     }
 }
