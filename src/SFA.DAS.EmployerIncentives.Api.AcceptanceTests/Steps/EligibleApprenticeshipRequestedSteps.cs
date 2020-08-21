@@ -1,7 +1,13 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Data.SqlClient;
+using FluentAssertions;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture;
+using Dapper;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -11,29 +17,72 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class EligibleApprenticeshipRequestedSteps : StepsBase
     {
         private HttpResponseMessage _apiResult;
+        private long _uln;
+        private IncentiveApplication _incentiveApplication;
+        private IncentiveApplicationApprenticeship _incentiveApprenticeship;
 
         public EligibleApprenticeshipRequestedSteps(TestContext testContext) : base(testContext)
         {
+            _uln = Fixture.Create<long>();
+            _incentiveApplication = Fixture.Build<IncentiveApplication>().Without(x => x.Apprenticeships).Create();
+            _incentiveApprenticeship =
+                Fixture.Build<IncentiveApplicationApprenticeship>()
+                    .With(x => x.Uln, _uln)
+                    .With(x=>x.IncentiveApplicationId, _incentiveApplication.Id)
+                    .Create();            
+
+            _incentiveApplication.Apprenticeships.Add(_incentiveApprenticeship); 
         }
 
         [Given(@"I am applying for the New Apprenticeship Incentive")]
         public void GivenIAmApplyingForTheNewApprenticeshipIncentive()
         {
+
         }
+
+        [Given(@"the ULN has been used on a previously submitted Incentive")]
+        public Task GivenTheULNHasBeenUsedOnAPreviouslySubmittedIncentive()
+        {
+            return SetupApplicationAndApprenticeship("Submitted");
+        }
+
+        [Given(@"the ULN has been used on a draft Incentive Application")]
+        public Task GivenTheULNHasBeenUsedOnAPreviouslyInProgressIncentive()
+        {
+            return SetupApplicationAndApprenticeship("InProgress");
+        }
+
 
         [When(@"I request the eligibility of an apprenticeship")]
         public async Task WhenIRequestTheEligibilityOfAnApprenticeship()
         {
-            var uln = 1234567;
-            var url = $"eligible-apprenticeships/{uln}?startDate=2020-08-01&isApproved=true";
+            var url = $"eligible-apprenticeships/{_uln}?startDate=2020-08-01&isApproved=true";
             _apiResult = await EmployerIncentiveApi.Client.GetAsync(url);
         }
 
-        [Then(@"the status of the apprenticeship is returned")]
-        public void ThenTheLegalEntitiesAreReturned()
+        [Then(@"the status of the apprenticeship is returned as eligible")]
+        public void ThenTheStatusOfTheApprenticeshipIsReturnedAsEligible()
         {
             _apiResult.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
+        [Then(@"the status of the apprenticeship is returned as not eligible")]
+        public void ThenTheStatusOfTheApprenticeshipIsReturnedAsNotEligible()
+        {
+            _apiResult.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        private async Task SetupApplicationAndApprenticeship(string status)
+        {
+            using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedBy) values " +
+                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, '{status}', @dateSubmitted, @submittedBy)", _incentiveApplication);
+                await dbConnection.ExecuteAsync($"insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
+                                                "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
+                                                "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
+                                                "@uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount)", _incentiveApprenticeship);
+            }
+        }
     }
 }

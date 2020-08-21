@@ -5,7 +5,6 @@ using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.Account;
 using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.EmployerIncentives.Queries.Account;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Decorators;
 
@@ -33,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Queries
                         .AsImplementedInterfaces()
                         .WithTransientLifetime();
                 })
+                .AddTransient<IUlnValidationService, UlnValidationService>()
                 .AddQueryHandlerDecorators()
                 .AddScoped<IQueryDispatcher, QueryDispatcher>()
                 .AddScoped<INewApprenticeIncentiveEligibilityService, NewApprenticeIncentiveEligibilityService>()
