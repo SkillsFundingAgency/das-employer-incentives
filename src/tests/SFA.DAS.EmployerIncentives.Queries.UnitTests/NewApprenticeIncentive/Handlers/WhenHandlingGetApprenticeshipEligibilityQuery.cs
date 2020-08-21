@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             //Arrange
             var query = _fixture.Create<GetApprenticeshipEligibilityRequest>();
             
-            _eligibilityService.Setup(x => x.IsApprenticeshipEligible(It.Is<Apprenticeship>(y => ApprenticeshipMatchesDto(query.Apprenticeship, y)))).Returns(isEligible);
+            _eligibilityService.Setup(x => x.IsApprenticeshipEligible(It.Is<Apprenticeship>(y => ApprenticeshipMatchesDto(query.Apprenticeship, y)))).ReturnsAsync(isEligible);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);

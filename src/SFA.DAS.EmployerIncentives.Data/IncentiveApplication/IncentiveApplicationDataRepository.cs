@@ -25,12 +25,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         public async Task<IncentiveApplicationModel> Get(Guid incentiveApplicationId)
         {
-            var incentiveApplication = _dbContext.Applications
+            var incentiveApplication = await _dbContext.Applications
                 .Include(x => x.Apprenticeships)
-                .FirstOrDefault(a => a.Id == incentiveApplicationId);
+                .FirstOrDefaultAsync(a => a.Id == incentiveApplicationId);
             if (incentiveApplication != null)
             {
-                return await Task.FromResult(incentiveApplication.Map());
+                return incentiveApplication.Map();
             }
             return null;
         }
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         public async Task Update(IncentiveApplicationModel incentiveApplication)
         {
             var model = incentiveApplication.Map();
-            var existingApplication = _dbContext.Applications.FirstOrDefault(x => x.Id == model.Id);
+            var existingApplication = await _dbContext.Applications.FirstOrDefaultAsync(x => x.Id == model.Id);
             if (existingApplication != null)
             {
                 _dbContext.Entry(existingApplication).CurrentValues.SetValues(model);

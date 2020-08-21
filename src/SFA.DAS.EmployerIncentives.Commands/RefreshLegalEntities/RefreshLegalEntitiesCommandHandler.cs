@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
     public class RefreshLegalEntitiesCommandHandler : ICommandHandler<RefreshLegalEntitiesCommand>
     {
         private readonly IAccountService _accountService;
-        private readonly IMultiEventPublisher _multiEventPublisher;        
+        private readonly IMultiEventPublisher _multiEventPublisher;
 
         public RefreshLegalEntitiesCommandHandler(
             IAccountService accountService,
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
             {
                 messages.Add(new RefreshLegalEntitiesEvent { PageNumber = i, PageSize = pageSize });
             }
-            
+
             await _multiEventPublisher.Publish(messages);
         }
 
@@ -50,18 +50,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
 
             foreach (var accountLegalEntity in accountLegalEntities)
             {
-                var legalEntity = await _accountService.GetLegalEntity(accountLegalEntity.AccountId, accountLegalEntity.LegalEntityId);
 
-                if (legalEntity != null)
+                messages.Add(new RefreshLegalEntityEvent
                 {
-                    messages.Add(new RefreshLegalEntityEvent
-                    {
-                        AccountId = accountLegalEntity.AccountId,
-                        AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
-                        LegalEntityId = accountLegalEntity.LegalEntityId,
-                        OrganisationName = legalEntity.Name
-                    });
-                }
+                    AccountId = accountLegalEntity.AccountId,
+                    AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
+                    LegalEntityId = accountLegalEntity.LegalEntityId,
+                    OrganisationName = accountLegalEntity.Name
+                });
             }
 
             await _multiEventPublisher.Publish(messages);

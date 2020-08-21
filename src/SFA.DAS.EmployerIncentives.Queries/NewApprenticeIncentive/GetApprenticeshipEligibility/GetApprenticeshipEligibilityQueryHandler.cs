@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
+using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Queries.Extensions;
 
@@ -8,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprentic
 {
     public class GetApprenticeshipEligibilityQueryHandler : IQueryHandler<GetApprenticeshipEligibilityRequest, GetApprenticeshipEligibilityResponse>
     {
-        private INewApprenticeIncentiveEligibilityService _eligibilityService;
+        private readonly INewApprenticeIncentiveEligibilityService _eligibilityService;
 
         public GetApprenticeshipEligibilityQueryHandler(INewApprenticeIncentiveEligibilityService eligibilityService)
         {
@@ -19,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprentic
         {
             var apprenticeship = query.Apprenticeship.ToApprenticeship();
 
-            var isEligible = _eligibilityService.IsApprenticeshipEligible(apprenticeship);
+            var isEligible = await _eligibilityService.IsApprenticeshipEligible(apprenticeship);
 
             return new GetApprenticeshipEligibilityResponse(isEligible);
         }
