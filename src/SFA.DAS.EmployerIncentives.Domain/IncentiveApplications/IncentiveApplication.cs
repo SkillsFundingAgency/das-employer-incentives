@@ -16,6 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public IncentiveApplicationStatus Status => Model.Status;
         public DateTime? DateSubmitted => Model.DateSubmitted;
         public string SubmittedByEmail => Model.SubmittedByEmail;
+        public string SubmittedByName => Model.SubmittedByName;
 
         private readonly List<Apprenticeship> _apprenticeships = new List<Apprenticeship>();
         public ReadOnlyCollection<Apprenticeship> Apprenticeships => _apprenticeships.AsReadOnly();
@@ -38,11 +39,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
-        public void Submit(DateTime submittedAt, string submittedByEmail)
+        public void Submit(DateTime submittedAt, string submittedByEmail, string submittedByName)
         {
             Model.Status = IncentiveApplicationStatus.Submitted;
             Model.DateSubmitted = submittedAt;
             Model.SubmittedByEmail = submittedByEmail;
+            Model.SubmittedByName = submittedByName;
         }
 
         public void SetApprenticeships(IEnumerable<Apprenticeship> apprenticeships)

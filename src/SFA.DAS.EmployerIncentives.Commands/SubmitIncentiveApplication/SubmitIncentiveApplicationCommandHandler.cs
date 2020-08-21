@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
                 throw new InvalidRequestException();
             }
 
-            application.Submit(command.DateSubmitted, command.SubmittedByEmail);
+            application.Submit(command.DateSubmitted, command.SubmittedByEmail, command.SubmittedByName);
 
             await _domainRepository.Save(application);
 

@@ -9,17 +9,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication
         public long AccountId { get; private set; }
         public DateTime DateSubmitted { get; private set; }
         public string SubmittedByEmail { get; private set; }
+        public string SubmittedByName { get; private set; }
 
         public SubmitIncentiveApplicationCommand(
             Guid incentiveApplicationId,
             long accountId,
             DateTime dateSubmitted,
-            string submittedByEmail)
+            string submittedByEmail, 
+            string submittedByName)
         {
             IncentiveApplicationId = incentiveApplicationId;
             AccountId = accountId;
             DateSubmitted = dateSubmitted;
             SubmittedByEmail = submittedByEmail;
+            SubmittedByName = submittedByName;
         }
     }
 }

@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
-            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
@@ -54,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             incentiveApplication.Status.Should().Be(IncentiveApplicationStatus.Submitted);
             incentiveApplication.DateSubmitted.Should().Be(command.DateSubmitted);
             incentiveApplication.SubmittedByEmail.Should().Be(command.SubmittedByEmail);
+            incentiveApplication.SubmittedByName.Should().Be(command.SubmittedByName);
             _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Once);
             _mockEventPublisher.Verify(x => x.Publish(It.IsAny<IEnumerable<EmployerIncentiveClaimSubmittedEvent>>()), Times.Once);
         }
@@ -63,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
-            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             IncentiveApplication nullResponse = null;
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
@@ -82,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
-            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);

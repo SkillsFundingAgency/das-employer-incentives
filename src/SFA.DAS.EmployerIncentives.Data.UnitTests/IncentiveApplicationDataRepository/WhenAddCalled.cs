@@ -57,6 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedAccount.DateSubmitted.Should().Be(testApplication.DateSubmitted);
             storedAccount.Status.Should().Be(testApplication.Status);
             storedAccount.SubmittedByEmail.Should().Be(testApplication.SubmittedByEmail);
+            storedAccount.SubmittedByName.Should().Be(testApplication.SubmittedByName);
         }
 
         [Test]

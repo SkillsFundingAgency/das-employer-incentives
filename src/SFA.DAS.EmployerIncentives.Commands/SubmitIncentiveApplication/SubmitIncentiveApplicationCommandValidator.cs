@@ -30,6 +30,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
                 result.AddError("SubmittedByEmail", "Is not set");
             }
 
+            if (item.SubmittedByName == default)
+            {
+                result.AddError("SubmittedByName", "Is not set");
+            }
+
             return Task.FromResult(result);
         }      
     }
