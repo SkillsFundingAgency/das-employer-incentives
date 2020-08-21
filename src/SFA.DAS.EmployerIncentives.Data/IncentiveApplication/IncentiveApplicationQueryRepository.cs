@@ -46,7 +46,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 AccountId = x.Application.AccountId,
                 AccountLegalEntityId = x.Application.AccountLegalEntityId,
                 Apprenticeships = x.Application.Apprenticeships.Select(y => MapToApprenticeshipDto(y)),
-                LegalEntityId = x.Account.LegalEntityId
+                LegalEntityId = x.Account.LegalEntityId,
+                SubmittedByEmail = x.Application.SubmittedByEmail,
+                SubmittedByName = x.Application.SubmittedByName
             };
         }
 
