@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         [Column(TypeName = "nvarchar(50)")]
         public IncentiveApplicationStatus Status { get; set; }
         public DateTime? DateSubmitted { get; set; }
-        public string SubmittedBy { get; set; }
+        public string SubmittedByEmail { get; set; }
         public ICollection<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }
     }
 }

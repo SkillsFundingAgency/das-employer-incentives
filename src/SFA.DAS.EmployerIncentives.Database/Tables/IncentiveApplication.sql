@@ -6,7 +6,7 @@
 	[DateCreated] DATETIME NOT NULL,
 	[Status] NVARCHAR(50) NOT NULL,
 	[DateSubmitted] DATETIME2 NULL,
-	[SubmittedBy] NVARCHAR(50) NULL
+	[SubmittedByEmail] NVARCHAR(50) NULL
 )
 GO
 CREATE INDEX IX_IncentiveApplication_AccountId ON IncentiveApplication (AccountId)

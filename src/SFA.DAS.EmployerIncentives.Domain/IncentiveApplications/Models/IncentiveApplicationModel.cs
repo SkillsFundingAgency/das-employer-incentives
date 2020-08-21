@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models
         public DateTime DateCreated { get; set; }
         public IncentiveApplicationStatus Status { get; set; }
         public DateTime? DateSubmitted { get; set; }
-        public string SubmittedBy { get; set; }
+        public string SubmittedByEmail { get; set; }
         public ICollection<ApprenticeshipModel> ApprenticeshipModels { get; set; }
     }
 }

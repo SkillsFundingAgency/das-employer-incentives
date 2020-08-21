@@ -25,9 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
                 result.AddError("DateSubmitted", "Is not set");
             }
 
-            if (item.SubmittedBy == default)
+            if (item.SubmittedByEmail == default)
             {
-                result.AddError("SubmittedBy", "Is not set");
+                result.AddError("SubmittedByEmail", "Is not set");
             }
 
             return Task.FromResult(result);

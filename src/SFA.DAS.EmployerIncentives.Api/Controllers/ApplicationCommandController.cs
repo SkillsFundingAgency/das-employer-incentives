@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             try
             {
-                await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedBy));
+                await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedByEmail));
                 return Ok();
             }
             catch (InvalidRequestException)

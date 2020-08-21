@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             // Assert
             incentiveApplication.Status.Should().Be(IncentiveApplicationStatus.Submitted);
             incentiveApplication.DateSubmitted.Should().Be(command.DateSubmitted);
-            incentiveApplication.SubmittedBy.Should().Be(command.SubmittedBy);
+            incentiveApplication.SubmittedByEmail.Should().Be(command.SubmittedByEmail);
             _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Once);
             _mockEventPublisher.Verify(x => x.Publish(It.IsAny<IEnumerable<EmployerIncentiveClaimSubmittedEvent>>()), Times.Once);
         }
