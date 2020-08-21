@@ -75,6 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
             services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
+            services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
             services.AddCommandServices();
             services.AddQueryServices();
 
@@ -95,6 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                         o.Conventions.Add(new AuthorizeControllerModelConvention());
                     }
                 }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

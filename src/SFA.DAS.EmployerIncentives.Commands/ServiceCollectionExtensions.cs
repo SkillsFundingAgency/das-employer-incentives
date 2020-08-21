@@ -33,7 +33,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 namespace SFA.DAS.EmployerIncentives.Commands
 {
     public static class ServiceCollectionExtensions
-    { 
+    {
         public static IServiceCollection AddCommandServices(this IServiceCollection serviceCollection)
         {
             serviceCollection
@@ -69,6 +69,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
 
             serviceCollection.AddScoped<IMultiEventPublisher, MultiEventPublisherWithLimit>();
+
+            serviceCollection.AddScoped(typeof(ICommandPublisher<>), typeof(CommandPublisher<>));
 
             return serviceCollection;
         }
@@ -128,7 +130,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             });
 
             return serviceCollection;
-        }
+        }       
 
         public static async Task StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,
@@ -144,12 +146,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
-                endpointConfiguration.UseLearningTransport();
+                endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
             {
                 endpointConfiguration
-                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => { });
+                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => r.AddRouting() );
             }
 
             if (!string.IsNullOrEmpty(configuration["ApplicationSettings:NServiceBusLicense"]))
