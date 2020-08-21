@@ -6,7 +6,7 @@
 	[DateCreated] DATETIME NOT NULL,
 	[Status] NVARCHAR(50) NOT NULL,
 	[DateSubmitted] DATETIME2 NULL,
-	[SubmittedByEmail] NVARCHAR(50) NULL,
+	[SubmittedByEmail] NVARCHAR(100) NULL,
 	[SubmittedByName] NVARCHAR(100) NULL
 )
 GO
