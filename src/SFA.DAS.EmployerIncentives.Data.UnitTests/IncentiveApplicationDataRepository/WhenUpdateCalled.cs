@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
 
             storedApplication.DateSubmitted = _fixture.Create<DateTime>();
             storedApplication.Status = Enums.IncentiveApplicationStatus.Submitted;
-            storedApplication.SubmittedBy = _fixture.Create<string>();
+            storedApplication.SubmittedByEmail = _fixture.Create<string>();
 
             await _sut.Update(storedApplication);
 
