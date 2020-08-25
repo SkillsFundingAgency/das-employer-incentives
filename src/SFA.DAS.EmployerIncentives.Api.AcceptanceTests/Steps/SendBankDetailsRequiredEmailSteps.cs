@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System;
+using AutoFixture;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.Notifications.Messages.Commands;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -46,13 +48,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
-            var mostRecentFile = directoryInfo.GetFiles().OrderByDescending(x => x.CreationTimeUtc).FirstOrDefault();
-            mostRecentFile.Should().NotBeNull();
+            var recentFiles = directoryInfo.GetFiles().OrderByDescending(x => x.CreationTimeUtc >= DateTime.Now.AddMinutes(-2));
 
-            var contents = File.ReadAllText(mostRecentFile.FullName, Encoding.UTF8);
+            foreach (var file in recentFiles)
+            {
+                var contents = File.ReadAllText(file.FullName, Encoding.UTF8);
 
-            contents.Should().Contain(_request.EmailAddress);
-            contents.Should().Contain(_request.AddBankDetailsUrl);
+                if(contents.Contains(_request.EmailAddress) && contents.Contains(_request.AddBankDetailsUrl))
+                {
+                    return;
+                }
+            }
+
+            Assert.Fail($"No NServiceBus Message found with {_request.EmailAddress} and {_request.AddBankDetailsUrl}");
         }
 
         [When(@"a bank details required email is sent with an invalid email address")]
