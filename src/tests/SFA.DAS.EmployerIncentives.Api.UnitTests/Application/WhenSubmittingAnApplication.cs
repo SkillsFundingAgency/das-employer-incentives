@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
                     c.IncentiveApplicationId == request.IncentiveApplicationId &&
                     c.AccountId == request.AccountId &&
                     c.DateSubmitted == request.DateSubmitted &&
-                    c.SubmittedBy == request.SubmittedBy),
+                    c.SubmittedByEmail == request.SubmittedByEmail),
                 It.IsAny<CancellationToken>())
                 , Times.Once);
         }

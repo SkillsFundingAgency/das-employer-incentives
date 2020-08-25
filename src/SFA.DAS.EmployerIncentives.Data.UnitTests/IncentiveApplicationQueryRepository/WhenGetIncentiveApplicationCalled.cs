@@ -38,11 +38,13 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
         public async Task Then_data_is_fetched_from_database()
         {
             // Arrange
-            var allApplications = _fixture.CreateMany<Models.IncentiveApplication>(10).ToArray();
+            var account = _fixture.Create<Models.Account>();
+            var allApplications = _fixture.Build<Models.IncentiveApplication>().With(x => x.AccountLegalEntityId, account.AccountLegalEntityId).CreateMany<Models.IncentiveApplication>(10).ToArray();
             var applicationId = Guid.NewGuid();
 
             allApplications[1].Id = applicationId;
-            
+
+            _context.Accounts.Add(account);
             _context.Applications.AddRange(allApplications);
             _context.SaveChanges();
 
@@ -51,6 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             //Assert
             actual.Should().BeEquivalentTo(allApplications[1], opts => opts.ExcludingMissingMembers());
+            actual.LegalEntityId.Should().Be(account.LegalEntityId);
         }
 
         [Test]

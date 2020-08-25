@@ -7,4 +7,6 @@
 	[HasSignedIncentivesTerms] BIT NOT NULL DEFAULT(0),
 	CONSTRAINT PK_Accounts PRIMARY KEY NONCLUSTERED ([Id], [AccountLegalEntityId])
 )
-GO;
+GO
+CREATE INDEX IX_Account_AccountLegalEntityId ON Accounts (AccountLegalEntityId)
+GO

@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_the_incentive_application_id_has_a_default_value()
         {
             //Arrange
-            var command = new SubmitIncentiveApplicationCommand(default, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var command = new SubmitIncentiveApplicationCommand(default, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_the_account_id_has_a_default_value()
         {
             //Arrange
-            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), default, _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), default, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         public async Task Then_the_command_is_invalid_when_the_submitted_date_has_a_default_value()
         {
             //Arrange
-            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), default, _fixture.Create<string>());
+            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), default, _fixture.Create<string>(), _fixture.Create<string>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -62,10 +62,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         }
 
         [Test]
-        public async Task Then_the_command_is_invalid_when_the_submitted_user_has_a_default_value()
+        public async Task Then_the_command_is_invalid_when_the_submitted_user_email_has_a_default_value()
         {
             //Arrange
-            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), default);
+            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), default, _fixture.Create<string>());
+
+            //Act
+            var result = await _sut.Validate(command);
+
+            //Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_the_submitted_user_name_has_a_default_value()
+        {
+            //Arrange
+            var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), default);
 
             //Act
             var result = await _sut.Validate(command);

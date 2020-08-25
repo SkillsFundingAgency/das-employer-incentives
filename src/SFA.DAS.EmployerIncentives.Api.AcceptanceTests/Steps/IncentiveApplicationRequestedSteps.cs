@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System.Data.SqlClient;
+using System.Linq;
 using FluentAssertions;
 using System.Threading.Tasks;
 using AutoFixture;
+using Dapper;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -16,17 +19,25 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private Fixture _fixture;
         private CreateIncentiveApplicationRequest _request;
         private IncentiveApplicationDto _returnedApplication;
+        private Account _testAccountTable;
 
         public IncentiveApplicationRequestedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
+            _testAccountTable = testContext.TestData.GetOrCreate<Account>();
+
             _fixture = new Fixture();
-            _request = _fixture.Create<CreateIncentiveApplicationRequest>();
+            _request = _fixture.Build<CreateIncentiveApplicationRequest>().With(x => x.AccountLegalEntityId, _testAccountTable.AccountLegalEntityId).Create();
         }
 
         [Given(@"An employer has selected the apprenticeships for their application")]
         public async Task GivenAnEmployerHasSelectedApprenticeships()
         {
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                await dbConnection.ExecuteAsync("insert into Accounts(id, accountLegalEntityId, legalEntityId, legalentityName) values(@id, @accountLegalEntityId, @legalEntityId, @legalentityName)", _testAccountTable);
+            }
+
             var url = $"applications";
             await EmployerIncentiveApi.Post(url, _request);
         }
