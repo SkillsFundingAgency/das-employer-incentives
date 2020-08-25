@@ -69,8 +69,7 @@
     <Build Include="Tables\ClientOutboxData.sql" />
     <Build Include="Tables\IncentiveApplication.sql" />
     <Build Include="Tables\IncentiveApplicationApprenticeship.sql" />
-    <Build Include="Views\ApplicationsInProgress.sql" />
-    <Build Include="Views\ApplicationsSubmitted.sql" />
+    <Build Include="Views\ApplicationsDashboard.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
