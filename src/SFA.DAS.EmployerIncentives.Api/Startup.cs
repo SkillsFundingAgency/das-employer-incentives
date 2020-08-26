@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SFA.DAS.UnitOfWork.NServiceBus.DependencyResolution.Microsoft;
 
 namespace SFA.DAS.EmployerIncentives.Api
 {
@@ -83,6 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             {
                 options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
             })
+            .AddNServiceBusUnitOfWork()
             .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
             .AddNServiceBusClientUnitOfWork();
 

@@ -39,8 +39,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddHashingService()
-                .AddNServiceBusUnitOfWork()
-                .AddNServiceBusClientUnitOfWork()
                 .AddAccountService();
             
             // set up the command handlers and command validators
@@ -67,8 +65,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
-
-            serviceCollection.AddScoped<IMultiEventPublisher, MultiEventPublisherWithLimit>();
 
             serviceCollection.AddScoped(typeof(ICommandPublisher<>), typeof(CommandPublisher<>));
 

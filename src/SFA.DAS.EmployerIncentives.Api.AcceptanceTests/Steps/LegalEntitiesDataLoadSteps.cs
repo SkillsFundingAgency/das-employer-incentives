@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var totalPages = 3;
 
-            for (int pageNumber = 1; pageNumber < totalPages; pageNumber++)
+            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
             {
                 SetUpMockPageResponse(pageNumber, totalPages);
             }
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var totalPages = 3;
 
-            for (int pageNumber = 1; pageNumber < totalPages; pageNumber++)
+            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
             {
                 var testData = _testContext.TestData.GetOrCreate<PagedModel<AccountLegalEntity>>($"PagedModel<AccountLegalEntity>_{pageNumber}");
                 testData.Data.Count.Should().Be(3);

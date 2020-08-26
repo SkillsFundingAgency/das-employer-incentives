@@ -5,15 +5,14 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Messages.Events;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using SFA.DAS.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplication.Handlers
 {
@@ -21,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
     {
         private SubmitIncentiveApplicationCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRespository;
-        private Mock<IMultiEventPublisher> _mockEventPublisher;
+        private Mock<IEventPublisher> _mockEventPublisher;
 
         private Fixture _fixture;
 
@@ -32,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             _fixture.Customize(new IncentiveApplicationCustomization());
 
             _mockDomainRespository = new Mock<IIncentiveApplicationDomainRepository>();
-            _mockEventPublisher = new Mock<IMultiEventPublisher>();
+            _mockEventPublisher = new Mock<IEventPublisher>();
 
             _sut = new SubmitIncentiveApplicationCommandHandler(_mockDomainRespository.Object, _mockEventPublisher.Object);
         }
@@ -56,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             incentiveApplication.SubmittedByEmail.Should().Be(command.SubmittedByEmail);
             incentiveApplication.SubmittedByName.Should().Be(command.SubmittedByName);
             _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Once);
-            _mockEventPublisher.Verify(x => x.Publish(It.IsAny<IEnumerable<EmployerIncentiveClaimSubmittedEvent>>()), Times.Once);
+            _mockEventPublisher.Verify(x => x.Publish(It.IsAny<EmployerIncentiveClaimSubmittedEvent>()), Times.Once);
         }
 
         [Test]

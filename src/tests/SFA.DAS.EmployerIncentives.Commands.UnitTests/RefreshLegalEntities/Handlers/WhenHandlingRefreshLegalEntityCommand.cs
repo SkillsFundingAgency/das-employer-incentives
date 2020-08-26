@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using System.Linq;
+using SFA.DAS.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.Handlers
 {
@@ -16,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
     {
         private RefreshLegalEntitiesCommandHandler _sut;
         private Mock<IAccountService> _mockAccountService;
-        private Mock<IMultiEventPublisher> _mockMultiEventPublisher;
+        private Mock<IEventPublisher> _mockEventPublisher;
 
         private Fixture _fixture;
         private PagedModel<AccountLegalEntity> _pagedData;
@@ -27,11 +28,11 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
             _fixture = new Fixture();
 
             _mockAccountService = new Mock<IAccountService>();
-            _mockMultiEventPublisher = new Mock<IMultiEventPublisher>();
+            _mockEventPublisher = new Mock<IEventPublisher>();
 
             _pagedData = _fixture.Create<PagedModel<AccountLegalEntity>>();
             
-            _mockMultiEventPublisher
+            _mockEventPublisher
                 .Setup(m => m.Publish(It.IsAny<List<RefreshLegalEntitiesEvent>>()))
                 .Returns(Task.CompletedTask);
 
@@ -39,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
                 .Setup(m => m.GetAccountLegalEntitiesByPage(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(_pagedData);
 
-            _sut = new RefreshLegalEntitiesCommandHandler(_mockAccountService.Object, _mockMultiEventPublisher.Object);
+            _sut = new RefreshLegalEntitiesCommandHandler(_mockAccountService.Object, _mockEventPublisher.Object);
         }
 
         [Test]
@@ -65,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
             await _sut.Handle(command);
 
             //Assert
-            _mockMultiEventPublisher.Verify(m => m.Publish(It.IsAny<List<RefreshLegalEntitiesEvent>>()), Times.Never);
+            _mockEventPublisher.Verify(m => m.Publish(It.IsAny<List<RefreshLegalEntitiesEvent>>()), Times.Never);
         }
 
         [Test]
@@ -80,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
             await _sut.Handle(command);
 
             //Assert            
-            _mockMultiEventPublisher.Verify(m => m.Publish(It.Is<List<RefreshLegalEntitiesEvent>>(events => AssertEvents(events, _pagedData))), Times.Once);
+            _mockEventPublisher.Verify(m => m.Publish(It.Is<List<RefreshLegalEntitiesEvent>>(events => AssertEvents(events, _pagedData))), Times.Once);
         }
 
         [Test]
@@ -95,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RefreshLegalEntities.
             await _sut.Handle(command);
 
             //Assert            
-            _mockMultiEventPublisher.Verify(m => m.Publish(It.Is<List<RefreshLegalEntityEvent>>(events => AssertEvents(events))), Times.Once);
+            _mockEventPublisher.Verify(m => m.Publish(It.Is<List<RefreshLegalEntityEvent>>(events => AssertEvents(events))), Times.Once);
         }
 
         private bool AssertEvents(List<RefreshLegalEntitiesEvent> events, PagedModel<AccountLegalEntity> pagedData)
