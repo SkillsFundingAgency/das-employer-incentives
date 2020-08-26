@@ -76,8 +76,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedBy) values " +
-                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, '{status}', @dateSubmitted, @submittedBy)", _incentiveApplication);
+                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByEmail, submittedByName) values " +
+                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, '{status}', @dateSubmitted, @submittedByEmail, @submittedByName)", _incentiveApplication);
                 await dbConnection.ExecuteAsync($"insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
                                                 "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
                                                 "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +

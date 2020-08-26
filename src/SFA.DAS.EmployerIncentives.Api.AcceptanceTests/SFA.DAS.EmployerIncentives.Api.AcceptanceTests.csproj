@@ -49,6 +49,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IncentiveDetailsRequested.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
     </Compile>
@@ -69,6 +74,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsReminderEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
