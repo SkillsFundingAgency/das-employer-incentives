@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.GetVrfCaseDetailsForNewSubmissions;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
 {
@@ -68,6 +69,19 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
                     c.PageSize == 500),
                 It.IsAny<CancellationToken>())
                 , Times.Once);
+        }
+
+        [Test]
+        public async Task Then_a_GetVrfCaseDetailsForNewSubmissionsCommand_command_is_dispatched()
+        {
+            // Arrange
+            var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.GetVrfCaseDetailsForNewApplications).Create();
+
+            // Act
+            await _sut.AddJob(request);
+
+            // Assert
+            _mockCommandDispatcher.Verify(m => m.Send(It.IsAny<GetVrfCaseDetailsForNewSubmissionsCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
