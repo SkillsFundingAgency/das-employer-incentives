@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
                 s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
                 s.AddTransient<IUnitOfWorkManager>(c => new TestUnitOfWorkManager());
-                
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.UseTestDb(_context);
@@ -68,6 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 a.AddInMemoryCollection(_config);
             });
             builder.UseEnvironment("LOCAL");
+
+            _context.ApiFactory = this;
         }
     }
 }

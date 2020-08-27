@@ -2,6 +2,7 @@
 using SFA.DAS.HashingService;
 using System;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -14,7 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         
         public TestData TestData { get; set; }
 
-        public IHashingService HashingService { get; set; }        
+        public IHashingService HashingService { get; set; }
+        public TestWebApi ApiFactory { get; set; }
 
         public TestContext()
         {
@@ -25,6 +27,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             }
             TestData = new TestData();
             HashingService = new HashingService.HashingService("46789BCDFGHJKLMNPRSTVWXY", "SFA: digital apprenticeship service");
+        }
+
+        public T GetApiService<T>()
+        {
+            var scope = ApiFactory.Services.CreateScope();
+            return scope.ServiceProvider.GetRequiredService<T>();
         }
     }
 }
