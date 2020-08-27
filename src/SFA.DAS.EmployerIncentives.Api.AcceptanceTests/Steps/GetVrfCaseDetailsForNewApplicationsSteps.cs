@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Messages.Events;
 using TechTalk.SpecFlow;
 
@@ -24,7 +25,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             _testAccount = testContext.TestData.GetOrCreate<Account>();
+            _testAccount.VrfCaseId = null;
             _testApplication = testContext.TestData.GetOrCreate<IncentiveApplication>();
+            _testApplication.Status = IncentiveApplicationStatus.Submitted;
+            _testApplication.AccountLegalEntityId = _testAccount.AccountLegalEntityId;
         }
 
         [Given(@"an application has been submitted")]
