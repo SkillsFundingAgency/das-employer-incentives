@@ -115,11 +115,10 @@ namespace SFA.DAS.EmployerIncentives.Api
                     c.RoutePrefix = string.Empty;
                 });
             }
-
-            app.UseUnitOfWork();
-
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
+
+            app.UseUnitOfWork();
 
             app.UseRouting();            
 
