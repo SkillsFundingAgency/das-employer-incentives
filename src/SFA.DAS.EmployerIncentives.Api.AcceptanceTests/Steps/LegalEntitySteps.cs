@@ -2,6 +2,7 @@
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using TechTalk.SpecFlow;
@@ -68,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().HaveCount(1);
-                account.Should().BeEquivalentTo(_testAccountTable);
+                account.Single().Should().BeEquivalentTo(_testAccountTable, opts => opts.Excluding(x => x.VrfCaseId).Excluding(x => x.VrfCaseStatus).Excluding(x => x.VrfVendorId));
             }
         }
     }

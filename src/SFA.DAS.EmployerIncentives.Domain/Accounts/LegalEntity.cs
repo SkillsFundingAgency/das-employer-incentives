@@ -8,6 +8,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
     {
         public string Name => Model.Name;
         public bool HasSignedAgreementTerms => Model.HasSignedAgreementTerms;
+        public string VrfVendorId => Model.VrfVendorId;
+        public string VrfCaseId => Model.VrfCaseId;
+        public string VrfCaseStatus => Model.VrfCaseStatus;
 
         public static LegalEntity New(long id, string name)
         {            

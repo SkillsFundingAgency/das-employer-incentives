@@ -39,6 +39,9 @@ namespace SFA.DAS.EmployerIncentives.Data
                 {
                     legalEntity.LegalEntityName = item.LegalEntityName;
                     legalEntity.HasSignedIncentivesTerms = item.HasSignedIncentivesTerms;
+                    legalEntity.VrfCaseId = item.VrfCaseId;
+                    legalEntity.VrfCaseStatus = item.VrfCaseStatus;
+                    legalEntity.VrfVendorId = item.VrfVendorId;
                 }
             }
 

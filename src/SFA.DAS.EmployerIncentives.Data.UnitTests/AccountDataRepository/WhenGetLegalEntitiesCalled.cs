@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             //Assert
             actual.All(x => x.AccountId == accountId).Should().BeTrue();
             actual.Should().BeEquivalentTo(new [] {allAccounts[0], allAccounts[1]},
-                opts => opts.Excluding(x => x.Id).Excluding(x => x.HasSignedIncentivesTerms));
+                opts => opts.ExcludingMissingMembers());
         }
     }
 }

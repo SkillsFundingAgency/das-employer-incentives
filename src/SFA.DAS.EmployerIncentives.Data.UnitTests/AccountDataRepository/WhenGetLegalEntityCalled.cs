@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             var actual = await _sut.Get(x => x.AccountLegalEntityId == accountLegalEntityId);
 
             //Assert
-            actual.Should().BeEquivalentTo(allAccounts[1], opts => opts.Excluding(x => x.Id));
+            actual.Should().BeEquivalentTo(allAccounts[1], opts => opts.ExcludingMissingMembers());
         }
     }
 }
