@@ -10,6 +10,8 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.HashingService;
@@ -27,8 +29,6 @@ using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -61,17 +61,23 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
-            serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
-            serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();
-
-            serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
-            serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
 
             serviceCollection.AddScoped<IMultiEventPublisher, MultiEventPublisherWithLimit>();
 
             serviceCollection.AddScoped(typeof(ICommandPublisher<>), typeof(CommandPublisher<>));
 
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddPersistenceServices(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
+            serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();
+
+            serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
+            serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
+            
             return serviceCollection;
         }
 

@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Events\SFA.DAS.EmployerIncentives.Events.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />
   </ItemGroup>
 

@@ -9,6 +9,7 @@ using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Events;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.Extensions;
 using SFA.DAS.EmployerIncentives.Infrastructure.UnitOfWork;
@@ -76,8 +77,10 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
             services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
+            services.AddPersistenceServices();
             services.AddCommandServices();
             services.AddQueryServices();
+            services.AddEventServices();
 
             services.AddDbContext<EmployerIncentivesDbContext>((options) =>
             {
