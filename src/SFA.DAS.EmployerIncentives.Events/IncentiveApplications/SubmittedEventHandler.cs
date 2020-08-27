@@ -19,16 +19,13 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public Task Handle(Submitted @event, CancellationToken cancellationToken = default)
         {
-            var events = new List<EmployerIncentiveClaimSubmittedEvent>
+            var submittedEvent = new EmployerIncentiveClaimSubmittedEvent
             {
-                new EmployerIncentiveClaimSubmittedEvent
-                {
-                    AccountId = @event.AccountId,
-                    IncentiveClaimApplicationId = @event.IncentiveClaimApplicationId
-                }
+                AccountId = @event.AccountId,
+                IncentiveClaimApplicationId = @event.IncentiveClaimApplicationId
             };
 
-            return _eventPublisher.Publish(events); // this could publish a command
+            return _eventPublisher.Publish(submittedEvent); // this could publish a command
         }
     }
 }

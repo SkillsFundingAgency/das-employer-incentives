@@ -24,8 +24,6 @@ using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
-using SFA.DAS.UnitOfWork.NServiceBus.DependencyResolution.Microsoft;
-using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -39,8 +37,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddHashingService()
-                .AddNServiceBusUnitOfWork()
-                .AddNServiceBusClientUnitOfWork()
                 .AddAccountService();
             
             // set up the command handlers and command validators

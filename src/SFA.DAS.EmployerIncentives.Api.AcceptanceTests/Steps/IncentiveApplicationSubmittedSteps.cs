@@ -9,6 +9,8 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
 using System;
+using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Messages.Events;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -68,6 +70,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Should().HaveCount(1);
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
+
+            var publishedEvents = _testContext.TestData.Get<List<EmployerIncentiveClaimSubmittedEvent>>();
+
+            var publishedEvent = publishedEvents.SingleOrDefault(e => 
+            e.AccountId == _submitRequest.AccountId &&
+            e.IncentiveClaimApplicationId == _submitRequest.IncentiveApplicationId);
+
+            publishedEvent.Should().NotBeNull();
         }
 
         [When(@"the invalid application id is submittted")]
