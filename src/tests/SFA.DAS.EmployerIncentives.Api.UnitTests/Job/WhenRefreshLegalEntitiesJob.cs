@@ -9,7 +9,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.GetVrfCaseDetailsForNewSubmissions;
+using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForNewSubmissions;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
 {
@@ -72,16 +72,16 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
         }
 
         [Test]
-        public async Task Then_a_GetVrfCaseDetailsForNewSubmissionsCommand_command_is_dispatched()
+        public async Task Then_an_UpdateVrfCaseDetailsForNewSubmissionsCommand_command_is_dispatched()
         {
             // Arrange
-            var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.GetVrfCaseDetailsForNewApplications).Create();
+            var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.UpdateVrfCaseDetailsForNewApplications).Create();
 
             // Act
             await _sut.AddJob(request);
 
             // Assert
-            _mockCommandDispatcher.Verify(m => m.Send(It.IsAny<GetVrfCaseDetailsForNewSubmissionsCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockCommandDispatcher.Verify(m => m.Send(It.IsAny<UpdateVrfCaseDetailsForNewSubmissionsCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]

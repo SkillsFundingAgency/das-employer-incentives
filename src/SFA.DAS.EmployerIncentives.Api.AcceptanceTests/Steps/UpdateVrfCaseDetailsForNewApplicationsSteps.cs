@@ -13,15 +13,15 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "GetVrfCaseDetailsForNewApplications")]
-    public class GetVrfCaseDetailsForNewApplicationsSteps : StepsBase
+    [Scope(Feature = "UpdateVrfCaseDetailsForNewApplications")]
+    public class UpdateVrfCaseDetailsForNewApplicationsSteps : StepsBase
     {
         private readonly TestContext _testContext;
         private readonly IServiceProvider _serviceProvider;
         private Account _testAccount;
         private IncentiveApplication _testApplication;
 
-        public GetVrfCaseDetailsForNewApplicationsSteps(TestContext testContext) : base(testContext)
+        public UpdateVrfCaseDetailsForNewApplicationsSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _testAccount = testContext.TestData.GetOrCreate<Account>();
@@ -40,12 +40,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbContext.SaveChangesAsync();
         }
 
-        [When(@"a GetVrfCaseDetailsForNewApplications job is requested")]
-        public async Task WhenAGetVrfCaseDetailsForNewApplicationsJobIsRequested()
+        [When(@"an UpdateVrfCaseDetailsForNewApplications job is requested")]
+        public async Task WhenAnUpdateVrfCaseDetailsForNewApplicationsJobIsRequested()
         {
             await EmployerIncentiveApi.Put(
                 $"/jobs",
-                new JobRequest { Type = JobType.GetVrfCaseDetailsForNewApplications, Data = null });
+                new JobRequest { Type = JobType.UpdateVrfCaseDetailsForNewApplications, Data = null });
 
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }

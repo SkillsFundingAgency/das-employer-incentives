@@ -4,7 +4,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.GetVrfCaseDetailsForNewSubmissions;
+using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForNewSubmissions;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -27,9 +27,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
                 await SendCommandAsync(new RefreshLegalEntitiesCommand(pageNumber, pageSize));
             } 
-            else if (request.Type == JobType.GetVrfCaseDetailsForNewApplications)
+            else if (request.Type == JobType.UpdateVrfCaseDetailsForNewApplications)
             {
-                await SendCommandAsync(new GetVrfCaseDetailsForNewSubmissionsCommand());
+                await SendCommandAsync(new UpdateVrfCaseDetailsForNewSubmissionsCommand());
             }
 
             return NoContent();

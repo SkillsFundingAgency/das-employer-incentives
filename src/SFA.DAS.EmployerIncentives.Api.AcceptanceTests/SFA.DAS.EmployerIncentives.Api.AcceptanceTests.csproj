@@ -49,10 +49,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Features\GetVrfCaseDetailsForNewSubmissionsJob.feature.cs">
+    <Compile Update="Features\UpdateVrfCaseDetailsForNewSubmissionsJob.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>GetVrfCaseDetailsForNewSubmissionsJob.feature</DependentUpon>
+      <DependentUpon>UpdateVrfCaseDetailsForNewSubmissionsJob.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
@@ -74,9 +74,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\GetVrfCaseDetailsForNewSubmissionsJob.feature">
+    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForNewSubmissionsJob.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>GetVrfCaseDetailsForNewSubmissionsJob.feature.cs</LastGenOutput>
+      <LastGenOutput>UpdateVrfCaseDetailsForNewSubmissionsJob.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsReminderEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

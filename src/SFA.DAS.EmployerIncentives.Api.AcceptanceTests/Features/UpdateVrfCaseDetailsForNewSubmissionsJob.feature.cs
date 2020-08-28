@@ -20,11 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.1.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("GetVrfCaseDetailsForNewApplications")]
+    [NUnit.Framework.DescriptionAttribute("UpdateVrfCaseDetailsForNewApplications")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
     [NUnit.Framework.CategoryAttribute("accountApi")]
-    public partial class GetVrfCaseDetailsForNewApplicationsFeature
+    public partial class UpdateVrfCaseDetailsForNewApplicationsFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -34,14 +34,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "api",
                 "accountApi"};
         
-#line 1 "GetVrfCaseDetailsForNewSubmissionsJob.feature"
+#line 1 "UpdateVrfCaseDetailsForNewSubmissionsJob.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "GetVrfCaseDetailsForNewApplications", "\tWhen case details need to be populated in Employer Incentives from VRF\r\n\tThen cu" +
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "UpdateVrfCaseDetailsForNewApplications", "\tWhen case details need to be populated in Employer Incentives from VRF\r\n\tThen cu" +
                     "rrent Legal entities in Managed Apprenticeships are available in Employer Incent" +
                     "ives", ProgrammingLanguage.CSharp, new string[] {
                         "database",
@@ -114,7 +114,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an application has been submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 10
- testRunner.When("a GetVrfCaseDetailsForNewApplications job is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("an UpdateVrfCaseDetailsForNewApplications job is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 11
  testRunner.Then("the case details are requested for the legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
