@@ -34,7 +34,6 @@ stages:
     pool:
       name: 'DAS - Continuous Integration'
       demands:
-        - dotnet
         - Agent.OS -equals Windows_NT
     workspace:
       clean: all
