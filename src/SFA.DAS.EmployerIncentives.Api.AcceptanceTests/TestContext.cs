@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }
         public List<object> EventsPublished { get; set; }
+        public bool ThrowErrorAfterSendingEvent { get; set; } = false;
 
         public TestContext()
         {

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoFixture;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
@@ -25,6 +26,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 hook.OnProcessed = (message) =>
                 {
                     testContext.EventsPublished.Add(message);
+                    if (testContext.ThrowErrorAfterSendingEvent)
+                    {
+                        throw new ApplicationException("Unexpected exception, should force a rollback");
+                    }
                 };
             }
         }
