@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
+            if (!configuration["EnvironmentName"].StartsWith("LOCAL", StringComparison.CurrentCultureIgnoreCase))
             {
                 config.AddAzureTableStorage(options =>
                 {
@@ -46,7 +46,10 @@ namespace SFA.DAS.EmployerIncentives.Api
                 });
             }
 #if DEBUG
-            config.AddJsonFile($"appsettings.Development.json", optional: true);
+            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            {
+                config.AddJsonFile($"appsettings.Development.json", optional: true);
+            }
 #endif
             Configuration = config.Build();
         }
@@ -132,7 +135,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 
         private bool ConfigurationIsLocalOrDev()
         {
-            return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+            return Configuration["EnvironmentName"].StartsWith("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
                    Configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
     }
