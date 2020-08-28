@@ -1,3 +1,8 @@
+parameters:
+- name: PublishBranchOfNugetPackage
+  type: boolean
+  default: false
+
 trigger:
   batch: true
   branches:
@@ -142,7 +147,7 @@ stages:
   displayName: 'Publish Nuget Package'
   pool:
     name: "DAS - Continuous Deployment"
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), ${{ parameters.PublishBranchOfNugetPackage }}))
   jobs:
   - job: 'CleanArtifacts'
     displayName: Clean artifacts directory
