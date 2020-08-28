@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using SFA.DAS.NServiceBus.Services;
+using SFA.DAS.UnitOfWork.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -13,10 +16,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         private readonly TestContext _context;
         private readonly Dictionary<string, string> _config;
+        private readonly IHook<object> _eventMessageHook;
 
-        public TestWebApi(TestContext context)
+        public TestWebApi(TestContext context, IHook<object> eventMessageHook)
         {
             _context = context;
+            _eventMessageHook = eventMessageHook;
 
             _config = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
@@ -64,6 +69,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
+
+                s.Decorate<IEventPublisher>((handler, sp) =>
+                {
+                    return new TestEventPublisher(handler, _eventMessageHook);
+                });
+
             });
             builder.ConfigureAppConfiguration(a =>
             {

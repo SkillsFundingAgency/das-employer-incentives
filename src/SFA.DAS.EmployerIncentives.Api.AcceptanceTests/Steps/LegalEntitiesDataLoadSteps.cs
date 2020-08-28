@@ -100,7 +100,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private void AssertRefreshLegalEntityWasPublished(AccountLegalEntity accountLegalEntity)
         {
-            var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntityEvent>>();
+            var publishedEvents = _testContext.EventsPublished.OfType<RefreshLegalEntityEvent>();
 
             var publishedEvent = publishedEvents.SingleOrDefault(e => e.AccountId == accountLegalEntity.AccountId &&
                                              e.AccountLegalEntityId == accountLegalEntity.AccountLegalEntityId &&
@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private void AssertRefreshLegalEntitiesEventsWerePublishedForPage(int pageNumber)
         {
-            var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntitiesEvent>>();
+            var publishedEvents = _testContext.EventsPublished.OfType<RefreshLegalEntitiesEvent>();
             var publishedEvent = publishedEvents.SingleOrDefault(e => e.PageNumber == pageNumber);
             publishedEvent.Should().NotBeNull();
         }

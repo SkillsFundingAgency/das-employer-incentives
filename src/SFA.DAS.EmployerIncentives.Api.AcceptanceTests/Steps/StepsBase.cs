@@ -1,5 +1,7 @@
-﻿using AutoFixture;
+﻿using System.Linq;
+using AutoFixture;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -15,6 +17,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             TestContext = testContext;
             EmployerIncentiveApi = testContext.EmployerIncentiveApi;
             Fixture = new Fixture();
+
+            var hook = testContext.Hooks.SingleOrDefault(h => h is Hook<object>) as Hook<object>;
+
+            if (hook != null)
+            {
+                hook.OnProcessed = (message) =>
+                {
+                    testContext.EventsPublished.Add(message);
+                };
+            }
         }
     }
 }
