@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
+            if (!configuration["EnvironmentName"].StartsWith("LOCAL", StringComparison.CurrentCultureIgnoreCase))
             {
                 config.AddAzureTableStorage(options =>
                 {
@@ -48,7 +48,10 @@ namespace SFA.DAS.EmployerIncentives.Api
                 });
             }
 #if DEBUG
-            config.AddJsonFile($"appsettings.Development.json", optional: true);
+            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            {
+                config.AddJsonFile($"appsettings.Development.json", optional: true);
+            }
 #endif
             Configuration = config.Build();
         }
@@ -83,13 +86,9 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddQueryServices();
             services.AddEventServices();
 
-            services.AddDbContext<EmployerIncentivesDbContext>((options) =>
-            {
-                options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
-            })
-            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
-            .AddNServiceBusUnitOfWork()
-            .AddNServiceBusClientUnitOfWork();
+            services.AddEntityFrameworkForEmployerIncentives()
+                .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
+                .AddNServiceBusClientUnitOfWork();
 
             services.AddTransient<UnitOfWorkManagerMiddleware>();
 
@@ -118,11 +117,10 @@ namespace SFA.DAS.EmployerIncentives.Api
                     c.RoutePrefix = string.Empty;
                 });
             }
-
-            app.UseUnitOfWork();
-
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
+
+            app.UseUnitOfWork();
 
             app.UseRouting();            
 
@@ -141,7 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 
         private bool ConfigurationIsLocalOrDev()
         {
-            return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+            return Configuration["EnvironmentName"].StartsWith("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
                    Configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
     }
