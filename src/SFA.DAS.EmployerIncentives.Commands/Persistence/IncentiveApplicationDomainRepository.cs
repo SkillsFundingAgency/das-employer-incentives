@@ -37,12 +37,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
         public async Task Save(IncentiveApplication aggregate)
         {
             if (aggregate.IsNew)
-            {               
+            {
                 await _incentiveApplicationDataRepository.Add(aggregate.GetModel());
             }
+            else
+            {
+                await _incentiveApplicationDataRepository.Update(aggregate.GetModel());
+            }
 
-            await _incentiveApplicationDataRepository.Update(aggregate.GetModel());
-                        
             foreach (dynamic domainEvent in aggregate.FlushEvents())
             {
                 await _domainEventDispatcher.Send(domainEvent);

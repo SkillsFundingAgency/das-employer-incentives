@@ -29,11 +29,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
         public async Task Save(Account aggregate)
         {
             if (aggregate.IsNew)
-            {               
+            {
                 await _accountDataRepository.Add(aggregate.GetModel());
             }
-
-            await _accountDataRepository.Update(aggregate.GetModel());
+            else
+            {
+                await _accountDataRepository.Update(aggregate.GetModel());
+            }
 
             foreach (dynamic domainEvent in aggregate.FlushEvents())
             {
