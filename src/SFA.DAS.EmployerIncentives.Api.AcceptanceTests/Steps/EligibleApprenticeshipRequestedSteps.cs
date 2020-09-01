@@ -1,13 +1,11 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using AutoFixture;
+using Dapper;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AutoFixture;
-using Dapper;
-using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -28,10 +26,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _incentiveApprenticeship =
                 Fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(x => x.Uln, _uln)
-                    .With(x=>x.IncentiveApplicationId, _incentiveApplication.Id)
-                    .Create();            
+                    .With(x => x.IncentiveApplicationId, _incentiveApplication.Id)
+                    .Create();
 
-            _incentiveApplication.Apprenticeships.Add(_incentiveApprenticeship); 
+            _incentiveApplication.Apprenticeships.Add(_incentiveApprenticeship);
         }
 
         [Given(@"I am applying for the New Apprenticeship Incentive")]
@@ -76,8 +74,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedBy) values " +
-                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, '{status}', @dateSubmitted, @submittedBy)", _incentiveApplication);
+                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByName, submittedByEmail) values " +
+                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, '{status}', @dateSubmitted, @submittedByName, @submittedByEmail)", _incentiveApplication);
                 await dbConnection.ExecuteAsync($"insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
                                                 "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
                                                 "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
