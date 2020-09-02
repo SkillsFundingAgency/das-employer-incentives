@@ -12,6 +12,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
         public const string RefreshLegalEntity = "SFA.DAS.EmployerIncentives.RefreshLegalEntity";
         public const string AgreementSigned = "SFA.DAS.EmployerIncentives.AgreementSigned";
 
-        public const string EmployerIncentiveClaimSubmitted = "SFA.DAS.EmployerIncentives.EmployerIncentiveClaimSubmittedEvent";
+        public const string ApplicationCalculateClaim = "SFA.DAS.EmployerIncentives.ApplicationCalculateClaim";
     }
 }

@@ -42,5 +42,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)
         {
         }
+
+        public void StartClaimCalculation()
+        {
+
+        }
     }
 }
