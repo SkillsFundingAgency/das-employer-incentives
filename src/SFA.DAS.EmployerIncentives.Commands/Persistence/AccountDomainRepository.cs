@@ -1,7 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Persistence
@@ -26,19 +24,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
         public Task Save(Account aggregate)
         {
             if (aggregate.IsNew)
-            {
+            {               
                 return _accountDataRepository.Add(aggregate.GetModel());
             }
 
             return _accountDataRepository.Update(aggregate.GetModel());
         }
-
-        public async Task<IEnumerable<Account>> GetByLegalEntityId(long legalEntityId)
-        {
-            var data = await _accountDataRepository.GetByLegalEntityId(legalEntityId);
-
-            return data.Select(Account.Create);
-        }
     }
-
+  
 }

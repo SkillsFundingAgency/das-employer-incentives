@@ -49,9 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Features\UpdateVrfCaseDetailsForExistingApplications.feature.cs">
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Update="Features\UpdateVrfCaseDetailsForNewSubmissionsJob.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -77,10 +74,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForExistingApplications.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>UpdateVrfCaseDetailsForExistingApplications.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForNewSubmissionsJob.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>UpdateVrfCaseDetailsForNewSubmissionsJob.feature.cs</LastGenOutput>
