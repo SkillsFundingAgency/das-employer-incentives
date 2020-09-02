@@ -27,6 +27,11 @@ using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using NServiceBus.Persistence;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.NServiceBus.SqlServer.Data;
+using SFA.DAS.UnitOfWork.Context;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -165,5 +170,23 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
                 .AddHostedService<NServiceBusHostedService>();
         }
+
+        public static IServiceCollection AddEntityFrameworkForEmployerIncentives(this IServiceCollection services)
+        {
+            return services.AddScoped(p =>
+            {
+                var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
+                var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
+                var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
+                var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
+
+                var dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
+
+                dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
+
+                return dbContext;
+            });
+        }
+
     }
 }
