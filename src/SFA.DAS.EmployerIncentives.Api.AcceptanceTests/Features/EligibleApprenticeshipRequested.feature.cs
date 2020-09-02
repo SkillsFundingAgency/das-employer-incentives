@@ -110,7 +110,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("I am applying for the New Apprenticeship Incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 10
- testRunner.When("I request the eligibility of an apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I request the eligibility of an apprenticeship that has a valid start date and UL" +
+                        "N", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 11
  testRunner.Then("the status of the apprenticeship is returned as eligible", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -152,7 +153,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("the ULN has been used on a previously submitted Incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 16
- testRunner.When("I request the eligibility of an apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I request the eligibility of an apprenticeship that has a valid start date and in" +
+                        "valid ULN", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 17
  testRunner.Then("the status of the apprenticeship is returned as not eligible", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -194,7 +196,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("the ULN has been used on a draft Incentive Application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 22
- testRunner.When("I request the eligibility of an apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("I request the eligibility of an apprenticeship that has a valid start date and UL" +
+                        "N", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 23
  testRunner.Then("the status of the apprenticeship is returned as eligible", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
@@ -15,18 +16,29 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
         }
 
-        [HttpGet("{uln}")]
-        public async Task<IActionResult> IsApprenticeshipEligible(long uln, [FromQuery]DateTime startDate, [FromQuery]bool isApproved)
+        [HttpPost("{accountId}/{accountLegalEntityId}")]
+        public async Task<IActionResult> AreApprenticeshipsEligible(long accountId, long accountLegalEntityId,
+                                                                    [FromBody] IEnumerable<EligibleApprenticeshipCheckDetails> apprenticeshipDetails)
         {
-            var request = new GetApprenticeshipEligibilityRequest(new ApprenticeshipDto { UniqueLearnerNumber = uln, StartDate = startDate, IsApproved = isApproved });
-            var response = await QueryAsync<GetApprenticeshipEligibilityRequest, GetApprenticeshipEligibilityResponse>(request);
+            var results = new List<EligibleApprenticeshipResult>();
 
-            if (response.IsEligible)
+            foreach(var apprenticeshipDetail in apprenticeshipDetails)
             {
-                return Ok();
-            }
+                var dto = new ApprenticeshipDto
+                {
+                    UniqueLearnerNumber = apprenticeshipDetail.Uln,
+                    IsApproved = apprenticeshipDetail.IsApproved,
+                    StartDate = apprenticeshipDetail.StartDate
+                };
+                var request = new GetApprenticeshipEligibilityRequest(dto);
 
-            return NotFound();
+                var response = await QueryAsync<GetApprenticeshipEligibilityRequest, GetApprenticeshipEligibilityResponse>(request);
+
+                results.Add(new EligibleApprenticeshipResult { Uln = apprenticeshipDetail.Uln, Eligible = response.IsEligible });
+            }
+            
+            return Ok(results);
         }
     }
+
 }
