@@ -1,8 +1,8 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
+using SFA.DAS.EmployerIncentives.Commands.Types;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Messages.Events;
 using SFA.DAS.NServiceBus.Services;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
