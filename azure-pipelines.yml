@@ -62,7 +62,7 @@ stages:
           src/**/*.UnitTests.csproj
           src/**/*.AcceptanceTests.csproj
           !src/**/*.Data.UnitTests.csproj
-        arguments: '--configuration debug --no-restore'
+        arguments: '--configuration $(buildConfiguration) --no-restore'
     - task: DotNetCoreCLI@2
       displayName: UnitTest
       inputs:
@@ -71,7 +71,7 @@ stages:
           src/**/*.UnitTests.csproj
           src/**/*.AcceptanceTests.csproj
           !src/**/*.Data.UnitTests.csproj
-        arguments: '--configuration debug --no-build --logger trx --collect "Code coverage"'
+        arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
     - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
 
