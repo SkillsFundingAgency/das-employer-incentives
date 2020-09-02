@@ -13,13 +13,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         public string VrfCaseStatus => Model.VrfCaseStatus;
 
         public static LegalEntity New(long id, string name)
-        {            
+        {
             var model = new LegalEntityModel
             {
                 Name = name,
                 HasSignedAgreementTerms = false
             };
-            
+
             return new LegalEntity(id, model, true);
         }
 
@@ -40,6 +40,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             {
                 Model.HasSignedAgreementTerms = true;
             }
+        }
+
+        internal void UpdateVendorRegistrationFormDetails(string caseId, string vendorId, string status)
+        {
+            Model.VrfCaseId = caseId;
+            Model.VrfVendorId = vendorId;
+            Model.VrfCaseStatus = status;
         }
     }
 }
