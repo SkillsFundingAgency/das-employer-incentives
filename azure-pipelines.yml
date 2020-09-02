@@ -58,6 +58,7 @@ stages:
       inputs:
         command: 'build'
         projects: |
+          src/**/*.Database.sqlproj
           src/**/*.UnitTests.csproj
           src/**/*.AcceptanceTests.csproj
           !src/**/*.Data.UnitTests.csproj
