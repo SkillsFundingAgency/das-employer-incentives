@@ -25,10 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim
                 throw new InvalidRequestException();
             }
 
-            foreach (var apprenticeship in application.Apprenticeships)
-            {
-                apprenticeship.StartClaimCalculation();
-            }
+            application.CalculateClaim();
+            
 
             await _domainRepository.Save(application);
         }

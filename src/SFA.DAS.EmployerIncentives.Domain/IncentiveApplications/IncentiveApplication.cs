@@ -71,5 +71,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
+
+        public void CalculateClaim()
+        {
+            foreach (var apprenticeship in Apprenticeships)
+            {
+                //AddEvent(new EarningsCalculationRequestedEvent
+                //{
+                //    AccountId = AccountId,
+                //    IncentiveClaimApplicationId = Id,
+                //    ApprenticeshipId = apprenticeship.Id
+                //});
+            }
+        }
     }
 }
