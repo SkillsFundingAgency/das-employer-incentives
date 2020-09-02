@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForNewSubmissi
         public async Task Handle(UpdateVrfCaseDetailsForNewSubmissionsCommand command, CancellationToken cancellationToken = default)
         {
             var applicationLegalEntities = await _queryRepository.GetList(x => x.ApplicationStatus == IncentiveApplicationStatus.Submitted && x.VrfCaseId == null);
-            var publishTasks = applicationLegalEntities.Select(x => _eventPublisher.Publish(new GetLegalEntityVrfCaseDetailsEvent { LegalEntityId = x.LegalEntityId }));
+            var publishTasks = applicationLegalEntities.Select(x => _eventPublisher.Publish(new UpdateLegalEntityVrfCaseDetailsEvent { LegalEntityId = x.LegalEntityId }));
             await Task.WhenAll(publishTasks);
         }
     }

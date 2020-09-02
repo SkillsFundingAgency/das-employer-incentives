@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.EmployerIncentives.Messages.Events
 {
-    public class GetLegalEntityVrfCaseDetailsEvent
+    public class UpdateLegalEntityVrfCaseDetailsEvent
     {
         public long LegalEntityId { get; set; }
     }

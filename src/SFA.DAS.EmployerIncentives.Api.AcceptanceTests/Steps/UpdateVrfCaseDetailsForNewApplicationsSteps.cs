@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the case details are requested for the legal entity")]
         public async Task ThenTheLegalEntitiesShouldBeAvailableInEmployerIncentives()
         {
-            var publishedEvents = _testContext.TestData.GetOrCreate<List<GetLegalEntityVrfCaseDetailsEvent>>();
+            var publishedEvents = _testContext.TestData.GetOrCreate<List<UpdateLegalEntityVrfCaseDetailsEvent>>();
 
             var publishedEvent = publishedEvents.SingleOrDefault(e => e.LegalEntityId == _testAccount.LegalEntityId);
 
