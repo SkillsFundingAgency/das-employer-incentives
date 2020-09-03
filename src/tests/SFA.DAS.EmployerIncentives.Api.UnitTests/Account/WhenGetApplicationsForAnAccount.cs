@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                 .ReturnsAsync(apprenticeApplicationList);
 
             // Act
-            var actual = await _sut.GetLegalEntities(accountId) as NotFoundResult;
+            var actual = await _sut.GetApplications(accountId) as NotFoundResult;
 
             // Assert
             actual.Should().NotBeNull();
