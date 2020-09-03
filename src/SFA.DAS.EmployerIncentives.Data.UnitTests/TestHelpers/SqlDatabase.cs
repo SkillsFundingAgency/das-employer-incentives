@@ -23,15 +23,18 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
        environment = "release";
 #endif
             DatabaseInfo = new DatabaseInfo();
-            var dacpacFileLocation =
-                Path.Combine(
-                    Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")),
-                    $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\{environment}\\SFA.DAS.EmployerIncentives.Database.dacpac");
 
-            if (!File.Exists(dacpacFileLocation))
-                throw new FileNotFoundException($"⚠ DACPAC File not found in: {dacpacFileLocation}");
+            var databaseBinFolder = Path.Combine(
+                Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")),
+                $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\");
 
-            DatabaseInfo.SetPackageLocation(dacpacFileLocation);
+            var files = Directory.GetFiles(databaseBinFolder, "*.dacpac", SearchOption.AllDirectories);
+
+            if (files.Length == 0)
+                throw new FileNotFoundException($"⚠ DACPAC File not found in src\\SFA.DAS.EmployerIncentives.Database\\bin\\");
+
+            Console.WriteLine($"Located .dacpac file in: {files[0]}");
+            DatabaseInfo.SetPackageLocation(files[0]);
 
             CreateTestDatabase();
         }
