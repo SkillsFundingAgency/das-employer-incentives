@@ -51,17 +51,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
-        [Given(@"an internal error will occur before the transaction completes")]
-        public void GivenAnInternalErrorWillOccurBeforeTheTransactionCompletes()
-        {
-            _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
-        }
-
         [When(@"the application is submitted")]
         public async Task WhenTheApplicationIsSubmitted()
         {
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
             await EmployerIncentiveApi.Patch(url, _submitRequest);
+        }
+
+        [When(@"the application is submitted and the system errors")]
+        public async Task WhenTheApplicationIsSubmittedAndtheSystemErrors()
+        {
+            _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
+
+            await WhenTheApplicationIsSubmitted();
         }
 
         [Then(@"the application status is updated to reflect completion")]
@@ -94,6 +96,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
             await EmployerIncentiveApi.Patch(url, _submitRequest);
+        }
+                
+        [Then(@"the application changes are not saved")]
+        public async Task ThenTheApplicatioChangesAreNotSaved()
+        {
+            await ThenTheApplicationStatusIsNotUpdated();
+            ThenTheServiceRespondsWithAnInternalError();
+            await ThenThereAreNoEventsInTheOutbox();
         }
 
         [Then(@"the application status is not updated")]
