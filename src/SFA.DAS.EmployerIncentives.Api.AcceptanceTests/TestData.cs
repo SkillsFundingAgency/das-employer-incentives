@@ -45,5 +45,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             return (T)_testdata[key];
         }
+
+        public void Set<T>(string key, T value)
+        {
+            _testdata[key] = value;
+        }
     }
 }

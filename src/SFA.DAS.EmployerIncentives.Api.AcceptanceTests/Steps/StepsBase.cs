@@ -27,7 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 hook.OnProcessed = (message) =>
                 {
                     testContext.EventsPublished.Add(message);
-                    if (testContext.ThrowErrorAfterSendingEvent)
+                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishEvent");
+                    if (throwError)
                     {
                         throw new ApplicationException("Unexpected exception, should force a rollback");
                     }
@@ -40,18 +41,23 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 commandsHook.OnReceived = (command) =>
                 {
-                    testContext.CommandsPublished.Add(new PublishedCommand(command) { IsReceived = true } );
+                    testContext.CommandsPublished.Add(new PublishedCommand(command) { IsReceived = true } );                    
                 };
                 commandsHook.OnProcessed = (command) =>
                 {
                     testContext.CommandsPublished.Single(c => c.Command == command).IsPublished = true;
+                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishCommand");
+                    if (throwError)
+                    {
+                        throw new ApplicationException("Unexpected exception, should force a rollback");
+                    }
                 };
                 commandsHook.OnErrored = (ex, command) =>
                 {
                     var publishedCommand = testContext.CommandsPublished.Single(c => c.Command == command);
                     publishedCommand.IsErrored = true;
-                    publishedCommand.LastError = ex;
-                    if(ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
+                    publishedCommand.LastError = ex;                    
+                    if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
                     {
                         publishedCommand.IsPublishedWithNoListener = true;
                         return true;

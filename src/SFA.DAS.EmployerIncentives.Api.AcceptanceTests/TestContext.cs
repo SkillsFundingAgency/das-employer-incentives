@@ -18,8 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }
         public List<object> EventsPublished { get; set; }
-        public List<PublishedCommand> CommandsPublished { get; set; }
-        public bool ThrowErrorAfterSendingEvent { get; set; } = false;
+        public List<PublishedCommand> CommandsPublished { get; set; }        
 
         public TestContext()
         {
@@ -29,6 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 Directory.CreateDirectory(TestDirectory.FullName);
             }
             TestData = new TestData();
+            TestData.GetOrCreate("ThrowErrorAfterPublishCommand", () => false);
+            TestData.GetOrCreate("ThrowErrorAfterPublishEvent", () => false);
             HashingService = new HashingService.HashingService("46789BCDFGHJKLMNPRSTVWXY", "SFA: digital apprenticeship service");
             Hooks = new List<IHook>();
             EventsPublished = new List<object>();

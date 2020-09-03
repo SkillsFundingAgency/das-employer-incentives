@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"an internal error will occur before the transaction completes")]
         public void GivenAnInternalErrorWillOccurBeforeTheTransactionCompletes()
         {
-            _testContext.ThrowErrorAfterSendingEvent = true;
+            _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
         }
 
         [When(@"the application is submitted")]

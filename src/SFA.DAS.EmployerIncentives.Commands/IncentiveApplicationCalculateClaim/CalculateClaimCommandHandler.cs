@@ -25,8 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim
                 throw new InvalidRequestException();
             }
 
-            application.CalculateClaim();
-            
+            application.CalculateClaim();            
 
             await _domainRepository.Save(application);
         }
