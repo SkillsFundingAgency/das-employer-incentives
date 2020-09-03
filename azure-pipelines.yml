@@ -32,8 +32,7 @@ stages:
     pool:
       name: 'DAS - Continuous Integration'
       demands:
-        - dotnet
-        - Agent.OS -equals Linux
+        - Agent.OS -equals Windows_NT
     workspace:
       clean: all
     steps:
@@ -137,6 +136,21 @@ stages:
       inputs:
         targetPath: $(build.artifactstagingdirectory)/publish
         artifactName: dacpac
+
+    - task: DotNetCoreCLI@2
+      displayName: Build Acceptance Tests
+      inputs:
+        command: 'build'
+        projects: |
+          src/**/*.AcceptanceTests.csproj
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+    - task: DotNetCoreCLI@2
+      displayName: Run Acceptance Tests
+      inputs:
+        command: test
+        projects: |
+          src/**/*.AcceptanceTests.csproj
+        arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
 - stage: NugetPublish
   displayName: 'Publish Nuget Package'
