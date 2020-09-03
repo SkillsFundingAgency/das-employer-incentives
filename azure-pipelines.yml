@@ -65,8 +65,8 @@ stages:
         projects: |
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
-        
-   - task: VSBuild@1
+
+    - task: VSBuild@1
       displayName: 'Build DACPAC'
       inputs:
         solution: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
