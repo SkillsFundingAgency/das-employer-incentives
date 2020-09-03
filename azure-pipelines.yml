@@ -80,8 +80,8 @@ stages:
       inputs:
         targetType: inline
         script: |
-          Write-Host "SemVer: $(GitVersion.SemVer)"
-          if ($null -eq "$(GitVersion.PreReleaseLabel)") { $NuGetPackageVersion = "$(GitVersion.SemVer)-prerelease" } else { $NuGetPackageVersion = "$(GitVersion.SemVer)" }
+          if ($null -ne "$(GitVersion.PreReleaseLabel)") { $NuGetPackageVersion = "$(GitVersion.SemVer)-prerelease" } else { $NuGetPackageVersion = "$(GitVersion.SemVer)" }
+          Write-Host "NuGetPackageVersion: $NuGetPackageVersion"
           Write-Host "##vso[task.setvariable variable=NuGetPackageVersion]$NuGetPackageVersion"
     - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
