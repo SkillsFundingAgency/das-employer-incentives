@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UpdateVrfCaseDetailsForIncompleteCases\Handlers\" />
+  </ItemGroup>
 </Project>
