@@ -7,7 +7,6 @@ using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
@@ -63,8 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
-
-            serviceCollection.AddScoped(typeof(ICommandPublisher<>), typeof(CommandPublisher<>));
+            serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
             return serviceCollection;
         }

@@ -7,7 +7,6 @@ using AutoFixture;
 using Dapper;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -17,10 +16,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class IncentiveApplicationCreatedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private Fixture _fixture;
-        private HttpStatusCode _expectedResult = HttpStatusCode.Created;
-        private CreateIncentiveApplicationRequest _request;
-        private GetApplicationResponse _getApplicationResponse;
+        private readonly Fixture _fixture;
+        private readonly HttpStatusCode _expectedResult = HttpStatusCode.Created;
+        private readonly CreateIncentiveApplicationRequest _request;
 
         public IncentiveApplicationCreatedSteps(TestContext testContext) : base(testContext)
         {
@@ -32,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"An employer is applying for the New Apprenticeship Incentive")]
         public void GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive()
         {
+            // 
         }
 
         [When(@"They have selected the apprenticeships for the application")]

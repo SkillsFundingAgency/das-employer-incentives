@@ -11,6 +11,7 @@ using TechTalk.SpecFlow;
 using System;
 using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Messages.Events;
+using SFA.DAS.EmployerIncentives.Commands.Types.Application;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -19,9 +20,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class IncentiveApplicationSubmittedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private Fixture _fixture;
-        private CreateIncentiveApplicationRequest _createRequest;
-        private SubmitIncentiveApplicationRequest _submitRequest;
+        private readonly Fixture _fixture;
+        private readonly CreateIncentiveApplicationRequest _createRequest;
+        private readonly SubmitIncentiveApplicationRequest _submitRequest;
 
         public IncentiveApplicationSubmittedSteps(TestContext testContext) : base(testContext)
         {
@@ -77,12 +78,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
 
-            var publishedEvents = _testContext.EventsPublished.OfType<EmployerIncentiveClaimSubmittedEvent>();
-            var publishedEvent = publishedEvents.SingleOrDefault(e => 
-            e.AccountId == _submitRequest.AccountId &&
-            e.IncentiveClaimApplicationId == _submitRequest.IncentiveApplicationId);
+            var publishedCommand = _testContext.CommandsPublished.SingleOrDefault(c => 
+            c.Command is CalculateClaimCommand &&
+            (c.IsPublished || c.IsPublishedWithNoListener))?.Command as CalculateClaimCommand;
 
-            publishedEvent.Should().NotBeNull();
+            publishedCommand.Should().NotBeNull();
+            publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);
+            publishedCommand.IncentiveClaimApplicationId.Should().Be(_submitRequest.IncentiveApplicationId);
         }
 
         [When(@"the invalid application id is submittted")]

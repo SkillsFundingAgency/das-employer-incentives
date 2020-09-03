@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.NServiceBus.Services;
 using SFA.DAS.UnitOfWork.NServiceBus.Services;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -17,11 +18,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly TestContext _context;
         private readonly Dictionary<string, string> _config;
         private readonly IHook<object> _eventMessageHook;
+        private readonly IHook<ICommand> _commandMessageHook;
 
-        public TestWebApi(TestContext context, IHook<object> eventMessageHook)
+        public TestWebApi(TestContext context, IHook<object> eventMessageHook, IHook<ICommand> commandMessageHook)
         {
             _context = context;
             _eventMessageHook = eventMessageHook;
+            _commandMessageHook = commandMessageHook;
 
             _config = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
@@ -71,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
-
+                s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
             });
             builder.ConfigureAppConfiguration(a =>
             {

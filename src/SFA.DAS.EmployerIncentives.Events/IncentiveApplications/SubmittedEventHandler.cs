@@ -1,31 +1,29 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
-using SFA.DAS.EmployerIncentives.Commands.Types;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
+using SFA.DAS.EmployerIncentives.Commands.Types.Application;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
-using SFA.DAS.EmployerIncentives.Messages.Events;
-using SFA.DAS.NServiceBus.Services;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
-{  
+{
     public class SubmittedEventHandler : IDomainEventHandler<Submitted>
     {
-        private readonly IEventPublisher _eventPublisher;
+        private readonly ICommandPublisher _commandPublisher;
 
-        public SubmittedEventHandler(IEventPublisher eventPublisher)
+        public SubmittedEventHandler(ICommandPublisher commandPublisher)
         {
-            _eventPublisher = eventPublisher;
+            _commandPublisher = commandPublisher;
         }
 
         public Task Handle(Submitted @event, CancellationToken cancellationToken = default)
         {
-            var submittedEvent = new EmployerIncentiveClaimSubmittedEvent
-            {
-                AccountId = @event.AccountId,
-                IncentiveClaimApplicationId = @event.IncentiveClaimApplicationId
-            };
+            var command = new CalculateClaimCommand(
+                @event.AccountId,
+                @event.IncentiveClaimApplicationId
+                );
 
-            return _eventPublisher.Publish(submittedEvent); // this could publish a command
+            return _commandPublisher.Publish(command);
         }
     }
 }

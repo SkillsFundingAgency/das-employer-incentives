@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetIncentive
 {
     public class GetIncentiveDetailsQueryHandler : IQueryHandler<GetIncentiveDetailsRequest, GetIncentiveDetailsResponse>
     {
-        public async Task<GetIncentiveDetailsResponse> Handle(GetIncentiveDetailsRequest query, CancellationToken cancellationToken = default)
+        public Task<GetIncentiveDetailsResponse> Handle(GetIncentiveDetailsRequest query, CancellationToken cancellationToken = default)
         {
-            return new GetIncentiveDetailsResponse(ValueObjects.NewApprenticeIncentive.EligibilityStartDate, ValueObjects.NewApprenticeIncentive.EligibilityEndDate);
+            return Task.FromResult(new GetIncentiveDetailsResponse(ValueObjects.NewApprenticeIncentive.EligibilityStartDate, ValueObjects.NewApprenticeIncentive.EligibilityEndDate));
         }
     }
 }

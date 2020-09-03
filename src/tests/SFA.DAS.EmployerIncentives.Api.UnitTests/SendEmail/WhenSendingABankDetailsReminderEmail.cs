@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.SendEmail
         }
 
         [Test]
-        public async Task Then_the_send_email_command_is_published()
+        public void Then_the_send_email_command_is_published()
         {
             // Arrange
             var request = _fixture.Create<SendBankDetailsEmailRequest>();

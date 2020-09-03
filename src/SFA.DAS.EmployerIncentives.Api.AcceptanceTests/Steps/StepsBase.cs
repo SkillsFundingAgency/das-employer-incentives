@@ -2,6 +2,7 @@
 using System.Linq;
 using AutoFixture;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
@@ -30,6 +31,32 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     {
                         throw new ApplicationException("Unexpected exception, should force a rollback");
                     }
+                };
+            }
+
+            var commandsHook = testContext.Hooks.SingleOrDefault(h => h is Hook<ICommand>) as Hook<ICommand>;
+
+            if (commandsHook != null)
+            {
+                commandsHook.OnReceived = (command) =>
+                {
+                    testContext.CommandsPublished.Add(new PublishedCommand(command) { IsReceived = true } );
+                };
+                commandsHook.OnProcessed = (command) =>
+                {
+                    testContext.CommandsPublished.Single(c => c.Command == command).IsPublished = true;
+                };
+                commandsHook.OnErrored = (ex, command) =>
+                {
+                    var publishedCommand = testContext.CommandsPublished.Single(c => c.Command == command);
+                    publishedCommand.IsErrored = true;
+                    publishedCommand.LastError = ex;
+                    if(ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
+                    {
+                        publishedCommand.IsPublishedWithNoListener = true;
+                        return true;
+                    }
+                    return false;
                 };
             }
         }
