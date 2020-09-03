@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForN
             await _sut.Handle(command);
 
             //Assert            
-            _mockEventPublisher.Verify(x => x.Publish(It.Is<GetLegalEntityVrfCaseDetailsEvent>(x => applicationLegalEntities.Any(y => y.LegalEntityId == x.LegalEntityId))), Times.Exactly(applicationLegalEntities.Count));
+            _mockEventPublisher.Verify(x => x.Publish(It.Is<UpdateLegalEntityVrfCaseDetailsEvent>(x => applicationLegalEntities.Any(y => y.LegalEntityId == x.LegalEntityId))), Times.Exactly(applicationLegalEntities.Count));
         }
     }
 }
