@@ -87,6 +87,12 @@ stages:
         targetPath: $(build.artifactstagingdirectory)/publish
         artifactName: dacpac
 
+    - task: PowerShell@2
+      displayName: 'Start MsSqlLocalDb'
+      inputs:
+        targetType: 'inline'
+        script: 'sqllocaldb start mssqllocaldb'
+
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
       inputs:
