@@ -80,13 +80,21 @@ stages:
         command: 'build'
         projects: src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
+    - task: PowerShell@2
+      displayName: 'Set NuGet Package Version'
+      inputs:
+        targetType: inline
+        script: |
+          if ("$(GitVersion.PreReleaseLabel)" -ne "") { $NuGetPackageVersion = "$(GitVersion.SemVer)-prerelease" } else { $NuGetPackageVersion = "$(GitVersion.SemVer)" }
+          Write-Host "NuGetPackageVersion: $NuGetPackageVersion"
+          Write-Host "##vso[task.setvariable variable=NuGetPackageVersion]$NuGetPackageVersion"
     - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
       inputs:
         command: pack
         packagesToPack: 'src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj'
         versioningScheme: byEnvVar
-        versionEnvVar: GitVersion.MajorMinorPatch
+        versionEnvVar: NuGetPackageVersion
         packDirectory: $(build.artifactstagingdirectory)/NugetPackages
 
     - task: DotNetCoreCLI@2
