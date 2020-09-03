@@ -19,10 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\SendBankDetailsRequiredEmail - Copy.feature.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />
@@ -32,9 +28,8 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="SpecFlow" Version="3.1.97" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.97" />
-    <PackageReference Include="SpecFlow.NUnit" Version="3.1.97" />
+    <PackageReference Include="SpecFlow" Version="3.3.57" />
+    <PackageReference Include="SpecFlow.NUnit" Version="3.3.57" />
     <PackageReference Include="WireMock.Net" Version="1.2.12" />
   </ItemGroup>
   
@@ -65,7 +60,7 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IncentiveApplicationRequested.feature</DependentUpon>
-	</Compile>
+    </Compile>
     <Compile Update="Features\LegalEntityAgreementSigned.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -93,7 +88,7 @@
     <SpecFlowFeatureFiles Update="Features\IncentiveApplicationRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveApplicationRequested.feature.cs</LastGenOutput>
-	</SpecFlowFeatureFiles>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
