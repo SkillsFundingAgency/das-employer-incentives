@@ -3,25 +3,25 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Types.Application;
+using SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.NServiceBus.AzureFunction.Attributes;
 
 namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 {
-    public class HandleApplicationCalculateClaimCommand
+    public class HandleApprenticeshipCalculateEarningsCommand
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly ILogger<HandleApplicationCalculateClaimCommand> _logger;
+        private readonly ILogger<HandleApprenticeshipCalculateEarningsCommand> _logger;
 
-        public HandleApplicationCalculateClaimCommand(ICommandDispatcher commandDispatcher, ILogger<HandleApplicationCalculateClaimCommand> logger)
+        public HandleApprenticeshipCalculateEarningsCommand(ICommandDispatcher commandDispatcher, ILogger<HandleApprenticeshipCalculateEarningsCommand> logger)
         {
             _commandDispatcher = commandDispatcher;
             _logger = logger;
         }
 
-        [FunctionName("HandleApplicationCalculateClaimCommand")]
-        public async Task RunEvent([NServiceBusTrigger(Endpoint = QueueNames.ApplicationCalculateClaim)] CalculateClaimCommand command)
+        [FunctionName("HandleApprenticeshipCalculateEarningsCommand")]
+        public async Task RunEvent([NServiceBusTrigger(Endpoint = QueueNames.ApplicationCalculateClaim)] CalculateEarningsCommand command)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             }
             catch (Exception e)
             {
-                _logger.LogError("Error calling Command Dispatcher from function 'HandleApplicationCalculateClaimCommand'", e);
+                _logger.LogError("Error calling Command Dispatcher from function 'HandleApprenticeshipCalculateEarningsCommand'", e);
                 throw;
             }
         }

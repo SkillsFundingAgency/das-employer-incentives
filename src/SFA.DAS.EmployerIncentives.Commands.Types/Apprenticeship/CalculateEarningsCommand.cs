@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Types.Aprenticeship
+namespace SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship
 {
     public class CalculateEarningsCommand : ICommand, ILockIdentifier, ILogWriter<CalculateEarningsCommand>
     {
