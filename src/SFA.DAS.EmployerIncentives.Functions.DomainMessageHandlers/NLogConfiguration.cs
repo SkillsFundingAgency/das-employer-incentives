@@ -1,12 +1,12 @@
-﻿using NLog;
+﻿using System;
+using System.IO;
+using NLog;
 using NLog.Common;
 using NLog.Config;
 using NLog.Targets;
 using SFA.DAS.NLog.Targets.Redis.DotNetCore;
-using System;
-using System.IO;
 
-namespace SFA.DAS.EmployerIncentives.Infrastructure.Logging
+namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 {
     public class NLogConfiguration
     {
