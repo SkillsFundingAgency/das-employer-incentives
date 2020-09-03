@@ -27,8 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         {
             using var dbConnection = new SqlConnection(_connectionString);
             dbConnection.Execute(
-                "insert into Accounts(id, accountLegalEntityId, legalEntityId, legalEntityName, hasSignedIncentivesTerms) values " +
-                "(@id, @accountLegalEntityId, @legalEntityId, @legalEntityName, @hasSignedIncentivesTerms)", account);
+                "insert into Accounts(id, accountLegalEntityId, legalEntityId, legalEntityName, hasSignedIncentivesTerms, vrfCaseId, vrfVendorId, vrfCaseStatus) values " +
+                "(@id, @accountLegalEntityId, @legalEntityId, @legalEntityName, @hasSignedIncentivesTerms, @vrfCaseId, @vrfVendorId, @vrfCaseStatus)", account);
         }
 
         public void SetupApplication(IncentiveApplication application)
@@ -37,7 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             dbConnection.Execute(
                 "insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByEmail, submittedByName) values " +
                 "(@id, @accountId, @accountLegalEntityId, @dateCreated, @status, @dateSubmitted, @submittedByEmail, @submittedByName)",
-                application);
+                new
+                {
+                    application.Id, application.AccountId, application.AccountLegalEntityId, application.DateCreated, Status = application.Status.ToString(), application.DateSubmitted, application.SubmittedByEmail, application.SubmittedByName
+                });
         }
 
         public void SetupApprenticeship(IncentiveApplicationApprenticeship apprenticeship)

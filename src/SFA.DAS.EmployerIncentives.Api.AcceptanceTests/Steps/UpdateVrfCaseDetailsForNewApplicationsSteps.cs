@@ -16,28 +16,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "UpdateVrfCaseDetailsForNewApplications")]
     public class UpdateVrfCaseDetailsForNewApplicationsSteps : StepsBase
     {
-        private readonly TestContext _testContext;
-        private readonly IServiceProvider _serviceProvider;
         private Account _testAccount;
         private IncentiveApplication _testApplication;
+        private DataAccess _dataAccess;
 
         public UpdateVrfCaseDetailsForNewApplicationsSteps(TestContext testContext) : base(testContext)
         {
-            _testContext = testContext;
-            _testAccount = testContext.TestData.GetOrCreate<Account>();
-            _testAccount.VrfCaseId = null;
-            _testApplication = testContext.TestData.GetOrCreate<IncentiveApplication>();
-            _testApplication.Status = IncentiveApplicationStatus.Submitted;
-            _testApplication.AccountLegalEntityId = _testAccount.AccountLegalEntityId;
+            _dataAccess = new DataAccess(testContext.SqlDatabase.DatabaseInfo.ConnectionString);
         }
 
         [Given(@"an application has been submitted")]
         public async Task GivenAnApplicationHasBeenSubmitted()
         {
-            var dbContext = _testContext.GetApiService<EmployerIncentivesDbContext>();
-            dbContext.Accounts.Add(_testAccount);
-            dbContext.Applications.Add(_testApplication);
-            await dbContext.SaveChangesAsync();
+            _testAccount = TestContext.TestData.GetOrCreate<Account>();
+            _testAccount.VrfCaseId = null;
+            _testApplication = TestContext.TestData.GetOrCreate<IncentiveApplication>();
+            _testApplication.Status = IncentiveApplicationStatus.Submitted;
+            _testApplication.AccountLegalEntityId = _testAccount.AccountLegalEntityId;
+
+            _dataAccess.SetupAccount(_testAccount);
+            _dataAccess.SetupApplication(_testApplication);
         }
 
         [When(@"an UpdateVrfCaseDetailsForNewApplications job is requested")]
@@ -53,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the case details are requested for the legal entity")]
         public async Task ThenTheLegalEntitiesShouldBeAvailableInEmployerIncentives()
         {
-            var publishedEvents = _testContext.TestData.GetOrCreate<List<UpdateLegalEntityVrfCaseDetailsEvent>>();
+            var publishedEvents = TestContext.TestData.GetOrCreate<List<UpdateLegalEntityVrfCaseDetailsEvent>>();
 
             var publishedEvent = publishedEvents.SingleOrDefault(e => e.LegalEntityId == _testAccount.LegalEntityId);
 

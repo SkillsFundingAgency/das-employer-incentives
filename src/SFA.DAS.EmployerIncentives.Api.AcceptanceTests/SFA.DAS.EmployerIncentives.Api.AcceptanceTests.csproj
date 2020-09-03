@@ -74,6 +74,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
     </Compile>
+    <Compile Update="Features\UpdateVrfCaseStatusForIncompleteCases.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UpdateVrfCaseStatusForIncompleteCases.feature</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -104,6 +109,10 @@
     <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseStatusForIncompleteCases.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>UpdateVrfCaseStatusForIncompleteCases.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 
