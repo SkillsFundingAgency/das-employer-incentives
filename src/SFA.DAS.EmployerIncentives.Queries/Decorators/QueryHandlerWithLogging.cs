@@ -25,19 +25,25 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
             var domainLog = (query is ILogWriter) ? (query as ILogWriter).Log : new Log();
 
             try
-            {
-                _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
+            {                
                 if (domainLog.OnProcessing != null)
                 {
-                    _log.LogInformation(domainLog.OnProcessing.Invoke());
+                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query : {domainLog.OnProcessing.Invoke()}");
+                }
+                else
+                {
+                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
                 }
 
                 var result = await _handler.Handle(query, cancellationToken);
-
-                _log.LogInformation($"End handle '{typeof(TQuery)}' query");
+                                
                 if (domainLog.OnProcessed != null)
                 {
-                    _log.LogInformation(domainLog.OnProcessed.Invoke());
+                    _log.LogInformation($"End handle '{typeof(TQuery)}' query : {domainLog.OnProcessed.Invoke()}");
+                }
+                else
+                {
+                    _log.LogInformation($"End handle '{typeof(TQuery)}' query");
                 }
                 return result;
             }

@@ -27,18 +27,25 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
 
             try
             {
-                _log.LogInformation($"Start handle '{typeof(T)}' event");
                 if (domainLog.OnProcessing != null)
                 {
-                    _log.LogInformation(domainLog.OnProcessing.Invoke());
+                    _log.LogInformation($"Start handle '{typeof(T)}' event : {domainLog.OnProcessing.Invoke()}");
+                }
+                else
+                {
+                    _log.LogInformation($"Start handle '{typeof(T)}' event");
                 }
 
                 await _handler.Handle(@event, cancellationToken);
 
-                _log.LogInformation($"End handle '{typeof(T)}' event");
+                
                 if (domainLog.OnProcessed != null)
                 {
-                    _log.LogInformation(domainLog.OnProcessed.Invoke());
+                    _log.LogInformation($"End handle '{typeof(T)}' event : {domainLog.OnProcessed.Invoke()}");
+                }
+                else
+                {
+                    _log.LogInformation($"End handle '{typeof(T)}' event");
                 }
             }
             catch (Exception ex)
