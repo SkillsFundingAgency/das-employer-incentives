@@ -23,19 +23,42 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
 
         public async Task Handle(T @event, CancellationToken cancellationToken = default)
         {
+            var domainLog = (@event is ILogWriter) ? (@event as ILogWriter).Log : new Log();
+
             try
             {
-                _log.LogInformation($"Start handle '{typeof(T)}' event");
-                if(@event is ILogWriter<T> writer)
+                if (domainLog.OnProcessing != null)
                 {
-                    writer.Write(_log);
+                    _log.LogInformation($"Start handle '{typeof(T)}' event : {domainLog.OnProcessing.Invoke()}");
                 }
+                else
+                {
+                    _log.LogInformation($"Start handle '{typeof(T)}' event");
+                }
+
                 await _handler.Handle(@event, cancellationToken);
-                _log.LogInformation($"End handle '{typeof(T)}' event");
+
+                
+                if (domainLog.OnProcessed != null)
+                {
+                    _log.LogInformation($"End handle '{typeof(T)}' event : {domainLog.OnProcessed.Invoke()}");
+                }
+                else
+                {
+                    _log.LogInformation($"End handle '{typeof(T)}' event");
+                }
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, $"Error handling '{typeof(T)}' event");
+                if (domainLog.OnError != null)
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' event : {domainLog.OnError.Invoke()}");
+                }
+                else
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' event");
+                }
                 throw;
             }
         }

@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace SFA.DAS.EmployerIncentives.Abstractions.Logging
+﻿namespace SFA.DAS.EmployerIncentives.Abstractions.Logging
 {
-    public interface ILogWriter<in T>
+    public interface ILogWriter
     {
-        public void Write(ILogger<T> logger);
+        [System.Text.Json.Serialization.JsonIgnore]        
+        public Log Log { get; }
     }
 }

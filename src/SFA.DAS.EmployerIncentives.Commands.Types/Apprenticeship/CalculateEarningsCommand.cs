@@ -1,13 +1,12 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship
 {
-    public class CalculateEarningsCommand : ICommand, ILockIdentifier, ILogWriter<CalculateEarningsCommand>
+    public class CalculateEarningsCommand : ICommand, ILockIdentifier, ILogWriter
     {
         public long AccountId { get; private set; }
         public Guid IncentiveClaimApplicationId { get; private set; }
@@ -24,9 +23,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship
             ApprenticeshipId = apprenticeshipId;
         }
 
-        public void Write(ILogger<CalculateEarningsCommand> logger)
+        [Newtonsoft.Json.JsonIgnore]
+        public Log Log
         {
-            logger.LogInformation($"CalculateEarningsCommand for AccountId {AccountId}, IncentiveClaimApplicationId {IncentiveClaimApplicationId} and ApprenticeshipId {ApprenticeshipId}");
+            get
+            {
+                var message = $"CalculateEarningsCommand for AccountId {AccountId}, IncentiveClaimApplicationId {IncentiveClaimApplicationId} and ApprenticeshipId {ApprenticeshipId}";
+                return new Log
+                {
+                    OnProcessing = () => message,
+                    OnError = () => message
+                };
+            }
         }
     }
 }

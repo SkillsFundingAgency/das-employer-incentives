@@ -22,20 +22,42 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
 
         public async Task<TResult> Handle(TQuery query, CancellationToken cancellationToken = default)
         {
+            var domainLog = (query is ILogWriter) ? (query as ILogWriter).Log : new Log();
+
             try
-            {
-                _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
-                if (query is ILogWriter<TQuery> writer)
+            {                
+                if (domainLog.OnProcessing != null)
                 {
-                    writer.Write(_log);
+                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query : {domainLog.OnProcessing.Invoke()}");
                 }
+                else
+                {
+                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
+                }
+
                 var result = await _handler.Handle(query, cancellationToken);
-                _log.LogInformation($"End handle '{typeof(TQuery)}' query");
+                                
+                if (domainLog.OnProcessed != null)
+                {
+                    _log.LogInformation($"End handle '{typeof(TQuery)}' query : {domainLog.OnProcessed.Invoke()}");
+                }
+                else
+                {
+                    _log.LogInformation($"End handle '{typeof(TQuery)}' query");
+                }
                 return result;
             }
             catch (Exception ex)
-            {
-                _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query");
+            {   
+                if (domainLog.OnError != null)
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query : {domainLog.OnError.Invoke()}");
+                }
+                else
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query");
+                }
+
                 throw;
             }
         }
