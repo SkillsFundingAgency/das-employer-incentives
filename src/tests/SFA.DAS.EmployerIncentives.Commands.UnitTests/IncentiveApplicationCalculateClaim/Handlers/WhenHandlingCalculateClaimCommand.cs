@@ -5,6 +5,7 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
@@ -48,12 +49,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
             // Assert
             var events = incentiveApplication.FlushEvents().OfType<EarningsCalculationRequestedEvent>().ToList();
             events.Count.Should().Be(incentiveApplication.Apprenticeships.Count);
-            events.Should().AllBeEquivalentTo(incentiveApplication.Apprenticeships.Select(x =>
-                new 
+            events.Should().BeEquivalentTo(incentiveApplication.Apprenticeships.Select(x =>
+                new EarningsCalculationRequestedEvent
                 {
-                    incentiveApplication.AccountId, 
+                    AccountId = incentiveApplication.AccountId, 
                     IncentiveClaimApplicationId = incentiveApplication.Id,
-                    ApprenticeshipId = x.Id
+                    ApprenticeshipId = x.Id,
+                    IncentiveType = x.AgeAtStartOfCourse() <= 24 ? IncentiveType.Under24 : IncentiveType.Over25,
+                    ApprenticeshipStartDate = x.PlannedStartDate
                 }));
         }
 
