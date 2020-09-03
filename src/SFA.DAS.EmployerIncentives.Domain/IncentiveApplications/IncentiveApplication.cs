@@ -76,12 +76,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             foreach (var apprenticeship in Apprenticeships)
             {
-                //AddEvent(new EarningsCalculationRequestedEvent
-                //{
-                //    AccountId = AccountId,
-                //    IncentiveClaimApplicationId = Id,
-                //    ApprenticeshipId = apprenticeship.Id
-                //});
+                AddEvent(new EarningsCalculationRequestedEvent
+                {
+                    AccountId = AccountId,
+                    IncentiveClaimApplicationId = Id,
+                    ApprenticeshipId = apprenticeship.Id
+                });
             }
         }
     }
