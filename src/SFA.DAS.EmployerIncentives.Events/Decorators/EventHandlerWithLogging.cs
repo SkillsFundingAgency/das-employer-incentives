@@ -46,7 +46,11 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
                 _log.LogError(ex, $"Error handling '{typeof(T)}' event");
                 if (domainLog.OnError != null)
                 {
-                    _log.LogInformation(domainLog.OnError.Invoke());
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' event : {domainLog.OnError.Invoke()}");
+                }
+                else
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' event");
                 }
                 throw;
             }

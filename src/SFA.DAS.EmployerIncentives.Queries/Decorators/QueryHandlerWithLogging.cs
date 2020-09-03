@@ -42,12 +42,16 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
                 return result;
             }
             catch (Exception ex)
-            {
-                _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query");
+            {   
                 if (domainLog.OnError != null)
                 {
-                    _log.LogInformation(domainLog.OnError.Invoke());
+                    _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query : {domainLog.OnError.Invoke()}");
                 }
+                else
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query");
+                }
+
                 throw;
             }
         }

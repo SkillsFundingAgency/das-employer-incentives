@@ -41,12 +41,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
                 }
             }
             catch(Exception ex)
-            {
-                _log.LogError(ex, $"Error handling '{typeof(T)}' command");
+            {    
                 if (domainLog.OnError != null)
                 {
-                    _log.LogInformation(domainLog.OnError.Invoke());
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
                 }
+                else
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' command");
+                }
+
                 throw;
             }
         }
