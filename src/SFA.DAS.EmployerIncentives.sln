@@ -61,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Commands.Types", "SFA.DAS.EmployerIncentives.Commands.Types\SFA.DAS.EmployerIncentives.Commands.Types.csproj", "{F176B48C-F870-4E57-A610-8396638B7EDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests", "SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests\SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.csproj", "{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,10 @@ Global
 		{F176B48C-F870-4E57-A610-8396638B7EDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F176B48C-F870-4E57-A610-8396638B7EDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F176B48C-F870-4E57-A610-8396638B7EDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -190,6 +196,7 @@ Global
 		{C67087BB-2277-4F36-BE23-91D9CD317A7C} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 		{F08B990D-C3CB-437A-8F81-1CF70BB70C6C} = {9281BA00-B46E-438F-BC4E-4B201E2D7EA6}
 		{F176B48C-F870-4E57-A610-8396638B7EDA} = {9281BA00-B46E-438F-BC4E-4B201E2D7EA6}
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3E3FB6-A534-4F3A-AC5E-BD27EF68874D}
