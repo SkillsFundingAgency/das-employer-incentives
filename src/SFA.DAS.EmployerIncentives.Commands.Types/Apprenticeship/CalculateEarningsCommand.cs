@@ -4,7 +4,7 @@ using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Types.Aprenticeship
+namespace SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship
 {
     public class CalculateEarningsCommand : ICommand, ILockIdentifier, ILogWriter
     {
