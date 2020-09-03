@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -7,7 +6,7 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.Application
 {    
-    public class CalculateClaimCommand : ICommand, ILockIdentifier, ILogWriter<CalculateClaimCommand>
+    public class CalculateClaimCommand : ICommand, ILockIdentifier, ILogWriter
     {
         public long AccountId { get; private set; }
         public Guid IncentiveClaimApplicationId { get; private set; }
@@ -21,9 +20,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Application
             IncentiveClaimApplicationId = incentiveClaimApplicationId;
         }
 
-        public void Write(ILogger<CalculateClaimCommand> logger)
+        [Newtonsoft.Json.JsonIgnore]
+        public Log Log
         {
-            logger.LogInformation($"CalculateClaimCommand for AccountId {AccountId} and IncentiveClaimApplicationId {IncentiveClaimApplicationId}");
+            get
+            {
+                var message = $"CalculateClaimCommand for AccountId {AccountId} and IncentiveClaimApplicationId {IncentiveClaimApplicationId}";
+                return new Log
+                {
+                    OnProcessing = () => message,
+                    OnError = () => message
+                };
+            }
         }
     }
 }

@@ -23,19 +23,31 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
 
         public async Task Handle(T @event, CancellationToken cancellationToken = default)
         {
+            var domainLog = (@event is ILogWriter) ? (@event as ILogWriter).Log : new Log();
+
             try
             {
                 _log.LogInformation($"Start handle '{typeof(T)}' event");
-                if(@event is ILogWriter<T> writer)
+                if (domainLog.OnProcessing != null)
                 {
-                    writer.Write(_log);
+                    _log.LogInformation(domainLog.OnProcessing.Invoke());
                 }
+
                 await _handler.Handle(@event, cancellationToken);
+
                 _log.LogInformation($"End handle '{typeof(T)}' event");
+                if (domainLog.OnProcessed != null)
+                {
+                    _log.LogInformation(domainLog.OnProcessed.Invoke());
+                }
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, $"Error handling '{typeof(T)}' event");
+                if (domainLog.OnError != null)
+                {
+                    _log.LogInformation(domainLog.OnError.Invoke());
+                }
                 throw;
             }
         }

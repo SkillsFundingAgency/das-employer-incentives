@@ -22,20 +22,32 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
 
         public async Task<TResult> Handle(TQuery query, CancellationToken cancellationToken = default)
         {
+            var domainLog = (query is ILogWriter) ? (query as ILogWriter).Log : new Log();
+
             try
             {
                 _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
-                if (query is ILogWriter<TQuery> writer)
+                if (domainLog.OnProcessing != null)
                 {
-                    writer.Write(_log);
+                    _log.LogInformation(domainLog.OnProcessing.Invoke());
                 }
+
                 var result = await _handler.Handle(query, cancellationToken);
+
                 _log.LogInformation($"End handle '{typeof(TQuery)}' query");
+                if (domainLog.OnProcessed != null)
+                {
+                    _log.LogInformation(domainLog.OnProcessed.Invoke());
+                }
                 return result;
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query");
+                if (domainLog.OnError != null)
+                {
+                    _log.LogInformation(domainLog.OnError.Invoke());
+                }
                 throw;
             }
         }
