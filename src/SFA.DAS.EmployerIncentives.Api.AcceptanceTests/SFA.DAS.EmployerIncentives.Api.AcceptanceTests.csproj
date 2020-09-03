@@ -51,6 +51,12 @@
   <ItemGroup>
     <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
       <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationsForAccountRequested.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IncentiveDetailsRequested.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
@@ -63,7 +69,7 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IncentiveApplicationRequested.feature</DependentUpon>
-	</Compile>
+    </Compile>
     <Compile Update="Features\LegalEntityAgreementSigned.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -75,6 +81,10 @@
     <SpecFlowFeatureFiles Update="Features\ApplicationsForAccountRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsReminderEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
