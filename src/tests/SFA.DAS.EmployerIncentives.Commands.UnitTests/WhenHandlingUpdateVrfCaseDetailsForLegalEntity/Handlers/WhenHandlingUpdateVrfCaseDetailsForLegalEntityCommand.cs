@@ -3,17 +3,17 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForExistingSubmission;
+using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForLegalEntity;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForExistingSubmission.Handlers
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.WhenHandlingUpdateVrfCaseDetailsForLegalEntity.Handlers
 {
-    public class WhenHandlingUpdateVrfCaseDetailsForExistingSubmissionCommand
+    public class WhenHandlingUpdateVrfCaseDetailsForLegalEntityCommand
     {
-        private UpdateVrfCaseDetailsForExistingSubmissionCommandHandler _sut;
+        private UpdateVrfCaseDetailsForLegalEntityCommandHandler _sut;
         private Mock<IAccountDomainRepository> _mockDomainRepository;
 
         private Fixture _fixture;
@@ -28,14 +28,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForE
 
             _mockDomainRepository = new Mock<IAccountDomainRepository>();
 
-            _sut = new UpdateVrfCaseDetailsForExistingSubmissionCommandHandler(_mockDomainRepository.Object);
+            _sut = new UpdateVrfCaseDetailsForLegalEntityCommandHandler(_mockDomainRepository.Object);
         }
 
         [Test]
         public async Task Then_VRF_details_for_given_legal_entity_are_updated()
         {
             // Arrange
-            var command = new UpdateVrfCaseDetailsForExistingSubmissionCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+            var command = new UpdateVrfCaseDetailsForLegalEntityCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             var accounts = _fixture.CreateMany<Account>(3).ToList();
             var legalEntityToBeUpdated = LegalEntity.New(LegalEntityToBeUpdatedId, _fixture.Create<string>());

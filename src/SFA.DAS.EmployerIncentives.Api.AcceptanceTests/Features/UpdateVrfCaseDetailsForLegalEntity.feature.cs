@@ -20,11 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.1.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("UpdateVrfCaseDetailsForExistingApplications")]
+    [NUnit.Framework.DescriptionAttribute("UpdateVrfCaseDetailsForLegalEntity")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
     [NUnit.Framework.CategoryAttribute("accountApi")]
-    public partial class UpdateVrfCaseDetailsForExistingApplicationsFeature
+    public partial class UpdateVrfCaseDetailsForLegalEntityFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -34,14 +34,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "api",
                 "accountApi"};
         
-#line 1 "UpdateVrfCaseDetailsForExistingApplications.feature"
+#line 1 "UpdateVrfCaseDetailsForLegalEntity.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "UpdateVrfCaseDetailsForExistingApplications", "\tWhen Case Id, Vendor Id or Status are changed in Vendor Registration Form (VRF)\r" +
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "UpdateVrfCaseDetailsForLegalEntity", "\tWhen Case Id, Vendor Id or Status are changed in Vendor Registration Form (VRF)\r" +
                     "\n\tThen Employer Incentives records are updated accordingly", ProgrammingLanguage.CSharp, new string[] {
                         "database",
                         "api",

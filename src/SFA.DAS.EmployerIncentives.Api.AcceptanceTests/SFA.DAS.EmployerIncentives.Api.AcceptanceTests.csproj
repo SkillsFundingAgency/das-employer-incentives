@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Features\UpdateVrfCaseDetailsForExistingApplications.feature.cs">
+    <Compile Update="Features\UpdateVrfCaseDetailsForLegalEntity.feature.cs">
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Update="Features\UpdateVrfCaseDetailsForNewSubmissionsJob.feature.cs">
@@ -77,9 +77,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForExistingApplications.feature">
+    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForLegalEntity.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>UpdateVrfCaseDetailsForExistingApplications.feature.cs</LastGenOutput>
+      <LastGenOutput>UpdateVrfCaseDetailsForLegalEntity.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForNewSubmissionsJob.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>

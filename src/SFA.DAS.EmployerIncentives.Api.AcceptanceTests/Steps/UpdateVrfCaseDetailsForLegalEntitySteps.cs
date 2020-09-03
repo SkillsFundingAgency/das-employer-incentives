@@ -8,7 +8,7 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class UpdateVrfCaseDetailsForExistingApplicationsSteps : StepsBase
+    public class UpdateVrfCaseDetailsForLegalEntitySteps : StepsBase
     {
         private readonly DataAccess _dataAccess;
         private readonly string _newVrfCaseId = $"NewVrfCaseId{Guid.NewGuid()}";
@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly string _newVrfStatus = $"NewVrfStatus{Guid.NewGuid()}";
         private Account _account;
 
-        public UpdateVrfCaseDetailsForExistingApplicationsSteps(TestContext testContext) : base(testContext)
+        public UpdateVrfCaseDetailsForLegalEntitySteps(TestContext testContext) : base(testContext)
         {
             _dataAccess = new DataAccess(testContext.SqlDatabase.DatabaseInfo.ConnectionString);
         }

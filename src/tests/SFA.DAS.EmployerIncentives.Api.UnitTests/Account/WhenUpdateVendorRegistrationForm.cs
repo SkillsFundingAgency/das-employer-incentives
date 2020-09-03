@@ -6,9 +6,9 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForExistingSubmission;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             _sut = new AccountCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<UpdateVrfCaseDetailsForExistingSubmissionCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<UpdateVrfCaseDetailsForLegalEntityCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 
             // Assert
             _mockCommandDispatcher
-                .Verify(m => m.Send(It.Is<UpdateVrfCaseDetailsForExistingSubmissionCommand>(c =>
+                .Verify(m => m.Send(It.Is<UpdateVrfCaseDetailsForLegalEntityCommand>(c =>
                     c.LegalEntityId == accountLegalEntityId &&
                     c.CaseId == request.CaseId &&
                     c.VendorId == request.VendorId &&

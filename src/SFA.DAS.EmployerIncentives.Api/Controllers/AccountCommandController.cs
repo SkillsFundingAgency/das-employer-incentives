@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForExistingSubmission;
+using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpPatch("/legalentities/{legalEntityId}/vendorregistrationform")]
         public async Task<IActionResult> UpdateVendorRegistrationForm([FromRoute] long legalEntityId, [FromBody] UpdateVendorRegistrationFormRequest request)
         {
-            await SendCommandAsync(command: new UpdateVrfCaseDetailsForExistingSubmissionCommand(legalEntityId, request.CaseId, request.VendorId, request.Status));
+            await SendCommandAsync(new UpdateVrfCaseDetailsForLegalEntityCommand(legalEntityId, request.CaseId, request.VendorId, request.Status));
             return NoContent();
         }
     }

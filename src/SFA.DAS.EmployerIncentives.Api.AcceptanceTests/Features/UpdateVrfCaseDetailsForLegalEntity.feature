@@ -2,7 +2,7 @@
 @api
 @accountApi
 
-Feature: UpdateVrfCaseDetailsForExistingApplications
+Feature: UpdateVrfCaseDetailsForLegalEntity
 	When Case Id, Vendor Id or Status are changed in Vendor Registration Form (VRF)
 	Then Employer Incentives records are updated accordingly
 
