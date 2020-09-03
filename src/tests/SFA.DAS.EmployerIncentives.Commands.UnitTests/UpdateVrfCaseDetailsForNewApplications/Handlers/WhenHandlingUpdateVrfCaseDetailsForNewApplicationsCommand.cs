@@ -1,20 +1,20 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForNewSubmissions;
+using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForNewApplications;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Messages.Events;
 using SFA.DAS.NServiceBus.Services;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForNewSubmissions.Handlers
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForNewApplications.Handlers
 {
-    public class WhenHandlingUpdateVrfCaseDetailsForNewSubmissionsCommand
+    public class WhenHandlingUpdateVrfCaseDetailsForNewApplicationsCommand
     {
-        private UpdateVrfCaseDetailsForNewSubmissionsCommandHandler _sut;
+        private UpdateVrfCaseDetailsForNewApplicationsCommandHandler _sut;
         private Mock<IQueryRepository<IncentiveApplicationLegalEntityDto>> _mockQueryRepository;
         private Mock<IEventPublisher> _mockEventPublisher;
 
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForN
             _mockQueryRepository = new Mock<IQueryRepository<IncentiveApplicationLegalEntityDto>>();
             _mockEventPublisher = new Mock<IEventPublisher>();
 
-            _sut = new UpdateVrfCaseDetailsForNewSubmissionsCommandHandler(_mockQueryRepository.Object, _mockEventPublisher.Object);
+            _sut = new UpdateVrfCaseDetailsForNewApplicationsCommandHandler(_mockQueryRepository.Object, _mockEventPublisher.Object);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForN
         {
             //Arrange
             var applicationLegalEntities = _fixture.CreateMany<IncentiveApplicationLegalEntityDto>().ToList();
-            var command = new UpdateVrfCaseDetailsForNewSubmissionsCommand();
+            var command = new UpdateVrfCaseDetailsForNewApplicationsCommand();
             _mockQueryRepository.Setup(x => x.GetList(dto => dto.ApplicationStatus == IncentiveApplicationStatus.Submitted && dto.VrfCaseId == null)).ReturnsAsync(applicationLegalEntities);
 
             //Act

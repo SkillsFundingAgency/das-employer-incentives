@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "api",
                 "accountApi"};
         
-#line 1 "UpdateVrfCaseDetailsForNewSubmissionsJob.feature"
+#line 1 "UpdateVrfCaseDetailsForNewApplications.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
