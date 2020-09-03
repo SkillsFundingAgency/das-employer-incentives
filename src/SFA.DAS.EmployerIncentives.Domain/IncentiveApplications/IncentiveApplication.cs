@@ -80,7 +80,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 {
                     AccountId = AccountId,
                     IncentiveClaimApplicationId = Id,
-                    ApprenticeshipId = apprenticeship.Id
+                    ApprenticeshipId = apprenticeship.Id,
+                    IncentiveType = apprenticeship.AgeAtStartOfCourse() <= 24 ? IncentiveType.Under24 : IncentiveType.Over25,
+                    ApprenticeshipStartDate = apprenticeship.PlannedStartDate
                 });
             }
         }
