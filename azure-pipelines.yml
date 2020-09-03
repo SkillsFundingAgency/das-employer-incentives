@@ -87,7 +87,13 @@ stages:
         targetPath: $(build.artifactstagingdirectory)/publish
         artifactName: dacpac
 
-    - task: PowerShell@2
+    - task: CmdLine@2
+      displayName: 'Install LocalDB 2017'
+      inputs:
+        script: 'choco install sqllocaldb -y'
+        failOnStderr: true
+
+    - task: CmdLine@2
       displayName: 'Start MsSqlLocalDb'
       inputs:
         targetType: 'inline'
