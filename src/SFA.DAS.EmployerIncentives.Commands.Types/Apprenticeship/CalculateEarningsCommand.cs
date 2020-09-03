@@ -1,11 +1,13 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using Microsoft.Extensions.Logging;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.Aprenticeship
 {
-    public class CalculateEarningsCommand : ICommand, ILockIdentifier
+    public class CalculateEarningsCommand : ICommand, ILockIdentifier, ILogWriter<CalculateEarningsCommand>
     {
         public long AccountId { get; private set; }
         public Guid IncentiveClaimApplicationId { get; private set; }
@@ -20,6 +22,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Aprenticeship
             AccountId = accountId;
             IncentiveClaimApplicationId = incentiveClaimApplicationId;
             ApprenticeshipId = apprenticeshipId;
+        }
+
+        public void Write(ILogger<CalculateEarningsCommand> logger)
+        {
+            logger.LogInformation($"CalculateEarningsCommand for AccountId {AccountId}, IncentiveClaimApplicationId {IncentiveClaimApplicationId} and ApprenticeshipId {ApprenticeshipId}");
         }
     }
 }

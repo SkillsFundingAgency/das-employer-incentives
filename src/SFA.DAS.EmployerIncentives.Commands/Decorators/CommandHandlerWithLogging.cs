@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
             try
             {
                 _log.LogInformation($"Start handle '{typeof(T)}' command");
+                if (command is ILogWriter<T> writer)
+                {
+                    writer.Write(_log);
+                }
                 await _handler.Handle(command, cancellationToken);
                 _log.LogInformation($"End handle '{typeof(T)}' command");
             }

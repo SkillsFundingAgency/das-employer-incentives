@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using System;
 using System.Threading;
@@ -25,6 +26,10 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
             try
             {
                 _log.LogInformation($"Start handle '{typeof(T)}' event");
+                if(@event is ILogWriter<T> writer)
+                {
+                    writer.Write(_log);
+                }
                 await _handler.Handle(@event, cancellationToken);
                 _log.LogInformation($"End handle '{typeof(T)}' event");
             }

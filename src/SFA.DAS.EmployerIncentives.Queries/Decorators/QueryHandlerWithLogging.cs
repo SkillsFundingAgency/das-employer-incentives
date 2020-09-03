@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using System;
 using System.Threading;
@@ -24,6 +25,10 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
             try
             {
                 _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
+                if (query is ILogWriter<TQuery> writer)
+                {
+                    writer.Write(_log);
+                }
                 var result = await _handler.Handle(query, cancellationToken);
                 _log.LogInformation($"End handle '{typeof(TQuery)}' query");
                 return result;
