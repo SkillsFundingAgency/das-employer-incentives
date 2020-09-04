@@ -90,13 +90,8 @@ stages:
     - task: CmdLine@2
       displayName: 'Install MsSqlLocalDb'
       inputs:
-        script: 'choco install sqllocaldb -y && refreshenv'
+        script: 'choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb'
         failOnStderr: true
-
-    - task: CmdLine@2
-      displayName: 'Start MsSqlLocalDb'
-      inputs:
-        script: 'sqllocaldb start mssqllocaldb'
 
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
