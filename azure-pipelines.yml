@@ -54,8 +54,6 @@ stages:
         projects: 'src/**/*.csproj'
         noCache: true
 
-    ##TO DO: remove exclusion for '!src/**/*.Data.UnitTests.csproj' when MSBuild on Windows agents is updated to a version later than 16.0
-    ##TO DO: build the dacpac so that Data.UnitTests can consume it and set agent pool demands to use a Windows agent
     - task: DotNetCoreCLI@2
       displayName: Build UnitTests
       inputs:
@@ -63,6 +61,7 @@ stages:
         projects: |
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
+
     - task: DotNetCoreCLI@2
       displayName: UnitTest
       inputs:
@@ -79,19 +78,6 @@ stages:
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
 
-    - task: CopyFiles@2
-      displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
-      inputs:
-        Contents: |
-          src\**\*.dacpac
-        TargetFolder: '$(build.artifactstagingdirectory)/publish'
-
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish Artifact: dacpac'
-      inputs:
-        targetPath: $(build.artifactstagingdirectory)/publish
-        artifactName: dacpac
-
     - task: CmdLine@2
       displayName: 'Install MsSqlLocalDb'
       inputs:
@@ -105,6 +91,7 @@ stages:
         projects: |
           src/**/*.AcceptanceTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
+
     - task: DotNetCoreCLI@2
       displayName: Run Acceptance Tests
       inputs:
@@ -121,6 +108,7 @@ stages:
         command: 'build'
         projects: src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
+
     - task: PowerShell@2
       displayName: 'Set NuGet Package Version'
       inputs:
@@ -129,6 +117,7 @@ stages:
           if ("$(GitVersion.PreReleaseLabel)" -ne "") { $NuGetPackageVersion = "$(GitVersion.SemVer)-prerelease" } else { $NuGetPackageVersion = "$(GitVersion.SemVer)" }
           Write-Host "NuGetPackageVersion: $NuGetPackageVersion"
           Write-Host "##vso[task.setvariable variable=NuGetPackageVersion]$NuGetPackageVersion"
+
     - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
       inputs:
@@ -138,6 +127,19 @@ stages:
         versionEnvVar: NuGetPackageVersion
         packDirectory: $(build.artifactstagingdirectory)/NugetPackages
 
+    - task: CopyFiles@2
+      displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
+      inputs:
+        Contents: |
+          src\**\*.dacpac
+        TargetFolder: '$(build.artifactstagingdirectory)/publish'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: dacpac'
+      inputs:
+        targetPath: $(build.artifactstagingdirectory)/publish
+        artifactName: dacpac
+
     - task: DotNetCoreCLI@2
       displayName: 'Publish - dotnet publish application $(SolutionBaseName).API'
       inputs:
@@ -145,6 +147,7 @@ stages:
         projects: 'src/$(SolutionBaseName).Api/$(SolutionBaseName).Api.csproj'
         arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
         publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
+ 
     - task: CopyFiles@2
       displayName: 'Copy Files to: $(build.artifactstagingdirectory)/publish'
       inputs:
@@ -158,6 +161,7 @@ stages:
       inputs:
         targetPath: $(build.artifactstagingdirectory)/NugetPackages
         artifactName: NugetPackages
+ 
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifact: drop'
       inputs:
