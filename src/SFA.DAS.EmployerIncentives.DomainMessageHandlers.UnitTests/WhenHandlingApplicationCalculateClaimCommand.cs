@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests
         }
 
         [Test]
-        public async Task And_an_exception_occurs_in_CommandDispatcher_Then_ensure_exception_is_logged_and_rethrown()
+        public void And_an_exception_occurs_in_CommandDispatcher_Then_ensure_exception_is_logged_and_rethrown()
         {
             _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<CalculateClaimCommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ApplicationException("Errored"));
