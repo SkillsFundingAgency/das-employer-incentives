@@ -42,9 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseDetailsForI
             await _sut.Handle(command);
 
             //Assert            
-            _mockEventPublisher.Verify(x => x.Publish(It.Is<UpdateLegalEntityVrfCaseStatusEvent>(x => x.LegalEntityId == legalEntities[0].LegalEntityId && x.VrfCaseId == legalEntities[0].VrfCaseId && x.VrfVendorId == legalEntities[0].VrfVendorId)), Times.Once);
-            _mockEventPublisher.Verify(x => x.Publish(It.Is<UpdateLegalEntityVrfCaseStatusEvent>(x => x.LegalEntityId == legalEntities[1].LegalEntityId && x.VrfCaseId == legalEntities[1].VrfCaseId && x.VrfVendorId == legalEntities[1].VrfVendorId)), Times.Once);
-            _mockEventPublisher.Verify(x => x.Publish(It.Is<UpdateLegalEntityVrfCaseStatusEvent>(x => x.LegalEntityId == legalEntities[2].LegalEntityId && x.VrfCaseId == legalEntities[2].VrfCaseId && x.VrfVendorId == legalEntities[2].VrfVendorId)), Times.Once);
+            _mockEventPublisher.Verify(x => x.Publish(It.Is<UpdateLegalEntityVrfCaseStatusEvent>(x => x.LegalEntityId == legalEntities[0].LegalEntityId && x.VrfCaseId == legalEntities[0].VrfCaseId)), Times.Once);
+            _mockEventPublisher.Verify(x => x.Publish(It.Is<UpdateLegalEntityVrfCaseStatusEvent>(x => x.LegalEntityId == legalEntities[1].LegalEntityId && x.VrfCaseId == legalEntities[1].VrfCaseId)), Times.Once);
+            _mockEventPublisher.Verify(x => x.Publish(It.Is<UpdateLegalEntityVrfCaseStatusEvent>(x => x.LegalEntityId == legalEntities[2].LegalEntityId && x.VrfCaseId == legalEntities[2].VrfCaseId)), Times.Once);
         }
     }
 }

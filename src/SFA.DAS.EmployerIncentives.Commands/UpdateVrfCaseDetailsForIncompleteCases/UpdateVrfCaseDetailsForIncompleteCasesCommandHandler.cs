@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForIncompleteC
         public async Task Handle(UpdateVrfCaseDetailsForIncompleteCasesCommand command, CancellationToken cancellationToken = default)
         {
             var legalEntities = await _queryRepository.GetList(x => x.VrfCaseId != null && x.VrfCaseStatus != CompletedCaseStatus);
-            var publishTasks = legalEntities.Select(x => _eventPublisher.Publish(new UpdateLegalEntityVrfCaseStatusEvent { LegalEntityId = x.LegalEntityId, VrfCaseId = x.VrfCaseId, VrfVendorId = x.VrfVendorId }));
+            var publishTasks = legalEntities.Select(x => _eventPublisher.Publish(new UpdateLegalEntityVrfCaseStatusEvent { LegalEntityId = x.LegalEntityId, VrfCaseId = x.VrfCaseId }));
             await Task.WhenAll(publishTasks);
         }
     }
