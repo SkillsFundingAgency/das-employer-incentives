@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
 
-            if (!ConfigurationIsLocalOrDev())
+            if (!ConfigurationIsLocalOrDevOrAcceptanceTests())
             {
                 var azureAdConfiguration = Configuration
                     .GetSection("AzureAd")
@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services
                 .AddMvc(o =>
                 {
-                    if (!ConfigurationIsLocalOrDev())
+                    if (!ConfigurationIsLocalOrAcceptanceTests())
                     {
                         o.Conventions.Add(new AuthorizeControllerModelConvention());
                     }
@@ -134,14 +134,16 @@ namespace SFA.DAS.EmployerIncentives.Api
             serviceProvider.StartNServiceBus(Configuration).GetAwaiter().GetResult();
         }
 
-        private bool ConfigurationIsLocalOrDev()
-        {
-            return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   Configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
-        }
         private bool ConfigurationIsLocalOrAcceptanceTests()
         {
             return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   Configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        private bool ConfigurationIsLocalOrDevOrAcceptanceTests()
+        {
+            return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   Configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase) ||
                    Configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
         }
     }
