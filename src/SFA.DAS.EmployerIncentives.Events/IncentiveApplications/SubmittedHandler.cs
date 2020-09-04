@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 {
-    public class SubmittedEventHandler : IDomainEventHandler<Submitted>
+    public class SubmittedHandler : IDomainEventHandler<Submitted>
     {
         private readonly ICommandPublisher _commandPublisher;
 
-        public SubmittedEventHandler(ICommandPublisher commandPublisher)
+        public SubmittedHandler(ICommandPublisher commandPublisher)
         {
             _commandPublisher = commandPublisher;
         }
@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
         {
             var command = new CalculateClaimCommand(
                 @event.AccountId,
-                @event.IncentiveClaimApplicationId
+                @event.IncentiveApplicationId
                 );
 
             return _commandPublisher.Publish(command);

@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipEarnings
 {
-    public class EarningsCalculationRequestedEventHandler : IDomainEventHandler<EarningsCalculationRequestedEvent>
+    public class EarningsCalculationRequestedHandler : IDomainEventHandler<EarningsCalculationRequested>
     {
         private readonly ICommandPublisher _commandPublisher;
 
-        public EarningsCalculationRequestedEventHandler(ICommandPublisher commandPublisher)
+        public EarningsCalculationRequestedHandler(ICommandPublisher commandPublisher)
         {
             _commandPublisher = commandPublisher;
         }
 
-        public Task Handle(EarningsCalculationRequestedEvent @event, CancellationToken cancellationToken = default)
+        public Task Handle(EarningsCalculationRequested @event, CancellationToken cancellationToken = default)
         {
             var command = new CalculateEarningsCommand(
                 @event.AccountId,
-                @event.IncentiveClaimApplicationId,
+                @event.IncentiveClaimApprenticeshipId,
                 @event.ApprenticeshipId,
                 @event.IncentiveType,
                 @event.ApprenticeshipStartDate);

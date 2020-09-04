@@ -26,35 +26,35 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 
             try
             {
-                if (domainLog.OnProcessing != null)
-                {
-                    _log.LogInformation($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
-                }
-                else
+                if (domainLog.OnProcessing == null)
                 {
                     _log.LogInformation($"Start handle '{typeof(T)}' command");
                 }
+                else
+                {
+                    _log.LogInformation($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
+                }
 
                 await _handler.Handle(command, cancellationToken);
-                                
-                if (domainLog.OnProcessed != null)
-                {
-                    _log.LogInformation($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
-                }
-                else
+
+                if (domainLog.OnProcessed == null)
                 {
                     _log.LogInformation($"End handle '{typeof(T)}' command");
                 }
+                else
+                {
+                    _log.LogInformation($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
+                }
             }
             catch(Exception ex)
-            {    
-                if (domainLog.OnError != null)
+            {
+                if (domainLog.OnError == null)
                 {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' command");
                 }
                 else
                 {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' command");
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
                 }
 
                 throw;

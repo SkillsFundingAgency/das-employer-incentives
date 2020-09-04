@@ -27,37 +27,37 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
 
             try
             {
-                if (domainLog.OnProcessing != null)
+                if (domainLog.OnProcessing == null)
                 {
-                    _log.LogInformation($"Start handle '{typeof(T)}' event : {domainLog.OnProcessing.Invoke()}");
+                    _log.LogInformation($"Start handle '{typeof(T)}' event");
                 }
                 else
                 {
-                    _log.LogInformation($"Start handle '{typeof(T)}' event");
+                    _log.LogInformation($"Start handle '{typeof(T)}' event : {domainLog.OnProcessing.Invoke()}");
                 }
 
                 await _handler.Handle(@event, cancellationToken);
 
-                
-                if (domainLog.OnProcessed != null)
+
+                if (domainLog.OnProcessed == null)
                 {
-                    _log.LogInformation($"End handle '{typeof(T)}' event : {domainLog.OnProcessed.Invoke()}");
+                    _log.LogInformation($"End handle '{typeof(T)}' event");
                 }
                 else
                 {
-                    _log.LogInformation($"End handle '{typeof(T)}' event");
+                    _log.LogInformation($"End handle '{typeof(T)}' event : {domainLog.OnProcessed.Invoke()}");
                 }
             }
             catch (Exception ex)
             {
                 _log.LogError(ex, $"Error handling '{typeof(T)}' event");
-                if (domainLog.OnError != null)
+                if (domainLog.OnError == null)
                 {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' event : {domainLog.OnError.Invoke()}");
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' event");
                 }
                 else
                 {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' event");
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' event : {domainLog.OnError.Invoke()}");
                 }
                 throw;
             }

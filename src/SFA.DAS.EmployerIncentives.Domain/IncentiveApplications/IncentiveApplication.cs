@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             AddEvent(new Submitted
             {
                  AccountId = AccountId,
-                 IncentiveClaimApplicationId = Id,
+                 IncentiveApplicationId = Id,
                  SubmittedAt = submittedAt,
                  SubmittedBy = submittedByName,
                  SubmittedByEmail = submittedByEmail
@@ -76,11 +76,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             foreach (var apprenticeship in Apprenticeships)
             {
-                AddEvent(new EarningsCalculationRequestedEvent
+                AddEvent(new EarningsCalculationRequested
                 {
-                    AccountId = AccountId,
-                    IncentiveClaimApplicationId = Id,
-                    ApprenticeshipId = apprenticeship.Id,
+                    AccountId = AccountId,                    
+                    IncentiveClaimApprenticeshipId = apprenticeship.Id,
+                    ApprenticeshipId = apprenticeship.ApprenticeshipId,
                     IncentiveType = apprenticeship.AgeAtStartOfCourse() <= 24 ? IncentiveType.Under24 : IncentiveType.Over25,
                     ApprenticeshipStartDate = apprenticeship.PlannedStartDate
                 });

@@ -4,11 +4,11 @@ using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
 {
-    public class EarningsCalculationRequestedEvent : IDomainEvent, ILogWriter
+    public class EarningsCalculationRequested : IDomainEvent, ILogWriter
     {
         public long AccountId { get; set; }
-        public Guid IncentiveClaimApplicationId { get; set; }
-        public Guid ApprenticeshipId { get; set; }
+        public Guid IncentiveClaimApprenticeshipId { get; set; }
+        public long ApprenticeshipId { get; set; }
         public IncentiveType IncentiveType { get; set; }
         public DateTime ApprenticeshipStartDate { get; set; }
 
@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
         {
             get
             {
-                var message = $"EarningsCalculationRequestedEvent with AccountId {AccountId}, IncentiveClaimApplicationId {IncentiveClaimApplicationId} and ApprenticeshipId {ApprenticeshipId}";
+                var message = $"EarningsCalculationRequested event with AccountId {AccountId}, IncentiveClaimApprenticeshipId {IncentiveClaimApprenticeshipId} and ApprenticeshipId {ApprenticeshipId}";
                 return new Log
                 {
                     OnProcessing = () => message,

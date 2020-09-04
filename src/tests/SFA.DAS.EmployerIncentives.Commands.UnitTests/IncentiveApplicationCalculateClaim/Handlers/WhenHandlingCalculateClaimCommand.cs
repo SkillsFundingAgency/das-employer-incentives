@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
-            var command = new CalculateClaimCommand(incentiveApplication.AccountId, _fixture.Create<Guid>()); ;
+            var command = new CalculateClaimCommand(incentiveApplication.AccountId, _fixture.Create<Guid>());
 
             _mockDomainRespository.Setup(x => x.Find(command.IncentiveClaimApplicationId)).ReturnsAsync(incentiveApplication);
 
@@ -47,14 +47,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
             await _sut.Handle(command);
 
             // Assert
-            var events = incentiveApplication.FlushEvents().OfType<EarningsCalculationRequestedEvent>().ToList();
+            var events = incentiveApplication.FlushEvents().OfType<EarningsCalculationRequested>().ToList();
             events.Count.Should().Be(incentiveApplication.Apprenticeships.Count);
             events.Should().BeEquivalentTo(incentiveApplication.Apprenticeships.Select(x =>
-                new EarningsCalculationRequestedEvent
+                new EarningsCalculationRequested
                 {
-                    AccountId = incentiveApplication.AccountId, 
-                    IncentiveClaimApplicationId = incentiveApplication.Id,
-                    ApprenticeshipId = x.Id,
+                    AccountId = incentiveApplication.AccountId,
+                    IncentiveClaimApprenticeshipId = incentiveApplication.Id,
+                    ApprenticeshipId = x.ApprenticeshipId,
                     IncentiveType = x.AgeAtStartOfCourse() <= 24 ? IncentiveType.Under24 : IncentiveType.Over25,
                     ApprenticeshipStartDate = x.PlannedStartDate
                 }));
