@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (ConfigurationIsLocalOrAcceptanceTests())
+            if (!ConfigurationIsLocalOrAcceptanceTests())
             {
                 config.AddAzureTableStorage(options =>
                 {
