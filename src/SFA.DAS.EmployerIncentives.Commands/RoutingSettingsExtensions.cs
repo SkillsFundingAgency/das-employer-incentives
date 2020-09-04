@@ -1,5 +1,6 @@
 ﻿using NServiceBus;
 using SFA.DAS.EmployerIncentives.Commands.Types.Application;
+using SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship;
 using SFA.DAS.Notifications.Messages.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands
@@ -13,6 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             routingSettings.RouteToEndpoint(typeof(SendEmailCommand), NotificationsMessageHandler);
             routingSettings.RouteToEndpoint(typeof(CalculateClaimCommand), DomainMessageHandlers);
+            routingSettings.RouteToEndpoint(typeof(CalculateEarningsCommand), DomainMessageHandlers);            
         }
     }
 }
