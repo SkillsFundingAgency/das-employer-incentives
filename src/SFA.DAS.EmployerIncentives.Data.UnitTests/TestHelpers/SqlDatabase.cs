@@ -1,40 +1,35 @@
 ﻿using Microsoft.SqlServer.Dac;
+using Polly;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
     public class SqlDatabase : IDisposable
     {
-        private bool isDisposed;
+        private bool _isDisposed;
 
-        public DatabaseInfo DatabaseInfo { get; private set; }
+        public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();
 
         public SqlDatabase()
         {
-            string environment;
 #if DEBUG
-            environment = "debug";
+            const string environment = "debug";
 #else
-       environment = "release";
+            const string environment = "release";
 #endif
-            DatabaseInfo = new DatabaseInfo();
 
-            var databaseBinFolder = Path.Combine(
-                Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")),
-                $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\");
+            var dacpacFileLocation =
+                Path.Combine(
+                    Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
+                    $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\{environment}\\SFA.DAS.EmployerIncentives.Database.dacpac");
 
-            var files = Directory.GetFiles(databaseBinFolder, "*.dacpac", SearchOption.AllDirectories);
+            if (!File.Exists(dacpacFileLocation))
+                throw new FileNotFoundException($"⚠ DACPAC File not found in: {dacpacFileLocation}");
 
-            if (files.Length == 0)
-                throw new FileNotFoundException($"⚠ DACPAC File not found in src\\SFA.DAS.EmployerIncentives.Database\\bin\\");
-
-            Console.WriteLine($"Located .dacpac file in: {files[0]}");
-            DatabaseInfo.SetPackageLocation(files[0]);
+            DatabaseInfo.SetPackageLocation(dacpacFileLocation);
 
             CreateTestDatabase();
         }
@@ -46,11 +41,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
             Publish();
 
-            using (var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString))
-            {
-                dbConnection.Open();
-                dbConnection.Close();
-            }
+            using var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString);
+            dbConnection.Open();
         }
 
         private void DeleteTestDatabase()
@@ -81,57 +73,36 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                 }
                 files.ForEach(DeleteFile);
             }
-#pragma warning disable S108 // Nested blocks of code should not be left empty
-            catch { }
-#pragma warning restore S108 // Nested blocks of code should not be left empty
+            catch { /*ignored*/ }
         }
+
         private static void DeleteFile(string file)
         {
             try
             {
                 File.Delete(file);
             }
-#pragma warning disable S108 // Nested blocks of code should not be left empty
-            catch { }
-#pragma warning restore S108 // Nested blocks of code should not be left empty
+            catch { /*ignored*/ }
         }
 
         private void Publish()
         {
-            // WaitForLockRelease();
-
             var dbPackage = DacPackage.Load(DatabaseInfo.PackageLocation);
             var services = new DacServices(DatabaseInfo.ConnectionString);
-            // var options = new DacDeployOptions { DatabaseLockTimeout = 300 };
 
-            services.Deploy(dbPackage, DatabaseInfo.DatabaseName);
-        }
-
-        private static void WaitForLockRelease()
-        {
-            var modelDbIsLocked = true;
-
-            const string sql = @"select request_session_id
-                    from sys.dm_tran_locks
-                    where resource_type = 'database' and
-                    resource_database_id = 3 and
-                    request_type = 'LOCK' and
-                    request_status = 'GRANT'";
-
-            const string masterDbConnString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True";
-            using var dbConn = new SqlConnection(masterDbConnString);
-            using var cmd = new SqlCommand(sql, dbConn);
-            dbConn.Open();
-
-            while (modelDbIsLocked)
-            {
-                modelDbIsLocked = cmd.ExecuteScalar() != null;
-                if (modelDbIsLocked)
+            var policy = Policy
+                .Handle<DacServicesException>()
+                .WaitAndRetry(new[]
                 {
-                    Debug.WriteLine("⚠ 'model' database is currently locked, retrying... ");
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                }
-            }
+                    // ℹ Tweak these time-outs if you're still getting errors 👇
+                    TimeSpan.FromMilliseconds(250),
+                    TimeSpan.FromMilliseconds(500),
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(2),
+                    TimeSpan.FromSeconds(4),
+                });
+
+            policy.Execute(() => services.Deploy(dbPackage, DatabaseInfo.DatabaseName));
         }
 
         public void Dispose()
@@ -142,14 +113,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
         protected virtual void Dispose(bool disposing)
         {
-            if (isDisposed) return;
+            if (_isDisposed) return;
 
             if (disposing)
             {
                 DeleteTestDatabase();
             }
 
-            isDisposed = true;
+            _isDisposed = true;
         }
     }
 }
