@@ -15,16 +15,4 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public virtual int MinimumAgreementVersion { get; set; }
         public List<IncentivePaymentProfile> IncentivePaymentProfiles { get; set; }
     }
-
-    public class IncentivePaymentProfile
-    {
-        public IncentiveType IncentiveType { get; set; }
-        public List<PaymentProfile> PaymentProfiles { get; set; }
-    }
-
-    public class PaymentProfile
-    {
-        public int DaysAfterApprenticeshipStart { get; set; }
-        public decimal AmountPayable { get; set; }
-    }
 }

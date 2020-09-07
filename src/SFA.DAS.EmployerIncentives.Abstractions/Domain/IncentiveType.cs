@@ -2,7 +2,7 @@
 {
     public enum IncentiveType : byte
     {
-        Under24 = 1,
-        Over25 = 2
+        UnderTwentyFiveIncentive = 1,
+        TwentyFiveOrOverIncentive = 2
     }
 }

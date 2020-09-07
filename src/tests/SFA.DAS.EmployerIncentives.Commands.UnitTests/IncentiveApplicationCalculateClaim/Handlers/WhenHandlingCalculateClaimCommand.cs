@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
+using SFA.DAS.EmployerIncentives.Commands.Extensions;
 using SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.Application;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalculateClaim.Handlers
@@ -20,6 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
     {
         private CalculateClaimCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRespository;
+        private Mock<IOptions<ApplicationSettings>> _mockApplicationSettings;
+
 
         private Fixture _fixture;
 
@@ -30,8 +38,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
             _fixture.Customize(new IncentiveApplicationCustomization());
 
             _mockDomainRespository = new Mock<IIncentiveApplicationDomainRepository>();
+            _mockApplicationSettings = new Mock<IOptions<ApplicationSettings>>();
+            _mockApplicationSettings.Setup(x => x.Value).Returns((ApplicationSettings) new ApplicationSettings
+            {
+                IncentivePaymentProfiles = new List<IncentivePaymentProfile>
+                {
+                    new IncentivePaymentProfile
+                    {
+                        IncentiveType = IncentiveType.TwentyFiveOrOverIncentive,
+                        PaymentProfiles = new List<PaymentProfile>
+                            {new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 90}}
+                    },
+                    new IncentivePaymentProfile
+                    {
+                        IncentiveType = IncentiveType.UnderTwentyFiveIncentive,
+                        PaymentProfiles = new List<PaymentProfile>
+                            {new PaymentProfile {AmountPayable = 1500, DaysAfterApprenticeshipStart = 90}}
+                    },
+                }
+            });
 
-            _sut = new CalculateClaimCommandHandler(_mockDomainRespository.Object);
+            _sut = new CalculateClaimCommandHandler(_mockDomainRespository.Object, _mockApplicationSettings.Object);
         }
 
         [Test]
@@ -49,15 +76,28 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
             // Assert
             var events = incentiveApplication.FlushEvents().OfType<EarningsCalculationRequested>().ToList();
             events.Count.Should().Be(incentiveApplication.Apprenticeships.Count);
-            events.Should().BeEquivalentTo(incentiveApplication.Apprenticeships.Select(x =>
-                new EarningsCalculationRequested
-                {
-                    AccountId = incentiveApplication.AccountId,
-                    IncentiveClaimApprenticeshipId = incentiveApplication.Id,
-                    ApprenticeshipId = x.ApprenticeshipId,
-                    IncentiveType = x.AgeAtStartOfCourse() <= 24 ? IncentiveType.Under24 : IncentiveType.Over25,
-                    ApprenticeshipStartDate = x.PlannedStartDate
-                }));
+        }
+
+        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive)]
+        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive)]
+        public async Task And_there_is_one_X_years_old_on_application_Then_the_EarningsCalculationRequestedEvent_is_raised_for_this_apprenticeship_with_expected_incentive_type(int age, IncentiveType expected)
+        {
+            //Arrange
+            var application = CreateTestApplication(age);
+            var command = new CalculateClaimCommand(application.AccountId, _fixture.Create<Guid>());
+            _mockDomainRespository.Setup(x => x.Find(command.IncentiveClaimApplicationId)).ReturnsAsync(application);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var events = application.FlushEvents().OfType<EarningsCalculationRequested>().ToList();
+            events.Count.Should().Be(1);
+            events[0].IncentiveType.Should().Be(expected);
+            events[0].ApprenticeshipId.Should().Be(application.Apprenticeships[0].ApprenticeshipId);
+            events[0].AccountId.Should().Be(application.AccountId);
+            events[0].ApprenticeshipStartDate.Should().Be(application.Apprenticeships[0].PlannedStartDate);
+            events[0].IncentiveClaimApprenticeshipId.Should().Be(application.Apprenticeships[0].Id);
         }
 
         [Test]
@@ -91,6 +131,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
 
             // Assert
             action.Should().Throw<InvalidRequestException>();
+        }
+
+        private IncentiveApplication CreateTestApplication(int age)
+        {
+            var today = DateTime.Today;
+
+            IncentiveApplicationApprenticeshipDto apprentice = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
+            apprentice.DateOfBirth = today.AddYears(-1 * age);
+            apprentice.PlannedStartDate = today.AddDays(1);
+            var list = new List<IncentiveApplicationApprenticeshipDto>();
+            list.Add(apprentice);
+
+            var factory = new IncentiveApplicationFactory();
+            var application = factory.CreateNew(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>());
+            application.SetApprenticeships(list.ToEntities(factory));
+
+            return application;
         }
     }
 }

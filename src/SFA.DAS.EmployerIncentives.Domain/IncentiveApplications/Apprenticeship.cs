@@ -43,16 +43,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)
         {
         }
-
-        public int AgeAtStartOfCourse()
-        {
-            var age = PlannedStartDate.Year - DateOfBirth.Year;
-            if (PlannedStartDate.DayOfYear < DateOfBirth.DayOfYear)
-            {
-                age--;
-            }
-
-            return age;
-        }
     }
 }
