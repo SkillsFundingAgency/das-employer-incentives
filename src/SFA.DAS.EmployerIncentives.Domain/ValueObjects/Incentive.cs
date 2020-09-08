@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
@@ -10,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly DateTime _dateOfBirth;
         private readonly DateTime _startDate;
         private readonly List<Payment> _payments;
-        private readonly List<IncentivePaymentProfile> _incentivePaymentProfiles;
+        private readonly IEnumerable<IncentivePaymentProfile> _incentivePaymentProfiles;
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 1, 31);
@@ -20,8 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public decimal Total => Payments.Sum(x => x.Amount);
         public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
-        public Incentive(DateTime dateOfBirth, DateTime startDate,
-            List<IncentivePaymentProfile> incentivePaymentProfiles)
+        public Incentive(DateTime dateOfBirth, DateTime startDate, List<IncentivePaymentProfile> incentivePaymentProfiles)
         {
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
@@ -45,11 +45,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var payments = new List<Payment>();
 
             if (!IsEligible)
-            {
-                return payments;
-            }
-
-            if (_incentivePaymentProfiles == null)
             {
                 return payments;
             }

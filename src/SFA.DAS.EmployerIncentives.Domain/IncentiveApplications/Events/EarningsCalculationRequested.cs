@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using System;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
 {

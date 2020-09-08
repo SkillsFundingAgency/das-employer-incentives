@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
+namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
     public class IncentivePaymentProfile
     {

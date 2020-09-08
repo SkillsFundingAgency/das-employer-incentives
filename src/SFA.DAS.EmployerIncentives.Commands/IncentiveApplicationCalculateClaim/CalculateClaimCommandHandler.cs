@@ -1,23 +1,23 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.Application;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim
 {
     public class CalculateClaimCommandHandler : ICommandHandler<CalculateClaimCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _domainRepository;
-        private readonly ApplicationSettings _applicationSettings;
+        private readonly IIncentivePaymentProfilesService _incentivePaymentProfilesService;
 
-        public CalculateClaimCommandHandler(IIncentiveApplicationDomainRepository domainRepository, IOptions<ApplicationSettings> applicationSettings)
+        public CalculateClaimCommandHandler(IIncentiveApplicationDomainRepository domainRepository, IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
             _domainRepository = domainRepository;
-            _applicationSettings = applicationSettings.Value;
+            _incentivePaymentProfilesService = incentivePaymentProfilesService;
         }
 
         public async Task Handle(CalculateClaimCommand command, CancellationToken cancellationToken = default)
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim
                 throw new InvalidRequestException();
             }
 
-            application.CalculateClaim(_applicationSettings.IncentivePaymentProfiles);            
+            application.CalculateClaim(_incentivePaymentProfilesService.MapToDomainIncentivePaymentProfiles().ToList());            
 
             await _domainRepository.Save(application);
         }
