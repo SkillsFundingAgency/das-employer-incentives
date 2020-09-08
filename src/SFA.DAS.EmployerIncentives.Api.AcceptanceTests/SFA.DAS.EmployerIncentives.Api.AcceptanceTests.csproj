@@ -56,6 +56,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>UpdateVrfCaseDetailsForNewApplications.feature</DependentUpon>
+	</Compile>
+    <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IncentiveDetailsRequested.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
@@ -89,6 +94,10 @@
     <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForNewApplications.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>UpdateVrfCaseDetailsForNewApplications.feature.cs</LastGenOutput>
+	</SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsReminderEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
