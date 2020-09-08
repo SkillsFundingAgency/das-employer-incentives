@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
             _incentivePaymentProfiles = incentivePaymentProfiles;
-            _payments = GenerateEarningsForApprenticeship();
+            _payments = GeneratePayments();
         }
 
         private int AgeAtStartOfCourse()
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return age;
         }
 
-        private List<Payment> GenerateEarningsForApprenticeship()
+        private List<Payment> GeneratePayments()
         {
             var payments = new List<Payment>();
 
