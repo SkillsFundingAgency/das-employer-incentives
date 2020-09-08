@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             if(!incentive.IsEligible)
             {
-                throw new InvalidIncentiveException("Incentive doe snot pass the eligibility checks");
+                throw new InvalidIncentiveException("Incentive does not pass the eligibility checks");
             }
 
             foreach (var payment in incentive.Payments)
