@@ -26,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
         {
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
+                .Include(x => x.PendingPayments)
                 .FirstOrDefaultAsync(a => a.Id == id);
             if (apprenticeshipIncentive != null)
             {
@@ -40,7 +41,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == model.Id);
             if (existingIncentive != null)
             {
-                _dbContext.Entry(existingIncentive).CurrentValues.SetValues(model);                
+                _dbContext.Entry(existingIncentive).CurrentValues.SetValues(model);
+                _dbContext.RemoveRange(existingIncentive.PendingPayments);
+                _dbContext.AddRange(model.PendingPayments);
+
                 await _dbContext.SaveChangesAsync();
             }
         }

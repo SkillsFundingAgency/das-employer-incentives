@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             };
         }
 
-        private static ICollection<Models.IncentiveApplicationApprenticeship> Map(this ICollection<ApprenticeshipModel> models, Guid applicationId)
+        private static ICollection<IncentiveApplicationApprenticeship> Map(this ICollection<ApprenticeshipModel> models, Guid applicationId)
         {
             return models.Select(x => new IncentiveApplicationApprenticeship
             {

@@ -9,10 +9,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         private readonly DateTime _startDate;
+        private readonly List<Payment> _payments;
         private readonly List<IncentivePaymentProfile> _incentivePaymentProfiles;
+
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 1, 31);
-        public List<PendingPayment> PendingPayments;
+        
+        public IEnumerable<Payment> Payments => _payments;
+        public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
+        public decimal Total => Payments.Sum(x => x.Amount);
+        public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
         public Incentive(DateTime dateOfBirth, DateTime startDate,
             List<IncentivePaymentProfile> incentivePaymentProfiles)
@@ -20,14 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
             _incentivePaymentProfiles = incentivePaymentProfiles;
-            PendingPayments = GenerateEarningsForApprenticeship();
+            _payments = GenerateEarningsForApprenticeship();
         }
-
-        public bool IsApprenticeshipEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
-
-        public decimal TotalIncentiveAmount => PendingPayments.Sum(x => x.AmountPayable);
-
-        public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
         private int AgeAtStartOfCourse()
         {
@@ -40,37 +40,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return age;
         }
 
-        private List<PendingPayment> GenerateEarningsForApprenticeship()
+        private List<Payment> GenerateEarningsForApprenticeship()
         {
-            var earnings = new List<PendingPayment>();
+            var payments = new List<Payment>();
 
-            if (!IsApprenticeshipEligible)
+            if (!IsEligible)
             {
-                return earnings;
+                return payments;
             }
 
             if (_incentivePaymentProfiles == null)
             {
-                return earnings;
+                return payments;
             }
 
             var incentivePaymentProfile = _incentivePaymentProfiles.FirstOrDefault(x => x.IncentiveType == IncentiveType);
 
             if (incentivePaymentProfile?.PaymentProfiles == null)
             {
-                return earnings;
+                return payments;
             }
 
             foreach (var paymentProfile in incentivePaymentProfile.PaymentProfiles)
             {
-                earnings.Add(new PendingPayment
-                {
-                    DatePayable = _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart),
-                    AmountPayable = paymentProfile.AmountPayable
-                });
+                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart)));
             }
 
-            return earnings;
+            return payments;
         }
 
         protected override IEnumerable<object> GetAtomicValues()
@@ -78,17 +74,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             yield return _dateOfBirth;
             yield return _startDate;
 
-            foreach (var earning in PendingPayments)
+            foreach (var payment in Payments)
             {
-                yield return earning.AmountPayable;
-                yield return earning.DatePayable;
+                yield return payment.Amount;
+                yield return payment.PaymentDate;
             }
         }
-    }
-
-    public class PendingPayment
-    {
-        public DateTime DatePayable { get; set; }
-        public decimal AmountPayable { get; set; }
     }
 }

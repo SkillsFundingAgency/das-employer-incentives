@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using SFA.DAS.Common.Domain.Types;
 
@@ -15,5 +16,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public DateTime DateOfBirth { get; set; }
         public long Uln { get; set; }
         public ApprenticeshipEmployerType EmployerType { get; set; }
+        public ICollection<PendingPayment> PendingPayments { get; set; }
+
+        public ApprenticeshipIncentive()
+        {
+            PendingPayments = new List<PendingPayment>();
+        }
     }
 }
