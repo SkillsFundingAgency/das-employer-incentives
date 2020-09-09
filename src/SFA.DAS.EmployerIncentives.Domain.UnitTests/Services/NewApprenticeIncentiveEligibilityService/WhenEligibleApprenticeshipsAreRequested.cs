@@ -30,16 +30,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
             result.Should().BeTrue();
         }
 
-        [TestCase(false, false, false)]
-        [TestCase(false, true, false)]
-        [TestCase(true, false, true)]
-        [TestCase(true, true, false)]
-        public async Task Then_an_eligible_apprenticeship_returns_expected_result(bool isApproved, bool ulnPreviouslyApplied, bool expected)
+        [TestCase( false, true)]
+        [TestCase(true, false)]
+        public async Task Then_an_eligible_apprenticeship_returns_expected_result(bool ulnPreviouslyApplied, bool expected)
         {
             _ulnValidationServiceMock.Setup(x => x.UlnAlreadyOnSubmittedIncentiveApplication(It.IsAny<long>()))
                 .ReturnsAsync(ulnPreviouslyApplied);
 
-            var apprenticeship = new ApprenticeshipBuilder().WithValidIncentiveProperties().WithIsApproved(isApproved).Build();
+            var apprenticeship = new ApprenticeshipBuilder().WithValidIncentiveProperties().Build();
 
             var result = await _sut.IsApprenticeshipEligible(apprenticeship);
 

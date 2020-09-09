@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Enums\SFA.DAS.EmployerIncentives.Enums.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.ValueObjects\SFA.DAS.EmployerIncentives.ValueObjects.csproj" />
   </ItemGroup>
 

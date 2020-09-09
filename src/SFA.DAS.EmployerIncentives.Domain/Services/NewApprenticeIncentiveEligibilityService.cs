@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Services
@@ -14,8 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
         }
         public async Task<bool> IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            var incentive = new NewApprenticeIncentive();
-            if (!incentive.IsApprenticeshipEligible(apprenticeship))
+            if (!Incentive.IsStartDateEligible(apprenticeship.StartDate))
             {
                 return false;
             }

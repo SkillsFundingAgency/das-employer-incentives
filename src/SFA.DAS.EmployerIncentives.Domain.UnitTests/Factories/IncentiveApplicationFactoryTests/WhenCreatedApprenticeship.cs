@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplicationFactoryTests
 {
@@ -15,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
         [SetUp]
         public void Arrange()
         {
+
             _sut = new IncentiveApplicationFactory();
             _fixture = new Fixture();
         }
@@ -24,7 +28,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
         {
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), 
+                _fixture.Create<ApprenticeshipEmployerType>(),
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.Id.Should().NotBe(Guid.Empty);
@@ -38,7 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(apprenticeshipId, _fixture.Create<string>(), _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), 
+                _fixture.Create<ApprenticeshipEmployerType>(),
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.ApprenticeshipId.Should().Be(apprenticeshipId);
@@ -52,7 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), firstName, _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), 
+                _fixture.Create<ApprenticeshipEmployerType>(),
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.FirstName.Should().Be(firstName);
@@ -66,7 +76,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), lastName,
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), 
+                _fixture.Create<ApprenticeshipEmployerType>(),
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.LastName.Should().Be(lastName);
@@ -80,7 +92,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
-                dateOfBirth, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
+                dateOfBirth, _fixture.Create<long>(), _fixture.Create<DateTime>(), 
+                _fixture.Create<ApprenticeshipEmployerType>(),
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.DateOfBirth.Should().Be(dateOfBirth);
@@ -94,7 +108,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), uln, _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>());
+                _fixture.Create<DateTime>(), uln, _fixture.Create<DateTime>(), 
+                _fixture.Create<ApprenticeshipEmployerType>(),
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.Uln.Should().Be(uln);
@@ -108,7 +124,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), plannedStartDate, _fixture.Create<ApprenticeshipEmployerType>());
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), plannedStartDate, 
+                _fixture.Create<ApprenticeshipEmployerType>(),
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.PlannedStartDate.Should().Be(plannedStartDate);
@@ -122,7 +140,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), employerType);
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), 
+                _fixture.Create<DateTime>(), employerType,
+                _fixture.Create<List<IncentivePaymentProfile>>());
 
             // Assert
             apprenticeship.ApprenticeshipEmployerTypeOnApproval.Should().Be(employerType);

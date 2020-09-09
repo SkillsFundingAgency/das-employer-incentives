@@ -134,7 +134,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
 
             var factory = new IncentiveApplicationFactory();
             var application = factory.CreateNew(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>());
-            application.SetApprenticeships(list.ToEntities(factory));
+            application.SetApprenticeships(list.ToEntities(factory, _mockPaymentProfilesService.Object));
 
             return application;
         }

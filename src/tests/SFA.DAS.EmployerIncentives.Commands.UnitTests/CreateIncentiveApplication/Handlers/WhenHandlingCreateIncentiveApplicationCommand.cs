@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
@@ -6,8 +7,10 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplication.Handlers
@@ -17,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplicati
         private CreateIncentiveApplicationCommandHandler _sut;
         private Mock<IIncentiveApplicationFactory> _mockDomainFactory;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRespository;
+        private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfileService;
          
         private Fixture _fixture;
 
@@ -28,8 +32,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplicati
 
             _mockDomainFactory = new Mock<IIncentiveApplicationFactory>();
             _mockDomainRespository = new Mock<IIncentiveApplicationDomainRepository>();
+            _mockIncentivePaymentProfileService = new Mock<IIncentivePaymentProfilesService>();
             
-            _sut = new CreateIncentiveApplicationCommandHandler(_mockDomainFactory.Object, _mockDomainRespository.Object);
+            _sut = new CreateIncentiveApplicationCommandHandler(_mockDomainFactory.Object, _mockDomainRespository.Object, _mockIncentivePaymentProfileService.Object);
         }
 
         [Test]
@@ -45,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplicati
                 _mockDomainFactory.Setup(x => x.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
-                    apprenticeship.ApprenticeshipEmployerTypeOnApproval)).Returns(_fixture.Create<Apprenticeship>());
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval, It.IsAny<List<IncentivePaymentProfile>>())).Returns(_fixture.Create<Apprenticeship>());
             }
             
             //Act

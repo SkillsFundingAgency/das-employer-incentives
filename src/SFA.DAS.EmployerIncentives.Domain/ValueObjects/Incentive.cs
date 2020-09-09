@@ -29,13 +29,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _payments = GeneratePayments();
         }
 
+        public static bool IsStartDateEligible(DateTime startDate)
+        {
+            return startDate >= EligibilityStartDate && startDate <= EligibilityEndDate;
+        }
+
         private int AgeAtStartOfCourse()
         {
             var age = _startDate.Year - _dateOfBirth.Year;
-            if (_startDate.DayOfYear < _dateOfBirth.DayOfYear)
-            {
-                age--;
-            }
+
+            if (_dateOfBirth.Date > _startDate.AddYears(-age)) age--;
 
             return age;
         }

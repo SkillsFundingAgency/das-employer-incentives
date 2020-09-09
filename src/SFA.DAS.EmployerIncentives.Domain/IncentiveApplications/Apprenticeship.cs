@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
@@ -17,13 +20,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval => Model.ApprenticeshipEmployerTypeOnApproval;
         public decimal TotalIncentiveAmount => Model.TotalIncentiveAmount;
 
-
         internal static Apprenticeship Create(ApprenticeshipModel model)
         {
             return new Apprenticeship(model.Id, model, false);
         }
 
-        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval)
+        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, IList<IncentivePaymentProfile> incentivePaymentProfiles)
         {
             IsNew = false;
             Model = new ApprenticeshipModel
@@ -36,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 Uln = uln,
                 PlannedStartDate = plannedStartDate,
                 ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval,
-                TotalIncentiveAmount = new NewApprenticeIncentive().CalculateTotalIncentiveAmount(dateOfBirth, plannedStartDate)
+                TotalIncentiveAmount = new Incentive(dateOfBirth, plannedStartDate, incentivePaymentProfiles.ToList()).Total
             };
         }
 

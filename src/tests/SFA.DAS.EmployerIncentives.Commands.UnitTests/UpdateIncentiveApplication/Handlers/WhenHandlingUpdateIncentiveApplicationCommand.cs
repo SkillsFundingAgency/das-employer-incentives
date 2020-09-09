@@ -10,6 +10,8 @@ using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.Services;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplication.Handlers
 {
@@ -18,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         private UpdateIncentiveApplicationCommandHandler _sut;
         private Mock<IIncentiveApplicationFactory> _mockDomainFactory;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRepository;
+        private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfilesService;
 
         private Fixture _fixture;
 
@@ -29,8 +32,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
 
             _mockDomainFactory = new Mock<IIncentiveApplicationFactory>();
             _mockDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
+            _mockIncentivePaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
 
-            _sut = new UpdateIncentiveApplicationCommandHandler(_mockDomainFactory.Object, _mockDomainRepository.Object);
+            _sut = new UpdateIncentiveApplicationCommandHandler(_mockDomainFactory.Object, _mockDomainRepository.Object, _mockIncentivePaymentProfilesService.Object);
         }
 
         [Test]
@@ -50,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
                 _mockDomainFactory.Setup(x => x.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
-                    apprenticeship.ApprenticeshipEmployerTypeOnApproval)).Returns(apprentice);
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval, It.IsAny<List<IncentivePaymentProfile>>())).Returns(apprentice);
                 expectedApprentices.Add(apprentice);
             }
 
