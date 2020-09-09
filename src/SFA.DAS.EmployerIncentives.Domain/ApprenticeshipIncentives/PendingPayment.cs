@@ -7,27 +7,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
     public class PendingPayment : Entity<Guid, PendingPaymentModel>
     {
-        public DateTime DatePayable => Model.DatePayable;
-        public decimal Amount => Model.AmountInPence > 0 ? Model.AmountInPence/100 : 0;
         public Account Account => Model.Account;
+        public DateTime DueDate => Model.DueDate;
+        public decimal Amount => Model.Amount;
 
         internal static PendingPayment New(
             Guid id, 
             Account account, 
             Guid apprenticeshipIncentiveId, 
             decimal amount,
-            DateTime datePayable,
-            DateTime dateCalculated
+            DateTime dueDate,
+            DateTime calculatedDate
             )
-        {
+        {            
             return new PendingPayment(new PendingPaymentModel { 
                 Id = id,
                 Account = account,
                 ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
-                AmountInPence = (long)(amount * 100),
-                DateCalculated = dateCalculated,
-                DatePayable = datePayable
-                },
+                Amount = amount,
+                CalculatedDate = calculatedDate,
+                DueDate = dueDate
+            },
                 true);
             }
 

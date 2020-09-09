@@ -3,10 +3,10 @@
     [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,	
     [AccountId] BIGINT NOT NULL, 
     [ApprenticeshipIncentiveId] UNIQUEIDENTIFIER NOT NULL,
-    [DatePayable] DATETIME2 NOT NULL, 
-    [AmountPayablePence] INT NOT NULL, 
-    [DateCalculated] DATETIME2 NOT NULL, 
-    [DatePaymentMade] DATETIME2 NULL,
+    [DueDate] DATETIME2 NOT NULL, 
+    [Amount] DECIMAL(9, 2) NOT NULL, 
+    [CalculatedDate] DATETIME2 NOT NULL, 
+    [PaymentMadeDate] DATETIME2 NULL,
     CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES ApprenticeshipIncentive(Id)
 )
 GO

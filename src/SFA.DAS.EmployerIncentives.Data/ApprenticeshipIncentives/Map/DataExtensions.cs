@@ -48,9 +48,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = x.Id,
                 AccountId = x.Account.Id,
                 ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
-                AmountPayablePence = x.AmountInPence,
-                DatePayable = x.DatePayable,
-                DateCalculated = x.DateCalculated
+                Amount = x.Amount,
+                DueDate = x.DueDate,
+                CalculatedDate = x.CalculatedDate
             }).ToList();
         }
 
@@ -61,9 +61,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = x.Id,
                 Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(x.AccountId),
                 ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
-                AmountInPence = x.AmountPayablePence,
-                DatePayable = x.DatePayable,
-                DateCalculated = x.DateCalculated
+                Amount = x.Amount,
+                DueDate = x.DueDate,
+                CalculatedDate = x.CalculatedDate
             }).ToList();
         }
     }

@@ -14,4 +14,60 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="AccountId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c3f3f361-6af2-49fb-9863-0e9414efa652" ChangeDateTime="09/09/2020 10:54:58">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[DatePayable]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DueDate" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0aaf4d4f-56a8-429d-98ea-7a739b87dbb8" ChangeDateTime="09/09/2020 10:55:25">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[DateCalculated]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CalculatedDate" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ccdcee35-ca36-4cb8-b661-cf538eeaea53" ChangeDateTime="09/09/2020 10:55:29">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[DatePaymentMade]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PaymentMadeDate" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ead1220c-25ed-4f2b-924b-a526e16f4b91" ChangeDateTime="09/09/2020 10:55:38">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[CalculatedDate]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CalculatedOn" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b61707e8-fb1b-4dd8-bdc5-625a385c5938" ChangeDateTime="09/09/2020 10:56:06">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[DueDate]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Due" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="798874b2-b846-4d55-9fc4-6fb6752ac110" ChangeDateTime="09/09/2020 10:56:09">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[AmountPayable]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Amount" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b5a96277-5b65-465a-ae9d-6a30c42d7329" ChangeDateTime="09/09/2020 10:56:34">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[CalculatedOn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CalculatedDate" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6ad2cd82-a53d-47ab-9fb3-aeb42016be4e" ChangeDateTime="09/09/2020 10:56:39">
+    <Property Name="ElementName" Value="[dbo].[PendingPayment].[Due]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PendingPayment]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DueDate" />
+  </Operation>
 </Operations>
