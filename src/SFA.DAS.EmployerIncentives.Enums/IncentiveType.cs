@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
+﻿namespace SFA.DAS.EmployerIncentives.Enums
 {
     public enum IncentiveType : byte
     {

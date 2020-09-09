@@ -4,20 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Extensions;
 using SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.Application;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalculateClaim.Handlers
@@ -26,9 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
     {
         private CalculateClaimCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRespository;
-        private Mock<IOptions<ApplicationSettings>> _mockApplicationSettings;
-
-
+        private Mock<IIncentivePaymentProfilesService> _mockPaymentProfilesService;
+        private List<Domain.ValueObjects.IncentivePaymentProfile> _incentivePaymentProfiles;
         private Fixture _fixture;
 
         [SetUp]
@@ -36,29 +34,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
         {
             _fixture = new Fixture();
             _fixture.Customize(new IncentiveApplicationCustomization());
+            _incentivePaymentProfiles = new List<Domain.ValueObjects.IncentivePaymentProfile>
+            {
+                new Domain.ValueObjects.IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
+                    new List<Domain.ValueObjects.PaymentProfile> {new Domain.ValueObjects.PaymentProfile(90, 750)}),
+                new Domain.ValueObjects.IncentivePaymentProfile(IncentiveType.UnderTwentyFiveIncentive,
+                    new List<Domain.ValueObjects.PaymentProfile> {new Domain.ValueObjects.PaymentProfile(90, 1000)})
+            };
 
             _mockDomainRespository = new Mock<IIncentiveApplicationDomainRepository>();
-            _mockApplicationSettings = new Mock<IOptions<ApplicationSettings>>();
-            _mockApplicationSettings.Setup(x => x.Value).Returns((ApplicationSettings) new ApplicationSettings
-            {
-                IncentivePaymentProfiles = new List<IncentivePaymentProfile>
-                {
-                    new IncentivePaymentProfile
-                    {
-                        IncentiveType = IncentiveType.TwentyFiveOrOverIncentive,
-                        PaymentProfiles = new List<PaymentProfile>
-                            {new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 90}}
-                    },
-                    new IncentivePaymentProfile
-                    {
-                        IncentiveType = IncentiveType.UnderTwentyFiveIncentive,
-                        PaymentProfiles = new List<PaymentProfile>
-                            {new PaymentProfile {AmountPayable = 1500, DaysAfterApprenticeshipStart = 90}}
-                    },
-                }
-            });
+            _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
+            _mockPaymentProfilesService.Setup(x => x.MapToDomainIncentivePaymentProfiles())
+                .Returns(_incentivePaymentProfiles);
 
-            _sut = new CalculateClaimCommandHandler(_mockDomainRespository.Object, _mockApplicationSettings.Object);
+            _sut = new CalculateClaimCommandHandler(_mockDomainRespository.Object, _mockPaymentProfilesService.Object);
         }
 
         [Test]
