@@ -28,6 +28,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NServiceBus.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.NServiceBus.SqlServer.Data;
 using SFA.DAS.UnitOfWork.Context;
@@ -62,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
+            serviceCollection.AddScoped<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
             return serviceCollection;
