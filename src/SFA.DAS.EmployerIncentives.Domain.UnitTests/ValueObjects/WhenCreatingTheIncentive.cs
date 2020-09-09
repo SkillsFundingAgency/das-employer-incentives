@@ -17,7 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         [SetUp]
         public void SetUp()
         {
-            _f = new Fixture();
             _incentivePaymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
