@@ -45,7 +45,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                 .BeEquivalentTo(
                     _model.PendingPaymentModels,
                     opt => opt.Excluding(x => x.ApprenticeshipIncentiveId)
-                              .Excluding(x => x.CalculatedDate));
+                              .Excluding(x => x.CalculatedDate)
+                              .Excluding(x => x.PaymentMadeDate));
         }
     }
 }

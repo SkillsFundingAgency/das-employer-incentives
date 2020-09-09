@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -57,6 +58,35 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedAccount.Uln.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
             storedAccount.DateOfBirth.Should().Be(testIncentive.Apprenticeship.DateOfBirth);
             storedAccount.EmployerType.Should().Be(testIncentive.Apprenticeship.EmployerType);
+        }
+
+        [Test]
+        public async Task Then_the_pending_payments_are_added_to_the_data_store()
+        {
+            var testPendingPayment = _fixture.Create<PendingPaymentModel>();
+            testPendingPayment.PaymentMadeDate = null;
+
+            // Arrange
+            var testApprenticeshipIncentive = _fixture
+                .Build<ApprenticeshipIncentiveModel>()
+                .With(f => f.Id, testPendingPayment.ApprenticeshipIncentiveId)
+                .With(f => f.PendingPaymentModels, new List<PendingPaymentModel> { testPendingPayment })
+                .Create();
+
+            // Act
+            await _sut.Add(testApprenticeshipIncentive);
+
+            // Assert
+            var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();
+            _ = storedIncentive.PendingPayments.Count().Should().Be(1);
+            var storedPendingPayment = storedIncentive.PendingPayments.Single();
+            storedPendingPayment.Id.Should().Be(testPendingPayment.Id);
+            storedPendingPayment.AccountId.Should().Be(testPendingPayment.Account.Id);
+            storedPendingPayment.ApprenticeshipIncentiveId.Should().Be(testPendingPayment.ApprenticeshipIncentiveId);
+            storedPendingPayment.DueDate.Should().Be(testPendingPayment.DueDate);
+            storedPendingPayment.Amount.Should().Be(testPendingPayment.Amount);
+            storedPendingPayment.CalculatedDate.Should().Be(testPendingPayment.CalculatedDate);
+            storedPendingPayment.PaymentMadeDate.Should().Be(testPendingPayment.PaymentMadeDate);
         }
     }
 }

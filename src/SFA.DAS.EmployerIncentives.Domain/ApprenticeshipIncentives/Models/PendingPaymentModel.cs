@@ -12,5 +12,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public DateTime DueDate { get; set; }
         public decimal Amount { get; set; }
         public DateTime CalculatedDate { get; set; }
+        public DateTime? PaymentMadeDate { get; set; }
     }
 }
