@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.Managers;
+using System;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -20,10 +21,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _context = context;
 
             _config = new Dictionary<string, string>{
-                    { "EnvironmentName", "LOCAL" },
-                    { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
-                    { "ConfigNames", "SFA.DAS.EmployerIncentives" }
-                };
+                { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
+                { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
+                { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
+                { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
+                { "ConfigNames", "SFA.DAS.EmployerIncentives" }
+            };
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -34,6 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
                     a.DistributedLockStorage = "UseDevelopmentStorage=true";
+                    a.AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY";
+                    a.Hashstring = "SFA: digital apprenticeship service";
+                    a.NServiceBusConnectionString = "UseLearningEndpoint=true";
+                    a.MinimumAgreementVersion = 4;
                 });
                 s.Configure<PolicySettings>(a =>
                 {
@@ -45,7 +52,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         QueryRetryAttempts = 0
                     };
                 });
-
+                s.Configure<EmailTemplateSettings>(e =>
+                {
+                    e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                });
                 if (_context.AccountApi != null)
                 {
                     s.Configure<AccountApi>(a =>
@@ -57,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
                 s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
                 s.AddTransient<IUnitOfWorkManager>(c => new TestUnitOfWorkManager());
-                
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.UseTestDb(_context);

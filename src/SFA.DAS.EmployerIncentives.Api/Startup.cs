@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
@@ -17,8 +19,6 @@ using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace SFA.DAS.EmployerIncentives.Api
 {
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
+            if (!ConfigurationIsLocalOrAcceptanceTests())
             {
                 config.AddAzureTableStorage(options =>
                 {
@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
 
-            if (!ConfigurationIsLocalOrDev())
+            if (!ConfigurationIsLocalOrDevOrAcceptanceTests())
             {
                 var azureAdConfiguration = Configuration
                     .GetSection("AzureAd")
@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services
                 .AddMvc(o =>
                 {
-                    if (!ConfigurationIsLocalOrDev())
+                    if (!ConfigurationIsLocalOrAcceptanceTests())
                     {
                         o.Conventions.Add(new AuthorizeControllerModelConvention());
                     }
@@ -119,11 +119,11 @@ namespace SFA.DAS.EmployerIncentives.Api
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
 
-            app.UseRouting();            
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseEndpoints(endpoints =>
-            {                
+            {
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/ping");
             });
@@ -134,10 +134,17 @@ namespace SFA.DAS.EmployerIncentives.Api
             serviceProvider.StartNServiceBus(Configuration).GetAwaiter().GetResult();
         }
 
-        private bool ConfigurationIsLocalOrDev()
+        private bool ConfigurationIsLocalOrAcceptanceTests()
         {
             return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   Configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
+                   Configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        private bool ConfigurationIsLocalOrDevOrAcceptanceTests()
+        {
+            return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   Configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase) ||
+                   Configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
