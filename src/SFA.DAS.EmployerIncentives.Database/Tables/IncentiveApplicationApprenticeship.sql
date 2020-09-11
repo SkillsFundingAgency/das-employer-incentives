@@ -15,5 +15,5 @@
 GO
 CREATE INDEX IX_IncentiveApplicationApprenticeship_ApplicationId ON IncentiveApplicationApprenticeship (IncentiveApplicationId)
 GO
-CREATE INDEX IX_IncentiveApplicationApprenticeship_Uln ON IncentiveApplicationApprenticeship (Uln)
+CREATE INDEX IX_IncentiveApplicationApprenticeship_Uln ON IncentiveApplicationApprenticeship ([ULN])
 GO
