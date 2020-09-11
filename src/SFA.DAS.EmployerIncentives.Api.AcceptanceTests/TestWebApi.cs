@@ -73,9 +73,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
-                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
-                s.AddTransient<IUnitOfWorkManager>(c => new TestUnitOfWorkManager());
-
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));

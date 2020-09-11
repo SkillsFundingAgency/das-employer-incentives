@@ -211,7 +211,8 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IncentiveApplicationIsSubmittedButAnInternalErrorOccurs()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Incentive Application is submitted but an internal error occurs", null, ((string[])(null)));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Incentive Application is submitted but an internal error occurs", null, tagsOfScenario, argumentsOfScenario);
 #line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
