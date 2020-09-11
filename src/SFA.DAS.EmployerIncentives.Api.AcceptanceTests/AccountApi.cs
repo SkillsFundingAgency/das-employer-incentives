@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
         public TestAccountApi()
         {
-            MockServer = WireMockServer.Start(ssl: true);
+            MockServer = WireMockServer.Start();
             BaseAddress = MockServer.Urls[0];
         }
 

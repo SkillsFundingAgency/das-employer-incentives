@@ -48,6 +48,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
+        [Given(@"an internal error will occur before the transaction completes")]
+        public void GivenAnInternalErrorWillOccurBeforeTheTransactionCompletes()
+        {
+            _testContext.ThrowErrorAfterSendingEvent = true;
+        }
+
         [When(@"the application is submitted")]
         public async Task WhenTheApplicationIsSubmitted()
         {
@@ -95,6 +101,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenTheServiceRespondsWithAnError()
         {
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Then(@"the service responds with an internal error")]
+        public void ThenTheServiceRespondsWithAnInternalError()
+        {
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        }
+
+        [Then(@"there are no events in the outbox")]
+        public async Task ThenThereAreNoEventsInTheOutbox()
+        {
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var messages = (await dbConnection.QueryAsync<object>("SELECT 1 FROM ClientOutboxData"));
+                var messagesExist = messages.Any();
+
+                messagesExist.Should().BeFalse();
+            }
         }
 
         [When(@"the invalid account id is submittted")]
