@@ -5,12 +5,13 @@
     <Description>NServiceBus messages published by SFA.DAS.EmployerIncentives</Description>
     <Authors>ESFA</Authors>
     <Company>ESFA</Company>
-    <PackageLicenseUrl>https://github.com/SkillsFundingAgency/das-employer-incentives/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicense>https://github.com/SkillsFundingAgency/das-employer-incentives/blob/master/LICENSE</PackageLicense>
     <PackageProjectUrl>https://github.com/SkillsFundingAgency/das-employer-incentives</PackageProjectUrl>
     <PackageId>SFA.DAS.EmployerIncentives.Messages</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>..\NugetPackages</PackageOutputPath>
     <PackageVersion>0.1.5.0</PackageVersion>
-  </PropertyGroup>
+  
+</PropertyGroup>
 
 </Project>
