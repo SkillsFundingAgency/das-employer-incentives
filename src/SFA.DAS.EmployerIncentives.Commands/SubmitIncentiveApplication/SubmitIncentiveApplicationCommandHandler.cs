@@ -2,22 +2,21 @@
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
-using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Messages.Events;
+using SFA.DAS.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 {
     public class SubmitIncentiveApplicationCommandHandler : ICommandHandler<SubmitIncentiveApplicationCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _domainRepository;
-        private readonly IMultiEventPublisher _eventPublisher;
+        private readonly IEventPublisher _eventPublisher;
 
-        public SubmitIncentiveApplicationCommandHandler(IIncentiveApplicationDomainRepository domainRepository, IMultiEventPublisher eventPublisher)
+        public SubmitIncentiveApplicationCommandHandler(IIncentiveApplicationDomainRepository domainRepository, IEventPublisher eventPublisher)
         {
             _domainRepository = domainRepository;
             _eventPublisher = eventPublisher;
@@ -36,16 +35,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 
             await _domainRepository.Save(application);
 
-            var events = new List<EmployerIncentiveClaimSubmittedEvent>
+            await _eventPublisher.Publish(new EmployerIncentiveClaimSubmittedEvent
             {
-                new EmployerIncentiveClaimSubmittedEvent
-                {
-                    AccountId = command.AccountId,
-                    IncentiveClaimApplicationId = command.IncentiveApplicationId
-                }
-            };
-
-            await _eventPublisher.Publish(events);
+                AccountId = command.AccountId,
+                IncentiveClaimApplicationId = command.IncentiveApplicationId
+            });
         }
     }
 }

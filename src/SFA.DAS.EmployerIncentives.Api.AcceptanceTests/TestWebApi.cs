@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +9,9 @@ using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.Managers;
 using System;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using SFA.DAS.NServiceBus.Services;
+using SFA.DAS.UnitOfWork.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -15,18 +19,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         private readonly TestContext _context;
         private readonly Dictionary<string, string> _config;
+        private readonly IHook<object> _eventMessageHook;
 
-        public TestWebApi(TestContext context)
+        public TestWebApi(TestContext context, IHook<object> eventMessageHook)
         {
             _context = context;
+            _eventMessageHook = eventMessageHook;
 
             _config = new Dictionary<string, string>{
-                { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
-                { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
-                { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
-                { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
-                { "ConfigNames", "SFA.DAS.EmployerIncentives" }
-            };
+                    { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
+                    { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
+                    { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
+                    { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ConfigNames", "SFA.DAS.EmployerIncentives" }
+                };
+
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -66,12 +73,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
-                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
-                s.AddTransient<IUnitOfWorkManager>(c => new TestUnitOfWorkManager());
-
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
-                s.UseTestDb(_context);
+                s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
+
             });
             builder.ConfigureAppConfiguration(a =>
             {
