@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 LegalEntityId = x.Account.LegalEntityId,
                 SubmittedByEmail = x.Application.SubmittedByEmail,
                 SubmittedByName = x.Application.SubmittedByName,
-                VrfCaseStatus = x.Account.VrfCaseStatus
+                BankDetailsRequired = MapBankDetailsRequired(x.Account.VrfCaseStatus)
             };
         }
 
@@ -62,6 +62,11 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 LastName = apprenticeship.LastName,
                 TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount
             };
+        }
+
+        private static bool MapBankDetailsRequired(string vrfCaseStatus)
+        {
+            return String.IsNullOrWhiteSpace(vrfCaseStatus);
         }
     }
 }

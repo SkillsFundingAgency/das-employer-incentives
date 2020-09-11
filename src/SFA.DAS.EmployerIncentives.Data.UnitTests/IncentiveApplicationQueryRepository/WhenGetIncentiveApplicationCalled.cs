@@ -72,5 +72,55 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             //Assert
             actual.Should().BeNull();
         }
+
+        [Test]
+        public async Task Then_bank_details_required_is_false_if_a_value_specified_for_vrf_status()
+        {
+            // Arrange
+            var applicationId = Guid.NewGuid();
+
+            var account = _fixture.Create<Models.Account>();
+            account.VrfCaseStatus = "To Process";
+            
+            var application = _fixture.Create<Models.IncentiveApplication>();            
+            application.Id = applicationId;
+            application.AccountLegalEntityId = account.AccountLegalEntityId;
+
+            _context.Accounts.Add(account);
+            _context.Applications.Add(application);
+            _context.SaveChanges();
+
+            // Act
+            var actual = await _sut.Get(x => x.Id == applicationId);
+
+            //Assert
+            actual.BankDetailsRequired.Should().BeFalse();
+        }
+
+        [TestCase("")]
+        [TestCase(null)]
+        public async Task Then_bank_details_required_is_true_if_no_value_for_vrf_status(string vrfStatus)
+        {
+            // Arrange
+            var applicationId = Guid.NewGuid();
+
+            var account = _fixture.Create<Models.Account>();            
+            account.VrfCaseStatus = vrfStatus;
+
+            var application = _fixture.Create<Models.IncentiveApplication>();
+
+            application.Id = applicationId;
+            application.AccountLegalEntityId = account.AccountLegalEntityId;
+
+            _context.Accounts.Add(account);
+            _context.Applications.Add(application);
+            _context.SaveChanges();
+
+            // Act
+            var actual = await _sut.Get(x => x.Id == applicationId);
+
+            //Assert
+            actual.BankDetailsRequired.Should().BeTrue();
+        }
     }
 }
