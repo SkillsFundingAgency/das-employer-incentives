@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using SFA.DAS.UnitOfWork.Context;
+using SFA.DAS.UnitOfWork.Managers;
+using System;
 using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.NServiceBus.Services;
@@ -30,6 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
+
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -57,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 });
                 s.Configure<EmailTemplateSettings>(e =>
                 {
-                    e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString()};
+                    e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
                 if (_context.AccountApi != null)
@@ -68,6 +72,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         a.ClientId = "";
                     });
                 }
+
+                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
+                s.AddTransient<IUnitOfWorkManager>(c => new TestUnitOfWorkManager());
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));

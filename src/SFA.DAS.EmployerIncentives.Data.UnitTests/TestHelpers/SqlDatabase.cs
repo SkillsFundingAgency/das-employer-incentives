@@ -1,27 +1,35 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Dac;
+using Polly;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using Microsoft.SqlServer.Dac;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
     public class SqlDatabase : IDisposable
     {
-        private bool isDisposed;
+        private bool _isDisposed;
 
-        public DatabaseInfo DatabaseInfo { get; private set; }
+        public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();
 
         public SqlDatabase()
         {
-            string environment;
 #if DEBUG
-       environment = "debug";
+            const string environment = "debug";
 #else
-       environment = "release";
+            const string environment = "release";
 #endif
-            DatabaseInfo = new DatabaseInfo();
-            DatabaseInfo.SetPackageLocation(Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\{environment}\\SFA.DAS.EmployerIncentives.Database.dacpac"));
+
+            var dacpacFileLocation =
+                Path.Combine(
+                    Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
+                    $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\{environment}\\SFA.DAS.EmployerIncentives.Database.dacpac");
+
+            if (!File.Exists(dacpacFileLocation))
+                throw new FileNotFoundException($"⚠ DACPAC File not found in: {dacpacFileLocation}");
+
+            DatabaseInfo.SetPackageLocation(dacpacFileLocation);
 
             CreateTestDatabase();
         }
@@ -29,15 +37,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         private void CreateTestDatabase()
         {
             DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
-            DatabaseInfo.SetConnectionString(@$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");            
+            DatabaseInfo.SetConnectionString(@$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");
 
             Publish();
 
-            using (var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString))
-            {
-                dbConnection.Open();
-                dbConnection.Close();
-            }
+            using var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString);
+            dbConnection.Open();
         }
 
         private void DeleteTestDatabase()
@@ -68,27 +73,38 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                 }
                 files.ForEach(DeleteFile);
             }
-#pragma warning disable S108 // Nested blocks of code should not be left empty
-            catch { }
-#pragma warning restore S108 // Nested blocks of code should not be left empty
+            catch { /*ignored*/ }
         }
+
         private static void DeleteFile(string file)
         {
             try
             {
                 File.Delete(file);
             }
-#pragma warning disable S108 // Nested blocks of code should not be left empty
-            catch { }
-#pragma warning restore S108 // Nested blocks of code should not be left empty
+            catch { /*ignored*/ }
         }
+
         private void Publish()
         {
             var dbPackage = DacPackage.Load(DatabaseInfo.PackageLocation);
             var services = new DacServices(DatabaseInfo.ConnectionString);
-            services.Deploy(dbPackage, DatabaseInfo.DatabaseName);
+
+            var policy = Policy
+                .Handle<DacServicesException>()
+                .WaitAndRetry(new[]
+                {
+                    // ℹ Tweak these time-outs if you're still getting errors 👇
+                    TimeSpan.FromMilliseconds(250),
+                    TimeSpan.FromMilliseconds(500),
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(2),
+                    TimeSpan.FromSeconds(4),
+                });
+
+            policy.Execute(() => services.Deploy(dbPackage, DatabaseInfo.DatabaseName));
         }
-        
+
         public void Dispose()
         {
             Dispose(true);
@@ -97,14 +113,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
         protected virtual void Dispose(bool disposing)
         {
-            if (isDisposed) return;
+            if (_isDisposed) return;
 
             if (disposing)
             {
                 DeleteTestDatabase();
             }
 
-            isDisposed = true;
+            _isDisposed = true;
         }
     }
 }
