@@ -1,17 +1,15 @@
-﻿using System.Data.SqlClient;
-using System.Linq;
+﻿using AutoFixture;
+using Dapper;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using System;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoFixture;
-using Dapper;
-using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
-using System;
-using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Messages.Events;
-using SFA.DAS.EmployerIncentives.Commands.Types.Application;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -81,12 +79,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
 
             var publishedCommand = _testContext.CommandsPublished.SingleOrDefault(c => 
-            c.Command is CalculateClaimCommand &&
-            (c.IsPublished || c.IsPublishedWithNoListener))?.Command as CalculateClaimCommand;
+            c.Command is CalculateEarningsCommand &&
+            (c.IsPublished || c.IsPublishedWithNoListener))?.Command as CalculateEarningsCommand;
 
             publishedCommand.Should().NotBeNull();
             publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);
-            publishedCommand.IncentiveClaimApplicationId.Should().Be(_submitRequest.IncentiveApplicationId);
+            publishedCommand.ApprenticeshipIncentiveId.Should().Be(_submitRequest.IncentiveApplicationId);
         }
 
         [When(@"the invalid application id is submittted")]

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -43,9 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
         }
 
         [Test]
-        public void then_config_settings_should_map_to_domain_values()
+        public async Task then_config_settings_should_map_to_domain_values()
         {
-            var result = _sut.MapToDomainIncentivePaymentProfiles().ToList();
+            var result = (await _sut.Get()).ToList();
 
             result.Count.Should().Be(2);
             result[0].IncentiveType.Should().Be(_incentivePaymentProfiles[0].IncentiveType);

@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
-using SFA.DAS.EmployerIncentives.Commands.Types.Application;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public Task Handle(Submitted @event, CancellationToken cancellationToken = default)
         {
-            var command = new CalculateClaimCommand(
+            var command = new CreateCommand(
                 @event.AccountId,
                 @event.IncentiveApplicationId
                 );

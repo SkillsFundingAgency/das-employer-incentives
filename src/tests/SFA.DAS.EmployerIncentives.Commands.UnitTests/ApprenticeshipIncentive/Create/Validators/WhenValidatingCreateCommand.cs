@@ -1,16 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Commands.IncentiveApplicationCalculateClaim;
-using SFA.DAS.EmployerIncentives.Commands.Types.Application;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Create;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using System;
+using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalculateClaim.Validators
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.Create.Validators
 {
-    public class WhenValidatingCalculateClaim
+    public class WhenValidatingCreateCommand
     {
-        private CalculateClaimCommandValidator _sut;
+        private CreateCommandValidator _sut;
 
         private Fixture _fixture;
 
@@ -19,14 +19,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
         {
             _fixture = new Fixture();
 
-            _sut = new CalculateClaimCommandValidator();
+            _sut = new CreateCommandValidator();
         }
 
         [Test]
         public async Task Then_the_command_is_invalid_when_the_incentive_application_id_has_a_default_value()
         {
             //Arrange
-            var command = new CalculateClaimCommand(default, _fixture.Create<Guid>());
+            var command = new CreateCommand(_fixture.Create<long>(), default);
 
             //Act
             var result = await _sut.Validate(command);
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.IncentiveApplicationCalc
         public async Task Then_the_command_is_invalid_when_the_account_id_has_a_default_value()
         {
             //Arrange
-            var command = new CalculateClaimCommand(_fixture.Create<long>(), default);
+            var command = new CreateCommand(default, _fixture.Create<Guid>());
 
             //Act
             var result = await _sut.Validate(command);

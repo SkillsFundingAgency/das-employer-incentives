@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var incentive = _sut.GetExisting(_id, _model);
 
             // Assert
-            incentive.Should().BeEquivalentTo(_model, opt => opt.Excluding(x => x.PendingPaymentModels));
+            incentive.Should().BeEquivalentTo(_model, opt => opt.Excluding(x => x.PendingPaymentModels).Excluding(x => x.ApplicationApprenticeshipId));
         }
 
         [Test]

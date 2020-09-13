@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
@@ -67,27 +66,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 AddApprenticeship(a);
             }
         }
+
+        public void EarningsCalculated(Guid apprenticeshipId)
+        {
+            var apprenticeship = _apprenticeships.Single(a => a.Id == apprenticeshipId);
+            apprenticeship.SetEarningsCalculated(true);
+        }
+
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
-        }
-
-        public void CalculateClaim(List<IncentivePaymentProfile> incentivePaymentProfiles)
-        {
-            foreach (var apprenticeship in Apprenticeships)
-            {
-                var incentive = new Incentive(apprenticeship.DateOfBirth, apprenticeship.PlannedStartDate, incentivePaymentProfiles);
-
-                AddEvent(new EarningsCalculationRequested
-                {
-                    AccountId = AccountId,                    
-                    IncentiveClaimApprenticeshipId = apprenticeship.Id,
-                    ApprenticeshipId = apprenticeship.ApprenticeshipId,
-                    IncentiveType = incentive.IncentiveType,
-                    ApprenticeshipStartDate = apprenticeship.PlannedStartDate
-                });
-            }
         }
     }
 }

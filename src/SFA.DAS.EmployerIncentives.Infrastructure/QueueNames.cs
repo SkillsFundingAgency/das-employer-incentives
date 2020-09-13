@@ -7,6 +7,7 @@
         public const string RefreshLegalEntity = "SFA.DAS.EmployerIncentives.RefreshLegalEntity";
         public const string RemovedLegalEntity = "SFA.DAS.EmployerIncentives.LegalEntityRemoved";
 
-        public const string ApplicationCalculateClaim = "SFA.DAS.EmployerIncentives.ApplicationCalculateClaim";
+        public const string ApprenticeshipIncentivesCreate = "SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive.Create";
+        public const string ApprenticeshipIncentivesCalculatePayments = "SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive.CalculatePayments";
     }
 }

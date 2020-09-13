@@ -1,35 +1,27 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
-using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship
+namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
     public class CalculateEarningsCommand : ICommand, ILockIdentifier, ILogWriter
     {
+        public Guid ApprenticeshipIncentiveId { get; private set; }
         public long AccountId { get; private set; }
-        public Guid IncentiveClaimApprenticeshipId { get; private set; }
         public long ApprenticeshipId { get; private set; }
-        public IncentiveType IncentiveType { get; private set; }
-        public DateTime ApprenticeshipStartDate { get; private set; }        
 
         public string LockId { get => $"{nameof(Account)}_{AccountId}"; }
 
         public CalculateEarningsCommand(
-            long accountId,
-            Guid incentiveClaimApprenticeshipId,
-            long apprenticeshipId,
-            IncentiveType incentiveType,
-            DateTime apprenticeshipStartDate)
+            Guid apprenticeshipIncentiveId,
+            long accountId,            
+            long apprenticeshipId)
         {
+            ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
             AccountId = accountId;
-            IncentiveClaimApprenticeshipId = incentiveClaimApprenticeshipId;
             ApprenticeshipId = apprenticeshipId;
-            IncentiveType = incentiveType;
-            ApprenticeshipStartDate = apprenticeshipStartDate;
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -37,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Apprenticeship
         {
             get
             {
-                var message = $"CalculateEarningsCommand for AccountId {AccountId}, IncentiveClaimApprenticeshipId {IncentiveClaimApprenticeshipId} and ApprenticeshipId {ApprenticeshipId}";
+                var message = $"ApprenticeshipIncentive CalculateEarningsCommand for AccountId {AccountId}, ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} and ApprenticeshipId {ApprenticeshipId}";
                 return new Log
                 {
                     OnProcessing = () => message,

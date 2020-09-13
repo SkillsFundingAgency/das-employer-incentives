@@ -7,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
 {
     public interface IApprenticeshipIncentiveFactory
     {
-        ApprenticeshipIncentive CreateNew(Guid id, Account account, Apprenticeship apprenticeship);
+        ApprenticeshipIncentive CreateNew(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate);
         ApprenticeshipIncentive GetExisting(Guid id, ApprenticeshipIncentiveModel model);
     }
 }

@@ -4,20 +4,20 @@ using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Types.Application
-{    
-    public class CalculateClaimCommand : ICommand, ILockIdentifier, ILogWriter
+namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
+{
+    public class CreateCommand : ICommand, ILockIdentifier, ILogWriter
     {
         public long AccountId { get; private set; }
-        public Guid IncentiveClaimApplicationId { get; private set; }
+        public Guid IncentiveApplicationId { get; private set; }
         public string LockId { get => $"{nameof(Account)}_{AccountId}"; }
 
-        public CalculateClaimCommand(
+        public CreateCommand(
             long accountId,
-            Guid incentiveClaimApplicationId)
+            Guid incentiveApplicationId)
         {
             AccountId = accountId;
-            IncentiveClaimApplicationId = incentiveClaimApplicationId;
+            IncentiveApplicationId = incentiveApplicationId;
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Application
         {
             get
             {
-                var message = $"CalculateClaimCommand for AccountId {AccountId} and IncentiveClaimApplicationId {IncentiveClaimApplicationId}";
+                var message = $"ApprenticeshipIncentive CreateCommand for AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId}";
                 return new Log
                 {
                     OnProcessing = () => message,

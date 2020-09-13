@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddDistributedLockProvider()
                 .AddHashingService()
                 .AddAccountService();
-            
+
             // set up the command handlers and command validators
             serviceCollection.Scan(scan =>
             {
@@ -56,7 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .WithSingletonLifetime();
             })
             .AddCommandHandlerDecorators()
-            .AddScoped<ICommandDispatcher, CommandDispatcher>();
+            .AddScoped<ICommandDispatcher, CommandDispatcher>()
+            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));

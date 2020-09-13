@@ -1,6 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             _domainEventDispatcher = domainEventDispatcher;
         }
 
-        public async Task<ApprenticeshipIncentive> Find(Guid id)
+        public async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> Find(Guid id)
         {
             var application = await _apprenticeshipIncentiveDataRepository.Get(id);
             if (application != null)
@@ -34,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
-        public async Task Save(ApprenticeshipIncentive aggregate)
+        public async Task Save(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive aggregate)
         {
             if (aggregate.IsNew)
             {

@@ -3,7 +3,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System.Threading.Tasks;
@@ -39,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
         public async Task Then_a_new_entity_is_persisted_by_the_data_layer()
         {
             //Arrange
-            var entity = _fixture.Create<ApprenticeshipIncentive>();
+            var entity = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             //Act
             await _sut.Save(entity);

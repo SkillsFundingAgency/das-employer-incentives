@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -21,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public decimal Total => Payments.Sum(x => x.Amount);
         public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
-        public Incentive(DateTime dateOfBirth, DateTime startDate, List<IncentivePaymentProfile> incentivePaymentProfiles)
+        public Incentive(DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
         {
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
@@ -53,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
             if (incentivePaymentProfile?.PaymentProfiles == null)
             {
-                return payments;
+                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {IncentiveType}");
             }
 
             foreach (var paymentProfile in incentivePaymentProfile.PaymentProfiles)

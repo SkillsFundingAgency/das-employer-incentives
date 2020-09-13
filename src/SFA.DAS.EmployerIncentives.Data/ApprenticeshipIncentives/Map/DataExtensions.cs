@@ -19,6 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 DateOfBirth = model.Apprenticeship.DateOfBirth,
                 Uln = model.Apprenticeship.UniqueLearnerNumber,
                 EmployerType = model.Apprenticeship.EmployerType,
+                PlannedStartDate = model.PlannedStartDate,
+                IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map()
             };
         }
@@ -37,6 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.Uln,
                      entity.EmployerType
                      ),
+                 PlannedStartDate = entity.PlannedStartDate,
+                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                  PendingPaymentModels = entity.PendingPayments.Map()
             };
         }

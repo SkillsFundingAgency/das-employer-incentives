@@ -24,4 +24,5 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Events\SFA.DAS.EmployerIncentives.Events.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
+
 </Project>

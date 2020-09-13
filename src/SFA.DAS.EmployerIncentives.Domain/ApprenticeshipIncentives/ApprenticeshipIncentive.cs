@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
@@ -14,24 +15,35 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
     {
         public Account Account => Model.Account;
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
+        public DateTime PlannedStartDate => Model.PlannedStartDate;        
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
-
-        internal static ApprenticeshipIncentive New(Guid id, Account account, Apprenticeship apprenticeship)
+        
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId,  Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
-            return new ApprenticeshipIncentive(id, new ApprenticeshipIncentiveModel { Id = id, Account = account, Apprenticeship = apprenticeship }, true);
+            return new ApprenticeshipIncentive(
+                id, 
+                new ApprenticeshipIncentiveModel { 
+                    Id = id, 
+                    ApplicationApprenticeshipId = applicationApprenticeshipId,
+                    Account = account, 
+                    Apprenticeship = apprenticeship, 
+                    PlannedStartDate = plannedStartDate }, true);
         }
 
         internal static ApprenticeshipIncentive Get(Guid id, ApprenticeshipIncentiveModel model)
         {
             return new ApprenticeshipIncentive(id, model);
         }
-        public void AddIncentive(Incentive incentive)
+
+        public void CalculateEarnings(IEnumerable<IncentivePaymentProfile> paymentProfiles)
         {
+            var incentive = new Incentive(Apprenticeship.DateOfBirth, PlannedStartDate, paymentProfiles);
             if(!incentive.IsEligible)
             {
                 throw new InvalidIncentiveException("Incentive does not pass the eligibility checks");
             }
 
+            Model.PendingPaymentModels.Clear();
             foreach (var payment in incentive.Payments)
             {
                 Model.PendingPaymentModels.Add(
@@ -44,10 +56,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                            DateTime.Now)
                        .GetModel());
             }
+
+            AddEvent(new EarningsCalculated
+            {
+                ApprenticeshipIncentiveId = Id,
+                AccountId = Account.Id,
+                ApprenticeshipId = Apprenticeship.Id,
+                ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
+            });
         }
 
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)
         {            
+            if(isNew)
+            {
+                AddEvent(new Created
+                {
+                    ApprenticeshipIncentiveId = id,
+                    AccountId = model.Account.Id,
+                    ApprenticeshipId =  model.Apprenticeship.Id
+                });
+            }
         }
     }
 }

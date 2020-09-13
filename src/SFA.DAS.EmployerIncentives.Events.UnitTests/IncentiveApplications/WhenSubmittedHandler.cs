@@ -2,13 +2,13 @@
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Types.Application;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Events.IncentiveApplications;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handlers
+namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
 {
     public class WhenSubmittedHandler
     {
@@ -37,9 +37,9 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.AddLegalEntity.Handle
             await _sut.Handle(@event);
 
             //Assert
-            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CalculateClaimCommand>(i => 
+            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateCommand>(i => 
                 i.AccountId == @event.AccountId &&
-                i.IncentiveClaimApplicationId == @event.IncentiveApplicationId), It.IsAny<CancellationToken>()), Times.Once);
+                i.IncentiveApplicationId == @event.IncentiveApplicationId), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

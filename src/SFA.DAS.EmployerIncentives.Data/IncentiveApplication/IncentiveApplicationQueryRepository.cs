@@ -56,6 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         {
             return new IncentiveApplicationApprenticeshipDto
             {
+                Id = apprenticeship.Id,
                 ApprenticeshipId = apprenticeship.ApprenticeshipId,
                 FirstName = apprenticeship.FirstName,
                 LastName = apprenticeship.LastName,

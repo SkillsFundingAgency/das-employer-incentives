@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services
 {
     public interface IIncentivePaymentProfilesService
     {
-        IEnumerable<Domain.ValueObjects.IncentivePaymentProfile> MapToDomainIncentivePaymentProfiles();
+        Task<IEnumerable<IncentivePaymentProfile>> Get();
     }
 }
