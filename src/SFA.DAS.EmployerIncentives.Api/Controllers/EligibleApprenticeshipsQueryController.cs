@@ -40,7 +40,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 var response = await QueryAsync<GetApprenticeshipEligibilityRequest, GetApprenticeshipEligibilityResponse>(request);
 
                 results.Add(new EligibleApprenticeshipResult { Uln = apprenticeshipDetail.Uln, Eligible = response.IsEligible });
-                _logger.LogInformation($"Uln {apprenticeshipDetail.Uln} Start Date {apprenticeshipDetail.StartDate} Eligible = {response.IsEligible}");
             }
             
             return Ok(results);
