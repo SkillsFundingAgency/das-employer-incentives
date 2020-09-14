@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
             var incentive = new NewApprenticeIncentive();
             if (!incentive.IsApprenticeshipEligible(apprenticeship))
             {
-                _logger.LogInformation($"Uln {apprenticeship.UniqueLearnerNumber} not within eligible date range");
+                _logger.LogInformation($"Uln {apprenticeship.UniqueLearnerNumber} failed eligibility check: start date {apprenticeship.StartDate} approved {apprenticeship.IsApproved}");
                 return false;
             }
 
