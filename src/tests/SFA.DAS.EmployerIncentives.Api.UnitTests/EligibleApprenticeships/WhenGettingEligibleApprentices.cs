@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
@@ -26,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EligibleApprenticeships
         public void Setup()
         {
             _queryDispatcherMock = new Mock<IQueryDispatcher>();
-            _sut = new EligibleApprenticeshipsQueryController(_queryDispatcherMock.Object);
+            _sut = new EligibleApprenticeshipsQueryController(_queryDispatcherMock.Object, new Mock<ILogger<EligibleApprenticeshipsQueryController>>().Object);
             _fixture = new Fixture();
 
             _accountId = _fixture.Create<long>();

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data;
@@ -17,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
         public void SetUp()
         {
             _ulnValidationServiceMock = new Mock<IUlnValidationService>();
-            _sut = new Domain.Services.NewApprenticeIncentiveEligibilityService(_ulnValidationServiceMock.Object);
+            _sut = new Domain.Services.NewApprenticeIncentiveEligibilityService(_ulnValidationServiceMock.Object, new Mock<ILogger<Domain.Services.NewApprenticeIncentiveEligibilityService>>().Object);
         }
 
         [Test]
