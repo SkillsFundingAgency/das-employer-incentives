@@ -16,6 +16,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         {
         }
 
+        public EmployerIncentivesDbContext(DbContextOptions<EmployerIncentivesDbContext> options)
+            : base(options)
+        {
+        }
+
         public EmployerIncentivesDbContext(DbContextOptions<EmployerIncentivesDbContext> options, AzureServiceTokenProvider azureServiceTokenProvider, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
             : base(options)
         {
@@ -30,12 +35,15 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder)
         {
-            SqlConnection connection = new SqlConnection();
-            connection.ConnectionString = _configuration["ApplicationSettings:DbConnectionString"];
-            if (!_hostingEnvironment.IsDevelopment())
-                connection.AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
+            if (_configuration != null)
+            {
+                SqlConnection connection = new SqlConnection();
+                connection.ConnectionString = _configuration["ApplicationSettings:DbConnectionString"];
+                if (!_hostingEnvironment.IsDevelopment())
+                    connection.AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
 
-            dbContextOptionsBuilder.UseSqlServer(connection);
+                dbContextOptionsBuilder.UseSqlServer(connection);
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
