@@ -1,21 +1,42 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
     public partial class EmployerIncentivesDbContext : DbContext
     {
+        private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
+        private readonly IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
+
         public EmployerIncentivesDbContext()
         {
         }
 
-        public EmployerIncentivesDbContext(DbContextOptions<EmployerIncentivesDbContext> options)
+        public EmployerIncentivesDbContext(DbContextOptions<EmployerIncentivesDbContext> options, AzureServiceTokenProvider azureServiceTokenProvider, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
             : base(options)
         {
+            _azureServiceTokenProvider = azureServiceTokenProvider;
+            _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<IncentiveApplication> Applications { get; set; }
         public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder)
+        {
+            SqlConnection connection = new SqlConnection();
+            connection.ConnectionString = _configuration["ApplicationSettings:DbConnectionString"];
+            if (!_hostingEnvironment.IsDevelopment())
+                connection.AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
+
+            dbContextOptionsBuilder.UseSqlServer(connection);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

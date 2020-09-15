@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,12 +80,10 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddCommandServices();
             services.AddQueryServices();
 
-            services.AddDbContext<EmployerIncentivesDbContext>((options) =>
-            {
-                options.UseSqlServer(Configuration["ApplicationSettings:DbConnectionString"]);
-            })
+            services.AddDbContext<EmployerIncentivesDbContext>()
             .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
             .AddNServiceBusClientUnitOfWork();
+            services.AddSingleton(new AzureServiceTokenProvider());
 
             services.AddTransient<UnitOfWorkManagerMiddleware>();
 
