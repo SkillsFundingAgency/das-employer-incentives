@@ -35,11 +35,12 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder)
         {
-            if (_hostingEnvironment != null && _hostingEnvironment.IsProduction())
+            if (!dbContextOptionsBuilder.IsConfigured)
             {
                 SqlConnection connection = new SqlConnection();
                 connection.ConnectionString = _configuration["ApplicationSettings:DbConnectionString"];
-                connection.AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
+                if (_hostingEnvironment.IsProduction())
+                    connection.AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
 
                 dbContextOptionsBuilder.UseSqlServer(connection);
             }
