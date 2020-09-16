@@ -26,10 +26,12 @@ namespace SFA.DAS.EmployerIncentives.Api
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
 
             var config = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
@@ -130,7 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
         {
-            serviceProvider.StartNServiceBus(Configuration).GetAwaiter().GetResult();
+            serviceProvider.StartNServiceBus(new AzureServiceTokenProvider(), Configuration, (Microsoft.AspNetCore.Hosting.IHostingEnvironment)_hostingEnvironment).GetAwaiter().GetResult();
         }
 
         private bool ConfigurationIsLocalOrAcceptanceTests()

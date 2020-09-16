@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
@@ -29,6 +30,8 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.AspNetCore.Hosting;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -134,14 +137,20 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
         public static async Task StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,
-            IConfiguration configuration)
+            AzureServiceTokenProvider azureServiceTokenProvider,
+            IConfiguration configuration,
+            Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
+            SqlConnection sqlConnection = new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]);
+            if (hostingEnvironment.IsProduction())
+                sqlConnection.AccessToken = azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
+
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Api")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
                 .UseServicesBuilder(serviceProvider)
-                .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
+                .UseSqlServerPersistence(() => sqlConnection)
                 .UseUnitOfWork();
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
