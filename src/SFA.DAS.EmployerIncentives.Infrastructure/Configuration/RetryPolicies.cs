@@ -4,7 +4,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
     public class PolicySettings
     {
         public RetryPolicySettings RetryPolicies { get; set; }
-        public MultiEventPublisherLimitPolicySettings MultiEventPublisherLimitPolicy { get; set; }
     }
 
     public class RetryPolicySettings
@@ -14,10 +13,5 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 
         public int QueryRetryWaitInMilliSeconds { get; set; }
         public int QueryRetryAttempts { get; set; }
-    }
-
-    public class MultiEventPublisherLimitPolicySettings
-    {
-        public int? MaxParallelization { get; set; }
     }
 }

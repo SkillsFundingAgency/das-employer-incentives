@@ -49,7 +49,10 @@ namespace SFA.DAS.EmployerIncentives.Api
                 });
             }
 #if DEBUG
-            config.AddJsonFile($"appsettings.Development.json", optional: true);
+            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            {
+                config.AddJsonFile($"appsettings.Development.json", optional: true);
+            }
 #endif
             Configuration = config.Build();
         }
@@ -82,9 +85,9 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddCommandServices();
             services.AddQueryServices();
 
-            services.AddDbContext<EmployerIncentivesDbContext>()
-            .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
-            .AddNServiceBusClientUnitOfWork();
+            services.AddEntityFrameworkForEmployerIncentives()
+                .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
+                .AddNServiceBusClientUnitOfWork();
             services.AddSingleton(new AzureServiceTokenProvider());
 
             services.AddTransient<UnitOfWorkManagerMiddleware>();
@@ -114,13 +117,12 @@ namespace SFA.DAS.EmployerIncentives.Api
                     c.RoutePrefix = string.Empty;
                 });
             }
-
-            app.UseUnitOfWork();
-
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
 
-            app.UseRouting();
+            app.UseUnitOfWork();
+
+            app.UseRouting();            
 
             app.UseAuthentication();
             app.UseEndpoints(endpoints =>

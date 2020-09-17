@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var totalPages = 3;
 
-            for (int pageNumber = 1; pageNumber < totalPages; pageNumber++)
+            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
             {
                 SetUpMockPageResponse(pageNumber, totalPages);
             }
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var totalPages = 3;
 
-            for (int pageNumber = 1; pageNumber < totalPages; pageNumber++)
+            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
             {
                 var testData = _testContext.TestData.GetOrCreate<PagedModel<AccountLegalEntity>>($"PagedModel<AccountLegalEntity>_{pageNumber}");
                 testData.Data.Count.Should().Be(3);
@@ -100,7 +100,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private void AssertRefreshLegalEntityWasPublished(AccountLegalEntity accountLegalEntity)
         {
-            var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntityEvent>>();
+            var publishedEvents = _testContext.EventsPublished.OfType<RefreshLegalEntityEvent>();
 
             var publishedEvent = publishedEvents.SingleOrDefault(e => e.AccountId == accountLegalEntity.AccountId &&
                                              e.AccountLegalEntityId == accountLegalEntity.AccountLegalEntityId &&
@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private void AssertRefreshLegalEntitiesEventsWerePublishedForPage(int pageNumber)
         {
-            var publishedEvents = _testContext.TestData.GetOrCreate<List<RefreshLegalEntitiesEvent>>();
+            var publishedEvents = _testContext.EventsPublished.OfType<RefreshLegalEntitiesEvent>();
             var publishedEvent = publishedEvents.SingleOrDefault(e => e.PageNumber == pageNumber);
             publishedEvent.Should().NotBeNull();
         }

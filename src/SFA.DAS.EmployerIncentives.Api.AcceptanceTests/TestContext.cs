@@ -1,6 +1,8 @@
-﻿using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
+﻿using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.HashingService;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -11,10 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
-        
         public TestData TestData { get; set; }
-
-        public IHashingService HashingService { get; set; }        
+        public IHashingService HashingService { get; set; }
+        public List<IHook> Hooks { get; set; }
+        public List<object> EventsPublished { get; set; }
+        public bool ThrowErrorAfterSendingEvent { get; set; } = false;
 
         public TestContext()
         {
@@ -25,6 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             }
             TestData = new TestData();
             HashingService = new HashingService.HashingService("46789BCDFGHJKLMNPRSTVWXY", "SFA: digital apprenticeship service");
+            Hooks = new List<IHook>();
+            EventsPublished = new List<object>();
         }
     }
 }
