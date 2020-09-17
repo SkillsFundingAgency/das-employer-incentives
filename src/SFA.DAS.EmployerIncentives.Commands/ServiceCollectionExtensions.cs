@@ -141,16 +141,18 @@ namespace SFA.DAS.EmployerIncentives.Commands
             IConfiguration configuration,
             Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
-            SqlConnection sqlConnection = new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]);
-            if (hostingEnvironment.IsProduction())
-                sqlConnection.AccessToken = azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
-
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Api")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
                 .UseServicesBuilder(serviceProvider)
-                .UseSqlServerPersistence(() => sqlConnection)
+                .UseSqlServerPersistence(() => 
+                {
+                    var sqlConnection = new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]);
+                    if (hostingEnvironment.IsProduction())
+                        sqlConnection.AccessToken = azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
+                    return sqlConnection;
+                })
                 .UseUnitOfWork();
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
