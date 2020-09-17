@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+﻿using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.HashingService;
 using System;
@@ -14,6 +13,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
+        public TestMessageBus MessageBus { get; set; }
+        public TestDomainMessageHandlers DomainMessageHandlers { get; set; }
+        
         public TestData TestData { get; set; }
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }

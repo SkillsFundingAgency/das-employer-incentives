@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
+using SFA.DAS.UnitOfWork.Managers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

@@ -27,9 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-reminder";
-            var projectDirectory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("bin"));
-            var sourceDirectory = new DirectoryInfo(projectDirectory).Parent;
-            _storageDirectory = Path.Combine(sourceDirectory.FullName, ".learningtransport");
+            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
         }
 
         [When(@"an employer selects to start the external bank details journey")]

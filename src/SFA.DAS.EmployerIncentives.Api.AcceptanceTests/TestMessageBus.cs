@@ -1,33 +1,30 @@
 ﻿using NServiceBus;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
-using SFA.DAS.NServiceBus.SqlServer.Configuration;
-using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
-using System;
-using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
+namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
     public class TestMessageBus
     {
         private IEndpointInstance _endpointInstance;
         public bool IsRunning { get; private set; }
         public DirectoryInfo StorageDirectory { get; private set; }
-        public async Task Start(DirectoryInfo storageDirectory)
+        public async Task Start(DirectoryInfo testDirectory)
         {
-            if(!storageDirectory.Exists)
+            StorageDirectory = new DirectoryInfo(Path.Combine(testDirectory.FullName, ".learningtransport"));
+            if (!StorageDirectory.Exists)
             {
-                throw new Exception("Messagebus storage directory does not exist");
+                Directory.CreateDirectory(StorageDirectory.FullName);
             }
-            StorageDirectory = storageDirectory;
-
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.TestMessageBus");
+            
+            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers");
             endpointConfiguration
                 .UseNewtonsoftJsonSerializer()
+                .UseMessageConventions()
                 .UseTransport<LearningTransport>()
-                .StorageDirectory(storageDirectory.FullName);
+                .StorageDirectory(StorageDirectory.FullName);
 
             _endpointInstance = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
             IsRunning = true;
@@ -42,6 +39,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
         public Task Publish(object message)
         {
             return _endpointInstance.Publish(message);
+        }
+
+        public Task Send(object message)
+        {
+            return _endpointInstance.Send(message);
         }
     }
 }

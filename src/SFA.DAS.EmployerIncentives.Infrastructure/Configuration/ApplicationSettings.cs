@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.Http.Configuration;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
-    public class ApplicationSettings
+    public class ApplicationSettings : IManagedIdentityClientConfiguration
     {
         public string DbConnectionString { get; set; }
         public string DistributedLockStorage { get; set; }
@@ -11,8 +11,11 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string AllowedHashstringCharacters { get; set; }
         public string Hashstring { get; set; }
         public string NServiceBusConnectionString { get; set; }
-        public string NServiceBusLicense { get; set; }      
+        public string NServiceBusLicense { get; set; }
+        public string UseLearningEndpointStorageDirectory { get; set; }        
         public virtual int MinimumAgreementVersion { get; set; }
         public List<IncentivePaymentProfile> IncentivePaymentProfiles { get; set; }
+        public string ApiBaseUrl { get; set; }
+        public string Identifier { get; set; }
     }
 }

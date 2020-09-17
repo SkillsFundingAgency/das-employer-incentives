@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -10,11 +8,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         public HttpClient Client { get; private set; }
         public HttpResponseMessage Response { get; set; }
+        public Uri BaseAddress { get; private set; }
         private bool isDisposed;
 
         public EmployerIncentiveApi(HttpClient client)
         {
             Client = client;
+            BaseAddress = client.BaseAddress;
         }
 
         public async Task Post<T>(string url, T data)

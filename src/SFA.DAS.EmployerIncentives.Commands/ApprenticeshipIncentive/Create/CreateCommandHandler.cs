@@ -13,7 +13,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Create
     {
         private readonly IIncentiveApplicationDomainRepository _applicationDomainRepository;
         private readonly IApprenticeshipIncentiveFactory _apprenticeshipIncentiveFactory;
-        private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;        
+        private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;
+        
 
         public CreateCommandHandler(
             IIncentiveApplicationDomainRepository applicationDomainRepository,
@@ -29,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Create
         {
             var application = await _applicationDomainRepository.Find(command.IncentiveApplicationId);
 
-            foreach(var apprenticeship in application.Apprenticeships)
+            foreach (var apprenticeship in application.Apprenticeships)
             {
                 var incentice = _apprenticeshipIncentiveFactory.CreateNew(
                     Guid.NewGuid(),
@@ -41,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Create
                         apprenticeship.LastName,
                         apprenticeship.DateOfBirth,
                         apprenticeship.Uln,
-                        apprenticeship.ApprenticeshipEmployerTypeOnApproval                        
+                        apprenticeship.ApprenticeshipEmployerTypeOnApproval
                     ),
                     apprenticeship.PlannedStartDate);
 

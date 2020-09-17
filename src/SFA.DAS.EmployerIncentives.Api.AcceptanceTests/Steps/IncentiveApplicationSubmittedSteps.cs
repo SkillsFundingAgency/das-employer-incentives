@@ -78,13 +78,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
 
-            var publishedCommand = _testContext.CommandsPublished.SingleOrDefault(c => 
-            c.Command is CalculateEarningsCommand &&
-            (c.IsPublished || c.IsPublishedWithNoListener))?.Command as CalculateEarningsCommand;
+            var publishedCommand = _testContext.CommandsPublished.Single(c => c.IsPublished).Command as CreateCommand;
 
             publishedCommand.Should().NotBeNull();
             publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);
-            publishedCommand.ApprenticeshipIncentiveId.Should().Be(_submitRequest.IncentiveApplicationId);
+            publishedCommand.IncentiveApplicationId.Should().Be(_submitRequest.IncentiveApplicationId);
         }
 
         [When(@"the invalid application id is submittted")]

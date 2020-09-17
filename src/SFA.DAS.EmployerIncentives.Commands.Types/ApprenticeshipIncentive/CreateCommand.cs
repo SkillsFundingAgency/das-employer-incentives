@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         public CreateCommand(
             long accountId,
             Guid incentiveApplicationId)
-        {
+        {         
             AccountId = accountId;
             IncentiveApplicationId = incentiveApplicationId;
         }

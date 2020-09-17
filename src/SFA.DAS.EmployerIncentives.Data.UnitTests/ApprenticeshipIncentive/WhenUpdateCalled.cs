@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

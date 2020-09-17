@@ -31,6 +31,8 @@ using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.NServiceBus.SqlServer.Data;
 using SFA.DAS.UnitOfWork.Context;
+using System.IO;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -63,6 +65,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
+            serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
+            
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
             return serviceCollection;
@@ -75,7 +79,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
-            
+
+            serviceCollection.AddScoped<IApprenticeshipIncentiveDataRepository, ApprenticeshipIncentiveDataRepository>();
+            serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
+
             return serviceCollection;
         }
 
@@ -136,11 +143,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceCollection;
         }       
 
-        public static async Task StartNServiceBus(
+        public static async Task<UpdateableServiceProvider> StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration)
         {
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Api")
+            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
@@ -150,6 +157,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
+                endpointConfiguration
+                    .UseTransport<LearningTransport>()
+                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
                 endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
@@ -168,6 +178,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceProvider.AddSingleton(p => endpoint)
                 .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
                 .AddHostedService<NServiceBusHostedService>();
+
+            return serviceProvider;
         }
 
         public static IServiceCollection AddEntityFrameworkForEmployerIncentives(this IServiceCollection services)

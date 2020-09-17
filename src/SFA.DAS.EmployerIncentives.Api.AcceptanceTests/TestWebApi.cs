@@ -8,8 +8,8 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.NServiceBus.Services;
-using SFA.DAS.UnitOfWork.NServiceBus.Services;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
                     { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(_context.TestDirectory.FullName, ".learningtransport") },
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };

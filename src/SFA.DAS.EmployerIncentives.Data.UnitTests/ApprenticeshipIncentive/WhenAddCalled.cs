@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Assert
             var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();
-            _ = storedIncentive.PendingPayments.Count().Should().Be(1);
+            _ = storedIncentive.PendingPayments.Count.Should().Be(1);
             var storedPendingPayment = storedIncentive.PendingPayments.Single();
             storedPendingPayment.Id.Should().Be(testPendingPayment.Id);
             storedPendingPayment.AccountId.Should().Be(testPendingPayment.Account.Id);
