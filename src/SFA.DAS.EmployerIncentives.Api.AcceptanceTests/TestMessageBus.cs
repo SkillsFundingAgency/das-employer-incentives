@@ -1,4 +1,5 @@
 ﻿using NServiceBus;
+using SFA.DAS.EmployerIncentives.Commands.Types;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using System.IO;
@@ -26,7 +27,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 .UseTransport<LearningTransport>()
                 .StorageDirectory(StorageDirectory.FullName);
 
+            endpointConfiguration.UseLearningTransport(s => s.AddRouting());
+
             _endpointInstance = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
+            
             IsRunning = true;
         }
 

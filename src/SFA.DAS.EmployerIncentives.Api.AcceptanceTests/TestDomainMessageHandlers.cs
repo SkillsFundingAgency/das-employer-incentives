@@ -68,35 +68,37 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Configure<ApplicationSettings>(a =>
                 {
                     a.ApiBaseUrl = _testContext.EmployerIncentiveApi.BaseAddress.AbsoluteUri;
-                    //a.SubscriptionKey = "";
+                    a.Identifier = "";
                 });
 
-                //_ = s.AddNServiceBus(new LoggerFactory().CreateLogger<TestDomainMessageHandlers>(),
-                //    (o) =>
-                //    {
-                //        o.EndpointConfiguration = (endpoint) =>
-                //        {
-                //            endpoint.UseTransport<LearningTransport>().StorageDirectory(_testMessageBus.StorageDirectory.FullName);
-                //            return endpoint;
-                //        };
+                s.AddNServiceBus(
+                    new LoggerFactory().CreateLogger<TestDomainMessageHandlers>(),
+                    (o) =>
+                    {
+                        o.EndpointConfiguration = (endpoint) =>
+                        {
+                            endpoint.UseTransport<LearningTransport>().StorageDirectory(_testMessageBus.StorageDirectory.FullName);
+                            Commands.Types.RoutingSettingsExtensions.AddRouting(endpoint.UseTransport<LearningTransport>().Routing());
+                            return endpoint;
+                        };
 
-                //        var hook = _messageHooks.SingleOrDefault(h => h is Hook<MessageContext>) as Hook<MessageContext>;
-                //        if (hook != null)
-                //        {
-                //            o.OnMessageReceived = (message) =>
-                //            {
-                //                hook?.OnReceived(message);
-                //            };
-                //            o.OnMessageProcessed = (message) =>
-                //            {
-                //                hook?.OnProcessed(message);
-                //            };
-                //            o.OnMessageErrored = (exception, message) =>
-                //            {
-                //                hook?.OnErrored(exception, message);
-                //            };
-                //        }
-                //    });
+                        var hook = _messageHooks.SingleOrDefault(h => h is Hook<MessageContext>) as Hook<MessageContext>;
+                        if (hook != null)
+                        {
+                            o.OnMessageReceived = (message) =>
+                            {
+                                hook?.OnReceived(message);
+                            };
+                            o.OnMessageProcessed = (message) =>
+                            {
+                                hook?.OnProcessed(message);
+                            };
+                            o.OnMessageErrored = (exception, message) =>
+                            {
+                                hook?.OnErrored(exception, message);
+                            };
+                        }
+                    });
             });
 
             hostBuilder.UseEnvironment("LOCAL");

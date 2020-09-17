@@ -2,10 +2,9 @@
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using NServiceBus.Transport;
-using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -22,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class ApprenticeshipIncentiveCreatedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private readonly IncentiveApplication _applicationModel;        
+        private readonly IncentiveApplication _applicationModel;
         private readonly Fixture _fixture;
         private readonly List<IncentiveApplicationApprenticeship> _apprenticeshipsModels;
         private const int NumberOfApprenticeships = 3;
@@ -35,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _applicationModel = _fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
                 .Create();
-                        
+
             _apprenticeshipsModels = _fixture.Build<IncentiveApplicationApprenticeship>()
                 .With(p => p.IncentiveApplicationId, _applicationModel.Id)
                 .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
@@ -50,8 +49,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_applicationModel);
-                await dbConnection.InsertAsync(_apprenticeshipsModels);                
+                await dbConnection.InsertAsync(_apprenticeshipsModels);
             }
+        }
+
+        [Given(@"an employer has submitted an application")]
+        public async Task GivenAnEmployerHasSubmittedAnApplication()
+        {
+            await GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive();
         }
 
         [When(@"they submit the application")]
@@ -67,10 +72,33 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await EmployerIncentiveApi.Patch(url, submitRequest);
         }
 
+        [When(@"the incentive is created for the application")]
+        public async Task WhenTheIncentiveIsCreated()
+        {
+            var createCommand = new CreateCommand(_applicationModel.AccountId, _applicationModel.Id);
+
+            await _testContext.WaitFor<MessageContext>(async () =>
+                 await _testContext.MessageBus.Send(createCommand));
+        }
+
         [Then(@"the apprentiveship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
             _testContext.CommandsPublished.Single(c => c.IsPublished).Command.Should().BeOfType<CreateCommand>();
+        }
+
+        [Then(@"an apprenticeship incentice is created for each apprenticship in the application")]
+        public void ThenAnTheApprenticeshipIncentiveIsCreatedForTheApplication()
+        {
+            var eventsPublished = _testContext.EventsPublished.OfType<CreateCommand>();
+            eventsPublished.Count().Should().Be(NumberOfApprenticeships);
+
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var createdIncentives = dbConnection.GetAll<ApprenticeshipIncentive>();
+
+                createdIncentives.Count().Should().Be(NumberOfApprenticeships);
+            }
         }
     }
 }
