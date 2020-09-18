@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
             {
                 SqlConnection connection = new SqlConnection();
                 connection.ConnectionString = _configuration["ApplicationSettings:DbConnectionString"];
-                if (!_hostingEnvironment.IsDevelopment() && _hostingEnvironment.EnvironmentName.Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+                if (!_hostingEnvironment.IsDevelopment() && !_hostingEnvironment.EnvironmentName.Contains("LOCAL", StringComparison.CurrentCultureIgnoreCase))
                     connection.AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
 
                 dbContextOptionsBuilder.UseSqlServer(connection);

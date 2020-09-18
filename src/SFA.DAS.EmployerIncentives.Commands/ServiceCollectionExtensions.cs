@@ -145,7 +145,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .UseSqlServerPersistence(() => 
                 {
                     var sqlConnection = new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]);
-                    if (!hostingEnvironment.IsDevelopment() && hostingEnvironment.EnvironmentName.Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+                    if (!hostingEnvironment.IsDevelopment() && !hostingEnvironment.EnvironmentName.Contains("LOCAL", StringComparison.CurrentCultureIgnoreCase))
                         sqlConnection.AccessToken = azureServiceTokenProvider.GetAccessTokenAsync("https://database.windows.net/").GetAwaiter().GetResult();
                     return sqlConnection;
                 })
