@@ -272,7 +272,7 @@ src/Tools/PhantomJS/tools/phantomjs/ChangeLog
 # Minified css and js
 
 # AppSetting environment files
-*.development.json
+*.[dD]evelopment.json
 
 #SonarCloud
 
