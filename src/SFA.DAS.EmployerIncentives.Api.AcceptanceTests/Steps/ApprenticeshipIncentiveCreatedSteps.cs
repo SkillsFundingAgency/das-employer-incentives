@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using NServiceBus.Transport;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
@@ -11,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -72,13 +72,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await EmployerIncentiveApi.Patch(url, submitRequest);
         }
 
-        [When(@"the incentive is created for the application")]
-        public async Task WhenTheIncentiveIsCreated()
+        [When(@"the apprenticeship incentice is created for each apprenticship in the application")]
+        public async Task WhenTheApprenticeshipIncentiveIsCreatedForEachApprenticeshipInTheApplication()
         {
             var createCommand = new CreateCommand(_applicationModel.AccountId, _applicationModel.Id);
+       
+            await EmployerIncentiveApi.PostCommand(
+                    $"commands/ApprenticeshipIncentive.CreateCommand",
+                    createCommand);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
-                 await _testContext.MessageBus.Send(createCommand));
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Then(@"the apprentiveship incentive is created for the application")]
@@ -87,11 +90,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext.CommandsPublished.Single(c => c.IsPublished).Command.Should().BeOfType<CreateCommand>();
         }
 
-        [Then(@"an apprenticeship incentice is created for each apprenticship in the application")]
-        public void ThenAnTheApprenticeshipIncentiveIsCreatedForTheApplication()
+        [Then(@"the earnings are calculated for each apprenticeship incentice")]
+        public void ThenTheEarningsAreCalculatedForEachApprenticeshipIncentive()
         {
-            var eventsPublished = _testContext.EventsPublished.OfType<CreateCommand>();
-            eventsPublished.Count().Should().Be(NumberOfApprenticeships);
+            var commandsPublished = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CalculateEarningsCommand));
+
+            commandsPublished.Count().Should().Be(NumberOfApprenticeships);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {

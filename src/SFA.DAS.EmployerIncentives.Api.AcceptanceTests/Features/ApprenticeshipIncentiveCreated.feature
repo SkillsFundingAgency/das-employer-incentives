@@ -13,5 +13,5 @@ Scenario: Incentive Application is submitted
 
 Scenario: Apprenticeship incentive is created
 	Given an employer has submitted an application
-	When the incentive is created for the application
-	Then an apprenticeship incentice is created for each apprenticship in the application
+	When the apprenticeship incentice is created for each apprenticship in the application
+	Then the earnings are calculated for each apprenticeship incentice

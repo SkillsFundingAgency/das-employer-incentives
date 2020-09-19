@@ -155,10 +155,11 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an employer has submitted an application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 16
- testRunner.When("the incentive is created for the application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("the apprenticeship incentice is created for each apprenticship in the application" +
+                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 17
- testRunner.Then("an apprenticeship incentice is created for each apprenticship in the application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the earnings are calculated for each apprenticeship incentice", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

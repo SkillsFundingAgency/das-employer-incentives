@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpPost("/commands/{type}")]
         public async Task<IActionResult> RunCommand(string type, [FromBody] string commandText)
         {               
-            var objectType = typeof(CreateCommand).Assembly.GetType($"{typesPrefix}.{type}");
+            var objectType = typeof(CreateCommand).Assembly.GetType($"{typesPrefix}{type}");
             var command = JsonConvert.DeserializeObject(commandText, objectType);
             
             await SendCommandAsync(command as dynamic);

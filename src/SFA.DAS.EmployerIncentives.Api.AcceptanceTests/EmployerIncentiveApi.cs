@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -15,6 +17,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         {
             Client = client;
             BaseAddress = client.BaseAddress;
+        }
+
+        public async Task PostCommand<T>(string url, T command) where T : ICommand
+        {
+            var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            var response = await Client.PostAsJsonAsync(url, commandText);
+
+            Response = response;
+            //await Client.PostAsJsonAsync(url, JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
         }
 
         public async Task Post<T>(string url, T data)
