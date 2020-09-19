@@ -8,6 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
     [Table("ApprenticeshipIncentive")]
     public partial class ApprenticeshipIncentive
     {
+        [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid Id { get; set; }
         public long AccountId { get; set; }
         public long ApprenticeshipId { get; set; }
@@ -18,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public ApprenticeshipEmployerType EmployerType { get; set; }
         public DateTime PlannedStartDate { get; set; }
         public Guid IncentiveApplicationApprenticeshipId { get; set; }
+        [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPayment> PendingPayments { get; set; }
 
         public ApprenticeshipIncentive()

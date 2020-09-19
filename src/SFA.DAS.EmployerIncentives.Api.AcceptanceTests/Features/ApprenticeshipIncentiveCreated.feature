@@ -15,3 +15,9 @@ Scenario: Apprenticeship incentive is created
 	Given an employer has submitted an application
 	When the apprenticeship incentice is created for each apprenticship in the application
 	Then the earnings are calculated for each apprenticeship incentice
+
+Scenario: Apprenticeship incentive earnings are calculated
+	Given an apprenticeship incentive exists
+	When the apprenticeship incentice earnings are calculated
+	Then the pending payments are stored against the apprenticeship incentive
+

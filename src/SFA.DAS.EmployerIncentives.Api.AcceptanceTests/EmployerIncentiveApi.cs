@@ -24,8 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
             var response = await Client.PostAsJsonAsync(url, commandText);
 
-            Response = response;
-            //await Client.PostAsJsonAsync(url, JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+            Response = response;          
         }
 
         public async Task Post<T>(string url, T data)

@@ -1,5 +1,6 @@
 ﻿using NServiceBus;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types
@@ -10,6 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
         {
             routingSettings.RouteToEndpoint(typeof(CreateCommand), QueueNames.ApprenticeshipIncentivesCreate);
             routingSettings.RouteToEndpoint(typeof(CalculateEarningsCommand), QueueNames.ApprenticeshipIncentivesCalculateEarnings);
+            routingSettings.RouteToEndpoint(typeof(CompleteEarningsCalculationCommand), QueueNames.CompleteEarningsCalculation);
         }
     }
 }

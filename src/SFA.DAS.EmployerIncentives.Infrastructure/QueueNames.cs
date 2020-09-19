@@ -9,5 +9,6 @@
 
         public const string ApprenticeshipIncentivesCreate = "SFA.DAS.EmployerIncentives.ApprentiveshipIncentive.Create";
         public const string ApprenticeshipIncentivesCalculateEarnings = "SFA.DAS.EmployerIncentives.ApprentiveshipIncentive.CalculateEarnings";
+        public const string CompleteEarningsCalculation = "SFA.DAS.EmployerIncentives.ApprentiveshipIncentive.CompleteEarningsCalculation";
     }
 }

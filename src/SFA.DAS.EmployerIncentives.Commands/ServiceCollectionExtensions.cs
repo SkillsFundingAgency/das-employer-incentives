@@ -33,6 +33,7 @@ using SFA.DAS.NServiceBus.SqlServer.Data;
 using SFA.DAS.UnitOfWork.Context;
 using System.IO;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -66,6 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
             serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
+
+            serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
             
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 

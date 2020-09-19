@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly Dictionary<string, string> _config;
         private readonly IHook<object> _eventMessageHook;
         private readonly IHook<ICommand> _commandMessageHook;
+        private readonly List<IncentivePaymentProfile> _paymentProfiles;
 
         public TestWebApi(TestContext context, IHook<object> eventMessageHook, IHook<ICommand> commandMessageHook)
         {
@@ -34,6 +35,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
+
+            _paymentProfiles = new List<IncentivePaymentProfile>
+            {
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile{ AmountPayable = 100, DaysAfterApprenticeshipStart = 10},
+                        new PaymentProfile{ AmountPayable = 200, DaysAfterApprenticeshipStart = 20},
+                    }
+                },
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile{ AmountPayable = 300, DaysAfterApprenticeshipStart = 30},
+                        new PaymentProfile{ AmountPayable = 400, DaysAfterApprenticeshipStart = 40},
+                    }
+                }
+            };
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -48,6 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.Hashstring = "SFA: digital apprenticeship service";
                     a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                     a.MinimumAgreementVersion = 4;
+                    a.IncentivePaymentProfiles = _paymentProfiles;
                 });
                 s.Configure<PolicySettings>(a =>
                 {
