@@ -24,13 +24,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.CompleteEarningsCalculation
 
         public async Task Handle(CompleteEarningsCalculationCommand command, CancellationToken cancellationToken = default)
         {
-            var applicationDto = await _queryRepository.Get(app=> 
-                                        app.AccountId == command.AccountId && 
-                                        app.Apprenticeships.Any(a => a.Id == command.IncentiveApplicationApprenticeshipId));
+            var applicationDto = await _queryRepository.Get(app => app.AccountId == command.AccountId);
+            var applicationApprenticeshipDto = applicationDto.Apprenticeships.Single(a => a.Id == command.IncentiveApplicationApprenticeshipId);
 
             var application = await _domainRepository.Find(applicationDto.Id);
 
-            application.EarningsCalculated(command.IncentiveApplicationApprenticeshipId);
+            application.EarningsCalculated(applicationApprenticeshipDto.Id);
 
             await _domainRepository.Save(application);
         }

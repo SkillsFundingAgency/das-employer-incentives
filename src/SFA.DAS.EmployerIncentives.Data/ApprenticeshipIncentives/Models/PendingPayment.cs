@@ -6,6 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
     [Table("PendingPayment")]
     public partial class PendingPayment
     {
+        [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid Id { get; set; }
         public long AccountId { get; set; }
         public Guid ApprenticeshipIncentiveId { get; set; }

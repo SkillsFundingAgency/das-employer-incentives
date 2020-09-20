@@ -21,3 +21,7 @@ Scenario: Apprenticeship incentive earnings are calculated
 	When the apprenticeship incentice earnings are calculated
 	Then the pending payments are stored against the apprenticeship incentive
 
+Scenario: Incentive application updated after earnings calculated
+	Given an apprenticeship incentive earnings have been calculated
+	When the earnings calculation against the apprenticeship incentice completes
+	Then the incentive application is updated to record that the earnings have been calculated

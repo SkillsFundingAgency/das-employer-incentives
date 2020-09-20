@@ -22,10 +22,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class ApprenticeshipIncentiveCreatedSteps : StepsBase
     {
         private readonly TestContext _testContext;
+
+        private readonly Account _accountModel;
         private readonly IncentiveApplication _applicationModel;
         private readonly Fixture _fixture;
         private readonly List<IncentiveApplicationApprenticeship> _apprenticeshipsModels;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
+        private readonly PendingPayment _pendingPayment;
         private const int NumberOfApprenticeships = 3;
 
         public ApprenticeshipIncentiveCreatedSteps(TestContext testContext) : base(testContext)
@@ -33,8 +36,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext = testContext;
             _fixture = new Fixture();
 
+            _accountModel = _fixture.Create<Account>();
+
             _applicationModel = _fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .Create();
 
             _apprenticeshipsModels = _fixture.Build<IncentiveApplicationApprenticeship>()
@@ -45,10 +52,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .CreateMany(NumberOfApprenticeships).ToList();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
+                .With( p => p.IncentiveApplicationApprenticeshipId, _apprenticeshipsModels.First().Id)
+                .With(p => p.AccountId, _applicationModel.AccountId)
+                .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
                 .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
                 .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
                 .Create();
 
+            _pendingPayment = _fixture.Build<PendingPayment>()
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                .Create();
         }
 
         [Given(@"an employer is applying for the New Apprenticeship Incentive")]
@@ -79,7 +93,20 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
             }
         }
-        
+
+        [Given(@"an apprenticeship incentive earnings have been calculated")]
+        public async Task GivenAnApprenticeshipEarningsHaveBeenCalculated()
+        {
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                await dbConnection.InsertAsync(_accountModel);
+                await dbConnection.InsertAsync(_applicationModel);
+                await dbConnection.InsertAsync(_apprenticeshipsModels.First());
+
+                await dbConnection.InsertAsync(_apprenticeshipIncentive);
+                await dbConnection.InsertAsync(_pendingPayment);                
+            }
+        }        
 
         [When(@"they submit the application")]
         public async Task WhenTheySubmitTheApplication()
@@ -120,6 +147,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+
+        [When(@"the earnings calculation against the apprenticeship incentice completes")]
+        public async Task WhenTheEarningCalculationCompletes()
+        {
+            var completeEarningsCalcCommand = new CompleteEarningsCalculationCommand(
+                _apprenticeshipIncentive.AccountId,
+                _apprenticeshipIncentive.IncentiveApplicationApprenticeshipId,
+                _apprenticeshipIncentive.ApprenticeshipId,
+                _apprenticeshipIncentive.Id);
+
+            await EmployerIncentiveApi.PostCommand(
+                    $"commands/IncentiveApplications.CompleteEarningsCalculationCommand",
+                    completeEarningsCalcCommand);
+
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+
         [Then(@"the apprentiveship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
@@ -158,7 +203,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 pendingPayments.Where(p => p.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList().Count.Should().Be(2);
             }
         }
-    }
 
-    //the pending payments are stored against the apprenticeship incentive
+        [Then(@"the incentive application is updated to record that the earnings have been calculated")]
+        public void ThenTheIncentiveApplicationIsUpdatedToRecordEarningsCalculated()
+        {  
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var apprenticeshipApplications = dbConnection.GetAll<IncentiveApplicationApprenticeship>();
+
+                apprenticeshipApplications.Count().Should().Be(1);
+                var application = apprenticeshipApplications
+                    .Single(a => a.IncentiveApplicationId == _applicationModel.Id &&
+                    a.ApprenticeshipId == _apprenticeshipIncentive.ApprenticeshipId);
+
+                application.EarningsCalculated.Should().BeTrue();
+            }
+        }
+    }
 }
