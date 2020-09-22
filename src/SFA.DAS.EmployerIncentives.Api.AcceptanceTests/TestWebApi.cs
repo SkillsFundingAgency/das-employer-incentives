@@ -1,17 +1,13 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.UnitOfWork.Context;
-using SFA.DAS.UnitOfWork.Managers;
+using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
-using SFA.DAS.NServiceBus.Services;
-using SFA.DAS.UnitOfWork.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
