@@ -43,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     legalEntity.VrfCaseId = item.VrfCaseId;
                     legalEntity.VrfCaseStatus = item.VrfCaseStatus;
                     legalEntity.VrfVendorId = item.VrfVendorId;
+                    legalEntity.VrfCaseStatusLastUpdatedDateTime = item.VrfCaseStatusLastUpdatedDateTime;
                 }
             }
 
@@ -67,5 +68,10 @@ namespace SFA.DAS.EmployerIncentives.Data
             return accounts?.Map();
         }
 
+        public async Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId)
+        {
+            var accounts = await _dbContext.Accounts.Where(x => x.HashedLegalEntityId == hashedLegalEntityId).ToListAsync();
+            return accounts?.Map();
+        }
     }
 }

@@ -6,13 +6,12 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForLegalEntity;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
-    public class WhenUpdateVendorRegistrationForm
+    public class WhenRefreshVendorRegistrationCaseStatus
     {
         private AccountCommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
@@ -26,24 +25,25 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             _sut = new AccountCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<UpdateVrfCaseDetailsForLegalEntityCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<UpdateVendorRegistrationCaseStatusCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
         [Test]
-        public async Task Then_a_UpdateVrfCaseDetailsForLegalEntityCommand_command_is_dispatched()
+        public async Task Then_a_UpdateVendorRegistrationCaseStatusCommand_command_is_dispatched()
         {
             // Arrange
-            var accountLegalEntityId = _fixture.Create<long>();
-            var request = _fixture.Create<UpdateVendorRegistrationFormRequest>();
+            var accountLegalEntityId = _fixture.Create<string>();
+            var request = _fixture.Create<UpdateVendorRegistrationCaseStatusRequest>();
 
             // Act
-            await _sut.UpdateVendorRegistrationForm(accountLegalEntityId, request);
+            await _sut.UpdateVendorRegistrationCaseStatus(accountLegalEntityId, request);
 
             // Assert
             _mockCommandDispatcher
-                .Verify(m => m.Send(It.Is<UpdateVrfCaseDetailsForLegalEntityCommand>(c =>
-                    c.LegalEntityId == accountLegalEntityId &&
+                .Verify(m => m.Send(It.Is<UpdateVendorRegistrationCaseStatusCommand>(c =>
+                    c.HashedLegalEntityId == accountLegalEntityId &&
+                    c.CaseStatusLastUpdatedDate == request.CaseStatusLastUpdatedDate &&
                     c.CaseId == request.CaseId &&
                     c.VendorId == request.VendorId &&
                     c.Status == request.Status),

@@ -39,6 +39,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 
             return data.Select(Account.Create);
         }
+
+        public async Task<IEnumerable<Account>> GetByHashedLegalEntityId(string hashedLegalEntityId)
+        {
+            var data = await _accountDataRepository.GetByHashedLegalEntityId(hashedLegalEntityId);
+
+            return data.Select(Account.Create);
+        }
     }
 
 }

@@ -6,11 +6,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
     public sealed class LegalEntity : Entity<long, LegalEntityModel>
     {
+        public string HashedLegalEntityId => Model.HashedLegalEntityId;
         public string Name => Model.Name;
         public bool HasSignedAgreementTerms => Model.HasSignedAgreementTerms;
         public string VrfVendorId => Model.VrfVendorId;
         public string VrfCaseId => Model.VrfCaseId;
         public string VrfCaseStatus => Model.VrfCaseStatus;
+        public DateTime? VrfCaseStatusLastUpdatedDateTime => Model.VrfCaseStatusLastUpdatedDateTime;
 
         public static LegalEntity New(long id, string name)
         {
@@ -18,6 +20,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             {
                 Name = name,
                 HasSignedAgreementTerms = false
+            };
+
+            return new LegalEntity(id, model, true);
+        }
+
+        public static LegalEntity New(long id, string name, string hashedId)
+        {
+            var model = new LegalEntityModel
+            {
+                Name = name,
+                HasSignedAgreementTerms = false,
+                HashedLegalEntityId = hashedId
             };
 
             return new LegalEntity(id, model, true);
@@ -47,6 +61,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.VrfCaseId = caseId;
             Model.VrfVendorId = vendorId;
             Model.VrfCaseStatus = status;
+        }
+
+        internal void UpdateVendorRegistrationCaseStatus(string caseId, string vendorId, string status, DateTime caseStatusLastUpdatedDate)
+        {
+            Model.VrfCaseId = caseId;
+            Model.VrfVendorId = vendorId;
+            Model.VrfCaseStatus = status;
+            Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
         }
     }
 }

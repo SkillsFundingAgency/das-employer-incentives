@@ -61,6 +61,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             }
         }
 
+        public void UpdateVendorRegistrationCaseStatus(string hashedLegalEntityId, string caseId, string vendorId, string status, DateTime lastUpdatedDate)
+        {
+            foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
+            {
+                legalEntity.UpdateVendorRegistrationCaseStatus(caseId, vendorId, status, lastUpdatedDate);
+            }
+        }
+
         private Account(long id, AccountModel model, bool isNew = false) : base(id, model, isNew)
         {
         }
