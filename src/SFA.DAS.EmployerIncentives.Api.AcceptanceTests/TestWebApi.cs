@@ -71,7 +71,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
 
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
-                s.UseTestDb(_context);
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
 
             });
