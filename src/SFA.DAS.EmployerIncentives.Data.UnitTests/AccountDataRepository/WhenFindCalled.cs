@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         [SetUp]
         public void Arrange()
         {
-            _fixture = new Fixture();            
+            _fixture = new Fixture();
 
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
@@ -51,6 +51,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             legalEntity.Id.Should().Be(testAccount.LegalEntityId);
             legalEntity.Name.Should().Be(testAccount.LegalEntityName);
             legalEntity.AccountLegalEntityId.Should().Be(testAccount.AccountLegalEntityId);
+            legalEntity.HashedLegalEntityId.Should().Be(testAccount.HashedLegalEntityId);
+            legalEntity.VrfCaseStatusLastUpdatedDateTime.Should().Be(testAccount.VrfCaseStatusLastUpdatedDateTime);
+            legalEntity.VrfCaseStatus.Should().Be(testAccount.VrfCaseStatus);
+            legalEntity.VrfVendorId.Should().Be(testAccount.VrfVendorId);
+            legalEntity.VrfCaseId.Should().Be(testAccount.VrfCaseId);
         }
 
         [Test]
