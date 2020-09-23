@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System;
+using AutoFixture;
 using Dapper;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -19,7 +20,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             var fixture = new Fixture();
-            _testAccountTable = _testContext.TestData.GetOrCreate<Account>(null, () => fixture.Build<Account>().With(x => x.HasSignedIncentivesTerms, false).Create());
+            _testAccountTable = _testContext.TestData.GetOrCreate<Account>(null,
+                () => fixture.Build<Account>()
+                    .With(x => x.HasSignedIncentivesTerms, false)
+                    .With(x => x.VrfCaseId, (string)null)
+                    .With(x => x.VrfCaseStatus, (string)null)
+                    .With(x => x.VrfCaseStatusLastUpdatedDateTime, (DateTime?)null)
+                    .With(x => x.VrfVendorId, (string)null).Create());
         }
 
         [Given(@"a legal entity is not available in employer incentives")]
@@ -67,8 +74,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().HaveCount(1);
-                account.Single().Should().BeEquivalentTo(_testAccountTable, opts => opts.Excluding(x => x.VrfCaseStatusLastUpdatedDateTime));
-                account.Single().VrfCaseStatusLastUpdatedDateTime.Should().HaveValue().And.BeCloseTo(_testAccountTable.VrfCaseStatusLastUpdatedDateTime.Value);
+                account.Single().Should().BeEquivalentTo(_testAccountTable, opts => opts.Excluding(x => x.HashedLegalEntityId));
+                account.Single().HashedLegalEntityId.Should().NotBeNullOrEmpty();
             }
         }
     }
