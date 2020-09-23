@@ -3,11 +3,13 @@
 	[Id] BIGINT NOT NULL,
 	[AccountLegalEntityId] BIGINT  NOT NULL,
 	[LegalEntityId] BIGINT  NOT NULL,
+    [HashedLegalEntityId] NVARCHAR(6) NOT NULL, 
 	[LegalEntityName] VARCHAR(MAX)  NOT NULL,
 	[HasSignedIncentivesTerms] BIT NOT NULL DEFAULT(0),
 	[VrfVendorId] NVARCHAR(100) NULL, 
     [VrfCaseId] NVARCHAR(100) NULL, 
     [VrfCaseStatus] NVARCHAR(100) NULL, 
+    [VrfCaseStatusLastUpdatedDateTime] DATETIME2 NULL, 
     CONSTRAINT PK_Accounts PRIMARY KEY NONCLUSTERED ([Id], [AccountLegalEntityId])
 )
 GO
