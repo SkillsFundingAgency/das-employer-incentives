@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Messages.Events;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -15,19 +15,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class UpdateVrfCaseStatusForIncompleteCasesSteps : StepsBase
     {
         private Account _testAccount;
-        private DataAccess _dataAccess;
-
         public UpdateVrfCaseStatusForIncompleteCasesSteps(TestContext testContext) : base(testContext)
         {
-            _dataAccess = new DataAccess(testContext.SqlDatabase.DatabaseInfo.ConnectionString);
         }
 
         [Given(@"a legal entity has submitted vendor registration form details")]
         public async Task GivenAnApplicationHasBeenSubmitted()
         {
             _testAccount = TestContext.TestData.GetOrCreate<Account>();
-
-            _dataAccess.SetupAccount(_testAccount);
+            DataAccess.SetupAccount(_testAccount);
         }
 
         [When(@"an UpdateVrfCaseStatusForIncompleteCases job is requested")]

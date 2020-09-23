@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Messages.Events;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -18,11 +17,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private Account _testAccount;
         private IncentiveApplication _testApplication;
-        private DataAccess _dataAccess;
 
         public UpdateVrfCaseDetailsForNewApplicationsSteps(TestContext testContext) : base(testContext)
         {
-            _dataAccess = new DataAccess(testContext.SqlDatabase.DatabaseInfo.ConnectionString);
         }
 
         [Given(@"an application has been submitted")]
@@ -34,8 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testApplication.Status = IncentiveApplicationStatus.Submitted;
             _testApplication.AccountLegalEntityId = _testAccount.AccountLegalEntityId;
 
-            _dataAccess.SetupAccount(_testAccount);
-            _dataAccess.SetupApplication(_testApplication);
+            DataAccess.SetupAccount(_testAccount);
+            DataAccess.SetupApplication(_testApplication);
         }
 
         [When(@"an UpdateVrfCaseDetailsForNewApplications job is requested")]

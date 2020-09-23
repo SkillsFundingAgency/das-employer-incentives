@@ -1,10 +1,10 @@
-﻿using Dapper;
+﻿using AutoFixture;
+using Dapper;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -39,10 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"the legal entity is already available in Employer Incentives")]
         public async Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.ExecuteAsync("insert into Accounts(id, accountLegalEntityId, legalEntityId, legalentityName) values(@id, @accountLegalEntityId, @legalEntityId, @legalentityName)", _testAccountTable);
-            }
+            DataAccess.SetupAccount(_testAccountTable);
         }
 
         [Then(@"the legal entity should no longer be available in employer incentives")]
@@ -63,13 +60,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the legal entity should still be available in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldBeAvailableInTheDatabase()
         {
+            //var account = DataAccess.GetAccountByLegalEntityId()
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().HaveCount(1);
-                account.Single().Should().BeEquivalentTo(_testAccountTable, opts => opts.Excluding(x => x.VrfCaseId).Excluding(x => x.VrfCaseStatus).Excluding(x => x.VrfVendorId));
+                account.Single().Should().BeEquivalentTo(_testAccountTable, opts => opts.Excluding(x => x.VrfCaseStatusLastUpdatedDateTime));
+                account.Single().VrfCaseStatusLastUpdatedDateTime.Should().HaveValue().And.BeCloseTo(_testAccountTable.VrfCaseStatusLastUpdatedDateTime.Value);
             }
         }
     }
