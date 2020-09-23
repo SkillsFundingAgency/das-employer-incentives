@@ -56,11 +56,11 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         public async Task Then_a_NoContent_response_is_returned()
         {
             // Arrange
-            var accountLegalEntityId = _fixture.Create<long>();
-            var request = _fixture.Create<UpdateVendorRegistrationFormRequest>();
+            var accountLegalEntityId = _fixture.Create<string>();
+            var request = _fixture.Create<UpdateVendorRegistrationCaseStatusRequest>();
 
             // Act
-            var actual = await _sut.UpdateVendorRegistrationForm(accountLegalEntityId, request) as NoContentResult;
+            var actual = await _sut.UpdateVendorRegistrationCaseStatus(accountLegalEntityId, request) as NoContentResult;
 
             // Assert
             actual.Should().NotBeNull();

@@ -4,7 +4,6 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
@@ -37,13 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> SignAgreement([FromRoute] long accountId, [FromRoute] long accountLegalEntityId, [FromBody] SignAgreementRequest request)
         {
             await SendCommandAsync(new SignLegalEntityAgreementCommand(accountId, accountLegalEntityId, request.AgreementVersion));
-            return NoContent();
-        }
-
-        [HttpPatch("/legalentities/{legalEntityId}/vendorregistrationform")]
-        public async Task<IActionResult> UpdateVendorRegistrationForm([FromRoute] long legalEntityId, [FromBody] UpdateVendorRegistrationFormRequest request)
-        {
-            await SendCommandAsync(new UpdateVrfCaseDetailsForLegalEntityCommand(legalEntityId, request.CaseId, request.VendorId, request.Status));
             return NoContent();
         }
 

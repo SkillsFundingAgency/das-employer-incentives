@@ -4,8 +4,6 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForIncompleteCases;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseDetailsForNewApplications;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -28,14 +26,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
                 await SendCommandAsync(new RefreshLegalEntitiesCommand(pageNumber, pageSize));
             } 
-            else if (request.Type == JobType.UpdateVrfCaseDetailsForNewApplications)
-            {
-                await SendCommandAsync(new UpdateVrfCaseDetailsForNewApplicationsCommand());
-            }
-            else if (request.Type == JobType.UpdateVrfCaseStatusForIncompleteCases)
-            {
-                await SendCommandAsync(new UpdateVrfCaseDetailsForIncompleteCasesCommand());
-            }
 
             return NoContent();
         }

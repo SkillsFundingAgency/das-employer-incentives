@@ -53,14 +53,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.LegalEntityModels.Add(legalEntityModel);
         }
 
-        public void UpdateVendorRegistrationFormDetails(long legalEntityId, string caseId, string vendorId, string status)
-        {
-            foreach (var legalEntity in LegalEntities.Where(x => x.Id == legalEntityId))
-            {
-                legalEntity.UpdateVendorRegistrationFormDetails(caseId, vendorId, status);
-            }
-        }
-
         public void UpdateVendorRegistrationCaseStatus(string hashedLegalEntityId, string caseId, string vendorId, string status, DateTime lastUpdatedDate)
         {
             foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
