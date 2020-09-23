@@ -8,6 +8,7 @@
 	[VrfVendorId] NVARCHAR(100) NULL, 
     [VrfCaseId] NVARCHAR(100) NULL, 
     [VrfCaseStatus] NVARCHAR(100) NULL, 
+	[HashedLegalEntityId] NVARCHAR(6) NULL,
     CONSTRAINT PK_Accounts PRIMARY KEY NONCLUSTERED ([Id], [AccountLegalEntityId])
 )
 GO
@@ -16,4 +17,6 @@ GO
 CREATE INDEX IX_Account_VrfCaseStatus ON Accounts (VrfCaseStatus)
 GO
 CREATE INDEX IX_Account_LegalEntityId ON Accounts (LegalEntityId)
+GO
+CREATE INDEX IX_Account_HashedLegalEntityId ON Accounts (HashedLegalEntityId)
 GO

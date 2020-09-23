@@ -55,7 +55,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             storedAccount.Id.Should().Be(testAccount.Id);
             storedAccount.LegalEntityId.Should().Be(testLegalEntity.Id);
             storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
-            storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);            
+            storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
+            storedAccount.HashedLegalEntityId.Should().Be(testLegalEntity.HashedLegalEntityId);
         }
     }
 }

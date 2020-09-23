@@ -7,9 +7,9 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             _sut = new AccountCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<AddLegalEntityCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<UpsertLegalEntityCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
@@ -39,11 +39,11 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             var accountId = _fixture.Create<long>();
 
             // Act
-            await _sut.AddLegalEntity(accountId, request);
+            await _sut.UpsertLegalEntity(accountId, request);
 
             // Assert
             _mockCommandDispatcher
-                .Verify(m => m.Send(It.Is<AddLegalEntityCommand>(c => 
+                .Verify(m => m.Send(It.Is<UpsertLegalEntityCommand>(c => 
                     c.AccountId == accountId && 
                     c.AccountLegalEntityId == request.AccountLegalEntityId &&
                     c.LegalEntityId == request.LegalEntityId &&
@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
              };
 
             // Act
-            var actual = await _sut.AddLegalEntity(accountId, request) as CreatedResult;
+            var actual = await _sut.UpsertLegalEntity(accountId, request) as CreatedResult;
 
             // Assert
             actual.Should().NotBeNull();

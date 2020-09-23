@@ -23,7 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             HasSignedIncentivesTerms = i.HasSignedAgreementTerms,
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
-                                                            VrfVendorId = i.VrfVendorId
+                                                            VrfVendorId = i.VrfVendorId,
+                                                            HashedLegalEntityId = i.HashedLegalEntityId
                                                         }
             ));
 
@@ -54,7 +55,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 Name = model.LegalEntityName,
                 VrfCaseId = model.VrfCaseId,
                 VrfVendorId = model.VrfVendorId,
-                VrfCaseStatus = model.VrfCaseStatus
+                VrfCaseStatus = model.VrfCaseStatus,
+                HashedLegalEntityId = model.HashedLegalEntityId
             };
         }
 
