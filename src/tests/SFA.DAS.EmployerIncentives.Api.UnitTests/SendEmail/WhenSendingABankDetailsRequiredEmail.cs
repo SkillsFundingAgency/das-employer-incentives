@@ -7,7 +7,6 @@ using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.SendEmail
 {
@@ -27,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.SendEmail
         }
 
         [Test]
-        public async Task Then_the_send_email_command_is_published()
+        public void Then_the_send_email_command_is_published()
         {
             // Arrange
             var request = _fixture.Create<SendBankDetailsEmailRequest>();

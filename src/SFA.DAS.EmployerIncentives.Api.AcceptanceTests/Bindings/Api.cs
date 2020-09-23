@@ -1,4 +1,5 @@
-﻿using TechTalk.SpecFlow;
+﻿using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 {
@@ -16,7 +17,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         [BeforeScenario()]
         public void InitialiseApi()
         {
-            var webApi = new TestWebApi(_context);
+            var eventsHook = new Hook<object>();
+            _context.Hooks.Add(eventsHook);
+
+            var webApi = new TestWebApi(_context, eventsHook);
             _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient());
         }
     }

@@ -1,13 +1,12 @@
-﻿using System.Data.SqlClient;
-using System.Linq;
-using FluentAssertions;
-using System.Net;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using Dapper;
+using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -20,7 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private Fixture _fixture;
         private HttpStatusCode _expectedResult = HttpStatusCode.Created;
         private CreateIncentiveApplicationRequest _request;
-        private GetApplicationResponse _getApplicationResponse;
 
         public IncentiveApplicationCreatedSteps(TestContext testContext) : base(testContext)
         {
