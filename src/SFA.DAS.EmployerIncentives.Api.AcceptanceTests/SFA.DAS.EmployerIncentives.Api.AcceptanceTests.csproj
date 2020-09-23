@@ -41,14 +41,6 @@
 
 
   <ItemGroup>
-    <Compile Update="Features\UpdateVrfCaseDetailsForLegalEntity.feature.cs">
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Update="Features\UpdateVrfCaseDetailsForNewApplications.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>UpdateVrfCaseDetailsForNewApplications.feature</DependentUpon>
-	</Compile>
     <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -71,22 +63,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
     </Compile>
-    <Compile Update="Features\UpdateVrfCaseStatusForIncompleteCases.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>UpdateVrfCaseStatusForIncompleteCases.feature</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForLegalEntity.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>UpdateVrfCaseDetailsForLegalEntity.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseDetailsForNewApplications.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>UpdateVrfCaseDetailsForNewApplications.feature.cs</LastGenOutput>
-	</SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
@@ -110,10 +89,6 @@
     <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\UpdateVrfCaseStatusForIncompleteCases.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>UpdateVrfCaseStatusForIncompleteCases.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 
