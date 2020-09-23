@@ -1,4 +1,5 @@
-﻿@database
+﻿@ignore
+@database
 @api
 @accountApi
 Feature: UpdateVrfCaseDetailsForNewApplications

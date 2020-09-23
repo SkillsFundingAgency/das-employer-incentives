@@ -44,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     legalEntity.VrfCaseStatus = item.VrfCaseStatus;
                     legalEntity.VrfVendorId = item.VrfVendorId;
                     legalEntity.VrfCaseStatusLastUpdatedDateTime = item.VrfCaseStatusLastUpdatedDateTime;
+                    legalEntity.HashedLegalEntityId = item.HashedLegalEntityId;
                 }
             }
 

@@ -19,3 +19,5 @@ CREATE INDEX IX_Account_VrfCaseStatus ON Accounts (VrfCaseStatus)
 GO
 CREATE INDEX IX_Account_LegalEntityId ON Accounts (LegalEntityId)
 GO
+CREATE INDEX IX_Account_HashedLegalEntityId ON Accounts (HashedLegalEntityId)
+GO
