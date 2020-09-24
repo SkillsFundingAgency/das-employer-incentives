@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.9" />
     <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
     <PackageReference Include="SFA.DAS.Http" Version="3.2.57" />
-    <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.7" />
+    <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.20" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands.Types\SFA.DAS.EmployerIncentives.Commands.Types.csproj" />
