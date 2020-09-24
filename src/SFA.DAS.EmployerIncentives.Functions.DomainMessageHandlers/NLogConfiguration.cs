@@ -30,10 +30,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 
         private static void AddLocalTarget(LoggingConfiguration config, string appName)
         {
-            InternalLogger.LogFile = Path.Combine(Directory.GetCurrentDirectory(), $"{appName}\\nlog-internal.{appName}.log");
+            InternalLogger.LogFile = Path.Combine(Directory.GetCurrentDirectory(), $"logs\\nlog-internal.{appName}.log");
             var fileTarget = new FileTarget("Disk")
             {
-                FileName = Path.Combine(Directory.GetCurrentDirectory(), $"{appName}\\{appName}.${{shortdate}}.log"),
+                FileName = Path.Combine(Directory.GetCurrentDirectory(), $"logs\\{appName}.${{shortdate}}.log"),
                 Layout = "${longdate} [${uppercase:${level}}] [${logger}] - ${message} ${onexception:${exception:format=tostring}}"
             };
             config.AddTarget(fileTarget);
