@@ -6,16 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Properties\**" />
-    <EmbeddedResource Remove="Properties\**" />
-    <None Remove="Properties\**" />
-    <SpecFlowFeatureFiles Remove="Properties\**" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Properties\**" />
+    <Compile Remove="Bindings\Functions.cs" />
+    <Compile Remove="Bindings\MessageBus.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Bindings\Functions.cs" />
-    <Compile Remove="Bindings\MessageBus.cs" />
+    <SpecFlowFeatureFiles Remove="%2a%2a\%2a.feature" />
   </ItemGroup>
 
   <ItemGroup>
