@@ -1,13 +1,13 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.NServiceBus.Services;
+using System;
+using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System.IO;
 
@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 });
                 s.Configure<EmailTemplateSettings>(e =>
                 {
-                    e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString()};
+                    e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
                 if (_context.AccountApi != null)
@@ -96,6 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         a.ClientId = "";
                     });
                 }
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
 
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));

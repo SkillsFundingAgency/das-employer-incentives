@@ -7,7 +7,6 @@ using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.SendEmail
 {
@@ -37,10 +36,10 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.SendEmail
 
             // Assert
             result.Should().NotBeNull();
-            _commandDispatcher.Verify(x => x.Send(It.Is<SendBankDetailsRequiredEmailCommand>(x => x.AccountId == request.AccountId &&
-                                                                                             x.AccountLegalEntityId == request.AccountLegalEntityId &&
-                                                                                             x.AddBankDetailsUrl == request.AddBankDetailsUrl &&
-                                                                                             x.EmailAddress == request.EmailAddress),
+            _commandDispatcher.Verify(x => x.Send(It.Is<SendBankDetailsRequiredEmailCommand>(cmd => cmd.AccountId == request.AccountId &&
+                                                                                             cmd.AccountLegalEntityId == request.AccountLegalEntityId &&
+                                                                                             cmd.AddBankDetailsUrl == request.AddBankDetailsUrl &&
+                                                                                             cmd.EmailAddress == request.EmailAddress),
                                                                                              It.IsAny<CancellationToken>()));
         }
     }

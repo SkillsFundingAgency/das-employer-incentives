@@ -6,6 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+    <SpecFlowFeatureFiles Remove="Properties\**" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Bindings\Functions.cs" />
+    <Compile Remove="Bindings\MessageBus.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
@@ -32,8 +45,12 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
   </ItemGroup>
 
+
   <ItemGroup>
-  
+    <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationsForAccountRequested.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -50,7 +67,7 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IncentiveApplicationRequested.feature</DependentUpon>
-	</Compile>
+    </Compile>
     <Compile Update="Features\LegalEntityAgreementSigned.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -59,6 +76,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\ApplicationsForAccountRequested.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
@@ -78,7 +99,7 @@
     <SpecFlowFeatureFiles Update="Features\IncentiveApplicationRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveApplicationRequested.feature.cs</LastGenOutput>
-	</SpecFlowFeatureFiles>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
