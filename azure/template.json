@@ -82,14 +82,19 @@
         "version": {
             "type": "string",
             "defaultValue": "1.0"
-        }
+        },
+        "functionsExtensionVersion": {
+            "type": "string",
+            "defaultValue": "~2.0"
+    }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
-        "storageContainerNames": [ "employer-incentives-distributed-locks" ]
+        "storageContainerNames": [ "employer-incentives-distributed-locks" ],
+        "functionAppNameDomainMessageHandlers": "[concat(variables('resourceNamePrefix'),'-rsrv-prv')]"
     },
     "resources": [
         {
@@ -305,7 +310,80 @@
                     }
                 }
             }
+        },
+        {
+      "apiVersion": "2017-05-10",
+      "name": "function-app-rsrv-idx",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'function-app.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "functionAppName": {
+            "value": "[variables('functionAppNameDomainMessageHandlers')]"
+          },
+          "appServicePlanName": {
+            "value": "[variables('apiAppServiceName')]"
+          },
+          "appServicePlanResourceGroup": {
+            "value": "[resourceGroup().name]"
+          },
+          "functionAppAppSettings": {
+            "value": [
+              {
+                "name": "ConfigurationStorageConnectionString",
+                "value": "[parameters('configurationStorageConnectionString')]"
+              },
+              {
+                "name": "ConfigNames",
+                "value": "[parameters('configNames')]"
+              },
+              {
+                "name": "EnvironmentName",
+                "value": "[parameters('environmentName')]"
+              },
+              {
+                "name": "Version",
+                "value": "[parameters('version')]"
+              },
+              {
+                "name": "AzureWebJobsStorage",
+                "value": "[reference('storage-account').outputs.storageConnectionString.value]"
+              },
+              {
+                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                "value": "[reference('function-app-insights').outputs.InstrumentationKey.value]"
+              },
+              {
+                "name": "FUNCTIONS_EXTENSION_VERSION",
+                "value": "[parameters('functionsExtensionVersion')]"
+              },
+              {
+                "name": "AppName",
+                "value": "das-reservations-jobs-reservation-index"
+              },
+              {
+                "name": "LoggingRedisConnectionString",
+                "value": "[parameters('loggingRedisConnectionString')]"
+              },
+              {
+                "name": "FUNCTIONS_WORKER_RUNTIME",
+                "value": "dotnet"
+              }
+            ]
+          }
         }
+      },
+
+      "dependsOn": [
+        "worker-app-service-plan",
+        "function-app-insights",
+        "storage-account"
+      ]
+    }
     ],
     "outputs": {
         "ApiAppServiceName": {
@@ -315,6 +393,10 @@
         "DatabaseName": {
             "type": "string",
             "value": "[variables('databaseName')]"
-        }
+        },
+        "functionAppNameDomainMessageHandlers": {
+            "type": "string",
+            "value": "[variables('functionAppNameDomainMessageHandlers')]"
+    }
     }
 }
