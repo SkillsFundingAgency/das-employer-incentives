@@ -83,12 +83,16 @@
             "type": "string",
             "defaultValue": "1.0"
         },
-        "functionsExtensionVersion": {
-            "type": "string",
-            "defaultValue": "~2.0"
-        },
         "sharedStorageAccountConnectionString": {
             "type": "securestring"
+        },
+        "appServicePlanSize": {
+            "type": "string",
+            "defaultValue": 1
+        },
+        "appServicePlanInstances": {
+            "type": "int",
+            "defaultValue": 1
         }
     },
     "variables": {
@@ -317,6 +321,29 @@
         },
         {
             "apiVersion": "2017-05-10",
+            "name": "function-app-service-plan",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "aspSize": {
+                        "value": "[parameters('appServicePlanSize')]"
+                    },
+                    "aspInstances": {
+                        "value": "[parameters('appServicePlanInstances')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
             "name": "function-application-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -383,7 +410,7 @@
                             },
                             {
                                 "name": "FUNCTIONS_EXTENSION_VERSION",
-                                "value": "[parameters('functionsExtensionVersion')]"
+                                "value": "~3"
                             },
                             {
                                 "name": "LoggingRedisConnectionString",
@@ -413,7 +440,7 @@
             "type": "string",
             "value": "[variables('databaseName')]"
         },
-        "functionAppNameDomainMessageHandlers": {
+        "functionAppName": {
             "type": "string",
             "value": "[variables('functionAppName')]"
         }
