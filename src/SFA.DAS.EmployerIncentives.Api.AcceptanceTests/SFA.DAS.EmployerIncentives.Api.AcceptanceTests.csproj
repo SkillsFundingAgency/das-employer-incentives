@@ -41,6 +41,10 @@
 
 
   <ItemGroup>
+    <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationsForAccountRequested.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -66,6 +70,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\ApplicationsForAccountRequested.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
