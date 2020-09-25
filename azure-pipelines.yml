@@ -92,13 +92,13 @@ stages:
           src/**/*.AcceptanceTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    - task: DotNetCoreCLI@2
-      displayName: Run Acceptance Tests
-      inputs:
-        command: test
-        projects: |
-          src/**/*.AcceptanceTests.csproj
-        arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Run Acceptance Tests
+    #   inputs:
+    #     command: test
+    #     projects: |
+    #       src/**/*.AcceptanceTests.csproj
+    #     arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
     - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
 
