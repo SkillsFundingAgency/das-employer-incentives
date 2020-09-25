@@ -148,18 +148,18 @@ stages:
         arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
         publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
     
-    - task: DotNetCoreCLI@2
-      displayName: Build $(SolutionBaseName).Functions.DomainMessageHandlersions
-      inputs:
-        command: 'build'
-        projects: src/$(SolutionBaseName).Functions.DomainMessageHandlers/$(SolutionBaseName).Functions.DomainMessageHandlers.csproj
-        arguments: '--configuration $(buildConfiguration) --no-restore'
+    # - task: DotNetCoreCLI@2
+    #   displayName: Build $(SolutionBaseName).Functions.DomainMessageHandlersions
+    #   inputs:
+    #     command: 'build'
+    #     projects: src/$(SolutionBaseName).Functions.DomainMessageHandlers/$(SolutionBaseName).Functions.DomainMessageHandlers.csproj
+    #     arguments: '--configuration $(buildConfiguration) --no-restore'
         
     - task: DotNetCoreCLI@2
       displayName: 'Publish - dotnet publish application $(SolutionBaseName).Functions.DomainMessageHandlers'
       inputs:
         command: 'publish'
-        projects: 'src/$(SolutionBaseName).Api/$(SolutionBaseName).Functions.DomainMessageHandlers.csproj'
+        projects: 'src/$(SolutionBaseName).Functions.DomainMessageHandlers/$(SolutionBaseName).Functions.DomainMessageHandlers.csproj'
         arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
         publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
 
