@@ -92,7 +92,7 @@
         },
         "appServicePlanInstances": {
             "type": "int",
-            "defaultValue": 1
+            "defaultValue": 2
         }
     },
     "variables": {
@@ -440,7 +440,7 @@
             "type": "string",
             "value": "[variables('databaseName')]"
         },
-        "functionAppName": {
+        "FunctionAppName": {
             "type": "string",
             "value": "[variables('functionAppName')]"
         }
