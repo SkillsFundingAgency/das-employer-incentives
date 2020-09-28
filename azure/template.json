@@ -88,7 +88,7 @@
         },
         "appServicePlanSize": {
             "type": "string",
-            "defaultValue": 1
+            "defaultValue": "1"
         },
         "appServicePlanInstances": {
             "type": "int",
