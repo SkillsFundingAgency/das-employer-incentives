@@ -427,7 +427,7 @@
 
             "dependsOn": [
                 "function-app-service-plan",
-                "function-applictation-insights"
+                "function-application-insights"
             ]
         }
     ],
