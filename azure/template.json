@@ -82,6 +82,17 @@
         "version": {
             "type": "string",
             "defaultValue": "1.0"
+        },
+        "sharedStorageAccountConnectionString": {
+            "type": "securestring"
+        },
+        "appServicePlanSize": {
+            "type": "string",
+            "defaultValue": "1"
+        },
+        "appServicePlanInstances": {
+            "type": "int",
+            "defaultValue": 2
         }
     },
     "variables": {
@@ -89,7 +100,9 @@
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
-        "storageContainerNames": [ "employer-incentives-distributed-locks" ]
+        "storageContainerNames": [ "employer-incentives-distributed-locks" ],
+        "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
+        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]"
     },
     "resources": [
         {
@@ -305,6 +318,117 @@
                     }
                 }
             }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "function-app-service-plan",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "aspSize": {
+                        "value": "[parameters('appServicePlanSize')]"
+                    },
+                    "aspInstances": {
+                        "value": "[parameters('appServicePlanInstances')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "function-application-insights",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('functionAppName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('functionAppName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "function-app",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'function-app.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "functionAppName": {
+                        "value": "[variables('functionAppName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "functionAppAppSettings": {
+                        "value": [
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigNames",
+                                "value": "[parameters('configNames')]"
+                            },
+                            {
+                                "name": "EnvironmentName",
+                                "value": "[parameters('environmentName')]"
+                            },
+                            {
+                                "name": "Version",
+                                "value": "[parameters('version')]"
+                            },
+                            {
+                                "name": "AzureWebJobsStorage",
+                                "value": "[parameters('sharedStorageAccountConnectionString')]"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference('function-application-insights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "FUNCTIONS_EXTENSION_VERSION",
+                                "value": "~3"
+                            },
+                            {
+                                "name": "LoggingRedisConnectionString",
+                                "value": "[parameters('loggingRedisConnectionString')]"
+                            },
+                            {
+                                "name": "FUNCTIONS_WORKER_RUNTIME",
+                                "value": "dotnet"
+                            }
+                        ]
+                    }
+                }
+            },
+
+            "dependsOn": [
+                "function-app-service-plan",
+                "function-application-insights"
+            ]
         }
     ],
     "outputs": {
@@ -315,6 +439,10 @@
         "DatabaseName": {
             "type": "string",
             "value": "[variables('databaseName')]"
+        },
+        "FunctionAppName": {
+            "type": "string",
+            "value": "[variables('functionAppName')]"
         }
     }
 }
