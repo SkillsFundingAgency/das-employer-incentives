@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
     {
         public void ConfigureNLog()
         {
-            var appName = Environment.GetEnvironmentVariable("AppName");
+            var appName = "das-employer-incentives-functions-domain-message-handlers";
             var env = Environment.GetEnvironmentVariable("EnvironmentName");
             var config = new LoggingConfiguration();
 
