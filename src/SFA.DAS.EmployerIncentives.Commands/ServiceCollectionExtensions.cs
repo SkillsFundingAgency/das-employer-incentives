@@ -1,15 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -22,18 +29,13 @@ using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
+using SFA.DAS.NServiceBus.SqlServer.Data;
+using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using NServiceBus.Persistence;
-using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.NServiceBus.SqlServer.Data;
-using SFA.DAS.UnitOfWork.Context;
 using System.IO;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Commands.Services;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -58,6 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
+            .AddSingleton<IValidator<CreateCommand>, NullValidator>()
+            .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
+            .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
@@ -94,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             serviceCollection
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))            
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 

@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
             result.Should().Throw<HttpRequestException>().WithMessage("Response status code does not indicate success: 500 (Internal Server Error).");
         }
 
-        public class InvalidCommand : ICommand
+        public class InvalidCommand : DomainCommand
         {
 
         }

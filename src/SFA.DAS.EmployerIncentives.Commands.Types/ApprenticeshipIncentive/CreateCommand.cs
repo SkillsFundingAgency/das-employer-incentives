@@ -6,7 +6,7 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
-    public class CreateCommand : ICommand, ILockIdentifier, ILogWriter
+    public class CreateCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
         public long AccountId { get; private set; }
         public Guid IncentiveApplicationId { get; private set; }
