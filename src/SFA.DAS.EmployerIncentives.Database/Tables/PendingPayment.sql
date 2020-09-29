@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[PendingPayment]
+﻿CREATE TABLE [incentives].[PendingPayment]
 (
     [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,	
     [AccountId] BIGINT NOT NULL, 
@@ -7,9 +7,9 @@
     [Amount] DECIMAL(9, 2) NOT NULL, 
     [CalculatedDate] DATETIME2 NOT NULL, 
     [PaymentMadeDate] DATETIME2 NULL,
-    CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES ApprenticeshipIncentive(Id)
+    CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id)
 )
 GO
-CREATE CLUSTERED INDEX IX_PendingPayment ON PendingPayment (AccountId)
+CREATE CLUSTERED INDEX IX_PendingPayment ON [incentives].[PendingPayment] (AccountId)
 GO
 

@@ -5,7 +5,7 @@ using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 {
-    [Table("ApprenticeshipIncentive")]
+    [Table("ApprenticeshipIncentive", Schema = "incentives")]
     public partial class ApprenticeshipIncentive
     {
         [Dapper.Contrib.Extensions.ExplicitKey]
