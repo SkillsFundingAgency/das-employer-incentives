@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.UnitOfWork.Context;
-using SFA.DAS.UnitOfWork.Managers;
+using SFA.DAS.NServiceBus.Services;
+using System;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -14,16 +15,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         private readonly TestContext _context;
         private readonly Dictionary<string, string> _config;
+        private readonly IHook<object> _eventMessageHook;
 
-        public TestWebApi(TestContext context)
+        public TestWebApi(TestContext context, IHook<object> eventMessageHook)
         {
             _context = context;
+            _eventMessageHook = eventMessageHook;
 
             _config = new Dictionary<string, string>{
-                    { "EnvironmentName", "LOCAL" },
+                    { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
+                    { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
+                    { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
+
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -34,6 +40,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
                     a.DistributedLockStorage = "UseDevelopmentStorage=true";
+                    a.AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY";
+                    a.Hashstring = "SFA: digital apprenticeship service";
+                    a.NServiceBusConnectionString = "UseLearningEndpoint=true";
+                    a.MinimumAgreementVersion = 4;
                 });
                 s.Configure<PolicySettings>(a =>
                 {
@@ -45,7 +55,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         QueryRetryAttempts = 0
                     };
                 });
-
+                s.Configure<EmailTemplateSettings>(e =>
+                {
+                    e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                });
                 if (_context.AccountApi != null)
                 {
                     s.Configure<AccountApi>(a =>
@@ -55,12 +69,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
-                s.AddTransient<IUnitOfWorkContext>(c => new TestUnitOfWorkContext(_context));
-                s.AddTransient<IUnitOfWorkManager>(c => new TestUnitOfWorkManager());
 
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
+                s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
 
-                s.UseTestDb(_context);
             });
             builder.ConfigureAppConfiguration(a =>
             {

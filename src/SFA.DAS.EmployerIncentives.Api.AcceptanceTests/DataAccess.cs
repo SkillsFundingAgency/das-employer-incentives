@@ -23,12 +23,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             return account;
         }
 
+        public Account GetAccountByAccountLegalEntityId(long accountId, long accountLegalEntityId)
+        {
+            using var dbConnection = new SqlConnection(_connectionString);
+            var account = dbConnection.QuerySingle<Account>("SELECT * FROM Accounts WHERE Id = @accountId AND AccountLegalEntityId = @AccountLegalEntityId",
+                new { accountId, accountLegalEntityId });
+
+            return account;
+        }
+
         public void SetupAccount(Account account)
         {
             using var dbConnection = new SqlConnection(_connectionString);
             dbConnection.Execute(
-                "insert into Accounts(id, accountLegalEntityId, legalEntityId, legalEntityName, hasSignedIncentivesTerms, vrfCaseId, vrfVendorId, vrfCaseStatus) values " +
-                "(@id, @accountLegalEntityId, @legalEntityId, @legalEntityName, @hasSignedIncentivesTerms, @vrfCaseId, @vrfVendorId, @vrfCaseStatus)", account);
+                "insert into Accounts(id, accountLegalEntityId, legalEntityId, hashedLegalEntityId, legalEntityName, hasSignedIncentivesTerms, vrfCaseId, vrfVendorId, vrfCaseStatus, vrfCaseStatusLastUpdatedDateTime) values " +
+                "(@id, @accountLegalEntityId, @legalEntityId, @hashedLegalEntityId, @legalEntityName, @hasSignedIncentivesTerms, @vrfCaseId, @vrfVendorId, @vrfCaseStatus, @vrfCaseStatusLastUpdatedDateTime)", account);
         }
 
         public void SetupApplication(IncentiveApplication application)
@@ -39,7 +48,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 "(@id, @accountId, @accountLegalEntityId, @dateCreated, @status, @dateSubmitted, @submittedByEmail, @submittedByName)",
                 new
                 {
-                    application.Id, application.AccountId, application.AccountLegalEntityId, application.DateCreated, Status = application.Status.ToString(), application.DateSubmitted, application.SubmittedByEmail, application.SubmittedByName
+                    application.Id,
+                    application.AccountId,
+                    application.AccountLegalEntityId,
+                    application.DateCreated,
+                    Status = application.Status.ToString(),
+                    application.DateSubmitted,
+                    application.SubmittedByEmail,
+                    application.SubmittedByName
                 });
         }
 

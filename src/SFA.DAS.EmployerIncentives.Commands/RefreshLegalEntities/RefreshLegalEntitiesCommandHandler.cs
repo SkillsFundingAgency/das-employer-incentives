@@ -1,24 +1,25 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Messages.Events;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
 {
     public class RefreshLegalEntitiesCommandHandler : ICommandHandler<RefreshLegalEntitiesCommand>
     {
         private readonly IAccountService _accountService;
-        private readonly IMultiEventPublisher _multiEventPublisher;
+        private readonly IEventPublisher _eventPublisher;
 
         public RefreshLegalEntitiesCommandHandler(
             IAccountService accountService,
-            IMultiEventPublisher multiEventPublisher)
+            IEventPublisher eventPublisher)
         {
             _accountService = accountService;
-            _multiEventPublisher = multiEventPublisher;
+            _eventPublisher = eventPublisher;
         }
         public async Task Handle(RefreshLegalEntitiesCommand command, CancellationToken cancellationToken = default)
         {
@@ -34,35 +35,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
 
         private async Task ProcessOtherPages(int totalPages, int pageSize)
         {
-            var messages = new List<RefreshLegalEntitiesEvent>();
-
             for (int i = 2; i <= totalPages; i++)
             {
-                messages.Add(new RefreshLegalEntitiesEvent { PageNumber = i, PageSize = pageSize });
+                await _eventPublisher.Publish(new RefreshLegalEntitiesEvent { PageNumber = i, PageSize = pageSize});
             }
-
-            await _multiEventPublisher.Publish(messages);
         }
 
         private async Task ProcessLegalEntities(List<AccountLegalEntity> accountLegalEntities)
         {
-            var messages = new List<RefreshLegalEntityEvent>();
-
-            foreach (var accountLegalEntity in accountLegalEntities)
-            {
-
-                messages.Add(new RefreshLegalEntityEvent
+            var tasks = accountLegalEntities.Select(ale=> _eventPublisher.Publish(new RefreshLegalEntityEvent
                 {
-                    AccountId = accountLegalEntity.AccountId,
-                    AccountLegalEntityId = accountLegalEntity.AccountLegalEntityId,
-                    LegalEntityId = accountLegalEntity.LegalEntityId,
-                    OrganisationName = accountLegalEntity.Name
-                });
-            }
+                    AccountId = ale.AccountId,
+                    AccountLegalEntityId = ale.AccountLegalEntityId,
+                    LegalEntityId = ale.LegalEntityId,
+                    OrganisationName = ale.Name
+                }));
 
-            await _multiEventPublisher.Publish(messages);
-
+            await Task.WhenAll(tasks);
         }
     }
 }
-

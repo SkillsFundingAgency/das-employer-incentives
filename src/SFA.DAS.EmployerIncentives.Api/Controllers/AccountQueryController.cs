@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -38,6 +39,20 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             if (response?.LegalEntity != null)
             {
                 return Ok(response.LegalEntity);
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("/accounts/{accountId}/applications")]
+        public async Task<IActionResult> GetApplications(long accountId)
+        {
+            var request = new GetApplicationsRequest(accountId);
+            var response = await QueryAsync<GetApplicationsRequest, GetApplicationsResponse>(request);
+
+            if (response?.ApprenticeApplications != null)
+            {
+                return Ok(response.ApprenticeApplications);
             }
 
             return NotFound();

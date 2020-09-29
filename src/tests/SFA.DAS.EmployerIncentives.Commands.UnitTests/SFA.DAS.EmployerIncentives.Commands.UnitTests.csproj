@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AddLegalEntity\Services\**" />
-    <EmbeddedResource Remove="AddLegalEntity\Services\**" />
-    <None Remove="AddLegalEntity\Services\**" />
+    <Compile Remove="UpsertLegalEntity\Services\**" />
+    <EmbeddedResource Remove="UpsertLegalEntity\Services\**" />
+    <None Remove="UpsertLegalEntity\Services\**" />
   </ItemGroup>
 
   <ItemGroup>

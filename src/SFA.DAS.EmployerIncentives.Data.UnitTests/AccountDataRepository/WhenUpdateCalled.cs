@@ -57,6 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
             storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
             storedAccount.HasSignedIncentivesTerms.Should().Be(testLegalEntity.HasSignedAgreementTerms);
+            storedAccount.HashedLegalEntityId.Should().Be(testLegalEntity.HashedLegalEntityId);
         }
 
         [Test]
@@ -92,6 +93,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             addedAccount.LegalEntityId.Should().Be(testAccount.LegalEntityId);
             addedAccount.LegalEntityName.Should().Be(newName);
             addedAccount.HasSignedIncentivesTerms.Should().Be(newHasSignedTerms);
+            addedAccount.VrfCaseId.Should().Be(testAccount.VrfCaseId);
+            addedAccount.VrfCaseStatus.Should().Be(testAccount.VrfCaseStatus);
+            addedAccount.VrfVendorId.Should().Be(testAccount.VrfVendorId);
+            addedAccount.VrfCaseStatusLastUpdatedDateTime.Should().Be(testAccount.VrfCaseStatusLastUpdatedDateTime);
+            addedAccount.HashedLegalEntityId.Should().Be(testAccount.HashedLegalEntityId);
         }
 
         [Test]

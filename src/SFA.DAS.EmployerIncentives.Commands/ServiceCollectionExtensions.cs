@@ -39,8 +39,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddHashingService()
-                .AddNServiceBusUnitOfWork()
-                .AddNServiceBusClientUnitOfWork()
                 .AddAccountService();
             
             // set up the command handlers and command validators
@@ -63,12 +61,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
             serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();
+            serviceCollection.AddScoped<IApprenticeApplicationDataRepository, ApprenticeApplicationDataRepository>();
 
             serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
-
-            serviceCollection.AddScoped<IMultiEventPublisher, MultiEventPublisherWithLimit>();
 
             serviceCollection.AddScoped(typeof(ICommandPublisher<>), typeof(CommandPublisher<>));
 
@@ -126,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new AccountService(client, s.GetRequiredService<IHashingService>());
+                return new AccountService(client);
             });
 
             return serviceCollection;
