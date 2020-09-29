@@ -101,7 +101,7 @@
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
         "storageContainerNames": [ "employer-incentives-distributed-locks" ],
-        "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
+        "functionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]"
     },
     "resources": [
