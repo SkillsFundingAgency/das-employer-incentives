@@ -121,7 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await EmployerIncentiveApi.Patch(url, submitRequest);
         }
 
-        [When(@"the apprenticeship incentice is created for each apprenticship in the application")]
+        [When(@"the apprenticeship incentive is created for each apprenticship in the application")]
         public async Task WhenTheApprenticeshipIncentiveIsCreatedForEachApprenticeshipInTheApplication()
         {
             var createCommand = new CreateCommand(_applicationModel.AccountId, _applicationModel.Id);
@@ -133,7 +133,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
                
-        [When(@"the apprenticeship incentice earnings are calculated")]
+        [When(@"the apprenticeship incentive earnings are calculated")]
         public async Task WhenTheApprenticeshipIncentiveEarningsAreCalculated()
         {
             var calcEarningsCommand = new CalculateEarningsCommand(
@@ -148,7 +148,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
-        [When(@"the earnings calculation against the apprenticeship incentice completes")]
+        [When(@"the earnings calculation against the apprenticeship incentive completes")]
         public async Task WhenTheEarningCalculationCompletes()
         {
             var completeEarningsCalcCommand = new CompleteEarningsCalculationCommand(
@@ -165,13 +165,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
 
-        [Then(@"the apprentiveship incentive is created for the application")]
+        [Then(@"the apprenticeship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
             _testContext.CommandsPublished.Single(c => c.IsPublished).Command.Should().BeOfType<CreateCommand>();
         }
 
-        [Then(@"the earnings are calculated for each apprenticeship incentice")]
+        [Then(@"the earnings are calculated for each apprenticeship incentive")]
         public void ThenTheEarningsAreCalculatedForEachApprenticeshipIncentive()
         {
             var commandsPublished = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CalculateEarningsCommand));

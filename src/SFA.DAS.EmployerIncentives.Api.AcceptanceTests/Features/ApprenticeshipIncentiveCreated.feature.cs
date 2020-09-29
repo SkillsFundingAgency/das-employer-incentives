@@ -198,7 +198,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 21
- testRunner.When("the apprenticeship incentice earnings are calculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("the apprenticeship incentive earnings are calculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 22
  testRunner.Then("the pending payments are stored against the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -238,7 +238,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an apprenticeship incentive earnings have been calculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 26
- testRunner.When("the earnings calculation against the apprenticeship incentice completes", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("the earnings calculation against the apprenticeship incentive completes", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 27
  testRunner.Then("the incentive application is updated to record that the earnings have been calcul" +
