@@ -2,9 +2,6 @@
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using System;
-using System.Reflection;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
@@ -21,8 +18,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {               
             var objectType = typeof(CreateCommand).Assembly.GetType($"{typesPrefix}{type}");
             var command = JsonConvert.DeserializeObject(commandText, objectType);
-            
-            await SendCommandAsync(command as dynamic);
+
+            if (objectType.IsSubclassOf(typeof(DomainCommand)))
+            {
+                await SendCommandAsync(command as dynamic);
+            }
             return Ok();
         }
 

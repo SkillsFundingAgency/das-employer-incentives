@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             _client = client;
         }
 
-        public async Task Dispatch<T>(T command) where T : ICommand
+        public async Task Dispatch<T>(T command) where T : DomainCommand
         {
             var commandType = command.GetType();
             EnsureIsValidType(commandType);
