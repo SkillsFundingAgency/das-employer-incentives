@@ -1,12 +1,8 @@
 ﻿using NServiceBus;
-using SFA.DAS.EmployerAccounts.Messages.Events;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
-using SFA.DAS.NServiceBus.SqlServer.Configuration;
-using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
-using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -44,17 +40,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
             do
             {
-                var message = new AddedLegalEntityEvent
-                {
-                    AccountId = 2,
-                    AccountLegalEntityId = 2,
-                    LegalEntityId = 3,
-                    OrganisationName = "Org name"
-                };
+                //var message = new AddedLegalEntityEvent
+                //{
+                //    AccountId = 2,
+                //    AccountLegalEntityId = 2,
+                //    LegalEntityId = 3,
+                //    OrganisationName = "Org name"
+                //};
 
                 //await endpointInstance.Publish(message);
 
-                var message2 = new Commands.Types.ApprenticeshipIncentive.CreateCommand(1, Guid.NewGuid());
+                var message2 = new Commands.Types.ApprenticeshipIncentive.CreateIncentiveCommand(1, Guid.NewGuid());
                 await endpointInstance.Send(message2);
 
                 Console.WriteLine("Message sent...");

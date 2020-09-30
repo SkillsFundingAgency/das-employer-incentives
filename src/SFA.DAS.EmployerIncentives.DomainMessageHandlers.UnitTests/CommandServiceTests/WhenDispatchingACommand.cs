@@ -1,17 +1,16 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
+using FluentAssertions;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers;
-using System;
-using FluentAssertions;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
-using System.Text.Json;
+using System;
 using System.Net;
-using Newtonsoft.Json;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServiceTests
 {
@@ -48,20 +47,20 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
         public async Task Then_the_command_is_dispatched_when_the_command_is_valid()
         {
             // arrange
-            var validCommand = _fixture.Create<CreateCommand>();
+            var validCommand = _fixture.Create<CreateIncentiveCommand>();
 
             // act
             await _sut.Dispatch(validCommand);
 
             // assert
-            _client.VerifyPostAsAsync($"commands/ApprenticeshipIncentive.CreateCommand", JsonConvert.SerializeObject(validCommand, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }), Times.Once());
+            _client.VerifyPostAsAsync($"commands/ApprenticeshipIncentive.CreateIncentiveCommand", JsonConvert.SerializeObject(validCommand, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }), Times.Once());
         }
 
         [Test]
         public void Then_an_exception_is_thrown_when_the_call_to_the_api_fails()
         {
             // arrange
-            var validCommand = _fixture.Create<CreateCommand>();
+            var validCommand = _fixture.Create<CreateIncentiveCommand>();
 
             _client.SetUpPostAsAsync(HttpStatusCode.InternalServerError);
 
@@ -72,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
             result.Should().Throw<HttpRequestException>().WithMessage("Response status code does not indicate success: 500 (Internal Server Error).");
         }
 
-        public class InvalidCommand : ICommand
+        public class InvalidCommand : DomainCommand
         {
 
         }

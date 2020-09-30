@@ -7,16 +7,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Create
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateIncentive
 {
-    public class CreateCommandHandler : ICommandHandler<CreateCommand>
+    public class CreateIncentiveCommandHandler : ICommandHandler<CreateIncentiveCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _applicationDomainRepository;
         private readonly IApprenticeshipIncentiveFactory _apprenticeshipIncentiveFactory;
         private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;
         
 
-        public CreateCommandHandler(
+        public CreateIncentiveCommandHandler(
             IIncentiveApplicationDomainRepository applicationDomainRepository,
             IApprenticeshipIncentiveFactory apprenticeshipIncentiveFactory,
             IApprenticeshipIncentiveDomainRepository apprenticeshipIncentiveDomainRepository)
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Create
             _apprenticeshipIncentiveDomainRepository = apprenticeshipIncentiveDomainRepository;
         }
 
-        public async Task Handle(CreateCommand command, CancellationToken cancellationToken = default)
+        public async Task Handle(CreateIncentiveCommand command, CancellationToken cancellationToken = default)
         {
             var application = await _applicationDomainRepository.Find(command.IncentiveApplicationId);
 

@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
 
-            var publishedCommand = _testContext.CommandsPublished.Single(c => c.IsPublished).Command as CreateCommand;
+            var publishedCommand = _testContext.CommandsPublished.Single(c => c.IsPublished).Command as CreateIncentiveCommand;
 
             publishedCommand.Should().NotBeNull();
             publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.NServiceBus.AzureFunction.Attributes;
@@ -17,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
         }
 
         [FunctionName("HandleApprenticeshipIncentivesCreateCommand")]
-        public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.ApprenticeshipIncentivesCreate)] CreateCommand command)
+        public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.ApprenticeshipIncentivesCreate)] CreateIncentiveCommand command)
         {
            await _commandService.Dispatch(command);
         }

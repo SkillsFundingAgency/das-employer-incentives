@@ -15,9 +15,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class EligibleApprenticeshipRequestedSteps : StepsBase
     {
         private HttpResponseMessage _apiResult;
-        private long _uln;
-        private IncentiveApplication _incentiveApplication;
-        private IncentiveApplicationApprenticeship _incentiveApprenticeship;
+        private readonly long _uln;
+        private readonly IncentiveApplication _incentiveApplication;
+        private readonly IncentiveApplicationApprenticeship _incentiveApprenticeship;
 
         public EligibleApprenticeshipRequestedSteps(TestContext testContext) : base(testContext)
         {
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"I am applying for the New Apprenticeship Incentive")]
         public void GivenIAmApplyingForTheNewApprenticeshipIncentive()
         {
-
+            // intentionally blank
         }
 
         [Given(@"the ULN has been used on a previously submitted Incentive")]

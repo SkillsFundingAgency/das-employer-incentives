@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].ApprenticeshipIncentive
+﻿CREATE TABLE [incentives].ApprenticeshipIncentive
 (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,
 	[AccountId] BIGINT NOT NULL,	
@@ -12,5 +12,5 @@
 	[IncentiveApplicationApprenticeshipId] UNIQUEIDENTIFIER NOT NULL
 )
 GO
-CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON ApprenticeshipIncentive (AccountId, ApprenticeshipId)
+CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, ApprenticeshipId)
 GO

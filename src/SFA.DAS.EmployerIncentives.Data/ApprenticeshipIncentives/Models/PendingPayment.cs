@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 {
-    [Table("PendingPayment")]
+    [Dapper.Contrib.Extensions.Table("incentives.PendingPayment")]
+    [Table("PendingPayment", Schema = "incentives")]
     public partial class PendingPayment
     {
         [Dapper.Contrib.Extensions.ExplicitKey]
