@@ -16,11 +16,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "SendBankDetailsReminderEmail")]
     public class SendBankDetailsReminderEmailSteps : StepsBase
     {
-        private TestContext _testContext;
-        private Fixture _fixture;
+        private readonly TestContext _testContext;
+        private readonly Fixture _fixture;
         private SendBankDetailsEmailRequest _request;
-        private string _url;
-        private string _storageDirectory;
+        private readonly string _url;
+        private readonly string _storageDirectory;
 
         public SendBankDetailsReminderEmailSteps(TestContext testContext) : base(testContext)
         {

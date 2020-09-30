@@ -1,10 +1,6 @@
 ﻿using NServiceBus;
-using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
-using SFA.DAS.NServiceBus.SqlServer.Configuration;
-using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
-using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 

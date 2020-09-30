@@ -1,17 +1,16 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
+using FluentAssertions;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers;
-using System;
-using FluentAssertions;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
-using System.Text.Json;
+using System;
 using System.Net;
-using Newtonsoft.Json;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServiceTests
 {

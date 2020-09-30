@@ -19,8 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             _appConfig = new Dictionary<string, string>
             {
                 { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
-                { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
-                //{ "ConfigNames", "SFA.DAS.EmployerIncentives" }
+                { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" }
             };
         }
 
