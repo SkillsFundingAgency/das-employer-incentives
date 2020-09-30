@@ -15,14 +15,14 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests
         private HandleApprenticeshipIncentivesCreateCommand _sut;
         private Mock<ICommandService> _mockCommandService;
         private Fixture _fixture;
-        private CreateCommand _command;
+        private CreateIncentiveCommand _command;
 
         [SetUp]
         public void Arrange()
         {
             _mockCommandService = new Mock<ICommandService>();
             _fixture = new Fixture();
-            _command = _fixture.Create<CreateCommand>();
+            _command = _fixture.Create<CreateIncentiveCommand>();
             _sut = new HandleApprenticeshipIncentivesCreateCommand(_mockCommandService.Object);
         }
 

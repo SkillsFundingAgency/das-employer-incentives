@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
-            .AddSingleton<IValidator<CreateCommand>, NullValidator>()
+            .AddSingleton<IValidator<CreateIncentiveCommand>, NullValidator>()
             .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
             .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
             .AddCommandHandlerDecorators()

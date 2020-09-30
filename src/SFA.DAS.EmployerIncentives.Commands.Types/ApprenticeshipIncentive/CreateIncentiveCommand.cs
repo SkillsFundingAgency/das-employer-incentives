@@ -6,13 +6,13 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
-    public class CreateCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class CreateIncentiveCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
         public long AccountId { get; private set; }
         public Guid IncentiveApplicationId { get; private set; }
         public string LockId { get => $"{nameof(Account)}_{AccountId}"; }
 
-        public CreateCommand(
+        public CreateIncentiveCommand(
             long accountId,
             Guid incentiveApplicationId)
         {         
@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         {
             get
             {
-                var message = $"ApprenticeshipIncentive CreateCommand for AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId}";
+                var message = $"ApprenticeshipIncentive CreateIncentiveCommand for AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId}";
                 return new Log
                 {
                     OnProcessing = () => message,

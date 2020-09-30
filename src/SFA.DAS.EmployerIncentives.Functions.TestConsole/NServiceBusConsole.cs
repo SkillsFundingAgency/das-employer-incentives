@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
                 //await endpointInstance.Publish(message);
 
-                var message2 = new Commands.Types.ApprenticeshipIncentive.CreateCommand(1, Guid.NewGuid());
+                var message2 = new Commands.Types.ApprenticeshipIncentive.CreateIncentiveCommand(1, Guid.NewGuid());
                 await endpointInstance.Send(message2);
 
                 Console.WriteLine("Message sent...");

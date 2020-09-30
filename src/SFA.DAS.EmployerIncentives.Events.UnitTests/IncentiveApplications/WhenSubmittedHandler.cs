@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             await _sut.Handle(@event);
 
             //Assert
-            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateCommand>(i => 
+            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i => 
                 i.AccountId == @event.AccountId &&
                 i.IncentiveApplicationId == @event.IncentiveApplicationId), It.IsAny<CancellationToken>()), Times.Once);
         }

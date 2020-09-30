@@ -124,10 +124,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the apprenticeship incentive is created for each apprenticship in the application")]
         public async Task WhenTheApprenticeshipIncentiveIsCreatedForEachApprenticeshipInTheApplication()
         {
-            var createCommand = new CreateCommand(_applicationModel.AccountId, _applicationModel.Id);
+            var createCommand = new CreateIncentiveCommand(_applicationModel.AccountId, _applicationModel.Id);
        
             await EmployerIncentiveApi.PostCommand(
-                    $"commands/ApprenticeshipIncentive.CreateCommand",
+                    $"commands/ApprenticeshipIncentive.CreateIncentiveCommand",
                     createCommand);
 
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -168,7 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
-            _testContext.CommandsPublished.Single(c => c.IsPublished).Command.Should().BeOfType<CreateCommand>();
+            _testContext.CommandsPublished.Single(c => c.IsPublished).Command.Should().BeOfType<CreateIncentiveCommand>();
         }
 
         [Then(@"the earnings are calculated for each apprenticeship incentive")]

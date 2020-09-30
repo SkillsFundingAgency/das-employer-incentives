@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public Task Handle(Submitted @event, CancellationToken cancellationToken = default)
         {
-            var command = new CreateCommand(
+            var command = new CreateIncentiveCommand(
                 @event.AccountId,
                 @event.IncentiveApplicationId
                 );
