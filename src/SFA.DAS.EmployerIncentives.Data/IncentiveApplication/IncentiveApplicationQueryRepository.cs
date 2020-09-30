@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -66,6 +67,13 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private static bool MapBankDetailsRequired(string vrfCaseStatus)
         {
+            if (vrfCaseStatus == LegalEntityVrfCaseStatus.RejectedDataValidation 
+                || vrfCaseStatus == LegalEntityVrfCaseStatus.RejectedVer1
+                || vrfCaseStatus == LegalEntityVrfCaseStatus.RejectedVerification)
+            {
+                return true;
+            }
+
             return String.IsNullOrWhiteSpace(vrfCaseStatus);
         }
     }
