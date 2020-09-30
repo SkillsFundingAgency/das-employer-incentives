@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             var objectType = typeof(CreateIncentiveCommand).Assembly.GetType($"{typesPrefix}{type}");
             var command = JsonConvert.DeserializeObject(commandText, objectType);
 
-            if (objectType.IsSubclassOf(typeof(DomainCommand)))
+            if (objectType != null && objectType.IsSubclassOf(typeof(DomainCommand)))
             {
                 await SendCommandAsync(command as dynamic);
             }
