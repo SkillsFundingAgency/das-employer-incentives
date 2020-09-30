@@ -35,9 +35,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _hostConfig = new Dictionary<string, string>();
             _appConfig = new Dictionary<string, string>
             {
-                { "EnvironmentName", "LOCAL" },
+                { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                 { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
-                { "ConfigNames", "SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers" },
+                //{ "ConfigNames", "SFA.DAS.EmployerIncentives" },
                 { "Values:AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                 { "ApplicationSettings:DbConnectionString", testContext.SqlDatabase.DatabaseInfo.ConnectionString },
                 { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },

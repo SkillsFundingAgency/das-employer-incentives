@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
+            if (!ConfigurationIsLocalOrAcceptanceTests(configuration))
             {
                 configBuilder.AddAzureTableStorage(options =>
                 {
@@ -36,7 +36,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                 });
             }
 #if DEBUG
-            configBuilder.AddJsonFile($"local.settings.json", optional: true);
+            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            {
+                configBuilder.AddJsonFile($"local.settings.json", optional: true);
+            }
 #endif
             var config = configBuilder.Build();
 
@@ -62,5 +65,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                     }
                 });
         }
+
+        private bool ConfigurationIsLocalOrAcceptanceTests(IConfiguration configuration)
+        {
+            return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        private bool ConfigurationIsLocalOrDevOrAcceptanceTests(IConfiguration configuration)
+        {
+            return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase) ||
+                   configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
+        }
+
     }
+
+
+
 }
