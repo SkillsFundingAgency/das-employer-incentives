@@ -93,6 +93,12 @@
         "appServicePlanInstances": {
             "type": "int",
             "defaultValue": 2
+        },
+        "nServiceBusConnectionString": {
+            "type": "string"
+        },
+        "nServiceBusLicense": {
+            "type": "string"
         }
     },
     "variables": {
@@ -419,6 +425,14 @@
                             {
                                 "name": "FUNCTIONS_WORKER_RUNTIME",
                                 "value": "dotnet"
+                            },
+                            {
+                                "name": "NServiceBusConnectionString",
+                                "value": "[parameters('nServiceBusConnectionString')]"
+                            },
+                            {
+                                "name": "NServiceBusLicense",
+                                "value": "[parameters('nServiceBusLicense')]"
                             }
                         ]
                     }
