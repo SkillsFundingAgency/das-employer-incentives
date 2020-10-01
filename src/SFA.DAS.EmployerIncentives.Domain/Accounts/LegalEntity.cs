@@ -6,6 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
     public sealed class LegalEntity : Entity<long, LegalEntityModel>
     {
+        private const string VrfCaseStatusCompleted = "Case request complete";
         public string HashedLegalEntityId => Model.HashedLegalEntityId;
         public string Name => Model.Name;
         public bool HasSignedAgreementTerms => Model.HasSignedAgreementTerms;
@@ -63,6 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 
         internal void UpdateVendorRegistrationCaseStatus(string caseId, string vendorId, string status, DateTime caseStatusLastUpdatedDate)
         {
+            if (Model.VrfCaseStatus == VrfCaseStatusCompleted) return;
+
             Model.VrfCaseId = caseId;
             Model.VrfVendorId = vendorId;
             Model.VrfCaseStatus = status;
