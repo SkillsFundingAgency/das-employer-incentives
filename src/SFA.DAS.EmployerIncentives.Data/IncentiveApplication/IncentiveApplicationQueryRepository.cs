@@ -67,9 +67,10 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private static bool MapBankDetailsRequired(string vrfCaseStatus)
         {
-            if (vrfCaseStatus == LegalEntityVrfCaseStatus.RejectedDataValidation 
-                || vrfCaseStatus == LegalEntityVrfCaseStatus.RejectedVer1
-                || vrfCaseStatus == LegalEntityVrfCaseStatus.RejectedVerification)
+            if (vrfCaseStatus != null && 
+                  (vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase)))
             {
                 return true;
             }
