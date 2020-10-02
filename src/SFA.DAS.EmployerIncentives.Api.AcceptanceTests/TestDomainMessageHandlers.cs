@@ -101,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
             });
 
-            hostBuilder.UseEnvironment("LOCAL");
+            hostBuilder.UseEnvironment("LOCAL");            
 
             host = await hostBuilder.StartAsync();
         }

@@ -62,6 +62,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                 return new CommandService(httpClient);
             });
 
+            serviceCollection.Decorate<ICommandService, CommandServiceWithLogging>();
+
             return serviceCollection;
         }
         
