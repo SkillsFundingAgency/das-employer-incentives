@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
@@ -72,6 +73,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.Identifier = "";
                 });
 
+                s.Replace(new ServiceDescriptor(typeof(ICommandService), new CommandService(_testContext.EmployerIncentiveApi.Client)));
+
                 s.AddNServiceBus(
                     new LoggerFactory().CreateLogger<TestDomainMessageHandlers>(),
                     (o) =>
@@ -102,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
             });
 
-            hostBuilder.UseEnvironment("LOCAL");
+            hostBuilder.UseEnvironment("LOCAL");            
 
             host = await hostBuilder.StartAsync();
         }
