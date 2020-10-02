@@ -63,12 +63,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 
         internal void UpdateVendorRegistrationCaseStatus(string caseId, string vendorId, string status, DateTime caseStatusLastUpdatedDate)
         {
-            if (Model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase)) return;
+            if (VrfStatusIsCompleted()) return;
 
             Model.VrfCaseId = caseId;
             Model.VrfVendorId = vendorId;
             Model.VrfCaseStatus = status;
             Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
+        }
+
+        private bool VrfStatusIsCompleted()
+        {
+            return Model.VrfCaseStatus != null && Model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

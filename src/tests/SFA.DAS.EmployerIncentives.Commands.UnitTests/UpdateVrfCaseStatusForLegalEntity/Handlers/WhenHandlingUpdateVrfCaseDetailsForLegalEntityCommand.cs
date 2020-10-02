@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
         public async Task Then_VRF_details_for_given_legal_entity_are_not_updated_if_status_is_completed()
         {
             // Arrange
-            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(), "Case request complete",
+            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(), "case request completed",
                 _fixture.Create<DateTime>());
 
             var accounts = _fixture.CreateMany<Account>(3).ToList();
