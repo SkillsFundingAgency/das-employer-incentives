@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -71,6 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
+                await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_applicationModel);
                 await dbConnection.InsertAsync(_apprenticeshipsModels);
             }
@@ -81,6 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
+                await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_applicationModel);
                 await dbConnection.InsertAsync(_apprenticeshipsModels);
             }
@@ -91,6 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
+                await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
             }
         }
@@ -127,11 +129,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var createCommand = new CreateIncentiveCommand(_applicationModel.AccountId, _applicationModel.Id);
        
-            await EmployerIncentiveApi.PostCommand(
-                    $"commands/ApprenticeshipIncentive.CreateIncentiveCommand",
-                    createCommand);
-
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            await _testContext.WaitFor<MessageContext>(async () =>
+               await _testContext.MessageBus.Send(createCommand));
         }
                
         [When(@"the apprenticeship incentive earnings are calculated")]
@@ -142,11 +141,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 _apprenticeshipIncentive.AccountId,
                 _apprenticeshipIncentive.ApprenticeshipId);
 
-            await EmployerIncentiveApi.PostCommand(
-                    $"commands/ApprenticeshipIncentive.CalculateEarningsCommand",
-                    calcEarningsCommand);
-
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            await _testContext.WaitFor<MessageContext>(async () =>
+              await _testContext.MessageBus.Send(calcEarningsCommand));
         }
 
         [When(@"the earnings calculation against the apprenticeship incentive completes")]
