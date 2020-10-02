@@ -158,14 +158,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 _apprenticeshipIncentive.ApprenticeshipId,
                 _apprenticeshipIncentive.Id);
 
-            //await EmployerIncentiveApi.PostCommand(
-            //        $"commands/IncentiveApplications.CompleteEarningsCalculationCommand",
-            //        completeEarningsCalcCommand);
+            await EmployerIncentiveApi.PostCommand(
+                    $"commands/IncentiveApplications.CompleteEarningsCalculationCommand",
+                    completeEarningsCalcCommand);
 
-            //EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
-                await _testContext.MessageBus.Send(completeEarningsCalcCommand));
+            //await _testContext.WaitFor<MessageContext>(async () =>
+            //    await _testContext.MessageBus.Send(completeEarningsCalcCommand));
         }
 
 

@@ -33,4 +33,4 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
         }
     }
-    }
+}

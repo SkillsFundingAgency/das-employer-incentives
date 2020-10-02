@@ -9,18 +9,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     public class DomainMessageHandlers
     {
         private readonly TestContext _context;
-        private readonly Dictionary<string, string> _hostConfig;
-        private readonly Dictionary<string, string> _appConfig;
 
         public DomainMessageHandlers(TestContext context)
         {
             _context = context;
-            _hostConfig = new Dictionary<string, string>();
-            _appConfig = new Dictionary<string, string>
-            {
-                { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
-                { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" }
-            };
         }
 
         [BeforeScenario(Order = 6)]

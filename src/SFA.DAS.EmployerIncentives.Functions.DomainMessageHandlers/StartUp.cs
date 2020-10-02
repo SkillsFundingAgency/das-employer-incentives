@@ -50,20 +50,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
-            builder.Services.AddNServiceBus(
-                logger, 
-                (options) =>
-                {   
-                    if (config["ApplicationSettings:NServiceBusConnectionString"] == "UseLearningEndpoint=true")
-                    {                        
-                        options.EndpointConfiguration = (endpoint) =>
-                        {
-                            endpoint.UseTransport<LearningTransport>().StorageDirectory(config.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
-                            Commands.Types.RoutingSettingsExtensions.AddRouting(endpoint.UseTransport<LearningTransport>().Routing());                            
-                            return endpoint;
-                        };
-                    }
-                });
+            if (!ConfigurationIsLocalOrAcceptanceTests(config))
+            { 
+                builder.Services.AddNServiceBus(logger);
+            }
         }
 
         private bool ConfigurationIsLocalOrAcceptanceTests(IConfiguration configuration)
