@@ -12,9 +12,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             var collectionPeriod = context.GetInput<string>();
 
-            log.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}");
+            log.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}", new { collectionPeriod });
 
-            log.LogInformation($"Incentive Payment process completed for collection period {collectionPeriod}");
+            log.LogInformation($"Incentive Payment process completed for collection period {collectionPeriod}", new { collectionPeriod });
         }
     }
 }
