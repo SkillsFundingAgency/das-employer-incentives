@@ -62,6 +62,8 @@
     <Folder Include="Tables" />
     <Folder Include="StoredProcedures" />
     <Folder Include="Views" />
+    <Folder Include="Schemas" />
+    <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Accounts.sql" />
@@ -70,8 +72,16 @@
     <Build Include="Tables\IncentiveApplication.sql" />
     <Build Include="Tables\IncentiveApplicationApprenticeship.sql" />
     <Build Include="Views\ApplicationsDashboard.sql" />
+    <Build Include="Tables\CollectionCalendar.sql" />
+    <Build Include="Schemas\Incentives.sql" />
+    <None Include="Scripts\Data.CollectionCalendar.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment.sql" />
   </ItemGroup>
 </Project>
