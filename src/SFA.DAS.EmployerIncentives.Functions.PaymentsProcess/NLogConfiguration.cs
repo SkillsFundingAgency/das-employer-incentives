@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.ApplicationInsights.NLogTarget;
 using NLog;
 using NLog.Common;
 using NLog.Config;
@@ -23,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             else
             {
                 AddRedisTarget(config, appName);
+                AddAppInsights(config);
             }
 
             LogManager.Configuration = config;
@@ -55,6 +57,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             config.AddTarget(target);
             config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "RedisLog");
+        }
+
+        private static void AddAppInsights(LoggingConfiguration config)
+        {
+            var target = new ApplicationInsightsTarget
+            {
+                Name = "AppInsightsLog"
+            };
+
+            config.AddTarget(target);
+            config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "AppInsightsLog");
         }
 
         private static LogLevel GetMinLogLevel() => LogLevel.FromString("Info");
