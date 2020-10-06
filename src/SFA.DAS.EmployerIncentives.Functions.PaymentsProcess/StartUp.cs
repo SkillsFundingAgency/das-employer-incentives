@@ -3,7 +3,9 @@ using System.IO;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -24,7 +26,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             if (!ConfigurationIsLocalOrAcceptanceTests(configuration))
             {
-                // Add azure storage config
+                configBuilder.AddAzureTableStorage(options =>
+                {
+                    options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
+                    options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                    options.EnvironmentName = configuration["EnvironmentName"];
+                    options.PreFixConfigurationKeys = false;
+                });
             }
 #if DEBUG
             if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
@@ -34,10 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 #endif
             var config = configBuilder.Build();
 
-            builder.Services.AddOptions();            
-            
-            // Add application settings
-            //builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
+            builder.Services.AddOptions();
+
+            builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
         }
 
         private bool ConfigurationIsLocalOrAcceptanceTests(IConfiguration configuration)
