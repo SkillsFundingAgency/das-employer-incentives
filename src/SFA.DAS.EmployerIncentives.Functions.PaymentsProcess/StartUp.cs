@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     {   
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            // Add NLog
+            builder.Services.AddNLog();
 
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
