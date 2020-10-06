@@ -9,6 +9,5 @@
 	[BCPaymentDateUTC] DATETIME2 NULL
 )
 GO
-GO
 CREATE CLUSTERED INDEX IX_CollectionCalendar_PriodNumber ON [incentives].CollectionCalendar (PeriodNumber)
 GO
