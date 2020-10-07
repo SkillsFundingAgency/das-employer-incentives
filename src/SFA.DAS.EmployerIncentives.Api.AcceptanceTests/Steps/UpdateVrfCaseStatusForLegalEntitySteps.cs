@@ -8,6 +8,7 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
+    [Scope(Feature = "UpdateVrfCaseStatusForLegalEntity")]
     public class UpdateVrfCaseStatusForLegalEntitySteps : StepsBase
     {
         private readonly string _newVrfCaseId = $"NewVrfCaseId{Guid.NewGuid()}";
