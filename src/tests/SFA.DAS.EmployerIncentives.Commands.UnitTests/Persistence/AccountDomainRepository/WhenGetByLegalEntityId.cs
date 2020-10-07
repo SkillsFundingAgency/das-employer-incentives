@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.AccountDomainRepository
 {
@@ -14,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.AccountDomai
     {
         private IAccountDomainRepository _sut;
         private Mock<IAccountDataRepository> _mockAccountDataRepository;
+        private Mock<IDomainEventDispatcher> _mockDomainEventDispatcher;
 
         private Fixture _fixture;
 
@@ -23,8 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.AccountDomai
             _fixture = new Fixture();
 
             _mockAccountDataRepository = new Mock<IAccountDataRepository>();
-
-            _sut = new Commands.Persistence.AccountDomainRepository(_mockAccountDataRepository.Object);
+            _mockDomainEventDispatcher = new Mock<IDomainEventDispatcher>();
+            _sut = new Commands.Persistence.AccountDomainRepository(_mockAccountDataRepository.Object, _mockDomainEventDispatcher.Object);
         }
 
         [Test]
