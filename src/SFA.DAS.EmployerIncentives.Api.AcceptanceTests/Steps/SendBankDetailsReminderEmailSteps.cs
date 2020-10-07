@@ -16,20 +16,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "SendBankDetailsReminderEmail")]
     public class SendBankDetailsReminderEmailSteps : StepsBase
     {
-        private TestContext _testContext;
-        private Fixture _fixture;
+        private readonly TestContext _testContext;
+        private readonly Fixture _fixture;
         private SendBankDetailsEmailRequest _request;
-        private string _url;
-        private string _storageDirectory;
+        private readonly string _url;
+        private readonly string _storageDirectory;
 
         public SendBankDetailsReminderEmailSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-reminder";
-            var projectDirectory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("bin"));
-            var sourceDirectory = new DirectoryInfo(projectDirectory).Parent;
-            _storageDirectory = Path.Combine(sourceDirectory.FullName, ".learningtransport");
+            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
         }
 
         [When(@"an employer selects to start the external bank details journey")]

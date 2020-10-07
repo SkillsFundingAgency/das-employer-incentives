@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
@@ -15,6 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
     {
         private AccountDomainRepository _sut;
         private Mock<IAccountDataRepository> _mockAccountDataRepository;
+        private Mock<IDomainEventDispatcher> _mockDomainEventDispatcher;
 
         private Fixture _fixture;
 
@@ -24,8 +26,9 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Persistence
             _fixture = new Fixture();
 
             _mockAccountDataRepository = new Mock<IAccountDataRepository>();
+            _mockDomainEventDispatcher = new Mock<IDomainEventDispatcher>();
 
-            _sut = new AccountDomainRepository(_mockAccountDataRepository.Object);
+            _sut = new AccountDomainRepository(_mockAccountDataRepository.Object, _mockDomainEventDispatcher.Object);
         }
 
         [Test]

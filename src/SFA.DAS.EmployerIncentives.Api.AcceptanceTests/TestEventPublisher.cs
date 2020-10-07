@@ -35,11 +35,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 }
                 catch (Exception ex)
                 {
+                    bool suppressError = false;
                     if (_hook?.OnErrored != null)
                     {
-                        _hook.OnErrored(ex, message);
+                        suppressError = _hook.OnErrored(ex, message);
                     }
-                    throw;
+                    if (!suppressError)
+                    {
+                        throw;
+                    }
                 }
             }
             else

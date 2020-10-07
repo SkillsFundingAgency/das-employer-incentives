@@ -4,7 +4,6 @@ using NServiceBus;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.Notifications.Messages.Commands;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,11 +12,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
     public class SendBankDetailsRequiredEmailCommandHandler : ICommandHandler<SendBankDetailsRequiredEmailCommand>
     {
-        private readonly ICommandPublisher<SendEmailCommand> _commandPublisher;
+        private readonly ICommandPublisher _commandPublisher;
         private readonly EmailTemplateSettings _emailTemplates;
         private const string AddBankDetailsUrlToken = "bank details url";
 
-        public SendBankDetailsRequiredEmailCommandHandler(ICommandPublisher<SendEmailCommand> commandPublisher, 
+        public SendBankDetailsRequiredEmailCommandHandler(ICommandPublisher commandPublisher, 
                                                           IOptions<EmailTemplateSettings> emailTemplates)
         {
             _commandPublisher = commandPublisher;

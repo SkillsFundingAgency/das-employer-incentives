@@ -1,14 +1,15 @@
-﻿using System.Data.SqlClient;
-using System.Linq;
+﻿using AutoFixture;
+using Dapper;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using System;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoFixture;
-using Dapper;
-using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
-using System;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -17,9 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class IncentiveApplicationSubmittedSteps : StepsBase
     {
         private readonly TestContext _testContext;
-        private Fixture _fixture;
-        private CreateIncentiveApplicationRequest _createRequest;
-        private SubmitIncentiveApplicationRequest _submitRequest;
+        private readonly Fixture _fixture;
+        private readonly CreateIncentiveApplicationRequest _createRequest;
+        private readonly SubmitIncentiveApplicationRequest _submitRequest;
 
         public IncentiveApplicationSubmittedSteps(TestContext testContext) : base(testContext)
         {
@@ -48,17 +49,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
-        [Given(@"an internal error will occur before the transaction completes")]
-        public void GivenAnInternalErrorWillOccurBeforeTheTransactionCompletes()
-        {
-            _testContext.ThrowErrorAfterSendingEvent = true;
-        }
-
         [When(@"the application is submitted")]
         public async Task WhenTheApplicationIsSubmitted()
         {
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
             await EmployerIncentiveApi.Patch(url, _submitRequest);
+        }
+
+        [When(@"the application is submitted and the system errors")]
+        public async Task WhenTheApplicationIsSubmittedAndtheSystemErrors()
+        {
+            _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
+
+            await WhenTheApplicationIsSubmitted();
         }
 
         [Then(@"the application status is updated to reflect completion")]
@@ -74,6 +77,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Should().HaveCount(1);
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
+
+            var publishedCommand = _testContext.CommandsPublished.Single(c => c.IsPublished).Command as CreateIncentiveCommand;
+
+            publishedCommand.Should().NotBeNull();
+            publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);
+            publishedCommand.IncentiveApplicationId.Should().Be(_submitRequest.IncentiveApplicationId);
         }
 
         [When(@"the invalid application id is submittted")]
@@ -83,6 +92,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
             await EmployerIncentiveApi.Patch(url, _submitRequest);
+        }
+                
+        [Then(@"the application changes are not saved")]
+        public async Task ThenTheApplicatioChangesAreNotSaved()
+        {
+            await ThenTheApplicationStatusIsNotUpdated();
+            ThenTheServiceRespondsWithAnInternalError();
+            await ThenThereAreNoEventsInTheOutbox();
         }
 
         [Then(@"the application status is not updated")]

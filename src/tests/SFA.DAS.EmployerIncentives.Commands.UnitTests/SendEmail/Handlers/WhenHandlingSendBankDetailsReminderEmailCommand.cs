@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
     [TestFixture]
     public class WhenHandlingSendBankDetailsReminderEmailCommand
     {
-        private Mock<ICommandPublisher<SendEmailCommand>> _commandPublisher;
+        private Mock<ICommandPublisher> _commandPublisher;
         private Mock<IOptions<EmailTemplateSettings>> _settings;
         private SendBankDetailsReminderEmailCommandHandler _sut;
         private EmailTemplateSettings _templates;
@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
         public void Arrange()
         {
             _fixture = new Fixture();
-            _commandPublisher = new Mock<ICommandPublisher<SendEmailCommand>>();
+            _commandPublisher = new Mock<ICommandPublisher>();
             _settings = new Mock<IOptions<EmailTemplateSettings>>();
             _templates = new EmailTemplateSettings { BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() } };
             _settings.Setup(x => x.Value).Returns(_templates);

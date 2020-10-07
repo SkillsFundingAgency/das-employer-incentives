@@ -13,11 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
     public class SendBankDetailsReminderEmailCommandHandler : ICommandHandler<SendBankDetailsReminderEmailCommand>
     {
-        private readonly ICommandPublisher<SendEmailCommand> _commandPublisher;
+        private readonly ICommandPublisher _commandPublisher;
         private readonly EmailTemplateSettings _emailTemplates;
         private const string AddBankDetailsUrlToken = "bank details url";
 
-        public SendBankDetailsReminderEmailCommandHandler(ICommandPublisher<SendEmailCommand> commandPublisher, 
+        public SendBankDetailsReminderEmailCommandHandler(ICommandPublisher commandPublisher, 
                                                           IOptions<EmailTemplateSettings> emailTemplates)
         {
             _commandPublisher = commandPublisher;
