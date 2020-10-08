@@ -14,9 +14,12 @@
     <PackageReference Include="Scrutor" Version="3.2.1" />
     <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
+    <PackageReference Include="SFA.DAS.UnitOfWork.EntityFrameworkCore" Version="9.0.20" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

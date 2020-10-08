@@ -7,9 +7,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayable
 {
     public class GetPayableLegalEntitiesQueryHandler : IQueryHandler<GetPayableLegalEntitiesRequest, GetPayableLegalEntitiesResponse>
     {
-        private IPaymentLegalEntityQueryRepository _queryRepository;
+        private IPayableLegalEntityQueryRepository _queryRepository;
 
-        public GetPayableLegalEntitiesQueryHandler(IPaymentLegalEntityQueryRepository queryRepository)
+        public GetPayableLegalEntitiesQueryHandler(IPayableLegalEntityQueryRepository queryRepository)
         {
             _queryRepository = queryRepository;
         }

@@ -4,7 +4,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncenti
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
-    public interface IPaymentLegalEntityQueryRepository
+    public interface IPayableLegalEntityQueryRepository
     {
         Task<List<PayableLegalEntityDto>> GetList(int collectionPeriodYear, int collectionPeriodMonth);
     }

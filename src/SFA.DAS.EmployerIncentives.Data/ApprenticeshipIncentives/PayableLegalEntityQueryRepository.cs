@@ -8,11 +8,11 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
-    public class PaymentLegalEntityQueryRepository : IPaymentLegalEntityQueryRepository
+    public class PayableLegalEntityQueryRepository : IPayableLegalEntityQueryRepository
     {
         private readonly EmployerIncentivesDbContext _context;
 
-        public PaymentLegalEntityQueryRepository(EmployerIncentivesDbContext context)
+        public PayableLegalEntityQueryRepository(EmployerIncentivesDbContext context)
         {
             _context = context;
         }

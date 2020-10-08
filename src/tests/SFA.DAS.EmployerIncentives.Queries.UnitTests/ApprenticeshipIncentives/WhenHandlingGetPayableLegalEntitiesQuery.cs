@@ -14,14 +14,14 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
     public class WhenHandlingGetPayableLegalEntitiesQuery
     {
         private GetPayableLegalEntitiesQueryHandler _sut;
-        private Mock<IPaymentLegalEntityQueryRepository> _repositoryMock;
+        private Mock<IPayableLegalEntityQueryRepository> _repositoryMock;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _repositoryMock = new Mock<IPaymentLegalEntityQueryRepository>();
+            _repositoryMock = new Mock<IPayableLegalEntityQueryRepository>();
             _sut = new GetPayableLegalEntitiesQueryHandler(_repositoryMock.Object);
         }
 
