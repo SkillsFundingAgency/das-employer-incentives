@@ -7,7 +7,7 @@ using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {    
-    public class TestContext : IDisposable
+    public class TestContext
     {
         public DirectoryInfo TestDirectory { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
@@ -36,29 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             Hooks = new List<IHook>();
             EventsPublished = new List<object>();
             CommandsPublished = new List<PublishedCommand>();
-        }
-
-        private bool _isDisposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_isDisposed) return;
-
-            if (disposing)
-            {
-                SqlDatabase?.Dispose();
-                EmployerIncentiveApi?.Dispose();
-                AccountApi?.Dispose();
-                DomainMessageHandlers?.Dispose();
-            }
-
-            _isDisposed = true;
         }
     }
 }

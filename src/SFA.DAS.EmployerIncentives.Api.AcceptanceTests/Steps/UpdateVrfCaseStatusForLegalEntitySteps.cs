@@ -1,23 +1,28 @@
 ﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
+    [Scope(Feature = "UpdateVrfCaseStatusForLegalEntity")]
+
     public class UpdateVrfCaseStatusForLegalEntitySteps : StepsBase
     {
         private readonly string _newVrfCaseId = $"NewVrfCaseId{Guid.NewGuid()}";
         private readonly string _newVrfVendorId = $"NewVrfVendorId{Guid.NewGuid()}";
-        private readonly string _newVrfStatus = $"NewVrfStatus{Guid.NewGuid()}";
+        private string _newVrfStatus;
         private readonly DateTime _newVrfStatusUpdateDate = DateTime.Parse("01-01-2020");
         private Account _account;
 
         public UpdateVrfCaseStatusForLegalEntitySteps(TestContext testContext) : base(testContext)
         {
+
         }
 
         [Given(@"an existing submitted incentive application")]
@@ -35,10 +40,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             DataAccess.SetupApprenticeship(apprenticeship);
         }
 
-        [When(@"VRF case status is changed")]
-        public async Task WhenVRFCaseStatusIsChanged()
+        [When(@"VRF case status is changed to '(.*)'")]
+        public async Task WhenVRFCaseStatusIsChangedTo(string status)
         {
             var url = $"/legalentities/{_account.HashedLegalEntityId}/vendorregistrationform/status";
+
+            _newVrfStatus = status;
+            
             var data = new
             {
                 CaseId = _newVrfCaseId,
@@ -62,6 +70,27 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             account.VrfVendorId.Should().Be(_newVrfVendorId);
             account.VrfCaseStatus.Should().Be(_newVrfStatus);
             account.VrfCaseStatusLastUpdatedDateTime.Should().Be(_newVrfStatusUpdateDate);
+        }
+
+        [Then(@"Employer Incentives account legal entity record is not updated")]
+        public void ThenEmployerIncentivesAccountLegalEntityRecordIsNotUpdated()
+        {
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            var account = DataAccess.GetAccountByLegalEntityId(_account.LegalEntityId);
+            account.Should().NotBeNull();
+            account.VrfCaseId.Should().NotBe(_newVrfCaseId);
+            account.VrfVendorId.Should().NotBe(_newVrfVendorId);
+            account.VrfCaseStatus.Should().NotBe(_newVrfStatus);
+            account.VrfCaseStatusLastUpdatedDateTime.Should().NotBe(_newVrfStatusUpdateDate);
+        }
+
+        [Then(@"a command to add an Employer Vendor Id Command is sent")]
+        public void ThenACommandToAddAnEmployerVendorIdCommandIsSent()
+        {
+            var command = TestContext.CommandsPublished.Single(c => c.IsPublished).Command; 
+            command.Should().BeOfType<AddEmployerVendorIdCommand>();
+            ((AddEmployerVendorIdCommand)command).HashedLegalEntityId.Should().Be(_account.HashedLegalEntityId);
         }
     }
 }

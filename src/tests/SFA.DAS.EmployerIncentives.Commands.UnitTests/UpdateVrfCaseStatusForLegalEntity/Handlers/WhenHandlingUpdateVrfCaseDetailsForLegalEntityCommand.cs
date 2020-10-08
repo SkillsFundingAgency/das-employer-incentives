@@ -88,24 +88,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
             accounts[1].AddLegalEntity(4, _fixture.Create<LegalEntity>());
             accounts[1].AddLegalEntity(5, legalEntityToBeUpdated);
 
+            // Act
             _mockDomainRepository.Setup(x => x.GetByHashedLegalEntityId(caseCompletedCommand.HashedLegalEntityId)).ReturnsAsync(accounts);
             await _sut.Handle(caseCompletedCommand);
-
-
-            // Act
-            var command2 = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, caseCompletedCommand.CaseId, caseCompletedCommand.VendorId, "New Status",
-                _fixture.Create<DateTime>());
-            await _sut.Handle(command2);
 
             // Assert
             var updatedLegalEntities = accounts.SelectMany(x => x.LegalEntities.Where(e => e.HashedLegalEntityId == caseCompletedCommand.HashedLegalEntityId)).ToList();
             updatedLegalEntities.Should().NotBeEmpty();
             foreach (var legalEntity in updatedLegalEntities)
             {
-                legalEntity.VrfCaseId.Should().Be(caseCompletedCommand.CaseId);
-                legalEntity.VrfVendorId.Should().Be(caseCompletedCommand.VendorId);
-                legalEntity.VrfCaseStatus.Should().Be(caseCompletedCommand.Status);
-                legalEntity.VrfCaseStatusLastUpdatedDateTime.Should().Be(caseCompletedCommand.CaseStatusLastUpdatedDate);
+                legalEntity.VrfCaseId.Should().NotBe(caseCompletedCommand.CaseId);
+                legalEntity.VrfVendorId.Should().NotBe(caseCompletedCommand.VendorId);
+                legalEntity.VrfCaseStatus.Should().NotBe(caseCompletedCommand.Status);
+                legalEntity.VrfCaseStatusLastUpdatedDateTime.Should().NotBe(caseCompletedCommand.CaseStatusLastUpdatedDate);
             }
         }
 
