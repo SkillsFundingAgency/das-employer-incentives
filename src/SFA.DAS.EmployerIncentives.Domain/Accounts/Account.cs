@@ -68,6 +68,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             }
         }
 
+        public void AddEmployerVendorIdToLegalEntities(string hashedLegalEntityId, string employerVendorId)
+        {
+            foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
+            {
+                legalEntity.AddEmployerVendorId(employerVendorId);
+            }
+        }
+
         private Account(long id, AccountModel model, bool isNew = false) : base(id, model, isNew)
         {
         }

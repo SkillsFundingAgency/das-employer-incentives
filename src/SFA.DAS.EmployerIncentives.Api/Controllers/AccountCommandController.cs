@@ -45,5 +45,14 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(hashedLegalEntityId, request.CaseId, request.VendorId, request.Status, request.CaseStatusLastUpdatedDate));
             return NoContent();
         }
+
+        [HttpPatch("/legalentities/{hashedLegalEntityId}/employervendorid")]
+        public async Task<IActionResult> AddEmplyerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] AddEmployerVendorIdRequest request)
+        {
+            await SendCommandAsync(new AddEmployerVendorIdForLegalEntityCommand(hashedLegalEntityId, request.EmployerVendorId));
+            return NoContent();
+        }
+
+
     }
 }
