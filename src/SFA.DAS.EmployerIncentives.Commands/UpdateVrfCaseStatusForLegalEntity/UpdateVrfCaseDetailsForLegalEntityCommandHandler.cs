@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
 
             foreach (var account in accounts)
             {
-                account.UpdateVendorRegistrationCaseStatus(command.HashedLegalEntityId, command.CaseId, command.VendorId, command.Status, command.CaseStatusLastUpdatedDate);
+                account.UpdateVendorRegistrationCaseStatus(command.HashedLegalEntityId, command.CaseId, command.Status, command.CaseStatusLastUpdatedDate);
 
                 await _domainRepository.Save(account);
             }

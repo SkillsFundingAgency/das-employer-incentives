@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
         public async Task Then_VRF_details_for_given_legal_entity_are_updated()
         {
             // Arrange
-            var command = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>(),
+            var command = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>());
 
             var accounts = _fixture.CreateMany<Account>(3).ToList();
@@ -60,7 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
             foreach (var legalEntity in updatedLegalEntities)
             {
                 legalEntity.VrfCaseId.Should().Be(command.CaseId);
-                legalEntity.VrfVendorId.Should().Be(command.VendorId);
                 legalEntity.VrfCaseStatus.Should().Be(command.Status);
                 legalEntity.VrfCaseStatusLastUpdatedDateTime.Should().Be(command.CaseStatusLastUpdatedDate);
             }
@@ -75,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
         public async Task Then_VRF_details_for_given_legal_entity_are_not_updated_if_status_is_completed()
         {
             // Arrange
-            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(), "Case request complete",
+            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), "case request completed",
                 _fixture.Create<DateTime>());
 
             var accounts = _fixture.CreateMany<Account>(3).ToList();
@@ -92,15 +91,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
             _mockDomainRepository.Setup(x => x.GetByHashedLegalEntityId(caseCompletedCommand.HashedLegalEntityId)).ReturnsAsync(accounts);
             await _sut.Handle(caseCompletedCommand);
 
+
+            // Act
+            var command2 = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, caseCompletedCommand.CaseId, "New Status",
+                _fixture.Create<DateTime>());
+            await _sut.Handle(command2);
+
             // Assert
             var updatedLegalEntities = accounts.SelectMany(x => x.LegalEntities.Where(e => e.HashedLegalEntityId == caseCompletedCommand.HashedLegalEntityId)).ToList();
             updatedLegalEntities.Should().NotBeEmpty();
             foreach (var legalEntity in updatedLegalEntities)
             {
-                legalEntity.VrfCaseId.Should().NotBe(caseCompletedCommand.CaseId);
-                legalEntity.VrfVendorId.Should().NotBe(caseCompletedCommand.VendorId);
-                legalEntity.VrfCaseStatus.Should().NotBe(caseCompletedCommand.Status);
-                legalEntity.VrfCaseStatusLastUpdatedDateTime.Should().NotBe(caseCompletedCommand.CaseStatusLastUpdatedDate);
+                legalEntity.VrfCaseId.Should().Be(caseCompletedCommand.CaseId);
+                legalEntity.VrfCaseStatus.Should().Be(caseCompletedCommand.Status);
+                legalEntity.VrfCaseStatusLastUpdatedDateTime.Should().Be(caseCompletedCommand.CaseStatusLastUpdatedDate);
             }
         }
 
@@ -108,8 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
         public async Task Then_event_BankDetailsApprovedForLegalEntity_is_raised_when_status_is_completed()
         {
             // Arrange
-            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(), "Case request complete",
-                _fixture.Create<DateTime>());
+            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), LegalEntityVrfCaseStatus.Completed, _fixture.Create<DateTime>());
 
             var account = _fixture.Create<Account>();
             var legalEntityToBeUpdated = LegalEntity.New(123, _fixture.Create<string>(), LegalEntityToBeUpdatedId);

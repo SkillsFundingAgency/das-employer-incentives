@@ -1,13 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
     public sealed class LegalEntity : Entity<long, LegalEntityModel>
     {
-        public const string VrfCaseStatusCompleted = "Case request complete";
         public string HashedLegalEntityId => Model.HashedLegalEntityId;
         public string Name => Model.Name;
         public bool HasSignedAgreementTerms => Model.HasSignedAgreementTerms;
@@ -63,22 +61,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.HashedLegalEntityId = hashedId;
         }
 
+        internal void UpdateVendorRegistrationCaseStatus(string caseId, string status, DateTime caseStatusLastUpdatedDate)
+        {
+            if (VrfStatusIsCompleted()) return;
+
+            Model.VrfCaseId = caseId;
+            Model.VrfCaseStatus = status;
+            Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
+        }
         public void AddEmployerVendorId(string employerVendorId)
         {
             Model.VrfVendorId ??= employerVendorId;
         }
 
-        internal void UpdateVendorRegistrationCaseStatus(string caseId, string vendorId, string status, DateTime caseStatusLastUpdatedDate)
+        private bool VrfStatusIsCompleted()
         {
-            if (status.Equals(VrfCaseStatusCompleted, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return;
-            }
-
-            Model.VrfCaseId = caseId;
-            Model.VrfVendorId = vendorId;
-            Model.VrfCaseStatus = status;
-            Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
+            return Model.VrfCaseStatus != null && Model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase);
         }
+
     }
 }

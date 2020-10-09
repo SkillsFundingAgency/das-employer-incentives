@@ -46,7 +46,6 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                     c.HashedLegalEntityId == accountLegalEntityId &&
                     c.CaseStatusLastUpdatedDate == request.CaseStatusLastUpdatedDate &&
                     c.CaseId == request.CaseId &&
-                    c.VendorId == request.VendorId &&
                     c.Status == request.Status),
                 It.IsAny<CancellationToken>())
                 , Times.Once);

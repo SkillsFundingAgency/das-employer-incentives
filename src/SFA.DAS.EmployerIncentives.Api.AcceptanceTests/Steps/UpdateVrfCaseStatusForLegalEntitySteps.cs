@@ -50,7 +50,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var data = new
             {
                 CaseId = _newVrfCaseId,
-                VendorId = _newVrfVendorId,
                 Status = _newVrfStatus,
                 LegalEntityId = _account.HashedLegalEntityId,
                 CaseStatusLastUpdatedDate = _newVrfStatusUpdateDate
@@ -67,7 +66,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var account = DataAccess.GetAccountByLegalEntityId(_account.LegalEntityId);
             account.Should().NotBeNull();
             account.VrfCaseId.Should().Be(_newVrfCaseId);
-            account.VrfVendorId.Should().Be(_newVrfVendorId);
             account.VrfCaseStatus.Should().Be(_newVrfStatus);
             account.VrfCaseStatusLastUpdatedDateTime.Should().Be(_newVrfStatusUpdateDate);
         }
