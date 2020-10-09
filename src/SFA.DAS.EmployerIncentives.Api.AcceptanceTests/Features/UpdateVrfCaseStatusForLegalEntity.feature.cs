@@ -157,7 +157,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("VRF case status is changed to \'Case request complete\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 18
- testRunner.Then("Employer Incentives account legal entity record is not updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("Employer Incentives account legal entity record is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 19
  testRunner.And("a command to add an Employer Vendor Id Command is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

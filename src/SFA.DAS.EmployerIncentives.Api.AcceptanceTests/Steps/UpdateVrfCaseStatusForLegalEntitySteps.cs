@@ -70,19 +70,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             account.VrfCaseStatusLastUpdatedDateTime.Should().Be(_newVrfStatusUpdateDate);
         }
 
-        [Then(@"Employer Incentives account legal entity record is not updated")]
-        public void ThenEmployerIncentivesAccountLegalEntityRecordIsNotUpdated()
-        {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-            var account = DataAccess.GetAccountByLegalEntityId(_account.LegalEntityId);
-            account.Should().NotBeNull();
-            account.VrfCaseId.Should().NotBe(_newVrfCaseId);
-            account.VrfVendorId.Should().NotBe(_newVrfVendorId);
-            account.VrfCaseStatus.Should().NotBe(_newVrfStatus);
-            account.VrfCaseStatusLastUpdatedDateTime.Should().NotBe(_newVrfStatusUpdateDate);
-        }
-
         [Then(@"a command to add an Employer Vendor Id Command is sent")]
         public void ThenACommandToAddAnEmployerVendorIdCommandIsSent()
         {
