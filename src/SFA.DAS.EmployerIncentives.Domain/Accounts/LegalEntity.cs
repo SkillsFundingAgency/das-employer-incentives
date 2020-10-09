@@ -61,12 +61,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.HashedLegalEntityId = hashedId;
         }
 
-        internal void UpdateVendorRegistrationCaseStatus(string caseId, string vendorId, string status, DateTime caseStatusLastUpdatedDate)
+        internal void UpdateVendorRegistrationCaseStatus(string caseId, string status, DateTime caseStatusLastUpdatedDate)
         {
             if (VrfStatusIsCompleted()) return;
 
             Model.VrfCaseId = caseId;
-            Model.VrfVendorId = vendorId;
             Model.VrfCaseStatus = status;
             Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
         }
