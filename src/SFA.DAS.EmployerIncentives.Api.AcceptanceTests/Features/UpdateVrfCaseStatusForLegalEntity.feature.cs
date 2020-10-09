@@ -154,7 +154,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an existing submitted incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 17
- testRunner.When("VRF case status is changed to \'Case request complete\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("VRF case status is changed to \'Case Request Completed\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 18
  testRunner.Then("Employer Incentives account legal entity record is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
