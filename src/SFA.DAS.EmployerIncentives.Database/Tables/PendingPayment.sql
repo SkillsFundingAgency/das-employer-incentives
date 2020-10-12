@@ -7,6 +7,8 @@
     [Amount] DECIMAL(9, 2) NOT NULL, 
     [CalculatedDate] DATETIME2 NOT NULL, 
     [PaymentMadeDate] DATETIME2 NULL,
+    [PaymentPeriod] TINYINT NULL,	
+	[PaymentYear] SMALLINT NULL
     CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id)
 )
 GO

@@ -77,6 +77,8 @@
     <None Include="Scripts\Data.CollectionCalendar.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Build Include="Tables\ApprenticeshipIncentive.sql" />
+    <Build Include="Tables\PendingPayment.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
