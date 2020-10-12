@@ -12,17 +12,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     public class GetPayableLegalEntities
     {
         private readonly IQueryDispatcher _queryDispatcher;
-        
-        public GetPayableLegalEntities(IQueryDispatcher queryDispatcher)
+        private ILogger<GetPayableLegalEntities> _logger;
+
+        public GetPayableLegalEntities(IQueryDispatcher queryDispatcher, ILogger<GetPayableLegalEntities> logger)
         {
             _queryDispatcher = queryDispatcher;
+            _logger = logger;
         }
 
         [FunctionName("GetPayableLegalEntities")]
-        public async Task<List<long>> Get([ActivityTrigger]CollectionPeriod collectionPeriod, ILogger log)
+        public async Task<List<long>> Get([ActivityTrigger]CollectionPeriod collectionPeriod)
         {
             var legalEntities = await _queryDispatcher.Send<GetPayableLegalEntitiesRequest, GetPayableLegalEntitiesResponse>(new GetPayableLegalEntitiesRequest(collectionPeriod.Year, collectionPeriod.Month));
-            log.LogInformation($"{legalEntities.PayableLegalEntities.Count} payable legal entities returned.");
+            _logger.LogInformation($"{legalEntities.PayableLegalEntities.Count} payable legal entities returned.");
             return legalEntities.PayableLegalEntities.Select(x => x.AccountLegalEntityId).ToList();
         }
     }
