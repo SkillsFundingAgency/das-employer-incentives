@@ -53,8 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             var actual = await _sut.GetList(collectionPeriodYear, collectionPeriodMonth);
 
             actual.Count.Should().Be(2);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountId);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountLegalEntityId);
         }
 
         [Test]
@@ -75,8 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             var actual = await _sut.GetList(collectionPeriodYear, collectionPeriodMonth);
 
             actual.Count.Should().Be(2);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountId);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountLegalEntityId);
         }
 
         [Test]
@@ -97,8 +97,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             var actual = await _sut.GetList(collectionPeriodYear, collectionPeriodMonth);
 
             actual.Count.Should().Be(2);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountId);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountLegalEntityId);
         }
 
         [Test]
@@ -108,8 +108,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             short collectionPeriodMonth = 5;
             var pendingPayments = new List<PendingPayment>
             {
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountId, 1234).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountId, 1234).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountLegalEntityId, 1234).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountLegalEntityId, 1234).Create(),
                 _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, (short)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
             };
 
@@ -119,7 +119,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             var actual = await _sut.GetList(collectionPeriodYear, collectionPeriodMonth);
 
             actual.Count.Should().Be(1);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
         }
 
         [Test]
@@ -140,8 +140,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             var actual = await _sut.GetList(collectionPeriodYear, collectionPeriodMonth);
 
             actual.Count.Should().Be(2);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountId);
-            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountLegalEntityId);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         public Task<List<PayableLegalEntityDto>> GetList(int collectionPeriodYear, int collectionPeriodMonth)
         {
             var accountLegalEntities = _context.Set<PendingPayment>().Where(x => !x.PaymentMadeDate.HasValue && (x.PaymentYear < collectionPeriodYear || (x.PaymentYear == collectionPeriodYear && x.PaymentPeriod <= collectionPeriodMonth)))
-                .Select(x => x.AccountId).Distinct(); //TODO: Changed to account legal entity id
+                .Select(x => x.AccountLegalEntityId).Distinct();
 
             return accountLegalEntities.Select(x => new PayableLegalEntityDto {AccountLegalEntityId = x}).ToListAsync();
         }
