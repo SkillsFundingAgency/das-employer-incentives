@@ -24,8 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private CalculateEarningsCommandHandler _sut;
         private Mock<IIncentivePaymentProfilesService> _mockPaymentProfilesService;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
         private List<IncentivePaymentProfile> _paymentProfiles;
+        private List<CollectionPeriod> _collectionPeriods;
 
         [SetUp]
         public void Arrange()
@@ -34,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
             _paymentProfiles = new List<IncentivePaymentProfile>
             {
@@ -48,6 +51,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockPaymentProfilesService
                .Setup(m => m.Get())
                .ReturnsAsync(_paymentProfiles);
+
+            _collectionPeriods = new List<CollectionPeriod>()
+            {
+                new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1))
+            };
+
+            _mockCollectionCalendarService
+                .Setup(m => m.Get())
+                .ReturnsAsync(new CollectionCalendar(_collectionPeriods));
 
             _fixture.Register(() => new ApprenticeshipIncentiveFactory()
                     .CreateNew(_fixture.Create<Guid>(), 
@@ -65,7 +77,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _sut = new CalculateEarningsCommandHandler(
                 _mockIncentiveDomainRespository.Object,
-                _mockPaymentProfilesService.Object);
+                _mockPaymentProfilesService.Object,
+                _mockCollectionCalendarService.Object);
         }
 
         [Test]

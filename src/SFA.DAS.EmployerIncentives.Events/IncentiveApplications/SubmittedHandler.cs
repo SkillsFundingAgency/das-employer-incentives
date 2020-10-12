@@ -20,7 +20,8 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
         {
             var command = new CreateIncentiveCommand(
                 @event.AccountId,
-                @event.IncentiveApplicationId
+                @event.IncentiveApplicationId,
+                @event.AccountLegalEntityId
                 );
 
             return _commandPublisher.Publish(command);

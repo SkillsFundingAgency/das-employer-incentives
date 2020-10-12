@@ -54,7 +54,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
                 Amount = x.Amount,
                 DueDate = x.DueDate,
-                CalculatedDate = x.CalculatedDate
+                CalculatedDate = x.CalculatedDate,
+                PaymentPeriod = x.PaymentPeriod,
+                PaymentYear = x.PaymentYear
             }).ToList();
         }
 
@@ -70,5 +72,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CalculatedDate = x.CalculatedDate
             }).ToList();
         }
+
+        internal static ICollection<Domain.ValueObjects.CollectionPeriod> Map(this ICollection<CollectionPeriod> models)
+        {
+            return models.Select(x => 
+                new Domain.ValueObjects.CollectionPeriod(
+                    x.PeriodNumber, 
+                    x.CalendarMonth, 
+                    x.CalendarYear, 
+                    x.EIScheduledOpenDateUTC)
+            ).ToList();
+        }
+      
     }
 }

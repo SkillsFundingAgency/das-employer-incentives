@@ -53,7 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                  IncentiveApplicationId = Id,
                  SubmittedAt = submittedAt,
                  SubmittedBy = submittedByName,
-                 SubmittedByEmail = submittedByEmail
+                 SubmittedByEmail = submittedByEmail,
+                 AccountLegalEntityId = Model.AccountLegalEntityId
             });
         }
 

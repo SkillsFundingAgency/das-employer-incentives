@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             incentiveApplication.SetApprenticeships(_fixture.CreateMany<Domain.IncentiveApplications.Apprenticeship>(numberOfApprenticeships).ToList());
 
-            var command = new CreateIncentiveCommand(incentiveApplication.AccountId, incentiveApplication.Id);
+            var command = new CreateIncentiveCommand(incentiveApplication.AccountId, incentiveApplication.Id, incentiveApplication.AccountLegalEntityId);
 
             _mockApplicationDomainRespository.Setup(x => x
             .Find(command.IncentiveApplicationId))
@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             incentiveApplication.SetApprenticeships(_fixture.CreateMany<Domain.IncentiveApplications.Apprenticeship>(numberOfApprenticeships).ToList());
 
             int itemsPersisted = 0;
-            var command = new CreateIncentiveCommand(incentiveApplication.AccountId, incentiveApplication.Id);
+            var command = new CreateIncentiveCommand(incentiveApplication.AccountId, incentiveApplication.Id, incentiveApplication.AccountLegalEntityId);
 
             _mockApplicationDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId)).ReturnsAsync(incentiveApplication);
 
