@@ -21,7 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 EmployerType = model.Apprenticeship.EmployerType,
                 PlannedStartDate = model.PlannedStartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
-                PendingPayments = model.PendingPaymentModels.Map()
+                PendingPayments = model.PendingPaymentModels.Map(),
+                AccountLegalEntityId = model.Account.AccountLegalEntityId
             };
         }
 
@@ -30,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return new ApprenticeshipIncentiveModel
             {
                  Id = entity.Id,
-                 Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId),
+                 Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
                  Apprenticeship = new Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship(
                      entity.ApprenticeshipId,
                      entity.FirstName,
@@ -51,6 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             {                
                 Id = x.Id,
                 AccountId = x.Account.Id,
+                AccountLegalEntityId = x.Account.AccountLegalEntityId,
                 ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
                 Amount = x.Amount,
                 DueDate = x.DueDate,
@@ -65,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x => new PendingPaymentModel
             {
                 Id = x.Id,
-                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(x.AccountId),
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(x.AccountId, x.AccountLegalEntityId),
                 ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
                 Amount = x.Amount,
                 DueDate = x.DueDate,

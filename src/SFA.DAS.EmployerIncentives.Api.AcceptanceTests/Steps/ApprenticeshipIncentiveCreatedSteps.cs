@@ -54,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
                 .With( p => p.IncentiveApplicationApprenticeshipId, _apprenticeshipsModels.First().Id)
                 .With(p => p.AccountId, _applicationModel.AccountId)
+                .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
                 .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
                 .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
@@ -62,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                 .Create();
         }
 
@@ -202,6 +204,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
                 pendingPayments.Where(p => p.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList().Count.Should().Be(2);
+                pendingPayments.ToList().ForEach(p => p.AccountLegalEntityId.Should().Be(_accountModel.AccountLegalEntityId));
             }
         }
 

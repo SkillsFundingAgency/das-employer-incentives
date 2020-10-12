@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public DateTime PlannedStartDate => Model.PlannedStartDate;        
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId,  Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
             return new ApprenticeshipIncentive(
                 id, 
