@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _account1 = TestContext.TestData.GetOrCreate<Account>("FirstAccount");
             _account1.HashedLegalEntityId = _hashedLegalEntityId;
-            _account1.VrfVendorId = "VendorId123";
+            _account1.VrfVendorId = _existingVendorId;
             DataAccess.SetupAccount(_account1);
         }
 
