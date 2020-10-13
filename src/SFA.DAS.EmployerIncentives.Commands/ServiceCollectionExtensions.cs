@@ -146,7 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new AccountService(client, s.GetRequiredService<IHashingService>());
+                return new AccountService(client);
             });
 
             return serviceCollection;

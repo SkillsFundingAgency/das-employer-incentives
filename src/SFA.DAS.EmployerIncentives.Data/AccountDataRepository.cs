@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Data
     public class AccountDataRepository : IAccountDataRepository
     {
         private readonly EmployerIncentivesDbContext _dbContext;
-        
+
         public AccountDataRepository(EmployerIncentivesDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -31,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             foreach (Models.Account item in account.Map())
             {
                 var legalEntity = existing.SingleOrDefault(a => a.AccountLegalEntityId == item.AccountLegalEntityId);
-                if(legalEntity == null)
+                if (legalEntity == null)
                 {
                     _dbContext.Add(item);
                 }
@@ -39,6 +40,11 @@ namespace SFA.DAS.EmployerIncentives.Data
                 {
                     legalEntity.LegalEntityName = item.LegalEntityName;
                     legalEntity.HasSignedIncentivesTerms = item.HasSignedIncentivesTerms;
+                    legalEntity.VrfCaseId = item.VrfCaseId;
+                    legalEntity.VrfCaseStatus = item.VrfCaseStatus;
+                    legalEntity.VrfVendorId = item.VrfVendorId;
+                    legalEntity.VrfCaseStatusLastUpdatedDateTime = item.VrfCaseStatusLastUpdatedDateTime;
+                    legalEntity.HashedLegalEntityId = item.HashedLegalEntityId;
                 }
             }
 
@@ -55,6 +61,18 @@ namespace SFA.DAS.EmployerIncentives.Data
         {
             var accounts = await _dbContext.Accounts.Where(a => a.Id == accountId).ToListAsync();
             return accounts?.MapSingle();
+        }
+
+        public async Task<IEnumerable<AccountModel>> GetByLegalEntityId(long legalEntityId)
+        {
+            var accounts = await _dbContext.Accounts.Where(x => x.LegalEntityId == legalEntityId).ToListAsync();
+            return accounts?.Map();
+        }
+
+        public async Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId)
+        {
+            var accounts = await _dbContext.Accounts.Where(x => x.HashedLegalEntityId == hashedLegalEntityId).ToListAsync();
+            return accounts?.Map();
         }
     }
 }

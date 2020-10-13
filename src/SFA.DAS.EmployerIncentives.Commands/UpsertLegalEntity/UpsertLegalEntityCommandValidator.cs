@@ -1,12 +1,11 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
-namespace SFA.DAS.EmployerIncentives.Application.AddLegalEntity
+namespace SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity
 {
-    public class AddLegalEntityCommandValidator : IValidator<AddLegalEntityCommand>
+    public class UpsertLegalEntityCommandValidator : IValidator<UpsertLegalEntityCommand>
     {
-        public Task<ValidationResult> Validate(AddLegalEntityCommand item)
+        public Task<ValidationResult> Validate(UpsertLegalEntityCommand item)
         {
             var result = new ValidationResult();
 

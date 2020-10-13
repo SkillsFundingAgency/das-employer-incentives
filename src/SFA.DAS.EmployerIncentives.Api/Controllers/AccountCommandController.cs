@@ -2,11 +2,12 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
+using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
+using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -18,9 +19,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPost("/accounts/{accountId}/legalEntities")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public async Task<IActionResult> AddLegalEntity([FromRoute] long accountId, [FromBody] AddLegalEntityRequest request)
+        public async Task<IActionResult> UpsertLegalEntity([FromRoute] long accountId, [FromBody] AddLegalEntityRequest request)
         {
-            await SendCommandAsync(new AddLegalEntityCommand(accountId, request.LegalEntityId, request.OrganisationName, request.AccountLegalEntityId));
+            await SendCommandAsync(new UpsertLegalEntityCommand(accountId, request.LegalEntityId, request.OrganisationName, request.AccountLegalEntityId));
             return Created($"/accounts/{accountId}/LegalEntities", new LegalEntityDto { AccountId = accountId, AccountLegalEntityId = request.AccountLegalEntityId, LegalEntityId = request.LegalEntityId, LegalEntityName = request.OrganisationName });
         }
 
@@ -35,6 +36,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> SignAgreement([FromRoute] long accountId, [FromRoute] long accountLegalEntityId, [FromBody] SignAgreementRequest request)
         {
             await SendCommandAsync(new SignLegalEntityAgreementCommand(accountId, accountLegalEntityId, request.AgreementVersion));
+            return NoContent();
+        }
+
+        [HttpPatch("/legalentities/{hashedLegalEntityId}/vendorregistrationform/status")]
+        public async Task<IActionResult> UpdateVendorRegistrationCaseStatus([FromRoute] string hashedLegalEntityId, [FromBody] UpdateVendorRegistrationCaseStatusRequest request)
+        {
+            await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(hashedLegalEntityId, request.CaseId, request.Status, request.CaseStatusLastUpdatedDate));
             return NoContent();
         }
     }
