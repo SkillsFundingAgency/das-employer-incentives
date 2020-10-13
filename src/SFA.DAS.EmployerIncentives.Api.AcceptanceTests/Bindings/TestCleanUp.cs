@@ -24,8 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             _context.AccountApi?.Dispose();
             _context.DomainMessageHandlers?.Dispose();
             _context.SqlDatabase.Dispose();
-
-            Directory.Delete(_context.TestDirectory.FullName, true);
         }
     }
 }
