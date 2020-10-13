@@ -1,9 +1,11 @@
-﻿using Dapper;
+﻿using System;
+using AutoFixture;
+using Dapper;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -18,7 +20,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             var fixture = new Fixture();
-            _testAccountTable = _testContext.TestData.GetOrCreate<Account>(null, () => fixture.Build<Account>().With(x => x.HasSignedIncentivesTerms, false).Create());
+            _testAccountTable = _testContext.TestData.GetOrCreate<Account>(null,
+                () => fixture.Build<Account>()
+                    .With(x => x.HasSignedIncentivesTerms, false)
+                    .With(x => x.VrfCaseId, (string)null)
+                    .With(x => x.VrfCaseStatus, (string)null)
+                    .With(x => x.VrfCaseStatusLastUpdatedDateTime, (DateTime?)null)
+                    .With(x => x.VrfVendorId, (string)null).Create());
         }
 
         [Given(@"a legal entity is not available in employer incentives")]
@@ -38,10 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"the legal entity is already available in Employer Incentives")]
         public async Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.ExecuteAsync("insert into Accounts(id, accountLegalEntityId, legalEntityId, legalentityName) values(@id, @accountLegalEntityId, @legalEntityId, @legalentityName)", _testAccountTable);
-            }
+            DataAccess.SetupAccount(_testAccountTable);
         }
 
         [Then(@"the legal entity should no longer be available in employer incentives")]
@@ -62,13 +67,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the legal entity should still be available in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldBeAvailableInTheDatabase()
         {
+            //var account = DataAccess.GetAccountByLegalEntityId()
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().HaveCount(1);
-                account.Should().BeEquivalentTo(_testAccountTable);
+                account.Single().Should().BeEquivalentTo(_testAccountTable, opts => opts.Excluding(x => x.HashedLegalEntityId));
+                account.Single().HashedLegalEntityId.Should().NotBeNullOrEmpty();
             }
         }
     }

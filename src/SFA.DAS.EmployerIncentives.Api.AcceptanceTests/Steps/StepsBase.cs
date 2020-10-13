@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using AutoFixture;
+﻿using AutoFixture;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using System;
+using System.Linq;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -12,12 +12,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         protected readonly TestContext TestContext;
         protected readonly EmployerIncentiveApi EmployerIncentiveApi;
         protected readonly Fixture Fixture;
+        protected readonly DataAccess DataAccess;
 
         public StepsBase(TestContext testContext)
         {
             TestContext = testContext;
             EmployerIncentiveApi = testContext.EmployerIncentiveApi;
             Fixture = new Fixture();
+            DataAccess = new DataAccess(testContext.SqlDatabase.DatabaseInfo.ConnectionString);
 
             var hook = testContext.Hooks.SingleOrDefault(h => h is Hook<object>) as Hook<object>;
 

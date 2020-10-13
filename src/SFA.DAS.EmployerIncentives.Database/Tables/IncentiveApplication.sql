@@ -12,3 +12,5 @@
 GO
 CREATE INDEX IX_IncentiveApplication_AccountId ON IncentiveApplication (AccountId)
 GO
+CREATE INDEX IX_IncentiveApplication_Status ON IncentiveApplication ([Status]) INCLUDE (AccountLegalEntityId)
+GO

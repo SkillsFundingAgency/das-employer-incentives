@@ -2,9 +2,9 @@
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
-namespace SFA.DAS.EmployerIncentives.Commands.AddLegalEntity
+namespace SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity
 {    
-    public class AddLegalEntityCommand : ICommand, ILockIdentifier
+    public class UpsertLegalEntityCommand : ICommand, ILockIdentifier
     {
         public long AccountId { get; private set; }
         public long LegalEntityId { get; private set; }
@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.AddLegalEntity
         public long AccountLegalEntityId { get; set; }
         public string LockId { get => $"{nameof(Account)}_{AccountId}"; }
 
-        public AddLegalEntityCommand(
+        public UpsertLegalEntityCommand(
             long accountId,
             long legalEntityId,
             string name,

@@ -9,8 +9,8 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Commands.AddLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
+using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
 {
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             _sut = new ApplicationCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<AddLegalEntityCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<UpsertLegalEntityCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 

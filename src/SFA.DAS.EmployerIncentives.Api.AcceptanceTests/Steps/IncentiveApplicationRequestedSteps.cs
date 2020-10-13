@@ -1,12 +1,10 @@
-﻿using System.Data.SqlClient;
-using System.Linq;
+﻿using AutoFixture;
 using FluentAssertions;
-using System.Threading.Tasks;
-using AutoFixture;
-using Dapper;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using System.Linq;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -15,28 +13,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "IncentiveApplicationRequested")]
     public class IncentiveApplicationRequestedSteps : StepsBase
     {
-        private readonly TestContext _testContext;
-        private Fixture _fixture;
-        private CreateIncentiveApplicationRequest _request;
+        private readonly CreateIncentiveApplicationRequest _request;
         private IncentiveApplicationDto _returnedApplication;
-        private Account _testAccountTable;
+        private readonly Account _testAccountTable;
 
         public IncentiveApplicationRequestedSteps(TestContext testContext) : base(testContext)
         {
-            _testContext = testContext;
             _testAccountTable = testContext.TestData.GetOrCreate<Account>();
-
-            _fixture = new Fixture();
-            _request = _fixture.Build<CreateIncentiveApplicationRequest>().With(x => x.AccountLegalEntityId, _testAccountTable.AccountLegalEntityId).Create();
+            var fixture = new Fixture();
+            _request = fixture.Build<CreateIncentiveApplicationRequest>().With(x => x.AccountLegalEntityId, _testAccountTable.AccountLegalEntityId).Create();
         }
 
         [Given(@"An employer has selected the apprenticeships for their application")]
         public async Task GivenAnEmployerHasSelectedApprenticeships()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.ExecuteAsync("insert into Accounts(id, accountLegalEntityId, legalEntityId, legalentityName) values(@id, @accountLegalEntityId, @legalEntityId, @legalentityName)", _testAccountTable);
-            }
+            DataAccess.SetupAccount(_testAccountTable);
 
             var url = $"applications";
             await EmployerIncentiveApi.Post(url, _request);
@@ -46,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheyRetrieveTheApplication()
         {
             var url = $"/accounts/{_request.AccountId}/applications/{_request.IncentiveApplicationId}";
-            var (status, data) =
+            var (_, data) =
                 await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplicationDto>(url);
 
             _returnedApplication = data;
