@@ -7,15 +7,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
     {
         public string HashedLegalEntityId { get; }
         public string CaseId { get; }
-        public string VendorId { get; }
         public string Status { get; }
         public DateTime CaseStatusLastUpdatedDate { get; }
 
-        public UpdateVendorRegistrationCaseStatusCommand(string hashedLegalEntityId, string caseId, string vendorId, string status, DateTime caseStatusLastUpdatedDate)
+        public UpdateVendorRegistrationCaseStatusCommand(string hashedLegalEntityId, string caseId, string status, DateTime caseStatusLastUpdatedDate)
         {
             HashedLegalEntityId = hashedLegalEntityId;
             CaseId = caseId;
-            VendorId = vendorId;
             Status = status;
             CaseStatusLastUpdatedDate = caseStatusLastUpdatedDate;
         }

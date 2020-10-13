@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpPatch("/legalentities/{hashedLegalEntityId}/vendorregistrationform/status")]
         public async Task<IActionResult> UpdateVendorRegistrationCaseStatus([FromRoute] string hashedLegalEntityId, [FromBody] UpdateVendorRegistrationCaseStatusRequest request)
         {
-            await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(hashedLegalEntityId, request.CaseId, request.VendorId, request.Status, request.CaseStatusLastUpdatedDate));
+            await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(hashedLegalEntityId, request.CaseId, request.Status, request.CaseStatusLastUpdatedDate));
             return NoContent();
         }
     }

@@ -62,7 +62,6 @@
     <Folder Include="Tables" />
     <Folder Include="StoredProcedures" />
     <Folder Include="Views" />
-    <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Accounts.sql" />
@@ -74,9 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
-  </ItemGroup>
-  <ItemGroup>
-    <PreDeploy Include="Scripts\Script.PreDeployment1.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
