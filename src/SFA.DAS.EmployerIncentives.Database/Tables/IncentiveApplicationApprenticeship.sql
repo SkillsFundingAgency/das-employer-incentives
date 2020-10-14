@@ -10,6 +10,7 @@
 	[PlannedStartDate] DATETIME2 NOT NULL,
 	[ApprenticeshipEmployerTypeOnApproval] INT NOT NULL,
 	[TotalIncentiveAmount] MONEY NOT NULL, 
+    [ProviderUKPRN] BIGINT NULL, 
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
 GO
