@@ -213,7 +213,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         {
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
-            apprenticeship.ProviderUKPRN = 0;
+            apprenticeship.ProviderUKPRN = null;
             var apprenticeships = new List<IncentiveApplicationApprenticeshipDto> { apprenticeship };
             var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), apprenticeships);
 
