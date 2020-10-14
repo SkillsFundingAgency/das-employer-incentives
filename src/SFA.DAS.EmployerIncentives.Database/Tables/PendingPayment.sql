@@ -16,3 +16,5 @@ GO
 CREATE CLUSTERED INDEX IX_PendingPayment ON [incentives].[PendingPayment] (AccountId)
 GO
 CREATE INDEX IX_PendingPayment_DuePayments ON [incentives].[PendingPayment] (PaymentMadeDate, PaymentYear, PaymentPeriod) INCLUDE (AccountLegalEntityId)
+GO
+CREATE INDEX IX_PendingPayment_DuePaymentsForALE ON [incentives].[PendingPayment] (AccountLegalEntityId, PaymentMadeDate, PaymentYear, PaymentPeriod) INCLUDE (Id)
