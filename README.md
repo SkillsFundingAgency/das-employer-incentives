@@ -17,6 +17,21 @@ Licensed under the [MIT license](https://github.com/SkillsFundingAgency/das-empl
 
 ##### Config
 
+###### SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
+
+local.settings.json
+
+	{
+	  "IsEncrypted": false,
+	  "Values": {
+		"AzureWebJobsStorage": "UseDevelopmentStorage=true",
+		"FUNCTIONS_WORKER_RUNTIME": "dotnet",
+		"ConfigurationStorageConnectionString": "UseDevelopmentStorage=true",
+		"ConfigNames": "SFA.DAS.EmployerIncentives",
+		"EnvironmentName": "LOCAL"
+	  }
+	}
+
 
 #### To run a local copy you will also require 
 
