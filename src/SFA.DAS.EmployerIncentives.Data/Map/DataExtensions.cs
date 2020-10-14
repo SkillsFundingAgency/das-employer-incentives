@@ -105,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 PlannedStartDate = x.PlannedStartDate,
                 Uln = x.Uln,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
-                ProviderUKPRN = x.ProviderUKPRN
+                UKPRN = x.UKPRN
             }).ToList();
         }
 

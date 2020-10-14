@@ -214,7 +214,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplicati
         {
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
-            apprenticeship.ProviderUKPRN = null;
+            apprenticeship.UKPRN = null;
             var apprenticeships = new List<IncentiveApplicationApprenticeshipDto> { apprenticeship };
             var command = new CreateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), apprenticeships);
             

@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedApprenticeship.PlannedStartDate.Should().Be(testApprenticeship.PlannedStartDate);
             storedApprenticeship.Uln.Should().Be(testApprenticeship.Uln);
             storedApprenticeship.TotalIncentiveAmount.Should().Be(testApprenticeship.TotalIncentiveAmount);
-            storedApprenticeship.ProviderUKPRN.Should().Be(testApprenticeship.ProviderUKPRN);
+            storedApprenticeship.UKPRN.Should().Be(testApprenticeship.UKPRN);
         }
     }
 }
