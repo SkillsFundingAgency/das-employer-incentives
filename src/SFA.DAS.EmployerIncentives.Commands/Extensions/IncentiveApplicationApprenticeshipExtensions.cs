@@ -14,7 +14,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Extensions
                 apprenticeship => factory.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
-                    apprenticeship.ApprenticeshipEmployerTypeOnApproval)
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                    apprenticeship.ProviderUKPRN)
             );
         }
     }

@@ -104,7 +104,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
                 Uln = x.Uln,
-                TotalIncentiveAmount = x.TotalIncentiveAmount
+                TotalIncentiveAmount = x.TotalIncentiveAmount,
+                ProviderUKPRN = x.ProviderUKPRN
             }).ToList();
         }
 
