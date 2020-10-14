@@ -207,5 +207,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             //Assert
             result.ValidationDictionary.Count.Should().Be(1);
         }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_the_provider_ukprn_has_a_default_value()
+        {
+            //Arrange
+            var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
+            apprenticeship.ProviderUKPRN = 0;
+            var apprenticeships = new List<IncentiveApplicationApprenticeshipDto> { apprenticeship };
+            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), apprenticeships);
+
+            //Act
+            var result = await _sut.Validate(command);
+
+            //Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
     }
 }
