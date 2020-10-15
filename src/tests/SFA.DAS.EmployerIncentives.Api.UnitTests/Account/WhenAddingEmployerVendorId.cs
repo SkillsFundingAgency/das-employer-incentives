@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             var request = _fixture.Create<AddEmployerVendorIdRequest>();
 
             // Act
-            await _sut.AddEmplyerVendorId(accountLegalEntityId, request);
+            await _sut.AddEmployerVendorId(accountLegalEntityId, request);
 
             // Assert
             _mockCommandDispatcher
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             var request = _fixture.Create<AddEmployerVendorIdRequest>();
 
             // Act
-            var actual = await _sut.AddEmplyerVendorId(accountLegalEntityId, request) as NoContentResult;
+            var actual = await _sut.AddEmployerVendorId(accountLegalEntityId, request) as NoContentResult;
 
             // Assert
             actual.Should().NotBeNull();

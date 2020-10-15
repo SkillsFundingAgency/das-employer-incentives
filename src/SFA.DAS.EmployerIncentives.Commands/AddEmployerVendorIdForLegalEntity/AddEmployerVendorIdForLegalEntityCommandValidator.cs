@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity
             }
             else if (item.EmployerVendorId.All(c => c == '0'))
             {
-                result.AddError("EmployerVendorId", "Is not set to a validate Id");
+                result.AddError("EmployerVendorId", "Is not set to a valid Id");
             }
 
             return Task.FromResult(result);
