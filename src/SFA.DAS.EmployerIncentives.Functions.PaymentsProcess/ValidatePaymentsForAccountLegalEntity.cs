@@ -11,9 +11,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         private readonly ICommandDispatcher _queryDispatcher;
         private ILogger<ValidatePaymentsForAccountLegalEntity> _logger;
 
-        public ValidatePaymentsForAccountLegalEntity(ICommandDispatcher queryDispatcher, ILogger<ValidatePaymentsForAccountLegalEntity> logger)
+        public ValidatePaymentsForAccountLegalEntity( //ICommandDispatcher queryDispatcher,
+                                                      ILogger<ValidatePaymentsForAccountLegalEntity> logger)
         {
-            _queryDispatcher = queryDispatcher;
+            //_queryDispatcher = queryDispatcher;
             _logger = logger;
         }
 
