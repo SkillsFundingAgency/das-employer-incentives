@@ -52,7 +52,5 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             await SendCommandAsync(new AddEmployerVendorIdForLegalEntityCommand(hashedLegalEntityId, request.EmployerVendorId));
             return NoContent();
         }
-
-
     }
 }
