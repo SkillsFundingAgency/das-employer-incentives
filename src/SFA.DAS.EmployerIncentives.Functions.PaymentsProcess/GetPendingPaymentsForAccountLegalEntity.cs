@@ -24,9 +24,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         [FunctionName("GetPendingPaymentsForAccountLegalEntity")]
         public async Task<List<Guid>> Get([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
-            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityCollectionPeriod.AccountLegalEntityId, accountLegalEntityCollectionPeriod.CollectionPeriod.Year, accountLegalEntityCollectionPeriod.CollectionPeriod.Month);
+            var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
+            var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
+            _logger.LogInformation($"Calculate Payments process started for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod });
+
+            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, collectionPeriod.Year, collectionPeriod.Month);
             var pendingPayments = await _queryDispatcher.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(request);
-            _logger.LogInformation($"{pendingPayments.PendingPayments.Count} pending payments returned.");
+            _logger.LogInformation($"{pendingPayments.PendingPayments.Count} pending payments returned for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod });
             return pendingPayments.PendingPayments.Select(x => x.Id).ToList();
         }
     }
