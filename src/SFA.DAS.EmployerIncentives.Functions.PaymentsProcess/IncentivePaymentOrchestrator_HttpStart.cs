@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriodMonth}")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
             short collectionPeriodYear,
-            short collectionPeriodMonth,
+            byte collectionPeriodMonth,
             ILogger log)
         {
             var collectionPeriod = new CollectionPeriod { Year = collectionPeriodYear, Month = collectionPeriodMonth };

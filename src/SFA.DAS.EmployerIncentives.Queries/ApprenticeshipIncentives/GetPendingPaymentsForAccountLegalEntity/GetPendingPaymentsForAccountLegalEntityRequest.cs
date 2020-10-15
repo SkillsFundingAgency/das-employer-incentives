@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPending
     {
         public long AccountLegalEntityId { get; }
         public short CollectionPeriodYear { get; }
-        public short CollectionPeriodMonth { get; }
+        public byte CollectionPeriodMonth { get; }
 
-        public GetPendingPaymentsForAccountLegalEntityRequest(long accountLegalEntityId, short collectionPeriodYear, short collectionPeriodMonth)
+        public GetPendingPaymentsForAccountLegalEntityRequest(long accountLegalEntityId, short collectionPeriodYear, byte collectionPeriodMonth)
         {
             AccountLegalEntityId = accountLegalEntityId;
             CollectionPeriodYear = collectionPeriodYear;

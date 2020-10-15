@@ -5,7 +5,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipInc
     public class PendingPaymentDto
     {
         public Guid Id { get; set; }
-        public short? PaymentPeriod { get; set; }
+        public byte? PaymentPeriod { get; set; }
         public short? PaymentYear { get; set; }
         public long AccountLegalEntityId { get; set; }
         public DateTime? PaymentMadeDate { get; set; }

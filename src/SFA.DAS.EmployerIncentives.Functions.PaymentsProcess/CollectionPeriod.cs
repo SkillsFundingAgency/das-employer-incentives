@@ -3,7 +3,7 @@
     public class CollectionPeriod
     {
         public short Year { get; set; }
-        public short Month { get; set; }
+        public byte Month { get; set; }
 
         public override string ToString()
         {
