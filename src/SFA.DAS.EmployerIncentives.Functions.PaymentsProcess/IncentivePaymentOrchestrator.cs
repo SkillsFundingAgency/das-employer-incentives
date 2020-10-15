@@ -20,21 +20,21 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             var collectionPeriod = context.GetInput<CollectionPeriod>();
 
-            _logger.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}", new { collectionPeriod });
+            await _logger.LogInformationAsync($"Incentive Payment process started for collection period {collectionPeriod}", new { collectionPeriod });
 
             var payableLegalEntities = await context.CallActivityAsync<List<long>>("GetPayableLegalEntities", collectionPeriod);
 
             var calculatePaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
             {
-                _logger.LogInformation($"Request made to process payments for account legal entity {legalEntity}", new { collectionPeriod, legalEntity });
+                await _logger.LogInformationAsync($"Request made to process payments for account legal entity {legalEntity}", new { collectionPeriod, legalEntity });
                 var calculatePaymentTask = context.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", new AccountLegalEntityCollectionPeriod { AccountLegalEntityId = legalEntity, CollectionPeriod = collectionPeriod });
                 calculatePaymentTasks.Add(calculatePaymentTask);
             }
 
             await Task.WhenAll(calculatePaymentTasks);
 
-            _logger.LogInformation($"Incentive Payment process completed for collection period {collectionPeriod}", new { collectionPeriod });
+            await _logger.LogInformationAsync($"Incentive Payment process completed for collection period {collectionPeriod}", new { collectionPeriod });
         }
     }
 }

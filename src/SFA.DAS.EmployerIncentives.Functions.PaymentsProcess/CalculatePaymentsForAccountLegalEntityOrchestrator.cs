@@ -23,16 +23,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
-            _logger.LogInformation($"Calculate Payments process started for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod  });
+            await _logger.LogInformationAsync($"Calculate Payments process started for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod  });
 
             var pendingPayments = await context.CallActivityAsync<List<Guid>>("GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
 
             foreach (var pendingPaymentId in pendingPayments)
             {
-                _logger.LogInformation($"Request made to validate pending payment for pending payment id {pendingPaymentId}", new { accountLegalEntityId, collectionPeriod, pendingPayment = pendingPaymentId });
+                await _logger.LogInformationAsync($"Request made to validate pending payment for pending payment id {pendingPaymentId}", new { accountLegalEntityId, collectionPeriod, pendingPayment = pendingPaymentId });
             }
 
-            _logger.LogInformation($"Calculate Payments process completed for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod });
+            await _logger.LogInformationAsync($"Calculate Payments process completed for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod });
         }
     }
 }
