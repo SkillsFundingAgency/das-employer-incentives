@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,12 +19,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
         {
             var accounts = await _domainRepository.GetByHashedLegalEntityId(command.HashedLegalEntityId);
 
+            var saveTasks = new List<Task>();
             foreach (var account in accounts)
             {
                 account.UpdateVendorRegistrationCaseStatus(command.HashedLegalEntityId, command.CaseId, command.Status, command.CaseStatusLastUpdatedDate);
 
-                await _domainRepository.Save(account);
+                saveTasks.Add(_domainRepository.Save(account));
             }
+
+            await Task.WhenAll(saveTasks);
         }
     }
 }
