@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
@@ -24,15 +25,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 _logger.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}", new {collectionPeriod});
 
             var payableLegalEntities = await context.CallActivityAsync<List<long>>("GetPayableLegalEntities", collectionPeriod);
-
-            var validatePaymentTasks = new List<Task>();
-            foreach (var legalEntity in payableLegalEntities)
-            {
-                var validatePaymentTask = context.CallActivityAsync("ValidatePaymentsForAccountLegalEntity", new AccountLegalEntityCollectionPeriod { AccountLegalEntityId = legalEntity, CollectionPeriod = collectionPeriod });
-                validatePaymentTasks.Add(validatePaymentTask);
-            }
-            await Task.WhenAll(validatePaymentTasks);
-
 
             var calculatePaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
