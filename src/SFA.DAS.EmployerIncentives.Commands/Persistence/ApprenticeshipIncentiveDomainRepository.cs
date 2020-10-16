@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Persistence
@@ -32,6 +33,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 
             return null;
         }
+
+        //public async Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindForAccountLegalEntity(long accountLegalEntityId)
+        //{
+        //    var application = await _apprenticeshipIncentiveDataRepository.Get(id);
+        //    if (application != null)
+        //    {
+        //        return await Task.FromResult(_apprenticeshipIncentiveFactory.GetExisting(id, application));
+        //    }
+
+        //    return null;
+        //}
 
         public async Task Save(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive aggregate)
         {
