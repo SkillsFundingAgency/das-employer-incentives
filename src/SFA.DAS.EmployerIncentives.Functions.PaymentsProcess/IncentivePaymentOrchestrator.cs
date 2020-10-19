@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
@@ -24,12 +25,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             if(!context.IsReplaying)
                 _logger.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}", new {collectionPeriod});
 
-            var payableLegalEntities = await context.CallActivityAsync<List<long>>("GetPayableLegalEntities", collectionPeriod);
+            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", collectionPeriod);
 
             var calculatePaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
             {
-                var calculatePaymentTask = context.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", new AccountLegalEntityCollectionPeriod { AccountLegalEntityId = legalEntity, CollectionPeriod = collectionPeriod });
+                var calculatePaymentTask = context.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
                 calculatePaymentTasks.Add(calculatePaymentTask);
             }
 
