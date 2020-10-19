@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPendingPaymentsForAccountLegalEntity;
 
@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         }
 
         [FunctionName("GetPendingPaymentsForAccountLegalEntity")]
-        public async Task<List<Guid>> Get([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
+        public async Task<List<PendingPaymentActivityDto>> Get([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, collectionPeriod.Year, collectionPeriod.Month);
             var pendingPayments = await _queryDispatcher.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(request);
             _logger.LogInformation($"{pendingPayments.PendingPayments.Count} pending payments returned for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod });
-            return pendingPayments.PendingPayments.Select(x => x.Id).ToList();
+            return pendingPayments.PendingPayments.Select(x => new PendingPaymentActivityDto { PendingPaymentId = x.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId }).ToList();
         }
     }
 }

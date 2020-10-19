@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _logger.LogInformation($"Getting VendorId for account legal entity {accountLegalEntityCollectionPeriod.AccountLegalEntityId}, collection period {accountLegalEntityCollectionPeriod.AccountId}");
             var legalEntity = await _queryDispatcher.Send<GetLegalEntityRequest, GetLegalEntityResponse>(new GetLegalEntityRequest(accountLegalEntityCollectionPeriod.AccountId, accountLegalEntityCollectionPeriod.AccountLegalEntityId));
 
-            return legalEntity.LegalEntity.VrfVendorId;
+            return legalEntity?.LegalEntity?.VrfVendorId;
         }
     }
 }
