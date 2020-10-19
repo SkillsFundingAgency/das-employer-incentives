@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -23,9 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
-            await context.CallActivityAsync("ValidatePaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
+            //await context.CallActivityAsync("ValidatePaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
 
             var pendingPayments = await context.CallActivityAsync<List<Guid>>("GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
+
 
             foreach (var pendingPaymentId in pendingPayments)
             {
