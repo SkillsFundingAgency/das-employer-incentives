@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             var list = await _sut.Get(_accountLegalEntityCollectionPeriod);
 
-            //list.Should().BeEquivalentTo(_pendingPayments.Select(x=> new PendingPaymentActivityDto { PendingPaymentId = x.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId}).ToList());
+            list.Should().BeEquivalentTo(_pendingPayments.Select(x=> new PendingPaymentActivityDto { PendingPaymentId = x.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId}).ToList());
         }
     }
 }
