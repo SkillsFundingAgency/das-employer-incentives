@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Add(testAccount);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Accounts.Count().Should().Be(1);
