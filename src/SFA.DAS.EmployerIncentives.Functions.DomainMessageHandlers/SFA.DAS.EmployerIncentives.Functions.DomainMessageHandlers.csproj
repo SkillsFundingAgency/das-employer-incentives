@@ -4,7 +4,7 @@
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
   </PropertyGroup> 
   <ItemGroup>
-    <Content Include="Nlog.config">
+    <Content Include="Nnlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
