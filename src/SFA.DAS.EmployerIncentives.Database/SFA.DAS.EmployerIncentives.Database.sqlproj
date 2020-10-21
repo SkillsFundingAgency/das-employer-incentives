@@ -80,6 +80,7 @@
     <Build Include="Tables\ApprenticeshipIncentive.sql" />
     <Build Include="Tables\PendingPayment.sql" />
     <Build Include="Tables\PendingPaymentValidationResult.sql" />
+    <Build Include="Tables\Payment.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />

@@ -1,0 +1,13 @@
+﻿CREATE TABLE [incentives].[Payment]
+(
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,
+	[ApprenticeshipIncentiveId] UNIQUEIDENTIFIER NOT NULL,
+	[PendingPaymentId] UNIQUEIDENTIFIER NOT NULL,
+	[AccountId] BIGINT NOT NULL,
+	[AccountLegalEntityId] BIGINT NOT NULL,
+	[CalculatedDate] DATETIME2 NOT NULL,
+	[PaidDate] DATETIME2 NOT NULL,
+	[SubNominalCode] NVARCHAR(20) NOT NULL,
+	[PaymentPeriod] TINYINT NOT NULL,
+	[PaymentYear] SMALLINT NOT NULL
+)
