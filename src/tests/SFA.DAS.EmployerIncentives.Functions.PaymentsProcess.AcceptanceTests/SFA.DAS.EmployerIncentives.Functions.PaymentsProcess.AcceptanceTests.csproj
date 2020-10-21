@@ -11,7 +11,9 @@
     <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.20" />
     <PackageReference Include="SpecFlow.Plus.LivingDocPlugin" Version="3.4.192" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.5" />
-    <PackageReference Include="SpecRun.SpecFlow" Version="3.4.19" />
+    <PackageReference Include="SpecFlow" Version="3.4.8" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.4.8" />
+    <PackageReference Include="SpecFlow.NUnit" Version="3.4.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +23,19 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Features\CalculatePayments.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\CalculatePayments.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>CalculatePayments.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>
