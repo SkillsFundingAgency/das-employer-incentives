@@ -6,10 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
-    <PackageReference Include="FluentAssertions" Version="4.17.0" />
+    <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.20" />
-    <PackageReference Include="SpecFlow.Plus.LivingDocPlugin" Version="3.4.192" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.5" />
     <PackageReference Include="SpecFlow" Version="3.4.8" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.4.8" />
@@ -17,25 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Drivers\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Features\CalculatePayments.feature.cs">
-      <DesignTime>True</DesignTime>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\CalculatePayments.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>CalculatePayments.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>

@@ -87,4 +87,7 @@
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
+  </ItemGroup>
 </Project>
