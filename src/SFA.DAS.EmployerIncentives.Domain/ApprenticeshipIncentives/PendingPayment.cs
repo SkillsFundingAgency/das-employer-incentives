@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public decimal Amount => Model.Amount;
         public byte? PaymentPeriod => Model.PaymentPeriod;
         public short? PaymentYear => Model.PaymentYear;
+        public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
 
         internal static PendingPayment New(
             Guid id, 
@@ -39,6 +40,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var period = collectionCalendar.GetPeriod(DueDate);
             Model.PaymentPeriod = period.PeriodNumber;
             Model.PaymentYear = period.CalendarYear;
+        }
+
+        public void SetPaymentMadeDate(DateTime paymentDate)
+        {
+            Model.PaymentMadeDate = paymentDate;
         }
 
         internal static PendingPayment Get(PendingPaymentModel model)

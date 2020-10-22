@@ -15,6 +15,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public DateTime? PaidDate => Model.PaidDate;
         public SubnominalCode SubnominalCode => Model.SubnominalCode;
 
+        internal static Payment New(
+            Guid id,
+            Account account,
+            Guid apprenticeshipIncentiveId,
+            Guid pendingPaymentId,
+            decimal amount,
+            DateTime calculatedDate,
+            short paymentYear,
+            byte paymentPeriod
+        )
+        {
+            return new Payment(new PaymentModel
+                {
+                    Id = id,
+                    Account = account,
+                    ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
+                    PendingPaymentId = pendingPaymentId,
+                    Amount = amount,
+                    CalculatedDate = calculatedDate,
+                    PaymentYear = paymentYear,
+                    PaymentPeriod = paymentPeriod
+                },
+                true);
+        }
+
         internal static Payment Get(PaymentModel model)
         {
             return new Payment(model);

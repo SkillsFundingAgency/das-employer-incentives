@@ -69,6 +69,55 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
         }
 
+        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth)
+        {
+            var pendingPayment = GetPendingPayment(pendingPaymentId);
+
+            // TODO: Make sure pending payment is valid
+
+            RemoveExistingPaymentIfExists(pendingPaymentId);
+
+            var paymentDate = DateTime.Now;
+
+            AddPayment(pendingPaymentId, collectionYear, collectionMonth, pendingPayment, paymentDate);
+            pendingPayment.SetPaymentMadeDate(paymentDate);
+        }
+
+        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
+        {
+            var payment = Payment.New(
+                Guid.NewGuid(), 
+                Model.Account, 
+                Model.Id, 
+                pendingPaymentId, 
+                pendingPayment.Amount,
+                paymentDate, 
+                collectionYear, 
+                collectionMonth);
+
+            Model.PaymentModels.Add(payment.GetModel());
+        }
+
+        private void RemoveExistingPaymentIfExists(Guid pendingPaymentId)
+        {
+            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == pendingPaymentId);
+            if (existingPayment != null)
+            {
+                Model.PaymentModels.Remove(existingPayment);
+            }
+        }
+
+        private PendingPayment GetPendingPayment(Guid pendingPaymentId)
+        {
+            var pendingPayment = PendingPayments.SingleOrDefault(x => x.Id == pendingPaymentId);
+            if (pendingPayment == null)
+            {
+                throw new ArgumentException("Pending payment does not exist.");
+            }
+
+            return pendingPayment;
+        }
+
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)
         {            
             if(isNew)
