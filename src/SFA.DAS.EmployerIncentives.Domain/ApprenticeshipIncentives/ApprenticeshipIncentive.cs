@@ -68,6 +68,32 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
         }
 
+        public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account,  CollectionPeriod collectionPeriod)
+        {
+            if(Account.Id != account.Id)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided Account record does not match the one against the incentive.");
+            }
+
+            var pendingPayment = PendingPayments.SingleOrDefault(p => p.Id == pendingPaymentId);
+
+            if (pendingPayment == null)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the pending payment record does not exist.");
+            }
+            
+            var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
+
+            bool isValid = false;
+
+            if (!string.IsNullOrEmpty(legalEntity.VrfVendorId))
+            {
+                isValid = true;
+            }
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, "HasBankDetails", isValid));
+        }
+
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)
         {            
             if(isNew)
