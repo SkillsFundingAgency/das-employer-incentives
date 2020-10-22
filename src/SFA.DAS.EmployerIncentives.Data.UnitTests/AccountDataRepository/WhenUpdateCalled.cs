@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(testAccount);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Accounts.Count().Should().Be(1);
@@ -87,6 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(accountModel);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             var addedAccount = _dbContext.Accounts.Single(a => a.Id == testAccount.Id && a.AccountLegalEntityId == testAccount.AccountLegalEntityId);
@@ -125,6 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(accountModel);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Accounts.Count().Should().Be(1);
@@ -150,6 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(accountModel);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Accounts.Count().Should().Be(0);
