@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         [AfterScenario()]
         public async Task CleanUp()
         {
-            if (_context.TestMessageBus.IsRunning)
+            if (_context.TestMessageBus != null && _context.TestMessageBus.IsRunning)
             {
                 await _context.TestMessageBus.Stop();
             }

@@ -1,10 +1,12 @@
 ﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
@@ -74,19 +76,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                 .Create();
 
-            //await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            //await connection.InsertAsync(_accountModel);
-            //await connection.InsertAsync(_applicationModel);
-            //await connection.InsertAsync(_apprenticeshipsModels);
-            //await connection.InsertAsync(_apprenticeshipIncentive);
-            //await connection.InsertAsync(_pendingPayment1);
-            //await connection.InsertAsync(_pendingPayment2);
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await connection.InsertAsync(_accountModel);
+            await connection.InsertAsync(_applicationModel);
+            await connection.InsertAsync(_apprenticeshipsModels);
+            await connection.InsertAsync(_apprenticeshipIncentive);
+            await connection.InsertAsync(_pendingPayment1);
+            await connection.InsertAsync(_pendingPayment2);
         }
 
         [When(@"the payment process is run")]
         public async Task WhenPendingPaymentsForTheLegalEntityAreValidated()
         {
-            await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriodMonth);
+            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriodMonth);
+
+            status.RuntimeStatus.Should().NotBe("Failed", status.Output);
+            status.RuntimeStatus.Should().Be("Completed");
         }
 
         [Then(@"the validation fails")]
@@ -98,7 +103,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"validation results are recorded")]
         public async Task ThenValidationResultsAreRecorded()
         {
-            var results = await _testContext.DataRepository.GetPaymentValidationResults();
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
             results.Should().HaveCount(2);
             results.Any(r => r.ValidationResult).Should().BeFalse();
         }

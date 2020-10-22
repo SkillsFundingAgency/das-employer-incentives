@@ -1,0 +1,13 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "EnvironmentName": "LOCAL",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "NServiceBusConnectionString": "UseDevelopmentStorage=true",
+    "ConfigNames": "SFA.DAS.EmployerIncentives",
+    "Version": "1.0"
+  },
+  "DotnetExecutablePath": "%ProgramFiles%\\dotnet\\dotnet.exe",
+  "FunctionHostPath": "%APPDATA%\\npm\\node_modules\\azure-functions-core-tools\\bin\\func.dll",
+  "FunctionApplicationPath": "..\\..\\..\\..\\..\\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\\bin\\Debug\\netcoreapp3.1",
+}

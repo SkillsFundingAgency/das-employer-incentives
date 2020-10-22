@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -19,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             builder.Services.AddNLog();
             builder.Services.AddQueryServices();
-            //builder.Services.AddCommandServices();
+            //      builder.Services.AddCommandServices();
 
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
@@ -29,13 +30,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            //configBuilder.AddAzureTableStorage(options =>
-            //{
-            //    // options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
-            //    options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-            //    options.EnvironmentName = configuration["EnvironmentName"];
-            //    options.PreFixConfigurationKeys = false;
-            //});
+            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            {
+                configBuilder.AddAzureTableStorage(options =>
+                {
+                    options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
+                    options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                    options.EnvironmentName = configuration["EnvironmentName"];
+                    options.PreFixConfigurationKeys = false;
+                });
+            }
 #if DEBUG
             if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
             {
