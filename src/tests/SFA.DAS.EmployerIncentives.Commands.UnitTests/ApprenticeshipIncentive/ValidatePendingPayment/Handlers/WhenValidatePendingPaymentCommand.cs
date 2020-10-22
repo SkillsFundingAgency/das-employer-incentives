@@ -25,8 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private ValidatePendingPaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
-        private ISpecificationsFactory<PendingPayment> _specificationsFactory;
-        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+                private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private List<CollectionPeriod> _collectionPeriods;
         private string _vrfVendorId;
         private Account _account;
@@ -41,8 +40,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
-
-            _specificationsFactory = new PendingPaymentSpecificationsFactory(_mockAccountDomainRepository.Object);
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
@@ -94,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _sut = new ValidatePendingPaymentCommandHandler(
                 _mockIncentiveDomainRespository.Object,
-                _specificationsFactory,
+                _mockAccountDomainRepository.Object,
                 _mockCollectionCalendarService.Object);
         }
 
@@ -141,12 +138,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var collectionPeriod = _collectionPeriods.First();
 
             var accountModel = _fixture.Build<AccountModel>()
-               .With(a => a.LegalEntityModels, new List<LegalEntityModel>() { 
+                .With(a => a.Id, _account.Id)
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() { 
                    _fixture.Build<LegalEntityModel>()
                    .With(l => l.VrfVendorId, string.Empty)
                    .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
                    .Create()})
-               .Create();
+                .Create();
 
             var domainAccount = Domain.Accounts.Account.Create(accountModel);
 
@@ -174,12 +172,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var collectionPeriod = _collectionPeriods.First();
 
             var accountModel = _fixture.Build<AccountModel>()
-               .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
+                .With(a => a.Id, _account.Id)
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
                    _fixture.Build<LegalEntityModel>()
                    .With(l => l.VrfVendorId, string.Empty)
                    .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
                    .Create()})
-               .Create();
+                .Create();
 
             var domainAccount = Domain.Accounts.Account.Create(accountModel);
 
@@ -193,12 +192,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Act
             accountModel = _fixture.Build<AccountModel>()
-               .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
+                .With(a => a.Id, _account.Id)
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
                    _fixture.Build<LegalEntityModel>()
                    .With(l => l.VrfVendorId, Guid.NewGuid().ToString())
                    .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
                    .Create()})
-               .Create();
+                .Create();
 
             domainAccount = Domain.Accounts.Account.Create(accountModel);
 

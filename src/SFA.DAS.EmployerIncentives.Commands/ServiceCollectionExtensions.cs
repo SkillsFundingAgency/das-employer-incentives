@@ -80,8 +80,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
-            serviceCollection.AddSingleton<ISpecificationsFactory<PendingPayment>, PendingPaymentSpecificationsFactory>();
-
             return serviceCollection;
         }
 

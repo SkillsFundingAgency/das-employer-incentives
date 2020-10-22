@@ -8,7 +8,6 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -68,19 +67,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
             });
         }
-        public async Task ValidatePendingPayment(Guid pendingPaymentId,  IEnumerable<Specification<PendingPayment>> pendingPaymentRules, CollectionPeriod collectionPeriod)
+
+        public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account,  CollectionPeriod collectionPeriod)
         {
+            if(Account.Id != account.Id)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided Account record does not match the one against the incentive.");
+            }
+
             var pendingPayment = PendingPayments.SingleOrDefault(p => p.Id == pendingPaymentId);
 
-            if(pendingPayment == null)
+            if (pendingPayment == null)
             {
                 throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the pending payment record does not exist.");
             }
+            
+            var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
 
-            foreach (var rule in pendingPaymentRules)
+            bool isValid = false;
+
+            if (!string.IsNullOrEmpty(legalEntity.VrfVendorId))
             {
-                pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, rule.Name, await rule.IsSatisfiedBy(pendingPayment)));                
+                isValid = true;
             }
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, "HasBankDetails", isValid));
         }
 
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)
