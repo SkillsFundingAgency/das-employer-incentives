@@ -36,6 +36,7 @@ using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -63,6 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             .AddSingleton<IValidator<CreateIncentiveCommand>, NullValidator>()
             .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
             .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
+            .AddSingleton<IValidator<CreatePaymentCommand>, NullValidator>()
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
