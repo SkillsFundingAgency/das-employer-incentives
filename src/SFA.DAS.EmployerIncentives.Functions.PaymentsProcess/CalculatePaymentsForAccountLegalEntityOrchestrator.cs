@@ -27,12 +27,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             var pendingPayments = await context.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
 
+            var tasks = new List<Task>();
             foreach (var pendingPayment in pendingPayments)
             {
-                await context.CallActivityAsync<string>("ValidatePendingPayment", pendingPayment);
-                //TODO: this logging should be removed when an activity is called from here but it in place to allow testing in the short term.
-                _logger.LogInformation($"Request made to validate pending payment for pending payment id {pendingPayment.PendingPaymentId}", new { accountLegalEntityId, collectionPeriod, pendingPayment = pendingPayment.PendingPaymentId });
+                tasks.Add(
+                    context.CallActivityAsync("ValidatePendingPayment", pendingPayment)
+                        .ContinueWith(previous => context.CallActivityAsync("CreatePayment",
+                            new CreatePaymentInput
+                            {
+                                ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
+                                PendingPaymentId = pendingPayment.PendingPaymentId, CollectionPeriod = collectionPeriod
+                            }), TaskContinuationOptions.OnlyOnRanToCompletion));
             }
+
+            await Task.WhenAll(tasks);
         }
     }
 }

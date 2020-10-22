@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -17,7 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private CalculatePaymentsForAccountLegalEntityOrchestrator _orchestrator;
         private AccountLegalEntityCollectionPeriod _accountLegalEntityCollectionPeriod;
-
+        private List<PendingPaymentActivityDto> _pendingPayments;
+        
         [SetUp]
         public void Setup()
         {
@@ -28,8 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
             _mockOrchestrationContext.Setup(x => x.GetInput<AccountLegalEntityCollectionPeriod>()).Returns(_accountLegalEntityCollectionPeriod);
 
-            var pendingPayments = _fixture.Create<List<PendingPaymentActivityDto>>();
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod)).ReturnsAsync(pendingPayments);
+            _pendingPayments = _fixture.CreateMany<PendingPaymentActivityDto>(3).ToList();
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod)).ReturnsAsync(_pendingPayments);
 
             _orchestrator = new CalculatePaymentsForAccountLegalEntityOrchestrator(Mock.Of<ILogger<CalculatePaymentsForAccountLegalEntityOrchestrator>>());
         }
@@ -40,6 +42,33 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_payment_is_created_after_validation_completes()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(
+                x => x.CallActivityAsync<object>("CreatePayment",
+                    It.Is<CreatePaymentInput>(y =>
+                        y.ApprenticeshipIncentiveId == _pendingPayments[0].ApprenticeshipIncentiveId &&
+                        y.PendingPaymentId == _pendingPayments[0].PendingPaymentId && 
+                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
+
+            _mockOrchestrationContext.Verify(
+                x => x.CallActivityAsync<object>("CreatePayment",
+                    It.Is<CreatePaymentInput>(y =>
+                        y.ApprenticeshipIncentiveId == _pendingPayments[1].ApprenticeshipIncentiveId &&
+                        y.PendingPaymentId == _pendingPayments[1].PendingPaymentId &&
+                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
+
+            _mockOrchestrationContext.Verify(
+                x => x.CallActivityAsync<object>("CreatePayment",
+                    It.Is<CreatePaymentInput>(y =>
+                        y.ApprenticeshipIncentiveId == _pendingPayments[2].ApprenticeshipIncentiveId &&
+                        y.PendingPaymentId == _pendingPayments[2].PendingPaymentId &&
+                        y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
         }
     }
 }
