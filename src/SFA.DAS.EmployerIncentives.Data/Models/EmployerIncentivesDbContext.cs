@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
         public virtual DbSet<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }
         public virtual DbSet<PendingPayment> PendingPayments { get; set; }
+        public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<CollectionPeriod> CollectionPeriods { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

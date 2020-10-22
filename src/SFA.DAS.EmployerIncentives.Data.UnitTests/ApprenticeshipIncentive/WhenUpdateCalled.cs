@@ -48,7 +48,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             storedIncentive.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
             storedIncentive.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
-            
+            storedIncentive.PendingPaymentModels = _fixture.CreateMany<PendingPaymentModel>().ToList();
+            storedIncentive.PaymentModels = _fixture.CreateMany<PaymentModel>().ToList();
+
             await _sut.Update(storedIncentive);
 
             // Assert
@@ -63,6 +65,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                      x.EmployerType == storedIncentive.Apprenticeship.EmployerType
                 )
                 .Should().Be(1);
+            _dbContext.PendingPayments.Count().Should().Be(storedIncentive.PendingPaymentModels.Count);
+            _dbContext.Payments.Count().Should().Be(storedIncentive.PaymentModels.Count);
         }
     }
 }

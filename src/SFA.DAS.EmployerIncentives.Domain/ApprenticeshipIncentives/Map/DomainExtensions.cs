@@ -15,5 +15,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
         {
             return PendingPayment.Get(model);
         }
+
+        public static IEnumerable<Payment> Map(this IEnumerable<PaymentModel> models)
+        {
+            return models.Select(q => q.Map());
+        }
+
+        public static Payment Map(this PaymentModel model)
+        {
+            return Payment.Get(model);
+        }
     }
 }

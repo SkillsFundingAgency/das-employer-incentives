@@ -6,8 +6,9 @@
 	[AccountId] BIGINT NOT NULL,
 	[AccountLegalEntityId] BIGINT NOT NULL,
 	[CalculatedDate] DATETIME2 NOT NULL,
-	[PaidDate] DATETIME2 NOT NULL,
+	[PaidDate] DATETIME2 NULL,
 	[SubNominalCode] NVARCHAR(20) NOT NULL,
 	[PaymentPeriod] TINYINT NOT NULL,
-	[PaymentYear] SMALLINT NOT NULL
+	[PaymentYear] SMALLINT NOT NULL, 
+    [Amount] DECIMAL(9, 2) NOT NULL
 )

@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var incentive = _sut.GetExisting(_id, _model);
 
             // Assert
-            incentive.Should().BeEquivalentTo(_model, opt => opt.Excluding(x => x.PendingPaymentModels).Excluding(x => x.ApplicationApprenticeshipId));
+            incentive.Should().BeEquivalentTo(_model, opt => opt.Excluding(x => x.PendingPaymentModels).Excluding(x => x.ApplicationApprenticeshipId).Excluding(x => x.PaymentModels));
         }
 
         [Test]
@@ -47,6 +47,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                     opt => opt.Excluding(x => x.ApprenticeshipIncentiveId)
                               .Excluding(x => x.CalculatedDate)
                               .Excluding(x => x.PaymentMadeDate));
+        }
+
+        [Test]
+        public void Then_the_payments_are_mapped()
+        {
+            // Act
+            var incentive = _sut.GetExisting(_id, _model);
+
+            // Assert
+            incentive.Payments
+                .Should()
+                .BeEquivalentTo(
+                    _model.PaymentModels,
+                    opt => opt.Excluding(x => x.ApprenticeshipIncentiveId)
+                        .Excluding(x => x.CalculatedDate)
+                        .Excluding(x => x.PendingPaymentId));
         }
     }
 }
