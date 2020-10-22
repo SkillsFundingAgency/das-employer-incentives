@@ -10,6 +10,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public string Step => Model.Step;
         public CollectionPeriod CollectionPeriod => Model.CollectionPeriod;
 
+        public DateTime DateTime => Model.DateTime;
+        public bool Result => Model.Result;
+
         internal static PendingPaymentValidationResult New(
             Guid id, 
             CollectionPeriod collectionPeriod, 
@@ -22,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 CollectionPeriod = collectionPeriod,
                 Step = step,
                 Result = result,
-                Datetime = DateTime.UtcNow
+                DateTime = DateTime.UtcNow
             },
                 true);
             }

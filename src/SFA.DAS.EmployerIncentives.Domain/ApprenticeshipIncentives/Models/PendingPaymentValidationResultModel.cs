@@ -10,6 +10,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public string Step { get; set; }
         public bool Result { get; set; }
         public CollectionPeriod CollectionPeriod { get; set; }
-        public DateTime Datetime { get; set; }
+        public DateTime DateTime { get; set; }
     }
 }
