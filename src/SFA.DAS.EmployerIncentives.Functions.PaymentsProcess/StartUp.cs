@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -20,7 +21,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             builder.Services.AddNLog();
             builder.Services.AddQueryServices();
-            //      builder.Services.AddCommandServices();
 
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
@@ -53,6 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddEntityFrameworkForEmployerIncentives().AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
 
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
+
+            builder.Services.AddCommandServices();
         }
 
         private bool ConfigurationIsLocalOrAcceptanceTests(IConfiguration configuration)
