@@ -7,6 +7,7 @@ using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
@@ -17,6 +18,7 @@ using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -77,6 +79,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
             
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
+
+            serviceCollection.AddSingleton<ISpecificationsFactory<PendingPayment>, PendingPaymentSpecificationsFactory>();
 
             return serviceCollection;
         }

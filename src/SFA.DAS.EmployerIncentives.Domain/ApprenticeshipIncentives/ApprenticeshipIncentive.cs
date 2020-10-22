@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -66,6 +67,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApprenticeshipId = Apprenticeship.Id,
                 ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
             });
+        }
+        public async Task ValidatePendingPayment(Guid pendingPaymentId,  IEnumerable<Specification<PendingPayment>> pendingPaymentRules, CollectionPeriod collectionPeriod)
+        {
+            var pendingPaymentModel = Model.PendingPaymentModels.SingleOrDefault(p => p.Id == pendingPaymentId);
+
+            if(pendingPaymentModel == null)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the pending payment record does not exist.");
+            }
+
+            var pendingPayment = pendingPaymentModel.Map();
+
+            foreach (var rule in pendingPaymentRules)
+            {
+                pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, rule.Name, await rule.IsSatisfiedBy(pendingPayment)));                
+            }
         }
 
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)
