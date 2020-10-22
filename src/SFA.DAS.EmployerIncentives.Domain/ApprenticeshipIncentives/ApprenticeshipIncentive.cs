@@ -70,14 +70,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         }
         public async Task ValidatePendingPayment(Guid pendingPaymentId,  IEnumerable<Specification<PendingPayment>> pendingPaymentRules, CollectionPeriod collectionPeriod)
         {
-            var pendingPaymentModel = Model.PendingPaymentModels.SingleOrDefault(p => p.Id == pendingPaymentId);
+            var pendingPayment = PendingPayments.SingleOrDefault(p => p.Id == pendingPaymentId);
 
-            if(pendingPaymentModel == null)
+            if(pendingPayment == null)
             {
                 throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the pending payment record does not exist.");
             }
-
-            var pendingPayment = pendingPaymentModel.Map();
 
             foreach (var rule in pendingPaymentRules)
             {
