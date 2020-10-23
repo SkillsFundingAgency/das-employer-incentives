@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public decimal TotalIncentiveAmount => Model.TotalIncentiveAmount;
         public bool EarningsCalculated => Model.EarningsCalculated;
 
-        internal static Apprenticeship Create(ApprenticeshipModel model)
+        public static Apprenticeship Create(ApprenticeshipModel model)
         {
             return new Apprenticeship(model.Id, model, false);
         }
