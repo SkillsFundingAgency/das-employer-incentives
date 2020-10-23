@@ -43,12 +43,20 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         [Test]
         public async Task Then_the_apprenticeship_incentive_is_updated_with_new_values()
         {
-            // Act
+            // Arrange
             var storedIncentive = await _sut.Get(_testIncentive.Id);
 
             storedIncentive.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
             storedIncentive.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
-            
+
+            var pendingPayments = _fixture.Build<PendingPaymentModel>().With(
+                x => x.ApprenticeshipIncentiveId, storedIncentive.Id).CreateMany().ToList();
+            storedIncentive.PendingPaymentModels = pendingPayments;
+
+            var validationResults = _fixture.CreateMany<PendingPaymentValidationResultModel>().ToList();
+            storedIncentive.PendingPaymentModels.First().PendingPaymentValidationResultModels = validationResults;
+
+            // Act
             await _sut.Update(storedIncentive);
 
             // Assert
@@ -63,6 +71,26 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                      x.EmployerType == storedIncentive.Apprenticeship.EmployerType
                 )
                 .Should().Be(1);
+
+            var savedPayments = _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == storedIncentive.Id);
+            savedPayments.Should().BeEquivalentTo(pendingPayments, opt => opt
+                .Excluding(x => x.Account)
+                .Excluding(x => x.PendingPaymentValidationResultModels));
+
+            var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
+                x.PendingPaymentId == storedIncentive.PendingPaymentModels.First().Id);
+            savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
+                .Excluding(x => x.DateTime)
+                .Excluding(x => x.CollectionPeriod)
+            );
+
+            foreach (var result in savedValidationResults)
+            {
+                result.CollectionPeriodMonth.Should()
+                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarMonth);
+                result.CollectionPeriodYear.Should()
+                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
+            }
         }
     }
 }

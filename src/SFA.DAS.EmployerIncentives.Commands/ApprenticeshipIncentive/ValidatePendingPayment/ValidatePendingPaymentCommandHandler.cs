@@ -10,23 +10,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
     public class ValidatePendingPaymentCommandHandler : ICommandHandler<ValidatePendingPaymentCommand>
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
-        private readonly IAccountDomainRepository _accountDomainRespository;
+        private readonly IAccountDomainRepository _accountDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
 
         public ValidatePendingPaymentCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository,
-            IAccountDomainRepository accountDomainRespository,
+            IAccountDomainRepository accountDomainRepository,
             ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
-            _accountDomainRespository = accountDomainRespository;
+            _accountDomainRepository = accountDomainRepository;
             _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(ValidatePendingPaymentCommand command, CancellationToken cancellationToken = default)
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
-            var account = await _accountDomainRespository.Find(incentive.Account.Id);
+            var account = await _accountDomainRepository.Find(incentive.Account.Id);
 
             var calendar = await _collectionCalendarService.Get();
             var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionMonth);

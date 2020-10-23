@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private PendingPayment _pendingPayment2;
         private const int NumberOfApprenticeships = 3;
         private const short CollectionPeriodYear = 2021;
-        private const byte CollectionPeriodMonth = 1;
+        private const byte CollectionPeriodMonth = 6;
 
         public ValidatePaymentsSteps(TestContext testContext)
         {
@@ -68,12 +68,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                 .With(p => p.PaymentPeriod, CollectionPeriodMonth)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
+                .Without(p => p.PaymentMadeDate)
                 .Create();
 
             _pendingPayment2 = _fixture.Build<PendingPayment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.PaymentPeriod, CollectionPeriodMonth)
+                .With(p => p.PaymentYear, CollectionPeriodYear)
+                .Without(p => p.PaymentMadeDate)
                 .Create();
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
@@ -106,7 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
             results.Should().HaveCount(2);
-            results.Any(r => r.ValidationResult).Should().BeFalse();
+            results.Any(r => r.Result == true).Should().BeFalse();
         }
 
         [Then(@"pending payments are marked as not payable")]

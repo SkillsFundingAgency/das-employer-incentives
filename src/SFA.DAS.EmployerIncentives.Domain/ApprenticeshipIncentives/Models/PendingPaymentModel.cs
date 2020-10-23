@@ -18,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public short? PaymentYear { get; set; }
         
         public ICollection<PendingPaymentValidationResultModel> PendingPaymentValidationResultModels { get; set; }
+        public bool Payable { get; set; }
 
         public PendingPaymentModel()
         {

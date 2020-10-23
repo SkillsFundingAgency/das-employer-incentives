@@ -22,24 +22,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
         internal static PendingPayment New(
-            Guid id, 
-            Account account, 
-            Guid apprenticeshipIncentiveId, 
+            Guid id,
+            Account account,
+            Guid apprenticeshipIncentiveId,
             decimal amount,
             DateTime dueDate,
             DateTime calculatedDate
             )
-        {            
-            return new PendingPayment(new PendingPaymentModel { 
+        {
+            return new PendingPayment(new PendingPaymentModel
+            {
                 Id = id,
                 Account = account,
                 ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                 Amount = amount,
                 CalculatedDate = calculatedDate,
-                DueDate = dueDate
+                DueDate = dueDate,
             },
                 true);
-            }
+        }
 
         public void SetPaymentPeriod(CollectionCalendar collectionCalendar)
         {
@@ -55,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
                                       v.CollectionPeriod == validationResult.CollectionPeriod);
 
-            if(existing != null)
+            if (existing != null)
             {
                 Model.PendingPaymentValidationResultModels.Remove(existing);
             }
