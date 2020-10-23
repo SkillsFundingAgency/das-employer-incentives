@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SFA.DAS.Configuration.AzureTableStorage;
-using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -11,6 +9,9 @@ using SFA.DAS.UnitOfWork.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using System;
 using System.IO;
+using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.EmployerIncentives.Commands;
+using SFA.DAS.EmployerIncentives.Events;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -20,8 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddNLog();
-            builder.Services.AddQueryServices();
-
+            
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
 
@@ -30,16 +30,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            configBuilder.AddAzureTableStorage(options =>
             {
-                configBuilder.AddAzureTableStorage(options =>
-                {
-                    options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
-                    options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-                    options.EnvironmentName = configuration["EnvironmentName"];
-                    options.PreFixConfigurationKeys = false;
-                });
-            }
+                options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
+                options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                options.EnvironmentName = configuration["EnvironmentName"];
+                options.PreFixConfigurationKeys = false;
+            });
 #if DEBUG
             if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -53,8 +50,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddEntityFrameworkForEmployerIncentives().AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
 
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
+            builder.Services.Configure<ApplicationSettings>(config.GetSection("PolicySettings"));
 
+            builder.Services.AddPersistenceServices();
+            builder.Services.AddQueryServices();
             builder.Services.AddCommandServices();
+            builder.Services.AddEventServices();
         }
 
         private bool ConfigurationIsLocalOrAcceptanceTests(IConfiguration configuration)

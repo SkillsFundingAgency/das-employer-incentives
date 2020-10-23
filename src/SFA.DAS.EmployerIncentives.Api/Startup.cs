@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!ConfigurationIsLocalOrAcceptanceTests())
+            if (!ConfigurationIsAcceptanceTests())
             {
                 config.AddAzureTableStorage(options =>
                 {
@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services
                 .AddMvc(o =>
                 {
-                    if (!ConfigurationIsLocalOrAcceptanceTests())
+                    if (!ConfigurationIsLocalOrDevOrAcceptanceTests())
                     {
                         o.Conventions.Add(new AuthorizeControllerModelConvention());
                     }
@@ -135,10 +135,9 @@ namespace SFA.DAS.EmployerIncentives.Api
             serviceProvider.StartNServiceBus(Configuration).GetAwaiter().GetResult();
         }
 
-        private bool ConfigurationIsLocalOrAcceptanceTests()
+        private bool ConfigurationIsAcceptanceTests()
         {
-            return Configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   Configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
+            return Configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
         }
 
         private bool ConfigurationIsLocalOrDevOrAcceptanceTests()
