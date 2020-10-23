@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             };
         }
 
-        private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(IncentiveApplicationApprenticeship apprenticeship)
+        private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(Models.IncentiveApplicationApprenticeship apprenticeship)
         {
             return new IncentiveApplicationApprenticeshipDto
             {
