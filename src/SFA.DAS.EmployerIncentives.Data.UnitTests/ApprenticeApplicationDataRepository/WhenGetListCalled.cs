@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             allApplications[0].AccountId = accountId;
             allApplications[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<IncentiveApplicationApprenticeship>(10).ToArray();
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
             allApprenticeships[1].IncentiveApplicationId = allApplications[0].Id;
             allApprenticeships[2].IncentiveApplicationId = allApplications[0].Id;
             allApprenticeships[3].IncentiveApplicationId = allApplications[0].Id;
