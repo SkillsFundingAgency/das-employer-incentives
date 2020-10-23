@@ -20,10 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var accountLegalEntityCollectionPeriod = context.GetInput<AccountLegalEntityCollectionPeriod>();
-            var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
-
-            var vendorId = await context.CallActivityAsync<string>("GetVendorIdForAccountLegalEntity", accountLegalEntityCollectionPeriod);
 
             var pendingPayments = await context.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
 
