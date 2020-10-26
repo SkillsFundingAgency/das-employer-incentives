@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Bindings
@@ -14,11 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             _context = context;
         }
 
-        [BeforeScenario()]
-        public async Task InitialiseFunctions()
+        [BeforeScenario(Order = 10)]
+        public void InitialiseFunctions()
         {
             _context.PaymentsProcessFunctions = new TestPaymentsProcessFunctions(_context);
-            await _context.PaymentsProcessFunctions.Start();
+            _context.PaymentsProcessFunctions.Start();
         }
     }
 }

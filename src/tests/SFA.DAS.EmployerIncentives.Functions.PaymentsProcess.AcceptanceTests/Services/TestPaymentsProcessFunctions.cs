@@ -26,9 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _client = new HttpClient { BaseAddress = new Uri($"http://localhost:{Port}") };
         }
 
-        public async Task Start()
+        public void Start()
         {
-            await ReplaceDbConnectionString();
             ReadTestConfig();
             StartFunctionHost();
         }
@@ -128,6 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             var functionConfig = Path.Combine(functionAppFolder, TestConfigFile);
             File.Copy(TestConfigFile, functionConfig, overwrite: true);
+            ReplaceDbConnectionString(functionConfig);
 
             var startInfo = new ProcessStartInfo
             {
@@ -151,11 +151,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Bind("TestSettings", _settings);
         }
 
-        private async Task ReplaceDbConnectionString()
+        private void ReplaceDbConnectionString(string pathToConfig)
         {
             var escapedConnString = HttpUtility.JavaScriptStringEncode(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            await File.WriteAllTextAsync(TestConfigFile, (await File.ReadAllTextAsync(TestConfigFile))
-                .Replace("DB_CONNECTION_STRING", escapedConnString));
+            File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("DB_CONNECTION_STRING", escapedConnString));
         }
     }
 }
