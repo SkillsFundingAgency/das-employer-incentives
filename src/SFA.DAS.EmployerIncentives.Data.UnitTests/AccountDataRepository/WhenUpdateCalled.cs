@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(testAccount);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Accounts.Count().Should().Be(1);
@@ -57,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
             storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
             storedAccount.HasSignedIncentivesTerms.Should().Be(testLegalEntity.HasSignedAgreementTerms);
+            storedAccount.HashedLegalEntityId.Should().Be(testLegalEntity.HashedLegalEntityId);
         }
 
         [Test]
@@ -86,12 +88,18 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(accountModel);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             var addedAccount = _dbContext.Accounts.Single(a => a.Id == testAccount.Id && a.AccountLegalEntityId == testAccount.AccountLegalEntityId);
             addedAccount.LegalEntityId.Should().Be(testAccount.LegalEntityId);
             addedAccount.LegalEntityName.Should().Be(newName);
             addedAccount.HasSignedIncentivesTerms.Should().Be(newHasSignedTerms);
+            addedAccount.VrfCaseId.Should().Be(testAccount.VrfCaseId);
+            addedAccount.VrfCaseStatus.Should().Be(testAccount.VrfCaseStatus);
+            addedAccount.VrfVendorId.Should().Be(testAccount.VrfVendorId);
+            addedAccount.VrfCaseStatusLastUpdatedDateTime.Should().Be(testAccount.VrfCaseStatusLastUpdatedDateTime);
+            addedAccount.HashedLegalEntityId.Should().Be(testAccount.HashedLegalEntityId);
         }
 
         [Test]
@@ -119,6 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(accountModel);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Accounts.Count().Should().Be(1);
@@ -144,6 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Act
             await _sut.Update(accountModel);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Accounts.Count().Should().Be(0);
