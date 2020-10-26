@@ -19,7 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public byte? PaymentPeriod { get; set; }
         public short? PaymentYear { get; set; }
         public long AccountLegalEntityId { get; set; }
-        public bool Payable { get; set; }
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPaymentValidationResult> ValidationResults { get; set; }
