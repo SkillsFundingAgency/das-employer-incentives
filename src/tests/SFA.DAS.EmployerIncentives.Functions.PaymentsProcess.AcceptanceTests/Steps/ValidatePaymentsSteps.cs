@@ -103,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
-            results.Should().HaveCount(2, _testContext.PaymentsProcessFunctions.FunctionLogs.ToString());
+            results.Should().HaveCount(2);
             results.Any(r => r.Result == true).Should().BeFalse();
         }
 

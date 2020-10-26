@@ -11,7 +11,6 @@
     "DbConnectionString": "DB_CONNECTION_STRING"
   },
   "TestSettings": {
-    "DotnetExecutablePath": "%ProgramFiles%\\dotnet\\dotnet.exe",
     "FunctionHostPath": "%APPDATA%\\npm\\node_modules\\azure-functions-core-tools\\bin\\func.exe",
     "FunctionApplicationPath": "src\\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\\bin\\Debug\\netcoreapp3.1"
   }
