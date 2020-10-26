@@ -89,6 +89,61 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await connection.InsertAsync(_pendingPayment2);
         }
 
+        [Given(@"a legal entity has pending payments with valid bank details")]
+        public async Task GivenALegalEntityHasAValidVendorId()
+        {
+            _accountModel = _fixture.Create<Account>();
+            _accountModel.VrfVendorId = "ABC123"; // Valid bank details
+
+            _applicationModel = _fixture.Build<IncentiveApplication>()
+                .With(p => p.Status, IncentiveApplicationStatus.InProgress)
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
+                .Create();
+
+            _apprenticeshipsModels = _fixture.Build<IncentiveApplicationApprenticeship>()
+                .With(p => p.IncentiveApplicationId, _applicationModel.Id)
+                .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
+                .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
+                .With(p => p.EarningsCalculated, false)
+                .CreateMany(NumberOfApprenticeships).ToList();
+
+            _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
+                .With(p => p.IncentiveApplicationApprenticeshipId, _apprenticeshipsModels.First().Id)
+                .With(p => p.AccountId, _applicationModel.AccountId)
+                .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
+                .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
+                .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
+                .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
+                .Create();
+
+            _pendingPayment1 = _fixture.Build<PendingPayment>()
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.PaymentPeriod, CollectionPeriod)
+                .With(p => p.PaymentYear, CollectionPeriodYear)
+                .Without(p => p.PaymentMadeDate)
+                .Create();
+
+            _pendingPayment2 = _fixture.Build<PendingPayment>()
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.PaymentPeriod, CollectionPeriod)
+                .With(p => p.PaymentYear, CollectionPeriodYear)
+                .Without(p => p.PaymentMadeDate)
+                .Create();
+
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await connection.InsertAsync(_accountModel);
+            await connection.InsertAsync(_applicationModel);
+            await connection.InsertAsync(_apprenticeshipsModels);
+            await connection.InsertAsync(_apprenticeshipIncentive);
+            await connection.InsertAsync(_pendingPayment1);
+            await connection.InsertAsync(_pendingPayment2);
+        }
+
         [When(@"the payment process is run")]
         public async Task WhenPendingPaymentsForTheLegalEntityAreValidated()
         {
@@ -99,12 +154,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Then(@"the validation fails and validation results are recorded")]
-        public async Task ThenValidationResultsAreRecorded()
+        public async Task ThenFailedValidationResultsAreRecorded()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
             results.Should().HaveCount(2);
             results.Any(r => r.Result == true).Should().BeFalse();
+        }
+
+
+        [Then(@"the validation succeeds and validation results are recorded")]
+        public async Task ThenSuccessValidationResultsAreRecorded()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
+            results.Should().HaveCount(2);
+            results.Any(r => r.Result == false).Should().BeFalse();
         }
 
     }

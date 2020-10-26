@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     {
         private const string TestConfigFile = "local.settings.json";
         private readonly TestContext _testContext;
-        private const int Port = 7002;
+        private const int Port = 7007;
         private readonly Settings _settings = new Settings();
         private readonly HttpClient _client;
         private bool _isDisposed;
@@ -131,8 +131,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = "cmd.exe",
-                Arguments = $"/k \"{functionHostPath}\" start -p {Port}",
+                FileName = functionHostPath,
+                Arguments = $"start -p {Port}",
                 WorkingDirectory = functionAppFolder,
                 UseShellExecute = true,
             };

@@ -40,12 +40,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                     options.PreFixConfigurationKeys = false;
                 });
             }
-            //#if DEBUG
-            //          if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
-            //           {
-            configBuilder.AddJsonFile($"local.settings.json", optional: true);
-            //          }
-            //#endif
+
+            configBuilder.AddJsonFile("local.settings.json", optional: true);
+
             var config = configBuilder.Build();
 
             builder.Services.AddOptions();
@@ -59,12 +56,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddQueryServices();
             builder.Services.AddCommandServices();
             builder.Services.AddEventServices();
-        }
-
-        private bool ConfigurationIsLocalOrAcceptanceTests(IConfiguration configuration)
-        {
-            return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
