@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.EmployerIncentives.Domain.Accounts
+namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
     public static class LegalEntityVrfCaseStatus
     {
@@ -8,3 +8,4 @@
         public const string Completed = "Case Request completed";
     }
 }
+

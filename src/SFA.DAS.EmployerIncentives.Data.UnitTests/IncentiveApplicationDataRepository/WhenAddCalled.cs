@@ -45,7 +45,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
 
             // Act
             await _sut.Add(testApplication);
-
+            await _dbContext.SaveChangesAsync();
+            
             // Assert
             _dbContext.Applications.Count().Should().Be(1);
 
@@ -73,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
 
             // Act
             await _sut.Add(testApplication);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.ApplicationApprenticeships.Count().Should().Be(1);
