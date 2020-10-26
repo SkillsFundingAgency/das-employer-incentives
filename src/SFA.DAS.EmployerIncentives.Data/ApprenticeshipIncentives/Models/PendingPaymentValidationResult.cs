@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public Guid PendingPaymentId { get; set; }
         public string Step { get; set; }
         public bool Result { get; set; }
-        public short CollectionPeriodMonth { get; set; }
+        public byte CollectionPeriodMonth { get; set; }
         public short CollectionPeriodYear { get; set; }
         public DateTime CollectionDateUtc { get; set; }
     }

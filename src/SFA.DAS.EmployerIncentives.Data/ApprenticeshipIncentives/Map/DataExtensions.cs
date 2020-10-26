@@ -93,7 +93,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CalculatedDate = x.CalculatedDate,
                 PaymentPeriod = x.PaymentPeriod,
                 PaymentYear = x.PaymentYear,
-                PaymentMadeDate = x.PaymentMadeDate
+                PaymentMadeDate = x.PaymentMadeDate,
+                PendingPaymentValidationResultModels = x.ValidationResults.Map()
+            }).ToList();
+        }
+
+        private static ICollection<PendingPaymentValidationResultModel> Map(this ICollection<PendingPaymentValidationResult> models)
+        {
+            return models.Select(x => new PendingPaymentValidationResultModel
+            {
+                 Id = x.Id,
+                 CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(1, x.CollectionPeriodMonth, x.CollectionPeriodYear, x.CollectionDateUtc),
+                 Result = x.Result,
+                 DateTime = x.CollectionDateUtc,
+                 Step = x.Step
             }).ToList();
         }
 
@@ -101,7 +114,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             return models.Select(x =>
                 new Domain.ValueObjects.CollectionPeriod(
-                    x.PeriodNumber,
+                    1, // TODO:
+                    //x.PeriodNumber,
                     x.CalendarMonth,
                     x.CalendarYear,
                     x.EIScheduledOpenDateUTC)
