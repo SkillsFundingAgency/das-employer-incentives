@@ -18,7 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         public void InitialiseDatabase()
         {
             _context.SqlDatabase = new SqlDatabase();
-            _context.DataRepository = new DataRepository(_context.SqlDatabase.DatabaseInfo.ConnectionString);
         }
     }
 }

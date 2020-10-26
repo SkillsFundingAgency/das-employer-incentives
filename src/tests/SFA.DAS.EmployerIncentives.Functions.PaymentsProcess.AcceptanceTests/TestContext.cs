@@ -3,9 +3,7 @@ using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
@@ -17,7 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public TestData TestData { get; set; }
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
-        public DataRepository DataRepository { get; set; }
 
         public TestContext()
         {
@@ -29,8 +26,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             TestData = new TestData();
             Hooks = new List<IHook>();
         }
-
-
     }
 }
 

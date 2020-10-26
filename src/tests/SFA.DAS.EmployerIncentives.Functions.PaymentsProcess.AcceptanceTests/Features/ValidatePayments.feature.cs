@@ -21,7 +21,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("ValidatePayments")]
-    [NUnit.Framework.CategoryAttribute("messageBus")]
     [NUnit.Framework.CategoryAttribute("database")]
     public partial class ValidatePaymentsFeature
     {
@@ -29,7 +28,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
         private string[] _featureTags = new string[] {
-                "messageBus",
                 "database"};
         
 #line 1 "ValidatePayments.feature"
@@ -41,7 +39,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ValidatePayments", "\tIn order to make employer incentives payments\r\n\tAs a employer incentives service" +
                     "\r\n\tI want to be validate and submit payment requests", ProgrammingLanguage.CSharp, new string[] {
-                        "messageBus",
                         "database"});
             testRunner.OnFeatureStart(featureInfo);
         }

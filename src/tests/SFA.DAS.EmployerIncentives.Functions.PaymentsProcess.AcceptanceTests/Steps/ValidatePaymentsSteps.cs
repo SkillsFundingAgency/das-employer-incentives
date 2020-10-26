@@ -1,10 +1,12 @@
 ﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
@@ -25,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private PendingPayment _pendingPayment2;
         private const int NumberOfApprenticeships = 3;
         private const short CollectionPeriodYear = 2021;
-        private const byte CollectionPeriodMonth = 1;
+        private const byte CollectionPeriodMonth = 6;
 
         public ValidatePaymentsSteps(TestContext testContext)
         {
@@ -66,27 +68,34 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                 .With(p => p.PaymentPeriod, CollectionPeriodMonth)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
+                .Without(p => p.PaymentMadeDate)
                 .Create();
 
             _pendingPayment2 = _fixture.Build<PendingPayment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.PaymentPeriod, CollectionPeriodMonth)
+                .With(p => p.PaymentYear, CollectionPeriodYear)
+                .Without(p => p.PaymentMadeDate)
                 .Create();
 
-            //await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            //await connection.InsertAsync(_accountModel);
-            //await connection.InsertAsync(_applicationModel);
-            //await connection.InsertAsync(_apprenticeshipsModels);
-            //await connection.InsertAsync(_apprenticeshipIncentive);
-            //await connection.InsertAsync(_pendingPayment1);
-            //await connection.InsertAsync(_pendingPayment2);
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await connection.InsertAsync(_accountModel);
+            await connection.InsertAsync(_applicationModel);
+            await connection.InsertAsync(_apprenticeshipsModels);
+            await connection.InsertAsync(_apprenticeshipIncentive);
+            await connection.InsertAsync(_pendingPayment1);
+            await connection.InsertAsync(_pendingPayment2);
         }
 
         [When(@"the payment process is run")]
         public async Task WhenPendingPaymentsForTheLegalEntityAreValidated()
         {
-            await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriodMonth);
+            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriodMonth);
+
+            status.RuntimeStatus.Should().NotBe("Failed", status.Output);
+            status.RuntimeStatus.Should().Be("Completed");
         }
 
         [Then(@"the validation fails")]
@@ -98,9 +107,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"validation results are recorded")]
         public async Task ThenValidationResultsAreRecorded()
         {
-            var results = await _testContext.DataRepository.GetPaymentValidationResults();
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
             results.Should().HaveCount(2);
-            results.Any(r => r.ValidationResult).Should().BeFalse();
+            results.Any(r => r.Result == true).Should().BeFalse();
         }
 
         [Then(@"pending payments are marked as not payable")]

@@ -10,10 +10,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid Id { get; set; }
         public Guid PendingPaymentId { get; set; }
-        public string ValidationStep { get; set; }
-        public bool ValidationResult { get; set; }
+        public string Step { get; set; }
+        public bool Result { get; set; }
         public short CollectionPeriodMonth { get; set; }
         public short CollectionPeriodYear { get; set; }
-        public DateTime CollectionDateUTC { get; set; }
+        public DateTime CollectionDateUtc { get; set; }
     }
 }

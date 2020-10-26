@@ -5,22 +5,25 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
-    public class CalculateEarningsCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class ValidatePendingPaymentCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
-        public Guid ApprenticeshipIncentiveId { get; private set; }
-        public long AccountId { get; private set; }
-        public long ApprenticeshipId { get; private set; }
+        public Guid ApprenticeshipIncentiveId { get; }
+        public Guid PendingPaymentId { get; }
+        public short CollectionYear { get; set; }
+        public byte CollectionMonth { get; set; }
 
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive)}_{ApprenticeshipIncentiveId}"; }
 
-        public CalculateEarningsCommand(
+        public ValidatePendingPaymentCommand(
             Guid apprenticeshipIncentiveId,
-            long accountId,            
-            long apprenticeshipId)
+            Guid pendingPaymentId,
+            short collectionYear,
+            byte collectionMonth)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
-            AccountId = accountId;
-            ApprenticeshipId = apprenticeshipId;
+            PendingPaymentId = pendingPaymentId;
+            CollectionYear = collectionYear;
+            CollectionMonth = collectionMonth;
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -28,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         {
             get
             {
-                var message = $"ApprenticeshipIncentive CalculateEarningsCommand for AccountId {AccountId}, ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} and ApprenticeshipId {ApprenticeshipId}";
+                var message = $"ApprenticeshipIncentive ValidatePendingPaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} and PendingPaymentId {PendingPaymentId}";
                 return new Log
                 {
                     OnProcessing = () => message,

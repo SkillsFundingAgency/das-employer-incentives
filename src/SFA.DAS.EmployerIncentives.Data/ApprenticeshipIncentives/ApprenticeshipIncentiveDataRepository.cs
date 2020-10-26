@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Threading.Tasks;
@@ -28,11 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.PendingPayments)
                 .Include(x => x.Payments)
                 .FirstOrDefaultAsync(a => a.Id == id);
-            if (apprenticeshipIncentive != null)
-            {
-                return apprenticeshipIncentive.Map();
-            }
-            return null;
+            return apprenticeshipIncentive?.Map();
         }
 
         public async Task Update(ApprenticeshipIncentiveModel apprenticeshipIncentive)
@@ -43,11 +40,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 _dbContext.Entry(existingIncentive).CurrentValues.SetValues(model);
                 _dbContext.RemoveRange(existingIncentive.PendingPayments);
-                _dbContext.AddRange(model.PendingPayments);
-                _dbContext.RemoveRange(existingIncentive.Payments);
-                _dbContext.AddRange(model.Payments);
 
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.AddRangeAsync(model.PendingPayments);
+
+                foreach (var payment in existingIncentive.PendingPayments) // TODO: Work out why duplicates
+                {
+                    _dbContext.RemoveRange(payment.ValidationResults); // TODO: why not fetched
+                }
+                foreach (var payment in model.PendingPayments)
+                {
+                    await _dbContext.AddRangeAsync(payment.ValidationResults);
+                }
+				
+				_dbContext.RemoveRange(existingIncentive.Payments);
+                _dbContext.AddRange(model.Payments);
             }
         }
     }
