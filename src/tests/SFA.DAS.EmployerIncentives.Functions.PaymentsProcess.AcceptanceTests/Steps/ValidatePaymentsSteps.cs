@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private PendingPayment _pendingPayment2;
         private const int NumberOfApprenticeships = 3;
         private const short CollectionPeriodYear = 2021;
-        private const byte CollectionPeriodMonth = 6;
+        private const byte CollectionPeriod = 6;
 
         public ValidatePaymentsSteps(TestContext testContext)
         {
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                .With(p => p.PaymentPeriod, CollectionPeriodMonth)
+                .With(p => p.PaymentPeriod, CollectionPeriod)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                .With(p => p.PaymentPeriod, CollectionPeriodMonth)
+                .With(p => p.PaymentPeriod, CollectionPeriod)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
@@ -92,31 +92,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the payment process is run")]
         public async Task WhenPendingPaymentsForTheLegalEntityAreValidated()
         {
-            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriodMonth);
+            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriod);
 
             status.RuntimeStatus.Should().NotBe("Failed", status.Output);
             status.RuntimeStatus.Should().Be("Completed");
         }
 
-        [Then(@"the validation fails")]
-        public void ThenTheValidationFails()
-        {
-            // TODO
-        }
-
-        [Then(@"validation results are recorded")]
+        [Then(@"the validation fails and validation results are recorded")]
         public async Task ThenValidationResultsAreRecorded()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
-            results.Should().HaveCount(2);
+            results.Should().HaveCount(2, _testContext.PaymentsProcessFunctions.FunctionLogs.ToString());
             results.Any(r => r.Result == true).Should().BeFalse();
         }
 
-        [Then(@"pending payments are marked as not payable")]
-        public void ThenPendingPaymentIsMarkedAsNotPayable()
-        {
-            // TODO
-        }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NUnit.Framework;
 using Polly;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using System;
@@ -9,12 +11,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
     public class TestPaymentsProcessFunctions : IDisposable
     {
+        private const string TestConfigFile = "local.settings.json";
+        private const bool HideFunctionHostWindow = false; // Set to `false` if debugging
+
         private readonly TestContext _testContext;
         private readonly Dictionary<string, string> _appConfig;
         private readonly Dictionary<string, string> _hostConfig;
@@ -24,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private bool _isDisposed;
         private readonly ILogger _logger;
         private Process _functionHostProcess;
-        private const int Port = 7002;
+        private const int Port = 7001;
         protected readonly HttpClient Client;
         private readonly Settings _settings = new Settings();
 
@@ -36,42 +43,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             Client = new HttpClient { BaseAddress = new Uri($"http://localhost:{Port}") };
 
-            _hostConfig = new Dictionary<string, string>();
-
-            _appConfig = new Dictionary<string, string>
-            {
-                {"EnvironmentName", "LOCAL_ACCEPTANCE_TESTS"},
-                {"ConfigurationStorageConnectionString", "UseDevelopmentStorage=true"},
-                {"ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true"},
-                {"NServiceBusConnectionString", "UseDevelopmentStorage=true"},
-                {"ConfigNames", "SFA.DAS.EmployerIncentives"}
-            };
-
             _logger = new LoggerFactory().CreateLogger<TestPaymentsProcessFunctions>();
         }
 
 
         public async Task Start()
         {
-            var startUp = new Startup();
-
-            var hostBuilder = new HostBuilder()
-                .ConfigureHostConfiguration(a =>
-                {
-                    a.Sources.Clear();
-                    a.AddInMemoryCollection(_hostConfig);
-                })
-                .ConfigureAppConfiguration(a =>
-                {
-                    a.Sources.Clear();
-                    a.AddInMemoryCollection(_appConfig);
-                    if (_testMessageBus != null)
-                        a.SetBasePath(_testMessageBus.StorageDirectory.FullName);
-                })
-                .ConfigureWebJobs(startUp.Configure);
-
-            hostBuilder.UseEnvironment("LOCAL");
-            _host = await hostBuilder.StartAsync();
+            var escapedConnString = HttpUtility.JavaScriptStringEncode(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await File.WriteAllTextAsync(TestConfigFile, (await File.ReadAllTextAsync(TestConfigFile))
+                .Replace("DB_CONNECTION_STRING", escapedConnString));
 
             StartFunctionHost();
         }
@@ -86,11 +66,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             if (_isDisposed) return;
 
-            if (disposing)
-            {
-                _host?.StopAsync();
-            }
-
             if (_functionHostProcess != null)
             {
                 if (!_functionHostProcess.HasExited)
@@ -98,10 +73,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     _functionHostProcess.Kill();
                 }
 
+                _functionHostProcess.CloseMainWindow();
                 _functionHostProcess.Dispose();
             }
 
-            _testContext.SqlDatabase.Dispose();
+            _testContext.SqlDatabase?.Dispose();
             _isDisposed = true;
         }
 
@@ -111,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             return await CompleteFunctionOrchestration(orchestrationLinks);
         }
 
-        private async Task<AzureFunctionOrchestrationLinks> StartFunctionOrchestration(short collectionPeriodYear, byte collectionPeriodMonth)
+        private async Task<AzureFunctionOrchestrationLinks> StartFunctionOrchestration(short collectionPeriodYear, byte collectionPeriod)
         {
             var policy = Policy
                 .Handle<HttpRequestException>()
@@ -122,10 +98,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     TimeSpan.FromSeconds(1),
                     TimeSpan.FromSeconds(2),
                     TimeSpan.FromSeconds(3),
-                    TimeSpan.FromSeconds(10),
+                    TimeSpan.FromSeconds(5),
                 });
 
-            var url = $"api/orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriodMonth}";
+            var url = $"api/orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriod}";
             HttpResponseMessage orchestrationResponse = null;
             await policy.ExecuteAsync(async () =>
             {
@@ -167,32 +143,72 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void StartFunctionHost()
         {
             new ConfigurationBuilder()
-                .AddJsonFile("local.settings.json", optional: false) // Must have it!
+                .AddJsonFile(TestConfigFile, optional: false) // Must have it!
                 .AddEnvironmentVariables()
-                .Build().Bind(_settings);
+                .Build()
+                .Bind("TestSettings", _settings);
 
-            var dotnetExePath = Environment.ExpandEnvironmentVariables(_settings.DotnetExecutablePath);
-            if (!File.Exists(dotnetExePath)) throw new Exception("Wrong path to dotnet.exe");
+            //var dotnetExePath = Environment.ExpandEnvironmentVariables(_settings.DotnetExecutablePath);
+            //if (!File.Exists(dotnetExePath)) throw new Exception("Wrong path to dotnet.exe");
 
             var functionHostPath = Environment.ExpandEnvironmentVariables(_settings.FunctionHostPath);
             if (!File.Exists(functionHostPath)) throw new Exception("Wrong path to func.dll");
 
-            var functionAppFolder = Path.GetRelativePath(Directory.GetCurrentDirectory(), _settings.FunctionApplicationPath);
+            var functionAppFolder = Path.Combine(
+                    Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)), _settings.FunctionApplicationPath);
             if (!Directory.Exists(functionAppFolder)) throw new Exception("Wrong path to functions' bin folder");
+
+            var functionConfig = Path.Combine(functionAppFolder, TestConfigFile);
+            File.Copy(TestConfigFile, functionConfig);
 
             _functionHostProcess = new Process
             {
                 StartInfo =
                 {
-                    FileName =  dotnetExePath,
-                    Arguments = $"\"{functionHostPath}\" start -p {Port}",
+                    FileName =  "cmd.exe",// dotnetExePath,
+                    Arguments = $"/k \"{functionHostPath}\" start -p {Port}",
                     WorkingDirectory = functionAppFolder,
+                    //RedirectStandardError = true,
+                    //RedirectStandardOutput = true,
+                  //  RedirectStandardInput = true,
+                    UseShellExecute = true,
+                    //CreateNoWindow = false,
+                   // WindowStyle = ProcessWindowStyle.Normal,
+
                 }
             };
             var success = _functionHostProcess.Start();
+
             if (!success)
             {
                 throw new InvalidOperationException("Could not start Azure Functions host.");
+            }
+
+            //   SaveFunctionHostProcessOutput();
+
+        }
+
+        public StringBuilder FunctionLogs { get; set; } = new StringBuilder();
+
+        public void SaveFunctionHostProcessOutput()
+        {
+            bool errored = false;
+            FunctionLogs.AppendLine("ERRORS:");
+            while (!_functionHostProcess.StandardError.EndOfStream)
+            {
+                FunctionLogs.AppendLine(_functionHostProcess.StandardError.ReadLine());
+                errored = true;
+            }
+
+            FunctionLogs.AppendLine("INFORMATION:");
+            while (!_functionHostProcess.StandardOutput.EndOfStream)
+            {
+                FunctionLogs.AppendLine(_functionHostProcess.StandardOutput.ReadLine());
+            }
+
+            if (errored)
+            {
+                Assert.Fail(FunctionLogs.ToString());
             }
         }
     }

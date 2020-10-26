@@ -40,20 +40,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                     options.PreFixConfigurationKeys = false;
                 });
             }
-#if DEBUG
-            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
-            {
-                configBuilder.AddJsonFile($"local.settings.json", optional: true);
-            }
-#endif
+            //#if DEBUG
+            //          if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            //           {
+            configBuilder.AddJsonFile($"local.settings.json", optional: true);
+            //          }
+            //#endif
             var config = configBuilder.Build();
 
             builder.Services.AddOptions();
-            builder.Services.AddUnitOfWork();
-            builder.Services.AddEntityFrameworkForEmployerIncentives().AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
-
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
             builder.Services.Configure<ApplicationSettings>(config.GetSection("PolicySettings"));
+
+            builder.Services.AddUnitOfWork();
+            builder.Services.AddEntityFrameworkForEmployerIncentives().AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
 
             builder.Services.AddPersistenceServices();
             builder.Services.AddQueryServices();
