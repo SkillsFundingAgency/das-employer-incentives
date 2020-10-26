@@ -34,11 +34,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         public async Task Update(ApprenticeshipIncentiveModel apprenticeshipIncentive)
         {
             var model = apprenticeshipIncentive.Map();
-
             var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == model.Id);
             if (existingIncentive != null)
             {
                 _dbContext.Entry(existingIncentive).CurrentValues.SetValues(model);
+                _dbContext.RemoveRange(existingIncentive.PendingPayments);
+                await _dbContext.AddRangeAsync(model.PendingPayments);
 
                 foreach (var payment in existingIncentive.PendingPayments) // TODO: Work out why duplicates
                 {
@@ -48,9 +49,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 {
                     await _dbContext.AddRangeAsync(payment.ValidationResults);
                 }
-
-                _dbContext.RemoveRange(existingIncentive.PendingPayments);
-                await _dbContext.AddRangeAsync(model.PendingPayments);
 
                 await _dbContext.SaveChangesAsync();
             }

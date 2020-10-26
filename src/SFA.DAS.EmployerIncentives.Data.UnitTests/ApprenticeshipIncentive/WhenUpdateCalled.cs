@@ -5,10 +5,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
@@ -41,25 +38,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         public void CleanUp()
         {
             _dbContext.Dispose();
-
-        }
-
-        [Test]
-        public void asdasdasdasdasdasdsa()
-        {
-            //     var process = Process.Start("cmd.exe", "/k ECHO hello Juan!");
-            var p = new ProcessStartInfo();
-            p.FileName = @"C:\git\test.bat";
-            p.Arguments = "/k ECHO hello Juan!";
-            p.WindowStyle = ProcessWindowStyle.Normal;
-            p.WorkingDirectory = Directory.GetCurrentDirectory();
-            //p.StartInfo.WorkingDirectory = Path.GetDirectoryName("%SYSTEMROOT%\\System32");
-
-            var process = Process.Start(p);
-
-            Thread.Sleep(3000);
-            process.Dispose();
-
         }
 
         [Test]
@@ -99,20 +77,20 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .Excluding(x => x.Account)
                 .Excluding(x => x.PendingPaymentValidationResultModels));
 
-            //var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
-            //    x.PendingPaymentId == storedIncentive.PendingPaymentModels.First().Id);
-            //savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
-            //    .Excluding(x => x.DateTime)
-            ////    .Excluding(x => x.CollectionPeriod)
-            //);
+            var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
+                x.PendingPaymentId == storedIncentive.PendingPaymentModels.First().Id);
+            savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
+                .Excluding(x => x.DateTime)
+                .Excluding(x => x.CollectionPeriod)
+            );
 
-            //foreach (var result in savedValidationResults)
-            //{
-            //    result.CollectionPeriodMonth.Should()
-            //        .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarMonth);
-            //    result.CollectionPeriodYear.Should()
-            //        .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
-            //}
+            foreach (var result in savedValidationResults)
+            {
+                result.CollectionPeriodMonth.Should()
+                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarMonth);
+                result.CollectionPeriodYear.Should()
+                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
+            }
         }
     }
 }

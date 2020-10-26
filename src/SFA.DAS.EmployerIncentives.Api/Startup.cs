@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -34,16 +35,16 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            //if (!ConfigurationIsAcceptanceTests())
-            //{
-            //    config.AddAzureTableStorage(options =>
-            //    {
-            //        options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
-            //        options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-            //        options.EnvironmentName = configuration["EnvironmentName"];
-            //        options.PreFixConfigurationKeys = false;
-            //    });
-            //}
+            if (!ConfigurationIsAcceptanceTests())
+            {
+                config.AddAzureTableStorage(options =>
+                {
+                    options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
+                    options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                    options.EnvironmentName = configuration["EnvironmentName"];
+                    options.PreFixConfigurationKeys = false;
+                });
+            }
 #if DEBUG
             if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -119,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             app.UseUnitOfWork();
 
-            app.UseRouting();
+            app.UseRouting();            
 
             app.UseAuthentication();
             app.UseEndpoints(endpoints =>
