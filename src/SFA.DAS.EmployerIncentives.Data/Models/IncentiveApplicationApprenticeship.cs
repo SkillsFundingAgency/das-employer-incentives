@@ -7,6 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
     [Table("IncentiveApplicationApprenticeship")]
     public partial class IncentiveApplicationApprenticeship
     {
+        [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid Id { get; set; }
         public Guid IncentiveApplicationId { get; set; }
         public long ApprenticeshipId { get; set; }
@@ -17,5 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public DateTime PlannedStartDate { get; set; }
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
+        public bool EarningsCalculated { get; set; }
     }
 }

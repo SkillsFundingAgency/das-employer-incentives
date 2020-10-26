@@ -15,5 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models
         public DateTime PlannedStartDate { get; set; }
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
+        public bool EarningsCalculated { get; set; }        
     }
 }

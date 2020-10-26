@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication

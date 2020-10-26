@@ -1,15 +1,23 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.HashingService;
@@ -21,14 +29,13 @@ using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
+using SFA.DAS.NServiceBus.SqlServer.Data;
+using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
-using SFA.DAS.UnitOfWork.NServiceBus.DependencyResolution.Microsoft;
-using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.Data.SqlClient;
+using System.IO;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -40,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddDistributedLockProvider()
                 .AddHashingService()
                 .AddAccountService();
-            
+
             // set up the command handlers and command validators
             serviceCollection.Scan(scan =>
             {
@@ -53,21 +60,37 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
+            .AddSingleton<IValidator<CreateIncentiveCommand>, NullValidator>()
+            .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
+            .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
             .AddCommandHandlerDecorators()
-            .AddScoped<ICommandDispatcher, CommandDispatcher>();
+            .AddScoped<ICommandDispatcher, CommandDispatcher>()
+            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
+            serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
+            serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
+
+            serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
+            
+            serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddPersistenceServices(this IServiceCollection serviceCollection)
+        {
             serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
             serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();
             serviceCollection.AddScoped<IApprenticeApplicationDataRepository, ApprenticeApplicationDataRepository>();
 
             serviceCollection.AddScoped<IIncentiveApplicationDataRepository, IncentiveApplicationDataRepository>();
             serviceCollection.AddScoped<IIncentiveApplicationDomainRepository, IncentiveApplicationDomainRepository>();
-            serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
 
-            serviceCollection.AddScoped(typeof(ICommandPublisher<>), typeof(CommandPublisher<>));
+            serviceCollection.AddScoped<IApprenticeshipIncentiveDataRepository, ApprenticeshipIncentiveDataRepository>();
+            serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
             return serviceCollection;
         }
@@ -76,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             serviceCollection
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))            
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 
@@ -129,11 +152,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceCollection;
         }       
 
-        public static async Task StartNServiceBus(
+        public static async Task<UpdateableServiceProvider> StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration)
         {
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Api")
+            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
@@ -143,6 +166,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
+                endpointConfiguration
+                    .UseTransport<LearningTransport>()
+                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
                 endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
@@ -161,6 +187,26 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceProvider.AddSingleton(p => endpoint)
                 .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
                 .AddHostedService<NServiceBusHostedService>();
+
+            return serviceProvider;
         }
+
+        public static IServiceCollection AddEntityFrameworkForEmployerIncentives(this IServiceCollection services)
+        {
+            return services.AddScoped(p =>
+            {
+                var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
+                var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
+                var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
+                var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
+
+                var dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
+
+                dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
+
+                return dbContext;
+            });
+        }
+
     }
 }

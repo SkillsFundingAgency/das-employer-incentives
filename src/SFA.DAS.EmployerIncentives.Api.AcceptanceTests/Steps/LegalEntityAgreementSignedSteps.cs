@@ -15,8 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "LegalEntityAgreementSigned")]
     public class LegalEntityAgreementSignedSteps : StepsBase
     {
-        private TestContext _testContext;
-        private Account _testAccountTable;
+        private readonly TestContext _testContext;
+        private readonly Account _testAccountTable;
 
         public LegalEntityAgreementSignedSteps(TestContext testContext) : base(testContext)
         {

@@ -273,6 +273,7 @@ src/Tools/PhantomJS/tools/phantomjs/ChangeLog
 
 # AppSetting environment files
 *.development.json
+local.settings.json
 
 #SonarCloud
 

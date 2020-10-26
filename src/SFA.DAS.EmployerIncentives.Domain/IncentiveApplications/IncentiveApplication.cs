@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -45,6 +46,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.DateSubmitted = submittedAt;
             Model.SubmittedByEmail = submittedByEmail;
             Model.SubmittedByName = submittedByName;
+
+            AddEvent(new Submitted
+            {
+                 AccountId = AccountId,
+                 IncentiveApplicationId = Id,
+                 SubmittedAt = submittedAt,
+                 SubmittedBy = submittedByName,
+                 SubmittedByEmail = submittedByEmail
+            });
         }
 
         public void SetApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
@@ -56,6 +66,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 AddApprenticeship(a);
             }
         }
+
+        public void EarningsCalculated(Guid apprenticeshipId)
+        {
+            var apprenticeship = _apprenticeships.Single(a => a.Id == apprenticeshipId);
+            apprenticeship.SetEarningsCalculated(true);
+        }
+
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
             _apprenticeships.Add(apprenticeship);
