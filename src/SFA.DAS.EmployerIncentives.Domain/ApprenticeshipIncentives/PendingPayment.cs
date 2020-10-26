@@ -54,7 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var existing = Model
                 .PendingPaymentValidationResultModels
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
-                                      v.CollectionPeriod == validationResult.CollectionPeriod);
+                                      v.CollectionPeriod.CalendarMonth == validationResult.CollectionPeriod.CalendarMonth &&
+                                      v.CollectionPeriod.CalendarYear == validationResult.CollectionPeriod.CalendarYear);
 
             if (existing != null)
             {
