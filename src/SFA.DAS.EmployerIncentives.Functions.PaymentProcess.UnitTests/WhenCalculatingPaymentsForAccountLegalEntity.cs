@@ -29,18 +29,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
             _mockOrchestrationContext.Setup(x => x.GetInput<AccountLegalEntityCollectionPeriod>()).Returns(_accountLegalEntityCollectionPeriod);
 
-            _pendingPayments = _fixture.CreateMany<PendingPaymentActivityDto>(12).ToList();
+            _pendingPayments = _fixture.CreateMany<PendingPaymentActivityDto>(3).ToList();
             _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod)).ReturnsAsync(_pendingPayments);
 
             _orchestrator = new CalculatePaymentsForAccountLegalEntityOrchestrator();
-
-            // Act 
-            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
         }
 
         [Test]
-        public void Then_query_is_called_to_get_pending_payments_for_the_legal_entity()
+        public async Task Then_query_is_called_to_get_pending_payments_for_the_legal_entity()
         {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
             _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod), Times.Once);
         }
 
@@ -71,8 +70,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
 		}
 
-        public void Then_activity_is_called_to_validate_pending_payments_for_the_legal_entity()
+        [Test]
+        public async Task Then_activity_is_called_to_validate_pending_payments_for_the_legal_entity()
         {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             foreach (var p in _pendingPayments)
                 _mockOrchestrationContext.Verify(

@@ -25,7 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionYear = _fixture.Create<short>();
             _collectionMonth = _fixture.Create<byte>();
 
+            _fixture.Customize<PendingPaymentValidationResultModel>(x => x.With(y => y.Result, true));
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.PaymentModels, new List<PaymentModel>()).Create();
+            
             _sut = Sut(_sutModel);
         }
 
@@ -42,7 +44,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         [Test]
         public void Then_the_payment_is_not_created_when_the_pending_payment_is_not_valid()
         {
-            //TODO
+            var pendingPayment = _sutModel.PendingPaymentModels.First();
+            pendingPayment.PendingPaymentValidationResultModels.First().Result = false;
+
+            // act
+            _sut.CreatePayment(pendingPayment.Id, _collectionYear, _collectionMonth);
+
+            // assert
+            _sut.Payments.Count.Should().Be(0);
         }
 
         [Test]
@@ -72,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var existingPayment = _fixture.Build<PaymentModel>().With(x => x.PendingPaymentId, pendingPayment.Id).Create();
             _sutModel.PaymentModels.Add(existingPayment);
 
-                // act
+            // act
             _sut.CreatePayment(pendingPayment.Id, _collectionYear, _collectionMonth);
 
             // assert

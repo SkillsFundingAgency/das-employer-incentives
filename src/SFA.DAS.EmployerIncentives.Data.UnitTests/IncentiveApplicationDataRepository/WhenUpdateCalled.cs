@@ -32,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
 
             _sut = new IncentiveApplication.IncentiveApplicationDataRepository(_dbContext);
             await _sut.Add(_testApplication);
+            await _dbContext.SaveChangesAsync();
         }
 
         [TearDown]
@@ -51,6 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedApplication.SubmittedByEmail = _fixture.Create<string>();
 
             await _sut.Update(storedApplication);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Applications.Count().Should().Be(1);
@@ -68,6 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedApplication.ApprenticeshipModels.Add(newApprenticeship);
 
             await _sut.Update(storedApplication);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Applications.Single(x => x.Id == _testApplication.Id)

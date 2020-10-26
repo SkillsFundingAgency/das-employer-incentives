@@ -60,6 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Act
             await _sut.Update(storedIncentive);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.ApprenticeshipIncentives.Count().Should().Be(1);

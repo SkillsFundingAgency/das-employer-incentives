@@ -9,10 +9,12 @@ using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using LegalEntity = SFA.DAS.EmployerIncentives.Domain.Accounts.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CreatePayment
 {
@@ -108,6 +110,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             };
 
             incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(collectionPeriods));
+            var account = Domain.Accounts.Account.New(incentive.Account.Id);
+            var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();
+            account.AddLegalEntity(incentive.PendingPayments.First().Account.AccountLegalEntityId, LegalEntity.Create(legalEntityModel));
+            incentive.ValidatePendingPaymentBankDetails(incentive.PendingPayments.First().Id, account, collectionPeriods.First());
 
             return incentive;
         }

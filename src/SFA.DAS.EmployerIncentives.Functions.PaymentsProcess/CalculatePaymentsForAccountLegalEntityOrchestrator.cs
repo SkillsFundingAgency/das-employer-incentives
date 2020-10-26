@@ -27,7 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                             new CreatePaymentInput
                             {
                                 ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
-                                PendingPaymentId = pendingPayment.PendingPaymentId, CollectionPeriod = collectionPeriod
+                                PendingPaymentId = pendingPayment.PendingPaymentId, 
+                                CollectionPeriod = collectionPeriod
                             }), TaskContinuationOptions.OnlyOnRanToCompletion));
             }
 
