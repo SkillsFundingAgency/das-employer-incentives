@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
                 await _dbContext.SaveChangesAsync();
             }
-        }                
+        }
 
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
         {
@@ -68,7 +68,22 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     _dbContext.PendingPayments.Add(pendingPayment);
                 }
             }
+
+            foreach (var payment in updatedIncentive.Payments)
+            {
+                var existingPayment = existingIncentive.Payments.SingleOrDefault(p => p.Id == payment.Id);
+
+                if (existingPayment != null)
+                {
+                    _dbContext.Entry(existingPayment).CurrentValues.SetValues(payment);
+                }
+                else
+                {
+                    _dbContext.Payments.Add(payment);
+                }
+            }
         }
+
         private void UpdatePendingPayment(PendingPayment updatedPendingPayment, PendingPayment existingPendingPayment)
         {
             _dbContext.Entry(existingPendingPayment).CurrentValues.SetValues(updatedPendingPayment);
