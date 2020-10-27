@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
@@ -9,6 +5,9 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -47,20 +46,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[0].AccountLegalEntityId, _legalEntities[0].AccountId))), Times.Once);
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[1].AccountLegalEntityId, _legalEntities[1].AccountId))), Times.Once);
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[2].AccountLegalEntityId, _legalEntities[2].AccountId))), Times.Once);
-        }
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                It.IsAny<AccountLegalEntityCollectionPeriod>()
+            ), Times.Exactly(_legalEntities.Count));
 
-        private bool VerifyInputMatchesAccountAndCollectionPeriod(object functionInput, long accountLegalEntityId, long accountId)
-        {
-            var accountLegalEntityAndCollectionPeriod = functionInput as AccountLegalEntityCollectionPeriod;
-            if (accountLegalEntityAndCollectionPeriod == null)
+            foreach (var entity in _legalEntities)
             {
-                return false;
-            }
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                        "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                        It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                            input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                            input.AccountId == entity.AccountId &&
+                            input.CollectionPeriod.Month == _collectionPeriod.Month &&
+                            input.CollectionPeriod.Year == _collectionPeriod.Year)
 
-            return accountLegalEntityAndCollectionPeriod.AccountLegalEntityId == accountLegalEntityId && accountLegalEntityAndCollectionPeriod.AccountId == accountId && accountLegalEntityAndCollectionPeriod.CollectionPeriod == _collectionPeriod;
+                    ), Times.Once);
+            }
         }
     }
 }
