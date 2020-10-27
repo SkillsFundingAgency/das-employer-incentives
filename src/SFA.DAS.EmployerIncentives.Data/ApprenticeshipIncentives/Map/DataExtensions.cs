@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Amount = x.Amount,
                 DueDate = x.DueDate,
                 CalculatedDate = x.CalculatedDate,
-                PaymentPeriod = x.PaymentPeriod,
+                PeriodNumber = x.PeriodNumber,
                 PaymentYear = x.PaymentYear,
                 PaymentMadeDate = x.PaymentMadeDate,
                 ValidationResults = x.PendingPaymentValidationResultModels.Map(x.Id),
@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x => new PendingPaymentValidationResult
             {
                 Id = x.Id,
-                CollectionDateUtc = x.CollectionPeriod.OpenDate, // TODO: Check this !!!
+                CollectionDateUtc = x.CollectionPeriod.OpenDate,
                 CollectionPeriodMonth = x.CollectionPeriod.CalendarMonth,
                 CollectionPeriodYear = x.CollectionPeriod.CalendarYear,
                 Result = x.Result,
@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Amount = x.Amount,
                 DueDate = x.DueDate,
                 CalculatedDate = x.CalculatedDate,
-                PaymentPeriod = x.PaymentPeriod,
+                PeriodNumber = x.PeriodNumber,
                 PaymentYear = x.PaymentYear,
                 PaymentMadeDate = x.PaymentMadeDate,
                 PendingPaymentValidationResultModels = x.ValidationResults.Map(collectionPeriods)
@@ -111,15 +111,19 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
         private static Domain.ValueObjects.CollectionPeriod Map(this CollectionPeriod model)
         {
-            return new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, model.CalendarMonth, model.CalendarYear, model.EIScheduledOpenDateUTC);
+            if (model != null)
+            {
+                return new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, model.CalendarMonth, model.CalendarYear, model.EIScheduledOpenDateUTC);
+            }
+
+            return null;
         }
 
         internal static ICollection<Domain.ValueObjects.CollectionPeriod> Map(this ICollection<CollectionPeriod> models)
         {
             return models.Select(x =>
                 new Domain.ValueObjects.CollectionPeriod(
-                    1, // TODO:
-                    //x.PeriodNumber,
+                    x.PeriodNumber,
                     x.CalendarMonth,
                     x.CalendarYear,
                     x.EIScheduledOpenDateUTC)

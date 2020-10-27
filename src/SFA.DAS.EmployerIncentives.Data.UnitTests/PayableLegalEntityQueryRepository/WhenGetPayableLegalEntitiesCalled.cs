@@ -42,9 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             byte collectionPeriodMonth = 5;
             var pendingPayments = new List<PendingPayment>
             {
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
             };
             
             _context.PendingPayments.AddRange(pendingPayments);
@@ -64,9 +64,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             byte collectionPeriodMonth = 5;
             var pendingPayments = new List<PendingPayment>
             {
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, (short)(collectionPeriodYear - 1)).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, (short)(collectionPeriodYear - 1)).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
             };
 
             _context.PendingPayments.AddRange(pendingPayments);
@@ -86,9 +86,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             byte collectionPeriodMonth = 5;
             var pendingPayments = new List<PendingPayment>
             {
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, (byte)(collectionPeriodMonth - 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, (byte)(collectionPeriodMonth - 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
             };
 
             _context.PendingPayments.AddRange(pendingPayments);
@@ -108,9 +108,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             byte collectionPeriodMonth = 5;
             var pendingPayments = new List<PendingPayment>
             {
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountLegalEntityId, 1234).With(x=>x.AccountId, 2).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountLegalEntityId, 1234).With(x=>x.AccountId, 2).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountLegalEntityId, 1234).With(x=>x.AccountId, 2).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).With(x => x.AccountLegalEntityId, 1234).With(x=>x.AccountId, 2).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, (byte)(collectionPeriodMonth + 1)).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
             };
 
             _context.PendingPayments.AddRange(pendingPayments);
@@ -129,9 +129,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             byte collectionPeriodMonth = 5;
             var pendingPayments = new List<PendingPayment>
             {
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
-                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PaymentPeriod, collectionPeriodMonth).With(x => x.PaymentMadeDate, DateTime.Now).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, (DateTime?)null).Create(),
+                _fixture.Build<PendingPayment>().With(x => x.PaymentYear, collectionPeriodYear).With(x => x.PeriodNumber, collectionPeriodMonth).With(x => x.PaymentMadeDate, DateTime.Now).Create(),
             };
 
             _context.PendingPayments.AddRange(pendingPayments);

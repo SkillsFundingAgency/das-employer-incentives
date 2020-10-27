@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                .With(p => p.PaymentPeriod, CollectionPeriod)
+                .With(p => p.PeriodNumber, CollectionPeriod)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                .With(p => p.PaymentPeriod, CollectionPeriod)
+                .With(p => p.PeriodNumber, CollectionPeriod)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
@@ -121,7 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                .With(p => p.PaymentPeriod, CollectionPeriod)
+                .With(p => p.PeriodNumber, CollectionPeriod)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
@@ -130,7 +130,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                 .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                .With(p => p.PaymentPeriod, CollectionPeriod)
+                .With(p => p.PeriodNumber, CollectionPeriod)
                 .With(p => p.PaymentYear, CollectionPeriodYear)
                 .Without(p => p.PaymentMadeDate)
                 .Create();

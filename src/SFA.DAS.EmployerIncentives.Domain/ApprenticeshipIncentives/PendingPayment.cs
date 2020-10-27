@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Account Account => Model.Account;
         public DateTime DueDate => Model.DueDate;
         public decimal Amount => Model.Amount;
-        public byte? PaymentPeriod => Model.PaymentPeriod;
+        public byte? PeriodNumber => Model.PeriodNumber;
         public short? PaymentYear => Model.PaymentYear;
 
         public bool IsValidated => Model.PendingPaymentValidationResultModels.Count > 0 && !Model.PendingPaymentValidationResultModels.Any(r => !r.Result);
@@ -45,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public void SetPaymentPeriod(CollectionCalendar collectionCalendar)
         {
             var period = collectionCalendar.GetPeriod(DueDate);
-            Model.PaymentPeriod = period.PeriodNumber;
+            Model.PeriodNumber = period.PeriodNumber;
             Model.PaymentYear = period.CalendarYear;
         }
 

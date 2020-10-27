@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 Id = x.Id,
                 AccountLegalEntityId = x.AccountLegalEntityId,
-                PaymentPeriod = x.PaymentPeriod,
+                PeriodNumber  = x.PeriodNumber,
                 PaymentYear = x.PaymentYear,
                 PaymentMadeDate = x.PaymentMadeDate,
                 ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId
