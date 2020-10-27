@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
 
             foreach (var apprenticeship in application.Apprenticeships)
             {
-                var incentice = _apprenticeshipIncentiveFactory.CreateNew(
+                var incentive = _apprenticeshipIncentiveFactory.CreateNew(
                     Guid.NewGuid(),
                     apprenticeship.Id,
                     new Account(application.AccountId, command.AccountLegalEntityId),
@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                     ),
                     apprenticeship.PlannedStartDate);
 
-                await _apprenticeshipIncentiveDomainRepository.Save(incentice);
+                await _apprenticeshipIncentiveDomainRepository.Save(incentive);
             }
         }
     }

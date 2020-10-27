@@ -26,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.AccountDomai
 
             _mockAccountDataRepository = new Mock<IAccountDataRepository>();
             _mockDomainEventDispatcher = new Mock<IDomainEventDispatcher>();
+
             _sut = new Commands.Persistence.AccountDomainRepository(_mockAccountDataRepository.Object, _mockDomainEventDispatcher.Object);
         }
 

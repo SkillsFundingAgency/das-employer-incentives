@@ -47,14 +47,11 @@ namespace SFA.DAS.EmployerIncentives.Data
                     legalEntity.HashedLegalEntityId = item.HashedLegalEntityId;
                 }
             }
-
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task Add(AccountModel account)
         {
             await _dbContext.AddRangeAsync(account.Map());
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<AccountModel> Find(long accountId)
