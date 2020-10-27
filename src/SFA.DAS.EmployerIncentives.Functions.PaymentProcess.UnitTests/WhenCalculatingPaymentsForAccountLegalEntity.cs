@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             foreach (var p in _pendingPayments)
                 _mockOrchestrationContext.Verify(
-                    x => x.CallActivityAsync<object>("ValidatePendingPayment", It.Is<ValidatePendingPaymentData>(
+                    x => x.CallActivityAsync("ValidatePendingPayment", It.Is<ValidatePendingPaymentData>(
                         d => d.ApprenticeshipIncentiveId == p.ApprenticeshipIncentiveId
                         && d.PendingPaymentId == p.PendingPaymentId
                         && d.Month == _accountLegalEntityCollectionPeriod.CollectionPeriod.Month

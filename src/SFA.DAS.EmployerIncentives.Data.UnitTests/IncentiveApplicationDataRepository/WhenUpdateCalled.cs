@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
 
             await _sut.Update(storedApplication);
             await _dbContext.SaveChangesAsync();
-
+            
             // Assert
             _dbContext.Applications.Single(x => x.Id == _testApplication.Id)
                 .Apprenticeships.Should().BeEquivalentTo(storedApplication.ApprenticeshipModels);

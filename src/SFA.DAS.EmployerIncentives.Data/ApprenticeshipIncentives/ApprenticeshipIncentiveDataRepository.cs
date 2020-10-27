@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -27,33 +28,87 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
                 .Include(x => x.PendingPayments)
+                .ThenInclude(x => x.ValidationResults)
                 .Include(x => x.Payments)
                 .FirstOrDefaultAsync(a => a.Id == id);
-            return apprenticeshipIncentive?.Map();
+            return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
 
         public async Task Update(ApprenticeshipIncentiveModel apprenticeshipIncentive)
         {
-            var model = apprenticeshipIncentive.Map();
-            var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == model.Id);
+            var updatedIncentive = apprenticeshipIncentive.Map();
+
+            var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == updatedIncentive.Id);
+
             if (existingIncentive != null)
             {
-                _dbContext.Entry(existingIncentive).CurrentValues.SetValues(model);
-                _dbContext.RemoveRange(existingIncentive.PendingPayments);
+                UpdateApprenticeshipIncentive(updatedIncentive, existingIncentive);
 
-                await _dbContext.AddRangeAsync(model.PendingPayments);
 
-                foreach (var payment in existingIncentive.PendingPayments) // TODO: Work out why duplicates
+                await _dbContext.SaveChangesAsync();
+            }
+        }                
+
+        private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            _dbContext.Entry(existingIncentive).CurrentValues.SetValues(updatedIncentive);
+
+            RemoveDeletedPendingPayments(updatedIncentive, existingIncentive);
+
+            foreach (var pendingPayment in updatedIncentive.PendingPayments)
+            {
+                var existingPendingPayment = existingIncentive.PendingPayments.SingleOrDefault(p => p.Id == pendingPayment.Id);
+
+                if (existingPendingPayment != null)
                 {
-                    _dbContext.RemoveRange(payment.ValidationResults); // TODO: why not fetched
+                    UpdatePendingPayment(pendingPayment, existingPendingPayment);
                 }
-                foreach (var payment in model.PendingPayments)
+                else
                 {
-                    await _dbContext.AddRangeAsync(payment.ValidationResults);
+                    _dbContext.PendingPayments.Add(pendingPayment);
                 }
-				
-				_dbContext.RemoveRange(existingIncentive.Payments);
-                _dbContext.AddRange(model.Payments);
+            }
+        }
+        private void UpdatePendingPayment(PendingPayment updatedPendingPayment, PendingPayment existingPendingPayment)
+        {
+            _dbContext.Entry(existingPendingPayment).CurrentValues.SetValues(updatedPendingPayment);
+
+            RemoveDeletedValidationResults(updatedPendingPayment, existingPendingPayment);
+
+            foreach (var validationResult in updatedPendingPayment.ValidationResults)
+            {
+                var existingValidationResult = existingPendingPayment.ValidationResults.SingleOrDefault(v => v.Id == validationResult.Id);
+
+                if (existingValidationResult != null)
+                {
+                    _dbContext.Entry(existingValidationResult).CurrentValues.SetValues(validationResult);
+                }
+                else
+                {
+                    _dbContext.PendingPaymentValidationResults.Add(validationResult);
+                }
+            }
+        }
+
+        private void RemoveDeletedPendingPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.PendingPayments)
+            {
+                if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.PendingPayments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedValidationResults(PendingPayment updatedPendingPayment, PendingPayment existingPendingPayment)
+        {
+            foreach (var existingValidationResult in existingPendingPayment.ValidationResults)
+            {
+                if (!updatedPendingPayment.ValidationResults.Any(c => c.Id == existingValidationResult.Id))
+                {
+                    _dbContext.PendingPaymentValidationResults.Remove(existingValidationResult);
+                }
             }
         }
     }
