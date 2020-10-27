@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         }
 
         internal static ApprenticeshipIncentiveModel Map(this ApprenticeshipIncentive entity, IEnumerable<CollectionPeriod> collectionPeriods)
-        {            
+        {
             return new ApprenticeshipIncentiveModel
             {
                 Id = entity.Id,
@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      ),
                 PlannedStartDate = entity.PlannedStartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
-                PendingPaymentModels = entity.PendingPayments.Map(),
+                PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
                 PaymentModels = entity.Payments.Map()
             };
         }
@@ -99,6 +99,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             }).ToList();
         }
 
+        private static ICollection<PendingPaymentValidationResultModel> Map(this ICollection<PendingPaymentValidationResult> models, IEnumerable<CollectionPeriod> collectionPeriods)
+        {
+            return models.Select(x => new PendingPaymentValidationResultModel
+            {
+                Id = x.Id,
+                CollectionPeriod = collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.CollectionPeriodYear && p.CalendarMonth == x.CollectionPeriodMonth).Map(),
+                Result = x.Result,
+                DateTime = x.CollectionDateUtc,
+                Step = x.Step
+            }).ToList();
+        }
         private static ICollection<Payment> Map(this ICollection<PaymentModel> models)
         {
             return models.Select(x => new Payment
@@ -109,10 +120,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
                 Amount = x.Amount,
                 CalculatedDate = x.CalculatedDate,
-                CollectionPeriod =  collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.CollectionPeriodYear && p.CalendarMonth == x.CollectionPeriodMonth).Map(),
-                Result = x.Result,
-                DateTime = x.CollectionDateUtc,
-                Step = x.Step
                 PaymentPeriod = x.PaymentPeriod,
                 PaymentYear = x.PaymentYear,
                 PaidDate = x.PaidDate,

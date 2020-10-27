@@ -49,26 +49,26 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync<object>("CreatePayment",
+                x => x.CallActivityAsync("CreatePayment",
                     It.Is<CreatePaymentInput>(y =>
                         y.ApprenticeshipIncentiveId == _pendingPayments[0].ApprenticeshipIncentiveId &&
-                        y.PendingPaymentId == _pendingPayments[0].PendingPaymentId && 
+                        y.PendingPaymentId == _pendingPayments[0].PendingPaymentId &&
                         y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
 
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync<object>("CreatePayment",
+                x => x.CallActivityAsync("CreatePayment",
                     It.Is<CreatePaymentInput>(y =>
                         y.ApprenticeshipIncentiveId == _pendingPayments[1].ApprenticeshipIncentiveId &&
                         y.PendingPaymentId == _pendingPayments[1].PendingPaymentId &&
                         y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
 
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync<object>("CreatePayment",
+                x => x.CallActivityAsync("CreatePayment",
                     It.Is<CreatePaymentInput>(y =>
                         y.ApprenticeshipIncentiveId == _pendingPayments[2].ApprenticeshipIncentiveId &&
                         y.PendingPaymentId == _pendingPayments[2].PendingPaymentId &&
                         y.CollectionPeriod == _accountLegalEntityCollectionPeriod.CollectionPeriod)), Times.Once);
-		}
+        }
 
         [Test]
         public async Task Then_activity_is_called_to_validate_pending_payments_for_the_legal_entity()
