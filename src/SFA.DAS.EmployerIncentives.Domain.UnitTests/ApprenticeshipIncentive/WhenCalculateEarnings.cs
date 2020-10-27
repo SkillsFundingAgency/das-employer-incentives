@@ -100,10 +100,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.DueDate.Should().Be(_plannedStartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
             secondPayment.DueDate.Should().Be(_plannedStartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
-            firstPayment.PaymentPeriod.Should().Be(2);
+            firstPayment.PeriodNumber.Should().Be(2);
             firstPayment.PaymentYear.Should().Be((short)_collectionPeriod.Year);
             firstPayment.Amount.Should().Be(100);
-            secondPayment.PaymentPeriod.Should().Be(1);
+            secondPayment.PeriodNumber.Should().Be(1);
             secondPayment.PaymentYear.Should().Be((short)_collectionPeriod.AddMonths(1).Year);
             secondPayment.Amount.Should().Be(300);
 
