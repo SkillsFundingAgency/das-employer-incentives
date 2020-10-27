@@ -25,6 +25,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return period;
         }
 
+        public CollectionPeriod GetPeriod(short collectionYear, byte collectionMonth)
+        {
+            return 
+                _collectionPeriods
+                .Single(d => d.CalendarYear == collectionYear && d.CalendarMonth == collectionMonth);
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             foreach (var collectionPeriod in _collectionPeriods)

@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             PeriodNumber = periodNumber;
             CalendarMonth = calendarMonth;
-            CalendarYear =calendarYear;
+            CalendarYear = calendarYear;
             OpenDate = openDate;
         }
 

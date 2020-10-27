@@ -60,9 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
-            .AddSingleton<IValidator<CreateIncentiveCommand>, NullValidator>()
-            .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
-            .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
@@ -75,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
-            
+
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
             return serviceCollection;
@@ -94,15 +91,15 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
             serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
-            
+
             return serviceCollection;
         }
 
-        public static IServiceCollection AddCommandHandlerDecorators(this IServiceCollection serviceCollection)        
+        public static IServiceCollection AddCommandHandlerDecorators(this IServiceCollection serviceCollection)
         {
             serviceCollection
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))            
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 
@@ -121,8 +118,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
         }
 
         public static IServiceCollection AddHashingService(this IServiceCollection serviceCollection)
-        {   
-            serviceCollection.AddSingleton<IHashingService>(c => {
+        {
+            serviceCollection.AddSingleton<IHashingService>(c =>
+            {
                 var settings = c.GetService<IOptions<ApplicationSettings>>().Value;
                 return new HashingService.HashingService(settings.AllowedHashstringCharacters, settings.Hashstring);
             });
@@ -136,7 +134,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 var settings = s.GetService<IOptions<AccountApi>>().Value;
 
-                var clientBuilder = new HttpClientBuilder()                
+                var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()
                     .WithLogging(s.GetService<ILoggerFactory>());
 
@@ -153,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             });
 
             return serviceCollection;
-        }       
+        }
 
         public static async Task<UpdateableServiceProvider> StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,
@@ -177,7 +175,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             else
             {
                 endpointConfiguration
-                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => r.AddRouting() );
+                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => r.AddRouting());
             }
 
             if (!string.IsNullOrEmpty(configuration["ApplicationSettings:NServiceBusLicense"]))

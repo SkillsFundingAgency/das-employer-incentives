@@ -1,9 +1,9 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
-using SFA.DAS.EmployerIncentives.Data;
+﻿using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 {
@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
     {
         private readonly IAccountDataRepository _accountDataRepository;
         private readonly IDomainEventDispatcher _domainEventDispatcher;
-        
+
         public AccountDomainRepository(
             IAccountDataRepository accountDataRepository,
             IDomainEventDispatcher domainEventDispatcher)
