@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.PendingPayments)
                 .ThenInclude(x => x.ValidationResults)
                 .FirstOrDefaultAsync(a => a.Id == id);
-            return apprenticeshipIncentive?.Map();
+            return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
 
         public async Task Update(ApprenticeshipIncentiveModel apprenticeshipIncentive)
