@@ -104,13 +104,13 @@
             "type": "string"
         },
         "subnetObject": {
-            "type": "string"
+            "type": "object"
         },
         "subnetServiceEndpointList": {
-            "type": "string"
+            "type": "array"
         },
         "subnetDelegations": {
-            "type": "string"
+            "type": "array"
         }
     },
     "variables": {
