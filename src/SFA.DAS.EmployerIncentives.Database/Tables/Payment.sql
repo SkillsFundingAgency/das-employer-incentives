@@ -12,3 +12,5 @@
 	[PaymentYear] SMALLINT NOT NULL, 
 	[Amount] DECIMAL(9, 2) NOT NULL
 )
+GO
+CREATE INDEX IX_Payment_ApprenticeshipIncentiveId ON [incentives].[Payment] (ApprenticeshipIncentiveId)
