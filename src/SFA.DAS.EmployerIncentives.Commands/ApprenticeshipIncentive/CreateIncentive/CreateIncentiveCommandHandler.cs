@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,41 +12,33 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
 {
     public class CreateIncentiveCommandHandler : ICommandHandler<CreateIncentiveCommand>
     {
-        private readonly IIncentiveApplicationDomainRepository _applicationDomainRepository;
         private readonly IApprenticeshipIncentiveFactory _apprenticeshipIncentiveFactory;
         private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;
-        
 
         public CreateIncentiveCommandHandler(
-            IIncentiveApplicationDomainRepository applicationDomainRepository,
             IApprenticeshipIncentiveFactory apprenticeshipIncentiveFactory,
             IApprenticeshipIncentiveDomainRepository apprenticeshipIncentiveDomainRepository)
         {
-            _applicationDomainRepository = applicationDomainRepository;
             _apprenticeshipIncentiveFactory = apprenticeshipIncentiveFactory;
             _apprenticeshipIncentiveDomainRepository = apprenticeshipIncentiveDomainRepository;
         }
 
         public async Task Handle(CreateIncentiveCommand command, CancellationToken cancellationToken = default)
         {
-            var application = await _applicationDomainRepository.Find(command.IncentiveApplicationId);
-
-            foreach (var apprenticeship in application.Apprenticeships)
+            foreach (var incentive in command.Apprenticeships.Select(apprenticeship => _apprenticeshipIncentiveFactory.CreateNew(
+                Guid.NewGuid(),
+                apprenticeship.IncentiveApplicationApprenticeshipId,
+                new Account(command.AccountId),
+                new Apprenticeship(
+                    apprenticeship.ApprenticeshipId,
+                    apprenticeship.FirstName,
+                    apprenticeship.LastName,
+                    apprenticeship.DateOfBirth,
+                    apprenticeship.Uln,
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                ),
+                apprenticeship.PlannedStartDate)))
             {
-                var incentive = _apprenticeshipIncentiveFactory.CreateNew(
-                    Guid.NewGuid(),
-                    apprenticeship.Id,
-                    new Account(application.AccountId),
-                    new Apprenticeship(
-                        apprenticeship.ApprenticeshipId,
-                        apprenticeship.FirstName,
-                        apprenticeship.LastName,
-                        apprenticeship.DateOfBirth,
-                        apprenticeship.Uln,
-                        apprenticeship.ApprenticeshipEmployerTypeOnApproval
-                    ),
-                    apprenticeship.PlannedStartDate);
-
                 await _apprenticeshipIncentiveDomainRepository.Save(incentive);
             }
         }
