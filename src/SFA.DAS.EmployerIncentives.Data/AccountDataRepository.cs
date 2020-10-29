@@ -60,12 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Data
             return accounts?.MapSingle();
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLegalEntityId(long legalEntityId)
-        {
-            var accounts = await _dbContext.Accounts.Where(x => x.LegalEntityId == legalEntityId).ToListAsync();
-            return accounts?.Map();
-        }
-
         public async Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId)
         {
             var accounts = await _dbContext.Accounts.Where(x => x.HashedLegalEntityId == hashedLegalEntityId).ToListAsync();
