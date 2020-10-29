@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [When(@"the application is submitted and the system errors")]
-        public async Task WhenTheApplicationIsSubmittedAndtheSystemErrors()
+        public async Task WhenTheApplicationIsSubmittedAndTheSystemErrors()
         {
             _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
 
@@ -82,20 +82,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             publishedCommand.Should().NotBeNull();
             publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);
-            publishedCommand.IncentiveApplicationId.Should().Be(_submitRequest.IncentiveApplicationId);
         }
 
-        [When(@"the invalid application id is submittted")]
-        public async Task WhenTheInvalidApplicationIdIsSubmittted()
+        [When(@"the invalid application id is submitted")]
+        public async Task WhenTheInvalidApplicationIdIsSubmitted()
         {
             var invalidApplicationId = _fixture.Create<Guid>();
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
             await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
-                
+
         [Then(@"the application changes are not saved")]
-        public async Task ThenTheApplicatioChangesAreNotSaved()
+        public async Task ThenTheApplicationChangesAreNotSaved()
         {
             await ThenTheApplicationStatusIsNotUpdated();
             ThenTheServiceRespondsWithAnInternalError();

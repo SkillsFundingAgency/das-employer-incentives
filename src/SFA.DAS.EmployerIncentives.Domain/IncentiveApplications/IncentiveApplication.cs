@@ -49,12 +49,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
             AddEvent(new Submitted
             {
-                 AccountId = AccountId,
-                 IncentiveApplicationId = Id,
-                 SubmittedAt = submittedAt,
-                 SubmittedBy = submittedByName,
-                 SubmittedByEmail = submittedByEmail,
-                 AccountLegalEntityId = Model.AccountLegalEntityId
+                AccountId = AccountId,
+                IncentiveApplicationId = Id,
+                SubmittedAt = submittedAt,
+                SubmittedBy = submittedByName,
+                SubmittedByEmail = submittedByEmail,
+                AccountLegalEntityId = Model.AccountLegalEntityId,
+                Apprenticeships = Model.ApprenticeshipModels,
             });
         }
 

@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
     {
         private SubmittedHandler _sut;
         private Mock<ICommandPublisher> _mockCommandPublisher;
-        
+
         private Fixture _fixture;
 
         [SetUp]
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             _fixture = new Fixture();
 
             _mockCommandPublisher = new Mock<ICommandPublisher>();
-            
+
             _sut = new SubmittedHandler(_mockCommandPublisher.Object);
         }
 
@@ -37,9 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             await _sut.Handle(@event);
 
             //Assert
-            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i => 
+            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
                 i.AccountId == @event.AccountId &&
-                i.IncentiveApplicationId == @event.IncentiveApplicationId), It.IsAny<CancellationToken>()), Times.Once);
+                i.AccountLegalEntityId == @event.AccountLegalEntityId &&
+                i.Apprenticeships.Count == @event.Apprenticeships.Count), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

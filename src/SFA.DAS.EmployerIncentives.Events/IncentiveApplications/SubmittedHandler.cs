@@ -2,6 +2,9 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,11 +23,25 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
         {
             var command = new CreateIncentiveCommand(
                 @event.AccountId,
-                @event.IncentiveApplicationId,
-                @event.AccountLegalEntityId
+                @event.AccountLegalEntityId,
+                MapForIncentive(@event.Apprenticeships)
                 );
 
             return _commandPublisher.Publish(command);
+        }
+
+        private static List<CreateIncentiveCommand.IncentiveApprenticeship> MapForIncentive(IEnumerable<ApprenticeshipModel> apprenticeships)
+        {
+            return apprenticeships.Select(a => new CreateIncentiveCommand.IncentiveApprenticeship(
+                a.Id,
+                a.ApprenticeshipId,
+                a.FirstName,
+                a.LastName,
+                a.DateOfBirth,
+                a.Uln,
+                a.ApprenticeshipEmployerTypeOnApproval,
+                a.PlannedStartDate)
+            ).ToList();
         }
     }
 }

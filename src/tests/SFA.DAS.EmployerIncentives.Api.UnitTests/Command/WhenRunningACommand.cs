@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
 {
-    public class WhenRuningACommand
+    public class WhenRunningACommand
     {
         private CommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
@@ -44,7 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
             _mockCommandDispatcher
                 .Verify(m => m.Send(It.Is<CreateIncentiveCommand>(c =>
                     c.AccountId == command.AccountId &&
-                    c.IncentiveApplicationId == command.IncentiveApplicationId),
+                    c.AccountLegalEntityId == command.AccountLegalEntityId &&
+                    c.Apprenticeships.Count == command.Apprenticeships.Count
+                    ),
                 It.IsAny<CancellationToken>())
                 , Times.Once);
         }
@@ -78,11 +80,11 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
                 .Verify(m => m.Send(It.IsAny<ICommand>(),
                 It.IsAny<CancellationToken>())
                 , Times.Never);
-        }       
+        }
     }
 
     public class TestCommand : DomainCommand
     {
         public string Test { get; set; }
-    }   
+    }
 }

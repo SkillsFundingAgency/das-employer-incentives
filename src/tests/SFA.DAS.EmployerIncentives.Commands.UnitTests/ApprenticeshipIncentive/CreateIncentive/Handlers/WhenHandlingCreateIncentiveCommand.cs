@@ -5,83 +5,81 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.Create.Handlers
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CreateIncentive.Handlers
 {
     public class WhenHandlingCreateIncentiveCommand
     {
         private CreateIncentiveCommandHandler _sut;
-        private Mock<IIncentiveApplicationDomainRepository> _mockApplicationDomainRespository;        
-        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
+        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            
-            _mockApplicationDomainRespository = new Mock<IIncentiveApplicationDomainRepository>();
-            _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
+
+            _mockIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
 
             _fixture.Customize(new ApprenticeshipIncentiveCustomization());
             _fixture.Customize(new IncentiveApplicationCustomization());
             _sut = new CreateIncentiveCommandHandler(
-                _mockApplicationDomainRespository.Object, 
                 new ApprenticeshipIncentiveFactory(),
-                _mockIncentiveDomainRespository.Object);
+                _mockIncentiveDomainRepository.Object);
         }
 
         [Test]
         public async Task Then_an_apprenticeship_incentive_created_event_is_raised_for_each_apprenticeship_in_the_application()
         {
-            //Arrange
-            int numberOfApprenticeships = 5;
-            var createdIncentives = new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
-            var incentiveApplication = _fixture.Create<IncentiveApplication>();
-            incentiveApplication.SetApprenticeships(_fixture.CreateMany<Domain.IncentiveApplications.Apprenticeship>(numberOfApprenticeships).ToList());
-
-            var command = new CreateIncentiveCommand(incentiveApplication.AccountId, incentiveApplication.Id, incentiveApplication.AccountLegalEntityId);
-
-            _mockApplicationDomainRespository.Setup(x => x
-            .Find(command.IncentiveApplicationId))
-                .ReturnsAsync(incentiveApplication);
-
-            _mockIncentiveDomainRespository
-                .Setup(m => m.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()))
-                .Callback<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>((i) =>
-                {
-                    createdIncentives.Add(i);
-                });
+            // Arrange
+            const int numberOfApprenticeships = 5;
+            var apprenticeships = _fixture.CreateMany<CreateIncentiveCommand.IncentiveApprenticeship>(numberOfApprenticeships).ToList();
+            var incentiveApplicationAccountId = _fixture.Create<long>();
+            var incentiveApplicationAccountLegalEntityId = _fixture.Create<long>();
+            var command = new CreateIncentiveCommand(incentiveApplicationAccountId, incentiveApplicationAccountLegalEntityId, apprenticeships);
 
             // Act
             await _sut.Handle(command);
 
             // Assert
-            createdIncentives.Count.Should().Be(numberOfApprenticeships);
-            createdIncentives.ForEach(i => i.FlushEvents().OfType<Created>().ToList().Count.Should().Be(1));
+            _mockIncentiveDomainRepository.Verify(r => r.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>())
+            , Times.Exactly(numberOfApprenticeships));
+
+            foreach (var apprenticeship in apprenticeships)
+            {
+                _mockIncentiveDomainRepository.Verify(r =>
+                    r.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(
+                        i =>
+                            i.Apprenticeship.Id == apprenticeship.ApprenticeshipId &&
+                            i.Apprenticeship.UniqueLearnerNumber == apprenticeship.Uln &&
+                            i.Apprenticeship.DateOfBirth == apprenticeship.DateOfBirth &&
+                            i.Apprenticeship.EmployerType == apprenticeship.ApprenticeshipEmployerTypeOnApproval &&
+                            i.Apprenticeship.FirstName == apprenticeship.FirstName &&
+                            i.Apprenticeship.LastName == apprenticeship.LastName &&
+                            i.Account.Id == incentiveApplicationAccountId &&
+                            i.Account.AccountLegalEntityId == incentiveApplicationAccountLegalEntityId
+                    )), Times.Once());
+            }
         }
 
         [Test]
         public async Task Then_an_apprenticeship_incentive_is_persisted_for_each_apprenticeship_in_the_application()
         {
             //Arrange
-            int numberOfApprenticeships = 3;
+            const int numberOfApprenticeships = 3;
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
-            incentiveApplication.SetApprenticeships(_fixture.CreateMany<Domain.IncentiveApplications.Apprenticeship>(numberOfApprenticeships).ToList());
+            incentiveApplication.SetApprenticeships(_fixture.CreateMany<Apprenticeship>(numberOfApprenticeships).ToList());
+            var apprenticeships = _fixture.CreateMany<CreateIncentiveCommand.IncentiveApprenticeship>().ToList();
 
-            int itemsPersisted = 0;
-            var command = new CreateIncentiveCommand(incentiveApplication.AccountId, incentiveApplication.Id, incentiveApplication.AccountLegalEntityId);
+            var itemsPersisted = 0;
+            var command = new CreateIncentiveCommand(incentiveApplication.AccountId, incentiveApplication.AccountLegalEntityId, apprenticeships);
 
-            _mockApplicationDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId)).ReturnsAsync(incentiveApplication);
-
-            _mockIncentiveDomainRespository.Setup(m => m.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()))
+            _mockIncentiveDomainRepository.Setup(m => m.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()))
                 .Callback(() =>
                 {
                     itemsPersisted++;
