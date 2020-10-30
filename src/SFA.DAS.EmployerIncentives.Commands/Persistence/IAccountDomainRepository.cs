@@ -7,7 +7,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 {
     public interface IAccountDomainRepository : IDomainRepository<long, Account>
     {
-        Task<IEnumerable<Account>> GetByLegalEntityId(long legalEntityId);
         Task<IEnumerable<Account>> GetByHashedLegalEntityId(string hashedLegalEntityId);
     }
 }
