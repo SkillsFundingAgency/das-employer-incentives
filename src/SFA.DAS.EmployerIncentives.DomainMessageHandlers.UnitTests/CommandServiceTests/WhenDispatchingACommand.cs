@@ -47,20 +47,20 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
         public async Task Then_the_command_is_dispatched_when_the_command_is_valid()
         {
             // arrange
-            var validCommand = _fixture.Create<CreateIncentiveCommand>();
+            var validCommand = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
 
             // act
             await _sut.Dispatch(validCommand);
 
             // assert
-            _client.VerifyPostAsAsync($"commands/ApprenticeshipIncentive.CreateIncentiveCommand", JsonConvert.SerializeObject(validCommand, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }), Times.Once());
+            _client.VerifyPostAsAsync($"commands/ApprenticeshipIncentive.CreateApprenticeshipIncentiveCommand", JsonConvert.SerializeObject(validCommand, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }), Times.Once());
         }
 
         [Test]
         public void Then_an_exception_is_thrown_when_the_call_to_the_api_fails()
         {
             // arrange
-            var validCommand = _fixture.Create<CreateIncentiveCommand>();
+            var validCommand = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
 
             _client.SetUpPostAsAsync(HttpStatusCode.InternalServerError);
 

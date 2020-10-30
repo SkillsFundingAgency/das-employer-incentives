@@ -1,21 +1,24 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Logging;
-using System;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
 {
     public class Submitted : IDomainEvent, ILogWriter
     {
-        public long AccountId { get; set; }
-        public Guid IncentiveApplicationId { get; set; }
-        public DateTime SubmittedAt { get; set; }
-        public string SubmittedBy { get; set; }
-        public string SubmittedByEmail { get; set; }
-                
+        public IncentiveApplicationModel Model { get; }
+
+        public Submitted(IncentiveApplicationModel model)
+        {
+            Model = model;
+        }
+
         public Log Log
         {
             get
             {
-                var message = $"Application Submitted event with AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId} on {SubmittedAt} by {SubmittedBy}";
+                var message =
+                    $"Application Submitted event with AccountId {Model.AccountId} and " +
+                    $"AccountLegalEntityId {Model.AccountLegalEntityId} on {Model.DateSubmitted} by {Model.SubmittedByName}";
                 return new Log
                 {
                     OnProcessing = () => message,

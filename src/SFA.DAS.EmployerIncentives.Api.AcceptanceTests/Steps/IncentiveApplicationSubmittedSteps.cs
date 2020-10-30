@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [When(@"the application is submitted and the system errors")]
-        public async Task WhenTheApplicationIsSubmittedAndtheSystemErrors()
+        public async Task WhenTheApplicationIsSubmittedAndTheSystemErrors()
         {
             _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
 
@@ -78,24 +79,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
 
-            var publishedCommand = _testContext.CommandsPublished.Single(c => c.IsPublished).Command as CreateIncentiveCommand;
+            var publishedCommand = _testContext.CommandsPublished.Where(c => c.IsPublished)
+                .Select(c => c.Command).ToArray();
 
-            publishedCommand.Should().NotBeNull();
-            publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);
-            publishedCommand.IncentiveApplicationId.Should().Be(_submitRequest.IncentiveApplicationId);
+            Debug.Assert(publishedCommand != null, nameof(publishedCommand) + " != null");
+            publishedCommand.Count().Should().Be(_createRequest.Apprenticeships.Count());
+
+            var cmd = publishedCommand.First() as CreateApprenticeshipIncentiveCommand;
+            cmd.Should().NotBeNull();
+            cmd.AccountId.Should().Be(_submitRequest.AccountId);
         }
 
-        [When(@"the invalid application id is submittted")]
-        public async Task WhenTheInvalidApplicationIdIsSubmittted()
+        [When(@"the invalid application id is submitted")]
+        public async Task WhenTheInvalidApplicationIdIsSubmitted()
         {
             var invalidApplicationId = _fixture.Create<Guid>();
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
             await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
-                
+
         [Then(@"the application changes are not saved")]
-        public async Task ThenTheApplicatioChangesAreNotSaved()
+        public async Task ThenTheApplicationChangesAreNotSaved()
         {
             await ThenTheApplicationStatusIsNotUpdated();
             ThenTheServiceRespondsWithAnInternalError();
