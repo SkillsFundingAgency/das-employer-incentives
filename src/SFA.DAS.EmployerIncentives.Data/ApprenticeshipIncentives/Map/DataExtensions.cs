@@ -24,7 +24,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
                 Payments = model.PaymentModels.Map(),
-                AccountLegalEntityId = model.Account.AccountLegalEntityId
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                UKPRN = model.Apprenticeship.UKPRN
             };
         }
 
@@ -40,7 +41,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.LastName,
                      entity.DateOfBirth,
                      entity.Uln,
-                     entity.EmployerType
+                     entity.EmployerType,
+                     entity.UKPRN
                      ),
                 PlannedStartDate = entity.PlannedStartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,

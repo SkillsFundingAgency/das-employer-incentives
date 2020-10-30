@@ -42,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                         apprenticeship.LastName,
                         apprenticeship.DateOfBirth,
                         apprenticeship.Uln,
-                        apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                        apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                        apprenticeship.UKPRN
                     ),
                     apprenticeship.PlannedStartDate);
 

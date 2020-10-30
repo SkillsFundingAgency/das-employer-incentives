@@ -9,12 +9,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class ApprenticeshipIncentiveQueryRepository : IApprenticeshipIncentiveQueryRepository
     {
-        private class JoinedObject
-        {
-            public Models.ApprenticeshipIncentive Incentive { get; set; }
-            public Data.Models.IncentiveApplicationApprenticeship Apprenticeship { get; set; }
-        }
-
         private readonly EmployerIncentivesDbContext _context;
 
         public ApprenticeshipIncentiveQueryRepository(EmployerIncentivesDbContext context)
@@ -25,10 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         public Task<List<ApprenticeshipIncentiveDto>> GetList()
         {
             return _context.Set<Models.ApprenticeshipIncentive>()
-                .Join(_context.Set<Data.Models.IncentiveApplicationApprenticeship>(), 
-                    ai => ai.IncentiveApplicationApprenticeshipId, iaa => iaa.Id, 
-                    (ai, iaa) => new ApprenticeshipIncentiveDto { Id = ai.Id, ApprenticeshipId = ai.ApprenticeshipId, ULN = ai.Uln, UKPRN = iaa.UKPRN })
-                .Select(x => x).ToListAsync();
+                .Select(x => new ApprenticeshipIncentiveDto { Id = x.Id, ApprenticeshipId = x.ApprenticeshipId, ULN = x.Uln, UKPRN = x.UKPRN }).ToListAsync();
         }
     }
 }

@@ -49,15 +49,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             // Assert
             _dbContext.ApprenticeshipIncentives.Count().Should().Be(1);
 
-            var storedAccount = _dbContext.ApprenticeshipIncentives.Single();
-            storedAccount.Id.Should().Be(testIncentive.Id);
-            storedAccount.AccountId.Should().Be(testIncentive.Account.Id);
-            storedAccount.ApprenticeshipId.Should().Be(testIncentive.Apprenticeship.Id);
-            storedAccount.FirstName.Should().Be(testIncentive.Apprenticeship.FirstName);
-            storedAccount.LastName.Should().Be(testIncentive.Apprenticeship.LastName);
-            storedAccount.Uln.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
-            storedAccount.DateOfBirth.Should().Be(testIncentive.Apprenticeship.DateOfBirth);
-            storedAccount.EmployerType.Should().Be(testIncentive.Apprenticeship.EmployerType);
+            var storedApprenticeshipIncentive = _dbContext.ApprenticeshipIncentives.Single();
+            storedApprenticeshipIncentive.Id.Should().Be(testIncentive.Id);
+            storedApprenticeshipIncentive.AccountId.Should().Be(testIncentive.Account.Id);
+            storedApprenticeshipIncentive.ApprenticeshipId.Should().Be(testIncentive.Apprenticeship.Id);
+            storedApprenticeshipIncentive.FirstName.Should().Be(testIncentive.Apprenticeship.FirstName);
+            storedApprenticeshipIncentive.LastName.Should().Be(testIncentive.Apprenticeship.LastName);
+            storedApprenticeshipIncentive.Uln.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
+            storedApprenticeshipIncentive.DateOfBirth.Should().Be(testIncentive.Apprenticeship.DateOfBirth);
+            storedApprenticeshipIncentive.EmployerType.Should().Be(testIncentive.Apprenticeship.EmployerType);
+            storedApprenticeshipIncentive.UKPRN.Should().Be(testIncentive.Apprenticeship.UKPRN);
         }
 
         [Test]

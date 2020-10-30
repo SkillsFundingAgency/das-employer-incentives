@@ -12,7 +12,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public string LastName { get; }
         public DateTime DateOfBirth { get; }
         public long UniqueLearnerNumber { get; }
-        public ApprenticeshipEmployerType EmployerType { get; }      
+        public ApprenticeshipEmployerType EmployerType { get; }
+        public long? UKPRN { get; }
 
         public Apprenticeship(
             long id, 
@@ -20,7 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             string lastName,
             DateTime dateOfBirth,
             long uniqueLearnerNumber,
-            ApprenticeshipEmployerType employerType)
+            ApprenticeshipEmployerType employerType,
+            long? ukprn)
         {
             if (id <= 0) throw new ArgumentException("Apprenticeship Id must be greater than 0", nameof(id));
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("FirstName must be set", nameof(firstName));
@@ -33,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             DateOfBirth = dateOfBirth;
             UniqueLearnerNumber = uniqueLearnerNumber;
             EmployerType = employerType;
+            UKPRN = ukprn;
         }
       
         protected override IEnumerable<object> GetAtomicValues()
@@ -43,6 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return DateOfBirth;
             yield return UniqueLearnerNumber;
             yield return EmployerType;
+            yield return UKPRN;
         }
     }
 }
