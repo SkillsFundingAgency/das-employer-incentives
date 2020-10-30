@@ -54,6 +54,22 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         }
 
         [Test]
+        public async Task Then_when_the_account_has_multiple_legal_entities_all_legal_entities_are_returned()
+        {
+            var accountId = _fixture.Create<long>();
+            var testAccounts = _fixture.Build<Models.Account>().With(x => x.Id, accountId).CreateMany(5);
+            
+            await _dbContext.AddRangeAsync(testAccounts);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var accounts = await _sut.GetByHashedLegalEntityId(testAccounts.First().HashedLegalEntityId);
+
+            // Assert
+            accounts.Single().LegalEntityModels.Count.Should().Be(5);
+        }
+
+        [Test]
         public async Task Then_a_null_account_is_returned_if_it_does_not_exist()
         {
             // Arrange
