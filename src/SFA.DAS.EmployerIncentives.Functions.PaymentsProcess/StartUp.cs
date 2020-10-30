@@ -12,6 +12,9 @@ using SFA.DAS.UnitOfWork.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using System;
 using System.IO;
+using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.EmployerIncentives.Commands;
+using SFA.DAS.EmployerIncentives.Events;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -21,7 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddNLog();
-
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
 

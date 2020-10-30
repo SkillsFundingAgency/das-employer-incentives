@@ -82,11 +82,45 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var storedPendingPayment = storedIncentive.PendingPayments.Single();
             storedPendingPayment.Id.Should().Be(testPendingPayment.Id);
             storedPendingPayment.AccountId.Should().Be(testPendingPayment.Account.Id);
+            storedPendingPayment.AccountLegalEntityId.Should().Be(testPendingPayment.Account.AccountLegalEntityId);
             storedPendingPayment.ApprenticeshipIncentiveId.Should().Be(testPendingPayment.ApprenticeshipIncentiveId);
             storedPendingPayment.DueDate.Should().Be(testPendingPayment.DueDate);
             storedPendingPayment.Amount.Should().Be(testPendingPayment.Amount);
             storedPendingPayment.CalculatedDate.Should().Be(testPendingPayment.CalculatedDate);
             storedPendingPayment.PaymentMadeDate.Should().Be(testPendingPayment.PaymentMadeDate);
+        }
+
+        [Test]
+        public async Task Then_the_payments_are_added_to_the_data_store()
+        {
+            var testPayment = _fixture.Create<PaymentModel>();
+            testPayment.PaidDate = null;
+
+            // Arrange
+            var testApprenticeshipIncentive = _fixture
+                .Build<ApprenticeshipIncentiveModel>()
+                .With(f => f.Id, testPayment.ApprenticeshipIncentiveId)
+                .With(f => f.PaymentModels, new List<PaymentModel> { testPayment })
+                .Create();
+
+            // Act
+            await _sut.Add(testApprenticeshipIncentive);
+
+            // Assert
+            var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();
+            _ = storedIncentive.Payments.Count.Should().Be(1);
+            var storedPayment = storedIncentive.Payments.Single();
+            storedPayment.Id.Should().Be(testPayment.Id);
+            storedPayment.AccountId.Should().Be(testPayment.Account.Id);
+            storedPayment.AccountLegalEntityId.Should().Be(testPayment.Account.AccountLegalEntityId);
+            storedPayment.ApprenticeshipIncentiveId.Should().Be(testPayment.ApprenticeshipIncentiveId);
+            storedPayment.PaymentPeriod.Should().Be(testPayment.PaymentPeriod);
+            storedPayment.PaymentYear.Should().Be(testPayment.PaymentYear);
+            storedPayment.Amount.Should().Be(testPayment.Amount);
+            storedPayment.CalculatedDate.Should().Be(testPayment.CalculatedDate);
+            storedPayment.PaidDate.Should().Be(testPayment.PaidDate);
+            storedPayment.PendingPaymentId.Should().Be(testPayment.PendingPaymentId);
+            storedPayment.SubnominalCode.Should().Be(testPayment.SubnominalCode);
         }
     }
 }

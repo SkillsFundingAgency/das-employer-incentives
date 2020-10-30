@@ -16,8 +16,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public decimal Amount => Model.Amount;
         public byte? PeriodNumber => Model.PeriodNumber;
         public short? PaymentYear => Model.PaymentYear;
+        public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
 
-        public bool IsValidated => Model.PendingPaymentValidationResultModels.Count > 0 && !Model.PendingPaymentValidationResultModels.Any(r => !r.Result);
+        public bool IsValidated => Model.PendingPaymentValidationResultModels.Count > 0 && Model.PendingPaymentValidationResultModels.All(r => r.Result);
 
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
@@ -48,6 +49,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.PeriodNumber = period.PeriodNumber;
             Model.PaymentYear = period.CalendarYear;
         }
+
+        public void SetPaymentMadeDate(DateTime paymentDate)
+        {
+            Model.PaymentMadeDate = paymentDate;
+		}
 
         public void AddValidationResult(PendingPaymentValidationResult validationResult)
         {

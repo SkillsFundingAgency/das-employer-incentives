@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
         public DateTime PlannedStartDate => Model.PlannedStartDate;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
+        public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
@@ -69,6 +70,57 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
             });
         }
+
+        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth)
+        {
+            var pendingPayment = GetPendingPayment(pendingPaymentId);
+            if (!pendingPayment.IsValidated)
+            {
+                return;
+            }
+
+            RemoveExistingPaymentIfExists(pendingPaymentId);
+
+            var paymentDate = DateTime.Now;
+
+            AddPayment(pendingPaymentId, collectionYear, collectionMonth, pendingPayment, paymentDate);
+            pendingPayment.SetPaymentMadeDate(paymentDate);
+        }
+
+        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
+        {
+            var payment = Payment.New(
+                Guid.NewGuid(), 
+                Model.Account, 
+                Model.Id, 
+                pendingPaymentId, 
+                pendingPayment.Amount,
+                paymentDate, 
+                collectionYear, 
+                collectionMonth);
+
+            Model.PaymentModels.Add(payment.GetModel());
+        }
+
+        private void RemoveExistingPaymentIfExists(Guid pendingPaymentId)
+        {
+            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == pendingPaymentId);
+            if (existingPayment != null)
+            {
+                Model.PaymentModels.Remove(existingPayment);
+            }
+        }
+
+        private PendingPayment GetPendingPayment(Guid pendingPaymentId)
+        {
+            var pendingPayment = PendingPayments.SingleOrDefault(x => x.Id == pendingPaymentId);
+            if (pendingPayment == null)
+            {
+                throw new ArgumentException("Pending payment does not exist.");
+            }
+
+            return pendingPayment;
+		}
 
         public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {

@@ -23,7 +23,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             _logger.LogInformation($"Validating Pending Payment [PendingPaymentId={payment.PendingPaymentId}], [collection period={payment.Year}/{payment.Month}], [ApprenticeshipIncentiveId={payment.ApprenticeshipIncentiveId}]",
                 new { payment });
-
             await _commandDispatcher.Send(new ValidatePendingPaymentCommand(payment.ApprenticeshipIncentiveId,
                 payment.PendingPaymentId, payment.Year, payment.Month));
         }

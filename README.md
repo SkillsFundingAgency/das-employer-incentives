@@ -23,6 +23,10 @@ Licensed under the [MIT license](https://github.com/SkillsFundingAgency/das-empl
 
 #### Run the solution
 
+#### Tests
+Acceptance tests require local Db as well as Azure Functions Core tools. Use NPM command to install them globally:
+
+`npm i -g azure-functions-core-tools@3 --unsafe-perm true`
 
 #### SonarCloud Analysis (Optional)
 

@@ -36,6 +36,7 @@ using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {

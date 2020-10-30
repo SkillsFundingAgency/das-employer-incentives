@@ -23,12 +23,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PlannedStartDate = model.PlannedStartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
+                Payments = model.PaymentModels.Map(),
                 AccountLegalEntityId = model.Account.AccountLegalEntityId
             };
         }
 
         internal static ApprenticeshipIncentiveModel Map(this ApprenticeshipIncentive entity, IEnumerable<CollectionPeriod> collectionPeriods)
-        {            
+        {
             return new ApprenticeshipIncentiveModel
             {
                 Id = entity.Id,
@@ -43,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      ),
                 PlannedStartDate = entity.PlannedStartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
-                PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods)
+                PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
+                PaymentModels = entity.Payments.Map()
             };
         }
 
@@ -101,11 +103,45 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             return models.Select(x => new PendingPaymentValidationResultModel
             {
-                 Id = x.Id,
-                 CollectionPeriod =  collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.CollectionPeriodYear && p.CalendarMonth == x.CollectionPeriodMonth).Map(),
-                 Result = x.Result,
-                 DateTime = x.CollectionDateUtc,
-                 Step = x.Step
+                Id = x.Id,
+                CollectionPeriod = collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.CollectionPeriodYear && p.CalendarMonth == x.CollectionPeriodMonth).Map(),
+                Result = x.Result,
+                DateTime = x.CollectionDateUtc,
+                Step = x.Step
+            }).ToList();
+        }
+        private static ICollection<Payment> Map(this ICollection<PaymentModel> models)
+        {
+            return models.Select(x => new Payment
+            {
+                Id = x.Id,
+                AccountId = x.Account.Id,
+                AccountLegalEntityId = x.Account.AccountLegalEntityId,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                Amount = x.Amount,
+                CalculatedDate = x.CalculatedDate,
+                PaymentPeriod = x.PaymentPeriod,
+                PaymentYear = x.PaymentYear,
+                PaidDate = x.PaidDate,
+                SubnominalCode = x.SubnominalCode,
+                PendingPaymentId = x.PendingPaymentId
+            }).ToList();
+        }
+
+        private static ICollection<PaymentModel> Map(this ICollection<Payment> models)
+        {
+            return models.Select(x => new PaymentModel
+            {
+                Id = x.Id,
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(x.AccountId, x.AccountLegalEntityId),
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                Amount = x.Amount,
+                CalculatedDate = x.CalculatedDate,
+                PaidDate = x.PaidDate,
+                PaymentPeriod = x.PaymentPeriod,
+                PaymentYear = x.PaymentYear,
+                SubnominalCode = x.SubnominalCode,
+                PendingPaymentId = x.PendingPaymentId
             }).ToList();
         }
 
