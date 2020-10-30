@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
+    [Dapper.Contrib.Extensions.Table("IncentiveApplicationApprenticeship")]
     [Table("IncentiveApplicationApprenticeship")]
     public partial class IncentiveApplicationApprenticeship
     {
@@ -19,5 +22,12 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
         public bool EarningsCalculated { get; set; }
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }
+
+        public IncentiveApplicationApprenticeship()
+        {
+            ApprenticeshipIncentives = new List<ApprenticeshipIncentive>();
+        }
     }
 }

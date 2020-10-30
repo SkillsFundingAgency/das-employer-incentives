@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,12 +19,13 @@ namespace SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck
 
         public Task Handle(EarningsCalculationRequired @event, CancellationToken cancellationToken = default)
         {
-            var command = new CreateIncentiveCommand(
-                @event.AccountId,
-                @event.IncentiveApplicationId
-                );
+            //var command = new CreateIncentiveCommand(
+            //    @event.AccountId,
+            //    @event.IncentiveApplicationId
+            //    );
 
-            return _commandPublisher.Publish(command);
+            //return _commandPublisher.Publish(command);
+            return Task.CompletedTask;
         }
     }
 }
