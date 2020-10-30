@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "database",
                 "api"};
         
-#line 1 "IncentiveClaimSubmitted.feature"
+#line 1 "IncentiveApplicationSubmittedFeature.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
@@ -151,7 +151,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an employer has entered incentive claim application details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 15
- testRunner.When("the invalid application id is submittted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("the invalid application id is submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 16
  testRunner.Then("the application status is not updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

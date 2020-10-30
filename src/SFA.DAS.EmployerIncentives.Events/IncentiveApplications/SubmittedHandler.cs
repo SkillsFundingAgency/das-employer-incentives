@@ -2,9 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,27 +19,27 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public Task Handle(Submitted @event, CancellationToken cancellationToken = default)
         {
-            var command = new CreateIncentiveCommand(
-                @event.AccountId,
-                @event.AccountLegalEntityId,
-                MapForIncentive(@event.Apprenticeships)
+            var commands = new List<Task>();
+            foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
+            {
+                var command = new CreateApprenticeshipIncentiveCommand(
+                    @event.Model.AccountId,
+                    @event.Model.AccountLegalEntityId,
+                    apprenticeship.Id,
+                    apprenticeship.ApprenticeshipId,
+                    apprenticeship.FirstName,
+                    apprenticeship.LastName,
+                    apprenticeship.DateOfBirth,
+                    apprenticeship.Uln,
+                    apprenticeship.PlannedStartDate,
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval
                 );
 
-            return _commandPublisher.Publish(command);
-        }
+                var task = _commandPublisher.Publish(command);
+                commands.Add(task);
+            }
 
-        private static List<CreateIncentiveCommand.IncentiveApprenticeship> MapForIncentive(IEnumerable<ApprenticeshipModel> apprenticeships)
-        {
-            return apprenticeships.Select(a => new CreateIncentiveCommand.IncentiveApprenticeship(
-                a.Id,
-                a.ApprenticeshipId,
-                a.FirstName,
-                a.LastName,
-                a.DateOfBirth,
-                a.Uln,
-                a.ApprenticeshipEmployerTypeOnApproval,
-                a.PlannedStartDate)
-            ).ToList();
+            return Task.WhenAll(commands);
         }
     }
 }

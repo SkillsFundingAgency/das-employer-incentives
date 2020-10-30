@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -78,10 +79,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
 
-            var publishedCommand = _testContext.CommandsPublished.Single(c => c.IsPublished).Command as CreateIncentiveCommand;
+            var publishedCommand = _testContext.CommandsPublished.Where(c => c.IsPublished)
+                .Select(c => c.Command).ToArray();
 
-            publishedCommand.Should().NotBeNull();
-            publishedCommand.AccountId.Should().Be(_submitRequest.AccountId);
+            Debug.Assert(publishedCommand != null, nameof(publishedCommand) + " != null");
+            publishedCommand.Count().Should().Be(_createRequest.Apprenticeships.Count());
+
+            var cmd = publishedCommand.First() as CreateApprenticeshipIncentiveCommand;
+            cmd.Should().NotBeNull();
+            cmd.AccountId.Should().Be(_submitRequest.AccountId);
         }
 
         [When(@"the invalid application id is submitted")]

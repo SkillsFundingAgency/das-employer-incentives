@@ -4,7 +4,6 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -31,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
             do
             {
-                var message2 = new Commands.Types.ApprenticeshipIncentive.CreateIncentiveCommand(1, 2, new List<CreateIncentiveCommand.IncentiveApprenticeship>());
+                var message2 = new CalculateEarningsCommand(Guid.NewGuid(), 1, 2);
                 await endpointInstance.Send(message2);
 
                 Console.WriteLine("Message sent...");

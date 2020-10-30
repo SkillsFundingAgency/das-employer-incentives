@@ -47,16 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.SubmittedByEmail = submittedByEmail;
             Model.SubmittedByName = submittedByName;
 
-            AddEvent(new Submitted
-            {
-                AccountId = AccountId,
-                IncentiveApplicationId = Id,
-                SubmittedAt = submittedAt,
-                SubmittedBy = submittedByName,
-                SubmittedByEmail = submittedByEmail,
-                AccountLegalEntityId = Model.AccountLegalEntityId,
-                Apprenticeships = Model.ApprenticeshipModels,
-            });
+            AddEvent(new Submitted(Model));
         }
 
         public void SetApprenticeships(IEnumerable<Apprenticeship> apprenticeships)

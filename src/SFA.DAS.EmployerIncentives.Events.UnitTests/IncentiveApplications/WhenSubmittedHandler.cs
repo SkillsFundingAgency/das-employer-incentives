@@ -37,10 +37,21 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             await _sut.Handle(@event);
 
             //Assert
-            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
-                i.AccountId == @event.AccountId &&
-                i.AccountLegalEntityId == @event.AccountLegalEntityId &&
-                i.Apprenticeships.Count == @event.Apprenticeships.Count), It.IsAny<CancellationToken>()), Times.Once);
+            foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
+            {
+                _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateApprenticeshipIncentiveCommand>(i =>
+                    i.AccountId == @event.Model.AccountId &&
+                    i.AccountLegalEntityId == @event.Model.AccountLegalEntityId &&
+                    i.IncentiveApplicationApprenticeshipId == apprenticeship.Id &&
+                    i.ApprenticeshipId == apprenticeship.ApprenticeshipId &&
+                    i.FirstName == apprenticeship.FirstName &&
+                    i.LastName == apprenticeship.LastName &&
+                    i.DateOfBirth == apprenticeship.DateOfBirth &&
+                    i.Uln == apprenticeship.Uln &&
+                    i.PlannedStartDate == apprenticeship.PlannedStartDate &&
+                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                ), It.IsAny<CancellationToken>()), Times.Once);
+            }
         }
     }
 }

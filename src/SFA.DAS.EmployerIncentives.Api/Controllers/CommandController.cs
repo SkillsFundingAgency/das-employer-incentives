@@ -11,17 +11,17 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     public class CommandController : ApiCommandControllerBase
     {
         public CommandController(ICommandDispatcher commandDispatcher) : base(commandDispatcher) { }
-        const string typesPrefix = "SFA.DAS.EmployerIncentives.Commands.Types.";
+        private const string TypesPrefix = "SFA.DAS.EmployerIncentives.Commands.Types.";
 
         [HttpPost("/commands/{type}")]
         public async Task<IActionResult> RunCommand(string type, [FromBody] string commandText)
-        {               
-            var objectType = typeof(CreateIncentiveCommand).Assembly.GetType($"{typesPrefix}{type}");
+        {
+            var objectType = typeof(CreateApprenticeshipIncentiveCommand).Assembly.GetType($"{TypesPrefix}{type}");
             var command = JsonConvert.DeserializeObject(commandText, objectType);
 
             if (objectType != null && objectType.IsSubclassOf(typeof(DomainCommand)))
             {
-                await SendCommandAsync(command as dynamic);
+                await SendCommandAsync((dynamic)command);
             }
             return Ok();
         }
