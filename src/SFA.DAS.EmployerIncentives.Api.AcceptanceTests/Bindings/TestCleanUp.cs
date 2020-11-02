@@ -20,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             {
                 await _context.MessageBus.Stop();
             }
+            _context.WebApiFactory?.Dispose();
             _context.EmployerIncentiveApi?.Dispose();
             _context.DomainMessageHandlers?.Dispose();
             _context.SqlDatabase.Dispose();
