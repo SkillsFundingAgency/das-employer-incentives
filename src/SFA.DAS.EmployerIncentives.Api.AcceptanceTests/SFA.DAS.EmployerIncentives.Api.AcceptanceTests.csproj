@@ -38,6 +38,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ApplicationsForAccountRequested.feature</DependentUpon>
     </Compile>
+    <Compile Update="Features\EarningsResilienceCheck.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -66,6 +69,10 @@
     <SpecFlowFeatureFiles Update="Features\ApplicationsForAccountRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\EarningsResilienceCheck.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>EarningsResilienceCheck.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
