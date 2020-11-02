@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Microsoft.EntityFrameworkCore;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Data.Map;
 
 namespace SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck
 {
@@ -17,15 +19,16 @@ namespace SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<EarningsResilienceCheckDto>> GetApplicationsWithoutEarningsCalculations()
+        public async Task<IEnumerable<Guid>> GetApplicationsWithoutEarningsCalculations()
         {
-            var earningsCheckApplications = new List<EarningsResilienceCheckDto>();
+            var earningsCheckApplications = new List<Guid>();
 
             var applicationsWithoutApprenticeshipIncentives = await (from applications in _dbContext.Applications
                                                               join apprenticeships in _dbContext.ApplicationApprenticeships
                                                               on applications.Id equals apprenticeships.IncentiveApplicationId                 
-                                                              where apprenticeships.ApprenticeshipIncentives.Count() == 0
-                                                              select new { applications.AccountId, applications.Id }).ToListAsync();
+                                                              where apprenticeships.ApprenticeshipIncentives.Count() == 0 
+                                                              && applications.Status == Enums.IncentiveApplicationStatus.Submitted                                                              
+                                                              select new { applications.Id }).ToListAsync();
                        
             var applicationsWithoutPendingPayments = await (from applications in _dbContext.Applications
                                                      join apprenticeships in _dbContext.ApplicationApprenticeships
@@ -33,15 +36,25 @@ namespace SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck
                                                      join incentives in _dbContext.ApprenticeshipIncentives
                                                      on apprenticeships.ApprenticeshipId equals incentives.ApprenticeshipId
                                                      where incentives.PendingPayments.Count() == 0
-                                                     select new { applications.AccountId, applications.Id }).ToListAsync();
+                                                     && applications.Status == Enums.IncentiveApplicationStatus.Submitted
+                                                     select new { applications.Id }).ToListAsync();
 
-            earningsCheckApplications.AddRange(from application in applicationsWithoutApprenticeshipIncentives
-                                               select new EarningsResilienceCheckDto { AccountId = application.AccountId, ApplicationId = application.Id });
-
-            earningsCheckApplications.AddRange(from application in applicationsWithoutPendingPayments
-                                               select new EarningsResilienceCheckDto { AccountId = application.AccountId, ApplicationId = application.Id });
+            earningsCheckApplications.AddRange(applicationsWithoutApprenticeshipIncentives.Select(application => application.Id));
+            earningsCheckApplications.AddRange(applicationsWithoutPendingPayments.Select(application => application.Id));
 
             return await Task.FromResult(earningsCheckApplications);
+        }
+
+        public async Task<IncentiveApplicationModel> GetApplicationDetail(Guid applicationId)
+        {
+            var incentiveApplication = await _dbContext.Applications
+               .Include(x => x.Apprenticeships)
+               .FirstOrDefaultAsync(a => a.Id == applicationId);
+            if (incentiveApplication != null)
+            {
+                return incentiveApplication.Map();
+            }
+            return null;
         }
     }
 }

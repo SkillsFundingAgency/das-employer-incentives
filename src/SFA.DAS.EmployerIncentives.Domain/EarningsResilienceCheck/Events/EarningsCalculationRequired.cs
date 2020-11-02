@@ -1,19 +1,23 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
-using System;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events
 {
     public class EarningsCalculationRequired : IDomainEvent, ILogWriter
     {
-        public long AccountId { get; set; }
-        public Guid IncentiveApplicationId { get; set; }
+        public IncentiveApplicationModel Model { get; }
+
+        public EarningsCalculationRequired(IncentiveApplicationModel model)
+        {
+            Model = model;
+        }
 
         public Log Log
         {
             get
             {
-                var message = $"Earnings Calculation Required event with AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId}";
+                var message = $"Earnings Calculation Required event with AccountId {Model.AccountId} and IncentiveApplicationId {Model.Id}";
                 return new Log
                 {
                     OnProcessing = () => message,

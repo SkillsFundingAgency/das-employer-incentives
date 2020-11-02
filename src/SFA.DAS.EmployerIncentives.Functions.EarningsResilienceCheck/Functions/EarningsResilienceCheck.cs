@@ -2,7 +2,7 @@ using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace SFA.DAS.EmployerIncentives.Functions.EarningsResilienceCheck
+namespace SFA.DAS.EmployerIncentives.Functions.EarningsResilienceCheck.Functions
 {
     public static class EarningsResilienceCheck
     {
