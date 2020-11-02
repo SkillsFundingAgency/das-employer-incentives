@@ -7,8 +7,10 @@ using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLegalEntity.Handlers
 {
@@ -85,6 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
             accounts[1].AddLegalEntity(4, _fixture.Create<LegalEntity>());
             accounts[1].AddLegalEntity(5, legalEntityToBeUpdated);
 
+            // Act
             _mockDomainRepository.Setup(x => x.GetByHashedLegalEntityId(caseCompletedCommand.HashedLegalEntityId)).ReturnsAsync(accounts);
             await _sut.Handle(caseCompletedCommand);
 
@@ -103,6 +106,29 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
                 legalEntity.VrfCaseStatus.Should().Be(caseCompletedCommand.Status);
                 legalEntity.VrfCaseStatusLastUpdatedDateTime.Should().Be(caseCompletedCommand.CaseStatusLastUpdatedDate);
             }
+        }
+
+        [Test]
+        public async Task Then_event_BankDetailsApprovedForLegalEntity_is_raised_when_status_is_completed()
+        {
+            // Arrange
+            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusCommand(LegalEntityToBeUpdatedId, _fixture.Create<string>(), LegalEntityVrfCaseStatus.Completed, _fixture.Create<DateTime>());
+
+            var account = _fixture.Create<Account>();
+            var legalEntityToBeUpdated = LegalEntity.New(123, _fixture.Create<string>(), LegalEntityToBeUpdatedId);
+
+            account.AddLegalEntity(1, legalEntityToBeUpdated);
+            account.AddLegalEntity(2, _fixture.Create<LegalEntity>());
+            account.AddLegalEntity(3, _fixture.Create<LegalEntity>());
+
+            _mockDomainRepository.Setup(x => x.GetByHashedLegalEntityId(caseCompletedCommand.HashedLegalEntityId)).ReturnsAsync(new List<Account> { account });
+            await _sut.Handle(caseCompletedCommand);
+
+            var @events = account.FlushEvents().ToList();
+
+            @events.Count.Should().Be(1);
+            @events[0].GetType().Should().Be<BankDetailsApprovedForLegalEntity>();
+            ((BankDetailsApprovedForLegalEntity) @events[0]).HashedLegalEntityId.Should().Be(LegalEntityToBeUpdatedId);
         }
     }
 }

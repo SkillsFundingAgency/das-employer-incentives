@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServiceTests
 {
     [TestFixture]
-    public class WhenDispatchingACommand
+    public class WhenDispatchingACommand : IDisposable
     {
         private CommandService _sut;
         private TestHttpClient _client;
@@ -74,6 +74,25 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
         public class InvalidCommand : DomainCommand
         {
 
+        }
+
+        private bool _isDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+
+            if (disposing)
+            {
+                _client?.Dispose();
+            }
+            _isDisposed = true;
         }
     }
 }

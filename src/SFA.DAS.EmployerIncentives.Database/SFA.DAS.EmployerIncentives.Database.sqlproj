@@ -63,6 +63,7 @@
     <Folder Include="StoredProcedures" />
     <Folder Include="Views" />
     <Folder Include="Schemas" />
+    <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Accounts.sql" />
