@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -20,10 +21,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             {
                 await _context.MessageBus.Stop();
             }
+            _context.EmployerIncentivesWebApiFactory?.Dispose();
             _context.EmployerIncentiveApi?.Dispose();
             _context.AccountApi?.Dispose();
             _context.DomainMessageHandlers?.Dispose();
-            _context.SqlDatabase.Dispose();
+            _context.SqlDatabase?.Dispose();
+           
+            try
+            {
+                Directory.Delete(_context.TestDirectory.FullName, true);
+            }
+            catch(Exception){}
         }
     }
 }
