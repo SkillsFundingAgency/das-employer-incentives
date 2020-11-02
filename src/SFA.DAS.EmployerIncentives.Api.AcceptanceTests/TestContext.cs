@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public List<IHook> Hooks { get; set; }
         public List<object> EventsPublished { get; set; }
         public List<PublishedCommand> CommandsPublished { get; set; }
-        public TestWebApi WebApiFactory { get; set; }
+        public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
 
         public TestContext()
         {
