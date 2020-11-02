@@ -23,10 +23,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             }
             _context.EmployerIncentivesWebApiFactory?.Dispose();
             _context.EmployerIncentiveApi?.Dispose();
+            _context.AccountApi?.Dispose();
             _context.DomainMessageHandlers?.Dispose();
             _context.SqlDatabase?.Dispose();
-            _context.AccountApi?.Dispose();
-
+           
             try
             {
                 Directory.Delete(_context.TestDirectory.FullName, true);

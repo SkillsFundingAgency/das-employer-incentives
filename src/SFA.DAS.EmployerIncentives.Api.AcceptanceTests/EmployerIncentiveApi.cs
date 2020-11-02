@@ -59,6 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             if (disposing)
             {
+                Response?.Dispose();
                 Client.Dispose();
             }
 

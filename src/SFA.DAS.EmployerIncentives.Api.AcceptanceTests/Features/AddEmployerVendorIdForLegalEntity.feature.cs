@@ -20,11 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("UpdateVrfCaseStatusForLegalEntity")]
+    [NUnit.Framework.DescriptionAttribute("AddEmployerVendorIdForLegalEntity")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
     [NUnit.Framework.CategoryAttribute("accountApi")]
-    public partial class UpdateVrfCaseStatusForLegalEntityFeature
+    public partial class AddEmployerVendorIdForLegalEntityFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -34,15 +34,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "api",
                 "accountApi"};
         
-#line 1 "UpdateVrfCaseStatusForLegalEntity.feature"
+#line 1 "AddEmployerVendorIdForLegalEntity.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "UpdateVrfCaseStatusForLegalEntity", "\tWhen Vendor Regisgtration Form Status for Legal Entity is changed\r\n\tThen Employe" +
-                    "r Incentives records are updated accordingly", ProgrammingLanguage.CSharp, new string[] {
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "AddEmployerVendorIdForLegalEntity", "\tWhen a new Employer Vendor Id is to be assigned to the Legal Entity\r\n\tThen the l" +
+                    "egal entities without an existing vendor are updated", ProgrammingLanguage.CSharp, new string[] {
                         "database",
                         "api",
                         "accountApi"});
@@ -84,12 +84,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("VRF case status updated with a general value for legal entity")]
-        public virtual void VRFCaseStatusUpdatedWithAGeneralValueForLegalEntity()
+        [NUnit.Framework.DescriptionAttribute("A new Employer Vendor Id will be assigned to legal entities who do not already ha" +
+            "ve a vedor assigned")]
+        public virtual void ANewEmployerVendorIdWillBeAssignedToLegalEntitiesWhoDoNotAlreadyHaveAVedorAssigned()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("VRF case status updated with a general value for legal entity", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A new Employer Vendor Id will be assigned to legal entities who do not already ha" +
+                    "ve a vedor assigned", null, tagsOfScenario, argumentsOfScenario);
 #line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -111,56 +113,19 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 10
- testRunner.Given("an existing submitted incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("a legal entity exists with a vendor assigned within an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 11
- testRunner.When("VRF case status is changed to \'Some Update Status\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.And("a the same legal entity exists without a vendor assigned for a seperate account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 12
- testRunner.Then("Employer Incentives account legal entity record is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("we add the employer vendor for this legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("VRF case status of \'Case request complete\' updated for legal entity")]
-        public virtual void VRFCaseStatusOfCaseRequestCompleteUpdatedForLegalEntity()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("VRF case status of \'Case request complete\' updated for legal entity", null, tagsOfScenario, argumentsOfScenario);
-#line 15
-this.ScenarioInitialize(scenarioInfo);
+#line 13
+ testRunner.Then("the vendor remains the same for first legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 16
- testRunner.Given("an existing submitted incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 17
- testRunner.When("VRF case status is changed to \'Case Request Completed\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 18
- testRunner.Then("Employer Incentives account legal entity record is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 19
- testRunner.And("a command to add an Employer Vendor Id Command is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 14
+ testRunner.And("the vendor is updated for the second legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
