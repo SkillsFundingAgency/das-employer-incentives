@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -23,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 log.LogInformation("Running late");
             }
 
-            log.LogInformation($"Triggering LearnerMatchingOrchestrator at {DateTime.UtcNow.ToShortDateString()}");
+            log.LogInformation("Triggering LearnerMatchingOrchestrator");
 
             string instanceId = await starter.StartNewAsync("LearnerMatchingOrchestrator");
 

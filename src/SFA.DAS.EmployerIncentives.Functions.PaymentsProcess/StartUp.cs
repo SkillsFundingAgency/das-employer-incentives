@@ -49,7 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             builder.Services.AddOptions();
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
-            builder.Services.Configure<ApplicationSettings>(config.GetSection("PolicySettings"));
+            builder.Services.Configure<PolicySettings>(config.GetSection("PolicySettings"));
+            builder.Services.Configure<LearnerMatchApi>(config.GetSection("LearnerMatchApi"));
 
             builder.Services.AddUnitOfWork();
             builder.Services.AddEntityFrameworkForEmployerIncentives().AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
