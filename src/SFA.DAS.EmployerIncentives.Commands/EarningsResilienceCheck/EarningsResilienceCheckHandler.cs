@@ -29,7 +29,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
             foreach (var applicationId in applicationIds)
             {
                 var applicationDetail = await _resilienceCheckRepository.GetApplicationDetail(applicationId);
-                await GenerateEventForApprenticeshipsWithoutEarningsCalculations(applicationDetail);
+                if (applicationDetail != null)
+                {
+                    await GenerateEventForApprenticeshipsWithoutEarningsCalculations(applicationDetail);
+                }
             }
         }
 
