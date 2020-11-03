@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public DateTime DateOfBirth { get; }
         public long UniqueLearnerNumber { get; }
         public Provider Provider { get; private set; }
-        public ApprenticeshipEmployerType EmployerType { get; }      
+        public ApprenticeshipEmployerType EmployerType { get; }              
 
         public Apprenticeship(
             long id, 
@@ -49,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return DateOfBirth;
             yield return UniqueLearnerNumber;
             yield return EmployerType;
+            yield return Provider;
         }
     }
 }

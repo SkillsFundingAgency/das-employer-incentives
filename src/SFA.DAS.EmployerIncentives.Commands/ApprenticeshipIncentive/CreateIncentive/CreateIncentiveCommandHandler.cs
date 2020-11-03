@@ -46,6 +46,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                     ),
                     apprenticeship.PlannedStartDate);
 
+                if (apprenticeship.UKPRN.HasValue)
+                {
+                    incentive.Apprenticeship.SetProvider(new Provider(apprenticeship.UKPRN.Value));
+                }
+
                 await _apprenticeshipIncentiveDomainRepository.Save(incentive);
             }
         }

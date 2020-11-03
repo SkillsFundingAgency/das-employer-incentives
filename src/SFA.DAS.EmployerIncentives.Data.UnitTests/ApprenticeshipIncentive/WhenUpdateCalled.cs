@@ -56,8 +56,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var validationResults = _fixture.CreateMany<PendingPaymentValidationResultModel>().ToList();
             storedIncentive.PendingPaymentModels.First().PendingPaymentValidationResultModels = validationResults;
 
+            foreach (var pendingPaymentModel in storedIncentive.PendingPaymentModels)
+            {
+                var payment = _fixture.Build<PaymentModel>()
+                    .With(x => x.ApprenticeshipIncentiveId, storedIncentive.Id)
+                    .With(x => x.PendingPaymentId, pendingPaymentModel.Id).Create();
+                storedIncentive.PaymentModels.Add(payment);
+            }
+
             // Act
             await _sut.Update(storedIncentive);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.ApprenticeshipIncentives.Count().Should().Be(1);
@@ -83,6 +92,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .Excluding(x => x.DateTime)
                 .Excluding(x => x.CollectionPeriod)
             );
+
+            _dbContext.PendingPayments.Count().Should().Be(storedIncentive.PendingPaymentModels.Count);
+            _dbContext.Payments.Count().Should().Be(storedIncentive.PaymentModels.Count);
 
             foreach (var result in savedValidationResults)
             {
