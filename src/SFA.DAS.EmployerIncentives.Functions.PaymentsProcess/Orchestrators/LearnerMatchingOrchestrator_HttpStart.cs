@@ -17,12 +17,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             [DurableClient] IDurableOrchestrationClient client,
             ILogger log)
         {
+            const string orchestrator = nameof(LearnerMatchingOrchestrator);
 
-            log.LogInformation($"Triggering LearnerMatchingOrchestrator at {DateTime.UtcNow.ToShortDateString()}");
+            log.LogInformation($"Triggering {orchestrator} at {DateTime.UtcNow.ToShortDateString()}");
 
-            var instanceId = await client.StartNewAsync("LearnerMatchingOrchestrator");
+            var instanceId = await client.StartNewAsync(orchestrator);
 
-            log.LogInformation($"Started LearnerMatchingOrchestrator with ID = '{instanceId}'.");
+            log.LogInformation($"Started {orchestrator} with ID = '{instanceId}'.");
 
             return new OkObjectResult(instanceId);
         }
