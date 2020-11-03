@@ -2,13 +2,10 @@
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
-    public class LearnerMatchApi : IAzureActiveDirectoryClientConfiguration
+    public class LearnerMatchApi : IManagedIdentityClientConfiguration
     {
         public virtual string ApiBaseUrl { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string IdentifierUri { get; set; }
-        public string Tenant { get; set; }
+        public string Identifier { get; set; }
         public string Version { get; set; }
     }
 }

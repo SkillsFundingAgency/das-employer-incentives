@@ -165,12 +165,17 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .WithDefaultHeaders()
                     .WithLogging(s.GetService<ILoggerFactory>());
 
-                if (!string.IsNullOrEmpty(settings.ClientId))
+                if (!string.IsNullOrEmpty(settings.Identifier))
                 {
-                    clientBuilder.WithBearerAuthorisationHeader(new AzureActiveDirectoryBearerTokenGenerator(settings));
+                    clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
                 }
 
                 var client = clientBuilder.Build();
+
+                if (!settings.ApiBaseUrl.EndsWith("/"))
+                {
+                    settings.ApiBaseUrl += "/";
+                }
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
