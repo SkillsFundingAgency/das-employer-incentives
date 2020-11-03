@@ -10,9 +10,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplicationApprenticeship
 {
     public class IncentiveApplicationApprenticeshipQueryRepository : IQueryRepository<Models.IncentiveApplicationApprenticeship>
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public IncentiveApplicationApprenticeshipQueryRepository(EmployerIncentivesDbContext context)
+        public IncentiveApplicationApprenticeshipQueryRepository(ApplicationDbContext context)
         {
             _context = context;
         }

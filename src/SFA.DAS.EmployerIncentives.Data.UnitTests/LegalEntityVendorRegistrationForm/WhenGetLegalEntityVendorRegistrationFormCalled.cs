@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LegalEntityVendorRegistratio
 {
     public class WhenGetLegalEntityVendorRegistrationFormCalled
     {
-        private EmployerIncentivesDbContext _context;
+        private ApplicationDbContext _context;
         private Fixture _fixture;
         private IQueryRepository<LegalEntityVendorRegistrationFormDto> _sut;
 
@@ -22,9 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LegalEntityVendorRegistratio
         {
             _fixture = new Fixture();
 
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _context = new EmployerIncentivesDbContext(options);
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase("ApplicationDbContext" + Guid.NewGuid()).Options;
+            _context = new ApplicationDbContext(options);
 
             _sut = new LegalEntityVendorRegistrationFormQueryRepository(_context);
         }

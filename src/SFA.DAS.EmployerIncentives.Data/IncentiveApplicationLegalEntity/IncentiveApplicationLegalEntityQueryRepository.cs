@@ -17,9 +17,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplicationLegalEntity
             public Models.Account Account { get; set; }
         }
 
-        private readonly EmployerIncentivesDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public IncentiveApplicationLegalEntityQueryRepository(EmployerIncentivesDbContext context)
+        public IncentiveApplicationLegalEntityQueryRepository(ApplicationDbContext context)
         {
             _context = context;
         }

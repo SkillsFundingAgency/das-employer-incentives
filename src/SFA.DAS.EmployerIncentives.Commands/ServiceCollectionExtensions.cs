@@ -205,9 +205,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
                 var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
                 var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
-                var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
+                var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(sqlStorageSession.Connection);
 
-                var dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
+                var dbContext = new ApplicationDbContext(optionsBuilder.Options);
 
                 dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
 

@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
     {
         private IncentiveApplication.IncentiveApplicationDataRepository _sut;
         private Fixture _fixture;
-        private EmployerIncentivesDbContext _dbContext;
+        private ApplicationDbContext _dbContext;
         private IncentiveApplicationModel _testApplication;
 
         [SetUp]
@@ -22,9 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
         {
             _fixture = new Fixture();
 
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _dbContext = new EmployerIncentivesDbContext(options);
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase("ApplicationDbContext" + Guid.NewGuid()).Options;
+            _dbContext = new ApplicationDbContext(options);
 
             _testApplication = _fixture
                 .Build<IncentiveApplicationModel>()

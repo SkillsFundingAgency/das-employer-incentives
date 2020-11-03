@@ -8,9 +8,9 @@ namespace SFA.DAS.EmployerIncentives.Data
 {
     public class UlnValidationService : IUlnValidationService
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public UlnValidationService(EmployerIncentivesDbContext context)
+        public UlnValidationService(ApplicationDbContext context)
         {
             _context = context;
         }

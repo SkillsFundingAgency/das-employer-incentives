@@ -11,9 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck
 {
     public class EarningsResilienceCheckRepository : IEarningsResilienceCheckRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private readonly ApplicationDbContext _dbContext;
 
-        public EarningsResilienceCheckRepository(EmployerIncentivesDbContext dbContext)
+        public EarningsResilienceCheckRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }

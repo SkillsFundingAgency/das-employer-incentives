@@ -18,9 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             public Models.Account Account { get; set; }
         }
 
-        private readonly EmployerIncentivesDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public IncentiveApplicationQueryRepository(EmployerIncentivesDbContext context)
+        public IncentiveApplicationQueryRepository(ApplicationDbContext context)
         {
             _context = context;
         }

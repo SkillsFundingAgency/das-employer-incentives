@@ -11,9 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Data.LegalEntityVendorRegistrationForm
 {
     public class LegalEntityVendorRegistrationFormQueryRepository : IQueryRepository<LegalEntityVendorRegistrationFormDto>
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public LegalEntityVendorRegistrationFormQueryRepository(EmployerIncentivesDbContext context)
+        public LegalEntityVendorRegistrationFormQueryRepository(ApplicationDbContext context)
         {
             _context = context;
         }

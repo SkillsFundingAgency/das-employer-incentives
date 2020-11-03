@@ -11,9 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
 {
     public class AccountQueryRepository : IQueryRepository<LegalEntityDto>
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public AccountQueryRepository(EmployerIncentivesDbContext context)
+        public AccountQueryRepository(ApplicationDbContext context)
         {
             _context = context;
         }

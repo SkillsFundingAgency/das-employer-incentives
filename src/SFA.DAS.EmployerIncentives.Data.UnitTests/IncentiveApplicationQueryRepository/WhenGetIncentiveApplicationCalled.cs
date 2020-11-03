@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 {
     public class WhenGetIncentiveApplicationCalled
     {
-        private EmployerIncentivesDbContext _context;
+        private ApplicationDbContext _context;
         private Fixture _fixture;
         private IQueryRepository<IncentiveApplicationDto> _sut;
 
@@ -22,9 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
         {
             _fixture = new Fixture();
 
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _context = new EmployerIncentivesDbContext(options);
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase("ApplicationDbContext" + Guid.NewGuid()).Options;
+            _context = new ApplicationDbContext(options);
 
             _sut = new IncentiveApplication.IncentiveApplicationQueryRepository(_context);
         }

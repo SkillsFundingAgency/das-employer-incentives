@@ -15,25 +15,25 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
         private Fixture _fixture;
-        private EmployerIncentivesDbContext _dbContext;
+        private IncentiveDbContext _dbContext;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
 
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _dbContext = new EmployerIncentivesDbContext(options);
+            var options = new DbContextOptionsBuilder<IncentiveDbContext>()
+                .UseInMemoryDatabase("IncentiveDbContext" + Guid.NewGuid()).Options;
+            _dbContext = new IncentiveDbContext(options);
 
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContext);
         }
 
         [TearDown]
         public void CleanUp()
-        {            
+        {
             _dbContext.Dispose();
-         }
+        }
 
         [Test]
         public async Task Then_the_apprenticeship_incentive_is_added_to_the_data_store()

@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ServiceCollectionExtensio
                 {
                     c.AddOptions();
                     c.Configure<PolicySettings>(configuration.GetSection("PolicySettings"));
-                    c.AddDbContext<EmployerIncentivesDbContext>();
+                    c.AddDbContext<ApplicationDbContext>();
                 });
         }
 

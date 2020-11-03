@@ -13,16 +13,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
     {
         private Data.AccountDataRepository _sut;
         private Fixture _fixture;
-        private EmployerIncentivesDbContext _dbContext;
+        private ApplicationDbContext _dbContext;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
 
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _dbContext = new EmployerIncentivesDbContext(options);
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase("ApplicationDbContext" + Guid.NewGuid()).Options;
+            _dbContext = new ApplicationDbContext(options);
 
             _sut = new Data.AccountDataRepository(_dbContext);
         }

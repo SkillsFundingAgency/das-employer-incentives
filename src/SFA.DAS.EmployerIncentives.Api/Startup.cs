@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddEventServices();
 
             services.AddEntityFrameworkForEmployerIncentives()
-                .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
+                .AddEntityFrameworkUnitOfWork<ApplicationDbContext>()
                 .AddNServiceBusClientUnitOfWork();
 
             services.AddTransient<UnitOfWorkManagerMiddleware>();

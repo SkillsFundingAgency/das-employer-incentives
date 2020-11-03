@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
         private Fixture _fixture;
-        private EmployerIncentivesDbContext _dbContext;
+        private IncentiveDbContext _dbContext;
         private ApprenticeshipIncentiveModel _testIncentive;
 
         [SetUp]
@@ -22,9 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         {
             _fixture = new Fixture();
 
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _dbContext = new EmployerIncentivesDbContext(options);
+            var options = new DbContextOptionsBuilder<IncentiveDbContext>()
+                .UseInMemoryDatabase("IncentiveDbContext" + Guid.NewGuid()).Options;
+            _dbContext = new IncentiveDbContext(options);
 
             _testIncentive = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             storedIncentive.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
             storedIncentive.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
-            
+
             await _sut.Update(storedIncentive);
 
             // Assert

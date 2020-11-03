@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
-    public partial class EmployerIncentivesDbContext : DbContext
+    public partial class ApplicationDbContext : DbContext
     {
-        public EmployerIncentivesDbContext()
+        public ApplicationDbContext()
         {
         }
 
-        public EmployerIncentivesDbContext(DbContextOptions<EmployerIncentivesDbContext> options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
@@ -17,8 +16,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<IncentiveApplication> Applications { get; set; }
         public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
-        public virtual DbSet<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }
-        public virtual DbSet<PendingPayment> PendingPayments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,11 +30,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
             });
 
             modelBuilder.Entity<IncentiveApplicationApprenticeship>().Property(x => x.ApprenticeshipEmployerTypeOnApproval).HasConversion<int>();
-            modelBuilder.Entity<ApprenticeshipIncentive>().Property(x => x.EmployerType).HasConversion<int>();
-
-            //modelBuilder.Entity<IncentiveApplication>(entity => entity.HasMany<IncentiveApplicationApprenticeship>());
-
-            OnModelCreatingPartial(modelBuilder);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

@@ -10,9 +10,9 @@ namespace SFA.DAS.EmployerIncentives.Data
 {
     public class AccountDataRepository : IAccountDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private readonly ApplicationDbContext _dbContext;
 
-        public AccountDataRepository(EmployerIncentivesDbContext dbContext)
+        public AccountDataRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
