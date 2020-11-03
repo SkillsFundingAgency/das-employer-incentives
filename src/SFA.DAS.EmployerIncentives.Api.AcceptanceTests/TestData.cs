@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
         public T GetOrCreate<T>(string key = null, Func<T> onCreate = null)
         {
-            if(key == null)
+            if (key == null)
             {
                 key = typeof(T).FullName;
             }
@@ -34,6 +34,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             }
 
             return (T)_testdata[key];
+        }
+
+        public T Get<T>(string key = null)
+        {
+            if (key == null)
+            {
+                key = typeof(T).FullName;
+            }
+
+            return (T)_testdata[key];
+        }
+
+        public void Set<T>(string key, T value)
+        {
+            _testdata[key] = value;
         }
     }
 }

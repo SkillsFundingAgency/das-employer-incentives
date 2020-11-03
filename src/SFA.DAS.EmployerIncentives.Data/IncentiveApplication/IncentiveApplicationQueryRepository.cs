@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -48,19 +49,29 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 Apprenticeships = x.Application.Apprenticeships.Select(y => MapToApprenticeshipDto(y)),
                 LegalEntityId = x.Account.LegalEntityId,
                 SubmittedByEmail = x.Application.SubmittedByEmail,
-                SubmittedByName = x.Application.SubmittedByName
+                SubmittedByName = x.Application.SubmittedByName,
+                BankDetailsRequired = MapBankDetailsRequired(x.Account.VrfCaseStatus)
             };
         }
 
-        private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(IncentiveApplicationApprenticeship apprenticeship)
+        private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(Models.IncentiveApplicationApprenticeship apprenticeship)
         {
             return new IncentiveApplicationApprenticeshipDto
             {
+                Id = apprenticeship.Id,
                 ApprenticeshipId = apprenticeship.ApprenticeshipId,
                 FirstName = apprenticeship.FirstName,
                 LastName = apprenticeship.LastName,
                 TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount
             };
+        }
+
+        private static bool MapBankDetailsRequired(string vrfCaseStatus)
+        {
+            return (String.IsNullOrWhiteSpace(vrfCaseStatus) 
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

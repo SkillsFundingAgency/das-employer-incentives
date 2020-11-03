@@ -24,8 +24,5 @@ Scenario: Incentive Application is submitted with invalid account id
 
 Scenario: Incentive Application is submitted but an internal error occurs
 	Given an employer has entered incentive claim application details
-	And an internal error will occur before the transaction completes
-	When the application is submitted
-	Then the application status is not updated
-	And the service responds with an internal error
-	And there are no events in the outbox
+	When the application is submitted and the system errors
+	Then the application changes are not saved	

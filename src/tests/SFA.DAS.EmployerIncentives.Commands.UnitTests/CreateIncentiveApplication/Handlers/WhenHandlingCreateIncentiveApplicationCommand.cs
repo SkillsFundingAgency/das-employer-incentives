@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplicati
         private CreateIncentiveApplicationCommandHandler _sut;
         private Mock<IIncentiveApplicationFactory> _mockDomainFactory;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRespository;
-        
+         
         private Fixture _fixture;
 
         [SetUp]

@@ -53,7 +53,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Enums", "SFA.DAS.EmployerIncentives.Enums\SFA.DAS.EmployerIncentives.Enums.csproj", "{4514EFD1-DBD4-41F6-9D76-7709125827C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.UnitTests.Shared", "SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj", "{C67087BB-2277-4F36-BE23-91D9CD317A7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.UnitTests.Shared", "SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj", "{C67087BB-2277-4F36-BE23-91D9CD317A7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Events", "SFA.DAS.EmployerIncentives.Events\SFA.DAS.EmployerIncentives.Events.csproj", "{F08B990D-C3CB-437A-8F81-1CF70BB70C6C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers", "SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj", "{03B5882C-31A1-4818-9FA0-D4AFA7F690F2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Commands.Types", "SFA.DAS.EmployerIncentives.Commands.Types\SFA.DAS.EmployerIncentives.Commands.Types.csproj", "{F176B48C-F870-4E57-A610-8396638B7EDA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests", "SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests\SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.csproj", "{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Events.UnitTests", "SFA.DAS.EmployerIncentives.Events.UnitTests\SFA.DAS.EmployerIncentives.Events.UnitTests.csproj", "{A52652C6-830A-4CB5-BFA0-AA7E36850081}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +157,26 @@ Global
 		{C67087BB-2277-4F36-BE23-91D9CD317A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C67087BB-2277-4F36-BE23-91D9CD317A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C67087BB-2277-4F36-BE23-91D9CD317A7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F08B990D-C3CB-437A-8F81-1CF70BB70C6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F08B990D-C3CB-437A-8F81-1CF70BB70C6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F08B990D-C3CB-437A-8F81-1CF70BB70C6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F08B990D-C3CB-437A-8F81-1CF70BB70C6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03B5882C-31A1-4818-9FA0-D4AFA7F690F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03B5882C-31A1-4818-9FA0-D4AFA7F690F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03B5882C-31A1-4818-9FA0-D4AFA7F690F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03B5882C-31A1-4818-9FA0-D4AFA7F690F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F176B48C-F870-4E57-A610-8396638B7EDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F176B48C-F870-4E57-A610-8396638B7EDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F176B48C-F870-4E57-A610-8396638B7EDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F176B48C-F870-4E57-A610-8396638B7EDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A52652C6-830A-4CB5-BFA0-AA7E36850081}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A52652C6-830A-4CB5-BFA0-AA7E36850081}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A52652C6-830A-4CB5-BFA0-AA7E36850081}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A52652C6-830A-4CB5-BFA0-AA7E36850081}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -170,6 +200,10 @@ Global
 		{F8DE248E-F5FD-49C0-8E8B-AF51CB548C00} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 		{4514EFD1-DBD4-41F6-9D76-7709125827C2} = {9281BA00-B46E-438F-BC4E-4B201E2D7EA6}
 		{C67087BB-2277-4F36-BE23-91D9CD317A7C} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
+		{F08B990D-C3CB-437A-8F81-1CF70BB70C6C} = {9281BA00-B46E-438F-BC4E-4B201E2D7EA6}
+		{F176B48C-F870-4E57-A610-8396638B7EDA} = {9281BA00-B46E-438F-BC4E-4B201E2D7EA6}
+		{7F4D2BA1-E5F2-40BB-8589-7BAED0D598D3} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
+		{A52652C6-830A-4CB5-BFA0-AA7E36850081} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3E3FB6-A534-4F3A-AC5E-BD27EF68874D}

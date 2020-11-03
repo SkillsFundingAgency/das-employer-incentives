@@ -1,15 +1,13 @@
-﻿using System;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
+using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.Notifications.Messages.Commands;
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -18,20 +16,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "SendBankDetailsRequiredEmail")]
     public class SendBankDetailsRequiredEmailSteps : StepsBase
     {
-        private TestContext _testContext;
-        private Fixture _fixture;
+        private readonly TestContext _testContext;
+        private readonly Fixture _fixture;
         private SendBankDetailsEmailRequest _request;
-        private string _url;
-        private string _storageDirectory;
+        private readonly string _url;
+        private readonly string _storageDirectory;
 
         public SendBankDetailsRequiredEmailSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-required";
-            var projectDirectory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("bin"));
-            var sourceDirectory = new DirectoryInfo(projectDirectory).Parent;
-            _storageDirectory = Path.Combine(sourceDirectory.FullName, ".learningtransport");
+            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
         }
 
         [When(@"a bank details required email is sent for a valid account, legal entity and email address")]

@@ -1,9 +1,9 @@
-﻿using System;
-using SFA.DAS.EmployerIncentives.Data;
-using System.Threading.Tasks;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
+using System;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 {
@@ -11,12 +11,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
     {
         private readonly IIncentiveApplicationDataRepository _incentiveApplicationDataRepository;
         private readonly IIncentiveApplicationFactory _incentiveApplicationFactory;
+        private readonly IDomainEventDispatcher _domainEventDispatcher;
 
-        public IncentiveApplicationDomainRepository(IIncentiveApplicationDataRepository incentiveApplicationDataRepository,
-                                                    IIncentiveApplicationFactory incentiveApplicationFactory)
+        public IncentiveApplicationDomainRepository(
+            IIncentiveApplicationDataRepository incentiveApplicationDataRepository,
+            IIncentiveApplicationFactory incentiveApplicationFactory,
+            IDomainEventDispatcher domainEventDispatcher)
         {
             _incentiveApplicationDataRepository = incentiveApplicationDataRepository;
             _incentiveApplicationFactory = incentiveApplicationFactory;
+            _domainEventDispatcher = domainEventDispatcher;
         }
 
         public async Task<IncentiveApplication> Find(Guid id)
@@ -30,15 +34,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
-        public Task Save(IncentiveApplication aggregate)
+        public async Task Save(IncentiveApplication aggregate)
         {
             if (aggregate.IsNew)
-            {               
-                return _incentiveApplicationDataRepository.Add(aggregate.GetModel());
+            {
+                await _incentiveApplicationDataRepository.Add(aggregate.GetModel());
+            }
+            else
+            {
+                await _incentiveApplicationDataRepository.Update(aggregate.GetModel());
             }
 
-            return _incentiveApplicationDataRepository.Update(aggregate.GetModel());
+            foreach (dynamic domainEvent in aggregate.FlushEvents())
+            {
+                await _domainEventDispatcher.Send(domainEvent);
+            }
         }
-    }
-  
+    }  
 }

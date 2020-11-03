@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,16 +21,42 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
         }
 
         public async Task Handle(T command, CancellationToken cancellationToken = default)
-        {   
+        {
+            var domainLog = (command is ILogWriter) ? (command as ILogWriter).Log : new Log();
+
             try
             {
-                _log.LogInformation($"Start handle '{typeof(T)}' command");
+                if (domainLog.OnProcessing == null)
+                {
+                    _log.LogInformation($"Start handle '{typeof(T)}' command");
+                }
+                else
+                {
+                    _log.LogInformation($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
+                }
+
                 await _handler.Handle(command, cancellationToken);
-                _log.LogInformation($"End handle '{typeof(T)}' command");
+
+                if (domainLog.OnProcessed == null)
+                {
+                    _log.LogInformation($"End handle '{typeof(T)}' command");
+                }
+                else
+                {
+                    _log.LogInformation($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
+                }
             }
             catch(Exception ex)
             {
-                _log.LogError(ex, $"Error handling '{typeof(T)}' command");
+                if (domainLog.OnError == null)
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' command");
+                }
+                else
+                {
+                    _log.LogError(ex, $"Error handling '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
+                }
+
                 throw;
             }
         }
