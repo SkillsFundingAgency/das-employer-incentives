@@ -22,12 +22,5 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
         public bool EarningsCalculated { get; set; }
-        [Dapper.Contrib.Extensions.Write(false)]
-        public ICollection<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }
-
-        public IncentiveApplicationApprenticeship()
-        {
-            ApprenticeshipIncentives = new List<ApprenticeshipIncentive>();
-        }
     }
 }

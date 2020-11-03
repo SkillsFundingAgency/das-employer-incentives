@@ -26,21 +26,11 @@ namespace SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck
             var applicationsWithoutApprenticeshipIncentives = await (from applications in _dbContext.Applications
                                                               join apprenticeships in _dbContext.ApplicationApprenticeships
                                                               on applications.Id equals apprenticeships.IncentiveApplicationId                 
-                                                              where apprenticeships.ApprenticeshipIncentives.Count() == 0 
+                                                              where apprenticeships.EarningsCalculated == false
                                                               && applications.Status == Enums.IncentiveApplicationStatus.Submitted                                                              
                                                               select new { applications.Id }).ToListAsync();
-                       
-            var applicationsWithoutPendingPayments = await (from applications in _dbContext.Applications
-                                                     join apprenticeships in _dbContext.ApplicationApprenticeships
-                                                     on applications.Id equals apprenticeships.IncentiveApplicationId
-                                                     join incentives in _dbContext.ApprenticeshipIncentives
-                                                     on apprenticeships.ApprenticeshipId equals incentives.ApprenticeshipId
-                                                     where incentives.PendingPayments.Count() == 0
-                                                     && applications.Status == Enums.IncentiveApplicationStatus.Submitted
-                                                     select new { applications.Id }).ToListAsync();
 
             earningsCheckApplications.AddRange(applicationsWithoutApprenticeshipIncentives.Select(application => application.Id));
-            earningsCheckApplications.AddRange(applicationsWithoutPendingPayments.Select(application => application.Id));
 
             return await Task.FromResult(earningsCheckApplications);
         }
