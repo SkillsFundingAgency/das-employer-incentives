@@ -141,7 +141,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval);
 
                 await _testContext.WaitFor<MessageContext>(async () =>
-                   await _testContext.MessageBus.Send(createCommand));
+                   await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
 
