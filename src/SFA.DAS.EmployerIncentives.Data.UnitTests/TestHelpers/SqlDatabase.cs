@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
     {
         private bool _isDisposed;
 
-        public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();
+        public DatabaseInfo DatabaseInfo { get; private set; } = new DatabaseInfo();
 
         public SqlDatabase()
         {
@@ -43,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
             using var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString);
             dbConnection.Open();
+            dbConnection.Close();
         }
 
         private void DeleteTestDatabase()
@@ -108,7 +109,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -118,6 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             if (disposing)
             {
                 DeleteTestDatabase();
+                DatabaseInfo = null;
             }
 
             _isDisposed = true;

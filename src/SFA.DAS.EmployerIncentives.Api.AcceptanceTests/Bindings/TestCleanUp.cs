@@ -8,7 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Binding]
     public class TestCleanUp
     {
-        private readonly TestContext _context;
+        private TestContext _context;
         public TestCleanUp(TestContext context)
         {
             _context = context;
@@ -21,12 +21,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             {
                 await _context.MessageBus.Stop();
             }
-            _context.EmployerIncentivesWebApiFactory?.Dispose();
+
             _context.EmployerIncentiveApi?.Dispose();
+            _context.EmployerIncentivesWebApiFactory?.Dispose();
             _context.AccountApi?.Dispose();
             _context.DomainMessageHandlers?.Dispose();
             _context.SqlDatabase?.Dispose();
-           
+
+            _context = null;
+
             try
             {
                 Directory.Delete(_context.TestDirectory.FullName, true);
