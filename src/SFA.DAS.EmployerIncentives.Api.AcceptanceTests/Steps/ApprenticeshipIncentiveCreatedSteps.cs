@@ -186,13 +186,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 command.AccountLegalEntityId.Should().Be(_applicationModel.AccountLegalEntityId);
                 command.LockId.Should().Be($"IncentiveApplicationApprenticeshipId_{command.IncentiveApplicationApprenticeshipId}");
             }
-
-            publishedCommands.Should().BeEquivalentTo(_apprenticeshipsModels, opts => opts
-                .Excluding(x => x.Id)
-                .Excluding(x => x.IncentiveApplicationId)
-                .Excluding(x => x.TotalIncentiveAmount)
-                .Excluding(x => x.EarningsCalculated)
-            );
         }
 
         [Then(@"the earnings are calculated for each apprenticeship incentive")]
