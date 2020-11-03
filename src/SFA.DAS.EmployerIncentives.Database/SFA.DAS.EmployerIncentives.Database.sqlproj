@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
+    <None Include="Scripts\Update.ApprenticeshipIncentives.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
