@@ -9,8 +9,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
     public static class LearnerMatchingOrchestratorStart
     {
         [FunctionName("LearnerMatchingOrchestrator_Start")]
-        public static async Task HttpStart(
-            [TimerTrigger("0 0 0 * * *")] TimerInfo timerInfo,
+        public static async Task TimerStart(
+#if DEBUG
+            [TimerTrigger("0 */05 * * * *")] TimerInfo timerInfo,
+#else
+            [TimerTrigger("%LearnerMatchingOrchestratorTriggerTime%")] TimerInfo timerInfo,
+#endif
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
