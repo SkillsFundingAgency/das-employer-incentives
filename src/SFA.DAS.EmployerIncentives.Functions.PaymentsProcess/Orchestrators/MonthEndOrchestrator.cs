@@ -22,13 +22,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             var collectionPeriod = context.GetInput<CollectionPeriod>();
 
-            await StartLearnerMatchingOrchestrator(context);
-            await StartIncentivePaymentOrchestrator(context, collectionPeriod);
+            await CallLearnerMatchingOrchestrator(context);
+            await CallIncentivePaymentOrchestrator(context, collectionPeriod);
 
             _logger.LogInformation($"{Orchestrator} Completed");
         }
 
-        private async Task StartLearnerMatchingOrchestrator(IDurableOrchestrationContext context)
+        private async Task CallLearnerMatchingOrchestrator(IDurableOrchestrationContext context)
         {
             const string subOrchestrator = nameof(LearnerMatchingOrchestrator);
 
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger.LogInformation($"Completed {subOrchestrator}");
         }
 
-        private async Task StartIncentivePaymentOrchestrator(IDurableOrchestrationContext context, CollectionPeriod collectionPeriod)
+        private async Task CallIncentivePaymentOrchestrator(IDurableOrchestrationContext context, CollectionPeriod collectionPeriod)
         {
             const string subOrchestrator = nameof(IncentivePaymentOrchestrator);
 
