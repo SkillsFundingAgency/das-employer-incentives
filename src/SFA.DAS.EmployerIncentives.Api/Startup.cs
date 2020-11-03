@@ -78,6 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
             services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
+            services.Configure<LearnerMatchApi>(Configuration.GetSection("LearnerMatchApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
             services.AddPersistenceServices();
             services.AddCommandServices();

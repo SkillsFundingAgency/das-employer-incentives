@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LastName = model.Apprenticeship.LastName,
                 DateOfBirth = model.Apprenticeship.DateOfBirth,
                 Uln = model.Apprenticeship.UniqueLearnerNumber,
+                UkPrn =  model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
                 PlannedStartDate = model.PlannedStartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
@@ -28,19 +29,26 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         }
 
         internal static ApprenticeshipIncentiveModel Map(this ApprenticeshipIncentive entity, IEnumerable<CollectionPeriod> collectionPeriods)
-        {            
-            return new ApprenticeshipIncentiveModel
-            {
-                Id = entity.Id,
-                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
-                Apprenticeship = new Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship(
+        {
+            var apprenticeship = new Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship(
                      entity.ApprenticeshipId,
                      entity.FirstName,
                      entity.LastName,
                      entity.DateOfBirth,
                      entity.Uln,
                      entity.EmployerType
-                     ),
+                     );
+
+            if (entity.UkPrn.HasValue)
+            {
+                apprenticeship.SetProvider(new Domain.ApprenticeshipIncentives.ValueTypes.Provider(entity.UkPrn.Value));
+            }
+
+            return new ApprenticeshipIncentiveModel
+            {
+                Id = entity.Id,
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
+                Apprenticeship = apprenticeship,
                 PlannedStartDate = entity.PlannedStartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods)
@@ -130,5 +138,51 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             ).ToList();
         }
 
+        internal static Domain.ApprenticeshipIncentives.ValueTypes.Learner Map(this Learner model)
+        {
+            var learner = new Domain.ApprenticeshipIncentives.ValueTypes.Learner(
+                model.Id,
+                model.ApprenticeshipIncentiveId, 
+                model.ApprenticeshipId,  
+                model.Ukprn, 
+                model.ULN, 
+                model.CreatedDate
+                );
+
+            if(model.SubmissionFound)
+            {
+                learner.SetSubmissionData(
+                    new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
+                    model.SubmissionDate.Value,
+                    model.LearningFound.Value)
+                );
+            }
+
+            return learner;
+        }
+
+        internal static Learner Map(this Domain.ApprenticeshipIncentives.ValueTypes.Learner model)
+        {
+            var learner = new Learner
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                ApprenticeshipId = model.ApprenticeshipId,
+                Ukprn = model.Ukprn,
+                ULN = model.UniqueLearnerNumber,
+                CreatedDate = model.CreatedDate,
+                SubmissionFound = model.SubmissionFound,
+                LearningFound = false
+            };
+
+            if(learner.SubmissionFound)
+            {
+                learner.LearningFound = model.SubmissionData.LearningFound;
+                learner.SubmissionDate = model.SubmissionData.SubmissionDate;
+                learner.RawJSON = model.SubmissionData.RawJson;
+            }
+
+            return learner;
+        }
     }
 }
