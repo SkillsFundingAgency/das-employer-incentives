@@ -15,16 +15,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 
         [AfterScenario()]
         public async Task CleanUp()
-        {
+        {            
+            _context.EmployerIncentiveApi?.Dispose();
+            _context.DomainMessageHandlers?.Dispose();
+
             if (_context.MessageBus != null && _context.MessageBus.IsRunning)
             {
                 await _context.MessageBus.Stop();
             }
-            _context.EmployerIncentiveApi?.Dispose();
-            _context.DomainMessageHandlers?.Dispose();
+
             _context.SqlDatabase.Dispose();
 
-            Directory.Delete(_context.TestDirectory.FullName, true);
+            try
+            {
+                Directory.Delete(_context.TestDirectory.FullName, true);
+            }
+            finally { 
+                // ignore file locks
+            }
         }
     }
 }

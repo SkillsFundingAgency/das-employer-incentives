@@ -17,11 +17,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
         public long Uln { get; set; }
+        public long? UKPRN { get; set; }
         public ApprenticeshipEmployerType EmployerType { get; set; }
         public DateTime PlannedStartDate { get; set; }
         public Guid IncentiveApplicationApprenticeshipId { get; set; }
         public long? AccountLegalEntityId { get; set; }
-        public long? UKPRN { get; set; }
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPayment> PendingPayments { get; set; }

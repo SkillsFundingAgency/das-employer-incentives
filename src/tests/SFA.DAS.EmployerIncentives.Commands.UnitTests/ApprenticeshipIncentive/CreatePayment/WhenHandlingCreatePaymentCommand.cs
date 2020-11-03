@@ -90,10 +90,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<string>(),
                         DateTime.Today.AddYears(-26),
                         _fixture.Create<long>(),
-                        ApprenticeshipEmployerType.Levy,
-                        _fixture.Create<long>()
+                        ApprenticeshipEmployerType.Levy
                     ),
                     DateTime.Today);
+
+            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
             var paymentProfiles = new List<IncentivePaymentProfile>
             {

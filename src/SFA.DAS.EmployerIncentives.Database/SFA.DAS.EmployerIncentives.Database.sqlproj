@@ -81,6 +81,7 @@
     <Build Include="Tables\ApprenticeshipIncentive.sql" />
     <Build Include="Tables\PendingPayment.sql" />
     <Build Include="Tables\PendingPaymentValidationResult.sql" />
+    <Build Include="Tables\Learner.sql" />
     <Build Include="Tables\Payment.sql" />
     <Build Include="Functions\GetNextCollectionPeriod.sql" />
     <Build Include="Views\PendingPaymentsValidationStepFailure.sql" />

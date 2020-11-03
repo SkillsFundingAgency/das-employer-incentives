@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .Build<ApprenticeshipIncentiveModel>()
                 .Create();
 
+            testIncentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+
             // Act
             await _sut.Add(testIncentive);
 
@@ -58,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedApprenticeshipIncentive.Uln.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
             storedApprenticeshipIncentive.DateOfBirth.Should().Be(testIncentive.Apprenticeship.DateOfBirth);
             storedApprenticeshipIncentive.EmployerType.Should().Be(testIncentive.Apprenticeship.EmployerType);
-            storedApprenticeshipIncentive.UKPRN.Should().Be(testIncentive.Apprenticeship.UKPRN);
+            storedApprenticeshipIncentive.UKPRN.Should().Be(testIncentive.Apprenticeship.Provider.Ukprn);
         }
 
         [Test]

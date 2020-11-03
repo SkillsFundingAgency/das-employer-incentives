@@ -11,8 +11,7 @@ using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
@@ -47,7 +46,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddHashingService()
-                .AddAccountService();
+                .AddAccountService()
+                .AddLearnerService();
 
             // set up the command handlers and command validators
             serviceCollection.Scan(scan =>
@@ -92,6 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
             serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
+            serviceCollection.AddScoped<ILearnerDataRepository, LearnerDataRepository>();
 
             return serviceCollection;
         }
@@ -149,6 +150,31 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
                 return new AccountService(client);
+            });
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<ILearnerService>(s =>
+            {
+                var settings = s.GetService<IOptions<LearnerMatchApi>>().Value;
+
+                var clientBuilder = new HttpClientBuilder()
+                    .WithDefaultHeaders()
+                    .WithLogging(s.GetService<ILoggerFactory>());
+
+                if (!string.IsNullOrEmpty(settings.ClientId))
+                {
+                    clientBuilder.WithBearerAuthorisationHeader(new AzureActiveDirectoryBearerTokenGenerator(settings));
+                }
+
+                var client = clientBuilder.Build();
+
+                client.BaseAddress = new Uri(settings.ApiBaseUrl);
+
+                return new LearnerService(client, settings.Version);
             });
 
             return serviceCollection;
