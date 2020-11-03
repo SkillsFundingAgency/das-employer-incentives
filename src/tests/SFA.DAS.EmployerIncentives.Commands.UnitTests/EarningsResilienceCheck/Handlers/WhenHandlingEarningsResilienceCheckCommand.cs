@@ -43,6 +43,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             var applicationIds = new List<Guid> { applicationId };
             _repository.Setup(x => x.GetApplicationsWithoutEarningsCalculations()).ReturnsAsync(applicationIds);
             var applicationDetails = _fixture.Create<IncentiveApplicationModel>();                  
+            foreach(var model in applicationDetails.ApprenticeshipModels)
+            {
+                model.EarningsCalculated = false;
+            }
             _repository.Setup(x => x.GetApplicationDetail(applicationId)).ReturnsAsync(applicationDetails);
 
             //Act
@@ -63,6 +67,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             _repository.Setup(x => x.GetApplicationsWithoutEarningsCalculations()).ReturnsAsync(applicationIds);
             var applicationDetails = _fixture.Create<IncentiveApplicationModel>();
             applicationDetails.ApprenticeshipModels = new Collection<ApprenticeshipModel>(_fixture.CreateMany<ApprenticeshipModel>(10).ToList());
+            foreach (var model in applicationDetails.ApprenticeshipModels)
+            {
+                model.EarningsCalculated = false;
+            }
             _repository.Setup(x => x.GetApplicationDetail(applicationId)).ReturnsAsync(applicationDetails);
 
             //Act
@@ -85,10 +93,86 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             _repository.Setup(x => x.GetApplicationsWithoutEarningsCalculations()).ReturnsAsync(applicationIds);
             var applicationDetails1 = _fixture.Create<IncentiveApplicationModel>();
             applicationDetails1.ApprenticeshipModels = new Collection<ApprenticeshipModel>(_fixture.CreateMany<ApprenticeshipModel>(3).ToList());
+            foreach (var model in applicationDetails1.ApprenticeshipModels)
+            {
+                model.EarningsCalculated = false;
+            }
             _repository.Setup(x => x.GetApplicationDetail(applicationId1)).ReturnsAsync(applicationDetails1);
             var applicationDetails2 = _fixture.Create<IncentiveApplicationModel>();
             applicationDetails2.ApprenticeshipModels = new Collection<ApprenticeshipModel>(_fixture.CreateMany<ApprenticeshipModel>(4).ToList());
+            foreach (var model in applicationDetails2.ApprenticeshipModels)
+            {
+                model.EarningsCalculated = false;
+            }
             _repository.Setup(x => x.GetApplicationDetail(applicationId2)).ReturnsAsync(applicationDetails2);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _eventDispatcher.Verify(x => x.Send(It.IsAny<EarningsCalculationRequired>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+
+        }
+
+        [Test]
+        public async Task Then_only_apprenticeships_with_no_earnings_calculations_are_processed_for_the_eligibility_check()
+        {
+            //Arrange
+            var command = new EarningsResilienceCheckCommand();
+
+            var applicationId1 = Guid.NewGuid();
+            var applicationId2 = Guid.NewGuid();
+            var applicationIds = new List<Guid> { applicationId1, applicationId2 };
+            _repository.Setup(x => x.GetApplicationsWithoutEarningsCalculations()).ReturnsAsync(applicationIds);
+            var applicationDetails1 = _fixture.Create<IncentiveApplicationModel>();
+            applicationDetails1.ApprenticeshipModels = new Collection<ApprenticeshipModel>(_fixture.CreateMany<ApprenticeshipModel>(3).ToList());
+            _repository.Setup(x => x.GetApplicationDetail(applicationId1)).ReturnsAsync(applicationDetails1);
+            foreach (var model in applicationDetails1.ApprenticeshipModels)
+            {
+                model.EarningsCalculated = false;
+            }
+            var applicationDetails2 = _fixture.Create<IncentiveApplicationModel>();
+            applicationDetails2.ApprenticeshipModels = new Collection<ApprenticeshipModel>(_fixture.CreateMany<ApprenticeshipModel>(4).ToList());
+            _repository.Setup(x => x.GetApplicationDetail(applicationId2)).ReturnsAsync(applicationDetails2);
+            foreach (var model in applicationDetails2.ApprenticeshipModels)
+            {
+                model.EarningsCalculated = true;
+            }
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _eventDispatcher.Verify(x => x.Send(It.IsAny<EarningsCalculationRequired>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+        }
+
+        [Test]
+        public async Task Then_applications_with_partial_apprenticeships_earnings_calculations_are_processed_for_the_eligibility_check()
+        {
+            //Arrange
+            var command = new EarningsResilienceCheckCommand();
+
+            var applicationId1 = Guid.NewGuid();
+            var applicationId2 = Guid.NewGuid();
+            var applicationIds = new List<Guid> { applicationId1, applicationId2 };
+            _repository.Setup(x => x.GetApplicationsWithoutEarningsCalculations()).ReturnsAsync(applicationIds);
+            var applicationDetails1 = _fixture.Create<IncentiveApplicationModel>();
+            applicationDetails1.ApprenticeshipModels = new Collection<ApprenticeshipModel>(_fixture.CreateMany<ApprenticeshipModel>(3).ToList());
+            _repository.Setup(x => x.GetApplicationDetail(applicationId1)).ReturnsAsync(applicationDetails1);
+            foreach (var model in applicationDetails1.ApprenticeshipModels)
+            {
+                model.EarningsCalculated = false;
+            }
+            var applicationDetails2 = _fixture.Create<IncentiveApplicationModel>();
+            applicationDetails2.ApprenticeshipModels = new Collection<ApprenticeshipModel>(_fixture.CreateMany<ApprenticeshipModel>(4).ToList());
+            _repository.Setup(x => x.GetApplicationDetail(applicationId2)).ReturnsAsync(applicationDetails2);
+            foreach (var model in applicationDetails2.ApprenticeshipModels)
+            {
+                
+                model.EarningsCalculated = true;
+            }
+            applicationDetails2.ApprenticeshipModels.ToList()[1].EarningsCalculated = false;
 
             //Act
             await _sut.Handle(command);
