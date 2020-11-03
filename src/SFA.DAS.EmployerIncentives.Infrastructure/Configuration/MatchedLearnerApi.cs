@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
-    public class LearnerMatchApi : IManagedIdentityClientConfiguration
+    public class MatchedLearnerApi : IManagedIdentityClientConfiguration
     {
         public virtual string ApiBaseUrl { get; set; }
         public string Identifier { get; set; }

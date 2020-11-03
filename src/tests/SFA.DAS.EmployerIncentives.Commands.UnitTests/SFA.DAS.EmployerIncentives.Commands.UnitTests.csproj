@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="RefreshLearner\" />
+    <Folder Include="RefreshLearner\Handlers\" />
   </ItemGroup>
 
 </Project>

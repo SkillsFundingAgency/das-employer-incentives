@@ -12,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
@@ -63,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>()
-            .Decorate<ILearnerService, LearnerServiceWithLogging>();            
+            .Decorate<ILearnerService, LearnerServiceWithLogging>();
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
@@ -104,6 +105,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+
+            serviceCollection
+                .AddSingleton(typeof(IValidator<CreateIncentiveCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator());
 
             return serviceCollection;
         }
@@ -159,7 +166,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             serviceCollection.AddTransient<ILearnerService>(s =>
             {
-                var settings = s.GetService<IOptions<LearnerMatchApi>>().Value;
+                var settings = s.GetService<IOptions<MatchedLearnerApi>>().Value;
 
                 var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()
