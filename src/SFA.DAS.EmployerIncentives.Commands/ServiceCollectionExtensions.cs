@@ -63,7 +63,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             })
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
-            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
+            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>()
+            .Decorate<ILearnerService, LearnerServiceWithLogging>();            
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
