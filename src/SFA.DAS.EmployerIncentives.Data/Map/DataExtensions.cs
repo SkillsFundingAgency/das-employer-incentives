@@ -38,9 +38,13 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
 
             foreach (var model in models)
             {
-                var account = accounts.SingleOrDefault(a => a.Id == model.Id) ?? new AccountModel { Id = model.Id };
+                var account = accounts.SingleOrDefault(a => a.Id == model.Id);
+                if (account == null)
+                {
+                    account = new AccountModel { Id = model.Id };
+                    accounts.Add(account);
+                }
                 account.LegalEntityModels.Add(MapLegalEntity(model));
-                accounts.Add(account);
             }
 
             return accounts;

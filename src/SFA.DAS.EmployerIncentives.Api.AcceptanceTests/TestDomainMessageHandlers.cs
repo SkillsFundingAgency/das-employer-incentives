@@ -134,6 +134,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 host.StopAsync();
             }
+            host?.Dispose();
 
             isDisposed = true;
         }
