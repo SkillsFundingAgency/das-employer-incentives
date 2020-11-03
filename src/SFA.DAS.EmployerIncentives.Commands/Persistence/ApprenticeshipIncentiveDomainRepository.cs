@@ -33,6 +33,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
+        public async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId)
+        {
+            var application = await _apprenticeshipIncentiveDataRepository.FindByApprenticeshipId(incentiveApplicationApprenticeshipId);
+            if (application != null)
+            {
+                return await Task.FromResult(_apprenticeshipIncentiveFactory.GetExisting(application.Id, application));
+            }
+
+            return null;
+        }
+
         public async Task Save(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive aggregate)
         {
             if (aggregate.IsNew)

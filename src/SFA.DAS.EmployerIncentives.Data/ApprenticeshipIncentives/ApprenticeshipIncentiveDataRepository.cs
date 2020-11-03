@@ -22,6 +22,18 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId)
+        {
+            var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
+               .Include(x => x.PendingPayments)
+               .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
+            if (apprenticeshipIncentive != null)
+            {
+                return apprenticeshipIncentive.Map();
+            }
+            return null;
+        }
+
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
         {
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
