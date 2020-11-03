@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -63,6 +64,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 AccountId = Account.Id,
                 ApprenticeshipId = Apprenticeship.Id,
                 ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
+            });
+        }
+
+        public void RecalculateEarnings()
+        {
+            AddEvent(new Created
+            {
+                AccountId = Account.Id,
+                ApprenticeshipId = Apprenticeship.Id,
+                ApprenticeshipIncentiveId = Id
             });
         }
 
