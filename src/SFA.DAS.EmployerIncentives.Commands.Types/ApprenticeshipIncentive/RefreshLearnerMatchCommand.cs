@@ -7,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
     public class RefreshLearnerCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
-        public Guid ApprenticeshipIncentiveId { get; private set; }
+        public Guid ApprenticeshipIncentiveId { get; }
 
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive)}_{ApprenticeshipIncentiveId}"; }
 

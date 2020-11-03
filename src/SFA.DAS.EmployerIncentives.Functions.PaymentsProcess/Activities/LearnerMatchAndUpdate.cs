@@ -4,6 +4,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
 {
@@ -26,15 +27,4 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _logger.LogInformation($"Created Learner Match record for apprenticeship incentive id {input.ApprenticeshipIncentiveId}");
         }
     }
-
-    // Remove - Once command is available
-    public class RefreshLearnerCommand : ICommand
-    {
-        public RefreshLearnerCommand(Guid apprenticeshipIncentive)
-        {
-            ApprenticeshipIncentiveId = apprenticeshipIncentive;
-        }
-        public Guid ApprenticeshipIncentiveId { get; }
-    }
-
 }
