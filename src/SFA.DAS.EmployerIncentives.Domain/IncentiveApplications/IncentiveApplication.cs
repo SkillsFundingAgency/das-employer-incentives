@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
@@ -70,6 +72,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
+        }
+
+        public void CalculateEarnings()
+        {
+            var earningsCalculationEvent = new EarningsCalculationRequired(Model);
+            AddEvent(earningsCalculationEvent);
         }
     }
 }
