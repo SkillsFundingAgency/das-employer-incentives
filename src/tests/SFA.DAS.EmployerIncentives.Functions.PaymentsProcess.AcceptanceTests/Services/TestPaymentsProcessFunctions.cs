@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -63,6 +64,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             return await CompleteFunctionOrchestration(orchestrationLinks);
         }
 
+        public async Task StartLearnerMatching()
+        {
+            await StartLearnerMatchingOrchestrator();
+        }
+
         private async Task<AzureFunctionOrchestrationLinks> StartFunctionOrchestration(short collectionPeriodYear, byte collectionPeriod)
         {
             var policy = Policy
@@ -88,6 +94,33 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var linksJson = await orchestrationResponse.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<AzureFunctionOrchestrationLinks>(linksJson);
         }
+
+        private async Task StartLearnerMatchingOrchestrator()
+        {
+            var policy = Policy
+                .Handle<HttpRequestException>()
+                .WaitAndRetryAsync(new[]
+                {
+                    // Tweak these time-outs if you're still getting errors 👇
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(1),
+                    TimeSpan.FromSeconds(2),
+                    TimeSpan.FromSeconds(3),
+                    TimeSpan.FromSeconds(5),
+                });
+
+            var url = $"admin/functions/LearnerMatchingOrchestrator_Start";
+            HttpResponseMessage response = null;
+            await policy.ExecuteAsync(async () =>
+            {
+                var content = new StringContent("{ input : null }", Encoding.UTF8, "application/json");
+                response = await _client.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
+            });
+
+            var linksJson = await response.Content.ReadAsStringAsync();
+        }
+
 
         private async Task<AzureFunctionOrchestrationStatus> CompleteFunctionOrchestration(AzureFunctionOrchestrationLinks azureFunctionOrchestrationLinks)
         {
@@ -128,6 +161,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var functionConfig = Path.Combine(functionAppFolder, TestConfigFile);
             File.Copy(TestConfigFile, functionConfig, overwrite: true);
             ReplaceDbConnectionString(functionConfig);
+            ReplaceLearnerMatchUrlString(functionConfig);
 
             var startInfo = new ProcessStartInfo
             {
@@ -156,5 +190,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var escapedConnString = HttpUtility.JavaScriptStringEncode(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("DB_CONNECTION_STRING", escapedConnString));
         }
+
+        private void ReplaceLearnerMatchUrlString(string pathToConfig)
+        {
+            var baseAddress = HttpUtility.JavaScriptStringEncode(_testContext.LearnerMatchApi.BaseAddress);
+            File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("LEARNER_MATCH_API_URL", baseAddress));
+        }
+
+
     }
 }

@@ -17,10 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-            if (timerInfo.IsPastDue)
-            {
-                log.LogInformation("Running late");
-            }
 
             log.LogInformation("Triggering LearnerMatchingOrchestrator");
 
