@@ -1,4 +1,5 @@
 ﻿@database
+@learnerMatchApi
 @functions
 Feature: ValidatePayments
 	In order to make employer incentives payments
