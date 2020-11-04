@@ -1,8 +1,8 @@
 ﻿@database
-@api
+@functions
 @learnerMatchApi
 Feature: RefreshLearnerData
-	When a request to refresh learner data for an apprenticeshuip incentive is received
+	When the request to refresh learner data for an apprenticeship incentive is received
 	Then the learner data is either created or updated
 
 Scenario: Request to refresh learner data for a new Apprenticeship Incentive where no learner data exists

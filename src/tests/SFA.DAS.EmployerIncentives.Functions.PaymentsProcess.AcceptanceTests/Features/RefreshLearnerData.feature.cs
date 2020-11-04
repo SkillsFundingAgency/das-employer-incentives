@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
+namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Features
 {
     using TechTalk.SpecFlow;
     using System;
@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("RefreshLearnerData")]
     [NUnit.Framework.CategoryAttribute("database")]
-    [NUnit.Framework.CategoryAttribute("api")]
+    [NUnit.Framework.CategoryAttribute("functions")]
     [NUnit.Framework.CategoryAttribute("learnerMatchApi")]
     public partial class RefreshLearnerDataFeature
     {
@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         private string[] _featureTags = new string[] {
                 "database",
-                "api",
+                "functions",
                 "learnerMatchApi"};
         
 #line 1 "RefreshLearnerData.feature"
@@ -41,10 +41,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RefreshLearnerData", "\tWhen a request to refresh learner data for an apprenticeshuip incentive is recei" +
-                    "ved\r\n\tThen the learner data is either created or updated", ProgrammingLanguage.CSharp, new string[] {
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RefreshLearnerData", "\tWhen the request to refresh learner data for an apprenticeship incentive is rece" +
+                    "ived\r\n\tThen the learner data is either created or updated", ProgrammingLanguage.CSharp, new string[] {
                         "database",
-                        "api",
+                        "functions",
                         "learnerMatchApi"});
             testRunner.OnFeatureStart(featureInfo);
         }

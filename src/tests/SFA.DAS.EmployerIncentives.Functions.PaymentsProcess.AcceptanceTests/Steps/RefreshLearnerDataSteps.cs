@@ -3,7 +3,6 @@ using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
@@ -14,11 +13,11 @@ using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 
-namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
+namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     [Binding]
     [Scope(Feature = "RefreshLearnerData")]
-    public class RefreshLearnerDataSteps : StepsBase
+    public class RefreshLearnerDataSteps //: StepsBase
     {
         private readonly TestContext _testContext;
         private readonly Account _accountModel;
@@ -26,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly LearnerSubmissionDto _learnerMatchApiData;
 
-        public RefreshLearnerDataSteps(TestContext testContext) : base(testContext)
+        public RefreshLearnerDataSteps(TestContext testContext) //: base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
@@ -43,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.Uln).Create())
                 .Create();
         }
-        
+
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
@@ -125,12 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
         public async Task WhenTheLearnerDataIsRefreshedForTheApprenticeshipIncentive()
         {
-            await EmployerIncentiveApi.PostCommand(
-                    $"commands/ApprenticeshipIncentive.RefreshLearnerCommand",
-                    new RefreshLearnerCommand(_apprenticeshipIncentive.Id));
-
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
-
+            await _testContext.PaymentsProcessFunctions.StartLearnerMatching();
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application without any submission data")]
@@ -147,7 +141,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             createdLearner.ULN.Should().Be(_apprenticeshipIncentive.Uln);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
-            
+
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
             createdLearner.SubmissionDate.Should().BeNull();
@@ -174,8 +168,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             createdLearner.RawJSON.Should().Be(JsonConvert.SerializeObject(_learnerMatchApiData));
 
             createdLearner.DaysInLearning.Should().BeNull();
-            createdLearner.HasDataLock.Should().BeNull();            
-            createdLearner.DaysInLearning.Should().BeNull();            
+            createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.StartDate.Should().BeNull();
         }
 

@@ -1,13 +1,12 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePendingPayment
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
     public class RefreshLearnerCommandHandler : ICommandHandler<RefreshLearnerCommand>
     {

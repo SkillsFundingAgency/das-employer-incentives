@@ -67,10 +67,6 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\RefreshLearnerData.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
@@ -94,10 +90,6 @@
     <SpecFlowFeatureFiles Update="Features\LegalEntityAgreementSigned.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>LegalEntityAgreementSigned.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\RefreshLearnerData.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>RefreshLearnerData.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 

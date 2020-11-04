@@ -22,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             }
             Directory.Delete(_context.TestDirectory.FullName, true);
             _context.PaymentsProcessFunctions?.Dispose();
+            _context.LearnerMatchApi?.Dispose();
         }
     }
 }
