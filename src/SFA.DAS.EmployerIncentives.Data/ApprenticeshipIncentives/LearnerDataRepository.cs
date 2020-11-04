@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             var learner = await _dbContext.Learners
                             .FirstOrDefaultAsync(a => a.ApprenticeshipIncentiveId == apprenticeshipIncentiveId);
 
-            if(learner == null)
+            if (learner == null)
             {
                 return null;
             }
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             var existingLearner = await _dbContext.Learners.FirstOrDefaultAsync(x => x.Id == updatedLearner.Id);
 
-            if(existingLearner != null)
+            if (existingLearner != null)
             {
                 _dbContext.Entry(existingLearner).CurrentValues.SetValues(updatedLearner);
             }
@@ -43,6 +43,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 _dbContext.Learners.Add(updatedLearner);
             }
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

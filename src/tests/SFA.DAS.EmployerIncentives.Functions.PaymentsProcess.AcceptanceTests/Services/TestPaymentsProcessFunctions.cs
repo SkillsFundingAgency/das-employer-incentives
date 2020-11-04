@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -67,6 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task StartLearnerMatching()
         {
             await StartLearnerMatchingOrchestrator();
+            Thread.Sleep(TimeSpan.FromSeconds(10));
         }
 
         private async Task<AzureFunctionOrchestrationLinks> StartFunctionOrchestration(short collectionPeriodYear, byte collectionPeriod)
@@ -118,7 +120,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 response.EnsureSuccessStatusCode();
             });
 
-            var linksJson = await response.Content.ReadAsStringAsync();
+            var output = await response.Content.ReadAsStringAsync();
+
         }
 
 
@@ -166,7 +169,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var startInfo = new ProcessStartInfo
             {
                 FileName = functionHostPath,
-                Arguments = $"start -p {Port}",
+                Arguments = $"start -p {Port} --pause-on-error",
                 WorkingDirectory = functionAppFolder,
                 UseShellExecute = true,
             };
