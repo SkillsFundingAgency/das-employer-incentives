@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             {
                 BaseAddress = new System.Uri(@"https://localhost:5001")
             };
+            _context.EmployerIncentivesWebApiFactory = webApi;
             _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
         }
     }

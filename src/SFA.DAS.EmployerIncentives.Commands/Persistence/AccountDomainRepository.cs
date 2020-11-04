@@ -45,13 +45,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             }
         }
 
-        public async Task<IEnumerable<Account>> GetByLegalEntityId(long legalEntityId)
-        {
-            var data = await _accountDataRepository.GetByLegalEntityId(legalEntityId);
-
-            return data.Select(Account.Create);
-        }
-
         public async Task<IEnumerable<Account>> GetByHashedLegalEntityId(string hashedLegalEntityId)
         {
             var data = await _accountDataRepository.GetByHashedLegalEntityId(hashedLegalEntityId);

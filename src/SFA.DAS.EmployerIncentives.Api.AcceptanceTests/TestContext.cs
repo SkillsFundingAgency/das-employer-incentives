@@ -4,7 +4,6 @@ using SFA.DAS.HashingService;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {    
@@ -21,7 +20,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }
         public List<object> EventsPublished { get; set; }
-        public List<PublishedCommand> CommandsPublished { get; set; }        
+        public List<PublishedCommand> CommandsPublished { get; set; }
+        public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
 
         public TestContext()
         {
