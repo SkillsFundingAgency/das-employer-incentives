@@ -93,6 +93,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_accountModel);
+                await dbConnection.InsertAsync(_applicationModel);
+                await dbConnection.InsertAsync(_apprenticeshipsModels);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
             }
         }
