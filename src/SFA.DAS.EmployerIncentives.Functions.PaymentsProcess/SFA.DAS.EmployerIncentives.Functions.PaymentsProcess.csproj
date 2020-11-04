@@ -17,7 +17,6 @@
     <PackageReference Include="SFA.DAS.UnitOfWork.EntityFrameworkCore" Version="9.0.20" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands.Types\SFA.DAS.EmployerIncentives.Commands.Types.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />

@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePendingPayment
 {

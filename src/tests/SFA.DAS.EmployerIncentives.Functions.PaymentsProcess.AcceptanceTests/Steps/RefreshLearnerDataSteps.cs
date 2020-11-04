@@ -124,15 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
         public async Task WhenTheLearnerDataIsRefreshedForTheApprenticeshipIncentive()
         {
-
             await _testContext.PaymentsProcessFunctions.StartLearnerMatching();
-
-            //await EmployerIncentiveApi.PostCommand(
-            //        $"commands/ApprenticeshipIncentive.RefreshLearnerCommand",
-            //        new RefreshLearnerCommand(_apprenticeshipIncentive.Id));
-
-            //EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
-
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application without any submission data")]
