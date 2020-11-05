@@ -38,6 +38,7 @@ using System.IO;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -113,6 +114,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator());
 
             return serviceCollection;
