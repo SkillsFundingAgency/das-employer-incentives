@@ -54,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
                 .With( p => p.IncentiveApplicationApprenticeshipId, _apprenticeshipsModels.First().Id)
                 .With(p => p.AccountId, _applicationModel.AccountId)
+                .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
                 .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
                 .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
@@ -62,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                 .Create();
         }
 
@@ -127,7 +129,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the apprenticeship incentive is created for each apprenticship in the application")]
         public async Task WhenTheApprenticeshipIncentiveIsCreatedForEachApprenticeshipInTheApplication()
         {
-            var createCommand = new CreateIncentiveCommand(_applicationModel.AccountId, _applicationModel.Id);
+            var createCommand = new CreateIncentiveCommand(_applicationModel.AccountId, _applicationModel.Id, _applicationModel.AccountLegalEntityId);
        
             await _testContext.WaitFor<MessageContext>(async () =>
                await _testContext.MessageBus.Send(createCommand));
@@ -162,7 +164,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
-            _testContext.CommandsPublished.Single(c => c.IsPublished).Command.Should().BeOfType<CreateIncentiveCommand>();
+            var publishedComand = _testContext.CommandsPublished.Single(c => c.IsPublished).Command;
+            publishedComand.Should().BeOfType<CreateIncentiveCommand>();
+
+            CreateIncentiveCommand createCommand = publishedComand as CreateIncentiveCommand;
+
+            createCommand.AccountId.Should().Be(_applicationModel.AccountId);
+            createCommand.IncentiveApplicationId.Should().Be(_applicationModel.Id);
+            createCommand.AccountLegalEntityId.Should().Be(_applicationModel.AccountLegalEntityId);
         }
 
         [Then(@"the earnings are calculated for each apprenticeship incentive")]
@@ -195,6 +204,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
                 pendingPayments.Where(p => p.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList().Count.Should().Be(2);
+                pendingPayments.ToList().ForEach(p => p.AccountLegalEntityId.Should().Be(_accountModel.AccountLegalEntityId));
             }
         }
 

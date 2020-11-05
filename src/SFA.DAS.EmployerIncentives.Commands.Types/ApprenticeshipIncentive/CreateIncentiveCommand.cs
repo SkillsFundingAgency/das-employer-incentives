@@ -10,14 +10,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
     {
         public long AccountId { get; private set; }
         public Guid IncentiveApplicationId { get; private set; }
+        public long AccountLegalEntityId { get; private set; }
+
         public string LockId { get => $"{nameof(Account)}_{AccountId}"; }
 
         public CreateIncentiveCommand(
             long accountId,
-            Guid incentiveApplicationId)
+            Guid incentiveApplicationId,
+            long accountLegalEntityId)
         {         
             AccountId = accountId;
             IncentiveApplicationId = incentiveApplicationId;
+            AccountLegalEntityId = accountLegalEntityId;
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -25,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         {
             get
             {
-                var message = $"ApprenticeshipIncentive CreateIncentiveCommand for AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId}";
+                var message = $"ApprenticeshipIncentive CreateIncentiveCommand for AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId} and AccountLegalEntityId {AccountLegalEntityId}";
                 return new Log
                 {
                     OnProcessing = () => message,

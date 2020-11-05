@@ -15,9 +15,7 @@
     <PackageReference Include="SFA.DAS.Notifications.Messages" Version="3.0.0" />
     <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.20" />
     <PackageReference Include="SFA.DAS.NServiceBus.SqlServer" Version="16.0.20" />
-    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.20" />
-
-    
+    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.20" />    
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
@@ -10,6 +11,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Account Account => Model.Account;
         public DateTime DueDate => Model.DueDate;
         public decimal Amount => Model.Amount;
+        public byte? PeriodNumber => Model.PeriodNumber;
+        public short? PaymentYear => Model.PaymentYear;
 
         internal static PendingPayment New(
             Guid id, 
@@ -30,6 +33,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             },
                 true);
             }
+
+        public void SetPaymentPeriod(CollectionCalendar collectionCalendar)
+        {
+            var period = collectionCalendar.GetPeriod(DueDate);
+            Model.PeriodNumber = period.PeriodNumber;
+            Model.PaymentYear = period.CalendarYear;
+        }
 
         internal static PendingPayment Get(PendingPaymentModel model)
         {

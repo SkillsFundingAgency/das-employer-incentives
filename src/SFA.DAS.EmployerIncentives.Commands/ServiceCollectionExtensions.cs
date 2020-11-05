@@ -74,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
 
             serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
+            serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
             
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
@@ -92,6 +93,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveDataRepository, ApprenticeshipIncentiveDataRepository>();
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
+            serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
+            
             return serviceCollection;
         }
 

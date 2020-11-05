@@ -10,7 +10,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
         public DateTime SubmittedAt { get; set; }
         public string SubmittedBy { get; set; }
         public string SubmittedByEmail { get; set; }
-                
+        public long AccountLegalEntityId { get; set; }
+
         public Log Log
         {
             get
