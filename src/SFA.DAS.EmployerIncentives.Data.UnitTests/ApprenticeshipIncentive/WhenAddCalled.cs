@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedApprenticeshipIncentive.ApprenticeshipId.Should().Be(testIncentive.Apprenticeship.Id);
             storedApprenticeshipIncentive.FirstName.Should().Be(testIncentive.Apprenticeship.FirstName);
             storedApprenticeshipIncentive.LastName.Should().Be(testIncentive.Apprenticeship.LastName);
-            storedApprenticeshipIncentive.Uln.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
+            storedApprenticeshipIncentive.ULN.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
             storedApprenticeshipIncentive.DateOfBirth.Should().Be(testIncentive.Apprenticeship.DateOfBirth);
             storedApprenticeshipIncentive.EmployerType.Should().Be(testIncentive.Apprenticeship.EmployerType);
             storedApprenticeshipIncentive.UKPRN.Should().Be(testIncentive.Apprenticeship.Provider.Ukprn);

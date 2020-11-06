@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             var query =
                 from apprentices in _context.ApplicationApprenticeships
                 join applications in _context.Applications on apprentices.IncentiveApplicationId equals applications.Id
-                where apprentices.Uln == uln && applications.Status == IncentiveApplicationStatus.Submitted
+                where apprentices.ULN == uln && applications.Status == IncentiveApplicationStatus.Submitted
                 select new {apprentices, applications};
 
             return query.AnyAsync();
