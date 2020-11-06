@@ -30,9 +30,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
         [TearDown]
         public void CleanUp()
-        {            
+        {
             _dbContext.Dispose();
-         }
+        }
 
         [Test]
         public async Task Then_the_learner_is_added_to_the_data_store()
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedLearner.ULN.Should().Be(testLearner.UniqueLearnerNumber);
             storedLearner.SubmissionFound.Should().Be(testLearner.SubmissionFound);
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
-            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFound);
+            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
             storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
             storedLearner.HasDataLock.Should().BeNull();
             storedLearner.DaysInLearning.Should().BeNull();
@@ -97,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedLearner.ULN.Should().Be(testLearner.UniqueLearnerNumber);
             storedLearner.SubmissionFound.Should().Be(testLearner.SubmissionFound);
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
-            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFound);
+            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
             storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
             storedLearner.HasDataLock.Should().BeNull();
             storedLearner.DaysInLearning.Should().BeNull();

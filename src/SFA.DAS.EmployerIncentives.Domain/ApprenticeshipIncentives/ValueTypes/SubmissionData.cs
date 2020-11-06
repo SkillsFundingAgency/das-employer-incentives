@@ -6,17 +6,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class SubmissionData : ValueObject
     {
+        public SubmissionData(DateTime submissionDate, LearningFoundStatus learningFoundStatus)
+        {
+            SubmissionDate = submissionDate;
+            LearningFoundStatus = learningFoundStatus;
+        }
+
         public SubmissionData(DateTime submissionDate, bool learningFound)
         {
             SubmissionDate = submissionDate;
-            LearningFound = learningFound;
+            LearningFoundStatus = new LearningFoundStatus(learningFound);
         }
 
+
         public DateTime SubmissionDate { get; }
-        public bool LearningFound { get; }
+
+        public LearningFoundStatus LearningFoundStatus { get; }
 
         public DateTime? StartDate { get; private set; }
-        
+
         public string RawJson { get; private set; }
 
         public void SetStartDate(DateTime? startDate)
@@ -32,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return SubmissionDate;
-            yield return LearningFound;
+            yield return LearningFoundStatus;
         }
     }
 }

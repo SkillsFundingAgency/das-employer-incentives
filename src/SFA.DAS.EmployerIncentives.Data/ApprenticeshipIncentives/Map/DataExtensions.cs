@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LastName = model.Apprenticeship.LastName,
                 DateOfBirth = model.Apprenticeship.DateOfBirth,
                 Uln = model.Apprenticeship.UniqueLearnerNumber,
-                UKPRN =  model.Apprenticeship.Provider?.Ukprn,
+                UKPRN = model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
                 PlannedStartDate = model.PlannedStartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
@@ -178,14 +178,14 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             var learner = new Domain.ApprenticeshipIncentives.ValueTypes.Learner(
                 model.Id,
-                model.ApprenticeshipIncentiveId, 
-                model.ApprenticeshipId,  
-                model.Ukprn, 
-                model.ULN, 
+                model.ApprenticeshipIncentiveId,
+                model.ApprenticeshipId,
+                model.Ukprn,
+                model.ULN,
                 model.CreatedDate
                 );
 
-            if(model.SubmissionFound)
+            if (model.SubmissionFound)
             {
                 var submissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
                     model.SubmissionDate.Value,
@@ -212,9 +212,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LearningFound = false
             };
 
-            if(learner.SubmissionFound)
+            if (learner.SubmissionFound)
             {
-                learner.LearningFound = model.SubmissionData.LearningFound;
+                learner.LearningFound = model.SubmissionData.LearningFoundStatus.LearningFound;
                 learner.SubmissionDate = model.SubmissionData.SubmissionDate;
                 learner.StartDate = model.SubmissionData.StartDate;
                 learner.RawJSON = model.SubmissionData.RawJson;

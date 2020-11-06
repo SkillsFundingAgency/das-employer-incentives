@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
-using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -36,15 +34,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             var jsonString = await response.Content.ReadAsStringAsync();
             var learnerSubmissionDto = JsonConvert.DeserializeObject<LearnerSubmissionDto>(jsonString);
 
+            var learningFound = learnerSubmissionDto.LearningFound(learner.ApprenticeshipId);
+
             var submissionData = new SubmissionData(
                 learnerSubmissionDto.IlrSubmissionDate,
-                learnerSubmissionDto.Training.Any(t => t.Reference == "ZPROG001")
+                learningFound
                 );
 
-            submissionData.SetStartDate(learnerSubmissionDto.LearningStartDateForAppenticeship(learner.ApprenticeshipId));
+            submissionData.SetStartDate(learnerSubmissionDto.LearningStartDateForApprenticeship(learner.ApprenticeshipId));
 
             submissionData.SetRawJson(jsonString);
             learner.SetSubmissionData(submissionData);
-        }        
+        }
+
+
     }
 }
