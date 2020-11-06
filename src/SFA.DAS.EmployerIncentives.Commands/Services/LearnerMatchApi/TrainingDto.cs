@@ -6,6 +6,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
     {
         public string Reference { get; set; }
 
-        public ICollection<PriceEpisodeDto> Training { get; set; }
+        public ICollection<PriceEpisodeDto> PriceEpisodes { get; set; }
     }
 }

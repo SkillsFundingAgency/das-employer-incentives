@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -24,11 +26,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly LearnerSubmissionDto _learnerMatchApiData;
+        private readonly DateTime _startDate;
 
         public RefreshLearnerDataSteps(TestContext testContext) //: base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
+            _startDate = _fixture.Create<DateTime>();
 
             _accountModel = _fixture.Create<Account>();
 
@@ -37,10 +41,30 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .Create();
 
-            _learnerMatchApiData = _fixture.Build<LearnerSubmissionDto>()
-                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-                .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.Uln).Create())
-                .Create();
+            _learnerMatchApiData = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+               .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.Uln).Create())
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                                                    .With(pe => pe.Periods, new List<PeriodDto>(){
+                                                        _fixture.Build<PeriodDto>()
+                                                       .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                                                       .With(period => period.IsPayable, true)
+                                                       .Create()
+                                                    })
+                                                    .With(pe => pe.StartDate, _startDate)
+                                                    .Create() }
+                        )
+                        .Create(),
+                    _fixture.Create<TrainingDto>() }
+                   )
+               .Create();
+
         }
 
         public async Task GivenAnApprenticeshipIncentiveExists()
@@ -142,12 +166,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
 
+            createdLearner.StartDate.Should().BeNull();
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
             createdLearner.SubmissionDate.Should().BeNull();
-            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.RawJSON.Should().BeNull();
-            createdLearner.StartDate.Should().BeNull();
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
@@ -157,7 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var createdLearners = dbConnection.GetAll<Learner>();
 
             var createdLearner = createdLearners.Single();
-
+            
             createdLearner.SubmissionFound.Should().Be(true);
             createdLearner.Id.Should().NotBeEmpty();
             createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
@@ -166,11 +189,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(_learnerMatchApiData.IlrSubmissionDate);
             createdLearner.RawJSON.Should().Be(JsonConvert.SerializeObject(_learnerMatchApiData));
+            createdLearner.StartDate.Should().Be(_startDate);
 
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
-            createdLearner.DaysInLearning.Should().BeNull();
-            createdLearner.StartDate.Should().BeNull();
         }
 
         [Then(@"the apprenticeship incentive learner data is updated for the application with submission data")]
@@ -192,11 +214,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(_learnerMatchApiData.IlrSubmissionDate);
             createdLearner.RawJSON.Should().Be(JsonConvert.SerializeObject(_learnerMatchApiData));
+            createdLearner.StartDate.Should().Be(_startDate);
 
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
-            createdLearner.DaysInLearning.Should().BeNull();
-            createdLearner.StartDate.Should().BeNull();
         }
     }
 }

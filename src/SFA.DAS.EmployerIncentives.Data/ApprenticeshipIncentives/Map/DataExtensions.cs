@@ -187,11 +187,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
             if(model.SubmissionFound)
             {
-                learner.SetSubmissionData(
-                    new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
+                var submissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
                     model.SubmissionDate.Value,
-                    model.LearningFound.Value)
-                );
+                    model.LearningFound.Value);
+
+                submissionData.SetStartDate(model.StartDate);
+                learner.SetSubmissionData(submissionData);
             }
 
             return learner;
@@ -215,6 +216,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             {
                 learner.LearningFound = model.SubmissionData.LearningFound;
                 learner.SubmissionDate = model.SubmissionData.SubmissionDate;
+                learner.StartDate = model.SubmissionData.StartDate;
                 learner.RawJSON = model.SubmissionData.RawJson;
             }
 

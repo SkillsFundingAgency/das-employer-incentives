@@ -14,7 +14,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
         public DateTime SubmissionDate { get; }
         public bool LearningFound { get; }
+
+        public DateTime? StartDate { get; private set; }
+        
         public string RawJson { get; private set; }
+
+        public void SetStartDate(DateTime? startDate)
+        {
+            StartDate = startDate;
+        }
 
         public void SetRawJson(string rawJson)
         {

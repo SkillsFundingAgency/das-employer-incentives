@@ -41,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var testLearner = _fixture.Create<Learner>();
             var submissionData = _fixture.Create<SubmissionData>();
             submissionData.SetRawJson(_fixture.Create<string>());
+            submissionData.SetStartDate(_fixture.Create<DateTime>());
             testLearner.SetSubmissionData(submissionData);
 
             // Act
@@ -59,8 +60,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedLearner.SubmissionFound.Should().Be(testLearner.SubmissionFound);
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
             storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFound);
+            storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
             storedLearner.HasDataLock.Should().BeNull();
-            storedLearner.StartDate.Should().BeNull();
             storedLearner.DaysInLearning.Should().BeNull();
             storedLearner.InLearning.Should().BeNull();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
@@ -78,6 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var testLearner = new Learner(existingLearner.Id, _fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<DateTime>());
             var submissionData = _fixture.Create<SubmissionData>();
             submissionData.SetRawJson(_fixture.Create<string>());
+            submissionData.SetStartDate(_fixture.Create<DateTime>());
             testLearner.SetSubmissionData(submissionData);
 
             // Act
@@ -96,8 +98,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedLearner.SubmissionFound.Should().Be(testLearner.SubmissionFound);
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
             storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFound);
+            storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
             storedLearner.HasDataLock.Should().BeNull();
-            storedLearner.StartDate.Should().BeNull();
             storedLearner.DaysInLearning.Should().BeNull();
             storedLearner.InLearning.Should().BeNull();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);

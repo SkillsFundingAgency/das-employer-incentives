@@ -7,7 +7,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
@@ -129,6 +128,43 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             //Assert
             _learner.SubmissionData.SubmissionDate.Should().Be(testDate);
+        }
+
+        [Test]
+        public async Task Then_the_startdate_is_set_when_one_exists_for_the_learner_data()
+        {
+            //Arrange           
+            var _testStartDate = _fixture.Create<DateTime>();
+
+            var learnerSubmissionDto = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                                                    .With(pe => pe.Periods, new List<PeriodDto>(){
+                                                        _fixture.Build<PeriodDto>()
+                                                       .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                                       .With(period => period.IsPayable, true)
+                                                       .Create()
+                                                    })
+                                                    .With(pe => pe.StartDate, _testStartDate)
+                                                    .Create() }
+                        )
+                        .Create(),
+                    _fixture.Create<TrainingDto>() }
+                    )
+                .Create();
+
+            _httpClient.SetUpGetAsAsync(learnerSubmissionDto, System.Net.HttpStatusCode.OK);
+
+            //Act
+            await _sut.Refresh(_learner);
+
+            //Assert
+            _learner.SubmissionData.StartDate.Should().Be(_testStartDate);
         }
     }
 }

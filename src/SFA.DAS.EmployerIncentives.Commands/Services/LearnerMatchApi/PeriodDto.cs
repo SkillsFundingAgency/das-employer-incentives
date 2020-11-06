@@ -3,5 +3,6 @@
     public class PeriodDto
     {
         public long ApprenticeshipId { get; set; }
+        public bool IsPayable { get; set; }
     }
 }
