@@ -1,1 +1,1 @@
-﻿CREATE SCHEMA [incentives]
+CREATE SCHEMA [incentives]
