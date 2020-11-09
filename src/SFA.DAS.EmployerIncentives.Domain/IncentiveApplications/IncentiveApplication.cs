@@ -7,8 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("SFA.DAS.EmployerIncentives.Commands.UnitTests")]
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public sealed class IncentiveApplication : AggregateRoot<Guid, IncentiveApplicationModel>

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.EarningsResilienceCheck
 {
-    public class WhenEarningsResilienceCheckRequiredHandler
+    public class WhenEarningsCalculationRequiredHandler
     {
         private EarningsCalculationRequiredHandler _sut;
         private Mock<ICommandPublisher> _mockCommandPublisher;
