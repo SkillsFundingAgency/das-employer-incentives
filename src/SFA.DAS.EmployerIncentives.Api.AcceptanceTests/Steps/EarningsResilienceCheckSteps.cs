@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished).Select(c => c.Command)
                 .ToArray();
-            publishedCommands.Count().Should().Be(20);
+            publishedCommands.Count().Should().Be(10);
             foreach (var publishedCommand in publishedCommands)
             {
                 publishedCommand.Should().BeOfType<CreateApprenticeshipIncentiveCommand>();
