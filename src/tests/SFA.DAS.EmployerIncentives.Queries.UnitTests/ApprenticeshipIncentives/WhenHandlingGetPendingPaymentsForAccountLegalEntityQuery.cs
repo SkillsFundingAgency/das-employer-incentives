@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
             var data = _fixture.CreateMany<PendingPaymentDto>().ToList();
             var expected = new GetPendingPaymentsForAccountLegalEntityResponse(data);
 
-            _repositoryMock.Setup(x => x.GetList(dto => dto.AccountLegalEntityId == query.AccountLegalEntityId && !dto.PaymentMadeDate.HasValue && (dto.PaymentYear < query.CollectionPeriodYear || (dto.PaymentYear == query.CollectionPeriodYear && dto.PaymentPeriod <= query.CollectionPeriodMonth)))).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.GetList(dto => dto.AccountLegalEntityId == query.AccountLegalEntityId && !dto.PaymentMadeDate.HasValue && (dto.PaymentYear < query.CollectionPeriodYear || (dto.PaymentYear == query.CollectionPeriodYear && dto.PeriodNumber <= query.CollectionPeriodMonth)))).ReturnsAsync(data);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
