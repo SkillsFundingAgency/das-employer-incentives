@@ -1,7 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,33 +9,42 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
 {
     public class EarningsResilienceCheckHandler : ICommandHandler<EarningsResilienceCheckCommand>
     {
-        private readonly IEarningsResilienceCheckRepository _resilienceCheckRepository;
-        private readonly IIncentiveApplicationDomainRepository _domainRepository;
+        private readonly IIncentiveApplicationDomainRepository _applicationDomainRepository;
+        private readonly IApprenticeshipIncentiveDomainRepository _incentiveDomainRepository;
 
-        public EarningsResilienceCheckHandler(IEarningsResilienceCheckRepository resilienceCheckRepository, IIncentiveApplicationDomainRepository domainRepository)
+        public EarningsResilienceCheckHandler(IIncentiveApplicationDomainRepository applicationDomainRepository,
+                                              IApprenticeshipIncentiveDomainRepository incentiveDomainRepository)
         {
-            _resilienceCheckRepository = resilienceCheckRepository;
-            _domainRepository = domainRepository;
+            _applicationDomainRepository = applicationDomainRepository;
+            _incentiveDomainRepository = incentiveDomainRepository;
         }
 
         public async Task Handle(EarningsResilienceCheckCommand command, CancellationToken cancellationToken = default)
         {
-            var applicationIds = await _resilienceCheckRepository.GetApplicationsWithoutEarningsCalculations();
+            await CalculateEarningsForApplications();
+            await CalculatePaymentsForIncentives();
+        }
 
-            foreach (var applicationId in applicationIds)
+        private async Task CalculateEarningsForApplications()
+        {
+            var applications = await _applicationDomainRepository.FindIncentiveApplicationsWithoutEarningsCalculations();
+            foreach(var application in applications)
             {
-                var application = await _domainRepository.Find(applicationId);
-
-                if (application == null)
-                {
-                    throw new InvalidRequestException();
-                }
-
                 application.CalculateEarnings();
 
-                await _domainRepository.Save(application);
+                await _applicationDomainRepository.Save(application);
             }
         }
 
+        private async Task CalculatePaymentsForIncentives()
+        {
+            var incentives = await _incentiveDomainRepository.FindIncentivesWithoutPayments();
+            foreach(var incentive in incentives)
+            {
+                incentive.CalculatePayments();
+
+                await _incentiveDomainRepository.Save(incentive);
+            }
+        }
     }
 }

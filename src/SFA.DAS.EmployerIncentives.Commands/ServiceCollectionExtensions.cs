@@ -15,7 +15,6 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
@@ -65,6 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             .AddSingleton<IValidator<CreateApprenticeshipIncentiveCommand>, NullValidator>()
             .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
             .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
+            .AddSingleton<IValidator<EarningsResilienceCheckCommand>, NullValidator>()
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
@@ -94,8 +94,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveDataRepository, ApprenticeshipIncentiveDataRepository>();
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
-            serviceCollection.AddScoped<IEarningsResilienceCheckRepository, EarningsResilienceCheckRepository>();
-
             return serviceCollection;
         }
 
@@ -105,8 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>))
-                .AddSingleton(typeof(IValidator<EarningsResilienceCheckCommand>), new NullValidator());
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 
             return serviceCollection;
         }

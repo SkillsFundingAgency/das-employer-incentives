@@ -3,6 +3,10 @@ using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
@@ -43,6 +47,53 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 _dbContext.RemoveRange(existingApplication.Apprenticeships);
                 _dbContext.AddRange(model.Apprenticeships);
             }
+        }
+
+        public async Task<List<IncentiveApplicationModel>> FindApplicationsWithoutApprenticeshipIncentives()
+        {
+            var queryResult = (from result in (_dbContext.Applications.Include(x => x.Apprenticeships)
+                               .Where(x => x.Status == Enums.IncentiveApplicationStatus.Submitted
+                               && x.Apprenticeships.Any(y => !y.EarningsCalculated)))
+                        let item = ApplicationToIncentiveApplicatonModel(result)
+                        select item).ToList();
+
+            return await Task.FromResult(queryResult);
+        }
+
+        private static IncentiveApplicationModel ApplicationToIncentiveApplicatonModel(Models.IncentiveApplication application)
+        {
+            return new IncentiveApplicationModel
+            {
+                AccountId = application.AccountId,
+                AccountLegalEntityId = application.AccountLegalEntityId,
+                ApprenticeshipModels = ApprenticeshipsToApprenticeshipModels(application.Apprenticeships),
+                DateCreated = application.DateCreated,
+                DateSubmitted = application.DateSubmitted,
+                Id = application.Id,
+                Status = application.Status,
+                SubmittedByEmail = application.SubmittedByEmail,
+                SubmittedByName = application.SubmittedByName
+            };
+        }
+
+        private static ICollection<ApprenticeshipModel> ApprenticeshipsToApprenticeshipModels(ICollection<Models.IncentiveApplicationApprenticeship> apprenticeships)
+        {
+            var apprenticeshipModels = (from apprenticeship in apprenticeships
+                                        let apprenticeshipModel = new ApprenticeshipModel
+                                        {
+                                            ApprenticeshipEmployerTypeOnApproval = apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                                            ApprenticeshipId = apprenticeship.ApprenticeshipId,
+                                            DateOfBirth = apprenticeship.DateOfBirth,
+                                            EarningsCalculated = apprenticeship.EarningsCalculated,
+                                            FirstName = apprenticeship.FirstName,
+                                            Id = apprenticeship.Id,
+                                            LastName = apprenticeship.LastName,
+                                            PlannedStartDate = apprenticeship.PlannedStartDate,
+                                            TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
+                                            Uln = apprenticeship.Uln
+                                        }
+                                        select apprenticeshipModel).ToList();
+            return new Collection<ApprenticeshipModel>(apprenticeshipModels);
         }
     }
 }

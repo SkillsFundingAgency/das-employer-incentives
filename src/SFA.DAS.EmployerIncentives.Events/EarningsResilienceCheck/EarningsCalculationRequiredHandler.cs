@@ -3,7 +3,6 @@ using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck
         public Task Handle(EarningsCalculationRequired @event, CancellationToken cancellationToken = default)
         {
             var commands = new List<Task>();
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels.Where(x => x.EarningsCalculated == false))
+            foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
             {
                 var command = new CreateApprenticeshipIncentiveCommand(
                     @event.Model.AccountId,

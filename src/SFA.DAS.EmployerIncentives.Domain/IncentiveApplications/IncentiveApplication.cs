@@ -76,8 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         public void CalculateEarnings()
         {
-            var earningsCalculationEvent = new EarningsCalculationRequired(Model);
-            AddEvent(earningsCalculationEvent);
+            AddEvent(new EarningsCalculationRequired(Model));
         }
     }
 }
