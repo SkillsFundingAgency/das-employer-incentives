@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 _logger.LogInformation($"Learner data refresh completed for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber} with result SubmissionFound : {learner.SubmissionFound}",
                     new { learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber });
 
-                if (!learner.SubmissionData.LearningFoundStatus.LearningFound) // EI-490
+                if (learner.SubmissionData != null && !learner.SubmissionData.LearningFoundStatus.LearningFound) // EI-490
                 {
                     _logger.LogInformation($"Matching ILR record not found for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber} with reason: {learner.SubmissionData.LearningFoundStatus.NotFoundReason}",
                         new { learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber, learner.SubmissionData.LearningFoundStatus.NotFoundReason });
