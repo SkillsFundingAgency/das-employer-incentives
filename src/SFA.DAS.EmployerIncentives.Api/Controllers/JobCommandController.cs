@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 int.TryParse(pageSizeRequest?.ToString()?? "500", out int pageSize);
 
                 await SendCommandAsync(new RefreshLegalEntitiesCommand(pageNumber, pageSize));
-            }
+            } 
 
             return NoContent();
         }

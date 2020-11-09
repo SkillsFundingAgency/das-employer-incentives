@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Amount = x.Amount,
                 DueDate = x.DueDate,
                 CalculatedDate = x.CalculatedDate,
-                PaymentPeriod = x.PaymentPeriod,
+                PeriodNumber = x.PeriodNumber,
                 PaymentYear = x.PaymentYear
             }).ToList();
         }

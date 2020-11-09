@@ -74,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 });
 
                 s.Replace(new ServiceDescriptor(typeof(ICommandService), new CommandService(_testContext.EmployerIncentiveApi.Client)));
+                s.Decorate<ICommandService, CommandServiceWithLogging>();
 
                 s.AddNServiceBus(
                     new LoggerFactory().CreateLogger<TestDomainMessageHandlers>(),
@@ -124,6 +125,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 host.StopAsync();
             }
+            host?.Dispose();
 
             isDisposed = true;
         }

@@ -6,16 +6,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
     public sealed class Account : AggregateRoot<long, AccountModel>
-    {   
+    {
         public IReadOnlyCollection<LegalEntity> LegalEntities => Model.LegalEntityModels.Map().ToList().AsReadOnly();
-     
+
         public static Account New(long id)
         {
-            return new Account(id, new AccountModel() { LegalEntityModels = new Collection<LegalEntityModel>() } , true);
+            return new Account(id, new AccountModel() { LegalEntityModels = new Collection<LegalEntityModel>() }, true);
         }
 
         public static Account Create(AccountModel model)
@@ -42,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         }
 
         public void AddLegalEntity(long accountLegalEntityId, LegalEntity legalEntity)
-        {   
+        {
             if (Model.LegalEntityModels.Any(i => i.AccountLegalEntityId.Equals(accountLegalEntityId)))
             {
                 throw new LegalEntityAlreadyExistsException("Legal entity has already been added");
@@ -53,8 +54,29 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.LegalEntityModels.Add(legalEntityModel);
         }
 
+        public void UpdateVendorRegistrationCaseStatus(string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
+        {
+            foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
+            {
+                legalEntity.UpdateVendorRegistrationCaseStatus(caseId, status, lastUpdatedDate);
+            }
+
+            if (status.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
+            {
+                AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
+            }
+        }
+
+        public void AddEmployerVendorIdToLegalEntities(string hashedLegalEntityId, string employerVendorId)
+        {
+            foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
+            {
+                legalEntity.AddEmployerVendorId(employerVendorId);
+            }
+        }
+
         private Account(long id, AccountModel model, bool isNew = false) : base(id, model, isNew)
-        {            
+        {
         }
     }
 }
