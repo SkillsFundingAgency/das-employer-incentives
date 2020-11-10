@@ -100,6 +100,10 @@
         "nServiceBusLicense": {
             "type": "string"
         },
+        "paymentProcessorSkuName": {
+            "type": "string",
+            "defaultValue": "EP1"
+        },
         "sharedEnvVirtualNetworkName": {
             "type": "string"
         },
@@ -120,7 +124,9 @@
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
         "storageContainerNames": [ "employer-incentives-distributed-locks" ],
         "functionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
-        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]"
+        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "paymentProcessFunctionAppName": "[concat(variables('resourceNamePrefix'),'-pay-fa')]",
+        "paymentProcessFunctionAspName": "[concat(variables('resourceNamePrefix'),'-pay-asp')]"
     },
     "resources": [
         {
@@ -299,7 +305,7 @@
             }
         },
         {
-            "apiVersion": "2018-02-01",
+            "apiVersion": "2019-05-01",
             "name": "employer-incentives-sql-database",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
@@ -515,6 +521,114 @@
             "dependsOn": [
                 "function-app"
             ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "payment-process-function-app-service-plan",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'premium-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "premiumPlanName": {
+                        "value": "[variables('paymentProcessFunctionAspName')]"
+                    },
+                    "skuName": {
+                        "value": "[parameters('paymentProcessorSkuName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "payment-process-function-application-insights",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('paymentProcessFunctionAppName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('paymentProcessFunctionAppName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "payment-process-function-app",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'function-app.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "functionAppName": {
+                        "value": "[variables('paymentProcessFunctionAppName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[variables('paymentProcessFunctionAspName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "functionAppAppSettings": {
+                        "value": [
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigNames",
+                                "value": "[parameters('configNames')]"
+                            },
+                            {
+                                "name": "EnvironmentName",
+                                "value": "[parameters('environmentName')]"
+                            },
+                            {
+                                "name": "Version",
+                                "value": "[parameters('version')]"
+                            },
+                            {
+                                "name": "AzureWebJobsStorage",
+                                "value": "[parameters('sharedStorageAccountConnectionString')]"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference('payment-process-function-application-insights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "FUNCTIONS_EXTENSION_VERSION",
+                                "value": "~3"
+                            },
+                            {
+                                "name": "LoggingRedisConnectionString",
+                                "value": "[parameters('loggingRedisConnectionString')]"
+                            },
+                            {
+                                "name": "FUNCTIONS_WORKER_RUNTIME",
+                                "value": "dotnet"
+                            }
+                        ]
+                    }
+                }
+            },
+
+            "dependsOn": [
+                "payment-process-function-app-service-plan",
+                "payment-process-function-application-insights"
+            ]
         }
     ],
     "outputs": {
@@ -529,6 +643,10 @@
         "FunctionAppName": {
             "type": "string",
             "value": "[variables('functionAppName')]"
+        },
+        "PaymentProcessFunctionAppName": {
+            "type": "string",
+            "value": "[variables('paymentProcessFunctionAppName')]"
         }
     }
 }
