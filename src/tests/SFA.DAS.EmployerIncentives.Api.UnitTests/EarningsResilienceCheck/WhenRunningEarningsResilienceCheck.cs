@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
             _sut = new EarningsResilienceCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<EarningsResilienceCheckCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<EarningsResilienceApplicationsCheckCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
             await _sut.CheckApplications();
 
             // Assert
-            _mockCommandDispatcher.Verify(m => m.Send(It.IsAny<EarningsResilienceCheckCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockCommandDispatcher.Verify(m => m.Send(It.IsAny<EarningsResilienceApplicationsCheckCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

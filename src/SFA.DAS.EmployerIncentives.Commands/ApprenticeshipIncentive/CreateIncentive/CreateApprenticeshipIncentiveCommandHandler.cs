@@ -1,9 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
@@ -27,14 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
 
         public async Task Handle(CreateApprenticeshipIncentiveCommand command, CancellationToken cancellationToken = default)
         {
-            var existingApprenticeshipIncentive = await _apprenticeshipIncentiveDomainRepository.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId);
-            if (existingApprenticeshipIncentive != null)
-            {                
-                existingApprenticeshipIncentive.RecalculateEarnings();
-                await _apprenticeshipIncentiveDomainRepository.Save(existingApprenticeshipIncentive);
-                return;
-            }
-
             var incentive = _apprenticeshipIncentiveFactory.CreateNew(
                 Guid.NewGuid(),
                 command.IncentiveApplicationApprenticeshipId,

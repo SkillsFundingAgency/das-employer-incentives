@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SFA.DAS.Common.Domain.Types;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {

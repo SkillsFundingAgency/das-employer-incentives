@@ -15,12 +15,12 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Data.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
 using SFA.DAS.HashingService;
 using SFA.DAS.Http;
 using SFA.DAS.Http.TokenGenerators;
@@ -64,6 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             .AddSingleton<IValidator<CreateApprenticeshipIncentiveCommand>, NullValidator>()
             .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
             .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
+            .AddSingleton<IValidator<EarningsResilienceApplicationsCheckCommand>, NullValidator>()
+            .AddSingleton<IValidator<EarningsResilienceIncentivesCheckCommand>, NullValidator>()
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
@@ -93,8 +95,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveDataRepository, ApprenticeshipIncentiveDataRepository>();
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
-
-            serviceCollection.AddScoped<IEarningsResilienceCheckRepository, EarningsResilienceCheckRepository>();
 
             serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
             

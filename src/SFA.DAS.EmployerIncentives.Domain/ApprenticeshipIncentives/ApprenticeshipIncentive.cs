@@ -4,11 +4,11 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -69,14 +69,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
         }
 
-        public void RecalculateEarnings()
+        public void CalculatePayments()
         {
-            AddEvent(new Created
-            {
-                AccountId = Account.Id,
-                ApprenticeshipId = Apprenticeship.Id,
-                ApprenticeshipIncentiveId = Id
-            });
+            AddEvent(new PaymentsCalculationRequired(Model));
         }
 
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)

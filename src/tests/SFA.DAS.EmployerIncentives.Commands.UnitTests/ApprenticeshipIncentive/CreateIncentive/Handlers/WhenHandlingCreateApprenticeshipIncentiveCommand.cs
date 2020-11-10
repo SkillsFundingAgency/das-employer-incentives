@@ -58,31 +58,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         i.Account.Id == command.AccountId
                 )), Times.Once());
         }
-
-        [Test]
-        public async Task Then_a_calculate_payments_event_is_triggered_if_the_apprenticeship_incentive_has_none_setup()
-        {
-            // Arrange
-            var command = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
-            var existingApprenticeshipIncentive = _factory.CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>());
-            _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(existingApprenticeshipIncentive);
-
-            // Act
-            await _sut.Handle(command);
-
-            // Assert
-            _mockIncentiveDomainRepository.Verify(r =>
-                r.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(
-                    i =>
-                        i.Apprenticeship.Id == existingApprenticeshipIncentive.Apprenticeship.Id &&
-                        i.Apprenticeship.UniqueLearnerNumber == existingApprenticeshipIncentive.Apprenticeship.UniqueLearnerNumber &&
-                        i.Apprenticeship.DateOfBirth == existingApprenticeshipIncentive.Apprenticeship.DateOfBirth &&
-                        i.Apprenticeship.EmployerType == existingApprenticeshipIncentive.Apprenticeship.EmployerType &&
-                        i.Apprenticeship.FirstName == existingApprenticeshipIncentive.Apprenticeship.FirstName &&
-                        i.Apprenticeship.LastName == existingApprenticeshipIncentive.Apprenticeship.LastName &&
-                        i.Account.Id == existingApprenticeshipIncentive.Account.Id
-                )), Times.Once());
-        }
-
+              
     }
 }
