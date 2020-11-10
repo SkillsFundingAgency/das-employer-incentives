@@ -25,7 +25,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 learner.SetSubmissionData(null);
-
                 return;
             }
 
@@ -34,19 +33,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             var jsonString = await response.Content.ReadAsStringAsync();
             var learnerSubmissionDto = JsonConvert.DeserializeObject<LearnerSubmissionDto>(jsonString);
 
+            UpdateSubmissionData(learner, learnerSubmissionDto, jsonString);
+            UpdateProviderDataLockData(learner, learnerSubmissionDto);
+        }
+
+        private static void UpdateSubmissionData(Learner learner, LearnerSubmissionDto learnerSubmissionDto, string jsonString)
+        {
             var learningFound = learnerSubmissionDto.LearningFound(learner.ApprenticeshipId);
 
             var submissionData = new SubmissionData(
                 learnerSubmissionDto.IlrSubmissionDate,
                 learningFound
-                );
+            );
 
             submissionData.SetStartDate(learnerSubmissionDto.LearningStartDateForApprenticeship(learner.ApprenticeshipId));
-
             submissionData.SetRawJson(jsonString);
             learner.SetSubmissionData(submissionData);
         }
 
-
+        private static void UpdateProviderDataLockData(Learner learner, LearnerSubmissionDto learnerSubmissionDto)
+        {
+            if (learnerSubmissionDto.HasProviderDataLocks(learner)) learner.SetHasDataLock();
+        }
     }
 }

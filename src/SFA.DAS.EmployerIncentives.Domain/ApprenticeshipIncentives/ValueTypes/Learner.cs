@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
-    public class Learner : ValueObject
+    public class Learner : ValueObject // TODO: Turn into Entity
     {
         public Learner(
-            Guid id, 
+            Guid id,
             Guid apprenticeshipIncentiveId,
             long apprenticeshipId,
             long ukprn,
@@ -37,6 +37,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         {
             SubmissionData = submissionData;
         }
+
+        public NextPendingPayment NextPendingPayment { get; private set; }
+
+
+        public void SetNextPendingPayment(NextPendingPayment value)
+        {
+            NextPendingPayment = value;
+        }
+
+        public bool HasDataLock { get; private set; }
+
+        public void SetHasDataLock() => HasDataLock = true;
 
         protected override IEnumerable<object> GetAtomicValues()
         {
