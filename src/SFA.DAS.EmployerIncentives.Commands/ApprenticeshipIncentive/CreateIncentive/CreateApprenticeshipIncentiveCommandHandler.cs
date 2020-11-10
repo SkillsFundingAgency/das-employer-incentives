@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
             var incentive = _apprenticeshipIncentiveFactory.CreateNew(
                 Guid.NewGuid(),
                 command.IncentiveApplicationApprenticeshipId,
-                new Account(command.AccountId),
+                new Account(command.AccountId, command.AccountLegalEntityId),
                 new Apprenticeship(
                     command.ApprenticeshipId,
                     command.FirstName,

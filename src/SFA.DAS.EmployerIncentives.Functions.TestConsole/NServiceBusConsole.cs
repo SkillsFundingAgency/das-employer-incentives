@@ -30,7 +30,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
             do
             {
-                var message2 = new CalculateEarningsCommand(Guid.NewGuid(), 1, 2);
+                //var message = new AddedLegalEntityEvent
+                //{
+                //    AccountId = 2,
+                //    AccountLegalEntityId = 2,
+                //    LegalEntityId = 3,
+                //    OrganisationName = "Org name"
+                //};
+
+                //await endpointInstance.Publish(message);
+
+                var message2 = new CreateApprenticeshipIncentiveCommand(1, 2, Guid.NewGuid(), 2, "test", "test", new DateTime(2000, 1, 1), 1, new DateTime(2020, 9, 1), 0);
                 await endpointInstance.Send(message2);
 
                 Console.WriteLine("Message sent...");

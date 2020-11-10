@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public DateTime PlannedStartDate => Model.PlannedStartDate;        
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId,  Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
             return new ApprenticeshipIncentive(
                 id, 
@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ApprenticeshipIncentive(id, model);
         }
 
-        public void CalculateEarnings(IEnumerable<IncentivePaymentProfile> paymentProfiles)
+        public void CalculateEarnings(IEnumerable<IncentivePaymentProfile> paymentProfiles, CollectionCalendar collectionCalendar)
         {
             var incentive = new Incentive(Apprenticeship.DateOfBirth, PlannedStartDate, paymentProfiles);
             if(!incentive.IsEligible)
@@ -47,15 +47,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.PendingPaymentModels.Clear();
             foreach (var payment in incentive.Payments)
             {
-                Model.PendingPaymentModels.Add(
-                       PendingPayment.New(
-                           Guid.NewGuid(),
-                           Model.Account,
-                           Model.Id,
-                           payment.Amount,
-                           payment.PaymentDate,
-                           DateTime.Now)
-                       .GetModel());
+                 var pendingPayment = PendingPayment.New(
+                               Guid.NewGuid(),
+                               Model.Account,
+                               Model.Id,
+                               payment.Amount,
+                               payment.PaymentDate,
+                               DateTime.Now);
+
+                pendingPayment.SetPaymentPeriod(collectionCalendar);
+                
+                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
             }
 
             AddEvent(new EarningsCalculated

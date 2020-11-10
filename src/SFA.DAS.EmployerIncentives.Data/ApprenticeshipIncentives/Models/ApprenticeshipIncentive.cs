@@ -20,6 +20,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public ApprenticeshipEmployerType EmployerType { get; set; }
         public DateTime PlannedStartDate { get; set; }
         public Guid IncentiveApplicationApprenticeshipId { get; set; }
+        public long? AccountLegalEntityId { get; set; }
+
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPayment> PendingPayments { get; set; }
 
