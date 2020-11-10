@@ -3,6 +3,9 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -20,6 +23,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             await _dbContext.AddAsync(apprenticeshipIncentive.Map());
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPayments()
+        {
+            var queryResult = (from result in (_dbContext.ApprenticeshipIncentives
+                   .Include(x => x.PendingPayments)
+                   .Where(x => x.PendingPayments.Count() == 0))
+                               let item = result.Map()
+                               select item).ToList();
+
+            return await Task.FromResult(queryResult);
         }
 
         public async Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId)

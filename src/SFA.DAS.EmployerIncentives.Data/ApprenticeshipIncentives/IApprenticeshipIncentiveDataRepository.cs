@@ -1,5 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -11,5 +13,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         Task Update(ApprenticeshipIncentiveModel apprenticeshipIncentive);
 
         Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId);
+        Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPayments();
     }
 }

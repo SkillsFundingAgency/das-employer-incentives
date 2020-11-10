@@ -2,7 +2,6 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
