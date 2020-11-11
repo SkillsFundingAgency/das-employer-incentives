@@ -9,11 +9,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class LearnerDataRepository : ILearnerDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public LearnerDataRepository(EmployerIncentivesDbContext dbContext)
+        public LearnerDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task<Learner> GetByApprenticeshipIncentiveId(Guid apprenticeshipIncentiveId)
@@ -43,8 +44,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 _dbContext.Learners.Add(updatedLearner);
             }
-
-            await _dbContext.SaveChangesAsync();
         }
     }
 }

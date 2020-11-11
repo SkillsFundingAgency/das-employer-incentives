@@ -33,6 +33,7 @@ using SFA.DAS.NServiceBus.SqlServer.Data;
 using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
@@ -107,7 +108,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithUnitOfWork<>));
 
             serviceCollection
                 .AddSingleton(typeof(IValidator<CreateIncentiveCommand>), new NullValidator())
@@ -236,18 +238,26 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceProvider;
         }
 
-        public static IServiceCollection AddEntityFrameworkForEmployerIncentives(this IServiceCollection services)
+        public static IServiceCollection AddEntityFrameworkForEmployerIncentives(this IServiceCollection services, IConfiguration configuration)
         {
             return services.AddScoped(p =>
             {
                 var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
-                var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
-                var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
-                var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
-
-                var dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
-
-                dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
+                EmployerIncentivesDbContext dbContext;
+                try
+                {
+                    var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
+                    var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
+                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
+                    dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
+                    dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
+                }
+                catch (KeyNotFoundException)
+                {
+                    var settings = p.GetService<IOptions<ApplicationSettings>>();
+                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(settings.Value.DbConnectionString);
+                    dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
+                }
 
                 return dbContext;
             });

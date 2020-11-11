@@ -10,11 +10,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplicationApprenticeship
 {
     public class IncentiveApplicationApprenticeshipQueryRepository : IQueryRepository<Models.IncentiveApplicationApprenticeship>
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public IncentiveApplicationApprenticeshipQueryRepository(EmployerIncentivesDbContext context)
+        public IncentiveApplicationApprenticeshipQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
-            _context = context;
+            _lazyContext = context;
         }
 
         public Task<Models.IncentiveApplicationApprenticeship> Get(Expression<Func<Models.IncentiveApplicationApprenticeship, bool>> predicate)
