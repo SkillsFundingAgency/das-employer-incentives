@@ -58,6 +58,30 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         i.Account.Id == command.AccountId
                 )), Times.Once());
         }
-              
+
+        [Test]
+        public async Task Then_the_apprenticeship_incentive_is_not_created_if_one_exists_for_the_apprenticeship_id()
+        {
+            var command = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
+            var existingAppenticeshipIncentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>());
+            _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(existingAppenticeshipIncentive);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _mockIncentiveDomainRepository.Verify(r =>
+                r.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(
+                    i =>
+                        i.Apprenticeship.Id == command.ApprenticeshipId &&
+                        i.Apprenticeship.UniqueLearnerNumber == command.Uln &&
+                        i.Apprenticeship.DateOfBirth == command.DateOfBirth &&
+                        i.Apprenticeship.EmployerType == command.ApprenticeshipEmployerTypeOnApproval &&
+                        i.Apprenticeship.FirstName == command.FirstName &&
+                        i.Apprenticeship.LastName == command.LastName &&
+                        i.Account.Id == command.AccountId
+                )), Times.Never());
+        }
+
     }
 }
