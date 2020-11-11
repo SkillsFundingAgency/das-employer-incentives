@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                      x.FirstName == storedIncentive.Apprenticeship.FirstName &&
                      x.LastName == storedIncentive.Apprenticeship.LastName &&
                      x.DateOfBirth == storedIncentive.Apprenticeship.DateOfBirth &&
-                     x.Uln == storedIncentive.Apprenticeship.UniqueLearnerNumber &&
+                     x.ULN == storedIncentive.Apprenticeship.UniqueLearnerNumber &&
                      x.EmployerType == storedIncentive.Apprenticeship.EmployerType
                 )
                 .Should().Be(1);

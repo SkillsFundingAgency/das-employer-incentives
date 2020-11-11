@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         public Task<List<ApprenticeshipIncentiveDto>> GetList()
         {
             return _context.Set<Models.ApprenticeshipIncentive>()
-                .Select(x => new ApprenticeshipIncentiveDto { Id = x.Id, ApprenticeshipId = x.ApprenticeshipId, ULN = x.Uln, UKPRN = x.UKPRN }).ToListAsync();
+                .Select(x => new ApprenticeshipIncentiveDto { Id = x.Id, ApprenticeshipId = x.ApprenticeshipId, ULN = x.ULN, UKPRN = x.UKPRN }).ToListAsync();
         }
     }
 }

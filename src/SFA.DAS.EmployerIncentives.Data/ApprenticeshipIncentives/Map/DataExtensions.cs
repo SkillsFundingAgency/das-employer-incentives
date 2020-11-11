@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 FirstName = model.Apprenticeship.FirstName,
                 LastName = model.Apprenticeship.LastName,
                 DateOfBirth = model.Apprenticeship.DateOfBirth,
-                Uln = model.Apprenticeship.UniqueLearnerNumber,
+                ULN = model.Apprenticeship.UniqueLearnerNumber,
                 UKPRN =  model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
                 PlannedStartDate = model.PlannedStartDate,
@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.FirstName,
                      entity.LastName,
                      entity.DateOfBirth,
-                     entity.Uln,
+                     entity.ULN,
                      entity.EmployerType
                      );
 
