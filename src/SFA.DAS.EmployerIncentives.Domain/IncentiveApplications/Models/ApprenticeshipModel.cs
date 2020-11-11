@@ -16,5 +16,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
         public long? UKPRN { get; set; }
+        public bool EarningsCalculated { get; set; }        
     }
 }

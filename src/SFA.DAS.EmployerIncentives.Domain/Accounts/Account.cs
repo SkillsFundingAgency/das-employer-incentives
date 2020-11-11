@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
@@ -58,6 +59,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
             {
                 legalEntity.UpdateVendorRegistrationCaseStatus(caseId, status, lastUpdatedDate);
+            }
+
+            if (status.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
+            {
+                AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
+            }
+        }
+
+        public void AddEmployerVendorIdToLegalEntities(string hashedLegalEntityId, string employerVendorId)
+        {
+            foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
+            {
+                legalEntity.AddEmployerVendorId(employerVendorId);
             }
         }
 

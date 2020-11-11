@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,14 +10,20 @@
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.5" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="NLog" Version="4.7.2" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.6.4" />
     <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.2933" />
-    <PackageReference Include="SFA.DAS.Http" Version="3.2.32" />
+    <PackageReference Include="SFA.DAS.Http" Version="3.2.57" />
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
-    <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.5" />
-    <PackageReference Include="SFA.DAS.UnitOfWork" Version="9.0.13" />
-    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.13" />
+    <PackageReference Include="SFA.DAS.UnitOfWork" Version="9.0.20" />
+    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.20" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Enums\SFA.DAS.EmployerIncentives.Enums.csproj" />
   </ItemGroup>
 
 </Project>

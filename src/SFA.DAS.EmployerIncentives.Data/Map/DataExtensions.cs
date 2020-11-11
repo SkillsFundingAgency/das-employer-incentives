@@ -38,9 +38,13 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
 
             foreach (var model in models)
             {
-                var account = accounts.SingleOrDefault(a => a.Id == model.Id) ?? new AccountModel { Id = model.Id };
+                var account = accounts.SingleOrDefault(a => a.Id == model.Id);
+                if (account == null)
+                {
+                    account = new AccountModel { Id = model.Id };
+                    accounts.Add(account);
+                }
                 account.LegalEntityModels.Add(MapLegalEntity(model));
-                accounts.Add(account);
             }
 
             return accounts;
@@ -93,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
 
         private static ICollection<Models.IncentiveApplicationApprenticeship> Map(this ICollection<ApprenticeshipModel> models, Guid applicationId)
         {
-            return models.Select(x => new IncentiveApplicationApprenticeship
+            return models.Select(x => new Models.IncentiveApplicationApprenticeship
             {
                 Id = x.Id,
                 IncentiveApplicationId = applicationId,
@@ -103,6 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 DateOfBirth = x.DateOfBirth,
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
+                EarningsCalculated = x.EarningsCalculated,
                 Uln = x.Uln,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN
@@ -121,11 +126,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 DateCreated = entity.DateCreated,
                 AccountId = entity.AccountId,
                 AccountLegalEntityId = entity.AccountLegalEntityId,
-                ApprenticeshipModels = entity.Apprenticeships.Map(entity.Id)
+                ApprenticeshipModels = entity.Apprenticeships.Map()
             };
         }
 
-        private static ICollection<ApprenticeshipModel> Map(this ICollection<Models.IncentiveApplicationApprenticeship> models, Guid applicationId)
+        private static ICollection<ApprenticeshipModel> Map(this ICollection<Models.IncentiveApplicationApprenticeship> models)
         {
             return models.Select(x => new ApprenticeshipModel
             {
@@ -137,7 +142,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
                 Uln = x.Uln,
-                TotalIncentiveAmount = x.TotalIncentiveAmount
+                TotalIncentiveAmount = x.TotalIncentiveAmount,
+                EarningsCalculated = x.EarningsCalculated                
             }).ToList();
         }
     }

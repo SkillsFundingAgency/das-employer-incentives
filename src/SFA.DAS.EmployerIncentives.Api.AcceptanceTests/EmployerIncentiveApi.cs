@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -10,11 +10,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         public HttpClient Client { get; private set; }
         public HttpResponseMessage Response { get; set; }
+        public Uri BaseAddress { get; private set; }
         private bool isDisposed;
 
         public EmployerIncentiveApi(HttpClient client)
         {
             Client = client;
+            BaseAddress = client.BaseAddress;
+        }
+
+        public async Task PostCommand<T>(string url, T command) where T : ICommand
+        {
+            var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            var response = await Client.PostAsJsonAsync(url, commandText);
+
+            Response = response;          
         }
 
         public async Task Post<T>(string url, T data)
@@ -49,6 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             if (disposing)
             {
+                Response?.Dispose();
                 Client.Dispose();
             }
 

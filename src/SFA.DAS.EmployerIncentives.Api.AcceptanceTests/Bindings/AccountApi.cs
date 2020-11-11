@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             _context = context;            
         }
 
-        [BeforeScenario(Order = 2)]
+        [BeforeScenario(Order = 4)]
         public void InitialiseAccountApi()
         {
             _context.AccountApi = new TestAccountApi();
