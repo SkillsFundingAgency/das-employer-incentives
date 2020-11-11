@@ -82,7 +82,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     x.PeriodNumber, 
                     x.CalendarMonth, 
                     x.CalendarYear, 
-                    x.EIScheduledOpenDateUTC)
+                    x.EIScheduledOpenDateUTC,
+                    x.CensusDate,
+                    x.AcademicYear,
+                    x.Active)
             ).ToList();
         }
       
