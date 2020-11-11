@@ -604,6 +604,14 @@
                                 "name": "AzureWebJobsStorage",
                                 "value": "[parameters('sharedStorageAccountConnectionString')]"
                             },
+                                                        {
+                                "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                                "value": "[parameters('sharedStorageAccountConnectionString')]"
+                            },
+                                                        {
+                                "name": "WEBSITE_CONTENTSHARE",
+                                "value": "[variables('paymentProcessFunctionAppName')]"
+                            },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                                 "value": "[reference('payment-process-function-application-insights').outputs.InstrumentationKey.value]"
