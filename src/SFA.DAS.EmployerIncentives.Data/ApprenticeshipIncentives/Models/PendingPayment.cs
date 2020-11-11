@@ -18,5 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public short? PeriodNumber { get; set; }
         public short? PaymentYear { get; set; }
         public long AccountLegalEntityId { get; set; }
+        public short? EarningType { get; set; }
     }
 }

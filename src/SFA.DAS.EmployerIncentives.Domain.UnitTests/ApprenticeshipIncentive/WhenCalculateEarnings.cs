@@ -111,6 +111,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
             secondPayment.Account.Id.Should().Be(_sutModel.Account.Id);
             secondPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
+
+            firstPayment.EarningType.Should().Be(1);
+            secondPayment.EarningType.Should().Be(2);
         }
 
         [Test]

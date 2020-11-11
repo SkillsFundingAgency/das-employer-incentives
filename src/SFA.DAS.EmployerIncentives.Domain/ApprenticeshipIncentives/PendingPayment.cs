@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public decimal Amount => Model.Amount;
         public byte? PeriodNumber => Model.PeriodNumber;
         public short? PaymentYear => Model.PaymentYear;
+        public short? EarningType => Model.EarningType;
 
         internal static PendingPayment New(
             Guid id, 
@@ -20,8 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Guid apprenticeshipIncentiveId, 
             decimal amount,
             DateTime dueDate,
-            DateTime calculatedDate
-            )
+            DateTime calculatedDate,
+            short earningType)
         {            
             return new PendingPayment(new PendingPaymentModel { 
                 Id = id,
@@ -29,7 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                 Amount = amount,
                 CalculatedDate = calculatedDate,
-                DueDate = dueDate
+                DueDate = dueDate,
+                EarningType = earningType
             },
                 true);
             }

@@ -15,5 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public DateTime? PaymentMadeDate { get; set; }
         public byte? PeriodNumber { get; set; }
         public short? PaymentYear { get; set; }
+        public short? EarningType { get; set; }
     }
 }

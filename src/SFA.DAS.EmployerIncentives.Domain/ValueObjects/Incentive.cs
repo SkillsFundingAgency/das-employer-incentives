@@ -57,9 +57,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {IncentiveType}");
             }
 
+            short paymentNumber = 1;
             foreach (var paymentProfile in incentivePaymentProfile.PaymentProfiles)
             {
-                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart)));
+                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart), paymentNumber));
+                paymentNumber++;
             }
 
             return payments;
@@ -71,9 +73,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             yield return _startDate;
 
             foreach (var payment in Payments)
-            {
+            {                
                 yield return payment.Amount;
                 yield return payment.PaymentDate;
+                yield return payment.PaymentNumber;
             }
         }
     }
