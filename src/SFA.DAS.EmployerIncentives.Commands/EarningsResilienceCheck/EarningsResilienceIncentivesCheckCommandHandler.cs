@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
 
         public async Task Handle(EarningsResilienceIncentivesCheckCommand command, CancellationToken cancellationToken = default)
         {
-            var incentives = await _incentiveDomainRepository.FindIncentivesWithoutPayments();
+            var incentives = await _incentiveDomainRepository.FindIncentivesWithoutPendingPayments();
             foreach (var incentive in incentives)
             {
                 incentive.CalculatePayments();

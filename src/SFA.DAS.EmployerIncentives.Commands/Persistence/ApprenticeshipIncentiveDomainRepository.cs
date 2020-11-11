@@ -46,9 +46,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
-        public async Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindIncentivesWithoutPayments()
+        public async Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindIncentivesWithoutPendingPayments()
         {
-            var incentives = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentivesWithoutPayments();
+            var incentives = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentivesWithoutPendingPayments();
             return (from incentive in incentives
                     select _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive)).ToList();
         }

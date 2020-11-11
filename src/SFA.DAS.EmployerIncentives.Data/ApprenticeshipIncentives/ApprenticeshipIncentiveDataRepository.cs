@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPayments()
+        public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments()
         {
             var queryResult = (from result in (_dbContext.ApprenticeshipIncentives
                    .Include(x => x.PendingPayments)

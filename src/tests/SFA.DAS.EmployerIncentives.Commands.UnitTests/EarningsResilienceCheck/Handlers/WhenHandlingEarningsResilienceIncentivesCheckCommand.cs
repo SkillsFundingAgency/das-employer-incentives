@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             {
                 Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), _fixture.Create<DateTime>())
             };
-            _incentiveRepository.Setup(x => x.FindIncentivesWithoutPayments()).ReturnsAsync(incentives);
+            _incentiveRepository.Setup(x => x.FindIncentivesWithoutPendingPayments()).ReturnsAsync(incentives);
 
             //Act
             await _sut.Handle(command);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
@@ -11,6 +10,6 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         Task Add(IncentiveApplicationModel incentiveApplication);
         Task<IncentiveApplicationModel> Get(Guid incentiveApplicationId);
         Task Update(IncentiveApplicationModel incentiveApplication);
-        Task<List<IncentiveApplicationModel>> FindApplicationsWithoutApprenticeshipIncentives();
+        Task<List<IncentiveApplicationModel>> FindApplicationsWithoutEarningsCalculated();
     }
 }

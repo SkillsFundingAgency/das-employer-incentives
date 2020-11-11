@@ -13,6 +13,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         Task Update(ApprenticeshipIncentiveModel apprenticeshipIncentive);
 
         Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId);
-        Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPayments();
+        Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments();
     }
 }
