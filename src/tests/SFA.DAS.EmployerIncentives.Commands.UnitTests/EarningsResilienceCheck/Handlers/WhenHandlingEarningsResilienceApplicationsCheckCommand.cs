@@ -1,14 +1,17 @@
 ﻿using AutoFixture;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.Handlers
@@ -18,13 +21,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
     {
         private EarningsResilienceApplicationsCheckCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _applicationRepository;
+        private Mock<IDomainEventDispatcher> _domainEventDispatcher;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _applicationRepository = new Mock<IIncentiveApplicationDomainRepository>();
-            _sut = new EarningsResilienceApplicationsCheckCommandHandler(_applicationRepository.Object);
+            _domainEventDispatcher = new Mock<IDomainEventDispatcher>();
+            _sut = new EarningsResilienceApplicationsCheckCommandHandler(_applicationRepository.Object, _domainEventDispatcher.Object);
             _fixture = new Fixture();
         }
 
@@ -43,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             await _sut.Handle(command);
 
             //Assert
-            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[0].Id)), Times.Once);
+            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[0].Id), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -61,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             await _sut.Handle(command);
 
             //Assert
-            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[0].Id)), Times.Once);
+            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[0].Id), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -84,8 +89,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             await _sut.Handle(command);
 
             //Assert
-            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[0].Id)), Times.Once);
-            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[1].Id)), Times.Once);
+            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[0].Id), It.IsAny<CancellationToken>()), Times.Once);
+            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[1].Id), It.IsAny<CancellationToken>()), Times.Once);
         }
 
     }

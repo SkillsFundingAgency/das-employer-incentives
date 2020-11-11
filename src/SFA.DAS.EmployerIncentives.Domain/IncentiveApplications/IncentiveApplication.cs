@@ -75,9 +75,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
 
-        public void CalculateEarnings()
-        {
-            AddEvent(new EarningsCalculationRequired(Model));
-        }
     }
 }
