@@ -1,10 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using System;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
-    public class Learner : ValueObject
+    public class Learner : ValueObject, ILogWriter
     {
         public Learner(
             Guid id, 
@@ -36,6 +37,30 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public void SetSubmissionData(SubmissionData submissionData)
         {
             SubmissionData = submissionData;
+        }
+
+        public Log Log
+        {
+            get
+            {
+                var message = $"Learner data : ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} and ApprenticeshipId {ApprenticeshipId} with Ukprn {Ukprn} and UniqueLearnerNumber {UniqueLearnerNumber}. ";
+
+                if(SubmissionFound)
+                {
+                    message += ((ILogWriter)SubmissionData).Log.OnProcessed;
+                }
+                else
+                {
+                    message += "Submission data not found.";
+                }
+
+                return new Log
+                {
+                    OnProcessing = () => message,
+                    OnProcessed = () => message,
+                    OnError = () => message
+                };
+            }
         }
 
         protected override IEnumerable<object> GetAtomicValues()

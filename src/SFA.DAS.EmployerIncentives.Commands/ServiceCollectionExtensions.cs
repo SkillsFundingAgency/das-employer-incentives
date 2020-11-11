@@ -191,7 +191,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new LearnerService(client, settings.Version);
+                return new LearnerService(client, settings.Version, s.GetRequiredService<IApprenticeshipIncentiveDomainRepository>());
             });
 
             return serviceCollection;

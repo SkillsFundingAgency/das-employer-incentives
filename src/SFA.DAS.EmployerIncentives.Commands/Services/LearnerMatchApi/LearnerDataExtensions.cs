@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using System;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
@@ -31,6 +32,53 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             }
 
             return null;
+        }
+
+        public static bool InLearningForAppenticeship(this LearnerSubmissionDto learnerData, long apprenticeshipId, PendingPayment pendingPayment)
+        {
+            // 1. For a given payment due date check whether due date falls in between 
+            // the start and end date of a price episode that contains a period with 
+            // a matching apprenticeship ID OR where there is no end date for the 
+            // price episode with a matching apprenticeship ID, the payment due date 
+            // is after the price episode start date
+            // 2. If a price episode meeting criteria in step 1 is found, set InLearning
+            // to True ELSE set InLearning to False
+
+            if (pendingPayment == null)
+            {
+                return false;
+            }
+
+            var matchedRecords =
+               from tr in learnerData.Training
+               where tr.Reference == "ZPROG001"
+               from pe in tr.PriceEpisodes
+               from p in pe.Periods
+               where p.ApprenticeshipId == apprenticeshipId
+               select new
+               {
+                   p.ApprenticeshipId,
+                   pe.StartDate,
+                   pe.EndDate,
+                   p.Period
+               };
+
+            bool isInLearning = false;
+            if (matchedRecords.Any())
+            {
+                foreach(var matchedRecord in matchedRecords)
+                {
+                    var endDate = matchedRecord.EndDate ?? pendingPayment.DueDate;
+                    if (pendingPayment.DueDate >= matchedRecord.StartDate &&
+                       pendingPayment.DueDate <= endDate)
+                    {
+                        isInLearning = true;
+                        break;
+                    }
+                }
+            }
+
+            return isInLearning;
         }
     }
 }

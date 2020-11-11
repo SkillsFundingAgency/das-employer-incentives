@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Linq;
@@ -11,17 +12,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
     {
         private readonly HttpClient _client;
         private readonly string _serviceVersion;
+        private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
 
         public LearnerService(
             HttpClient client,
-            string serviceVersion)
+            string serviceVersion,
+            IApprenticeshipIncentiveDomainRepository domainRepository)
         {
             _client = client;
             _serviceVersion = serviceVersion;
+            _domainRepository = domainRepository;
         }
 
         public async Task Refresh(Learner learner)
         {
+            var incentive = await _domainRepository.Find(learner.ApprenticeshipIncentiveId);
+            if(incentive == null)
+            {
+                throw new ArgumentException("Apprenticeship inventive does not exist for learner record");
+            }
+
             var response = await _client.GetAsync($"api/v{_serviceVersion}/{learner.Ukprn}/{learner.UniqueLearnerNumber}?");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -43,8 +53,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
             submissionData.SetStartDate(learnerSubmissionDto.LearningStartDateForAppenticeship(learner.ApprenticeshipId));
 
+            var firstPendingPayment = incentive.PendingPayments.Where(p => p.PaymentMadeDate == null).OrderBy(p => p.DueDate).FirstOrDefault();
+            submissionData.SetIsInLearning(learnerSubmissionDto.InLearningForAppenticeship(learner.ApprenticeshipId, firstPendingPayment));
+
             submissionData.SetRawJson(jsonString);
             learner.SetSubmissionData(submissionData);
-        }        
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService.
             await _sut.Refresh(learner);
 
             //Assert
-            _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"Start refresh of learner data from learner match service for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber}");
+            _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"Start refresh of learner data from learner match service : Learner data : ApprenticeshipIncentiveId {learner.ApprenticeshipIncentiveId} and ApprenticeshipId {learner.ApprenticeshipId} with Ukprn {learner.Ukprn} and UniqueLearnerNumber {learner.UniqueLearnerNumber}. Submission data not found.");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService.
             await _sut.Refresh(learner);
 
             //Assert
-            _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"Learner data refresh completed for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber} with result SubmissionFound : {learner.SubmissionFound}");
+            _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"End refresh of learner data from learner match service : Learner data : ApprenticeshipIncentiveId {learner.ApprenticeshipIncentiveId} and ApprenticeshipId {learner.ApprenticeshipId} with Ukprn {learner.Ukprn} and UniqueLearnerNumber {learner.UniqueLearnerNumber}. Submission data not found.");
         }
 
         [Test]
@@ -84,7 +84,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService.
             action.Invoke();
 
             //Assert
-            _mockLogger.VerifyLog(LogLevel.Error, Times.Once(), $"Error during learner data refresh for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber} with result SubmissionFound : {learner.SubmissionFound}", exception);
+            _mockLogger.VerifyLog(LogLevel.Error, Times.Once(),
+                $"Error refreshing learner data from learner match service : Learner data : ApprenticeshipIncentiveId {learner.ApprenticeshipIncentiveId} and ApprenticeshipId {learner.ApprenticeshipId} with Ukprn {learner.Ukprn} and UniqueLearnerNumber {learner.UniqueLearnerNumber}. Submission data not found.", exception);
         }
 
         [Test]

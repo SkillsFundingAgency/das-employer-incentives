@@ -4,5 +4,6 @@
     {
         public long ApprenticeshipId { get; set; }
         public bool IsPayable { get; set; }
+        public byte Period { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Threading.Tasks;
@@ -19,21 +20,45 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         }
 
         public async Task Refresh(Learner learner)
-        {
+        { 
+            var learnerLog = (learner is ILogWriter) ? (learner as ILogWriter).Log : new Log();
+
             try
             {
-                _logger.LogInformation($"Start refresh of learner data from learner match service for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber}");
+                if (learnerLog.OnProcessing == null)
+                {
+                    _logger.LogInformation($"Start refresh of learner data from learner match service for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId}");
+                }
+                else
+                {
+                    _logger.LogInformation($"Start refresh of learner data from learner match service : {learnerLog.OnProcessing.Invoke()}");
+                }
 
                 await _learnerService.Refresh(learner);
 
-                _logger.LogInformation($"Learner data refresh completed for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber} with result SubmissionFound : {learner.SubmissionFound}");
+                if (learnerLog.OnProcessed == null)
+                {
+                    _logger.LogInformation($"End refresh of learner data from learner match service for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId}");
+                }
+                else
+                {
+                    _logger.LogInformation($"End refresh of learner data from learner match service : {learnerLog.OnProcessed.Invoke()}");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error during learner data refresh for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId},  ApprenticeshipId : {learner.ApprenticeshipId}, Ukprn : {learner.Ukprn}, Url : {learner.UniqueLearnerNumber} with result SubmissionFound : {learner.SubmissionFound}");
+                if (learnerLog.OnError == null)
+                {
+                    _logger.LogInformation($"Error refreshing learner data from learner match service for ApprenticeshipIncentiveId : {learner.ApprenticeshipIncentiveId}");
+                }
+                else
+                {
+                    _logger.LogError(ex, $"Error refreshing learner data from learner match service : {learnerLog.OnError.Invoke()}");
+                }
 
                 throw;
             }
+
         }
     }
 }
