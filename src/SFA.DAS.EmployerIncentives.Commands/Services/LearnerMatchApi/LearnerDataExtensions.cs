@@ -1,11 +1,14 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 {
     public static class LearnerDataExtensions
     {
+        private static string PROGRAM_REFERENCE = "ZPROG001";
+
         public static DateTime? LearningStartDateForApprenticeship(this LearnerSubmissionDto learnerData, long apprenticeshipId)
         {
             // To determine which price episode to look at requires looking at the Payable Periods within a Price Episode, because Payable Periods are labelled with the Apprenticeship ID.
@@ -15,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
             var matchedRecords =
                 from tr in learnerData.Training
-                where tr.Reference == "ZPROG001"
+                where tr.Reference == PROGRAM_REFERENCE
                 from pe in tr.PriceEpisodes
                 from p in pe.Periods
                 where p.ApprenticeshipId == apprenticeshipId
@@ -34,7 +37,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return null;
         }
 
-
         public static LearningFoundStatus LearningFound(this LearnerSubmissionDto data, long apprenticeshipId)
         {
             if (data.Training == null || !data.Training.Any())
@@ -42,17 +44,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 return new LearningFoundStatus("No learning aims were found");
             }
 
-            if (data.Training.All(t => t.Reference != "ZPROG001"))
+            if (data.Training.All(t => t.Reference != PROGRAM_REFERENCE))
             {
                 return new LearningFoundStatus("Learning aims were found for the ULN, but none of them had a reference of ZPROG001");
             }
 
-            if (!data.Training.Any(t => t.Reference == "ZPROG001" && t.PriceEpisodes.Count > 0))
+            if (!data.Training.Any(t => t.Reference == PROGRAM_REFERENCE && t.PriceEpisodes.Count > 0))
             {
                 return new LearningFoundStatus("A ZPROG001 aim was found, but it had no price episodes");
             }
 
-            if (!AnyPriceEpisodePeriodsForApprenticeship(data, apprenticeshipId))
+            if (!data.PaymentsForApprenticeship(apprenticeshipId).Any())
             {
                 return new LearningFoundStatus("A ZPROG001 aim was found, with price episodes, but with no periods with the apprenticeship id that matches the commitment");
             }
@@ -60,12 +62,36 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return new LearningFoundStatus();
         }
 
-        private static bool AnyPriceEpisodePeriodsForApprenticeship(LearnerSubmissionDto data, long apprenticeshipId)
+        // *** Conditions for Provider DataLock ***
+        // 1. ZPROG001 reference
+        // 2. PriceEpisode.StartDate <= NexPayment.DueDate => PriceEpisode.EndDate
+        // 3. Period.Period == NexPayment.CollectionPeriod
+        // 4. Period.ApprenticeshipId == ApprenticeshipIncentive.ApprenticeshipId
+        // 5. Period.IsPayable == false
+        public static bool HasProviderDataLocks(this LearnerSubmissionDto data, Learner learner)
         {
-            return data.Training.Where(t => t.Reference == "ZPROG001")
+            if (learner.NextPendingPayment == null) return false;
+
+            return data
+                .PaymentsForApprenticeship(learner.ApprenticeshipId, learner.NextPendingPayment.DueDate)
+                .Any(p => p.Period == learner.NextPendingPayment.CollectionPeriod && !p.IsPayable);
+        }
+
+        private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)
+        {
+            return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
                 .SelectMany(t => t.PriceEpisodes)
                 .SelectMany(e => e.Periods)
-                .Any(p => p.ApprenticeshipId == apprenticeshipId);
+                .Where(p => p.ApprenticeshipId == apprenticeshipId);
+        }
+
+        private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId, DateTime paymentDueDate)
+        {
+            return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
+                .SelectMany(t => t.PriceEpisodes.Where(pe => pe.StartDate <= paymentDueDate
+                && (pe.EndDate >= paymentDueDate || pe.EndDate == null)))
+                .SelectMany(e => e.Periods)
+                .Where(p => p.ApprenticeshipId == apprenticeshipId);
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService
 {
-    //    Conditions for DataLock:
+    // *** Conditions for Provider DataLock ***
     // 1. ZPROG001 reference
     // 2. PriceEpisode.StartDate <= NexPayment.DueDate => PriceEpisode.EndDate
     // 3. Period.Period == NexPayment.CollectionPeriod
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService
         }
 
         [Test]
-        public async Task HasDataLock_is_true_when_learner_is_getting_paid_for_the_same_period_elsewhere()
+        public async Task HasDataLock_is_True_when_learner_data_contains_matching_price_episode_period_marked_as_not_payable()
         {
             //Arrange  
             var learnerSubmissionDto = _fixture
@@ -59,17 +59,43 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService
                     _fixture
                         .Build<TrainingDto>()
                         .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
-                            .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
-                            .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
-                            .With(pe => pe.Periods, new List<PeriodDto>(){
-                                                        _fixture.Build<PeriodDto>()
-                                                       .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
-                                                       .With(period => period.IsPayable, false)
-                                                       .With(period => period.Period, NextPendingPaymentCollectionPeriod)
-                                                       .Create()
-                                                    })
-                                                    .Create()
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>{
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                                .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                                .With(pe => pe.Periods, new List<PeriodDto>(){
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 1)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 2)
+                                        .Create(),
+                                }).Create(),
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                                .Without(pe => pe.EndDate)
+                                .With(pe => pe.Periods, new List<PeriodDto>(){
+
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, false) // matching period for given ApprenticeshipId has data-lock
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, true) // matching period for given ApprenticeshipId has data-lock
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod+1)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId + 1) // different learner
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod)
+                                        .Create(),
+                                }).Create(),
                             })
                         .Create(),
                     _fixture.Create<TrainingDto>()
@@ -86,7 +112,144 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService
         }
 
         [Test]
-        public async Task HasDataLock_is_false_when_learner_is_not_getting_paid_for_the_same_period_elsewhere()
+        public async Task HasDataLock_is_False_when_learner_data_contains_matching_price_episode_period_marked_as_payable()
+        {
+            //Arrange  
+            var learnerSubmissionDto = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>{
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                                .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                                .With(pe => pe.Periods, new List<PeriodDto>(){
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, false)
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod-2)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, false)
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod-1)
+                                        .Create(),
+                                }).Create(),
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                                .Without(pe => pe.EndDate)
+                                .With(pe => pe.Periods, new List<PeriodDto>(){
+
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, true) // matching period for given ApprenticeshipId is Payable
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                        .With(period => period.IsPayable, false)
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod+1)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId + 1)
+                                        .With(period => period.IsPayable, false)
+                                        .With(period => period.Period, NextPendingPaymentCollectionPeriod)
+                                        .Create(),
+                                }).Create(),
+                            })
+                        .Create(),
+                    _fixture.Create<TrainingDto>()
+                })
+                .Create();
+
+            _httpClient.SetUpGetAsAsync(learnerSubmissionDto, System.Net.HttpStatusCode.OK);
+
+            //Act
+            await _sut.Refresh(_learner);
+
+            //Assert
+            _learner.HasDataLock.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task HasDataLock_is_false_when_learner_data_contains_no_ZPROG001_training()
+        {
+            //Arrange  
+            var learnerSubmissionDto = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "NOT-ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                            .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                            .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                    .With(period => period.IsPayable, false)
+                                    .With(period => period.Period, NextPendingPaymentCollectionPeriod)
+                                    .Create()
+                            })
+                            .Create()
+                            })
+                        .Create(),
+                    _fixture.Create<TrainingDto>()
+                })
+                .Create();
+
+            _httpClient.SetUpGetAsAsync(learnerSubmissionDto, System.Net.HttpStatusCode.OK);
+
+            //Act
+            await _sut.Refresh(_learner);
+
+            //Assert
+            _learner.HasDataLock.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task HasDataLock_is_false_when_learner_data_contains_no_price_episodes_falling_within_the_next_pending_payment_due_date()
+        {
+            //Arrange  
+            var learnerSubmissionDto = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                            .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear-1}", new CultureInfo("en-GB")))
+                            .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear-1}", new CultureInfo("en-GB"))) // previous year's data
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
+                                    .With(period => period.IsPayable, false)
+                                    .With(period => period.Period, NextPendingPaymentCollectionPeriod)
+                                    .Create()
+                            })
+                            .Create()
+                        })
+                        .Create(),
+                    _fixture.Create<TrainingDto>()
+                })
+                .Create();
+
+            _httpClient.SetUpGetAsAsync(learnerSubmissionDto, System.Net.HttpStatusCode.OK);
+
+            //Act
+            await _sut.Refresh(_learner);
+
+            //Assert
+            _learner.HasDataLock.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task HasDataLock_is_false_when_learner_data_contains_no_price_episodes_with_matching_payment_period()
         {
             //Arrange  
             var learnerSubmissionDto = _fixture
@@ -98,16 +261,53 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerService
                         .With(p => p.Reference, "ZPROG001")
                         .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
                             .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
-                            .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                            .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB"))) // previous year's data
                             .With(pe => pe.Periods, new List<PeriodDto>(){
                                 _fixture.Build<PeriodDto>()
                                     .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId)
-                                    .With(period => period.IsPayable, true) // this breaks the data-lock condition !
+                                    .With(period => period.IsPayable, false)
+                                    .With(period => period.Period, NextPendingPaymentCollectionPeriod-1)
+                                    .Create()
+                            })
+                            .Create()
+                        })
+                        .Create(),
+                    _fixture.Create<TrainingDto>()
+                })
+                .Create();
+
+            _httpClient.SetUpGetAsAsync(learnerSubmissionDto, System.Net.HttpStatusCode.OK);
+
+            //Act
+            await _sut.Refresh(_learner);
+
+            //Assert
+            _learner.HasDataLock.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task HasDataLock_is_false_when_learner_data_contains_no_price_episodes_with_matching_payment_period_for_given_apprenticeship()
+        {
+            //Arrange  
+            var learnerSubmissionDto = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                            .With(pe => pe.StartDate, DateTime.Parse($"01/09/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB")))
+                            .With(pe => pe.EndDate, DateTime.Parse($"01/12/{NextPendingPaymentCollectionYear}", new CultureInfo("en-GB"))) // previous year's data
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _learner.ApprenticeshipId+1) // different apprenticeship
+                                    .With(period => period.IsPayable, false)
                                     .With(period => period.Period, NextPendingPaymentCollectionPeriod)
                                     .Create()
                             })
                             .Create()
-                            })
+                        })
                         .Create(),
                     _fixture.Create<TrainingDto>()
                 })
