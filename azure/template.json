@@ -632,10 +632,36 @@
                     }
                 }
             },
-
             "dependsOn": [
                 "payment-process-function-app-service-plan",
                 "payment-process-function-application-insights"
+            ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "payment-process-function-app-sb-role-assignment",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[reference('payment-process-function-app').outputs.managedServiceIdentityId.value]"
+                    },
+                    "assignmentType": {
+                        "value": "ServiceBusOwner"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "payment-process-function-app"
             ]
         }
     ],
