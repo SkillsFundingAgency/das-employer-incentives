@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         {
             Apprenticeships = new List<IncentiveApplicationApprenticeship>();
         }
-
+        [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid Id { get; set; }
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
@@ -22,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public DateTime? DateSubmitted { get; set; }
         public string SubmittedByEmail { get; set; }
         public string SubmittedByName { get; set; }
+        [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }
     }
 }

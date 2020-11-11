@@ -47,14 +47,11 @@ namespace SFA.DAS.EmployerIncentives.Data
                     legalEntity.HashedLegalEntityId = item.HashedLegalEntityId;
                 }
             }
-
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task Add(AccountModel account)
         {
             await _dbContext.AddRangeAsync(account.Map());
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<AccountModel> Find(long accountId)
@@ -63,15 +60,10 @@ namespace SFA.DAS.EmployerIncentives.Data
             return accounts?.MapSingle();
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLegalEntityId(long legalEntityId)
-        {
-            var accounts = await _dbContext.Accounts.Where(x => x.LegalEntityId == legalEntityId).ToListAsync();
-            return accounts?.Map();
-        }
-
         public async Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId)
         {
-            var accounts = await _dbContext.Accounts.Where(x => x.HashedLegalEntityId == hashedLegalEntityId).ToListAsync();
+            var accountIds = _dbContext.Accounts.Where(y => y.HashedLegalEntityId == hashedLegalEntityId).Select(z => z.Id).Distinct();
+            var accounts = await _dbContext.Accounts.Where(x => accountIds.Contains(x.Id)).ToListAsync();
             return accounts?.Map();
         }
     }

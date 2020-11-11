@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
@@ -16,6 +17,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<IncentiveApplication> Applications { get; set; }
         public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
+        public virtual DbSet<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }
+        public virtual DbSet<PendingPayment> PendingPayments { get; set; }
+        public virtual DbSet<CollectionPeriod> CollectionPeriods { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
             });
 
             modelBuilder.Entity<IncentiveApplicationApprenticeship>().Property(x => x.ApprenticeshipEmployerTypeOnApproval).HasConversion<int>();
+            modelBuilder.Entity<ApprenticeshipIncentive>().Property(x => x.EmployerType).HasConversion<int>();
 
             //modelBuilder.Entity<IncentiveApplication>(entity => entity.HasMany<IncentiveApplicationApprenticeship>());
 
