@@ -23,7 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
             var dacpacFileLocation =
                 Path.Combine(
-                    Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
+                    Directory.GetCurrentDirectory().Substring(0,
+                        Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
                     $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\{environment}\\SFA.DAS.EmployerIncentives.Database.dacpac");
 
             if (!File.Exists(dacpacFileLocation))
@@ -37,7 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         private void CreateTestDatabase()
         {
             DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
-            DatabaseInfo.SetConnectionString(@$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");
+            DatabaseInfo.SetConnectionString(
+                @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");
 
             Publish();
 
@@ -64,6 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                                 files.Add((string)reader["filename"]);
                             }
                         }
+
                         cmd.CommandText = $"ALTER DATABASE [{dbName}] SET OFFLINE";
                         cmd.ExecuteNonQuery();
                         cmd.CommandText = $"EXEC sp_detach_db '{dbName}', 'true';";
@@ -71,9 +74,13 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                         dbConn.Close();
                     }
                 }
+
                 files.ForEach(DeleteFile);
             }
-            catch { /*ignored*/ }
+            catch
+            {
+                /*ignored*/
+            }
         }
 
         private static void DeleteFile(string file)
@@ -82,7 +89,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             {
                 File.Delete(file);
             }
-            catch { /*ignored*/ }
+            catch
+            {
+                /*ignored*/
+            }
         }
 
         private void Publish()
@@ -121,6 +131,24 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             }
 
             _isDisposed = true;
+        }
+
+        public void ClearDown()
+        {
+            const string sql = @"EXEC sys.sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL';
+                        EXEC sys.sp_msforeachtable 'IF OBJECT_ID(''?'') NOT IN (
+                            ISNULL(OBJECT_ID(''[dbo].[__RefactorLog]''),0),
+                            ISNULL(OBJECT_ID(''[dbo].[CollectionCalendar]''),0)
+                        )
+                        SET QUOTED_IDENTIFIER ON; DELETE FROM ?'
+                        EXEC sys.sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL';
+                        ";
+
+            using var dbConn = new SqlConnection(DatabaseInfo.ConnectionString);
+            using var cmd = new SqlCommand(sql, dbConn);
+            dbConn.Open();
+            cmd.ExecuteNonQuery();
+            dbConn.Close();
         }
     }
 }

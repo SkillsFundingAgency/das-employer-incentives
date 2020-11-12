@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
 
         public LearnerMatchApi(TestContext context)
         {
-            _context = context;            
+            _context = context;
         }
 
         [BeforeScenario(Order = 5)]
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         [AfterScenario()]
         public void CleanUpLearnerMatchApi()
         {
-            _context.LearnerMatchApi.Dispose();
+            _context.LearnerMatchApi?.Dispose();
         }
     }
 }
