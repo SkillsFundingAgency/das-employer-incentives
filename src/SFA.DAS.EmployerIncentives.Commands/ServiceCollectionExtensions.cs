@@ -105,11 +105,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
         public static IServiceCollection AddCommandHandlerDecorators(this IServiceCollection serviceCollection)
         {
             serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithUnitOfWork<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithUnitOfWork<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+                
 
             serviceCollection
                 .AddSingleton(typeof(IValidator<CreateIncentiveCommand>), new NullValidator())
@@ -238,7 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceProvider;
         }
 
-        public static IServiceCollection AddEntityFrameworkForEmployerIncentives(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddEntityFrameworkForEmployerIncentives(this IServiceCollection services)
         {
             return services.AddScoped(p =>
             {

@@ -83,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddQueryServices();
             services.AddEventServices();
 
-            services.AddEntityFrameworkForEmployerIncentives(Configuration)
+            services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
 
