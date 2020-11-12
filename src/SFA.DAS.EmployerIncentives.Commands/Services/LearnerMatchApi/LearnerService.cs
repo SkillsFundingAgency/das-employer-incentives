@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
-using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -19,29 +18,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             _serviceVersion = serviceVersion;
         }
 
-        public async Task Refresh(Learner learner)
+        public async Task<LearnerSubmissionDto> Get(Learner learner)
         {
             var response = await _client.GetAsync($"api/v{_serviceVersion}/{learner.Ukprn}/{learner.UniqueLearnerNumber}?");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                learner.SetSubmissionData(null);
-
-                return;
+                return null;
             }
 
             response.EnsureSuccessStatusCode();
 
             var jsonString = await response.Content.ReadAsStringAsync();
-            var learnerSubmissionDto = JsonConvert.DeserializeObject<LearnerSubmissionDto>(jsonString);
+            var data = JsonConvert.DeserializeObject<LearnerSubmissionDto>(jsonString);
+            data.RawJson = jsonString;
 
-            var submissionData = new SubmissionData(
-                learnerSubmissionDto.IlrSubmissionDate,
-                learnerSubmissionDto.Training.Any(t => t.Reference == "ZPROG001")
-                );
-
-            submissionData.SetRawJson(jsonString);
-            learner.SetSubmissionData(submissionData);
+            return data;
         }
     }
 }

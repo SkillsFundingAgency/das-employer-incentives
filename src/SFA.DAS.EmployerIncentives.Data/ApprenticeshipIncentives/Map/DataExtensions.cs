@@ -174,30 +174,31 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             ).ToList();
         }
 
-        internal static Domain.ApprenticeshipIncentives.ValueTypes.Learner Map(this Learner model)
+        internal static LearnerModel Map(this Learner model)
         {
-            var learner = new Domain.ApprenticeshipIncentives.ValueTypes.Learner(
-                model.Id,
-                model.ApprenticeshipIncentiveId, 
-                model.ApprenticeshipId,  
-                model.Ukprn, 
-                model.ULN, 
-                model.CreatedDate
-                );
+            var learner = new LearnerModel
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                ApprenticeshipId = model.ApprenticeshipId,
+                Ukprn = model.Ukprn,
+                UniqueLearnerNumber = model.ULN,
+                CreatedDate = model.CreatedDate,
+              };
 
             if(model.SubmissionFound)
             {
-                learner.SetSubmissionData(
-                    new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
+                learner.SubmissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
                     model.SubmissionDate.Value,
-                    model.LearningFound.Value)
-                );
+                    model.LearningFound.Value);
+
+                learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
             return learner;
         }
 
-        internal static Learner Map(this Domain.ApprenticeshipIncentives.ValueTypes.Learner model)
+        internal static Learner Map(this LearnerModel model)
         {
             var learner = new Learner
             {
@@ -206,13 +207,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
                 ULN = model.UniqueLearnerNumber,
-                CreatedDate = model.CreatedDate,
-                SubmissionFound = model.SubmissionFound,
-                LearningFound = false
+                CreatedDate = model.CreatedDate
             };
 
-            if(learner.SubmissionFound)
+            if(model.SubmissionData != null)
             {
+                learner.SubmissionFound = true;
                 learner.LearningFound = model.SubmissionData.LearningFound;
                 learner.SubmissionDate = model.SubmissionData.SubmissionDate;
                 learner.RawJSON = model.SubmissionData.RawJson;
