@@ -20,22 +20,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("TestRunnerIsReady")]
-    public partial class TestRunnerIsReadyFeature
+    [NUnit.Framework.DescriptionAttribute("__TestRunnerIsReady__")]
+    public partial class @__TestRunnerIsReady__Feature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
         private string[] _featureTags = ((string[])(null));
         
-#line 1 "_TestRunnerIsReady.feature"
+#line 1 "TestRunnerIsReady.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "TestRunnerIsReady", "\tIn order to run acceptance tests\r\n\tAs a developer\r\n\tI want to ensure test runner" +
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "__TestRunnerIsReady__", "\tIn order to run acceptance tests\r\n\tAs a developer\r\n\tI want to ensure test runner" +
                     " is setup and ready", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }

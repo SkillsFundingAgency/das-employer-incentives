@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         [AfterTestRun()]
         public static void TearDownDatabase(TestContext context)
         {
-            context.SqlDatabase?.Dispose();
+            //   context.SqlDatabase?.Dispose();
         }
     }
 }

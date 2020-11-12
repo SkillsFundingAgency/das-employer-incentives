@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
 
     public static class FunctionsHostPerTestRunHook
     {
-        [BeforeScenario(Order = 10)]
+        [BeforeTestRun(Order = 10)]
         public static async Task InitialiseFunctions(TestContext context)
         {
             if (context.SqlDatabase?.DatabaseInfo != null == false)

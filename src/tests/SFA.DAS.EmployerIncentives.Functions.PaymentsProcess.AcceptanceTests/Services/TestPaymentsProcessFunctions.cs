@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _isDisposed = true;
         }
 
-        public async Task<AzureFunctionOrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodMonth)
+        public async Task<OrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodMonth)
         {
             var orchestrationLinks = await StartIncentivePaymentOrchestrator(collectionPeriodYear, collectionPeriodMonth);
             return await FunctionOrchestrationCompleted(orchestrationLinks);
@@ -59,13 +59,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await AllFunctionOrchestrationCompleted();
         }
 
-        private async Task<AzureFunctionOrchestrationLinks> StartIncentivePaymentOrchestrator(short collectionPeriodYear, byte collectionPeriod)
+        private async Task<OrchestrationLinks> StartIncentivePaymentOrchestrator(short collectionPeriodYear, byte collectionPeriod)
         {
             var url = $"api/orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriod}";
             var orchestrationResponse = await _client.GetAsync(url);
             orchestrationResponse.EnsureSuccessStatusCode();
             var json = await orchestrationResponse.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<AzureFunctionOrchestrationLinks>(json);
+            return JsonConvert.DeserializeObject<OrchestrationLinks>(json);
         }
 
         private async Task StartLearnerMatchingOrchestrator()
@@ -84,14 +84,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .WaitAndRetryAsync(Enumerable.Repeat(TimeSpan.FromSeconds(1), StartupTimeoutInSeconds));
 
             var url = $"http://localhost:{Port}/runtime/webhooks/durabletask/instances?&runtimeStatus=Running,Pending";
-            List<AzureFunctionOrchestrationStatus> status;
+            List<OrchestrationStatus> status;
 
             await policy.ExecuteAsync(async () =>
             {
                 var statusResponse = await _client.GetAsync(url);
                 statusResponse.EnsureSuccessStatusCode();
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();
-                status = JsonConvert.DeserializeObject<List<AzureFunctionOrchestrationStatus>>(statusJson);
+                status = JsonConvert.DeserializeObject<List<OrchestrationStatus>>(statusJson);
                 return status.Any();
             });
         }
@@ -119,23 +119,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
-        private async Task<AzureFunctionOrchestrationStatus> FunctionOrchestrationCompleted(AzureFunctionOrchestrationLinks azureFunctionOrchestrationLinks)
+        private async Task<OrchestrationStatus> FunctionOrchestrationCompleted(OrchestrationLinks orchestrationLinks)
         {
             var policy = Policy
                 .HandleResult(true)
                 .WaitAndRetryAsync(Enumerable.Repeat(TimeSpan.FromSeconds(1), OrchestratorRunTimeoutInSeconds));
 
-            AzureFunctionOrchestrationStatus azureFunctionOrchestrationStatus = null;
+            OrchestrationStatus orchestrationStatus = null;
             await policy.ExecuteAsync(async () =>
             {
-                var statusResponse = await _client.GetAsync(azureFunctionOrchestrationLinks.StatusQueryGetUri);
+                var statusResponse = await _client.GetAsync(orchestrationLinks.StatusQueryGetUri);
                 statusResponse.EnsureSuccessStatusCode();
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();
-                azureFunctionOrchestrationStatus = JsonConvert.DeserializeObject<AzureFunctionOrchestrationStatus>(statusJson);
+                orchestrationStatus = JsonConvert.DeserializeObject<OrchestrationStatus>(statusJson);
 
-                return azureFunctionOrchestrationStatus.RuntimeStatus == "Pending" || azureFunctionOrchestrationStatus.RuntimeStatus == "Running";
+                return orchestrationStatus.RuntimeStatus == "Pending" || orchestrationStatus.RuntimeStatus == "Running";
             });
-            return azureFunctionOrchestrationStatus;
+            return orchestrationStatus;
         }
 
     }

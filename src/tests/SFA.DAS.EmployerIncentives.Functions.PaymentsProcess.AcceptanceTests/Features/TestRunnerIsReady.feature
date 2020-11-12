@@ -1,4 +1,4 @@
-﻿Feature: TestRunnerIsReady
+﻿Feature: __TestRunnerIsReady__
 	In order to run acceptance tests
 	As a developer
 	I want to ensure test runner is setup and ready

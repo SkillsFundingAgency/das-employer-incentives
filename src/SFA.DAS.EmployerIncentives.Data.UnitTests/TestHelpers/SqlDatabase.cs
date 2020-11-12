@@ -133,16 +133,20 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             _isDisposed = true;
         }
 
+        /// <summary>
+        /// Database data clear-down script. Ensure tables containing reference data are excluded below.
+        /// </summary>
         public void ClearDown()
         {
-            const string sql = @"EXEC sys.sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL';
-                        EXEC sys.sp_msforeachtable 'IF OBJECT_ID(''?'') NOT IN (
-                            ISNULL(OBJECT_ID(''[dbo].[__RefactorLog]''),0),
-                            ISNULL(OBJECT_ID(''[dbo].[CollectionCalendar]''),0)
-                        )
-                        SET QUOTED_IDENTIFIER ON; DELETE FROM ?'
-                        EXEC sys.sp_MSForEachTable 'ALTER TABLE ? CHECK CONSTRAINT ALL';
-                        ";
+            const string sql = @"
+                EXEC sys.sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL';
+                EXEC sys.sp_msforeachtable 'IF OBJECT_ID(''?'') NOT IN (
+                     ISNULL(OBJECT_ID(''[dbo].[__RefactorLog]''),0)
+                    ,ISNULL(OBJECT_ID(''[incentives].[CollectionCalendar]''),0)
+                )
+                BEGIN SET QUOTED_IDENTIFIER ON; DELETE FROM ?; END'
+                EXEC sys.sp_msforeachtable 'ALTER TABLE ? CHECK CONSTRAINT ALL'
+                ";
 
             using var dbConn = new SqlConnection(DatabaseInfo.ConnectionString);
             using var cmd = new SqlCommand(sql, dbConn);

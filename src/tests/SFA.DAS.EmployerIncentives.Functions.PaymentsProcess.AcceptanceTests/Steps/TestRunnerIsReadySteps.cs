@@ -4,12 +4,12 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "TestRunnerIsReady")]
-    public class _TestRunnerIsReadySteps
+    [Scope(Feature = "__TestRunnerIsReady__")]
+    public class TestRunnerIsReadySteps
     {
         private readonly TestContext _testContext;
 
-        public _TestRunnerIsReadySteps(TestContext testContext)
+        public TestRunnerIsReadySteps(TestContext testContext)
         {
             _testContext = testContext;
         }
