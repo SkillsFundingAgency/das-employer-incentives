@@ -19,5 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             _context.SqlDatabase = new SqlDatabase();
         }
+
     }
 }
