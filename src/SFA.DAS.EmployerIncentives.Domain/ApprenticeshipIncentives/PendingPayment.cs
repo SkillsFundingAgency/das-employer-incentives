@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
@@ -13,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public decimal Amount => Model.Amount;
         public byte? PeriodNumber => Model.PeriodNumber;
         public short? PaymentYear => Model.PaymentYear;
-        public short? EarningType => Model.EarningType;
+        public EarningType EarningType => Model.EarningType;
 
         internal static PendingPayment New(
             Guid id, 
@@ -22,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             decimal amount,
             DateTime dueDate,
             DateTime calculatedDate,
-            short earningType)
+            EarningType earningType)
         {            
             return new PendingPayment(new PendingPaymentModel { 
                 Id = id,

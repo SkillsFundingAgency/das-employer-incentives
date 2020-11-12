@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,8 +113,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             secondPayment.Account.Id.Should().Be(_sutModel.Account.Id);
             secondPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
 
-            firstPayment.EarningType.Should().Be(1);
-            secondPayment.EarningType.Should().Be(2);
+            firstPayment.EarningType.Should().Be(EarningType.FirstPayment);
+            secondPayment.EarningType.Should().Be(EarningType.SecondPayment);
         }
 
         [Test]

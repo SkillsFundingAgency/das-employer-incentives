@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                                payment.Amount,
                                payment.PaymentDate,
                                DateTime.Now,
-                               payment.PaymentNumber);
+                               payment.EarningType);
 
                 pendingPayment.SetPaymentPeriod(collectionCalendar);
                 

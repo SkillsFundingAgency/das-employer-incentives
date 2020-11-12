@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Enums;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
@@ -18,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public short? PeriodNumber { get; set; }
         public short? PaymentYear { get; set; }
         public long AccountLegalEntityId { get; set; }
-        public short? EarningType { get; set; }
+        [Column(TypeName = "nvarchar(20)")]
+        public EarningType EarningType { get; set; }
     }
 }
