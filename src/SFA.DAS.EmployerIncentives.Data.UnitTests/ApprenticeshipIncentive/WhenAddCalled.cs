@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContext);
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 
         [TearDown]
@@ -48,6 +48,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Act
             await _sut.Add(testIncentive);
+
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.ApprenticeshipIncentives.Count().Should().Be(1);
@@ -79,6 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Act
             await _sut.Add(testApprenticeshipIncentive);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();
@@ -109,6 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Act
             await _sut.Add(testApprenticeshipIncentive);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();

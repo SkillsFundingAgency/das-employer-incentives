@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
@@ -10,11 +11,12 @@ namespace SFA.DAS.EmployerIncentives.Data
 {
     public class AccountDataRepository : IAccountDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public AccountDataRepository(EmployerIncentivesDbContext dbContext)
+        public AccountDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task Update(AccountModel account)

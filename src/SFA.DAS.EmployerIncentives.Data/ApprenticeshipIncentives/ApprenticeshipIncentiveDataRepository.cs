@@ -6,22 +6,23 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using StructureMap.Pipeline.Lazy;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class ApprenticeshipIncentiveDataRepository : IApprenticeshipIncentiveDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public ApprenticeshipIncentiveDataRepository(EmployerIncentivesDbContext dbContext)
+        public ApprenticeshipIncentiveDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task Add(ApprenticeshipIncentiveModel apprenticeshipIncentive)
         {
             await _dbContext.AddAsync(apprenticeshipIncentive.Map());
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
@@ -43,9 +44,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             if (existingIncentive != null)
             {
                 UpdateApprenticeshipIncentive(updatedIncentive, existingIncentive);
-
-
-                await _dbContext.SaveChangesAsync();
             }
         }
 
