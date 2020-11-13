@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"a client requests the apprenticeships for the account")]
         public async Task WhenAClientRequestsTheApprenticeshipApplicationsForTheAccount()
         {
-            var url = $"/accounts/{_account.Id}/applications";
+            var url = $"/accounts/{_account.Id}/legalentity/{_account.AccountLegalEntityId}/applications";
             var (status, data) =
                 await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<ApprenticeApplicationDto>>(url);
 

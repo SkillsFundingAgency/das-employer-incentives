@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
                 ApprenticeApplications = applicationsList
             };
 
-            _repository.Setup(x => x.GetList(query.AccountId)).ReturnsAsync(applicationsList);
+            _repository.Setup(x => x.GetList(query.AccountId, query.AccountLegalEntityId)).ReturnsAsync(applicationsList);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
