@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplicati
             {
                 _mockDomainFactory.Setup(x => x.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
-                    apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
+                    apprenticeship.DateOfBirth, apprenticeship.ULN, apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval, apprenticeship.UKPRN.Value)).Returns(_fixture.Create<Apprenticeship>());
             }
             

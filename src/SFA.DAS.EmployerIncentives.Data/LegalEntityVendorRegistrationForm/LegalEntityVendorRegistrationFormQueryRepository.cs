@@ -11,11 +11,12 @@ namespace SFA.DAS.EmployerIncentives.Data.LegalEntityVendorRegistrationForm
 {
     public class LegalEntityVendorRegistrationFormQueryRepository : IQueryRepository<LegalEntityVendorRegistrationFormDto>
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public LegalEntityVendorRegistrationFormQueryRepository(EmployerIncentivesDbContext context)
+        public LegalEntityVendorRegistrationFormQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
-            _context = context;
+            _lazyContext = context;
         }
 
         public Task<LegalEntityVendorRegistrationFormDto> Get(Expression<Func<LegalEntityVendorRegistrationFormDto, bool>> predicate)

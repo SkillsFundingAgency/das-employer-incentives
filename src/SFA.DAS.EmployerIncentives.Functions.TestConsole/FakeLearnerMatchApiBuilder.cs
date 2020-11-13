@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
             _learnerMatchApiData = _fixture.Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-                .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.Uln).Create())
+                .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.ULN).Create())
                 .Create();
 
             _server

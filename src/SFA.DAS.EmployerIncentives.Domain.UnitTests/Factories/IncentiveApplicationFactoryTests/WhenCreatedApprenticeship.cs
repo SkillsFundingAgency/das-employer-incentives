@@ -97,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
                 _fixture.Create<DateTime>(), uln, _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
 
             // Assert
-            apprenticeship.Uln.Should().Be(uln);
+            apprenticeship.ULN.Should().Be(uln);
         }
 
         [Test]

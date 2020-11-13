@@ -42,10 +42,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
 
             _learnerMatchApiData = _fixture
-               .Build<LearnerSubmissionDto>()
-               .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-               .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.Uln).Create())
-               .With(l => l.Training, new List<TrainingDto> {
+              .Build<LearnerSubmissionDto>()
+              .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+              .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.ULN).Create())
+              .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
                         .Build<TrainingDto>()
@@ -62,9 +62,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         )
                         .Create(),
                     _fixture.Create<TrainingDto>() }
-                   )
-               .Create();
-
+                  )
+              .Create();
         }
 
         public async Task GivenAnApprenticeshipIncentiveExists()
@@ -85,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             .Given(
                     Request
                     .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.Uln}")
+                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
                     .UsingGet()
                     )
                 .RespondWith(Response.Create()
@@ -102,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             .Given(
                     Request
                     .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.Uln}")
+                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
                     .UsingGet()
                     )
                 .RespondWith(Response.Create()
@@ -122,7 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(s => s.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-                .With(s => s.ULN, _apprenticeshipIncentive.Uln)
+                .With(s => s.ULN, _apprenticeshipIncentive.ULN)
                 .With(s => s.SubmissionFound, false)
                 .Create();
             });
@@ -136,7 +135,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             .Given(
                     Request
                     .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.Uln}")
+                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
                     .UsingGet()
                     )
                 .RespondWith(Response.Create()
@@ -162,15 +161,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.SubmissionFound.Should().Be(false);
             createdLearner.Id.Should().NotBeEmpty();
             createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
-            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.Uln);
+            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
 
-            createdLearner.StartDate.Should().BeNull();
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
             createdLearner.SubmissionDate.Should().BeNull();
+            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.RawJSON.Should().BeNull();
+            createdLearner.StartDate.Should().BeNull();
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
@@ -180,11 +180,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var createdLearners = dbConnection.GetAll<Learner>();
 
             var createdLearner = createdLearners.Single();
-            
+
             createdLearner.SubmissionFound.Should().Be(true);
             createdLearner.Id.Should().NotBeEmpty();
             createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
-            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.Uln);
+            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(_learnerMatchApiData.IlrSubmissionDate);
@@ -193,6 +193,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.DaysInLearning.Should().BeNull();            
         }
 
         [Then(@"the apprenticeship incentive learner data is updated for the application with submission data")]
@@ -209,7 +210,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.SubmissionFound.Should().Be(true);
             createdLearner.Id.Should().NotBeEmpty();
             createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
-            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.Uln);
+            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             createdLearner.SubmissionDate.Should().Be(_learnerMatchApiData.IlrSubmissionDate);
@@ -218,6 +219,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.DaysInLearning.Should().BeNull();
         }
     }
 }

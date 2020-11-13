@@ -12,8 +12,6 @@ using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Events;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.EmployerIncentives.Infrastructure.Extensions;
-using SFA.DAS.EmployerIncentives.Infrastructure.UnitOfWork;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
@@ -89,8 +87,6 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
 
-            services.AddTransient<UnitOfWorkManagerMiddleware>();
-
             services
                 .AddMvc(o =>
                 {
@@ -118,8 +114,6 @@ namespace SFA.DAS.EmployerIncentives.Api
             }
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
-
-            app.UseUnitOfWork();
 
             app.UseRouting();            
 

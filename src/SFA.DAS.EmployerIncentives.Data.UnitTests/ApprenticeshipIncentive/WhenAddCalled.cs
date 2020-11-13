@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContext);
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 
         [TearDown]
@@ -49,6 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             // Act
             await _sut.Add(testIncentive);
 
+            await _dbContext.SaveChangesAsync();
+
             // Assert
             _dbContext.ApprenticeshipIncentives.Count().Should().Be(1);
 
@@ -58,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedApprenticeshipIncentive.ApprenticeshipId.Should().Be(testIncentive.Apprenticeship.Id);
             storedApprenticeshipIncentive.FirstName.Should().Be(testIncentive.Apprenticeship.FirstName);
             storedApprenticeshipIncentive.LastName.Should().Be(testIncentive.Apprenticeship.LastName);
-            storedApprenticeshipIncentive.Uln.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
+            storedApprenticeshipIncentive.ULN.Should().Be(testIncentive.Apprenticeship.UniqueLearnerNumber);
             storedApprenticeshipIncentive.DateOfBirth.Should().Be(testIncentive.Apprenticeship.DateOfBirth);
             storedApprenticeshipIncentive.EmployerType.Should().Be(testIncentive.Apprenticeship.EmployerType);
             storedApprenticeshipIncentive.UKPRN.Should().Be(testIncentive.Apprenticeship.Provider.Ukprn);
@@ -79,6 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Act
             await _sut.Add(testApprenticeshipIncentive);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();
@@ -109,6 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Act
             await _sut.Add(testApprenticeshipIncentive);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();

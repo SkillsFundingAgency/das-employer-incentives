@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PendingPaymentQueryRepositor
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.PendingPaymentQueryRepository(_context);
+            _sut = new ApprenticeshipIncentives.PendingPaymentQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
         [TearDown]
