@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -22,10 +23,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
                 throw new Exception("This hook requires a Learner Match Api");
             }
 
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             context.PaymentsProcessFunctions = new TestPaymentsProcessFunctions(context.SqlDatabase.DatabaseInfo.ConnectionString,
                 context.LearnerMatchApi.BaseAddress);
 
             await context.PaymentsProcessFunctions.Start();
+
+            stopwatch.Stop();
+            Console.WriteLine($"[{nameof(FunctionsHostPerTestRunHook)}] time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Seconds} seconds");
         }
 
         [AfterTestRun()]

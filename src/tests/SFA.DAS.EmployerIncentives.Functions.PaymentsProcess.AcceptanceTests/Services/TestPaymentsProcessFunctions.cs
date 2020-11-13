@@ -55,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartLearnerMatching()
         {
+            await AllFunctionOrchestrationCompleted();
             await StartLearnerMatchingOrchestrator();
             await AllFunctionOrchestrationCompleted();
         }
@@ -77,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await response.Content.ReadAsStringAsync();
         }
 
-        private async Task AllFunctionOrchestrationCompleted()
+        public async Task AllFunctionOrchestrationCompleted()
         {
             var policy = Policy
                 .HandleResult(true)
@@ -88,6 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             await policy.ExecuteAsync(async () =>
             {
+                Console.WriteLine("[TestPaymentsProcessFunctions] AllFunctionOrchestrationCompleted");
                 var statusResponse = await _client.GetAsync(url);
                 statusResponse.EnsureSuccessStatusCode();
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();
@@ -108,6 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                 await policy.ExecuteAsync(async () =>
                 {
+                    Console.WriteLine("[TestPaymentsProcessFunctions] FunctionsOrchestratorIsReady");
                     var statusResponse = await _client.GetAsync(url);
                     statusResponse.EnsureSuccessStatusCode();
                 });
@@ -128,6 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             OrchestrationStatus orchestrationStatus = null;
             await policy.ExecuteAsync(async () =>
             {
+                Console.WriteLine("[TestPaymentsProcessFunctions] FunctionOrchestrationCompleted");
                 var statusResponse = await _client.GetAsync(orchestrationLinks.StatusQueryGetUri);
                 statusResponse.EnsureSuccessStatusCode();
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();

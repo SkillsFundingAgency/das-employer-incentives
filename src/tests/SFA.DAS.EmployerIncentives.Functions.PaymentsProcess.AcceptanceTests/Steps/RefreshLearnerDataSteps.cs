@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
+//[assembly: Parallelizable(ParallelScope.Self)]
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -201,7 +202,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var createdLearners = dbConnection.GetAll<Learner>();
 
-            var createdLearner = createdLearners.Single();
+            var createdLearner = createdLearners.Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
             var testLearner = _testContext.TestData.Get<Learner>("ExistingLearner");
 
