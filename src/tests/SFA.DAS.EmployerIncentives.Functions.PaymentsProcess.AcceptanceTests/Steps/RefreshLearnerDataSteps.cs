@@ -19,7 +19,9 @@ using WireMock.ResponseBuilders;
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "RefreshLearnerData")]
+    [Scope(Feature = "RefreshLearnerData1")]
+    [Scope(Feature = "RefreshLearnerData2")]
+    [Scope(Feature = "RefreshLearnerData3")]
     public class RefreshLearnerDataSteps
     {
         private readonly TestContext _testContext;

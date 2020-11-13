@@ -1,23 +1,29 @@
-﻿using System.Threading.Tasks;
-using TechTalk.SpecFlow;
+﻿using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Bindings
 {
     [Binding]
     public class TestCleanUp
     {
-        [BeforeScenario]
-        public async Task CheckFunctionsArentRunning(TestContext context)
-        {
-            // await context.PaymentsProcessFunctions.AllFunctionOrchestrationCompleted();
-        }
+        //[BeforeScenario]
+        //public async Task CheckFunctionsArentRunning(TestContext context)
+        //{
+        //    // await context.PaymentsProcessFunctions.AllFunctionOrchestrationCompleted();
+        //}
 
-        [AfterScenario()]
-        public async Task CleanUp(TestContext context)
-        {
-            // await context.PaymentsProcessFunctions.AllFunctionOrchestrationCompleted();
-            context.SqlDatabase.ClearDown();
-        }
+        //[AfterFeature()]
+        //public static void CleanUp(TestContext context)
+        //{
+        //    // await context.PaymentsProcessFunctions.AllFunctionOrchestrationCompleted();
+        //    context.SqlDatabase.ClearDown();
+        //}
+
+        //[AfterScenario()]
+        //public void CleanUp(TestContext context)
+        //{
+        //    // await context.PaymentsProcessFunctions.AllFunctionOrchestrationCompleted();
+        //    context.SqlDatabase.ClearDown();
+        //}
 
     }
 }

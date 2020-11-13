@@ -21,11 +21,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly FunctionsController _functionsController;
         private readonly TestPaymentsProcessFunctionsConfigurator _configurator;
 
-        public TestPaymentsProcessFunctions(string databaseConnectionString, string learnerMatchApiBaseUrl)
+        public TestPaymentsProcessFunctions(TestContext context)
         {
             _client = new HttpClient { BaseAddress = new Uri($"http://localhost:{Port}") };
             _functionsController = new FunctionsController();
-            _configurator = new TestPaymentsProcessFunctionsConfigurator(databaseConnectionString, learnerMatchApiBaseUrl);
+            _configurator = new TestPaymentsProcessFunctionsConfigurator(context.SqlDatabase.DatabaseInfo.ConnectionString,
+                context.LearnerMatchApi.BaseAddress);
         }
 
         public async Task Start()
