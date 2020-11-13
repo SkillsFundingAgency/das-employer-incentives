@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private List<PendingPaymentActivityDto> _pendingPayments;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             // Arrange 
             _fixture = new Fixture();

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.Events;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
@@ -8,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 {
-    
-
     public class LearnerDomainRepository : ILearnerDomainRepository
     {
         private readonly ILearnerDataRepository _learnerDataRepository;

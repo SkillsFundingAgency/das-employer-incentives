@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.LearnerDataRepository(_dbContext);
+            _sut = new ApprenticeshipIncentives.LearnerDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 
         [TearDown]
@@ -56,7 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .Create();
 
             // Act
-            await _sut.Update(testLearner);            
+            await _sut.Update(testLearner);
+            await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.Learners.Count().Should().Be(1);

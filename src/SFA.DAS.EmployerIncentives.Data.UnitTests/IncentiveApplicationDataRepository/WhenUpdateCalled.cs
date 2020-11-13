@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
                 .Build<IncentiveApplicationModel>()
                 .Create();
 
-            _sut = new IncentiveApplication.IncentiveApplicationDataRepository(_dbContext);
+            _sut = new IncentiveApplication.IncentiveApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
             await _sut.Add(_testApplication);
             await _dbContext.SaveChangesAsync();
         }

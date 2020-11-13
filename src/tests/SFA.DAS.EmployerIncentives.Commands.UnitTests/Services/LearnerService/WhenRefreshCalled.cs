@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public async Task Then_the_learner_submission_date_is_null_when_the_learner_data_does_not_exist()
+        public async Task Then_the_learner_submission_data_is_null_when_the_learner_data_does_not_exist()
         {
             //Arrange
             _httpClient.SetUpGetAsAsync(System.Net.HttpStatusCode.NotFound);
@@ -49,10 +49,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public async Task Then_the_learner_submission_date_is_valid_when_the_learner_data_exists()
+        public async Task Then_the_learner_submission_data_is_valid_when_the_learner_data_exists()
         {
             //Arrange
-            var learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
+            var learnerSubmissionDto = _fixture.Build<LearnerSubmissionDto>().With(l => l.Ukprn, _learner.Ukprn).Create();
 
             _httpClient.SetUpGetAsAsync(learnerSubmissionDto, System.Net.HttpStatusCode.OK);
 

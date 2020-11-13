@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;

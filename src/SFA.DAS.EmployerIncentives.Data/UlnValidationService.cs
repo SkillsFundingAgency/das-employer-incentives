@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -8,11 +9,12 @@ namespace SFA.DAS.EmployerIncentives.Data
 {
     public class UlnValidationService : IUlnValidationService
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public UlnValidationService(EmployerIncentivesDbContext context)
+        public UlnValidationService(Lazy<EmployerIncentivesDbContext> context)
         {
-            _context = context;
+            _lazyContext = context;
         }
 
         public Task<bool> UlnAlreadyOnSubmittedIncentiveApplication(long uln)
