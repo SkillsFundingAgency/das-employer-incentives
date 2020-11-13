@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class ApprenticeshipIncentiveQueryRepository : IApprenticeshipIncentiveQueryRepository
     {
-        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private readonly Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
         public ApprenticeshipIncentiveQueryRepository(Lazy<EmployerIncentivesDbContext> context)
