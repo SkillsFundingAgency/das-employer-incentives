@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _learnerMatchApiData = _fixture
               .Build<LearnerSubmissionDto>()
               .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-              .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.Uln, _apprenticeshipIncentive.ULN).Create())
+              .With(s => s.Uln, _apprenticeshipIncentive.ULN)
               .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
