@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.ValidatePendingPayment.Handlers
 {
@@ -25,10 +26,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private ValidatePendingPaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
-                private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Mock<ILearnerDataRepository> _mockLearnerDataRepository;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private List<CollectionPeriod> _collectionPeriods;
         private string _vrfVendorId;
         private Account _account;
+        private Learner _learner;
 
         private Fixture _fixture;
 
@@ -40,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
+            _mockLearnerDataRepository = new Mock<ILearnerDataRepository>();
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
@@ -89,10 +93,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(m => m.Find(incentive.Account.Id))
                 .ReturnsAsync(domainAccount);
 
+            _learner = new Learner(Guid.NewGuid(), incentive.Id, incentive.Apprenticeship.Id, _fixture.Create<long>(), incentive.Apprenticeship.UniqueLearnerNumber, DateTime.UtcNow);
+            var submissionData = new SubmissionData(DateTime.UtcNow, true);
+            submissionData.SetIsInLearning(true);
+            _learner.SetSubmissionData(submissionData);
+
+            _mockLearnerDataRepository
+                .Setup(m => m.GetByApprenticeshipIncentiveId(incentive.Id))
+                .ReturnsAsync(_learner);
+
+
             _sut = new ValidatePendingPaymentCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
-                _mockCollectionCalendarService.Object);
+                _mockCollectionCalendarService.Object,
+                _mockLearnerDataRepository.Object);
         }
 
         [Test]

@@ -129,18 +129,37 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided Account record does not match the one against the incentive.");
             }
 
-            var pendingPayment = PendingPayments.SingleOrDefault(p => p.Id == pendingPaymentId);
-
-            if (pendingPayment == null)
-            {
-                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the pending payment record does not exist.");
-            }
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
             var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
 
             var isValid = !string.IsNullOrEmpty(legalEntity.VrfVendorId);
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, "HasBankDetails", isValid));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasBankDetails, isValid));
+        }
+
+        public void ValidateApprenticeshipIsInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
+        {
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            var isInLearning = false;
+            if (matchedLearner != null)
+            {
+                isInLearning = matchedLearner.SubmissionFound && matchedLearner.SubmissionData.IsInlearning == true;
+            }
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.IsInLearning, isInLearning));
+        }
+
+        private PendingPayment GetPendingPaymentForValidationCheck(Guid pendingPaymentId)
+        {
+            var pendingPayment = PendingPayments.SingleOrDefault(x => x.Id == pendingPaymentId);
+            if (pendingPayment == null)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the pending payment record does not exist.");
+            }
+
+            return pendingPayment;
         }
 
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)
