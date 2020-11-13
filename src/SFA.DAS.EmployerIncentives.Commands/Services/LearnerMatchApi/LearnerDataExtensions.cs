@@ -6,7 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 {
     public static class LearnerDataExtensions
     {
-        public static DateTime? LearningStartDateForAppenticeship(this LearnerSubmissionDto learnerData, long apprenticeshipId)
+        public static DateTime? LearningStartDateForApprenticeship(this LearnerSubmissionDto learnerData, long apprenticeshipId)
         {
             // To determine which price episode to look at requires looking at the Payable Periods within a Price Episode, because Payable Periods are labelled with the Apprenticeship ID.
             // searching for the earliest period with an apprenticeship Id that matches the commitment
@@ -28,13 +28,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
             if (matchedRecords.Any())
             {
-                return matchedRecords.OrderBy(m => m.StartDate).FirstOrDefault().StartDate;
+                return matchedRecords.OrderBy(m => m.StartDate).First().StartDate;
             }
 
             return null;
         }
 
-        public static bool InLearningForAppenticeship(this LearnerSubmissionDto learnerData, long apprenticeshipId, PendingPayment pendingPayment)
+        public static bool InLearningForApprenticeship(this LearnerSubmissionDto learnerData, long apprenticeshipId, PendingPayment pendingPayment)
         {
             // 1. For a given payment due date check whether due date falls in between 
             // the start and end date of a price episode that contains a period with 

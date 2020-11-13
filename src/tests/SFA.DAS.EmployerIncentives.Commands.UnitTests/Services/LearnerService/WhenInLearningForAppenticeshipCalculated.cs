@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Arrange    
 
             //Act
-            var isInLearning = _sut.InLearningForAppenticeship(_apprenticeshipId, _pendingPayment);
+            var isInLearning = _sut.InLearningForApprenticeship(_apprenticeshipId, _pendingPayment);
 
             //Assert
             isInLearning.Should().BeTrue();
@@ -89,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.EndDate = null;
 
             //Act
-            var isInLearning = _sut.InLearningForAppenticeship(_apprenticeshipId, _pendingPayment);
+            var isInLearning = _sut.InLearningForApprenticeship(_apprenticeshipId, _pendingPayment);
 
             //Assert
             isInLearning.Should().BeTrue();
@@ -102,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.Reference = _fixture.Create<string>();
 
             //Act
-            var isInLearning = _sut.InLearningForAppenticeship(_apprenticeshipId, _pendingPayment);
+            var isInLearning = _sut.InLearningForApprenticeship(_apprenticeshipId, _pendingPayment);
 
             //Assert
             isInLearning.Should().BeFalse();
@@ -115,7 +114,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.StartDate = _pendingPayment.DueDate.AddSeconds(1);
 
             //Act
-            var isInLearning = _sut.InLearningForAppenticeship(_apprenticeshipId, _pendingPayment);
+            var isInLearning = _sut.InLearningForApprenticeship(_apprenticeshipId, _pendingPayment);
 
             //Assert
             isInLearning.Should().BeFalse();
@@ -128,7 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.ApprenticeshipId = _fixture.Create<long>();
 
             //Act
-            var isInLearning = _sut.InLearningForAppenticeship(_apprenticeshipId, _pendingPayment);
+            var isInLearning = _sut.InLearningForApprenticeship(_apprenticeshipId, _pendingPayment);
 
             //Assert
             isInLearning.Should().BeFalse();
@@ -141,7 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.EndDate = _pendingPayment.DueDate.AddSeconds(-1);
 
             //Act
-            var isInLearning = _sut.InLearningForAppenticeship(_apprenticeshipId, _pendingPayment);
+            var isInLearning = _sut.InLearningForApprenticeship(_apprenticeshipId, _pendingPayment);
 
             //Assert
             isInLearning.Should().BeFalse();
@@ -154,7 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Arrange    
 
             //Act
-            var isInLearning = _sut.InLearningForAppenticeship(_apprenticeshipId, null);
+            var isInLearning = _sut.InLearningForApprenticeship(_apprenticeshipId, null);
 
             //Assert
             isInLearning.Should().BeFalse();

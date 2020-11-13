@@ -33,8 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _testContext = testContext;
             _fixture = new Fixture();
-            _startDate = _fixture.Create<DateTime>();
 
+            _startDate = _fixture.Create<DateTime>();
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -47,13 +47,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.DueDate, _startDate.AddMonths(1))
                 .Create();
+
             _pendingPayment.PaymentMadeDate = null;
 
             _learnerMatchApiData = _fixture
-               .Build<LearnerSubmissionDto>()
-               .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-               .With(s => s.Learner, _fixture.Build<LearnerDto>().With(l => l.ULN, _apprenticeshipIncentive.ULN).Create())
-               .With(l => l.Training, new List<TrainingDto> {
+             .Build<LearnerSubmissionDto>()
+             .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+             .With(s => s.Uln, _apprenticeshipIncentive.ULN)
+             .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
                         .Build<TrainingDto>()
@@ -72,9 +73,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         )
                         .Create(),
                     _fixture.Create<TrainingDto>() }
-                   )
-               .Create();
-
+                 )
+             .Create();
         }
 
         public async Task GivenAnApprenticeshipIncentiveExists()
@@ -176,13 +176,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
-            
+
             createdLearner.StartDate.Should().BeNull();
             createdLearner.InLearning.Should().BeNull();
-            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
             createdLearner.SubmissionDate.Should().BeNull();
-            createdLearner.RawJSON.Should().BeNull();
+            createdLearner.DaysInLearning.Should().BeNull();
+            createdLearner.RawJSON.Should().BeNull();            
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
@@ -192,7 +192,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var createdLearners = dbConnection.GetAll<Learner>();
 
             var createdLearner = createdLearners.Single();
-            
+
             createdLearner.SubmissionFound.Should().Be(true);
             createdLearner.Id.Should().NotBeEmpty();
             createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
@@ -204,8 +204,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.StartDate.Should().Be(_startDate);
             createdLearner.InLearning.Should().BeTrue();
 
-            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.DaysInLearning.Should().BeNull();            
         }
 
         [Then(@"the apprenticeship incentive learner data is updated for the application with submission data")]
@@ -230,8 +230,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.StartDate.Should().Be(_startDate);
             createdLearner.InLearning.Should().BeTrue();
 
-            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.DaysInLearning.Should().BeNull();            
         }
     }
 }

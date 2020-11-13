@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -6,7 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public interface ILearnerDataRepository
     {
-        Task<Learner> GetByApprenticeshipIncentiveId(Guid apprenticeshipIncentiveId);
-        Task Save(Learner learner);
+        Task<LearnerModel> GetByApprenticeshipIncentiveId(Guid incentiveId);
+        Task<LearnerModel> Get(Guid id);
+        Task Add(LearnerModel learnerModel);
+        Task Update(LearnerModel learnerModel);
     }
 }

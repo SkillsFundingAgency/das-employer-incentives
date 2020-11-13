@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             
 
             //Act
-            var startDate = _sut.LearningStartDateForAppenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
 
             //Assert
             startDate.Should().Be(_startTime);
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.Periods.ToList().ForEach(p => p.IsPayable = false);
 
             //Act
-            var startDate = _sut.LearningStartDateForAppenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
 
             //Assert
             startDate.Should().BeNull();
@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.Reference = _fixture.Create<string>();
 
             //Act
-            var startDate = _sut.LearningStartDateForAppenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
 
             //Assert
             startDate.Should().BeNull();
@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.ApprenticeshipId = _fixture.Create<long>();
 
             //Act
-            var startDate = _sut.LearningStartDateForAppenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
 
             //Assert
             startDate.Should().BeNull();
@@ -103,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             });
 
             //Act
-            var startDate = _sut.LearningStartDateForAppenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
 
             //Assert
             startDate.Should().Be(_startTime.AddDays(-3));

@@ -174,32 +174,33 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             ).ToList();
         }
 
-        internal static Domain.ApprenticeshipIncentives.ValueTypes.Learner Map(this Learner model)
+        internal static LearnerModel Map(this Learner model)
         {
-            var learner = new Domain.ApprenticeshipIncentives.ValueTypes.Learner(
-                model.Id,
-                model.ApprenticeshipIncentiveId, 
-                model.ApprenticeshipId,  
-                model.Ukprn, 
-                model.ULN, 
-                model.CreatedDate
-                );
-
-            if(model.SubmissionFound)
+            var learner = new LearnerModel
             {
-                var submissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                ApprenticeshipId = model.ApprenticeshipId,
+                Ukprn = model.Ukprn,
+                UniqueLearnerNumber = model.ULN,
+                CreatedDate = model.CreatedDate,
+              };
+
+            if (model.SubmissionFound)
+            {
+                learner.SubmissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(
                     model.SubmissionDate.Value,
                     model.LearningFound.Value);
 
-                submissionData.SetStartDate(model.StartDate);
-                submissionData.SetIsInLearning(model.InLearning);
-                learner.SetSubmissionData(submissionData);                
+                learner.SubmissionData.SetStartDate(model.StartDate);
+                learner.SubmissionData.SetIsInLearning(model.InLearning);
+                learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
             return learner;
         }
 
-        internal static Learner Map(this Domain.ApprenticeshipIncentives.ValueTypes.Learner model)
+        internal static Learner Map(this LearnerModel model)
         {
             var learner = new Learner
             {
@@ -208,13 +209,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
                 ULN = model.UniqueLearnerNumber,
-                CreatedDate = model.CreatedDate,
-                SubmissionFound = model.SubmissionFound,
-                LearningFound = false
+                CreatedDate = model.CreatedDate
             };
 
-            if(learner.SubmissionFound)
+            if(model.SubmissionData != null)
             {
+                learner.SubmissionFound = true;
                 learner.LearningFound = model.SubmissionData.LearningFound;
                 learner.SubmissionDate = model.SubmissionData.SubmissionDate;
                 learner.StartDate = model.SubmissionData.StartDate;
