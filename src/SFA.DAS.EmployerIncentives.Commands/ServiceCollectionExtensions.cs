@@ -40,6 +40,9 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -67,14 +70,14 @@ namespace SFA.DAS.EmployerIncentives.Commands
             })
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
-            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>()
-            .Decorate<ILearnerService, LearnerServiceWithLogging>();
+            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
             serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
+            serviceCollection.AddScoped<ILearnerFactory, LearnerFactory>();
 
             serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
@@ -98,6 +101,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
             serviceCollection.AddScoped<ILearnerDataRepository, LearnerDataRepository>();
+            serviceCollection.AddScoped<ILearnerDomainRepository, LearnerDomainRepository>();
+            serviceCollection.Decorate<ILearnerDomainRepository, LearnerDomainRepositoryWithLogging>();
 
             return serviceCollection;
         }
@@ -194,7 +199,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new LearnerService(client, settings.Version, s.GetRequiredService<IApprenticeshipIncentiveDomainRepository>());
+                return new LearnerService(client, settings.Version);
             });
 
             return serviceCollection;

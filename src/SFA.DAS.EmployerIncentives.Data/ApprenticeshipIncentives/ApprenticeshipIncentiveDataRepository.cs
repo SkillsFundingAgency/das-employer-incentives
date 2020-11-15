@@ -6,13 +6,12 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using StructureMap.Pipeline.Lazy;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class ApprenticeshipIncentiveDataRepository : IApprenticeshipIncentiveDataRepository
     {
-        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private readonly Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
         public ApprenticeshipIncentiveDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
