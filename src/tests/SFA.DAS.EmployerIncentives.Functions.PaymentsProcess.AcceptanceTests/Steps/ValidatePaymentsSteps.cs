@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
-        [Given(@"the apprentice is in learning is (.*)")]
+        [Given(@"the apprentice 'is in learning' is (.*)")]
         public async Task GivenTheApprenticeIsInLearningIs(bool? isInLearning)
         {
             await CreateLearnerRecord(isInLearning);
