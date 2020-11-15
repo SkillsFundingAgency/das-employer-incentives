@@ -4,7 +4,6 @@ using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePendingPayment
 {
@@ -13,25 +12,25 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly IAccountDomainRepository _accountDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
-        private readonly ILearnerDataRepository _learnerDataRepository;
+        private readonly ILearnerDomainRepository _learnerDomainRepository;
 
         public ValidatePendingPaymentCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository,
             IAccountDomainRepository accountDomainRepository,
             ICollectionCalendarService collectionCalendarService,
-            ILearnerDataRepository learnerDataRepository)
+            ILearnerDomainRepository learnerDomainRepository)
         {
             _domainRepository = domainRepository;
             _accountDomainRepository = accountDomainRepository;
             _collectionCalendarService = collectionCalendarService;
-            _learnerDataRepository = learnerDataRepository;
+            _learnerDomainRepository = learnerDomainRepository;
         }
 
         public async Task Handle(ValidatePendingPaymentCommand command, CancellationToken cancellationToken = default)
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
             var account = await _accountDomainRepository.Find(incentive.Account.Id);
-            var learner = await _learnerDataRepository.GetByApprenticeshipIncentiveId(incentive.Id);
+            var learner = await _learnerDomainRepository.GetByApprenticeshipIncentiveId(incentive.Id);
 
             var calendar = await _collectionCalendarService.Get();
             var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionMonth);

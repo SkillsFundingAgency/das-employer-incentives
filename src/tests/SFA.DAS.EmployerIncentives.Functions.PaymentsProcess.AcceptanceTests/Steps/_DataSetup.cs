@@ -7,6 +7,7 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Account = SFA.DAS.EmployerIncentives.Data.Models.Account;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -75,6 +76,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await connection.InsertAsync(_pendingPayment2);
             await connection.InsertAsync(_pendingPayment3);
         }
-    }
 
+        private async Task CreateLearnerRecord(bool? isInLearning)
+        {
+            _learner = _fixture.Build<Learner>()
+                .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.ULN, _apprenticeshipIncentive.ULN)
+                .With(p => p.SubmissionFound, true)
+                .With(p => p.InLearning, isInLearning)
+                .Create();
+
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await connection.InsertAsync(_learner);
+        }
+    }
 }

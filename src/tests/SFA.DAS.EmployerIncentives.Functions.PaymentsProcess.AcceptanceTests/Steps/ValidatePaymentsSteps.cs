@@ -1,13 +1,19 @@
-﻿using AutoFixture;
+﻿using System;
+using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using TechTalk.SpecFlow;
+using ApprenticeshipIncentive = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive;
+using Learner = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Learner;
+using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
+using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
+using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -22,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private PendingPayment _pendingPayment2;
         private PendingPayment _pendingPayment3;
         private IncentiveApplication _applicationModel;
+        private Learner _learner;
         private List<IncentiveApplicationApprenticeship> _apprenticeshipsModels;
         private ApprenticeshipIncentive _apprenticeshipIncentive;
         private const int NumberOfApprenticeships = 3;
@@ -33,16 +40,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _testContext = testContext;
         }
 
-        [Given(@"a legal entity has pending payments with valid bank details")]
-        public async Task GivenALegalEntityHasAValidVendorId()
-        {
-            await CreateIncentiveWithPayments("ABC123");
-        }
-
         [Given(@"a legal entity has pending payments without bank details")]
         public async Task GivenALegalEntityDoesNotHaveAValidVendorId()
         {
             await CreateIncentiveWithPayments();
+        }
+
+        [Given(@"a legal entity has pending payments with (.*) bank details")]
+        public async Task GivenALegalEntityHasPendingPaymentsWithBankDetails(string status)
+        {
+            if (status.Equals("valid", StringComparison.InvariantCultureIgnoreCase))
+            {
+                await CreateIncentiveWithPayments("ABC123");
+            }
+            else
+            {
+                await CreateIncentiveWithPayments();
+            }
+        }
+
+        [Given(@"the apprentice is in learning is (.*)")]
+        public async Task GivenTheApprenticeIsInLearningIs(bool? isInLearning)
+        {
+            await CreateLearnerRecord(isInLearning);
         }
 
         [When(@"the payment process is run")]
@@ -56,22 +76,32 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             status.RuntimeStatus.Should().Be("Completed");
         }
 
+        [Then(@"bank details validation check is (.*)")]
+        public async Task ThenBankDetailsValidationCheckIs(bool isValid)
+        {
+            await CheckValidationStepIs(ValidationStep.HasBankDetails, isValid);
+        }
+
+        [Then(@"apprentice is in learning check is (.*)")]
+        public async Task ThenApprenticeIsInLearningCheckIs(bool isInLearning)
+        {
+            await CheckValidationStepIs(ValidationStep.IsInLearning, isInLearning);
+        }
+
         [Then(@"successful validation results are recorded")]
         public async Task ThenSuccessValidationResultsAreRecorded()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
-            results.Should().HaveCount(2);
-            results.Any(r => r.Result == false).Should().BeFalse();
+            results.All(r => r.Result == true).Should().BeTrue();
         }
 
-        [Then(@"failed validation results are recorded")]
-        public async Task ThenFailedValidationResultsAreRecorded()
+        public async Task CheckValidationStepIs(string step, bool value)
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
             results.Should().HaveCount(2);
-            results.Any(r => r.Result == true).Should().BeFalse();
+            results.All(r => r.Result == value).Should().BeTrue();
         }
 
         [Then(@"payment records are created")]
