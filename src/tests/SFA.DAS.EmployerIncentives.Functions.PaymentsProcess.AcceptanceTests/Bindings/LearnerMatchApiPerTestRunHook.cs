@@ -8,7 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
     [Binding]
     public static class LearnerMatchApiPerTestRunHook
     {
-        [BeforeTestRun(Order = 2)]
+        [BeforeTestRun(Order = 3)]
         public static void InitialiseLearnerMatchApi(TestContext context)
         {
             var stopwatch = new Stopwatch();

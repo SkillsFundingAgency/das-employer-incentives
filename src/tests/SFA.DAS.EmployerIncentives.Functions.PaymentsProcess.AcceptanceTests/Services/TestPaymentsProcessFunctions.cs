@@ -6,20 +6,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
     public class TestPaymentsProcessFunctions : IDisposable
     {
-        private const int Port = 7007;
-        private const int StartupTimeoutInSeconds = 30;
-        private const int OrchestratorRunTimeoutInSeconds = 10;
+        private const int Port = 7003;
+        private const int StartupTimeoutInSeconds = 15;
+        private const int OrchestratorRunTimeoutInSeconds = 30;
 
         private bool _isDisposed;
         private readonly HttpClient _client;
         private readonly FunctionsController _functionsController;
         private readonly TestPaymentsProcessFunctionsConfigurator _configurator;
+        private DateTime _functionHostStartedOn;
 
         public TestPaymentsProcessFunctions(TestContext context)
         {
@@ -33,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _functionsController.StartFunctionsHost(Port, _configurator.Setup().Settings);
             await FunctionsOrchestratorIsReady();
+            _functionHostStartedOn = DateTime.UtcNow;
         }
 
         public void Dispose()
@@ -45,6 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             if (_isDisposed) return;
             _functionsController.Dispose();
+            _client.Dispose();
             _isDisposed = true;
         }
 
@@ -56,8 +60,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartLearnerMatching()
         {
-            await AllFunctionOrchestrationCompleted();
             await StartLearnerMatchingOrchestrator();
+            Thread.Sleep(TimeSpan.FromSeconds(1)); // time it takes function host to update storage 🤷‍
             await AllFunctionOrchestrationCompleted();
         }
 
@@ -76,25 +80,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var content = new StringContent("{ input : null }", Encoding.UTF8, "application/json");
             var response = await _client.PostAsync(url, content);
             response.EnsureSuccessStatusCode();
-            await response.Content.ReadAsStringAsync();
         }
 
         public async Task AllFunctionOrchestrationCompleted()
         {
             var policy = Policy
                 .HandleResult(true)
-                .WaitAndRetryAsync(Enumerable.Repeat(TimeSpan.FromSeconds(1), StartupTimeoutInSeconds));
+                .WaitAndRetryAsync(Enumerable.Repeat(TimeSpan.FromSeconds(1), OrchestratorRunTimeoutInSeconds));
 
-            var url = $"http://localhost:{Port}/runtime/webhooks/durabletask/instances?&runtimeStatus=Running,Pending";
+            const string statusQuery = "Running,Pending";
+
+            var url = $"runtime/webhooks/durabletask/instances?createdTimeFrom={_functionHostStartedOn:s}&runtimeStatus={statusQuery}";
             List<OrchestrationStatus> status;
 
             await policy.ExecuteAsync(async () =>
             {
-                Console.WriteLine("[TestPaymentsProcessFunctions] AllFunctionOrchestrationCompleted");
                 var statusResponse = await _client.GetAsync(url);
                 statusResponse.EnsureSuccessStatusCode();
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();
                 status = JsonConvert.DeserializeObject<List<OrchestrationStatus>>(statusJson);
+
+                Console.WriteLine($"[{nameof(TestPaymentsProcessFunctions)}] AllFunctionOrchestrationCompleted: {status.Count} functions in status {statusQuery}");
                 return status.Any();
             });
         }
@@ -103,7 +109,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             try
             {
-                var url = $"http://localhost:{Port}/runtime/webhooks/durabletask/instances";
+                var url = "runtime/webhooks/durabletask/instances";
 
                 var policy = Policy
                     .Handle<HttpRequestException>()
@@ -111,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                 await policy.ExecuteAsync(async () =>
                 {
-                    Console.WriteLine("[TestPaymentsProcessFunctions] FunctionsOrchestratorIsReady");
+                    Console.WriteLine($"[{nameof(TestPaymentsProcessFunctions)}] FunctionsOrchestratorIsReady");
                     var statusResponse = await _client.GetAsync(url);
                     statusResponse.EnsureSuccessStatusCode();
                 });
@@ -132,7 +138,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             OrchestrationStatus orchestrationStatus = null;
             await policy.ExecuteAsync(async () =>
             {
-                Console.WriteLine("[TestPaymentsProcessFunctions] FunctionOrchestrationCompleted");
+                Console.WriteLine($"[{nameof(TestPaymentsProcessFunctions)}] FunctionOrchestrationCompleted");
                 var statusResponse = await _client.GetAsync(orchestrationLinks.StatusQueryGetUri);
                 statusResponse.EnsureSuccessStatusCode();
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();

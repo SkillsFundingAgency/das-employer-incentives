@@ -6,12 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RefreshLearnerData - Copy (2).feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RefreshLearnerData - Copy (3).feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RefreshLearnerData - Copy.feature.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
@@ -33,46 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Features\RefreshLearnerData - Copy %282%29.feature.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Update="Features\RefreshLearnerData - Copy %283%29.feature.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Update="Features\RefreshLearnerData - Copy.feature.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="local.settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\RefreshLearnerData - Copy %282%29.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>RefreshLearnerData - Copy (2).feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\RefreshLearnerData - Copy %283%29.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>RefreshLearnerData - Copy (3).feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\RefreshLearnerData - Copy.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>RefreshLearnerData - Copy.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>

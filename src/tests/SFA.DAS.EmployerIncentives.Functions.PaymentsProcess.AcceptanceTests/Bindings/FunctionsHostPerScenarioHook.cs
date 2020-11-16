@@ -7,11 +7,10 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Bindings
 {
     [Binding]
-
-    public static class FunctionsHostPerScenarioHook
+    public class FunctionsHostPerScenarioHook
     {
         [BeforeScenario(Order = 10)]
-        public static async Task InitialiseFunctions(TestContext context)
+        public async Task InitialiseFunctions(TestContext context)
         {
             if (context.SqlDatabase?.DatabaseInfo != null == false)
             {
@@ -35,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         }
 
         [AfterScenario]
-        public static void TearDownFunctions(TestContext context)
+        public void TearDownFunctions(TestContext context)
         {
             context.PaymentsProcessFunctions?.Dispose();
         }
