@@ -26,11 +26,11 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.csproj" />
   </ItemGroup>
 
+
   <ItemGroup>
     <None Update="local.settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-
 </Project>

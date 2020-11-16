@@ -61,8 +61,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
-            results.Where(x => x.Result == true).Should().HaveCount(2);
-            //results.Any(r => r.Result == false).Should().BeFalse();
+            results.Should().HaveCount(2);
+            results.Any(r => r.Result == false).Should().BeFalse();
         }
 
         [Then(@"failed validation results are recorded")]
@@ -70,8 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
-            results.Where(x => x.Result == false).Should().HaveCount(2);
-            //results.Any(r => r.Result == true).Should().BeFalse();
+            results.Should().HaveCount(2);
+            results.Any(r => r.Result == true).Should().BeFalse();
         }
 
         [Then(@"payment records are created")]
