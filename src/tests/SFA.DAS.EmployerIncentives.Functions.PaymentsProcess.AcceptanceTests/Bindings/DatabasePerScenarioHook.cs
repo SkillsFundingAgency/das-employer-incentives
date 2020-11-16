@@ -13,12 +13,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            context.SqlDatabase = new SqlDatabaseForTest();
+            context.SqlDatabase = new SqlDatabase2();
             stopwatch.Stop();
             Console.WriteLine($"[{nameof(DatabasePerScenarioHook)}] time it took to deploy test database: {stopwatch.Elapsed.Seconds} seconds");
         }
 
-        [BeforeScenario]
+        [AfterScenario]
         public static void TearDownDatabase(TestContext context)
         {
             context.SqlDatabase?.Dispose();

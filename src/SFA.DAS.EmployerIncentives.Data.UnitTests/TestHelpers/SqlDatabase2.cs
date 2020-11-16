@@ -5,12 +5,12 @@ using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
-    public class SqlDatabaseForTest : IDisposable
+    public class SqlDatabase2 : IDisposable
     {
         private bool _isDisposed;
         public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();
 
-        public SqlDatabaseForTest()
+        public SqlDatabase2()
         {
             CreateTestDatabase();
         }
@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             }
             catch
             {
-                Console.WriteLine($"[{nameof(SqlDatabaseForTest)}] {nameof(DeleteTestDatabase)} exception thrown");
+                Console.WriteLine($"[{nameof(SqlDatabase2)}] {nameof(DeleteTestDatabase)} exception thrown");
             }
         }
 
@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             }
             catch
             {
-                Console.WriteLine($"[{nameof(SqlDatabaseForTest)}] {nameof(DeleteFile)} exception thrown");
+                Console.WriteLine($"[{nameof(SqlDatabase2)}] {nameof(DeleteFile)} exception thrown");
             }
         }
 
