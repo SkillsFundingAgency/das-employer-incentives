@@ -77,14 +77,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await connection.InsertAsync(_pendingPayment3);
         }
 
-        private async Task CreateLearnerRecord(bool? isInLearning)
+        private async Task CreateLearnerRecord()
         {
             _learner = _fixture.Build<Learner>()
                 .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.ULN, _apprenticeshipIncentive.ULN)
                 .With(p => p.SubmissionFound, true)
-                .With(p => p.InLearning, isInLearning)
+                .With(p => p.InLearning, _isInLearning)
+                .With(p => p.HasDataLock, _hasDataLock)
                 .Create();
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);

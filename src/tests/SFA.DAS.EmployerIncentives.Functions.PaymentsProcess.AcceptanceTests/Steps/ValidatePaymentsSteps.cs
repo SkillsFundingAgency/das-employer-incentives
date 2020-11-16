@@ -34,6 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private const int NumberOfApprenticeships = 3;
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
+        private bool? _isInLearning;
+        private bool? _hasDataLock;
 
         public ValidatePaymentsSteps(TestContext testContext)
         {
@@ -60,14 +62,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Given(@"the apprentice 'is in learning' is (.*)")]
-        public async Task GivenTheApprenticeIsInLearningIs(bool? isInLearning)
+        public void GivenTheApprenticeIsInLearningIs(bool? isInLearning)
         {
-            await CreateLearnerRecord(isInLearning);
+            _isInLearning = isInLearning;
         }
+
+        [Given(@"the apprenticeship datalock status is '(.*)")]
+        public void GivenTheApprenticeshipIs(string datalockStatus)
+        {
+            _hasDataLock = datalockStatus.Equals("datalocks", StringComparison.InvariantCultureIgnoreCase);
+        }
+
 
         [When(@"the payment process is run")]
         public async Task WhenPendingPaymentsForTheLegalEntityAreValidated()
         {
+            await CreateLearnerRecord();
+
             var status =
                 await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear,
                     CollectionPeriod);

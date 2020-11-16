@@ -137,17 +137,20 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("When at least one validation check fails")]
-        [NUnit.Framework.TestCaseAttribute("Valid", "false", "true", "false", null)]
-        [NUnit.Framework.TestCaseAttribute("Valid", "", "true", "false", null)]
-        [NUnit.Framework.TestCaseAttribute("Notvalid", "true", "false", "true", null)]
-        public virtual void WhenAtLeastOneValidationCheckFails(string bankDetailStatus, string isInLearning, string bankDetailsValidationResult, string isInLearningValidationResult, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("Valid", "false", "no datalocks", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("Valid", "", "no datalocks", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("Notvalid", "true", "no datalocks", "false", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("Valid", "true", "datalocks", "true", "true", "false", null)]
+        public virtual void WhenAtLeastOneValidationCheckFails(string bankDetailStatus, string isInLearning, string dataLockStatus, string bankDetailsValidationResult, string isInLearningValidationResult, string dataLockValidationResult, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("BankDetailStatus", bankDetailStatus);
             argumentsOfScenario.Add("IsInLearning", isInLearning);
+            argumentsOfScenario.Add("DataLockStatus", dataLockStatus);
             argumentsOfScenario.Add("BankDetailsValidationResult", bankDetailsValidationResult);
             argumentsOfScenario.Add("IsInLearningValidationResult", isInLearningValidationResult);
+            argumentsOfScenario.Add("DataLockValidationResult", dataLockValidationResult);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When at least one validation check fails", null, tagsOfScenario, argumentsOfScenario);
 #line 18
 this.ScenarioInitialize(scenarioInfo);
@@ -176,18 +179,21 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And(string.Format("the apprentice \'is in learning\' is {0}", isInLearning), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 21
- testRunner.When("the payment process is run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.And(string.Format("the apprenticeship datalock status is \'{0}\'", dataLockStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 22
- testRunner.Then(string.Format("bank details validation check is {0}", bankDetailsValidationResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("the payment process is run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 23
- testRunner.Then(string.Format("apprentice is in learning check is {0}", isInLearningValidationResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then(string.Format("bank details validation check is {0}", bankDetailsValidationResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 24
- testRunner.And("no payment records are created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then(string.Format("apprentice is in learning check is {0}", isInLearningValidationResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 25
+ testRunner.And("no payment records are created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 26
  testRunner.And("pending payments are not marked as paid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

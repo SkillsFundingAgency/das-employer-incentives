@@ -18,6 +18,7 @@ Scenario: When bank details have been validated successfully
 Scenario: When at least one validation check fails
 	Given a legal entity has pending payments with <BankDetailStatus> bank details
 	And the apprentice 'is in learning' is <IsInLearning> 
+	And the apprenticeship datalock status is '<DataLockStatus>'
 	When the payment process is run
 	Then bank details validation check is <BankDetailsValidationResult>
 	Then apprentice is in learning check is <IsInLearningValidationResult>
@@ -25,7 +26,8 @@ Scenario: When at least one validation check fails
 	And pending payments are not marked as paid
 
 Examples:
-	| BankDetailStatus | IsInLearning | BankDetailsValidationResult | IsInLearningValidationResult |
-	| Valid            | false        | true                        | false                        |
-	| Valid            |              | true                        | false                        |
-	| Notvalid         | true         | false                       | true                         |
+	| BankDetailStatus | IsInLearning | DataLockStatus | BankDetailsValidationResult | IsInLearningValidationResult | DataLockValidationResult |
+	| Valid            | false        | no datalocks   | true                        | false                        | true                     |
+	| Valid            |              | no datalocks   | true                        | false                        | true                     |
+	| Notvalid         | true         | no datalocks   | false                       | true                         | true                     |
+	| Valid            | true         | datalocks      | true                        | true                         | false                    |
