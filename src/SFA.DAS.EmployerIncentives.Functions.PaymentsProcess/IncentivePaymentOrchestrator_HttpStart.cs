@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             var collectionPeriod = new CollectionPeriod { Year = collectionPeriodYear, Month = collectionPeriodMonth };
 
-            log.LogInformation($"Triggering IncentivePaymentOrchestrator for collection period {collectionPeriod}", new { collectionPeriod });
+            log.LogInformation("Triggering IncentivePaymentOrchestrator for collection period {collectionPeriod}", collectionPeriod);
 
             string instanceId = await starter.StartNewAsync("IncentivePaymentOrchestrator", null, collectionPeriod);
 

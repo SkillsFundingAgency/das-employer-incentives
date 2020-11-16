@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             foreach (var pendingPaymentId in pendingPayments)
             {
                 //TODO: this logging should be removed when an activity is called from here but it in place to allow testing in the short term.
-                _logger.LogInformation($"Request made to validate pending payment for pending payment id {pendingPaymentId}", new { accountLegalEntityId, collectionPeriod, pendingPayment = pendingPaymentId });
+                _logger.LogInformation("Request made to validate pending payment for pending payment id {pendingPaymentId}", accountLegalEntityId, collectionPeriod, pendingPaymentId);
             }
         }
     }

@@ -46,19 +46,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[0]))), Times.Once);
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[1]))), Times.Once);
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[2]))), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", It.Is<AccountLegalEntityCollectionPeriod>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[0]))), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", It.Is<AccountLegalEntityCollectionPeriod>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[1]))), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", It.Is<AccountLegalEntityCollectionPeriod>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[2]))), Times.Once);
         }
 
-        private bool VerifyInputMatchesAccountAndCollectionPeriod(object functionInput, long accountLegalEntityId)
+        private bool VerifyInputMatchesAccountAndCollectionPeriod(AccountLegalEntityCollectionPeriod accountLegalEntityAndCollectionPeriod, long accountLegalEntityId)
         {
-            var accountLegalEntityAndCollectionPeriod = functionInput as AccountLegalEntityCollectionPeriod;
-            if (accountLegalEntityAndCollectionPeriod == null)
-            {
-                return false;
-            }
-
             return accountLegalEntityAndCollectionPeriod.AccountLegalEntityId == accountLegalEntityId && accountLegalEntityAndCollectionPeriod.CollectionPeriod == _collectionPeriod;
         }
     }
