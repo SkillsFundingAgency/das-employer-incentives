@@ -21,9 +21,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly HttpClient _client;
         private bool _isDisposed;
         private Process _functionHostProcess;
+        private string _hubName;
 
         public TestPaymentsProcessFunctions(TestContext testContext)
         {
+            _hubName = $"PPTest{Guid.NewGuid()}".Replace("-", "");
             _testContext = testContext;
             _client = new HttpClient { BaseAddress = new Uri($"http://localhost:{Port}") };
         }
@@ -124,7 +126,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         }
 
-
         private async Task<AzureFunctionOrchestrationStatus> CompleteFunctionOrchestration(AzureFunctionOrchestrationLinks azureFunctionOrchestrationLinks)
         {
             var policy = Policy
@@ -166,6 +167,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             ReplaceDbConnectionString(functionConfig);
             ReplaceLearnerMatchUrlString(functionConfig);
 
+            var hostConfig = Path.Combine(functionAppFolder, "host.json");
+            ReplaceHubName(hostConfig);
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = functionHostPath,
@@ -200,6 +204,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("LEARNER_MATCH_API_URL", baseAddress));
         }
 
+        private void ReplaceHubName(string pathToHostConfig)
+        {
+            var baseAddress = HttpUtility.JavaScriptStringEncode(_hubName);
+            File.WriteAllText(pathToHostConfig, (File.ReadAllText(pathToHostConfig)).Replace("EmployerIncentivesFunctionsPaymentsProcessHub", baseAddress));
+        }
 
     }
 }

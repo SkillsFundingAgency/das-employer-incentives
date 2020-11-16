@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
         [FunctionName("LearnerMatchingOrchestrator_Start")]
         public static async Task TimerStart(
 #if DEBUG
-            [TimerTrigger("0 */15 * * * *", RunOnStartup = false)] TimerInfo timerInfo,
+            [TimerTrigger("0 */15 1 * * *", RunOnStartup = false)] TimerInfo timerInfo,
 #else
             [TimerTrigger("%LearnerMatchingOrchestratorTriggerTime%")] TimerInfo timerInfo,
 #endif
