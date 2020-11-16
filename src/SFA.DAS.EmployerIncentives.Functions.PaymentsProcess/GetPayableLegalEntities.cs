@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             _logger.LogInformation("Getting payable legal entities for collection period {collectionPeriod}.", collectionPeriod);
             var legalEntities = await _queryDispatcher.Send<GetPayableLegalEntitiesRequest, GetPayableLegalEntitiesResponse>(new GetPayableLegalEntitiesRequest(collectionPeriod.Year, collectionPeriod.Month));
-            _logger.LogInformation($"{legalEntities.PayableLegalEntities.Count} payable legal entities returned for collection period {collectionPeriod}.", new  { collectionPeriod });
+            _logger.LogInformation("{legalEntitiesCount} payable legal entities returned for collection period {collectionPeriod}.", new  { legalEntitiesCount = legalEntities.PayableLegalEntities.Count}, collectionPeriod);
             return legalEntities.PayableLegalEntities.Select(x => x.AccountLegalEntityId).ToList();
         }
     }
