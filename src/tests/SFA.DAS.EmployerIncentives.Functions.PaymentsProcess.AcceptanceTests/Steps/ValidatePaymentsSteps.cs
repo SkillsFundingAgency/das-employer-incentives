@@ -1,16 +1,10 @@
-﻿using System;
-using AutoFixture;
-using Dapper.Contrib.Extensions;
+﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Data.Models;
-using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using TechTalk.SpecFlow;
-using ApprenticeshipIncentive = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive;
-using Learner = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Learner;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
@@ -21,46 +15,33 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     [Scope(Feature = "ValidatePayments")]
     public partial class ValidatePaymentsSteps
     {
-        private readonly TestContext _testContext;
-        private readonly Fixture _fixture = new Fixture();
-        private Account _accountModel;
-        private PendingPayment _pendingPayment1;
-        private PendingPayment _pendingPayment2;
-        private PendingPayment _pendingPayment3;
-        private IncentiveApplication _applicationModel;
-        private Learner _learner;
-        private List<IncentiveApplicationApprenticeship> _apprenticeshipsModels;
-        private ApprenticeshipIncentive _apprenticeshipIncentive;
-        private const int NumberOfApprenticeships = 3;
+        private readonly TestContext _testContext;        
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
-        private bool _isInLearning;
-        private bool _hasBankDetails;
+
+        private ValidatePaymentData _validatePaymentData;
 
         public ValidatePaymentsSteps(TestContext testContext)
         {
-            _accountModel = _fixture.Build<Account>().Without(a => a.VrfVendorId).Create();
-            _isInLearning = true;
-            _hasBankDetails = true;
             _testContext = testContext;
         }
 
         [Given(@"there are pending payments")]
-        public Task GivenThereArePendingPayments()
+        public void GivenThereArePendingPayments()
         {
-            return CreateIncentiveWithPayments();
+            _validatePaymentData = new ValidatePaymentData(_testContext);
         }
 
         [Given(@"the '(.*)' will fail")]
-        public void GivenTheValidationStepWillFail(string validationStep)
+        public async Task GivenTheValidationStepWillFail(string validationStep)
         {
             switch (validationStep)
             {
                 case ValidationStep.HasBankDetails:
-                    _hasBankDetails = false;
+                    _validatePaymentData.AccountModel.VrfVendorId = null; // no bank details
                     break;
                 case ValidationStep.IsInLearning:
-                    _isInLearning = false;
+                    _validatePaymentData.LearnerModel.InLearning = false;
                     break;
             }
         }
@@ -68,8 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the payment process is run")]
         public async Task WhenThePaymentProcessIsRun()
         {
-            await CreateAccount();
-            await CreateLearnerRecord();
+            await _validatePaymentData.Create();
 
             var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriod);
 
@@ -83,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
             results.Should().HaveCount(2);
-            results.All(r => r.Result == false).Should().BeTrue();
+            results.All(r => !r.Result).Should().BeTrue();
         }
 
         [Then(@"successful validation results are recorded")]
@@ -91,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
-            results.All(r => r.Result == true).Should().BeTrue();
+            results.All(r => r.Result).Should().BeTrue();
         }
 
         [Then(@"payment records are created")]
@@ -99,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<Payment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id);
             results.Should().HaveCount(2);
         }
 
@@ -108,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<Payment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id);
             results.Should().BeEmpty();
         }
 
@@ -117,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPayment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList();
+                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id).ToList();
             results.Count.Should().Be(3);
             results.Any(x => x.PaymentMadeDate.HasValue).Should().BeFalse();
         }
@@ -127,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPayment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id &&
+                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id &&
                             x.PeriodNumber <= CollectionPeriod)
                 .ToList();
 
@@ -140,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPayment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id &&
+                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id &&
                             x.PeriodNumber > CollectionPeriod);
 
             results.All(x => x.PaymentMadeDate.HasValue).Should().BeFalse();
