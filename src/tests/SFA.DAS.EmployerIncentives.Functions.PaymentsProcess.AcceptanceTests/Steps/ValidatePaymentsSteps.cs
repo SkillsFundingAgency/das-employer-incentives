@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Given(@"the '(.*)' will fail")]
-        public async Task GivenTheValidationStepWillFail(string validationStep)
+        public void GivenTheValidationStepWillFail(string validationStep)
         {
             switch (validationStep)
             {
