@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
                 return new Log
                 {
-                    OnProcessed = () => $"Submisison data : LearningFound {LearningFound}, StartDate {StartDate}, IsInlearning {IsInlearning} "
+                    OnProcessed = () => $"Submission data : LearningFound {LearningFound}, StartDate {StartDate}, IsInlearning {IsInlearning} "
             };
             }
         }
