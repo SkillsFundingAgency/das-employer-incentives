@@ -7,17 +7,24 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Account = SFA.DAS.EmployerIncentives.Data.Models.Account;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     public partial class ValidatePaymentsSteps
     {
-        private async Task CreateIncentiveWithPayments(string vendorId = null)
+        private async Task CreateAccount()
         {
-            _accountModel = _fixture.Create<Account>();
-            _accountModel.VrfVendorId = vendorId; // Invalid bank details if null
+            if (_hasBankDetails)
+            {
+                _accountModel.VrfVendorId = _fixture.Create<string>(); // Invalid bank details if null
+            }
 
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await connection.InsertAsync(_accountModel);
+        }
+
+        private async Task CreateIncentiveWithPayments()
+        {
             _applicationModel = _fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
                 .With(p => p.AccountId, _accountModel.Id)
@@ -68,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            await connection.InsertAsync(_accountModel);
+            //await connection.InsertAsync(_accountModel);
             await connection.InsertAsync(_applicationModel);
             await connection.InsertAsync(_apprenticeshipsModels);
             await connection.InsertAsync(_apprenticeshipIncentive);
@@ -85,7 +92,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ULN, _apprenticeshipIncentive.ULN)
                 .With(p => p.SubmissionFound, true)
                 .With(p => p.InLearning, _isInLearning)
-                .With(p => p.HasDataLock, _hasDataLock)
                 .Create();
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
