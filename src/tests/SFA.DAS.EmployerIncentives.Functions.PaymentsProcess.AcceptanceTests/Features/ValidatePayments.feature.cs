@@ -136,6 +136,7 @@ this.ScenarioInitialize(scenarioInfo);
         [NUnit.Framework.DescriptionAttribute("When at least one validation check fails")]
         [NUnit.Framework.TestCaseAttribute("HasBankDetails", null)]
         [NUnit.Framework.TestCaseAttribute("IsInLearning", null)]
+        [NUnit.Framework.TestCaseAttribute("HasLearningRecord", null)]
         public virtual void WhenAtLeastOneValidationCheckFails(string validationStep, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;

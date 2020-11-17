@@ -43,6 +43,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 case ValidationStep.IsInLearning:
                     _validatePaymentData.LearnerModel.InLearning = false;
                     break;
+                case ValidationStep.HasLearningRecord:
+                    _validatePaymentData.LearnerModel.LearningFound = false;
+                    break;
             }
         }
 

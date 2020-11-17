@@ -138,7 +138,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasBankDetails, isValid));
         }
 
-        public void ValidateApprenticeshipIsInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
+        public void ValidateIsInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
@@ -150,6 +150,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.IsInLearning, isInLearning));
         }
+
+        public void ValidateHasLearningRecord(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
+        {
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            var hasLearningRecord = false;
+
+            if (learner != null && learner.SubmissionFound && learner.SubmissionData.LearningFound)
+            {
+                hasLearningRecord = true;
+            }
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasLearningRecord, hasLearningRecord));
+        }
+
 
         private PendingPayment GetPendingPaymentForValidationCheck(Guid pendingPaymentId)
         {

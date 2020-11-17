@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePendingPayment;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
@@ -17,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.ValidatePendingPayment.Handlers
 {

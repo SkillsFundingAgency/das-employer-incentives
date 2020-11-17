@@ -36,7 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
             var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionMonth);
 
             incentive.ValidatePendingPaymentBankDetails(command.PendingPaymentId, account, collectionPeriod);
-            incentive.ValidateApprenticeshipIsInLearning(command.PendingPaymentId, learner, collectionPeriod);
+            incentive.ValidateHasLearningRecord(command.PendingPaymentId, learner, collectionPeriod);
+            incentive.ValidateIsInLearning(command.PendingPaymentId, learner, collectionPeriod);
 
             await _domainRepository.Save(incentive);
         }

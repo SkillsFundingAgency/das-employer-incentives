@@ -4,5 +4,6 @@
     {
         public const string HasBankDetails = "HasBankDetails";
         public const string IsInLearning = "IsInLearning";
+        public const string HasLearningRecord = "HasLearningRecord";
     }
 }
