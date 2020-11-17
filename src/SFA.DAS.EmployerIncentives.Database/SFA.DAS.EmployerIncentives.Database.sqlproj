@@ -74,12 +74,12 @@
     <Build Include="Tables\IncentiveApplicationApprenticeship.sql" />
     <Build Include="Views\ApplicationsDashboard.sql" />
     <Build Include="Tables\CollectionCalendar.sql" />
+    <Build Include="Tables\ApprenticeshipIncentive.sql" />
+    <Build Include="Tables\PendingPayment.sql" />
     <Build Include="Schemas\Incentives.sql" />
     <None Include="Scripts\Data.CollectionCalendar.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Build Include="Tables\ApprenticeshipIncentive.sql" />
-    <Build Include="Tables\PendingPayment.sql" />
     <Build Include="Tables\PendingPaymentValidationResult.sql" />
     <Build Include="Tables\Learner.sql" />
     <Build Include="Tables\Payment.sql" />
