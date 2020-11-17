@@ -174,8 +174,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             ).ToList();
         }
 
-        internal static Domain.ApprenticeshipIncentives.ValueTypes.Learner Map(this Learner model,
-            PendingPayment payment)
+        internal static Domain.ApprenticeshipIncentives.ValueTypes.Learner Map(this Learner model)
         {
             var learner = new Domain.ApprenticeshipIncentives.ValueTypes.Learner(
                 model.Id,
@@ -195,13 +194,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 submissionData.SetStartDate(model.StartDate);
                 learner.SetSubmissionData(submissionData);
             }
-
-            if (payment?.PaymentYear != null && payment.PeriodNumber.HasValue)
-            {
-                var pendingPayment = new Domain.ApprenticeshipIncentives.ValueTypes.NextPendingPayment(payment.PaymentYear.Value, payment.PeriodNumber.Value, payment.DueDate);
-                learner.SetNextPendingPayment(pendingPayment);
-            }
-
             return learner;
         }
 
@@ -216,7 +208,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ULN = model.UniqueLearnerNumber,
                 CreatedDate = model.CreatedDate,
                 SubmissionFound = model.SubmissionFound,
-                LearningFound = false
+                LearningFound = false,
+                HasDataLock = model.HasDataLock
             };
 
             if (learner.SubmissionFound)

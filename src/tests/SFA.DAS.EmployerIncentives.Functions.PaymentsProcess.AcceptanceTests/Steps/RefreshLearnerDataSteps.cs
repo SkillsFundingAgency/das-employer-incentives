@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -75,6 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             };
         }
 
+        [Given(@"an apprenticeship incentive exists")]
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
@@ -155,11 +157,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .WithBody(LearnerMatchApiResponses.BL_R03_InLearning_json));
         }
 
-        [Given(@"an apprenticeship incentive exists with a data locked price episode")]
-        public async Task GivenAnApprenticeshipIncentiveExistsWithADataLockedPriceEpisode()
-        {
-            await GivenAnApprenticeshipIncentiveExists();
 
+        [Given(@"the latest learner data has a data locked price episode")]
+        public void GivenAnApprenticeshipIncentiveExistsWithADataLockedPriceEpisode()
+        {
             _testContext.LearnerMatchApi.MockServer
                 .Given(
                     Request
@@ -196,7 +197,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             createdLearner.StartDate.Should().BeNull();
             createdLearner.DaysInLearning.Should().BeNull();
-            createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.HasDataLock.Should().BeFalse();
             createdLearner.SubmissionDate.Should().BeNull();
             createdLearner.RawJSON.Should().BeNull();
             createdLearner.InLearning.Should().BeNull();
@@ -223,7 +224,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.InLearning.Should().BeNull();
-            createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.HasDataLock.Should().BeFalse();
             createdLearner.LearningFound.Should().BeTrue();
         }
 
@@ -249,7 +250,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.StartDate.Should().Be(_startDate);
 
             createdLearner.DaysInLearning.Should().BeNull();
-            createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.HasDataLock.Should().BeFalse();
             createdLearner.LearningFound.Should().BeTrue();
         }
 
@@ -257,7 +258,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void TheLockedPriceEpisodePeriodMatchesTheNextPendingPaymentPeriod()
         {
             const byte lockedPeriod = 3; // see Course-Price-Dlock-R03.json.txt
-            var nextPaymentPeriod = _pendingPayments.Where(x => x.PaymentMadeDate == null).OrderBy(x => x.DueDate).First().PeriodNumber;
+            var nextPaymentPeriod = _pendingPayments.Where(x => x.PaymentMadeDate == null)
+                .OrderBy(x => x.DueDate).First().PeriodNumber;
             nextPaymentPeriod.Should().Be(lockedPeriod);
         }
 
@@ -275,8 +277,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ULN.Should().Be(_apprenticeshipIncentive.Uln);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
-            createdLearner.SubmissionDate.Should().Be(_submissionDate);
-            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R04_InBreak_json);
+            createdLearner.SubmissionDate.Should().Be(DateTime.Parse("2020-11-09 17:04:31.407", new CultureInfo("en-GB")));
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.Course_Price_Dlock_R03_json);
             createdLearner.StartDate.Should().Be(_startDate);
             createdLearner.DaysInLearning.Should().BeNull();
         }

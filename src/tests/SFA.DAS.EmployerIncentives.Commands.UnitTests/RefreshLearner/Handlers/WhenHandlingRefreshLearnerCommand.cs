@@ -1,17 +1,15 @@
 ﻿using AutoFixture;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePendingPayment;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 {
@@ -23,11 +21,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Mock<ILearnerDataRepository> _mockLearnerDataRepository;
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
+        private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentiveEntity;
 
         [SetUp]
         public void Arrange()
         {
-            _fixture = new Fixture();                        
+            _fixture = new Fixture();
 
             _mockDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerService = new Mock<ILearnerService>();
@@ -42,9 +41,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             _apprenticeshipIncentiveId = incentive.Id;
 
+            _incentiveEntity = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveId, incentive);
             _mockDomainRepository
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
-                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveId, incentive));
+                .ReturnsAsync(_incentiveEntity);
 
             _sut = new RefreshLearnerCommandHandler(_mockDomainRepository.Object, _mockLearnerService.Object, _mockLearnerDataRepository.Object);
         }
@@ -70,8 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var learner = _fixture.Create<Learner>();
 
             _mockLearnerDataRepository
-                .Setup(m => m.GetByApprenticeshipIncentiveId(_apprenticeshipIncentiveId))
-                .ReturnsAsync(learner);                
+                .Setup(m => m.Get(_incentiveEntity))
+                .ReturnsAsync(learner);
 
             // Act
             await _sut.Handle(command);

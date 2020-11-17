@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
@@ -13,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly ILearnerService _learnerService;
         private readonly ILearnerDataRepository _learnerDataRepository;
-        
+
         public RefreshLearnerCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository,
             ILearnerService learnerService,
@@ -28,19 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
 
-            var learner = await _learnerDataRepository.GetByApprenticeshipIncentiveId(incentive.Id);
-
-            if (learner == null)
-            {
-                learner = new Domain.ApprenticeshipIncentives.ValueTypes.Learner(
-                    Guid.NewGuid(), 
-                    incentive.Id, 
-                    incentive.Apprenticeship.Id, 
-                    incentive.Apprenticeship.Provider.Ukprn, 
-                    incentive.Apprenticeship.UniqueLearnerNumber, 
-                    DateTime.UtcNow
-                    );
-            }
+            var learner = await _learnerDataRepository.Get(incentive);
 
             await _learnerService.Refresh(learner);
 

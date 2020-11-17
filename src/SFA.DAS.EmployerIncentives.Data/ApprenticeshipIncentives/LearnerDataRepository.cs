@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Linq;
@@ -17,21 +18,38 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             _dbContext = dbContext;
         }
 
-        public async Task<Learner> GetByApprenticeshipIncentiveId(Guid apprenticeshipIncentiveId)
+        public async Task<Learner> Get(ApprenticeshipIncentive incentive)
         {
-            var learner = await _dbContext.Learners
-                            .FirstOrDefaultAsync(a => a.ApprenticeshipIncentiveId == apprenticeshipIncentiveId);
+            var existing = await _dbContext.Learners
+                .FirstOrDefaultAsync(a => a.ApprenticeshipIncentiveId == incentive.Id);
 
-            if (learner == null)
+            Learner learner;
+            if (existing != null)
             {
-                return null;
+                learner = existing.Map();
+            }
+            else
+            {
+                learner = new Learner(
+                    Guid.NewGuid(),
+                    incentive.Id,
+                    incentive.Apprenticeship.Id,
+                    incentive.Apprenticeship.Provider.Ukprn,
+                    incentive.Apprenticeship.UniqueLearnerNumber,
+                    DateTime.UtcNow
+                );
             }
 
-            var nextPayment = await _dbContext.PendingPayments.Where(pp => pp.ApprenticeshipIncentiveId == apprenticeshipIncentiveId
-                && pp.PaymentMadeDate == null)
-                .OrderBy(pp => pp.DueDate).FirstOrDefaultAsync();
+            var nextPayment = incentive.PendingPayments.Where(pp => pp.PaymentMadeDate == null)
+                .OrderBy(pp => pp.DueDate).FirstOrDefault();
 
-            return learner.Map(nextPayment);
+            if (nextPayment?.PaymentYear != null && nextPayment.PeriodNumber.HasValue)
+            {
+                learner.SetNextPendingPayment(new NextPendingPayment(
+                    nextPayment.PaymentYear.Value, nextPayment.PeriodNumber.Value, nextPayment.DueDate));
+            }
+
+            return learner;
         }
 
         public async Task Save(Learner learner)

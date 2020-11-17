@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
 {
     public class WhenSaveCalled
     {
@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
             storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
             storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
-            storedLearner.HasDataLock.Should().BeNull();
+            storedLearner.HasDataLock.Should().BeFalse();
             storedLearner.DaysInLearning.Should().BeNull();
             storedLearner.InLearning.Should().BeNull();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
@@ -77,6 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             await _dbContext.SaveChangesAsync();
 
             var testLearner = new Learner(existingLearner.Id, _fixture.Create<Guid>(), _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<DateTime>());
+            testLearner.SetHasDataLock();
             var submissionData = _fixture.Create<SubmissionData>();
             submissionData.SetRawJson(_fixture.Create<string>());
             submissionData.SetStartDate(_fixture.Create<DateTime>());
@@ -99,7 +100,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
             storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
             storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
-            storedLearner.HasDataLock.Should().BeNull();
+            storedLearner.HasDataLock.Should().BeTrue();
             storedLearner.DaysInLearning.Should().BeNull();
             storedLearner.InLearning.Should().BeNull();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
