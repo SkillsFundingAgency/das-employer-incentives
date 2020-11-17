@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -25,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly DateTime _startDate;
         private readonly DateTime _submissionDate;
+        private readonly IList<PendingPayment> _pendingPayments;
 
         public RefreshLearnerDataSteps(TestContext testContext)
         {
@@ -41,14 +43,46 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .Create();
+
+            _pendingPayments = new List<PendingPayment>
+            {
+                _fixture.Build<PendingPayment>()
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.PeriodNumber, (byte?) 2) // previous period
+                    .With(p => p.PaymentYear, (short?) 2020)
+                    .With(p => p.PaymentMadeDate, DateTime.Now.AddDays(-1))
+                    .Create(),
+                _fixture.Build<PendingPayment>()
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.PeriodNumber, (byte?) 3) // current period
+                    .With(p => p.PaymentYear, (short?) 2020)
+                    .With(p => p.DueDate, DateTime.Parse("2020-08-10"))
+                    .Without(p => p.PaymentMadeDate)
+                    .Create(),
+                _fixture.Build<PendingPayment>()
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.PeriodNumber, (byte?) 4) // future period
+                    .With(p => p.PaymentYear, (short?) 2020)
+                    .With(p => p.DueDate, DateTime.Parse("2020-09-10"))
+                    .Without(p => p.PaymentMadeDate)
+                    .Create()
+            };
         }
 
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_accountModel);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            foreach (var pendingPayment in _pendingPayments)
             {
-                await dbConnection.InsertAsync(_accountModel);
-                await dbConnection.InsertAsync(_apprenticeshipIncentive);
+                await dbConnection.InsertAsync(pendingPayment);
             }
         }
 
@@ -103,7 +137,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
             });
 
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            await using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(learner);
             }
@@ -119,6 +153,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .WithStatusCode(HttpStatusCode.OK)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(LearnerMatchApiResponses.BL_R03_InLearning_json));
+        }
+
+        [Given(@"an apprenticeship incentive exists with a data locked price episode")]
+        public async Task GivenAnApprenticeshipIncentiveExistsWithADataLockedPriceEpisode()
+        {
+            await GivenAnApprenticeshipIncentiveExists();
+
+            _testContext.LearnerMatchApi.MockServer
+                .Given(
+                    Request
+                        .Create()
+                        .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.Uln}")
+                        .UsingGet()
+                )
+                .RespondWith(Response.Create()
+                    .WithStatusCode(HttpStatusCode.OK)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(LearnerMatchApiResponses.Course_Price_Dlock_R03_json));
         }
 
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
@@ -200,6 +252,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.HasDataLock.Should().BeNull();
             createdLearner.LearningFound.Should().BeTrue();
         }
+
+        [When(@"the locked price episode period matches the next pending payment period")]
+        public void TheLockedPriceEpisodePeriodMatchesTheNextPendingPaymentPeriod()
+        {
+            const byte lockedPeriod = 3; // see Course-Price-Dlock-R03.json.txt
+            var nextPaymentPeriod = _pendingPayments.Where(x => x.PaymentMadeDate == null).OrderBy(x => x.DueDate).First().PeriodNumber;
+            nextPaymentPeriod.Should().Be(lockedPeriod);
+        }
+
+        [Then(@"the apprenticeship incentive learner data is updated indicating data lock")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedIndicatingDataLock()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+
+            createdLearner.HasDataLock.Should().BeTrue();
+
+            createdLearner.SubmissionFound.Should().Be(true);
+            createdLearner.Id.Should().NotBeEmpty();
+            createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
+            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.Uln);
+            createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
+            createdLearner.SubmissionDate.Should().Be(_submissionDate);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R04_InBreak_json);
+            createdLearner.StartDate.Should().Be(_startDate);
+            createdLearner.DaysInLearning.Should().BeNull();
+        }
+
     }
 }
 

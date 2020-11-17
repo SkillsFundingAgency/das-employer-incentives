@@ -4,8 +4,8 @@
     "IlrSubmissionDate": "2020-11-09T17:04:31.407+00:00",
     "IlrSubmissionWindowPeriod": 3,
     "AcademicYear": 2021,
-    "Ukprn": 10000028,
-    "Uln": 9900084305,
+    "Ukprn": 10036143,
+    "Uln": 9900084607,
     "Training": [
         {
             "Reference": "ZPROG001",
@@ -14,22 +14,40 @@
             "FrameworkCode": 0,
             "PathwayCode": 0,
             "FundingLineType": null,
-            "StartDate": "2020-10-10T00:00:00",
+            "StartDate": "2020-08-10T00:00:00",
             "PriceEpisodes": [
                 {
                     "Identifier": "25-62-10/10/2020",
                     "AgreedPrice": 14000.00000,
-                    "StartDate": "2020-10-10T00:00:00",
+                    "StartDate": "2020-08-10T00:00:00",
                     "EndDate": "2021-07-31T00:00:00",
                     "NumberOfInstalments": 12,
                     "InstalmentAmount": 600.00000,
                     "CompletionAmount": 1800.00000,
                     "Periods": [
                         {
+                            "Period": 1,
+                            "IsPayable": true,
+                            "AccountId": 5115,
+                            "ApprenticeshipId": 511526,
+                            "ApprenticeshipEmployerType": 1,
+                            "TransferSenderAccountId": 0,
+                            "DataLockFailures": null
+                        },
+                        {
+                            "Period": 2,
+                            "IsPayable": true,
+                            "AccountId": 5115,
+                            "ApprenticeshipId": 511526,
+                            "ApprenticeshipEmployerType": 1,
+                            "TransferSenderAccountId": 0,
+                            "DataLockFailures": null
+                        },
+                        {
                             "Period": 3,
                             "IsPayable": false,
                             "AccountId": 5115,
-                            "ApprenticeshipId": 511528,
+                            "ApprenticeshipId": 511526,
                             "ApprenticeshipEmployerType": 1,
                             "TransferSenderAccountId": 0,
                             "DataLockFailures": [

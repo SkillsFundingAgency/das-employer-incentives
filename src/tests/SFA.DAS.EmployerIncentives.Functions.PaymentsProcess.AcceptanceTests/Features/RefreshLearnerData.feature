@@ -16,3 +16,9 @@ Scenario: Request to refresh learner data for a new Apprenticeship Incentive whe
 	Given an apprenticeship incentive exists and has previously been refreshed
 	When the learner data is refreshed for the apprenticeship incentive
 	Then the apprenticeship incentive learner data is updated for the application with submission data
+
+Scenario: Request to refresh learner data for a new Apprenticeship Incentive where learner has provider data lock
+	Given an apprenticeship incentive exists with a data locked price episode
+	When the learner data is refreshed for the apprenticeship incentive
+	And the locked price episode period matches the next pending payment period
+	Then the apprenticeship incentive learner data is updated indicating data lock
