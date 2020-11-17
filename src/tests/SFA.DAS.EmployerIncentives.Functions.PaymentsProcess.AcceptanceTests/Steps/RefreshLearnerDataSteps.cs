@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 {
     [Binding]
     [Scope(Feature = "RefreshLearnerData")]
-    public class RefreshLearnerDataSteps //: StepsBase
+    public class RefreshLearnerDataSteps
     {
         private readonly TestContext _testContext;
         private readonly Account _accountModel;
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly LearnerSubmissionDto _learnerMatchApiData;
         private readonly DateTime _startDate;
 
-        public RefreshLearnerDataSteps(TestContext testContext) //: base(testContext)
+        public RefreshLearnerDataSteps(TestContext testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
@@ -180,7 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var createdLearners = dbConnection.GetAll<Learner>();
 
             var createdLearner = createdLearners.Single();
-            
+
             createdLearner.SubmissionFound.Should().Be(true);
             createdLearner.Id.Should().NotBeEmpty();
             createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
@@ -201,7 +201,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var createdLearners = dbConnection.GetAll<Learner>();
 
-            var createdLearner = createdLearners.Single();
+            var createdLearner = createdLearners.Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
             var testLearner = _testContext.TestData.Get<Learner>("ExistingLearner");
 
