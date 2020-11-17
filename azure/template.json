@@ -107,7 +107,7 @@
         "sharedEnvVirtualNetworkName": {
             "type": "string"
         },
-        "msgHandlerSubnetObject": {
+        "messageHandlerSubnetObject": {
             "type": "object"
         },
         "subnetServiceEndpointList": {
@@ -382,10 +382,10 @@
                         "value": "[parameters('sharedEnvVirtualNetworkName')]"
                     },
                     "subnetName": {
-                        "value": "[parameters('msgHandlerSubnetObject').name]"
+                        "value": "[parameters('messageHandlerSubnetObject').name]"
                     },
                     "subnetAddressPrefix": {
-                        "value": "[parameters('msgHandlerSubnetObject').addressSpace]"
+                        "value": "[parameters('messageHandlerSubnetObject').addressSpace]"
                     },
                     "serviceEndpointList": {
                         "value": "[parameters('subnetServiceEndpointList')]"
