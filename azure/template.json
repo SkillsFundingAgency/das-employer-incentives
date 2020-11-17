@@ -460,7 +460,7 @@
                         "value": "[variables('appServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[resourceGroup().name]"
+                        "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
                         "value": "[reference('message-handler-function-subnet').outputs.SubnetResourceId.value]"
@@ -641,7 +641,7 @@
                         "value": "[variables('paymentProcessFunctionAspName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[resourceGroup().name]"
+                        "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
                         "value": "[reference('payment-process-function-subnet').outputs.SubnetResourceId.value]"
