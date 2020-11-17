@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
@@ -13,14 +15,19 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class ApplicationCommandController : ApiCommandControllerBase
     {
-        public ApplicationCommandController(ICommandDispatcher commandDispatcher) : base(commandDispatcher)
+        private readonly ILogger<ApplicationCommandController> _logger;
+
+        public ApplicationCommandController(ICommandDispatcher commandDispatcher, ILogger<ApplicationCommandController> logger) : base(commandDispatcher)
         {
+            _logger = logger;
         }
 
         [HttpPost("/applications")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateIncentiveApplication([FromBody] CreateIncentiveApplicationRequest request)
         {
+            var json = JsonConvert.SerializeObject(request);
+            _logger.LogInformation($"Create Incentive Application request received from Outer API: {json}");
             await SendCommandAsync(new CreateIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.AccountLegalEntityId, request.Apprenticeships));
             return Created($"/applications/{request.IncentiveApplicationId}", null);
         }
