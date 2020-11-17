@@ -620,7 +620,7 @@
                         "value": "[resourceGroup().name]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('function-subnet').outputs.SubnetResourceId.value]"
+                        "value": "[reference('payment-process-function-subnet').outputs.SubnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": [
