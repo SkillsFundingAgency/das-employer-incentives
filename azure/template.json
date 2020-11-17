@@ -115,6 +115,9 @@
         },
         "subnetDelegations": {
             "type": "array"
+        },
+        "paySubnetObject": {
+            "type": "object"
         }
     },
     "variables": {
@@ -528,6 +531,36 @@
         },
         {
             "apiVersion": "2017-05-10",
+            "name": "payment-process-function-subnet",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'subnet.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "virtualNetworkName": {
+                        "value": "[parameters('sharedEnvVirtualNetworkName')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('paySubnetObject').name]"
+                    },
+                    "subnetAddressPrefix": {
+                        "value": "[parameters('paySubnetObject').addressSpace]"
+                    },
+                    "serviceEndpointList": {
+                        "value": "[parameters('subnetServiceEndpointList')]"
+                    },
+                    "delegations": {
+                        "value": "[parameters('subnetDelegations')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
             "name": "payment-process-function-app-service-plan",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -641,7 +674,8 @@
             },
             "dependsOn": [
                 "payment-process-function-app-service-plan",
-                "payment-process-function-application-insights"
+                "payment-process-function-application-insights",
+                "payment-process-function-subnet"
             ]
         },
         {
