@@ -177,6 +177,7 @@
             "apiVersion": "2020-06-01",
             "name": "api-application-insights",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -197,6 +198,7 @@
             "apiVersion": "2020-06-01",
             "name": "api-app-service",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -398,6 +400,7 @@
             "apiVersion": "2020-06-01",
             "name": "message-handler-function-app-service-plan",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -421,6 +424,7 @@
             "apiVersion": "2020-06-01",
             "name": "message-handler-function-application-insights",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -441,6 +445,7 @@
             "apiVersion": "2020-06-01",
             "name": "message-handler-function-app",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -579,6 +584,7 @@
             "apiVersion": "2020-06-01",
             "name": "payment-process-function-app-service-plan",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -599,6 +605,7 @@
             "apiVersion": "2020-06-01",
             "name": "payment-process-function-application-insights",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -619,6 +626,7 @@
             "apiVersion": "2020-06-01",
             "name": "payment-process-function-app",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
