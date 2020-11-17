@@ -54,7 +54,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriod);
 
             status.RuntimeStatus.Should().NotBe("Failed", status.Output);
-            status.RuntimeStatus.Should().Be("Completed");
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]
