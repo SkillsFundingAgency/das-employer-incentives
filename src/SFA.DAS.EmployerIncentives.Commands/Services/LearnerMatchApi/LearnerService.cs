@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -18,42 +18,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             _serviceVersion = serviceVersion;
         }
 
-        public async Task Refresh(Learner learner)
+        public async Task<LearnerSubmissionDto> Get(Learner learner)
         {
             var response = await _client.GetAsync($"api/v{_serviceVersion}/{learner.Ukprn}/{learner.UniqueLearnerNumber}?");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                learner.SetSubmissionData(null);
-                return;
+                return null;
             }
 
             response.EnsureSuccessStatusCode();
 
             var jsonString = await response.Content.ReadAsStringAsync();
-            var learnerSubmissionDto = JsonConvert.DeserializeObject<LearnerSubmissionDto>(jsonString);
+            var data = JsonConvert.DeserializeObject<LearnerSubmissionDto>(jsonString);
+            data.RawJson = jsonString;
 
-            UpdateSubmissionData(learner, learnerSubmissionDto, jsonString);
-            UpdateProviderDataLockData(learner, learnerSubmissionDto);
-        }
-
-        private static void UpdateSubmissionData(Learner learner, LearnerSubmissionDto learnerSubmissionDto, string jsonString)
-        {
-            var learningFound = learnerSubmissionDto.LearningFound(learner.ApprenticeshipId);
-
-            var submissionData = new SubmissionData(
-                learnerSubmissionDto.IlrSubmissionDate,
-                learningFound
-            );
-
-            submissionData.SetStartDate(learnerSubmissionDto.LearningStartDateForApprenticeship(learner.ApprenticeshipId));
-            submissionData.SetRawJson(jsonString);
-            learner.SetSubmissionData(submissionData);
-        }
-
-        private static void UpdateProviderDataLockData(Learner learner, LearnerSubmissionDto learnerSubmissionDto)
-        {
-            if (learnerSubmissionDto.HasProviderDataLocks(learner)) learner.SetHasDataLock();
+            return data;
         }
     }
 }

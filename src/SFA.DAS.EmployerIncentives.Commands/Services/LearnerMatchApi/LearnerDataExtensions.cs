@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
     {
         private static string PROGRAM_REFERENCE = "ZPROG001";
 
-        public static DateTime? LearningStartDateForApprenticeship(this LearnerSubmissionDto learnerData, long apprenticeshipId)
+        public static DateTime? LearningStartDateForApprenticeship(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             // To determine which price episode to look at requires looking at the Payable Periods within a Price Episode, because Payable Periods are labelled with the Apprenticeship ID.
             // searching for the earliest period with an apprenticeship Id that matches the commitment
@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 where tr.Reference == PROGRAM_REFERENCE
                 from pe in tr.PriceEpisodes
                 from p in pe.Periods
-                where p.ApprenticeshipId == apprenticeshipId
+                where p.ApprenticeshipId == incentive.Apprenticeship.Id
                      && p.IsPayable
                 select new
                 {
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return null;
         }
 
-        public static LearningFoundStatus LearningFound(this LearnerSubmissionDto data, long apprenticeshipId)
+        public static LearningFoundStatus LearningFound(this LearnerSubmissionDto data, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             if (data.Training == null || !data.Training.Any())
             {
@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 return new LearningFoundStatus("A ZPROG001 aim was found, but it had no price episodes");
             }
 
-            if (!data.PaymentsForApprenticeship(apprenticeshipId).Any())
+            if (!data.PaymentsForApprenticeship(incentive.Apprenticeship.Id).Any())
             {
                 return new LearningFoundStatus("A ZPROG001 aim was found, with price episodes, but with no periods with the apprenticeship id that matches the commitment");
             }
@@ -64,17 +64,28 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         // *** Conditions for Provider DataLock ***
         // 1. ZPROG001 reference
-        // 2. PriceEpisode.StartDate <= NexPayment.DueDate => PriceEpisode.EndDate
-        // 3. Period.Period == NexPayment.CollectionPeriod
+        // 2. PriceEpisode.StartDate <= NextPayment.DueDate => PriceEpisode.EndDate
+        // 3. Period.Period == NextPayment.CollectionPeriod
         // 4. Period.ApprenticeshipId == ApprenticeshipIncentive.ApprenticeshipId
         // 5. Period.IsPayable == false
-        public static bool HasProviderDataLocks(this LearnerSubmissionDto data, Learner learner)
+        public static bool HasProviderDataLocks(this LearnerSubmissionDto data, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
-            if (learner.NextPendingPayment == null) return false;
+            if (incentive == null) return false;
 
-            return data
-                .PaymentsForApprenticeship(learner.ApprenticeshipId, learner.NextPendingPayment.DueDate)
-                .Any(p => p.Period == learner.NextPendingPayment.CollectionPeriod && !p.IsPayable);
+            var pendingPayments = incentive.PendingPayments.Where(p => p.PaymentMadeDate == null);
+            if(!pendingPayments.Any())
+            {
+                return false;
+            }
+            var nextPayment = pendingPayments.OrderBy(p => p.DueDate).First();
+            if (nextPayment.PaymentYear != null && nextPayment.PeriodNumber.HasValue)
+            {
+                return data
+               .PaymentsForApprenticeship(incentive.Apprenticeship.Id, nextPayment.DueDate)
+               .Any(p => p.Period == nextPayment.PeriodNumber && !p.IsPayable);
+            }
+
+            return false;
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)

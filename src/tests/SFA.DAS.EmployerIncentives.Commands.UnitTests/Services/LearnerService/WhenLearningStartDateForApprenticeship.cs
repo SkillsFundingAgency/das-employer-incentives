@@ -2,18 +2,20 @@
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
 {
-    public class WhenStartDateForAppenticeshipCalculated
+    public class WhenLearningStartDateForApprenticeship
     {
         private LearnerSubmissionDto _sut;
         private TrainingDto _testTrainingDto;
         private PriceEpisodeDto _testPriceEpisodeDto;
         private PeriodDto _testPeriodDto;
-        private long _apprenticeshipId;
+        private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
         private DateTime _startTime;
         private Fixture _fixture;
 
@@ -22,8 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         {
             _fixture = new Fixture();
 
+            var model = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+
             _sut = _fixture.Create<LearnerSubmissionDto>();
-            _apprenticeshipId = _fixture.Create<long>();
             _startTime = DateTime.Now;
 
             _testTrainingDto = _sut.Training.First();
@@ -34,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             _testPeriodDto = _testPriceEpisodeDto.Periods.First();
 
-            _testPeriodDto.ApprenticeshipId = _apprenticeshipId;
+            _testPeriodDto.ApprenticeshipId = _incentive.Apprenticeship.Id;
             _testPeriodDto.IsPayable = true;
         }
 
@@ -46,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             
 
             //Act
-            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_incentive);
 
             //Assert
             startDate.Should().Be(_startTime);
@@ -59,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.Periods.ToList().ForEach(p => p.IsPayable = false);
 
             //Act
-            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_incentive);
 
             //Assert
             startDate.Should().BeNull();
@@ -72,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.Reference = _fixture.Create<string>();
 
             //Act
-            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_incentive);
 
             //Assert
             startDate.Should().BeNull();
@@ -85,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.ApprenticeshipId = _fixture.Create<long>();
 
             //Act
-            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_incentive);
 
             //Assert
             startDate.Should().BeNull();
@@ -98,12 +102,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             var counter = 1;
             _testTrainingDto.PriceEpisodes.ToList().ForEach(pe => 
             {
-                pe.Periods.ToList().ForEach(p => { p.ApprenticeshipId = _apprenticeshipId; p.IsPayable = true; });            
+                pe.Periods.ToList().ForEach(p => { p.ApprenticeshipId = _incentive.Apprenticeship.Id; p.IsPayable = true; });            
                 pe.StartDate = _startTime.AddDays(counter*-1); counter++; 
             });
 
             //Act
-            var startDate = _sut.LearningStartDateForApprenticeship(_apprenticeshipId);
+            var startDate = _sut.LearningStartDateForApprenticeship(_incentive);
 
             //Assert
             startDate.Should().Be(_startTime.AddDays(-3));

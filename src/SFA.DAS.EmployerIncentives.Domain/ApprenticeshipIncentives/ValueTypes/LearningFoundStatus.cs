@@ -1,6 +1,9 @@
-﻿namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using System.Collections.Generic;
+
+namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
-    public class LearningFoundStatus
+    public class LearningFoundStatus : ValueObject
     {
         public bool LearningFound { get; }
 
@@ -15,6 +18,12 @@
         public LearningFoundStatus(bool learningFound)
         {
             LearningFound = learningFound;
+        }
+
+        protected override IEnumerable<object> GetAtomicValues()
+        {
+            yield return LearningFound;
+            yield return NotFoundReason;
         }
     }
 }

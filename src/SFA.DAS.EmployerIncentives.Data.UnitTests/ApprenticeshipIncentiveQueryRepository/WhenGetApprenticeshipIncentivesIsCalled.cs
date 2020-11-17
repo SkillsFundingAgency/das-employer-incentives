@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveQueryRepository(_context);
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
         [TearDown]
@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
             actual.Count.Should().Be(apprenticeshipIncentives.Count);
             actual.Should().Contain(x => x.Id == apprenticeshipIncentives[0].Id);
             actual.Should().Contain(x => x.ApprenticeshipId == apprenticeshipIncentives[0].ApprenticeshipId);
-            actual.Should().Contain(x => x.ULN == apprenticeshipIncentives[0].Uln);
+            actual.Should().Contain(x => x.ULN == apprenticeshipIncentives[0].ULN);
             actual.Should().Contain(x => x.UKPRN == apprenticeshipIncentives[0].UKPRN);
         }
     }
