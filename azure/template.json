@@ -107,7 +107,7 @@
         "sharedEnvVirtualNetworkName": {
             "type": "string"
         },
-        "subnetObject": {
+        "msgHandlerSubnetObject": {
             "type": "object"
         },
         "subnetServiceEndpointList": {
@@ -132,8 +132,8 @@
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
         "storageContainerNames": [ "employer-incentives-distributed-locks" ],
-        "messageHandlerfunctionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
-        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "messageHandlerFunctionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
+        "messageHandlerFunctionAspName": "[concat(variables('resourceNamePrefix'),'-asp')]",
         "paymentProcessFunctionAppName": "[concat(variables('resourceNamePrefix'),'-pay-fa')]",
         "paymentProcessFunctionAspName": "[concat(variables('resourceNamePrefix'),'-pay-asp')]",
         "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]"
@@ -382,10 +382,10 @@
                         "value": "[parameters('sharedEnvVirtualNetworkName')]"
                     },
                     "subnetName": {
-                        "value": "[parameters('subnetObject').name]"
+                        "value": "[parameters('msgHandlerSubnetObject').name]"
                     },
                     "subnetAddressPrefix": {
-                        "value": "[parameters('subnetObject').addressSpace]"
+                        "value": "[parameters('msgHandlerSubnetObject').addressSpace]"
                     },
                     "serviceEndpointList": {
                         "value": "[parameters('subnetServiceEndpointList')]"
@@ -409,7 +409,7 @@
                 },
                 "parameters": {
                     "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
+                        "value": "[variables('messageHandlerFunctionAspName')]"
                     },
                     "aspSize": {
                         "value": "[parameters('appServicePlanSize')]"
@@ -433,10 +433,10 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('messageHandlerfunctionAppName')]"
+                        "value": "[variables('messageHandlerFunctionAppName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('messageHandlerfunctionAppName')]"
+                        "value": "[variables('messageHandlerFunctionAppName')]"
                     }
                 }
             }
@@ -454,10 +454,10 @@
                 },
                 "parameters": {
                     "functionAppName": {
-                        "value": "[variables('messageHandlerfunctionAppName')]"
+                        "value": "[variables('messageHandlerFunctionAppName')]"
                     },
                     "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
+                        "value": "[variables('messageHandlerFunctionAspName')]"
                     },
                     "appServicePlanResourceGroup": {
                         "value": "[variables('resourceGroupName')]"
@@ -741,9 +741,9 @@
             "type": "string",
             "value": "[variables('databaseName')]"
         },
-        "FunctionAppName": {
+        "MessageHandlerFunctionAppName": {
             "type": "string",
-            "value": "[variables('messageHandlerfunctionAppName')]"
+            "value": "[variables('messageHandlerFunctionAppName')]"
         },
         "PaymentProcessFunctionAppName": {
             "type": "string",
