@@ -34,58 +34,56 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private const int NumberOfApprenticeships = 3;
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
+        private bool _isInLearning;
+        private bool _hasBankDetails;
 
         public ValidatePaymentsSteps(TestContext testContext)
         {
+            _accountModel = _fixture.Build<Account>().Without(a => a.VrfVendorId).Create();
+            _isInLearning = true;
+            _hasBankDetails = true;
             _testContext = testContext;
         }
 
-        [Given(@"a legal entity has pending payments without bank details")]
-        public async Task GivenALegalEntityDoesNotHaveAValidVendorId()
+        [Given(@"there are pending payments")]
+        public Task GivenThereArePendingPayments()
         {
-            await CreateIncentiveWithPayments();
+            return CreateIncentiveWithPayments();
         }
 
-        [Given(@"a legal entity has pending payments with (.*) bank details")]
-        public async Task GivenALegalEntityHasPendingPaymentsWithBankDetails(string status)
+        [Given(@"the '(.*)' will fail")]
+        public void GivenTheValidationStepWillFail(string validationStep)
         {
-            if (status.Equals("valid", StringComparison.InvariantCultureIgnoreCase))
+            switch (validationStep)
             {
-                await CreateIncentiveWithPayments("ABC123");
+                case ValidationStep.HasBankDetails:
+                    _hasBankDetails = false;
+                    break;
+                case ValidationStep.IsInLearning:
+                    _isInLearning = false;
+                    break;
             }
-            else
-            {
-                await CreateIncentiveWithPayments();
-            }
-        }
-
-        [Given(@"the apprentice 'is in learning' is (.*)")]
-        public async Task GivenTheApprenticeIsInLearningIs(bool? isInLearning)
-        {
-            await CreateLearnerRecord(isInLearning);
         }
 
         [When(@"the payment process is run")]
-        public async Task WhenPendingPaymentsForTheLegalEntityAreValidated()
+        public async Task WhenThePaymentProcessIsRun()
         {
-            var status =
-                await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear,
-                    CollectionPeriod);
+            await CreateAccount();
+            await CreateLearnerRecord();
+
+            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriod);
 
             status.RuntimeStatus.Should().NotBe("Failed", status.Output);
             status.RuntimeStatus.Should().Be("Completed");
         }
 
-        [Then(@"bank details validation check is (.*)")]
-        public async Task ThenBankDetailsValidationCheckIs(bool isValid)
+        [Then(@"the '(.*)' will have a failed validation result")]
+        public async Task ThenTheValidationStepWillHaveAFailedValidationResult(string step)
         {
-            await CheckValidationStepIs(ValidationStep.HasBankDetails, isValid);
-        }
-
-        [Then(@"apprentice is in learning check is (.*)")]
-        public async Task ThenApprenticeIsInLearningCheckIs(bool isInLearning)
-        {
-            await CheckValidationStepIs(ValidationStep.IsInLearning, isInLearning);
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
+            results.Should().HaveCount(2);
+            results.All(r => r.Result == false).Should().BeTrue();
         }
 
         [Then(@"successful validation results are recorded")]
@@ -94,14 +92,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
             results.All(r => r.Result == true).Should().BeTrue();
-        }
-
-        public async Task CheckValidationStepIs(string step, bool value)
-        {
-            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
-            results.Should().HaveCount(2);
-            results.All(r => r.Result == value).Should().BeTrue();
         }
 
         [Then(@"payment records are created")]

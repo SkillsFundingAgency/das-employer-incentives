@@ -7,17 +7,24 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Account = SFA.DAS.EmployerIncentives.Data.Models.Account;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     public partial class ValidatePaymentsSteps
     {
-        private async Task CreateIncentiveWithPayments(string vendorId = null)
+        private async Task CreateAccount()
         {
-            _accountModel = _fixture.Create<Account>();
-            _accountModel.VrfVendorId = vendorId; // Invalid bank details if null
+            if (_hasBankDetails)
+            {
+                _accountModel.VrfVendorId = _fixture.Create<string>(); // Invalid bank details if null
+            }
 
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await connection.InsertAsync(_accountModel);
+        }
+
+        private async Task CreateIncentiveWithPayments()
+        {
             _applicationModel = _fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
                 .With(p => p.AccountId, _accountModel.Id)
@@ -68,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            await connection.InsertAsync(_accountModel);
+            //await connection.InsertAsync(_accountModel);
             await connection.InsertAsync(_applicationModel);
             await connection.InsertAsync(_apprenticeshipsModels);
             await connection.InsertAsync(_apprenticeshipIncentive);
@@ -77,14 +84,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await connection.InsertAsync(_pendingPayment3);
         }
 
-        private async Task CreateLearnerRecord(bool? isInLearning)
+        private async Task CreateLearnerRecord()
         {
             _learner = _fixture.Build<Learner>()
                 .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.ULN, _apprenticeshipIncentive.ULN)
                 .With(p => p.SubmissionFound, true)
-                .With(p => p.InLearning, isInLearning)
+                .With(p => p.InLearning, _isInLearning)
                 .Create();
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
