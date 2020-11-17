@@ -132,7 +132,7 @@
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
         "storageContainerNames": [ "employer-incentives-distributed-locks" ],
-        "functionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
+        "messageHandlerfunctionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
         "paymentProcessFunctionAppName": "[concat(variables('resourceNamePrefix'),'-pay-fa')]",
         "paymentProcessFunctionAspName": "[concat(variables('resourceNamePrefix'),'-pay-asp')]",
@@ -429,10 +429,10 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('messageHandlerfunctionAppName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('messageHandlerfunctionAppName')]"
                     }
                 }
             }
@@ -449,7 +449,7 @@
                 },
                 "parameters": {
                     "functionAppName": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('messageHandlerfunctionAppName')]"
                     },
                     "appServicePlanName": {
                         "value": "[variables('appServicePlanName')]"
@@ -458,7 +458,7 @@
                         "value": "[resourceGroup().name]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('function-subnet').outputs.SubnetResourceId.value]"
+                        "value": "[reference('message-handler-function-subnet').outputs.SubnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
@@ -485,7 +485,7 @@
                                 },
                                 {
                                     "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference('function-application-insights').outputs.InstrumentationKey.value]"
+                                    "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -531,7 +531,7 @@
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[reference('function-app').outputs.managedServiceIdentityId.value]"
+                        "value": "[reference('message-handler-function-app').outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusOwner"
@@ -733,7 +733,7 @@
         },
         "FunctionAppName": {
             "type": "string",
-            "value": "[variables('functionAppName')]"
+            "value": "[variables('messageHandlerfunctionAppName')]"
         },
         "PaymentProcessFunctionAppName": {
             "type": "string",
