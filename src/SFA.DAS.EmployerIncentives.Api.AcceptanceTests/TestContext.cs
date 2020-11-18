@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     public class TestContext
     {
         public DirectoryInfo TestDirectory { get; set; }
-        public SqlDatabase2 SqlDatabase { get; set; }
+        public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
         public TestMessageBus MessageBus { get; set; }

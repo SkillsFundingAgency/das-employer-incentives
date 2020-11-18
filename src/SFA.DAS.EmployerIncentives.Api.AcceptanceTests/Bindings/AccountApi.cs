@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 
         public AccountApi(TestContext context)
         {
-            _context = context;            
+            _context = context;
         }
 
         [BeforeScenario(Order = 4)]
