@@ -24,3 +24,4 @@ Examples:
 	| HasBankDetails    |
 	| IsInLearning      |
 	| HasLearningRecord |
+	| HasNoDataLocks    |
