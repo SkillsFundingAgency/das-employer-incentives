@@ -3,17 +3,24 @@
 	As a employer incentives service
 	I want to be validate and submit payment requests
 
-Scenario: When bank details have been validated successfully
-	Given a legal entity has pending payments with valid bank details
+Scenario: When all validation checks are successful
+	Given there are pending payments
 	When the payment process is run
 	Then successful validation results are recorded
 	And payment records are created
 	And pending payments are marked as paid
 	And future payments are not marked as paid
 
-Scenario: When bank details have failed validation
-	Given a legal entity has pending payments without bank details
+Scenario: When at least one validation check fails
+	Given there are pending payments
+	And the '<ValidationStep>' will fail
 	When the payment process is run
-	Then failed validation results are recorded
+	Then the '<ValidationStep>' will have a failed validation result
 	And no payment records are created
 	And pending payments are not marked as paid
+
+Examples:
+	| ValidationStep    |
+	| HasBankDetails    |
+	| IsInLearning      |
+	| HasLearningRecord |

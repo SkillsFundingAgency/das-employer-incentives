@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePendingPayment;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
@@ -25,10 +24,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private ValidatePendingPaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
-                private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private List<CollectionPeriod> _collectionPeriods;
         private string _vrfVendorId;
         private Account _account;
+        private LearnerModel _learnerModel;
+        private Learner _learner;
 
         private Fixture _fixture;
 
@@ -40,6 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
+            _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
@@ -89,10 +92,29 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(m => m.Find(incentive.Account.Id))
                 .ReturnsAsync(domainAccount);
 
+            var submissionData = new SubmissionData(DateTime.UtcNow);
+            submissionData.SetLearningFound(new LearningFoundStatus(true));
+            submissionData.SetIsInLearning(true);
+
+            _learnerModel = _fixture.Build<LearnerModel>()
+                .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)
+                .With(m => m.ApprenticeshipIncentiveId, incentive.Id)
+                .With(m => m.UniqueLearnerNumber, incentive.Apprenticeship.UniqueLearnerNumber)
+                .With(m=>m.SubmissionData, submissionData)
+                .Create();
+
+            _learner = new LearnerFactory().GetExisting(_learnerModel);
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetByApprenticeshipIncentiveId(incentive.Id))
+                .ReturnsAsync(_learner);
+
+
             _sut = new ValidatePendingPaymentCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
-                _mockCollectionCalendarService.Object);
+                _mockCollectionCalendarService.Object,
+                _mockLearnerDomainRepository.Object);
         }
 
         [Test]
