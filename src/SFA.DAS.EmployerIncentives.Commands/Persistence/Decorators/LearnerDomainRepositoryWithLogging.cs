@@ -15,7 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators
             ILoggerFactory loggerFactory)
         {
             _domainRepository = domainRepository;
-            _aggregateLogger = new DomainRepositoryWithAggregateLogging<Guid, Learner>(_domainRepository, loggerFactory);
+            _aggregateLogger =
+                new DomainRepositoryWithAggregateLogging<Guid, Learner>(_domainRepository, loggerFactory);
         }
 
         public Task<Learner> Find(Guid id)
@@ -23,9 +24,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators
             return _aggregateLogger.Find(id);
         }
 
-        public Task<Learner> GetByApprenticeshipIncentiveId(Guid incentiveId)
+        public Task<Learner> Get(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
-            return _domainRepository.GetByApprenticeshipIncentiveId(incentiveId);
+            return _domainRepository.Get(incentive);
         }
 
         public Task Save(Learner aggregate)

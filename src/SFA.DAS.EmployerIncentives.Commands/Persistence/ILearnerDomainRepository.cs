@@ -1,11 +1,12 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using System;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 {
-    public interface ILearnerDomainRepository : IDomainRepository<Guid, Domain.ApprenticeshipIncentives.Learner>
+    public interface ILearnerDomainRepository : IDomainRepository<Guid, Learner>
     {
-        Task<Domain.ApprenticeshipIncentives.Learner> GetByApprenticeshipIncentiveId(Guid incentiveId);
+        Task<Learner> Get(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive);
     }
 }

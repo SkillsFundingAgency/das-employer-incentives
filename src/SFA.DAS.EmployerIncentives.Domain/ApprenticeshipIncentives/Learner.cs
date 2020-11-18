@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public long Ukprn => Model.Ukprn;
         public long UniqueLearnerNumber => Model.UniqueLearnerNumber;
         public long ApprenticeshipId => Model.ApprenticeshipId;
-        public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;        
+        public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;
 
         public SubmissionData SubmissionData => Model.SubmissionData;
         public bool SubmissionFound => Model.SubmissionData != null;
@@ -27,14 +27,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             return new Learner(
                 new LearnerModel
-            {
-                Id = id,
-                ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
-                ApprenticeshipId = apprenticeshipId,
-                Ukprn = ukprn,
-                UniqueLearnerNumber = uniqueLearnerNumber,
-                CreatedDate = createdDate
-            },  true);
+                {
+                    Id = id,
+                    ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
+                    ApprenticeshipId = apprenticeshipId,
+                    Ukprn = ukprn,
+                    UniqueLearnerNumber = uniqueLearnerNumber,
+                    CreatedDate = createdDate
+                }, true);
         }
 
         internal static Learner Get(LearnerModel model)
@@ -47,10 +47,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.SubmissionData = submissionData;
         }
 
+        public NextPendingPayment NextPendingPayment { get; private set; }
+
+        public void SetNextPendingPayment(NextPendingPayment value)
+        {
+            NextPendingPayment = value;
+        }
+
         private Learner(LearnerModel model, bool isNew = false) : base(model.Id, model, isNew)
         {
         }
-
 
         public Log Log
         {
