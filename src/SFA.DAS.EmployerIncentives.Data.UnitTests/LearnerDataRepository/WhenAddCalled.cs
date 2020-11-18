@@ -43,6 +43,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             submissionData.SetLearningFound(new LearningFoundStatus());
             submissionData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
+            submissionData.SetStartDate(_fixture.Create<DateTime>());
+            submissionData.SetIsInLearning(true);
 
             var testLearner = 
                 _fixture.Build<LearnerModel>()
@@ -66,9 +68,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
             storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
             storedLearner.HasDataLock.Should().BeTrue();
-            storedLearner.StartDate.Should().BeNull();
+            storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
             storedLearner.DaysInLearning.Should().BeNull();
-            storedLearner.InLearning.Should().BeNull();
+            storedLearner.InLearning.Should().BeTrue();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
             storedLearner.CreatedDate.Should().Be(testLearner.CreatedDate);
         }

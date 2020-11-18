@@ -50,9 +50,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             if(learnerData != null)
             {
                 submissionData = new SubmissionData(learnerData.IlrSubmissionDate);
-                submissionData.SetStartDate(learnerData.LearningStartDateForApprenticeship(incentive));
+                submissionData.SetStartDate(learnerData.LearningStartDate(incentive));
                 submissionData.SetLearningFound(learnerData.LearningFound(incentive));
-                submissionData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
+                submissionData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));                
+                submissionData.SetIsInLearning(learnerData.IsInLearning(incentive));
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 

@@ -37,11 +37,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             HasDataLock = hasDataLock;
         }
 
+        public void SetIsInLearning(bool? isInLearning)
+        {
+            IsInlearning = isInLearning;
+        }
+
         public void SetRawJson(string rawJson)
         {
             RawJson = rawJson;
         }
-
+                
         public Log Log
         {
             get
