@@ -38,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
             incentive.ValidatePendingPaymentBankDetails(command.PendingPaymentId, account, collectionPeriod);
             incentive.ValidateHasLearningRecord(command.PendingPaymentId, learner, collectionPeriod);
             incentive.ValidateIsInLearning(command.PendingPaymentId, learner, collectionPeriod);
+            incentive.ValidateHasNoDataLocks(command.PendingPaymentId, learner, collectionPeriod);
 
             await _domainRepository.Save(incentive);
         }

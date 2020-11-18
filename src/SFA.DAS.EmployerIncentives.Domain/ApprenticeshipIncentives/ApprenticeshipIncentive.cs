@@ -165,6 +165,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasLearningRecord, hasLearningRecord));
         }
 
+        public void ValidateHasNoDataLocks(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
+        {
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            var hasDataLock = false;
+            if (matchedLearner != null)
+            {
+                hasDataLock = matchedLearner.SubmissionFound && matchedLearner.SubmissionData.HasDataLock;
+            }
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
+        }
 
         private PendingPayment GetPendingPaymentForValidationCheck(Guid pendingPaymentId)
         {
