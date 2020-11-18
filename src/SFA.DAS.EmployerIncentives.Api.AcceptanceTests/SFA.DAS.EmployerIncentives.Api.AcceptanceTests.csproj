@@ -31,7 +31,6 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
   </ItemGroup>
 
-
   <ItemGroup>
     <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
       <DesignTime>True</DesignTime>
