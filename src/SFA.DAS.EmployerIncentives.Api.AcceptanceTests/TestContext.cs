@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
-{    
+{
     public class TestContext
     {
         public DirectoryInfo TestDirectory { get; set; }
@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public TestLearnerMatchApi LearnerMatchApi { get; set; }
         public TestMessageBus MessageBus { get; set; }
         public TestDomainMessageHandlers DomainMessageHandlers { get; set; }
-        
+
         public TestData TestData { get; set; }
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }

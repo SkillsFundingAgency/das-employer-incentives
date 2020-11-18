@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
     public static class SqlDatabaseModel
     {
-        public const string ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=model;Integrated Security=True";
+        public const string ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True";
 
         public static void Update()
         {
@@ -19,10 +19,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             {
                 var operationKeys = FetchRefactorLogRecords();
                 modelNeedsUpdating = CheckModelNeedsUpdating(operationKeys);
+                Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(Update)}: ModelNeedsUpdating={modelNeedsUpdating}");
             }
             catch (SqlException ex)
             {
-                if (ex.Message.Contains("Invalid object name 'dbo.__RefactorLog'"))
+                if (ex.Message.Contains("RefactorLog"))
                     modelNeedsUpdating = true;
             }
 
@@ -55,17 +56,27 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         {
             var operationKeys = new HashSet<Guid>();
             using var dbConn = new SqlConnection(ConnectionString);
-            using var cmd = new SqlCommand("SELECT * FROM [dbo].[__RefactorLog]", dbConn);
-            dbConn.Open();
-            var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                operationKeys.Add(Guid.Parse(reader[0].ToString()!));
+                using var cmd = new SqlCommand("SELECT * FROM [model].[dbo].[__RefactorLog] WITH (NOLOCK)", dbConn);
+                dbConn.Open();
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    operationKeys.Add(Guid.Parse(reader[0].ToString()!));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                dbConn.Close();
             }
 
-            dbConn.Close();
             return operationKeys;
-
         }
 
         private static void PublishModel()
