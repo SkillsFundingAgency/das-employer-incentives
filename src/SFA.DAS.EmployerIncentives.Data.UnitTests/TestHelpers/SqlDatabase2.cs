@@ -18,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
         private void CreateTestDatabase()
         {
+            Directory.CreateDirectory("C:\\temp");
             DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
             DatabaseInfo.SetConnectionString(
                 @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");
