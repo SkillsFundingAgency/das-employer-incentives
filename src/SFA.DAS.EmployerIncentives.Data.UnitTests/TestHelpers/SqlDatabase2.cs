@@ -25,7 +25,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             using var dbConn = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True");
             try
             {
-                var sql = $"CREATE DATABASE [{DatabaseInfo.DatabaseName}]";
+                var sql = @$"CREATE DATABASE [{DatabaseInfo.DatabaseName}] ON PRIMARY
+                     (NAME = [{DatabaseInfo.DatabaseName}_Data],
+                      FILENAME = 'C:\\temp\\{DatabaseInfo.DatabaseName}.mdf')
+                      LOG ON (NAME = [{DatabaseInfo.DatabaseName}_Log],
+                      FILENAME = 'C:\\temp\\{DatabaseInfo.DatabaseName}.ldf')";
                 using var cmd = new SqlCommand(sql, dbConn);
                 dbConn.Open();
                 cmd.ExecuteNonQuery();
