@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _httpClient.VerifyGetAsAsync($"api/v{_version}/{_learner.Ukprn}/{_learner.UniqueLearnerNumber}?", Times.Once());
             response.Should().NotBeNull();
             response.RawJson.Should().Be(JsonConvert.SerializeObject(learnerSubmissionDto));
-            response.Ukprn.Should().Be(_learner.Ukprn);            
+            response.Ukprn.Should().Be(_learner.Ukprn);
         }
     }
 }

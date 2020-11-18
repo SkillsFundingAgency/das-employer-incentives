@@ -24,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
         private LearnerSubmissionDto _learnerSubmissionDto;
+        private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _apprenticeshipIncentive;
 
         [SetUp]
         public void Arrange()
@@ -43,10 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .Create();
 
             _apprenticeshipIncentiveId = incentive.Id;
-
+            _apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveId, incentive);
+            
             _mockApprenticeshipIncentiveDomainRepository
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
-                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveId, incentive));
+                .ReturnsAsync(_apprenticeshipIncentive);
 
             _learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
 
@@ -147,7 +149,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => !l.SubmissionData.LearningFound)
+                It.Is<Learner>(l => !l.SubmissionData.LearningFoundStatus.LearningFound)
                 ), Times.Once);
         }
 
@@ -163,6 +165,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             _fixture
                                 .Build<TrainingDto>()
                                 .With(p => p.Reference, "ZPROG001")
+                                .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){
+                                    _fixture.Build<PriceEpisodeDto>()
+                                    .With(pe => pe.Periods, new List<PeriodDto>(){
+                                        _fixture.Build<PeriodDto>().With(p => p.ApprenticeshipId, _apprenticeshipIncentive.Apprenticeship.Id).Create()
+                                        })
+                                    .Create()
+                                })
                                 .Create(),
                             _fixture.Create<TrainingDto>()
                             })
@@ -177,7 +186,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.LearningFound)
+                It.Is<Learner>(l => l.SubmissionData.LearningFoundStatus.LearningFound)
                 ), Times.Once);
         }
 

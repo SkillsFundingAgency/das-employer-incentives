@@ -1,37 +1,41 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Polly;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.AzureFunctions;
 using System;
-using System.Diagnostics;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
     public class TestPaymentsProcessFunctions : IDisposable
     {
-        private const string TestConfigFile = "local.settings.json";
-        private readonly TestContext _testContext;
-        private const int Port = 7007;
-        private readonly Settings _settings = new Settings();
-        private readonly HttpClient _client;
-        private bool _isDisposed;
-        private Process _functionHostProcess;
+        private const int Port = 7003;
+        private const int StartupTimeoutInSeconds = 15;
+        private const int OrchestratorRunTimeoutInSeconds = 30;
 
-        public TestPaymentsProcessFunctions(TestContext testContext)
+        private bool _isDisposed;
+        private readonly HttpClient _client;
+        private readonly FunctionsController _functionsController;
+        private readonly TestPaymentsProcessFunctionsConfigurator _configurator;
+        private DateTime _functionHostStartedOn;
+
+        public TestPaymentsProcessFunctions(TestContext context)
         {
-            _testContext = testContext;
             _client = new HttpClient { BaseAddress = new Uri($"http://localhost:{Port}") };
+            _functionsController = new FunctionsController();
+            _configurator = new TestPaymentsProcessFunctionsConfigurator(context.SqlDatabase.DatabaseInfo.ConnectionString,
+                context.LearnerMatchApi.BaseAddress);
         }
 
-        public void Start()
+        public async Task Start()
         {
-            ReadTestConfig();
-            StartFunctionHost();
+            _functionsController.StartFunctionsHost(Port, _configurator.Setup().Settings);
+            await FunctionsOrchestratorIsReady();
+            _functionHostStartedOn = DateTime.UtcNow;
         }
 
         public void Dispose()
@@ -43,163 +47,107 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         protected virtual void Dispose(bool disposing)
         {
             if (_isDisposed) return;
-
-            if (_functionHostProcess != null)
-            {
-                if (!_functionHostProcess.HasExited)
-                {
-                    _functionHostProcess.Kill();
-                }
-
-                _functionHostProcess.CloseMainWindow();
-                _functionHostProcess.Dispose();
-            }
-
-            _testContext.SqlDatabase?.Dispose();
+            _functionsController.Dispose();
+            _client.Dispose();
             _isDisposed = true;
         }
 
-        public async Task<AzureFunctionOrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodMonth)
+        public async Task<OrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodMonth)
         {
-            var orchestrationLinks = await StartFunctionOrchestration(collectionPeriodYear, collectionPeriodMonth);
-            return await CompleteFunctionOrchestration(orchestrationLinks);
+            var orchestrationLinks = await StartIncentivePaymentOrchestrator(collectionPeriodYear, collectionPeriodMonth);
+            return await FunctionOrchestrationCompleted(orchestrationLinks);
         }
 
         public async Task StartLearnerMatching()
         {
             await StartLearnerMatchingOrchestrator();
-            Thread.Sleep(TimeSpan.FromSeconds(20));
+            Thread.Sleep(TimeSpan.FromSeconds(1)); // time it takes function host to update storage 🤷‍
+            await AllFunctionOrchestrationCompleted();
         }
 
-        private async Task<AzureFunctionOrchestrationLinks> StartFunctionOrchestration(short collectionPeriodYear, byte collectionPeriod)
+        private async Task<OrchestrationLinks> StartIncentivePaymentOrchestrator(short collectionPeriodYear, byte collectionPeriod)
         {
-            var policy = Policy
-                .Handle<HttpRequestException>()
-                .WaitAndRetryAsync(new[]
-                {
-                    // Tweak these time-outs if you're still getting errors 👇
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(2),
-                    TimeSpan.FromSeconds(3),
-                    TimeSpan.FromSeconds(5),
-                });
-
             var url = $"api/orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriod}";
-            HttpResponseMessage orchestrationResponse = null;
-            await policy.ExecuteAsync(async () =>
-            {
-                orchestrationResponse = await _client.GetAsync(url);
-                orchestrationResponse.EnsureSuccessStatusCode();
-            });
-
-            var linksJson = await orchestrationResponse.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<AzureFunctionOrchestrationLinks>(linksJson);
+            var orchestrationResponse = await _client.GetAsync(url);
+            orchestrationResponse.EnsureSuccessStatusCode();
+            var json = await orchestrationResponse.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<OrchestrationLinks>(json);
         }
 
         private async Task StartLearnerMatchingOrchestrator()
         {
-            var policy = Policy
-                .Handle<HttpRequestException>()
-                .WaitAndRetryAsync(new[]
-                {
-                    // Tweak these time-outs if you're still getting errors 👇
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(2),
-                    TimeSpan.FromSeconds(3),
-                    TimeSpan.FromSeconds(5),
-                });
-
             var url = $"admin/functions/LearnerMatchingOrchestrator_Start";
-            HttpResponseMessage response = null;
-            await policy.ExecuteAsync(async () =>
-            {
-                var content = new StringContent("{ input : null }", Encoding.UTF8, "application/json");
-                response = await _client.PostAsync(url, content);
-                response.EnsureSuccessStatusCode();
-            });
-
-            var output = await response.Content.ReadAsStringAsync();
-
+            var content = new StringContent("{ input : null }", Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync(url, content);
+            response.EnsureSuccessStatusCode();
         }
 
-
-        private async Task<AzureFunctionOrchestrationStatus> CompleteFunctionOrchestration(AzureFunctionOrchestrationLinks azureFunctionOrchestrationLinks)
+        public async Task AllFunctionOrchestrationCompleted()
         {
             var policy = Policy
-                .HandleResult<bool>(true)
-                .WaitAndRetryAsync(new[]
-                {
-                    // Tweak these time-outs if you're still getting errors 👇
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(2),
-                    TimeSpan.FromSeconds(3),
-                    TimeSpan.FromSeconds(5),
-                });
+                .HandleResult(true)
+                .WaitAndRetryAsync(Enumerable.Repeat(TimeSpan.FromSeconds(1), OrchestratorRunTimeoutInSeconds));
 
-            AzureFunctionOrchestrationStatus azureFunctionOrchestrationStatus = null;
+            const string statusQuery = "Running,Pending";
+
+            var url = $"runtime/webhooks/durabletask/instances?createdTimeFrom={_functionHostStartedOn:s}&runtimeStatus={statusQuery}";
+            List<OrchestrationStatus> status;
+
             await policy.ExecuteAsync(async () =>
             {
-                var statusResponse = await _client.GetAsync(azureFunctionOrchestrationLinks.StatusQueryGetUri);
+                var statusResponse = await _client.GetAsync(url);
                 statusResponse.EnsureSuccessStatusCode();
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();
-                azureFunctionOrchestrationStatus = JsonConvert.DeserializeObject<AzureFunctionOrchestrationStatus>(statusJson);
+                status = JsonConvert.DeserializeObject<List<OrchestrationStatus>>(statusJson);
 
-                return azureFunctionOrchestrationStatus.RuntimeStatus == "Pending" || azureFunctionOrchestrationStatus.RuntimeStatus == "Running";
+                Console.WriteLine($"[{nameof(TestPaymentsProcessFunctions)}] AllFunctionOrchestrationCompleted: {status.Count} functions in status {statusQuery}");
+                return status.Any();
             });
-            return azureFunctionOrchestrationStatus;
         }
 
-        public void StartFunctionHost()
+        private async Task FunctionsOrchestratorIsReady()
         {
-            var functionHostPath = Environment.ExpandEnvironmentVariables(_settings.FunctionHostPath);
-            if (!File.Exists(functionHostPath)) throw new Exception("Wrong path to func.exe");
-
-            var functionAppFolder = Path.Combine(
-                    Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)), _settings.FunctionApplicationPath);
-            if (!Directory.Exists(functionAppFolder)) throw new Exception("Wrong path to functions' bin folder");
-
-            var functionConfig = Path.Combine(functionAppFolder, TestConfigFile);
-            File.Copy(TestConfigFile, functionConfig, overwrite: true);
-            ReplaceDbConnectionString(functionConfig);
-            ReplaceLearnerMatchUrlString(functionConfig);
-
-            var startInfo = new ProcessStartInfo
+            try
             {
-                FileName = functionHostPath,
-                Arguments = $"start -p {Port} --pause-on-error",
-                WorkingDirectory = functionAppFolder,
-                UseShellExecute = true,
-            };
-            _functionHostProcess = new Process { StartInfo = startInfo };
-            var success = _functionHostProcess.Start();
+                var url = "runtime/webhooks/durabletask/instances";
 
-            if (!success) throw new InvalidOperationException("Could not start Azure Functions host.");
+                var policy = Policy
+                    .Handle<HttpRequestException>()
+                    .WaitAndRetryAsync(Enumerable.Repeat(TimeSpan.FromSeconds(1), StartupTimeoutInSeconds));
+
+                await policy.ExecuteAsync(async () =>
+                {
+                    Console.WriteLine($"[{nameof(TestPaymentsProcessFunctions)}] FunctionsOrchestratorIsReady");
+                    var statusResponse = await _client.GetAsync(url);
+                    statusResponse.EnsureSuccessStatusCode();
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to start functions host. {ex.Message}");
+                throw;
+            }
         }
 
-        private void ReadTestConfig()
+        private async Task<OrchestrationStatus> FunctionOrchestrationCompleted(OrchestrationLinks orchestrationLinks)
         {
-            new ConfigurationBuilder()
-                .AddJsonFile(TestConfigFile, optional: false) // Must have it!
-                .AddEnvironmentVariables()
-                .Build()
-                .Bind("TestSettings", _settings);
-        }
+            var policy = Policy
+                .HandleResult(true)
+                .WaitAndRetryAsync(Enumerable.Repeat(TimeSpan.FromSeconds(1), OrchestratorRunTimeoutInSeconds));
 
-        private void ReplaceDbConnectionString(string pathToConfig)
-        {
-            var escapedConnString = HttpUtility.JavaScriptStringEncode(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("DB_CONNECTION_STRING", escapedConnString));
-        }
+            OrchestrationStatus orchestrationStatus = null;
+            await policy.ExecuteAsync(async () =>
+            {
+                Console.WriteLine($"[{nameof(TestPaymentsProcessFunctions)}] FunctionOrchestrationCompleted");
+                var statusResponse = await _client.GetAsync(orchestrationLinks.StatusQueryGetUri);
+                statusResponse.EnsureSuccessStatusCode();
+                var statusJson = await statusResponse.Content.ReadAsStringAsync();
+                orchestrationStatus = JsonConvert.DeserializeObject<OrchestrationStatus>(statusJson);
 
-        private void ReplaceLearnerMatchUrlString(string pathToConfig)
-        {
-            var baseAddress = HttpUtility.JavaScriptStringEncode(_testContext.LearnerMatchApi.BaseAddress);
-            File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("LEARNER_MATCH_API_URL", baseAddress));
+                return orchestrationStatus.RuntimeStatus == "Pending" || orchestrationStatus.RuntimeStatus == "Running";
+            });
+            return orchestrationStatus;
         }
-
 
     }
 }

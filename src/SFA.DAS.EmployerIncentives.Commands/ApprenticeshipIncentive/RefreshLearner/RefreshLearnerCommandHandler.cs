@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
@@ -50,7 +49,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             var learnerData = await _learnerService.Get(learner);
             if(learnerData != null)
             {
-                submissionData = new SubmissionData(learnerData.IlrSubmissionDate, learnerData.Training.Any(t => t.Reference == "ZPROG001"));
+                submissionData = new SubmissionData(learnerData.IlrSubmissionDate);
+                submissionData.SetStartDate(learnerData.LearningStartDateForApprenticeship(incentive));
+                submissionData.SetLearningFound(learnerData.LearningFound(incentive));
+                submissionData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 

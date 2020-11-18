@@ -21,18 +21,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("RefreshLearnerData")]
-    [NUnit.Framework.CategoryAttribute("database")]
-    [NUnit.Framework.CategoryAttribute("functions")]
-    [NUnit.Framework.CategoryAttribute("learnerMatchApi")]
     public partial class RefreshLearnerDataFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = new string[] {
-                "database",
-                "functions",
-                "learnerMatchApi"};
+        private string[] _featureTags = ((string[])(null));
         
 #line 1 "RefreshLearnerData.feature"
 #line hidden
@@ -42,10 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RefreshLearnerData", "\tWhen the request to refresh learner data for an apprenticeship incentive is rece" +
-                    "ived\r\n\tThen the learner data is either created or updated", ProgrammingLanguage.CSharp, new string[] {
-                        "database",
-                        "functions",
-                        "learnerMatchApi"});
+                    "ived\r\n\tThen the learner data is either created or updated", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -92,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Request to refresh learner data for a new Apprenticeship Incentive where no learn" +
                     "er data exists", null, tagsOfScenario, argumentsOfScenario);
-#line 8
+#line 5
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -112,14 +103,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 6
  testRunner.Given("an apprenticeship incentive exists and without a corresponding learner match reco" +
                         "rd", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 10
+#line 7
  testRunner.When("the learner data is refreshed for the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 11
+#line 8
  testRunner.Then("the apprenticeship incentive learner data is created for the application without " +
                         "any submission data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -136,7 +127,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Request to refresh learner data for a new Apprenticeship Incentive where learner " +
                     "data exists", null, tagsOfScenario, argumentsOfScenario);
-#line 13
+#line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -156,13 +147,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 14
+#line 11
  testRunner.Given("an apprenticeship incentive exists and with a corresponding learner match record", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 15
+#line 12
  testRunner.When("the learner data is refreshed for the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 16
+#line 13
  testRunner.Then("the apprenticeship incentive learner data is created for the application with sub" +
                         "mission data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -179,7 +170,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Request to refresh learner data for a new Apprenticeship Incentive where learner " +
                     "data previously refreshed", null, tagsOfScenario, argumentsOfScenario);
-#line 18
+#line 15
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -199,13 +190,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 19
+#line 16
  testRunner.Given("an apprenticeship incentive exists and has previously been refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 20
+#line 17
  testRunner.When("the learner data is refreshed for the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 21
+#line 18
  testRunner.Then("the apprenticeship incentive learner data is updated for the application with sub" +
                         "mission data", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

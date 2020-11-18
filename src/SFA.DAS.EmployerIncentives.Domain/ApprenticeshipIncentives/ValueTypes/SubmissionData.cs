@@ -7,15 +7,35 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class SubmissionData : ValueObject, ILogWriter
     {
-        public SubmissionData(DateTime submissionDate, bool learningFound)
+        public SubmissionData(DateTime submissionDate)
         {
             SubmissionDate = submissionDate;
-            LearningFound = learningFound;
         }
 
         public DateTime SubmissionDate { get; }
-        public bool LearningFound { get; }
+
+        public bool? IsInlearning { get; private set; }
+        public LearningFoundStatus LearningFoundStatus { get; private set; }
+
+        public DateTime? StartDate { get; private set; }
+        public bool HasDataLock { get; private set; }
+
         public string RawJson { get; private set; }
+
+        public void SetStartDate(DateTime? startDate)
+        {
+            StartDate = startDate;
+        }
+
+        public void SetLearningFound(LearningFoundStatus learningFoundStatus)
+        {
+            LearningFoundStatus = learningFoundStatus;
+        }
+
+        public void SetHasDataLock(bool hasDataLock)
+        {
+            HasDataLock = hasDataLock;
+        }
 
         public void SetRawJson(string rawJson)
         {
@@ -29,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
                 return new Log
                 {
-                    OnProcessed = () => $"Submisison data : LearningFound {LearningFound}"
+                    OnProcessed = () => $"Submission data : LearningFound {LearningFoundStatus?.LearningFound}, StartDate {StartDate}, IsInlearning {IsInlearning}, HasDataLock {HasDataLock} "
                 };
             }
         }
@@ -37,7 +57,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return SubmissionDate;
-            yield return LearningFound;
+            yield return LearningFoundStatus;
+            yield return IsInlearning;            
+            yield return HasDataLock;
         }
     }
 }

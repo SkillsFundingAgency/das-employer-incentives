@@ -47,6 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             await _dbContext.SaveChangesAsync();
 
             var submissionData = _fixture.Create<SubmissionData>();
+            submissionData.SetLearningFound(new LearningFoundStatus());
+            submissionData.SetHasDataLock(true);            
             submissionData.SetRawJson(_fixture.Create<string>());
 
             var testLearner =
@@ -70,9 +72,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedLearner.ULN.Should().Be(testLearner.UniqueLearnerNumber);
             storedLearner.SubmissionFound.Should().Be(true);
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
-            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFound);
-            storedLearner.HasDataLock.Should().BeNull();
-            storedLearner.StartDate.Should().BeNull();
+            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
+            storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
+            storedLearner.HasDataLock.Should().BeTrue();
             storedLearner.DaysInLearning.Should().BeNull();
             storedLearner.InLearning.Should().BeNull();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
