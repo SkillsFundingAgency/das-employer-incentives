@@ -17,16 +17,14 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
     {
         private ApplicationCommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
-        private Mock<ILogger<ApplicationCommandController>> _mockLogger;
         private Fixture _fixture;
 
         [SetUp]
         public void Setup()
         {
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
-            _mockLogger = new Mock<ILogger<ApplicationCommandController>>();
             _fixture = new Fixture();
-            _sut = new ApplicationCommandController(_mockCommandDispatcher.Object, _mockLogger.Object);
+            _sut = new ApplicationCommandController(_mockCommandDispatcher.Object);
         }
 
         [Test]
