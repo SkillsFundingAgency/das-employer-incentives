@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
         private LearnerSubmissionDto _learnerSubmissionDto;
-        private ApprenticeshipIncentiveModel _incentiveModel;
+        private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _apprenticeshipIncentive;
 
         [SetUp]
         public void Arrange()
@@ -39,15 +39,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeship = _fixture.Create<Apprenticeship>();
             apprenticeship.SetProvider(_fixture.Create<Provider>());
 
-            _incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+            var incentive = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(p => p.Apprenticeship, apprenticeship)
                 .Create();
 
-            _apprenticeshipIncentiveId = _incentiveModel.Id;
-
+            _apprenticeshipIncentiveId = incentive.Id;
+            _apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveId, incentive);
+            
             _mockApprenticeshipIncentiveDomainRepository
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
-                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveId, _incentiveModel));
+                .ReturnsAsync(_apprenticeshipIncentive);
 
             _learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
 
@@ -148,7 +149,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => !l.SubmissionData.LearningFound)
+                It.Is<Learner>(l => !l.SubmissionData.LearningFoundStatus.LearningFound)
                 ), Times.Once);
         }
 
@@ -164,6 +165,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             _fixture
                                 .Build<TrainingDto>()
                                 .With(p => p.Reference, "ZPROG001")
+                                .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){
+                                    _fixture.Build<PriceEpisodeDto>()
+                                    .With(pe => pe.Periods, new List<PeriodDto>(){
+                                        _fixture.Build<PeriodDto>().With(p => p.ApprenticeshipId, _apprenticeshipIncentive.Apprenticeship.Id).Create()
+                                        })
+                                    .Create()
+                                })
                                 .Create(),
                             _fixture.Create<TrainingDto>()
                             })
@@ -178,7 +186,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.LearningFound)
+                It.Is<Learner>(l => l.SubmissionData.LearningFoundStatus.LearningFound)
                 ), Times.Once);
         }
 
@@ -204,142 +212,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.SubmissionDate == testDate)
-                ), Times.Once);
-        }
-
-        [Test]
-        public async Task Then_the_startdate_is_set_when_one_exists_for_the_learner_data()
-        {
-            //Arrange
-            var testStartDate = _fixture.Create<DateTime>();
-
-            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
-
-            var learnerSubmissionDto = _fixture
-                .Build<LearnerSubmissionDto>()
-                .With(l => l.Training, new List<TrainingDto> {
-                    _fixture.Create<TrainingDto>(),
-                    _fixture
-                        .Build<TrainingDto>()
-                        .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
-                                                    .With(pe => pe.Periods, new List<PeriodDto>(){
-                                                        _fixture.Build<PeriodDto>()
-                                                       .With(period => period.ApprenticeshipId, _incentiveModel.Apprenticeship.Id)
-                                                       .With(period => period.IsPayable, true)
-                                                       .Create()
-                                                    })
-                                                    .With(pe => pe.StartDate, testStartDate)
-                                                    .Create() }
-                        )
-                        .Create(),
-                    _fixture.Create<TrainingDto>() }
-                    )
-                .Create();
-
-            _mockLearnerService
-                .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
-
-            //Act
-            await _sut.Handle(command);
-
-            //Assert
-            _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.StartDate == testStartDate)
-                ), Times.Once);
-        }
-
-        [Test]
-        public async Task Then_the_inlearning_flag_is_false_when_there_are_no_pending_payments()
-        {
-            //Arrange
-            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
-
-            var learnerSubmissionDto = _fixture
-               .Build<LearnerSubmissionDto>()
-               .With(l => l.Training, new List<TrainingDto> {
-                    _fixture.Create<TrainingDto>(),
-                    _fixture
-                        .Build<TrainingDto>()
-                        .With(p => p.Reference, "ZPROG001")
-                        .Create(),
-                    _fixture.Create<TrainingDto>()
-                   })
-               .Create();
-
-            _mockLearnerService
-                .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
-
-            //Act
-            await _sut.Handle(command);
-
-            //Assert
-            _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.IsInlearning == false)
-                ), Times.Once);
-        }
-
-        [Test]
-        public async Task Then_the_inlearning_flag_is_true_when_there_is_a_pending_payment_with_a_matching_inlearning_period()
-        {
-            //Arrange
-            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
-
-            var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
-            var pendingPaymentModel = _fixture.Create<PendingPaymentModel>();
-            pendingPaymentModel.PaymentMadeDate = null;
-
-            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
-               .With(p => p.Apprenticeship, apprenticeship)
-               .With(p => p.PendingPaymentModels, new List<PendingPaymentModel> { pendingPaymentModel })
-               .Create();
-
-            _mockApprenticeshipIncentiveDomainRepository
-                .Setup(m => m.Find(_apprenticeshipIncentiveId))
-                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.ApplicationApprenticeshipId, apprenticeshipIncentiveModel));
-
-
-            var learnerSubmissionDto = _fixture
-               .Build<LearnerSubmissionDto>()
-               .With(l => l.Training, new List<TrainingDto> {
-                    _fixture.Create<TrainingDto>(),
-                    _fixture
-                        .Build<TrainingDto>()
-                        .With(p => p.Reference, "ZPROG001")
-                        .With(t => t.PriceEpisodes,
-                        new List<PriceEpisodeDto>{
-                            _fixture
-                            .Build<PriceEpisodeDto>()
-                            .With(pe => pe.StartDate, pendingPaymentModel.DueDate.AddDays(-1))
-                            .With(pe => pe.EndDate, pendingPaymentModel.DueDate.AddDays(1))
-                            .With(pe => pe.Periods,
-                                    new List<PeriodDto>{
-                                        _fixture
-                                        .Build<PeriodDto>()
-                                        .With(p => p.Period, pendingPaymentModel.PeriodNumber)
-                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentiveModel.Apprenticeship.Id)
-                                        .Create()
-                                    })
-                            .Create()
-                            }).Create(),
-                        _fixture.Create<TrainingDto>()
-                   })
-               .Create();
-
-            _mockLearnerService
-                .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
-
-            //Act
-            await _sut.Handle(command);
-
-            //Assert
-            _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.IsInlearning == true)
                 ), Times.Once);
         }
     }

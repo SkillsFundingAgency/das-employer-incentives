@@ -94,8 +94,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(m => m.Find(incentive.Account.Id))
                 .ReturnsAsync(domainAccount);
 
-            var submissionData = new SubmissionData(DateTime.UtcNow, true);
-            submissionData.SetIsInLearning(true);
+            var submissionData = new SubmissionData(DateTime.UtcNow);
+            submissionData.SetLearningFound(new LearningFoundStatus(true));
 
             _learnerModel = _fixture.Build<LearnerModel>()
                 .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)
@@ -116,25 +116,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 _mockAccountDomainRepository.Object,
                 _mockCollectionCalendarService.Object,
                 _mockLearnerDomainRepository.Object);
-        }
-
-        [Test]
-        public async Task Then_a_passing_pendingPayment_validation_result_is_saved_against_the_pendingPayment_and_the_pending_payment_is_validated()
-        {
-            //Arrange
-            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
-
-            var pendingPayment = incentive.PendingPayments.First();
-            var collectionPeriod = _collectionPeriods.First();
-
-            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.CalendarYear, collectionPeriod.CalendarMonth);
-
-            // Act
-            await _sut.Handle(command);
-
-            // Assert
-            incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(1);
-            incentive.PendingPayments.First().IsValidated.Should().BeTrue();
         }
 
         [Test]
@@ -185,55 +166,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             incentive.PendingPayments.First().IsValidated.Should().BeFalse(); 
         }
 
-        [Test]
-        public async Task Then_a_previously_failed_pendingPayment_validation_result_is_updated_to_passing()
-        {
-            //Arrange
-            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
-
-            var pendingPayment = incentive.PendingPayments.First();
-            var collectionPeriod = _collectionPeriods.First();
-
-            var accountModel = _fixture.Build<AccountModel>()
-                .With(a => a.Id, _account.Id)
-                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
-                   _fixture.Build<LegalEntityModel>()
-                   .With(l => l.VrfVendorId, string.Empty)
-                   .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
-                   .Create()})
-                .Create();
-
-            var domainAccount = Domain.Accounts.Account.Create(accountModel);
-
-            _mockAccountDomainRepository
-               .Setup(m => m.Find(incentive.Account.Id))
-               .ReturnsAsync(domainAccount);
-
-            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.CalendarYear, collectionPeriod.CalendarMonth);
-            await _sut.Handle(command);
-            incentive.PendingPayments.First().IsValidated.Should().BeFalse();
-
-            // Act
-            accountModel = _fixture.Build<AccountModel>()
-                .With(a => a.Id, _account.Id)
-                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
-                   _fixture.Build<LegalEntityModel>()
-                   .With(l => l.VrfVendorId, Guid.NewGuid().ToString())
-                   .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
-                   .Create()})
-                .Create();
-
-            domainAccount = Domain.Accounts.Account.Create(accountModel);
-
-            _mockAccountDomainRepository
-               .Setup(m => m.Find(incentive.Account.Id))
-               .ReturnsAsync(domainAccount);
-
-            await _sut.Handle(command);
-
-            // Assert
-            incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(1);
-            incentive.PendingPayments.First().IsValidated.Should().BeTrue();
-        }
     }
 }

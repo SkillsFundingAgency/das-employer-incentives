@@ -6,12 +6,11 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
 {
-    public class WhenAddCalled
+    public class WhenGetCalled
     {
         private ApprenticeshipIncentives.LearnerDataRepository _sut;
         private Fixture _fixture;
@@ -36,41 +35,39 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
         }
 
         [Test]
-        public async Task Then_the_learner_is_added_to_the_data_store()
+        public async Task Then_the_learner_is_retrieved()
         {
-            // Arrange
             var submissionData = _fixture.Create<SubmissionData>();
             submissionData.SetLearningFound(new LearningFoundStatus());
             submissionData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
 
-            var testLearner = 
+            var testLearner =
                 _fixture.Build<LearnerModel>()
                 .With(l => l.SubmissionData, submissionData)
                 .Create();
-            
+
             // Act
             await _sut.Add(testLearner);
             await _dbContext.SaveChangesAsync();
 
-            // Assert
-            _dbContext.Learners.Count().Should().Be(1);
+            // Act
+            var result = await _sut.Get(testLearner.Id);
 
-            var storedLearner = _dbContext.Learners.Single();
-            storedLearner.Id.Should().Be(testLearner.Id);
-            storedLearner.ApprenticeshipIncentiveId.Should().Be(testLearner.ApprenticeshipIncentiveId);
-            storedLearner.ApprenticeshipId.Should().Be(testLearner.ApprenticeshipId);
-            storedLearner.Ukprn.Should().Be(testLearner.Ukprn);
-            storedLearner.ULN.Should().Be(testLearner.UniqueLearnerNumber);
-            storedLearner.SubmissionFound.Should().BeTrue();
-            storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
-            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
-            storedLearner.HasDataLock.Should().BeTrue();
-            storedLearner.StartDate.Should().BeNull();
-            storedLearner.DaysInLearning.Should().BeNull();
-            storedLearner.InLearning.Should().BeNull();
-            storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
-            storedLearner.CreatedDate.Should().Be(testLearner.CreatedDate);
+            // Assert            
+            result.Id.Should().Be(testLearner.Id);
+            result.ApprenticeshipIncentiveId.Should().Be(testLearner.ApprenticeshipIncentiveId);
+            result.ApprenticeshipId.Should().Be(testLearner.ApprenticeshipId);
+            result.Ukprn.Should().Be(testLearner.Ukprn);
+            result.UniqueLearnerNumber.Should().Be(testLearner.UniqueLearnerNumber);
+            result.SubmissionData.Should().NotBeNull();
+            result.SubmissionData.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
+            result.SubmissionData.LearningFoundStatus.Should().Be(new LearningFoundStatus(testLearner.SubmissionData.LearningFoundStatus.LearningFound));
+            result.SubmissionData.HasDataLock.Should().BeTrue();
+            result.SubmissionData.StartDate.Should().BeNull();
+            result.SubmissionData.IsInlearning.Should().BeNull();
+            result.SubmissionData.RawJson.Should().Be(testLearner.SubmissionData.RawJson);
+            result.CreatedDate.Should().Be(testLearner.CreatedDate);
         }
     }
 }
