@@ -16,13 +16,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 
         [AfterScenario()]
         public async Task CleanUp()
-        {
+        {            
+            _context.EmployerIncentiveApi?.Dispose();
+            _context.DomainMessageHandlers?.Dispose();
+
             if (_context.MessageBus != null && _context.MessageBus.IsRunning)
             {
                 await _context.MessageBus.Stop();
             }
             _context.EmployerIncentivesWebApiFactory?.Dispose();
             _context.EmployerIncentiveApi?.Dispose();
+            _context.LearnerMatchApi?.Dispose();
             _context.AccountApi?.Dispose();
             _context.DomainMessageHandlers?.Dispose();
             _context.SqlDatabase?.Dispose();

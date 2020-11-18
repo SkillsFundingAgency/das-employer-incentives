@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
@@ -18,5 +19,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public byte? PeriodNumber { get; set; }
         public short? PaymentYear { get; set; }
         public long AccountLegalEntityId { get; set; }
+
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<PendingPaymentValidationResult> ValidationResults { get; set; }
+
+        public PendingPayment()
+        {
+            ValidationResults = new List<PendingPaymentValidationResult>();
+        }
     }
 }

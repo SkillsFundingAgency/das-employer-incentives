@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -10,19 +11,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class PayableLegalEntityQueryRepository : IPayableLegalEntityQueryRepository
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public PayableLegalEntityQueryRepository(EmployerIncentivesDbContext context)
+        public PayableLegalEntityQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
-            _context = context;
+            _lazyContext = context;
         }
 
         public Task<List<PayableLegalEntityDto>> GetList(short collectionPeriodYear, byte collectionPeriodMonth)
         {
             var accountLegalEntities = _context.Set<PendingPayment>().Where(x => !x.PaymentMadeDate.HasValue && (x.PaymentYear < collectionPeriodYear || (x.PaymentYear == collectionPeriodYear && x.PeriodNumber <= collectionPeriodMonth)))
-                .Select(x => x.AccountLegalEntityId).Distinct();
+                .Select(x => new { x.AccountLegalEntityId, x.AccountId }).Distinct();
 
-            return accountLegalEntities.Select(x => new PayableLegalEntityDto {AccountLegalEntityId = x}).ToListAsync();
+            return accountLegalEntities.Select(x=> new PayableLegalEntityDto {AccountLegalEntityId = x.AccountLegalEntityId, AccountId = x.AccountId }).ToListAsync();
         }
     }
 }

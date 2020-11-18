@@ -12,11 +12,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class PendingPaymentQueryRepository : IQueryRepository<PendingPaymentDto>
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public PendingPaymentQueryRepository(EmployerIncentivesDbContext context)
+        public PendingPaymentQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
-            _context = context;
+            _lazyContext = context;
         }
 
         public Task<PendingPaymentDto> Get(Expression<Func<PendingPaymentDto, bool>> predicate)
@@ -39,7 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 AccountLegalEntityId = x.AccountLegalEntityId,
                 PeriodNumber = x.PeriodNumber,
                 PaymentYear = x.PaymentYear,
-                PaymentMadeDate = x.PaymentMadeDate
+                PaymentMadeDate = x.PaymentMadeDate,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId
             };
         }
     }

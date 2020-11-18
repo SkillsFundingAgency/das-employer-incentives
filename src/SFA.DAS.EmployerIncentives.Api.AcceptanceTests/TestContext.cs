@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
+        public TestLearnerMatchApi LearnerMatchApi { get; set; }
         public TestMessageBus MessageBus { get; set; }
         public TestDomainMessageHandlers DomainMessageHandlers { get; set; }
         
