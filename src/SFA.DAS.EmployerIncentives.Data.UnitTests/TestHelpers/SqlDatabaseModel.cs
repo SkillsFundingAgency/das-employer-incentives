@@ -19,10 +19,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             {
                 var operationKeys = FetchRefactorLogRecords();
                 modelNeedsUpdating = CheckModelNeedsUpdating(operationKeys);
+                Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(Update)}: ModelNeedsUpdating={modelNeedsUpdating}");
             }
             catch (SqlException ex)
             {
-                if (ex.Message.Contains("Invalid object name 'dbo.__RefactorLog'"))
+                if (ex.Message.Contains("RefactorLog"))
                     modelNeedsUpdating = true;
             }
 
