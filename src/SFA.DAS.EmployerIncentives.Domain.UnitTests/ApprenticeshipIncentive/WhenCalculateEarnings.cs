@@ -3,7 +3,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
@@ -69,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_when_the_incentive_does_not_pass_the_eligibility_check()
+        public void Then_earnings_are_not_calculated_when_the_incentive_does_not_pass_the_eligibility_check()
         {
             // arrange            
             var apprentiveshipDob = DateTime.Now.AddYears(-24);
@@ -79,10 +78,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // act
-            Action result = () => _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
 
             // assert
-            result.Should().Throw<InvalidIncentiveException>().WithMessage("Incentive does not pass the eligibility checks");            
+            _sut.PendingPayments.Should().BeEmpty();
         }
 
         [Test]

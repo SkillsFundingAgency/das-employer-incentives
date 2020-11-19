@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var incentive = new Incentive(Apprenticeship.DateOfBirth, ActualStartDate ?? PlannedStartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {
-                throw new InvalidIncentiveException("Incentive does not pass the eligibility checks");
+                return;
             }
 
             foreach (var payment in incentive.Payments)
