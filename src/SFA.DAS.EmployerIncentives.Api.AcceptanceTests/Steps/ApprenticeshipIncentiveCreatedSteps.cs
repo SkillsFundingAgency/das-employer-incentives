@@ -139,10 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the apprenticeship incentive earnings are calculated")]
         public async Task WhenTheApprenticeshipIncentiveEarningsAreCalculated()
         {
-            var calcEarningsCommand = new CalculateEarningsCommand(
-                _apprenticeshipIncentive.Id,
-                _apprenticeshipIncentive.AccountId,
-                _apprenticeshipIncentive.ApprenticeshipId);
+            var calcEarningsCommand = new CalculateEarningsCommand(_apprenticeshipIncentive.Id);
 
             await _testContext.WaitFor<MessageContext>(async () =>
               await _testContext.MessageBus.Send(calcEarningsCommand));

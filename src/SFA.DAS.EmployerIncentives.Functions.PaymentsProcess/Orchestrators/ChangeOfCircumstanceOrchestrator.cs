@@ -23,6 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 _logger.LogInformation("Learner Change of Circumstances process started for apprenticeship Incentive {apprenticeshipIncentiveId}, Uln: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);
 
             await context.CallActivityAsync("LearnerChangeOfCircumstanceActivity", learnerChangeOfCircumstanceInput);
+            await context.CallActivityAsync("CalculateEarningsActivity", new CalculateEarningsInput(learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln));
+
+            _logger.LogInformation("Learner Change of Circumstances process completed for apprenticeship Incentive {apprenticeshipIncentiveId}, Uln: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);
         }
     }
 }
