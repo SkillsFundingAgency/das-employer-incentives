@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         {
             var incentive = await _incentiveDomainRepository.Find(command.ApprenticeshipIncentiveId);
 
-            var learner = await _learnerDomainRepository.Get(incentive);
+            var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
             SubmissionData submissionData = null;
             var learnerData = await _learnerService.Get(learner);

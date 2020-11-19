@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Commands.Extensions;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         public static bool HasProviderDataLocks(this LearnerSubmissionDto data, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             if (incentive == null) return false;
-            var nextPayment = incentive.PendingPayments.NextDuePayment();
+            var nextPayment = incentive.NextDuePayment;
             if (nextPayment == null) return false;
 
             var hasLock = data
@@ -93,19 +92,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             // to True ELSE set InLearning to False
 
             if (incentive == null) return false;
-
-            var pendingPayments = incentive.PendingPayments.Where(p => p.PaymentMadeDate == null);
-            if (!pendingPayments.Any())
-            {
-                return false;
-            }
-
-            var firstPendingPayment = pendingPayments.OrderBy(p => p.DueDate).FirstOrDefault();
-
-            if (firstPendingPayment == null)
-            {
-                return false;
-            }
+            var nextPayment = incentive.NextDuePayment;
+            if (nextPayment == null) return false;
 
             var matchedRecords =
                from tr in learnerData.Training
@@ -126,9 +114,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             {
                 foreach (var matchedRecord in matchedRecords)
                 {
-                    var endDate = matchedRecord.EndDate ?? firstPendingPayment.DueDate;
-                    if (firstPendingPayment.DueDate >= matchedRecord.StartDate &&
-                       firstPendingPayment.DueDate <= endDate)
+                    var endDate = matchedRecord.EndDate ?? nextPayment.DueDate;
+                    if (nextPayment.DueDate >= matchedRecord.StartDate &&
+                        nextPayment.DueDate <= endDate)
                     {
                         isInLearning = true;
                         break;

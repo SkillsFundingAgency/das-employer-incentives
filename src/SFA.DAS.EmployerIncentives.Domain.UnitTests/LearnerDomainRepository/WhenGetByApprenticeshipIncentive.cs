@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             _learnerDataRepositoryMock.Setup(r => r.GetByApprenticeshipIncentiveId(incentive.Id)).ReturnsAsync(learner);
 
             // Act
-            var result = await _sut.Get(incentive);
+            var result = await _sut.GetOrCreate(incentive);
 
             // Assert
             result.Id.Should().Be(learner.Id, "should return existing");
@@ -89,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             _learnerDataRepositoryMock.Setup(r => r.GetByApprenticeshipIncentiveId(incentive.Id)).ReturnsAsync((LearnerModel)null);
 
             // Act
-            var result = await _sut.Get(incentive);
+            var result = await _sut.GetOrCreate(incentive);
 
             // Assert
             result.Id.Should().NotBeEmpty("should set a new Id");

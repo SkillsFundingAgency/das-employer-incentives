@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
-        public async Task<Learner> Get(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        public async Task<Learner> GetOrCreate(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             var existing = await _learnerDataRepository.GetByApprenticeshipIncentiveId(incentive.Id);
             if (existing != null)
