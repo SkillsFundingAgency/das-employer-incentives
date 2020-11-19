@@ -69,10 +69,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.VrfCaseStatus = status;
             Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
         }
+        public void AddEmployerVendorId(string employerVendorId)
+        {
+            Model.VrfVendorId ??= employerVendorId;
+        }
 
         private bool VrfStatusIsCompleted()
         {
             return Model.VrfCaseStatus != null && Model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase);
         }
+
     }
 }

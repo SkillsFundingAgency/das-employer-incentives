@@ -9,7 +9,6 @@ namespace SFA.DAS.EmployerIncentives.Data
         Task Update(AccountModel account);
         Task Add(AccountModel account);
         Task<AccountModel> Find(long accountId);
-        Task<IEnumerable<AccountModel>> GetByLegalEntityId(long legalEntityId);
         Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId);
     }
 }

@@ -7,9 +7,10 @@
     [Amount] DECIMAL(9, 2) NOT NULL, 
     [CalculatedDate] DATETIME2 NOT NULL, 
     [PaymentMadeDate] DATETIME2 NULL,
-    [PeriodNumber] TINYINT NULL,
+    [PeriodNumber] TINYINT NULL,	
 	[PaymentYear] SMALLINT NULL,
     [AccountLegalEntityId] BIGINT NULL
+    CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id)
 )
 GO
 CREATE CLUSTERED INDEX IX_PendingPayment ON [incentives].[PendingPayment] (AccountId)
