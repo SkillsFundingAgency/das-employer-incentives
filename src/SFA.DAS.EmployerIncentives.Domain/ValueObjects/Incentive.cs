@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -32,13 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         private int AgeAtStartOfCourse()
         {
-            var age = _startDate.Year - _dateOfBirth.Year;
-            if (_startDate.DayOfYear < _dateOfBirth.DayOfYear)
-            {
-                age--;
-            }
-
-            return age;
+            return _dateOfBirth.AgeOnThisDay(_startDate);
         }
 
         private List<Payment> GeneratePayments()

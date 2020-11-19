@@ -8,6 +8,9 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -89,6 +92,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
         {
+            var subnominalCode = DetermineSubnominalCode();
+
             var payment = Payment.New(
                 Guid.NewGuid(), 
                 Model.Account, 
@@ -97,9 +102,38 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 pendingPayment.Amount,
                 paymentDate, 
                 collectionYear, 
-                collectionMonth);
+                collectionMonth,
+                subnominalCode);
 
             Model.PaymentModels.Add(payment.GetModel());
+        }
+
+        private SubnominalCode DetermineSubnominalCode()
+        {
+            var age = Model.Apprenticeship.DateOfBirth.AgeOnThisDay(Model.PlannedStartDate);
+            var employerType = Model.Apprenticeship.EmployerType;
+
+            if (employerType == ApprenticeshipEmployerType.Levy)
+            {
+                if (age <= 18)
+                {
+                    return SubnominalCode.Levy16To18;
+                }
+
+                return SubnominalCode.Levy19Plus;
+            }
+
+            if (employerType == ApprenticeshipEmployerType.NonLevy)
+            {
+                if (age <= 18)
+                {
+                    return SubnominalCode.NonLevy16To18;
+                }
+
+                return SubnominalCode.NonLevy19Plus;
+            }
+
+            throw new InvalidIncentiveException("Cannot determine SubnominalCode as EmployerType has not been assigned as Levy or Non Levy");
         }
 
         private void RemoveExistingPaymentIfExists(Guid pendingPaymentId)
