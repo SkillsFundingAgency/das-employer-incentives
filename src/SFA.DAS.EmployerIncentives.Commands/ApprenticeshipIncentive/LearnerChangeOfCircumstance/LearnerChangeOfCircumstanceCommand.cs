@@ -8,14 +8,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
     public class LearnerChangeOfCircumstanceCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
         public Guid ApprenticeshipIncentiveId { get; }
-        public DateTime StartDate { get; }
 
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive)}_{ApprenticeshipIncentiveId}"; }
 
-        public LearnerChangeOfCircumstanceCommand(Guid apprenticeshipIncentiveId, DateTime startDate)
+        public LearnerChangeOfCircumstanceCommand(Guid apprenticeshipIncentiveId)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
-            StartDate = startDate;
         }
 
         [Newtonsoft.Json.JsonIgnore]

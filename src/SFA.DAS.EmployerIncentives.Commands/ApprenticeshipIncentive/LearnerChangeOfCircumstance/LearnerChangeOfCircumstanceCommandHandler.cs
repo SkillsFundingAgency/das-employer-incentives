@@ -8,17 +8,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
     public class LearnerChangeOfCircumstanceCommandHandler : ICommandHandler<LearnerChangeOfCircumstanceCommand>
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
-        
-        public LearnerChangeOfCircumstanceCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository)
+        private readonly ILearnerDomainRepository _learnerDomainRepository;
+
+        public LearnerChangeOfCircumstanceCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, ILearnerDomainRepository learnerDomainRepository)
         {
             _domainRepository = domainRepository;
+            _learnerDomainRepository = learnerDomainRepository;
         }
 
         public async Task Handle(LearnerChangeOfCircumstanceCommand command, CancellationToken cancellationToken = default)
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
+            var learner = await _learnerDomainRepository.GetByApprenticeshipIncentiveId(incentive.Id);
 
-            incentive.SetActualStartDate(command.StartDate);
+            if(learner.SubmissionFound && learner.SubmissionData.StartDate.HasValue)
+                incentive.SetActualStartDate(learner.SubmissionData.StartDate.Value);
 
             await _domainRepository.Save(incentive);
         }
