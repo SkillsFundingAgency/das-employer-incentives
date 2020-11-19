@@ -47,13 +47,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.SubmissionData = submissionData;
         }
 
-        public NextPendingPayment NextPendingPayment { get; private set; }
-
-        public void SetNextPendingPayment(NextPendingPayment value)
-        {
-            NextPendingPayment = value;
-        }
-
         private Learner(LearnerModel model, bool isNew = false) : base(model.Id, model, isNew)
         {
         }

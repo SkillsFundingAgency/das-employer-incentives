@@ -18,5 +18,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Extensions
                     apprenticeship.UKPRN.Value)
             );
         }
+
+        public static Domain.ApprenticeshipIncentives.PendingPayment NextDuePayment(this IReadOnlyCollection<Domain.ApprenticeshipIncentives.PendingPayment> payments)
+        {
+            return payments.Where(pp => pp.PaymentMadeDate == null && pp.PaymentYear.HasValue && pp.PeriodNumber.HasValue)
+                 .OrderBy(pp => pp.DueDate).FirstOrDefault();
+        }
     }
 }

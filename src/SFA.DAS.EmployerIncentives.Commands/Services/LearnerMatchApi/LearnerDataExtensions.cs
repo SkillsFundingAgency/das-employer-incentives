@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+﻿using SFA.DAS.EmployerIncentives.Commands.Extensions;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,21 +72,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         public static bool HasProviderDataLocks(this LearnerSubmissionDto data, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             if (incentive == null) return false;
+            var nextPayment = incentive.PendingPayments.NextDuePayment();
+            if (nextPayment == null) return false;
 
-            var pendingPayments = incentive.PendingPayments.Where(p => p.PaymentMadeDate == null);
-            if(!pendingPayments.Any())
-            {
-                return false;
-            }
-            var nextPayment = pendingPayments.OrderBy(p => p.DueDate).First();
-            if (nextPayment.PaymentYear != null && nextPayment.PeriodNumber.HasValue)
-            {
-                return data
+            var hasLock = data
                .PaymentsForApprenticeship(incentive.Apprenticeship.Id, nextPayment.DueDate)
                .Any(p => p.Period == nextPayment.PeriodNumber && !p.IsPayable);
-            }
 
-            return false;
+            return hasLock;
         }
 
         public static bool IsInLearning(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)

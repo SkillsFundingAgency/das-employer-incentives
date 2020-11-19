@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
         }
 
         [Test]
-        public async Task Then_the_existing_learner_is_retrieved_with_the_next_pending_payment()
+        public async Task Then_the_existing_learner_is_returned()
         {
             // Arrange
             var incentiveModel = _fixture.Create<ApprenticeshipIncentiveModel>();
@@ -59,20 +59,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.ApplicationApprenticeshipId, incentiveModel);
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
-            _learnerDataRepositoryMock.Setup(r => r.GetByApprenticeshipIncentiveId(incentive.Id)).ReturnsAsync(_fixture.Create<LearnerModel>());
+            var learner = _fixture.Create<LearnerModel>();
+            _learnerDataRepositoryMock.Setup(r => r.GetByApprenticeshipIncentiveId(incentive.Id)).ReturnsAsync(learner);
 
             // Act
             var result = await _sut.Get(incentive);
 
             // Assert
-            result.NextPendingPayment.CollectionPeriod.Should().Be(payments[1].PeriodNumber);
-            result.NextPendingPayment.CollectionYear.Should().Be(payments[1].PaymentYear);
-            result.NextPendingPayment.DueDate.Should().Be(payments[1].DueDate);
+            result.Id.Should().Be(learner.Id, "should return existing");
         }
 
 
         [Test]
-        public async Task Then_a_new_learner_is_retrieved_with_the_next_pending_payment()
+        public async Task Then_a_new_learner_is_returned()
         {
             // Arrange
             var incentiveModel = _fixture.Create<ApprenticeshipIncentiveModel>();
@@ -93,16 +92,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             var result = await _sut.Get(incentive);
 
             // Assert
+            result.Id.Should().NotBeEmpty("should set a new Id");
             result.ApprenticeshipIncentiveId.Should().Be(incentive.Id);
             result.ApprenticeshipId.Should().Be(incentive.Apprenticeship.Id);
-            result.Id.Should().NotBeEmpty();
             result.SubmissionFound.Should().Be(false);
             result.Ukprn.Should().Be(incentive.Apprenticeship.Provider.Ukprn);
             result.UniqueLearnerNumber.Should().Be(incentive.Apprenticeship.UniqueLearnerNumber);
-
-            result.NextPendingPayment.CollectionPeriod.Should().Be(payments[0].PeriodNumber);
-            result.NextPendingPayment.CollectionYear.Should().Be(payments[0].PaymentYear);
-            result.NextPendingPayment.DueDate.Should().Be(payments[0].DueDate);
         }
     }
 }
