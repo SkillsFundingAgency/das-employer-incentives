@@ -90,7 +90,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetActualStartDate(DateTime startDate)
         {
-            throw new NotImplementedException();
+            if (startDate != Model.ActualStartDate)
+            {
+                Model.ActualStartDate = startDate;
+                Model.PendingPaymentModels.Clear();
+            }
         }
 
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
