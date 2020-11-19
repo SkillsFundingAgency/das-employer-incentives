@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
@@ -14,6 +14,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger = logger;
         }
 
+        [FunctionName("ChangeOfCircumstanceOrchestrator")]
+        public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
+        {
+            var learnerChangeOfCircumstanceInput = context.GetInput<LearnerChangeOfCircumstanceInput>();
 
+            if (!context.IsReplaying)
+                _logger.LogInformation("Learner Change of Circumstances process started for apprenticeship Incentive {apprenticeshipIncentiveId}, Uln: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);
+
+            await context.CallActivityAsync("LearnerChangeOfCircumstanceActivity", learnerChangeOfCircumstanceInput);
+        }
     }
 }
