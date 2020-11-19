@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public string LastName { get; }
         public DateTime DateOfBirth { get; }
         public long UniqueLearnerNumber { get; }
-        public ApprenticeshipEmployerType EmployerType { get; }      
+        public ApprenticeshipEmployerType EmployerType { get; }   
 
         public Apprenticeship(
             long id, 
