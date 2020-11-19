@@ -106,7 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _learner = new LearnerFactory().GetExisting(_learnerModel);
 
             _mockLearnerDomainRepository
-                .Setup(m => m.GetByApprenticeshipIncentiveId(incentive.Id))
+                .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
 
 

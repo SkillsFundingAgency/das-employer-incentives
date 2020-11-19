@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             await context.PaymentsProcessFunctions.Start();
 
             stopwatch.Stop();
-            Console.WriteLine($"[{nameof(FunctionsHostPerScenarioHook)}] time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Seconds} seconds");
+            Console.WriteLine($@"[{nameof(FunctionsHostPerScenarioHook)}] time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Seconds} seconds");
         }
 
         [AfterScenario]
