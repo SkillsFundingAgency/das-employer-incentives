@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Account Account => Model.Account;
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
         public DateTime PlannedStartDate => Model.PlannedStartDate;
-        public DateTime ActualStartDate => Model.ActualStartDate;
+        public DateTime? ActualStartDate => Model.ActualStartDate;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
 
@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void CalculateEarnings(IEnumerable<IncentivePaymentProfile> paymentProfiles, CollectionCalendar collectionCalendar)
         {
-            var incentive = new Incentive(Apprenticeship.DateOfBirth, PlannedStartDate, paymentProfiles);
+            var incentive = new Incentive(Apprenticeship.DateOfBirth, ActualStartDate ?? PlannedStartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {
                 throw new InvalidIncentiveException("Incentive does not pass the eligibility checks");
@@ -88,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.SetPaymentMadeDate(paymentDate);
         }
 
-        public void SetActualStartDate(DateTime startDate)
+        public void SetActualStartDate(DateTime? startDate)
         {
             if (startDate != Model.ActualStartDate)
             {
