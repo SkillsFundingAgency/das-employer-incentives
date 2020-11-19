@@ -27,17 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Files\LearnerMatchApiResponses.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LearnerMatchApiResponses.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Update="Files\LearnerMatchApiResponses.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>LearnerMatchApiResponses.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
