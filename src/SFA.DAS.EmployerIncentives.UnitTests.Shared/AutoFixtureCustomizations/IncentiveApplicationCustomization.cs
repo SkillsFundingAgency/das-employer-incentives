@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations
         {
             fixture.Register(() => new IncentiveApplicationFactory().CreateNew(fixture.Create<Guid>(), fixture.Create<long>(), fixture.Create<long>()));
             fixture.Register(() => new IncentiveApplicationFactory().CreateApprenticeship(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<string>(), 
-                fixture.Create<DateTime>(), fixture.Create<long>(), fixture.Create<DateTime>(), fixture.Create<ApprenticeshipEmployerType>()));
+                fixture.Create<DateTime>(), fixture.Create<long>(), fixture.Create<DateTime>(), fixture.Create<ApprenticeshipEmployerType>(), fixture.Create<long>()));
         }
     }
 }
