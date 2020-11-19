@@ -41,13 +41,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void CalculateEarnings(IEnumerable<IncentivePaymentProfile> paymentProfiles, CollectionCalendar collectionCalendar)
         {
+            if (Model.PendingPaymentModels.Any())
+            {
+                return;
+            }
+
             var incentive = new Incentive(Apprenticeship.DateOfBirth, ActualStartDate ?? PlannedStartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {
                 throw new InvalidIncentiveException("Incentive does not pass the eligibility checks");
             }
 
-            Model.PendingPaymentModels.Clear();
             foreach (var payment in incentive.Payments)
             {
                 var pendingPayment = PendingPayment.New(

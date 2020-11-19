@@ -61,6 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionCalendar = new CollectionCalendar(_collectionPeriods);
 
             _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.PlannedStartDate = _plannedStartDate;
             _sutModel.ActualStartDate = null;
@@ -147,7 +148,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_the_earnings_are_calculated_and_any_existing_pending_payments_are_replaced()
+        public void Then_the_earnings_are_not_recalculated_if_earnings_already_exist()
         {
             // Arrange
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(_fixture.CreateMany<PendingPaymentModel>(3));
@@ -160,8 +161,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
 
             // Assert
-            _sut.PendingPayments.Count.Should().Be(2);
-            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeFalse());
+            _sut.PendingPayments.Count.Should().Be(3);
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeTrue());
         }
 
         [Test]
