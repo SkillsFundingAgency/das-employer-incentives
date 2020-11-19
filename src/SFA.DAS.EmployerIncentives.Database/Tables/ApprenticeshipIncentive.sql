@@ -11,7 +11,8 @@
 	[PlannedStartDate] DATETIME2 NOT NULL,
 	[IncentiveApplicationApprenticeshipId] UNIQUEIDENTIFIER NOT NULL,
 	[AccountLegalEntityId] BIGINT NULL, 
-    [UKPRN] BIGINT NULL
+    [UKPRN] BIGINT NULL, 
+    [ActualStartDate] DATETIME2 NULL
 )
 GO
 CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, ApprenticeshipId)

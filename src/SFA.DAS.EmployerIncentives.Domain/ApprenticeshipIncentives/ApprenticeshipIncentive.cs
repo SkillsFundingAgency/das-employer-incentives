@@ -16,6 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Account Account => Model.Account;
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
         public DateTime PlannedStartDate => Model.PlannedStartDate;
+        public DateTime ActualStartDate => Model.ActualStartDate;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
 
@@ -85,6 +86,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             AddPayment(pendingPaymentId, collectionYear, collectionMonth, pendingPayment, paymentDate);
             pendingPayment.SetPaymentMadeDate(paymentDate);
+        }
+
+        public void SetActualStartDate(DateTime startDate)
+        {
+            throw new NotImplementedException();
         }
 
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
