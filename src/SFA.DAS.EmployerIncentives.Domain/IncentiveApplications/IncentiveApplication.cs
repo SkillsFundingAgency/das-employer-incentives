@@ -53,6 +53,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             AddEvent(new Submitted(Model));
         }
 
+        public void Resubmit()
+        {
+            if (Model.Status != IncentiveApplicationStatus.Submitted)
+            {
+                return;
+            }
+
+            AddEvent(new Submitted(Model));
+        }
+
         public void SetApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
         {
             _apprenticeships.Clear();

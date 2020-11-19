@@ -21,15 +21,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
     {
         private EarningsResilienceApplicationsCheckCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _applicationRepository;
-        private Mock<IDomainEventDispatcher> _domainEventDispatcher;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _applicationRepository = new Mock<IIncentiveApplicationDomainRepository>();
-            _domainEventDispatcher = new Mock<IDomainEventDispatcher>();
-            _sut = new EarningsResilienceApplicationsCheckCommandHandler(_applicationRepository.Object, _domainEventDispatcher.Object);
+            _sut = new EarningsResilienceApplicationsCheckCommandHandler(_applicationRepository.Object);
             _fixture = new Fixture();
         }
 
@@ -48,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             await _sut.Handle(command);
 
             //Assert
-            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[0].Id), It.IsAny<CancellationToken>()), Times.Once);
+            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[0].Id)), Times.Once);
         }
 
         [Test]
@@ -66,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             await _sut.Handle(command);
 
             //Assert
-            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[0].Id), It.IsAny<CancellationToken>()), Times.Once);
+            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[0].Id)), Times.Once);
         }
 
         [Test]
@@ -89,8 +87,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             await _sut.Handle(command);
 
             //Assert
-            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[0].Id), It.IsAny<CancellationToken>()), Times.Once);
-            _domainEventDispatcher.Verify(x => x.Send(It.Is<EarningsCalculationRequired>(x => x.Model.Id == applications[1].Id), It.IsAny<CancellationToken>()), Times.Once);
+            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[0].Id)), Times.Once);
+            _applicationRepository.Verify(x => x.Save(It.Is<IncentiveApplication>(x => x.Id == applications[1].Id)), Times.Once);
         }
 
     }

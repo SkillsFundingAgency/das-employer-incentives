@@ -11,13 +11,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
     public class EarningsResilienceApplicationsCheckCommandHandler : ICommandHandler<EarningsResilienceApplicationsCheckCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _applicationDomainRepository;
-        private readonly IDomainEventDispatcher _domainEventDispatcher;
 
-        public EarningsResilienceApplicationsCheckCommandHandler(IIncentiveApplicationDomainRepository applicationDomainRepository,
-                                                                 IDomainEventDispatcher domainEventDispatcher)
+        public EarningsResilienceApplicationsCheckCommandHandler(IIncentiveApplicationDomainRepository applicationDomainRepository)
         {
             _applicationDomainRepository = applicationDomainRepository;
-            _domainEventDispatcher = domainEventDispatcher;
         }
 
         public async Task Handle(EarningsResilienceApplicationsCheckCommand command, CancellationToken cancellationToken = default)
@@ -25,7 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
             var applications = await _applicationDomainRepository.FindIncentiveApplicationsWithoutEarningsCalculations();
             foreach (var application in applications)
             {
-                await _domainEventDispatcher.Send(new EarningsCalculationRequired(application.GetModel()));                
+                application.Resubmit();
+                await _applicationDomainRepository.Save(application);
             }
         }
     }
