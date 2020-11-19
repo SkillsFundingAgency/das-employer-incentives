@@ -7,6 +7,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 {
     public interface ILearnerDomainRepository : IDomainRepository<Guid, Learner>
     {
-        Task<Learner> Get(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive);
+        Task<Learner> GetOrCreate(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive);
     }
 }

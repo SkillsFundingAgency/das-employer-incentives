@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
             var account = await _accountDomainRepository.Find(incentive.Account.Id);
-            var learner = await _learnerDomainRepository.Get(incentive);
+            var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
             var calendar = await _collectionCalendarService.Get();
             var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionMonth);
