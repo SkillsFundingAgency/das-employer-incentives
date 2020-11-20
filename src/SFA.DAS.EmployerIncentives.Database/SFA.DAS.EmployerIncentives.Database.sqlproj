@@ -95,5 +95,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
+    <None Include="update-model.publish.xml" />
   </ItemGroup>
 </Project>
