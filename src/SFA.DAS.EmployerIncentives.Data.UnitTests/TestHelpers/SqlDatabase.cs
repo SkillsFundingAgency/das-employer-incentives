@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(CreateTestDatabase)} failed. Exception={ex}");
             }
             finally
             {

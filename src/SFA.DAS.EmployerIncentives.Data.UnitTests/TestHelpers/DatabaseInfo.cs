@@ -5,7 +5,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
     {
         public string ConnectionString { get; private set; }
         public string DatabaseName { get; private set; }
-        public string PackageLocation { get; private set; }
 
         public DatabaseInfo(string connectionString = null)
         {
@@ -20,13 +19,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         {
             ConnectionString = connectionString;
         }
+
         public void SetDatabaseName(string databaseName)
         {
             DatabaseName = databaseName;
-        }
-        public void SetPackageLocation(string packageLocation)
-        {
-            PackageLocation = packageLocation;
         }
     }
 }
