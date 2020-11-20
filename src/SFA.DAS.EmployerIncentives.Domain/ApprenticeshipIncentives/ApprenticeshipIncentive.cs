@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public DateTime? ActualStartDate => Model.ActualStartDate;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
+        public bool EarningsHaveBeenRecalculated { get; private set; }
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
@@ -74,6 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApprenticeshipId = Apprenticeship.Id,
                 ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
             });
+
+            EarningsHaveBeenRecalculated = true;
         }
 
         public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth)
