@@ -109,18 +109,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task GivenAnApprenticeshipIncentiveExistsWithACorrespondingLearnerMatchRecord()
         {
             await GivenAnApprenticeshipIncentiveExists();
-
-            _testContext.LearnerMatchApi.MockServer
-            .Given(
-                    Request
-                    .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
-                    .UsingGet()
-                    )
-                .RespondWith(Response.Create()
-                .WithStatusCode(HttpStatusCode.OK)
-                .WithHeader("Content-Type", "application/json")
-                .WithBody(LearnerMatchApiResponses.BL_R03_InLearning_json));
         }
 
         [Given(@"an apprenticeship incentive exists and has previously been refreshed")]
@@ -146,33 +134,31 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"the latest learner data has active in learning data")]
         public void AndTheLatestLearnerDataHasInLearningData()
         {
-            _testContext.LearnerMatchApi.MockServer
-            .Given(
-                    Request
-                    .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
-                    .UsingGet()
-                    )
-                .RespondWith(Response.Create()
-                .WithStatusCode(HttpStatusCode.OK)
-                .WithHeader("Content-Type", "application/json")
-                .WithBody(LearnerMatchApiResponses.BL_R03_InLearning_json));
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_json);
         }
 
         [Given(@"the latest learner data has a data locked price episode")]
-        public void GivenAnApprenticeshipIncentiveExistsWithADataLockedPriceEpisode()
+        public void GivenLatestLearnerDataHasADataLockedPriceEpisode()
         {
-            _testContext.LearnerMatchApi.MockServer
-                .Given(
-                    Request
-                        .Create()
-                        .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
-                        .UsingGet()
-                )
-                .RespondWith(Response.Create()
-                    .WithStatusCode(HttpStatusCode.OK)
-                    .WithHeader("Content-Type", "application/json")
-                    .WithBody(LearnerMatchApiResponses.Course_Price_Dlock_R03_json));
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.Course_Price_Dlock_R03_json);
+        }
+
+        [Given(@"the latest learner data has training entries for a different apprenticeship")]
+        public void GivenLatestLearnerDataHasNoPriceEpisodeForCurrentPeriod()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_DifferentApprenticeship_json);
+        }
+
+        [Given(@"the latest learner data has no training entries")]
+        public void GivenLatestLearnerDataHasNoTrainingEntries()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoTraining);
+        }
+
+        [Given(@"the latest learner data has no ZPROG001 training entries")]
+        public void GivenLatestLearnerDataHasNoZPROG001TrainingEntries()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoZPROG001_json);
         }
 
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
@@ -203,7 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.InLearning.Should().BeNull();
             createdLearner.LearningFound.Should().BeNull();
 
-            createdLearner.HasDataLock.Should().BeNull(); // TODO: Check this shouldn't be `False`
+            createdLearner.HasDataLock.Should().BeNull();
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
@@ -285,6 +271,30 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.DaysInLearning.Should().BeNull();
         }
 
+        [Then(@"the apprenticeship incentive learner data is updated indicating learning not found")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedIndicatingLearningNotFound()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+
+            createdLearner.SubmissionFound.Should().Be(true);
+            createdLearner.LearningFound.Should().BeFalse();
+        }
+
+        private void SetupLearnerMatchApiResponse(string json)
+        {
+            _testContext.LearnerMatchApi.MockServer
+                .Given(
+                    Request
+                        .Create()
+                        .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
+                        .UsingGet()
+                )
+                .RespondWith(Response.Create()
+                    .WithStatusCode(HttpStatusCode.OK)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(json));
+        }
     }
 }
 
