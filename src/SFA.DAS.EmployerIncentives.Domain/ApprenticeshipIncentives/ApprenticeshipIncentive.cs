@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
         public DateTime PlannedStartDate => Model.PlannedStartDate;
         public DateTime? ActualStartDate => Model.ActualStartDate;
+        public bool RefreshedLearnerForEarnings => Model.RefreshedLearnerForEarnings;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
 

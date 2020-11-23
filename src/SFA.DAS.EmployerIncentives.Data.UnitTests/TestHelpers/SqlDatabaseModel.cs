@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                     modelNeedsUpdating = true;
             }
 
+            modelNeedsUpdating = true;
             if (modelNeedsUpdating) PublishModel();
         }
 
