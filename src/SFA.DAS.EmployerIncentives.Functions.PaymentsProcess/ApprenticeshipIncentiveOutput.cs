@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
-    public class ApprenticeshipIncentive
+    public class ApprenticeshipIncentiveOutput
     {
         public Guid Id { get; set; }
         public long ULN { get; set; }
