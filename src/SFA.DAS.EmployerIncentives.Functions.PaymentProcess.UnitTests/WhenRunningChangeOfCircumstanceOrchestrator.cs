@@ -42,9 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockOrchestrationContext.InSequence(sequence).Setup(x => x.CallActivityAsync("LearnerChangeOfCircumstanceActivity", _changeOfCircumstanceInput));
             _mockOrchestrationContext.InSequence(sequence).Setup(
                 x => x.CallActivityAsync("CalculateEarningsActivity",
-                    It.Is<CalculateEarningsInput>(y =>
-                        y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId &&
-                        y.Uln == _changeOfCircumstanceInput.Uln)));
+                    It.Is<CalculateEarningsInput>(y =>  y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId &&  y.Uln == _changeOfCircumstanceInput.Uln)));
 
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
@@ -53,6 +51,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                     It.Is<CalculateEarningsInput>(y =>
                         y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId &&
                         y.Uln == _changeOfCircumstanceInput.Uln)), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_learner_match_is_called_after_recalculating_earnings()
+        {
+            var sequence = new MockSequence();
+            _mockOrchestrationContext.InSequence(sequence).Setup(
+                x => x.CallActivityAsync("CalculateEarningsActivity",
+                    It.Is<LearnerMatchInput>(y =>  y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId)));
+            _mockOrchestrationContext.InSequence(sequence).Setup(x => x.CallActivityAsync("LearnerMatchAndUpdate",
+                It.Is<LearnerMatchInput>(y => y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId)));
+
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(
+                x => x.CallActivityAsync("LearnerMatchAndUpdate",
+                    It.Is<LearnerMatchInput>(y => y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId)), Times.Once);
         }
     }
 }

@@ -75,6 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApprenticeshipId = Apprenticeship.Id,
                 ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
             });
+
+            Model.RefreshedLearnerForEarnings = false;
         }
 
         public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth)
@@ -191,6 +193,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
+        }
+
+        public void LearnerRefreshCompleted()
+        {
+            Model.RefreshedLearnerForEarnings = true;
         }
 
         private PendingPayment GetPendingPaymentForValidationCheck(Guid pendingPaymentId)

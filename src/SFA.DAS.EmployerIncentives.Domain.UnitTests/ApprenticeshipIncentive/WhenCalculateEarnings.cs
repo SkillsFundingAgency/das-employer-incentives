@@ -182,6 +182,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             expectedEvent.ApplicationApprenticeshipId.Should().Be(_sutModel.ApplicationApprenticeshipId);
         }
 
+        [Test]
+        public void Then_RefreshedLearnerForEarnings_is_set_to_false_when_earnings_are_calculated()
+        {
+            // arrange
+            _sutModel.RefreshedLearnerForEarnings = true;
+
+            // act
+            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+
+            // assert
+            _sut.RefreshedLearnerForEarnings.Should().BeFalse();
+        }
+
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);
