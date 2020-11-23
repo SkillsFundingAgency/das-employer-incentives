@@ -111,7 +111,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 PlannedStartDate = x.PlannedStartDate,
                 EarningsCalculated = x.EarningsCalculated,
                 Uln = x.Uln,
-                TotalIncentiveAmount = x.TotalIncentiveAmount
+                TotalIncentiveAmount = x.TotalIncentiveAmount,
+                UKPRN = x.UKPRN
             }).ToList();
         }
 
@@ -144,7 +145,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 PlannedStartDate = x.PlannedStartDate,
                 Uln = x.Uln,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
-                EarningsCalculated = x.EarningsCalculated                
+                EarningsCalculated = x.EarningsCalculated,
+                UKPRN = x.UKPRN
             }).ToList();
         }
 

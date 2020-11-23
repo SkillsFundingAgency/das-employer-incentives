@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 
         public AccountApi(TestContext context)
         {
-            _context = context;            
+            _context = context;
         }
 
         [BeforeScenario(Order = 4)]
@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         [AfterScenario()]
         public void CleanUpAccountApi()
         {
-            _context.AccountApi.Dispose();
+            _context.AccountApi?.Dispose();
         }
     }
 }
