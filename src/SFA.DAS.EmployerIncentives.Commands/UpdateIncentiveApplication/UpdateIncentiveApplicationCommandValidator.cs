@@ -78,6 +78,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
             {
                 result.AddError("Apprenticeship.LastName", "Is not set");
             }
+
+            if (apprenticeship.UKPRN == default)
+            {
+                result.AddError("Apprenticeship.UKPRN", "Is not set");
+            }
         }
     }
 }
