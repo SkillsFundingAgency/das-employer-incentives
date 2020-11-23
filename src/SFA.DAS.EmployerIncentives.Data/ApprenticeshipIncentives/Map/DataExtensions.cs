@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LastName = model.Apprenticeship.LastName,
                 DateOfBirth = model.Apprenticeship.DateOfBirth,
                 ULN = model.Apprenticeship.UniqueLearnerNumber,
-                UKPRN =  model.Apprenticeship.Provider?.Ukprn,
+                UKPRN = model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
                 PlannedStartDate = model.PlannedStartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
@@ -157,7 +157,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             if (model != null)
             {
-                return new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, model.CalendarMonth, model.CalendarYear, model.EIScheduledOpenDateUTC);
+                return new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, model.CalendarMonth,
+                    model.CalendarYear, model.EIScheduledOpenDateUTC, model.CensusDate, model.AcademicYear,
+                    model.Active);
             }
 
             return null;
@@ -187,7 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
                 CreatedDate = model.CreatedDate,
-              };
+            };
 
             if (model.SubmissionFound)
             {
@@ -220,7 +222,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDate = model.CreatedDate
             };
 
-            if(model.SubmissionData != null)
+            if (model.SubmissionData != null)
             {
                 learner.SubmissionFound = true;
                 learner.LearningFound = model.SubmissionData.LearningFoundStatus?.LearningFound;
