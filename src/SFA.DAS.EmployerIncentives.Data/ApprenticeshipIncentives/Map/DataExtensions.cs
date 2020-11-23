@@ -26,7 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PendingPayments = model.PendingPaymentModels.Map(),
                 Payments = model.PaymentModels.Map(),
                 AccountLegalEntityId = model.Account.AccountLegalEntityId,
-                ActualStartDate = model.ActualStartDate
+                ActualStartDate = model.ActualStartDate,
+                RefreshedLeanerForEarnings = model.RefreshedLearnerForEarnings
             };
         }
 
@@ -55,7 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
                 PaymentModels = entity.Payments.Map(),
-                ActualStartDate = entity.ActualStartDate
+                ActualStartDate = entity.ActualStartDate,
+                RefreshedLearnerForEarnings = entity.RefreshedLeanerForEarnings
             };
         }
 
