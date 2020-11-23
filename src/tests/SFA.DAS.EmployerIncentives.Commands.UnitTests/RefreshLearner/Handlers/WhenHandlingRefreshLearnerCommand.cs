@@ -367,5 +367,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _apprenticeshipIncentive.RefreshedLearnerForEarnings.Should().BeTrue();
             _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(_apprenticeshipIncentive), Times.Once);
         }
+
+        [Test]
+        public async Task When_the_ilr_submission_has_not_changed_and_the_learner_has_been_refreshed_for_the_current_earnings_then_the_learner_match_is_not_updated()
+        {
+            //Arrange
+            _incentiveModel.RefreshedLearnerForEarnings = true;
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+            _learnerSubmissionDto.IlrSubmissionDate = learner.SubmissionData.SubmissionDate;
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetByApprenticeshipIncentiveId(_apprenticeshipIncentiveId))
+                .ReturnsAsync(learner);
+
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLearnerDomainRepository.Verify(x => x.Save(It.IsAny<Learner>()), Times.Never);
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
+        }
     }
 }
