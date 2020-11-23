@@ -25,6 +25,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return period;
         }
 
+        public CollectionPeriod GetActivePeriod()
+        {
+            return
+                _collectionPeriods
+                .Single(d => d.Active);
+        }
+
         public CollectionPeriod GetPeriod(short collectionYear, byte collectionMonth)
         {
             return 

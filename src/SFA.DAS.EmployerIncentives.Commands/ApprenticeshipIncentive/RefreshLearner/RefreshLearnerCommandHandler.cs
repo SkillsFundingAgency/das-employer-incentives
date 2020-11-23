@@ -19,11 +19,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         public RefreshLearnerCommandHandler(
             IApprenticeshipIncentiveDomainRepository incentiveDomainRepository,
             ILearnerService learnerService,
-            ILearnerDomainRepository learnerDomainRepository)
+            ILearnerDomainRepository learnerDomainRepository,
+            ICollectionCalendarService collectionCalendarService)
         {
             _incentiveDomainRepository = incentiveDomainRepository;
             _learnerService = learnerService;
             _learnerDomainRepository = learnerDomainRepository;
+            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(RefreshLearnerCommand command, CancellationToken cancellationToken = default)
@@ -40,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 submissionData.SetStartDate(learnerData.LearningStartDate(incentive));
                 submissionData.SetLearningFound(learnerData.LearningFound(incentive));
                 submissionData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
-                submissionData.SetIsInLearning(learnerData.IsInLearning(incentive));
+                submissionData.SetIsInLearning(learnerData.IsInLearning(incentive));                
+                submissionData.SetDaysInLearning(learnerData.DaysInLearning(incentive, await _collectionCalendarService.Get()));
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 
