@@ -44,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         ApprenticeshipEmployerType.Levy
                         ),
                     DateTime.Today);
+            incentive.SetHasPossibleChangeOfCircumstances(true);
             
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
@@ -122,6 +123,34 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _incentive.ActualStartDate.Should().Be(originalStartDate);
+        }
+
+        [Test]
+        public async Task Then_HasPossibleChangeOfCircumstances_set_to_false_when_change_of_circs_complete()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _incentive.HasPossibleChangeOfCircumstances.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_process_should_exit_if_no_possible_change_of_circumstances()
+        {
+            //Arrange
+            _incentive.SetHasPossibleChangeOfCircumstances(false);
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _mockLearnerDomainRespository.Verify(x => x.GetByApprenticeshipIncentiveId(It.IsAny<Guid>()), Times.Never);
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
         }
     }
 }
