@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         It.Is<AccountLegalEntityCollectionPeriod>(input =>
                             input.AccountLegalEntityId == entity.AccountLegalEntityId &&
                             input.AccountId == entity.AccountId &&
-                            input.CollectionPeriod.Month == _collectionPeriod.Month &&
+                            input.CollectionPeriod.Period == _collectionPeriod.Period &&
                             input.CollectionPeriod.Year == _collectionPeriod.Year)
 
                     ), Times.Once);

@@ -32,13 +32,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         internal static ApprenticeshipIncentiveModel Map(this ApprenticeshipIncentive entity, IEnumerable<CollectionPeriod> collectionPeriods)
         {
             var apprenticeship = new Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship(
-                     entity.ApprenticeshipId,
-                     entity.FirstName,
-                     entity.LastName,
-                     entity.DateOfBirth,
-                     entity.ULN,
-                     entity.EmployerType
-                     );
+                entity.ApprenticeshipId,
+                entity.FirstName,
+                entity.LastName,
+                entity.DateOfBirth,
+                entity.ULN,
+                entity.EmployerType
+            );
 
             if (entity.UKPRN.HasValue)
             {
@@ -82,8 +82,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             {
                 Id = x.Id,
                 CollectionDateUtc = x.CollectionPeriod.OpenDate,
-                CollectionPeriodMonth = x.CollectionPeriod.CalendarMonth,
-                CollectionPeriodYear = x.CollectionPeriod.CalendarYear,
+                PeriodNumber = x.CollectionPeriod.PeriodNumber,
+                PaymentYear = x.CollectionPeriod.CalendarYear,
                 Result = x.Result,
                 Step = x.Step,
                 PendingPaymentId = paymentId
@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x => new PendingPaymentValidationResultModel
             {
                 Id = x.Id,
-                CollectionPeriod = collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.CollectionPeriodYear && p.CalendarMonth == x.CollectionPeriodMonth).Map(),
+                CollectionPeriod = collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
                 Result = x.Result,
                 DateTime = x.CollectionDateUtc,
                 Step = x.Step
@@ -157,7 +157,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             if (model != null)
             {
-                return new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, model.CalendarMonth, model.CalendarYear, model.EIScheduledOpenDateUTC);
+                return new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, model.CalendarMonth,
+                    model.CalendarYear, model.EIScheduledOpenDateUTC,
+                    model.CensusDate, model.AcademicYear, model.Active);
             }
 
             return null;
@@ -170,7 +172,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     x.PeriodNumber,
                     x.CalendarMonth,
                     x.CalendarYear,
-                    x.EIScheduledOpenDateUTC)
+                    x.EIScheduledOpenDateUTC,
+                    x.CensusDate,
+                    x.AcademicYear,
+                    x.Active)
             ).ToList();
         }
 

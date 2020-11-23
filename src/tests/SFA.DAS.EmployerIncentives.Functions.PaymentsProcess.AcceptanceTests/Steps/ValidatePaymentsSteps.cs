@@ -1,9 +1,12 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System.Collections.Generic;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
@@ -15,7 +18,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     [Scope(Feature = "ValidatePayments")]
     public partial class ValidatePaymentsSteps
     {
-        private readonly TestContext _testContext;        
+        private readonly TestContext _testContext;
+        private readonly Fixture _fixture = new Fixture();
+        private Account _accountModel;
+        private PendingPayment _pendingPayment1;
+        private PendingPayment _pendingPayment2;
+        private PendingPayment _pendingPayment3;
+        private IncentiveApplication _applicationModel;
+        private List<IncentiveApplicationApprenticeship> _apprenticeshipsModels;
+        private ApprenticeshipIncentive _apprenticeshipIncentive;
+        private const int NumberOfApprenticeships = 3;
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
 

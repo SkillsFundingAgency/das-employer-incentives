@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartLearnerMatching()
         {
-            await StartLearnerMatchingOrchestrator();
+            //await StartLearnerMatchingOrchestrator();
             Thread.Sleep(TimeSpan.FromSeconds(1)); // time it takes function host to update storage 🤷‍
             await AllFunctionOrchestrationCompleted();
         }
@@ -74,13 +74,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             return JsonConvert.DeserializeObject<OrchestrationLinks>(json);
         }
 
-        private async Task StartLearnerMatchingOrchestrator()
-        {
-            var url = $"admin/functions/LearnerMatchingOrchestrator_Start";
-            var content = new StringContent("{ input : null }", Encoding.UTF8, "application/json");
-            var response = await _client.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
-        }
+        //public async Task<AzureFunctionOrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodMonth)
+        //{
+        //    var orchestrationLinks = await StartFunctionOrchestration(collectionPeriodYear, collectionPeriodMonth);
+        //    return await CompleteFunctionOrchestration(orchestrationLinks);
+        //}
 
         public async Task AllFunctionOrchestrationCompleted()
         {
