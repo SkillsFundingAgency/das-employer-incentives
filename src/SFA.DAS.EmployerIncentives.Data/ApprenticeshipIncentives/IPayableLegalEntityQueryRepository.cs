@@ -7,5 +7,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
     public interface IPayableLegalEntityQueryRepository
     {
         Task<List<PayableLegalEntityDto>> GetList(short collectionPeriodYear, byte collectionPeriodMonth);
+        Task<List<PaymentDto>> GetPaymentsToSendForAccountLegalEntity(long accountLegalEntity);
     }
 }

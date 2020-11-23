@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
     public interface IBusinessCentralFinancePaymentsService
     {
-        public Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> apprenticeshipIncentives);
+        public Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments);
     }
 }

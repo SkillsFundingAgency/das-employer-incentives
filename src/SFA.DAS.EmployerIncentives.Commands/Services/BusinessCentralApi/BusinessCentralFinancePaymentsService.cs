@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -13,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             _client = client;
         }
 
-        Task<PaymentsSuccessfullySent> IBusinessCentralFinancePaymentsService.SendPaymentRequestsForLegalEntity(List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> apprenticeshipIncentives)
+        public Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
         {
             throw new System.NotImplementedException();
         }

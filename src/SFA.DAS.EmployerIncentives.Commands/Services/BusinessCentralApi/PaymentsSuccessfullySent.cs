@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
     public class PaymentsSuccessfullySent
     {
-        public PaymentsSuccessfullySent(List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> apprenticeshipIncentives, bool allPaymentsSent)
+        public PaymentsSuccessfullySent(List<PaymentDto> paymentsSent, bool allPaymentsSent)
         {
-            ApprenticeshipIncentives = apprenticeshipIncentives;
+            PaymentsSent = paymentsSent;
             AllPaymentsSent = allPaymentsSent;
         }
-        public List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> ApprenticeshipIncentives { get; }
+        public List<PaymentDto> PaymentsSent { get; }
         public bool AllPaymentsSent { get; }
     }
 }
