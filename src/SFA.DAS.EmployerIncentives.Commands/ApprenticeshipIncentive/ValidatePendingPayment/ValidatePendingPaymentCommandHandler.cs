@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
             var account = await _accountDomainRepository.Find(incentive.Account.Id);
 
             var calendar = await _collectionCalendarService.Get();
-            var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionMonth);
+            var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionPeriod);
 
             incentive.ValidatePendingPaymentBankDetails(command.PendingPaymentId, account, collectionPeriod);
 
