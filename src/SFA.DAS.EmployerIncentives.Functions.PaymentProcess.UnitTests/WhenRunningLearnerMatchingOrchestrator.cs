@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Fixture _fixture;
         private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private LearnerMatchingOrchestrator _orchestrator;
-        private List<Guid> _apprenticeshipIncentives;
+        private List<ApprenticeshipIncentive> _apprenticeshipIncentives;
 
         [SetUp]
         public void Setup()
@@ -26,8 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
 
-            _apprenticeshipIncentives = _fixture.CreateMany<Guid>(3).ToList();
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<Guid>>("GetAllApprenticeshipIncentives", null)).ReturnsAsync(_apprenticeshipIncentives);
+            _apprenticeshipIncentives = _fixture.CreateMany<ApprenticeshipIncentive>(3).ToList();
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<ApprenticeshipIncentive>>("GetAllApprenticeshipIncentives", null)).ReturnsAsync(_apprenticeshipIncentives);
 
             _orchestrator = new LearnerMatchingOrchestrator(Mock.Of<ILogger<LearnerMatchingOrchestrator>>());
         }
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<Guid>>("GetAllApprenticeshipIncentives", null), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<ApprenticeshipIncentive>>("GetAllApprenticeshipIncentives", null), Times.Once);
         }
 
         [Test]
@@ -50,9 +50,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                 It.IsAny<LearnerMatchInput>()
             ), Times.Exactly(_apprenticeshipIncentives.Count));
 
-            foreach (var id in _apprenticeshipIncentives)
+            foreach (var apprenticeshipIncentive in _apprenticeshipIncentives)
             {
-                _mockOrchestrationContext.Verify(x => x.CallActivityAsync(It.IsAny<string>(), It.Is<LearnerMatchInput>(input => input.ApprenticeshipIncentiveId == id)), Times.Once);
+                _mockOrchestrationContext.Verify(x => x.CallActivityAsync("LearnerMatchAndUpdate", It.Is<LearnerMatchInput>(input => input.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id)), Times.Once);
+            }
+        }
+
+        [Test]
+        public async Task Then_activity_to_change_circumstances_is_called_for_each_apprenticeship_incentive()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            foreach (var apprenticeshipIncentive in _apprenticeshipIncentives)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallActivityAsync("LearnerChangeOfCircumstanceActivity", It.Is<LearnerChangeOfCircumstanceInput>(input => input.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id && input.Uln == apprenticeshipIncentive.ULN)), Times.Once);
             }
         }
     }
