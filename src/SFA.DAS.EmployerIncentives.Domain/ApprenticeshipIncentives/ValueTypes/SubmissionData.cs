@@ -66,5 +66,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return IsInlearning;            
             yield return HasDataLock;
         }
+
+        public override bool Equals(object obj)
+        {
+            var compareTo = obj as SubmissionData;
+            if (compareTo == null)
+                return false;
+
+            return SubmissionDate == compareTo.SubmissionDate && 
+                   HasDataLock == compareTo.HasDataLock &&
+                   StartDate == compareTo.StartDate && 
+                   IsInlearning == compareTo.IsInlearning &&
+                   LearningFoundStatus == compareTo.LearningFoundStatus;
+        }
     }
 }
