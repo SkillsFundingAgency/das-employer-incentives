@@ -58,8 +58,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             }
 
             learner.SetSubmissionData(submissionData);
+            incentive.LearnerRefreshCompleted();
 
             await _learnerDomainRepository.Save(learner);
+            await _incentiveDomainRepository.Save(incentive);
         }
     }
 }

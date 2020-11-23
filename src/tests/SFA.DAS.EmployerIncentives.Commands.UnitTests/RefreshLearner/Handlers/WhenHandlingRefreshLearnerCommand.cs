@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 {
@@ -42,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             _incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(p => p.Apprenticeship, apprenticeship)
+                .With(p => p.RefreshedLearnerForEarnings, false)
                 .Create();
 
             _apprenticeshipIncentiveId = _incentiveModel.Id;
@@ -350,6 +352,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.IsInlearning == true)
                 ), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_apprenticeship_incentive_is_updated_when_the_learner_refresh_is_completed()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _apprenticeshipIncentive.RefreshedLearnerForEarnings.Should().BeTrue();
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(_apprenticeshipIncentive), Times.Once);
         }
     }
 }
