@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(l => l.LearningFound, true)
                     .With(l => l.InLearning, true)
                     .With(l => l.HasDataLock, false)
-                    .With(l => l.DaysInLearning, 100)
+                    .With(l => l.DaysInLearning, 90)
                     .With(l => l.StartDate, DateTime.Now.AddDays(-100))
                     .Create();
             }

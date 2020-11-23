@@ -95,6 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var submissionData = new SubmissionData(DateTime.UtcNow);
             submissionData.SetLearningFound(new LearningFoundStatus(true));
             submissionData.SetIsInLearning(true);
+            submissionData.SetDaysInLearning(90);
 
             _learnerModel = _fixture.Build<LearnerModel>()
                 .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)

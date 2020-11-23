@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public DateTime SubmissionDate { get; }
 
         public bool? IsInlearning { get; private set; }
+        public int? DaysinLearning { get; private set; }
         public LearningFoundStatus LearningFoundStatus { get; private set; }
 
         public DateTime? StartDate { get; private set; }
@@ -40,6 +41,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public void SetIsInLearning(bool? isInLearning)
         {
             IsInlearning = isInLearning;
+        }
+
+        public void SetDaysInLearning(int? daysInLearning)
+        {
+            DaysinLearning = daysInLearning;
         }
 
         public void SetRawJson(string rawJson)

@@ -198,6 +198,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 {
                     learner.SubmissionData.SetHasDataLock(model.HasDataLock.Value);
                 }
+                if (model.DaysInLearning.HasValue)
+                {
+                    learner.SubmissionData.SetDaysInLearning(model.DaysInLearning.Value);
+                }
                 learner.SubmissionData.SetIsInLearning(model.InLearning);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
@@ -225,6 +229,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 learner.StartDate = model.SubmissionData.StartDate;
                 learner.HasDataLock = model.SubmissionData.HasDataLock;
                 learner.InLearning = model.SubmissionData.IsInlearning;
+                learner.DaysInLearning = model.SubmissionData.DaysinLearning;
                 learner.RawJSON = model.SubmissionData.RawJson;
             }
 
