@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,5 +43,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
                 HasSignedIncentivesTerms = x.HasSignedIncentivesTerms
             };
         }
+
     }
 }

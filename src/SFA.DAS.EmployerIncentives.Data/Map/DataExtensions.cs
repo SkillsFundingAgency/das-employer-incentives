@@ -1,6 +1,7 @@
-﻿using SFA.DAS.EmployerIncentives.Data.Models;
+﻿using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -62,7 +63,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfCaseId = model.VrfCaseId,
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
-                VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime
+                VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
+                BankDetailsStatus = MapBankDetailsStatus(model)
             };
         }
 
@@ -144,6 +146,28 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 EarningsCalculated = x.EarningsCalculated                
             }).ToList();
+        }
+
+        private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
+        {
+            if (String.IsNullOrWhiteSpace(model.VrfCaseStatus))
+            {
+                return BankDetailsStatus.NotSupplied;
+            }
+
+            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
+             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return BankDetailsStatus.Rejected;
+            }
+
+            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return BankDetailsStatus.Completed;
+            }
+
+            return BankDetailsStatus.InProgress;
         }
     }
 }

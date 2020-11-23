@@ -15,15 +15,17 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
     public class WhenHandlingGetApplicationsQuery
     {
         private GetApplicationsQueryHandler _sut;
-        private Mock<IApprenticeApplicationDataRepository> _repository;
+        private Mock<IApprenticeApplicationDataRepository> _applicationRepository;
+        private Mock<IAccountDataRepository> _accountRepository;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _repository = new Mock<IApprenticeApplicationDataRepository>();
-            _sut = new GetApplicationsQueryHandler(_repository.Object);
+            _applicationRepository = new Mock<IApprenticeApplicationDataRepository>();
+            _accountRepository = new Mock<IAccountDataRepository>();
+            _sut = new GetApplicationsQueryHandler(_applicationRepository.Object, _accountRepository.Object);
         }
 
         [Test]
@@ -37,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
                 ApprenticeApplications = applicationsList
             };
 
-            _repository.Setup(x => x.GetList(query.AccountId, query.AccountLegalEntityId)).ReturnsAsync(applicationsList);
+            _applicationRepository.Setup(x => x.GetList(query.AccountId, query.AccountLegalEntityId)).ReturnsAsync(applicationsList);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);

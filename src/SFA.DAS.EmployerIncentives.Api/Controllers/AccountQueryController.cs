@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
             if (response?.ApprenticeApplications != null)
             {
-                return Ok(response.ApprenticeApplications);
+                return Ok(response);
             }
 
             return NotFound();
