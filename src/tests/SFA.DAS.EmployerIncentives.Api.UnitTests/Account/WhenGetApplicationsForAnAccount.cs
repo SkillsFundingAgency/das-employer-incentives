@@ -35,7 +35,8 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 
             var apprenticeApplicationList = new GetApplicationsResponse
             {
-                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplicationDto>()
+                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplicationDto>(),
+                BankDetailsStatus = Enums.BankDetailsStatus.InProgress
             };
 
             _queryDispatcher.Setup(x => x.Send<GetApplicationsRequest, GetApplicationsResponse>(
@@ -47,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 
             // Assert
             result.Should().NotBeNull();
-            result.Value.Should().Be(apprenticeApplicationList.ApprenticeApplications);
+            result.Value.Should().Be(apprenticeApplicationList);
         }
 
         [Test]
