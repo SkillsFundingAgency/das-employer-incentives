@@ -105,6 +105,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
+        public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
+        {
+            Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
+        }
+
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var payment = Payment.New(
