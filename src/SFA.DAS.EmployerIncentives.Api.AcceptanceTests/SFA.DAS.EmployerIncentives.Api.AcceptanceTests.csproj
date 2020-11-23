@@ -6,18 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="%2a%2a\**" />
-    <EmbeddedResource Remove="%2a%2a\**" />
-    <None Remove="%2a%2a\**" />
-    <SpecFlowFeatureFiles Remove="%2a%2a\**" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="%2a%2a\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Remove="%2a%2a\%2a.feature" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
@@ -30,9 +18,9 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.20" />
-    <PackageReference Include="SpecFlow" Version="3.4.8" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.4.8" />
-    <PackageReference Include="SpecFlow.NUnit" Version="3.4.8" />
+    <PackageReference Include="SpecFlow" Version="3.5.5" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.5.5" />
+    <PackageReference Include="SpecFlow.NUnit" Version="3.5.5" />
     <PackageReference Include="WireMock.Net" Version="1.2.12" />
   </ItemGroup>
   
@@ -42,7 +30,6 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
@@ -71,6 +58,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
     </Compile>
+    
   </ItemGroup>
 
   <ItemGroup>

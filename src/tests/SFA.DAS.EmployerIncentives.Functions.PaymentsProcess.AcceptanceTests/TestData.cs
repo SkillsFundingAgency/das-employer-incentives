@@ -20,5 +20,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 
             return (T)_testdata[key];
         }
+
+        public T Get<T>(string key = null)
+        {
+            if (key == null)
+            {
+                key = typeof(T).FullName;
+            }
+
+            return (T)_testdata[key];
+        }
+
+        public void Set<T>(string key, T value)
+        {
+            _testdata[key] = value;
+        }
     }
 }

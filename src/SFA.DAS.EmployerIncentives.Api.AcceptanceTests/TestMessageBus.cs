@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
         public async Task Stop()
         {
-            await _endpointInstance.Stop();
+            await _endpointInstance.Stop().ConfigureAwait(false);
             IsRunning = false;
         }
 

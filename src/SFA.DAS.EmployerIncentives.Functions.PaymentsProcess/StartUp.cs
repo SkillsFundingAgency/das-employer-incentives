@@ -11,10 +11,11 @@ using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using System;
+using System.Data.Common;
 using System.IO;
-using SFA.DAS.Configuration.AzureTableStorage;
-using SFA.DAS.EmployerIncentives.Commands;
-using SFA.DAS.EmployerIncentives.Events;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Options;
+using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -49,10 +50,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             builder.Services.AddOptions();
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
-            builder.Services.Configure<ApplicationSettings>(config.GetSection("PolicySettings"));
+            builder.Services.Configure<PolicySettings>(config.GetSection("PolicySettings"));
+            builder.Services.Configure<MatchedLearnerApi>(config.GetSection("MatchedLearnerApi"));
 
             builder.Services.AddUnitOfWork();
-            builder.Services.AddEntityFrameworkForEmployerIncentives().AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>();
+
+            // Required for the sql unit of work
+            builder.Services.AddScoped<DbConnection>(p =>
+            {
+                var settings = p.GetService<IOptions<ApplicationSettings>>();
+                return new SqlConnection(settings.Value.DbConnectionString);
+            });
+
+            builder.Services.AddEntityFrameworkForEmployerIncentives()
+                .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
+                // This can be replaced if we ever use NServiceBus from within the durable functions.
+                .AddSqlServerUnitOfWork();
 
             builder.Services.AddPersistenceServices();
             builder.Services.AddQueryServices();

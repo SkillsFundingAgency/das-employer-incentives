@@ -94,6 +94,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     ),
                     DateTime.Today);
 
+            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+
             var paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(

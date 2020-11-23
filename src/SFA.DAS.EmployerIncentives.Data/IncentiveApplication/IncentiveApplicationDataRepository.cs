@@ -9,11 +9,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
     public class IncentiveApplicationDataRepository : IIncentiveApplicationDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public IncentiveApplicationDataRepository(EmployerIncentivesDbContext dbContext)
+        public IncentiveApplicationDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task Add(IncentiveApplicationModel incentiveApplication)
