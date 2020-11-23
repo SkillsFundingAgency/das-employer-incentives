@@ -35,8 +35,10 @@ using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
 using System.Data.SqlClient;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -75,6 +77,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
+
+            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s) => new BusinessCentralFinancePaymentsService(c));
 
             return serviceCollection;
         }
@@ -153,6 +157,32 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             return serviceCollection;
         }
+
+        private static IServiceCollection AddBusinessCentralClient<T>(this IServiceCollection serviceCollection, Func<HttpClient, IServiceProvider, T> instance) where T : class
+        {
+            serviceCollection.AddTransient(s =>
+            {
+                var settings = s.GetService<IOptions<BusinessCentralApiClient>>().Value;
+
+                var clientBuilder = new HttpClientBuilder()
+                    .WithDefaultHeaders()
+                    .WithApimAuthorisationHeader(settings)
+                    .WithLogging(s.GetService<ILoggerFactory>());
+
+                var httpClient = clientBuilder.Build();
+
+                if (!settings.ApiBaseUrl.EndsWith("/"))
+                {
+                    settings.ApiBaseUrl += "/";
+                }
+                httpClient.BaseAddress = new Uri(settings.ApiBaseUrl);
+
+                return instance.Invoke(httpClient, s);
+            });
+
+            return serviceCollection;
+        }
+
 
         public static async Task<UpdateableServiceProvider> StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,
