@@ -73,11 +73,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             if (compareTo == null)
                 return false;
 
-            return SubmissionDate == compareTo.SubmissionDate && 
-                   HasDataLock == compareTo.HasDataLock &&
+            return HasDataLock == compareTo.HasDataLock &&
                    StartDate == compareTo.StartDate && 
                    IsInlearning == compareTo.IsInlearning &&
-                   LearningFoundStatus == compareTo.LearningFoundStatus;
+                   LearningFoundStatus?.LearningFound == compareTo.LearningFoundStatus?.LearningFound;
         }
     }
 }

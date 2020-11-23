@@ -44,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(p => p.Apprenticeship, apprenticeship)
                 .With(p => p.RefreshedLearnerForEarnings, false)
+                .With(p => p.HasPossibleChangeOfCircumstances, false)
                 .Create();
 
             _apprenticeshipIncentiveId = _incentiveModel.Id;
@@ -388,6 +389,71 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(x => x.Save(It.IsAny<Learner>()), Times.Never);
             _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
+        }
+
+        [Test]
+        public async Task When_submission_data_has_changed_HasPossibleChangeOfCircumstances_is_true()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetByApprenticeshipIncentiveId(_apprenticeshipIncentiveId))
+                .ReturnsAsync(learner);
+
+            var learnerSubmissionDto = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _incentiveModel.Apprenticeship.Id)
+                                    .With(period => period.IsPayable, true)
+                                    .Create()
+                            })
+                            .With(pe => pe.StartDate, _fixture.Create<DateTime>())
+                            .Create() }
+                        )
+                        .Create(),
+                    _fixture.Create<TrainingDto>() }
+                )
+                .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _incentiveModel.HasPossibleChangeOfCircumstances.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task When_submission_data_has_not_changed_HasPossibleChangeOfCircumstances_is_not_updated()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+            var submissionData = new SubmissionData(DateTime.Now);
+            submissionData.SetIsInLearning(false);
+            submissionData.SetLearningFound(new LearningFoundStatus(false));
+            var learner = new LearnerFactory().GetExisting(_fixture.Build<LearnerModel>().With(x => x.SubmissionData, submissionData).Create());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetByApprenticeshipIncentiveId(_apprenticeshipIncentiveId))
+                .ReturnsAsync(learner);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _incentiveModel.HasPossibleChangeOfCircumstances.Should().BeFalse();
         }
     }
 }
