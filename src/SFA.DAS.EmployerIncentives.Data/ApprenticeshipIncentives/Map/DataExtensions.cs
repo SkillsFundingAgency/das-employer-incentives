@@ -167,10 +167,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             return models.Select(x =>
                 new Domain.ValueObjects.CollectionPeriod(
-                    x.PeriodNumber,
-                    x.CalendarMonth,
-                    x.CalendarYear,
-                    x.EIScheduledOpenDateUTC)
+                    x.PeriodNumber, 
+                    x.CalendarMonth, 
+                    x.CalendarYear, 
+                    x.EIScheduledOpenDateUTC,
+                    x.CensusDate,
+                    x.AcademicYear,
+                    x.Active)
             ).ToList();
         }
 
