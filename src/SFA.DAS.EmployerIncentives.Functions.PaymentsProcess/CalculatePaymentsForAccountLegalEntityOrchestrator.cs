@@ -33,6 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
 
             await Task.WhenAll(tasks);
+            await context.CallActivityAsync<bool>("SendPaymentRequestsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
         }
     }
 }
