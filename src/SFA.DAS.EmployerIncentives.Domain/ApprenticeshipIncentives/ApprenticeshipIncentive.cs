@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
-            if (!pendingPayment.IsValidated) // TODO: use period
+            if (!pendingPayment.IsValidated(collectionYear, collectionPeriod))
             {
                 return;
             }
