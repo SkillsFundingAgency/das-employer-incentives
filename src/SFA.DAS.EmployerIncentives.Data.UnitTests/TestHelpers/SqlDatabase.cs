@@ -11,17 +11,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         private bool _isDisposed;
         public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();
 
-        public SqlDatabase()
+        public SqlDatabase(string dbName)
         {
+            DatabaseInfo.SetDatabaseName(dbName);
             CreateTestDatabase();
         }
 
         private void CreateTestDatabase()
         {
             Directory.CreateDirectory("C:\\temp");
-            DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
             DatabaseInfo.SetConnectionString(
-                @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;MultipleActiveResultSets=True;Pooling=False;Connect Timeout=30");
+                @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;MultipleActiveResultSets=True;Pooling=False;Connect Timeout=30;MultipleActiveResultSets=true");
 
             using var dbConn = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True");
             try

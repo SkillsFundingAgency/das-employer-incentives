@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            context.SqlDatabase = new SqlDatabase();
+            context.SqlDatabase = new SqlDatabase(context.InstanceId);
             stopwatch.Stop();
             Console.WriteLine($"[{nameof(DatabasePerScenarioHook)}] time it took to deploy test database: {stopwatch.Elapsed.Seconds} seconds");
         }
