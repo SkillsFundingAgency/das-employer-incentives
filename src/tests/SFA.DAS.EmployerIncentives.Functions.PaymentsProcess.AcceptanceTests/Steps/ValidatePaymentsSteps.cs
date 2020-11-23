@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private List<IncentiveApplicationApprenticeship> _apprenticeshipsModels;
         private ApprenticeshipIncentive _apprenticeshipIncentive;
         private const int NumberOfApprenticeships = 3;
-        private const short CollectionPeriodYear = 2021;
+        private const short PaymentYear = 2021;
         private const byte CollectionPeriod = 6;
 
         public ValidatePaymentsSteps(TestContext testContext)
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task WhenPendingPaymentsForTheLegalEntityAreValidated()
         {
             var status =
-                await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear,
+                await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(PaymentYear,
                     CollectionPeriod);
 
             status.RuntimeStatus.Should().NotBe("Failed", status.Output);

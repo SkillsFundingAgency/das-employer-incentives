@@ -80,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                     x => x.CallActivityAsync("ValidatePendingPayment", It.Is<ValidatePendingPaymentData>(
                         d => d.ApprenticeshipIncentiveId == p.ApprenticeshipIncentiveId
                         && d.PendingPaymentId == p.PendingPaymentId
-                        && d.Month == _accountLegalEntityCollectionPeriod.CollectionPeriod.Month
+                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
                         && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)),
                     Times.Once);
         }

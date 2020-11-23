@@ -1,7 +1,7 @@
-﻿using System;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment
 {
@@ -10,15 +10,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePaym
         public Guid ApprenticeshipIncentiveId { get; }
         public Guid PendingPaymentId { get; }
         public short CollectionYear { get; }
-        public Byte CollectionMonth { get; }
+        public byte CollectionPeriod { get; }
         public string LockId { get => $"{nameof(ApprenticeshipIncentiveId)}_{ApprenticeshipIncentiveId}"; }
 
-        public CreatePaymentCommand(Guid apprenticeshipIncentiveId, Guid pendingPaymentId, short collectionYear, byte collectionMonth)
+        public CreatePaymentCommand(Guid apprenticeshipIncentiveId, Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
             PendingPaymentId = pendingPaymentId;
             CollectionYear = collectionYear;
-            CollectionMonth = collectionMonth;
+            CollectionPeriod = collectionPeriod;
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePaym
         {
             get
             {
-                var message = $"IncentiveApplications CreatePaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, PendingPaymentId {PendingPaymentId}, CollectionYear {CollectionYear} and CollectionMonth {CollectionMonth}";
+                var message = $"IncentiveApplications CreatePaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, PendingPaymentId {PendingPaymentId}, CollectionYear {CollectionYear} and CollectionPeriod {CollectionPeriod}";
                 return new Log
                 {
                     OnProcessing = () => message,

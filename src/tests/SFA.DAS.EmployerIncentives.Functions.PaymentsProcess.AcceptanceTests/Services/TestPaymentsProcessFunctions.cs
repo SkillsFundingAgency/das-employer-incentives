@@ -57,9 +57,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _isDisposed = true;
         }
 
-        public async Task<AzureFunctionOrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodMonth)
+        public async Task<AzureFunctionOrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodNumber)
         {
-            var orchestrationLinks = await StartFunctionOrchestration(collectionPeriodYear, collectionPeriodMonth);
+            var orchestrationLinks = await StartFunctionOrchestration(collectionPeriodYear, collectionPeriodNumber);
             return await CompleteFunctionOrchestration(orchestrationLinks);
         }
 

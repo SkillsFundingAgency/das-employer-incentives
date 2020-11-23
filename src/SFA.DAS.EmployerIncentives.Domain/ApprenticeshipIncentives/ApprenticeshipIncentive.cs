@@ -71,10 +71,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
         }
 
-        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth)
+        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
-            if (!pendingPayment.IsValidated)
+            if (!pendingPayment.IsValidated) // TODO: use period
             {
                 return;
             }
@@ -83,21 +83,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var paymentDate = DateTime.Now;
 
-            AddPayment(pendingPaymentId, collectionYear, collectionMonth, pendingPayment, paymentDate);
+            AddPayment(pendingPaymentId, collectionYear, collectionPeriod, pendingPayment, paymentDate);
             pendingPayment.SetPaymentMadeDate(paymentDate);
         }
 
-        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
+        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var payment = Payment.New(
-                Guid.NewGuid(), 
-                Model.Account, 
-                Model.Id, 
-                pendingPaymentId, 
+                Guid.NewGuid(),
+                Model.Account,
+                Model.Id,
+                pendingPaymentId,
                 pendingPayment.Amount,
-                paymentDate, 
-                collectionYear, 
-                collectionMonth);
+                paymentDate,
+                collectionYear,
+                collectionPeriod);
 
             Model.PaymentModels.Add(payment.GetModel());
         }
@@ -120,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             return pendingPayment;
-		}
+        }
 
         public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {
