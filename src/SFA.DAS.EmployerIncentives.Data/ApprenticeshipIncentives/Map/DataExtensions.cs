@@ -206,6 +206,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 }
                 learner.SubmissionData.SetIsInLearning(model.InLearning);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
+                learner.SubmissionData.SetStartDate(model.StartDate);
             }
 
             return learner;
