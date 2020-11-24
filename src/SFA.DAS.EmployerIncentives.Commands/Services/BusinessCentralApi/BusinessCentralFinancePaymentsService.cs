@@ -1,22 +1,100 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
     public class BusinessCentralFinancePaymentsService : IBusinessCentralFinancePaymentsService
     {
         private readonly HttpClient _client;
+        private const string ApiVersion = "2020-10-01";
+        private int _paymentRequestsLimit;
 
         public BusinessCentralFinancePaymentsService(HttpClient client)
         {
             _client = client;
+            _paymentRequestsLimit = 1000;
         }
 
-        public Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
+        public async Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
         {
-            throw new System.NotImplementedException();
+            var paymentsToSend = payments.Take(_paymentRequestsLimit).ToList();
+
+            var paymentRequests = paymentsToSend.Select(MapToBusinessCentralPaymentRequest);
+            var requestBody = new PaymentRequestContainer { PaymentRequests = paymentRequests.ToArray()};
+            var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.Default, " application/payments-data");
+            var response = await _client.PostAsync($"payments/requests?api-version={ApiVersion}", content);
+
+            if (response.StatusCode == HttpStatusCode.Accepted)
+            {
+                var morePaymentsToSend = payments.Count > paymentsToSend.Count;
+                return new PaymentsSuccessfullySent(paymentsToSend, !morePaymentsToSend);
+            }
+
+            if (response.StatusCode >= HttpStatusCode.InternalServerError)
+            {
+                throw new BusinessCentralApiException($"Business Central API is unavailable and returned an internal code of {response.StatusCode}", response.StatusCode);
+            }
+
+            throw new BusinessCentralApiException($"Business Central API returned a server code of {response.StatusCode}", response.StatusCode);
+        }
+
+        private BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)
+        {
+            return new BusinessCentralFinancePaymentRequest
+            {
+                RequestorUniquePaymentIdentifier = payment.PaymentId,
+                Requestor = "ApprenticeServiceEI",
+                FundingStream = new FundingStream
+                {
+                    Code = "EIAPP",
+                    StartDate = new DateTime(2020, 9, 1),
+                    EndDate = new DateTime(2021, 8, 30),
+                },
+                DueDate = payment.DueDate,
+                VendorNo = payment.VendorId,
+                AccountCode = MapToAccountCode(payment.SubnominalCode),
+                CostCentreCode = "AAA40",
+                Amount = payment.Amount,
+                Currency = "GBP",
+                ExternalReference = new ExternalReference
+                {
+                    Type = "ApprenticeIdentifier",
+                    Value = payment.AccountLegalEntityId.ToString()
+                },
+                PaymentLineDescription = CreatePaymentLineDescription(payment),
+                Approver = @"AD.HQ.DEPT\JPOOLE"
+            };
+        }
+
+        private string CreatePaymentLineDescription(PaymentDto payment)
+        {
+            return $"Hire a new apprentice ({payment.PaymentSequence} payment). Employer: {payment.HashedLegalEntityId} ULN: {payment.ULN}";
+        }
+
+        private string MapToAccountCode(SubnominalCode subnominalCode)
+        {
+            switch (subnominalCode)
+            {
+                case SubnominalCode.Levy16To18:
+                    return "2240147";
+                case SubnominalCode.Levy19Plus:
+                    return "2340147";
+                case SubnominalCode.NonLevy16To18:
+                    return "2240250";
+                case SubnominalCode.NonLevy19Plus:
+                    return "2340292";
+                default:
+                    throw new InvalidIncentiveException($"No mapping found for subnominalCode {subnominalCode}");
+            }
         }
     }
 }

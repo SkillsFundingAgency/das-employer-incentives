@@ -30,7 +30,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
             var sent = await _businessCentralFinancePaymentsService.SendPaymentRequestsForLegalEntity(payments);
 
             // update payments PaidDate
-            // Question is do we do this for each ApprenticeshipIncentive or via the AccountLegalEntity record??
 
             // if not all payments sent sent command again
             if (!sent.AllPaymentsSent)
