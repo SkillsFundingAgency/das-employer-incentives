@@ -1,8 +1,7 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance
 {
@@ -26,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
                 return;
             }
 
-            var learner = await _learnerDomainRepository.GetByApprenticeshipIncentiveId(incentive.Id);
+            var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
             if (learner.SubmissionFound && learner.SubmissionData.StartDate.HasValue)
                 incentive.SetActualStartDate(learner.SubmissionData.StartDate.Value);
