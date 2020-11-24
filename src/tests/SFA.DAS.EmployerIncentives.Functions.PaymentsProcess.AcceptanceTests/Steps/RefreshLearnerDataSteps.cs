@@ -276,7 +276,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.SubmissionDate.Should().Be(DateTime.Parse("2020-11-09 17:04:31.407", new CultureInfo("en-GB")));
             createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.Course_Price_Dlock_R03_json);
             createdLearner.StartDate.Should().Be(_startDate);
-            createdLearner.DaysInLearning.Should().BeNull();
+            createdLearner.DaysInLearning.Should().Be(22);
         }
 
         [Then(@"the apprenticeship incentive learner data is updated indicating learning not found")]
@@ -298,6 +298,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var firstEpisodeDaysInLearning = (int)(DateTime.Parse("2020-07-30T00:00:00") - DateTime.Parse("2020-01-01T00:00:00")).TotalDays + 1;
             var secondEpisodeDaysInLearning = (int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
             var expectedDaysInLearning = firstEpisodeDaysInLearning + secondEpisodeDaysInLearning;
+            createdLearner.DaysInLearning.Should().Be(expectedDaysInLearning);
+        }
+
+        [Given(@"the latest learner data has a matching in-break training episode")]
+        public void GivenTheLatestLearnerDataHasAMatchingIn_BreakTrainingEpisode()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InBreak_json);
+        }
+
+        [Then(@"the apprenticeship incentive learner data is updated with days in learning counted up until training end date")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedWithDaysInLearningCountedUpUntilTrainingEndDate()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+            var expectedDaysInLearning = (int)(DateTime.Parse("2020-08-20T00:00:00") - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
+
             createdLearner.DaysInLearning.Should().Be(expectedDaysInLearning);
         }
 

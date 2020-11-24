@@ -10,8 +10,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
     [Scope(Tag = "activeCalendarPeriod")]
     public class ActiveCalendarPeriod
     {
+        /// <summary>
+        /// Sets period 2020/1 (August) with Opening Date 2020-08-08 & Census Date 2020-08-31 as active
+        /// </summary>
         [BeforeScenario(Order = 20)]
-        public async Task CreateDatabase(TestContext context)
+        public async Task SetActiveCollectionCalendarPeriod(TestContext context)
         {
             await using var dbConnection = new SqlConnection(context.SqlDatabase.DatabaseInfo.ConnectionString);
 
