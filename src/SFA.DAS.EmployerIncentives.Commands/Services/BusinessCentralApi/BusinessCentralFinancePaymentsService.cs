@@ -15,13 +15,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     public class BusinessCentralFinancePaymentsService : IBusinessCentralFinancePaymentsService
     {
         private readonly HttpClient _client;
-        private const string ApiVersion = "2020-10-01";
+        private string _apiVersion;
         private int _paymentRequestsLimit;
 
-        public BusinessCentralFinancePaymentsService(HttpClient client)
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit = 1000, string apiVersion = "2020-10-01 ")
         {
             _client = client;
-            _paymentRequestsLimit = 1000;
+            _apiVersion = apiVersion;
+            _paymentRequestsLimit = paymentRequestsLimit;
         }
 
         public async Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
@@ -29,9 +30,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             var paymentsToSend = payments.Take(_paymentRequestsLimit).ToList();
 
             var paymentRequests = paymentsToSend.Select(MapToBusinessCentralPaymentRequest);
-            var requestBody = new PaymentRequestContainer { PaymentRequests = paymentRequests.ToArray()};
-            var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.Default, " application/payments-data");
-            var response = await _client.PostAsync($"payments/requests?api-version={ApiVersion}", content);
+            var body = new PaymentRequestContainer { PaymentRequests = paymentRequests.ToArray()};
+            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.Default);
+            var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
             if (response.StatusCode == HttpStatusCode.Accepted)
             {
@@ -47,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             throw new BusinessCentralApiException($"Business Central API returned a server code of {response.StatusCode}", response.StatusCode);
         }
 
-        private BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)
+        public BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)
         {
             return new BusinessCentralFinancePaymentRequest
             {

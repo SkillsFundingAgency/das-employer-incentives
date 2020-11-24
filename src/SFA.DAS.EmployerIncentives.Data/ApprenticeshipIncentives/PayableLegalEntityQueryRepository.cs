@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                         DueDate = x.PendingPayment.DueDate,
                         SubnominalCode = x.Payment.SubnominalCode,
                         Amount = x.Payment.Amount,
-                        PaymentSequence = "First", // TODO needs to be updated to either first or Second
+                        PaymentSequence = "first", // TODO needs to be updated to either first or Second
                         ULN = x.ApprenticeshipIncentive.ULN,
                         HashedLegalEntityId = x.Account.HashedLegalEntityId
                     });
