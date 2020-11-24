@@ -146,7 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             var censusDate = collectionCalendar.GetActivePeriod().CensusDate.Date;
 
             var matchedRecords =
-               from tr in learnerData.Training
+               (from tr in learnerData.Training
                where tr.Reference == PROGRAM_REFERENCE
                from pe in tr.PriceEpisodes
                from p in pe.Periods
@@ -156,8 +156,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                    p.ApprenticeshipId,
                    pe.StartDate,
                    pe.EndDate,
-                   p.Period
-               };
+               }).Distinct().ToArray();
 
             if (matchedRecords.Any())
             {
@@ -167,17 +166,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 {
                     if (!matchedRecord.EndDate.HasValue)
                     {
-                        daysInLearning += censusDate.Subtract(matchedRecord.StartDate.Date).Days;
+                        daysInLearning += censusDate.Subtract(matchedRecord.StartDate.Date).Days + 1;
                     }
                     else
                     {
                         if (matchedRecord.EndDate.Value.Date < censusDate)
                         {
-                            daysInLearning += matchedRecord.EndDate.Value.Date.Subtract(matchedRecord.StartDate.Date).Days;
+                            daysInLearning += matchedRecord.EndDate.Value.Date.Subtract(matchedRecord.StartDate.Date).Days + 1;
                         }
                         else
                         {
-                            daysInLearning += censusDate.Subtract(matchedRecord.StartDate.Date).Days;
+                            daysInLearning += censusDate.Subtract(matchedRecord.StartDate.Date).Days + 1;
                         }
                     }
                 }

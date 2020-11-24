@@ -80,7 +80,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisode2Dto = _fixture.Create<PriceEpisodeDto>();
             _testPriceEpisode2Dto.StartDate = _startDate.AddDays(-30);
             _testPriceEpisode2Dto.EndDate = _testPriceEpisode2Dto.StartDate.AddDays(12);
-            _testPriceEpisode2Dto.Periods.First().ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id;
+            // probbaly not valid data but add multiple apprenticeship periods by price episode just in case
+            _testPriceEpisode2Dto.Periods.ToList().ForEach(p => p.ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id);            
             _testTrainingDto.PriceEpisodes.Add(_testPriceEpisode2Dto);
 
             _testTrainingDto.PriceEpisodes.Add(_fixture.Create<PriceEpisodeDto>());
@@ -97,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_expected_days_is_returned_when_there_are_matching_periods_and_null_latest_price_episode_end_date()
         {
             //Arrange  
-            int expectedDays = 17 + 15 + 12;
+            int expectedDays = 18 + 16 + 13;
 
             //Act
             var daysInLearning = _sut.DaysInLearning(_incentive, _collectionCalendar);
@@ -111,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         {
             //Arrange  
             _testPriceEpisode3Dto.EndDate = _censusDate.AddDays(1);
-            int expectedDays = 17 + 15 + 12;
+            int expectedDays = 18 + 16 + 13;
 
             //Act
             var daysInLearning = _sut.DaysInLearning(_incentive, _collectionCalendar);
@@ -125,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         {
             //Arrange  
             _testPriceEpisode3Dto.EndDate = _censusDate.AddDays(-1);
-            int expectedDays = 17 + 15 + 12 - 1;
+            int expectedDays = 18 + 16 + 13 - 1;
 
             //Act
             var daysInLearning = _sut.DaysInLearning(_incentive, _collectionCalendar);
@@ -152,7 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         {
             //Arrange    
             _testPriceEpisode1Dto.Periods.First().ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id + 1;
-            _testPriceEpisode2Dto.Periods.First().ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id + 1;
+            _testPriceEpisode2Dto.Periods.ToList().ForEach(p => p.ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id + 1);
             _testPriceEpisode3Dto.Periods.First().ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id + 1;
 
             //Act
