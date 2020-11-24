@@ -465,7 +465,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.DaysinLearning == 1)
+                It.Is<Learner>(l => l.SubmissionData.DaysinLearning == 2)
                 ), Times.Once);
         }
     }
