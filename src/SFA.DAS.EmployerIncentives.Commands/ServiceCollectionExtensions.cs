@@ -37,6 +37,7 @@ using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -78,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
-            
+
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
             return serviceCollection;
@@ -97,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
             serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
-            
+
             return serviceCollection;
         }
 

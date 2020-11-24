@@ -4,13 +4,13 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayable
 {
     public class GetPayableLegalEntitiesRequest : IQuery
     {
-        public short CollectionPeriodYear { get; }
-        public byte CollectionPeriodMonth { get; }
+        public short PaymentYear { get; }
+        public byte PeriodNumber { get; }
 
-        public GetPayableLegalEntitiesRequest(short collectionPeriodYear, byte collectionPeriodMonth)
+        public GetPayableLegalEntitiesRequest(short collectionPeriodYear, byte collectionPeriodNumber)
         {
-            CollectionPeriodYear = collectionPeriodYear;
-            CollectionPeriodMonth = collectionPeriodMonth;
+            PaymentYear = collectionPeriodYear;
+            PeriodNumber = collectionPeriodNumber;
         }
     }
 }

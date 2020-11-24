@@ -16,19 +16,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
     {
         public Account Account => Model.Account;
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
-        public DateTime PlannedStartDate => Model.PlannedStartDate;        
+        public DateTime PlannedStartDate => Model.PlannedStartDate;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
-        
+        public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
+
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
             return new ApprenticeshipIncentive(
-                id, 
-                new ApprenticeshipIncentiveModel { 
-                    Id = id, 
+                id,
+                new ApprenticeshipIncentiveModel
+                {
+                    Id = id,
                     ApplicationApprenticeshipId = applicationApprenticeshipId,
-                    Account = account, 
-                    Apprenticeship = apprenticeship, 
-                    PlannedStartDate = plannedStartDate }, true);
+                    Account = account,
+                    Apprenticeship = apprenticeship,
+                    PlannedStartDate = plannedStartDate
+                }, true);
         }
 
         internal static ApprenticeshipIncentive Get(Guid id, ApprenticeshipIncentiveModel model)
@@ -39,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public void CalculateEarnings(IEnumerable<IncentivePaymentProfile> paymentProfiles, CollectionCalendar collectionCalendar)
         {
             var incentive = new Incentive(Apprenticeship.DateOfBirth, PlannedStartDate, paymentProfiles);
-            if(!incentive.IsEligible)
+            if (!incentive.IsEligible)
             {
                 throw new InvalidIncentiveException("Incentive does not pass the eligibility checks");
             }
@@ -47,16 +50,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.PendingPaymentModels.Clear();
             foreach (var payment in incentive.Payments)
             {
-                 var pendingPayment = PendingPayment.New(
-                               Guid.NewGuid(),
-                               Model.Account,
-                               Model.Id,
-                               payment.Amount,
-                               payment.PaymentDate,
-                               DateTime.Now);
+                var pendingPayment = PendingPayment.New(
+                              Guid.NewGuid(),
+                              Model.Account,
+                              Model.Id,
+                              payment.Amount,
+                              payment.PaymentDate,
+                               DateTime.Now,
+                               payment.EarningType);
 
                 pendingPayment.SetPaymentPeriod(collectionCalendar);
-                
+
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
             }
 
@@ -73,16 +77,88 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             AddEvent(new PaymentsCalculationRequired(Model));
         }
+        
+        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
+        {
+            var pendingPayment = GetPendingPayment(pendingPaymentId);
+            if (!pendingPayment.IsValidated(collectionYear, collectionPeriod))
+            {
+                return;
+            }
+
+            RemoveExistingPaymentIfExists(pendingPaymentId);
+
+            var paymentDate = DateTime.Now;
+
+            AddPayment(pendingPaymentId, collectionYear, collectionPeriod, pendingPayment, paymentDate);
+            pendingPayment.SetPaymentMadeDate(paymentDate);
+        }
+
+        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
+        {
+            var payment = Payment.New(
+                Guid.NewGuid(),
+                Model.Account,
+                Model.Id,
+                pendingPaymentId,
+                pendingPayment.Amount,
+                paymentDate,
+                collectionYear,
+                collectionPeriod);
+
+            Model.PaymentModels.Add(payment.GetModel());
+        }
+
+        private void RemoveExistingPaymentIfExists(Guid pendingPaymentId)
+        {
+            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == pendingPaymentId);
+            if (existingPayment != null)
+            {
+                Model.PaymentModels.Remove(existingPayment);
+            }
+        }
+
+        private PendingPayment GetPendingPayment(Guid pendingPaymentId)
+        {
+            var pendingPayment = PendingPayments.SingleOrDefault(x => x.Id == pendingPaymentId);
+            if (pendingPayment == null)
+            {
+                throw new ArgumentException("Pending payment does not exist.");
+            }
+
+            return pendingPayment;
+        }
+
+        public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
+        {
+            if (Account.Id != account.Id)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided Account record does not match the one against the incentive.");
+            }
+
+            var pendingPayment = PendingPayments.SingleOrDefault(p => p.Id == pendingPaymentId);
+
+            if (pendingPayment == null)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the pending payment record does not exist.");
+            }
+
+            var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
+
+            var isValid = !string.IsNullOrEmpty(legalEntity.VrfVendorId);
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, "HasBankDetails", isValid));
+        }
 
         private ApprenticeshipIncentive(Guid id, ApprenticeshipIncentiveModel model, bool isNew = false) : base(id, model, isNew)
-        {            
-            if(isNew)
+        {
+            if (isNew)
             {
                 AddEvent(new Created
                 {
                     ApprenticeshipIncentiveId = id,
                     AccountId = model.Account.Id,
-                    ApprenticeshipId =  model.Apprenticeship.Id
+                    ApprenticeshipId = model.Apprenticeship.Id
                 });
             }
         }
