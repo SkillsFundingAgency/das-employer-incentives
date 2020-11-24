@@ -3,15 +3,14 @@ using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
-using Newtonsoft.Json;
-using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -29,68 +28,66 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Account _accountModel;
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
-        private readonly PendingPayment _pendingPayment;
-        private readonly LearnerSubmissionDto _learnerMatchApiData;
         private readonly DateTime _startDate;
+        private readonly DateTime _submissionDate;
+        private readonly IList<PendingPayment> _pendingPayments;
 
         public RefreshLearnerDataSteps(TestContext testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
-
-            _startDate = _fixture.Create<DateTime>();
+            _startDate = DateTime.Parse("2020-08-10");
+            _submissionDate = DateTime.Parse("2020-11-09T16:53:17.293+00:00");
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
+                .With(p => p.UKPRN, 10036143)
+                .With(p => p.ULN, 9900084607)
+                .With(p => p.ApprenticeshipId, 511526)
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .Create();
 
-            _pendingPayment = _fixture.Build<PendingPayment>()
-               .With(p => p.AccountId, _accountModel.Id)
-               .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-               .With(p => p.DueDate, _startDate.AddMonths(1))
-               .Create();
-
-            _pendingPayment.PaymentMadeDate = null;
-            _learnerMatchApiData = _fixture.Build<LearnerSubmissionDto>()
-                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
-                .Create();
-            _learnerMatchApiData = _fixture
-               .Build<LearnerSubmissionDto>()
-               .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-               .With(s => s.Uln, _apprenticeshipIncentive.ULN)
-               .With(l => l.Training, new List<TrainingDto> {
-                    _fixture.Create<TrainingDto>(),
-                    _fixture
-                        .Build<TrainingDto>()
-                        .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
-                                                    .With(pe => pe.Periods, new List<PeriodDto>(){
-                                                        _fixture.Build<PeriodDto>()
-                                                       .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
-                                                       .With(period => period.IsPayable, true)
-                                                       .With(period => period.Period, _pendingPayment.PeriodNumber)
-                                                       .Create()
-                                                    })
-                                                    .With(pe => pe.StartDate, _startDate)
-                                                    .With(pe => pe.EndDate, _startDate.AddMonths(2))
-                                                    .Create() }
-                        )
-                        .Create(),
-                    _fixture.Create<TrainingDto>() }
-                   )
-               .Create();
+            _pendingPayments = new List<PendingPayment>
+            {
+                _fixture.Build<PendingPayment>()
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.PeriodNumber, (byte?) 2) // previous period
+                    .With(p => p.PaymentYear, (short?) 2020)
+                    .With(p => p.PaymentMadeDate, DateTime.Now.AddDays(-1))
+                    .Create(),
+                _fixture.Build<PendingPayment>()
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.PeriodNumber, (byte?) 3) // current period
+                    .With(p => p.PaymentYear, (short?) 2020)
+                    .With(p => p.DueDate, DateTime.Parse("2020-08-10"))
+                    .Without(p => p.PaymentMadeDate)
+                    .Create(),
+                _fixture.Build<PendingPayment>()
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.PeriodNumber, (byte?) 4) // future period
+                    .With(p => p.PaymentYear, (short?) 2020)
+                    .With(p => p.DueDate, DateTime.Parse("2020-09-10"))
+                    .Without(p => p.PaymentMadeDate)
+                    .Create()
+            };
         }
 
+        [Given(@"an apprenticeship incentive exists")]
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_accountModel);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            foreach (var pendingPayment in _pendingPayments)
             {
-                await dbConnection.InsertAsync(_accountModel);
-                await dbConnection.InsertAsync(_apprenticeshipIncentive);
-                await dbConnection.InsertAsync(_pendingPayment);
+                await dbConnection.InsertAsync(pendingPayment);
             }
         }
 
@@ -113,20 +110,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         [Given(@"an apprenticeship incentive exists and with a corresponding learner match record")]
         public async Task GivenAnApprenticeshipIncentiveExistsWithACorrespondingLearnerMatchRecord()
-        {         
-            await GivenAnApprenticeshipIncentiveExists();            
-
-            _testContext.LearnerMatchApi.MockServer
-            .Given(
-                    Request
-                    .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
-                    .UsingGet()
-                    )
-                .RespondWith(Response.Create()
-                .WithStatusCode(HttpStatusCode.OK)
-                .WithHeader("Content-Type", "application/json")
-                .WithBodyAsJson(_learnerMatchApiData));
+        {
+            await GivenAnApprenticeshipIncentiveExists();
         }
 
         [Given(@"an apprenticeship incentive exists and has previously been refreshed")]
@@ -145,22 +130,38 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
             });
 
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.InsertAsync(learner);
-            }
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(learner);
+        }
 
-            _testContext.LearnerMatchApi.MockServer
-            .Given(
-                    Request
-                    .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
-                    .UsingGet()
-                    )
-                .RespondWith(Response.Create()
-                .WithStatusCode(HttpStatusCode.OK)
-                .WithHeader("Content-Type", "application/json")
-                .WithBodyAsJson(_learnerMatchApiData));
+        [Given(@"the latest learner data has active in learning data")]
+        public void AndTheLatestLearnerDataHasInLearningData()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_json);
+        }
+
+        [Given(@"the latest learner data has a data locked price episode")]
+        public void GivenLatestLearnerDataHasADataLockedPriceEpisode()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.Course_Price_Dlock_R03_json);
+        }
+
+        [Given(@"the latest learner data has training entries for a different apprenticeship")]
+        public void GivenLatestLearnerDataHasNoPriceEpisodeForCurrentPeriod()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_DifferentApprenticeship_json);
+        }
+
+        [Given(@"the latest learner data has no training entries")]
+        public void GivenLatestLearnerDataHasNoTrainingEntries()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoTraining);
+        }
+
+        [Given(@"the latest learner data has no ZPROG001 training entries")]
+        public void GivenLatestLearnerDataHasNoZPROG001TrainingEntries()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoZPROG001_json);
         }
 
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
@@ -193,19 +194,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
 
             createdLearner.StartDate.Should().BeNull();
-            createdLearner.InLearning.Should().BeNull();
-            createdLearner.HasDataLock.Should().BeNull();
-            createdLearner.SubmissionDate.Should().BeNull();
             createdLearner.DaysInLearning.Should().BeNull();
-            createdLearner.RawJSON.Should().BeNull();            
+            createdLearner.SubmissionDate.Should().BeNull();
+            createdLearner.RawJSON.Should().BeNull();
+            createdLearner.InLearning.Should().BeNull();
+            createdLearner.LearningFound.Should().BeNull();
+
+            createdLearner.HasDataLock.Should().BeNull();
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
         public void ThenTheApprenticeshipIncentiveLearnerDataIsCreatedForTheApplicationWithSubmissionData()
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();           
-
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var createdLearners = dbConnection.GetAll<Learner>();
 
@@ -217,15 +217,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
-            createdLearner.SubmissionDate.Should().Be(_learnerMatchApiData.IlrSubmissionDate);
-            createdLearner.RawJSON.Should().Be(JsonConvert.SerializeObject(_learnerMatchApiData));
+            createdLearner.SubmissionDate.Should().Be(_submissionDate);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_json);
             createdLearner.StartDate.Should().Be(_startDate);
+
+            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.InLearning.Should().BeTrue();
             createdLearner.HasDataLock.Should().BeFalse();
-            createdLearner.InLearning.Should().BeTrue();
-            
-            stopwatch.Stop();
-            Console.WriteLine($"Time it took to assert test datan: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");
+            createdLearner.LearningFound.Should().BeTrue();
         }
 
         [Then(@"the apprenticeship incentive learner data is updated for the application with submission data")]
@@ -245,12 +244,67 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
             createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
-            createdLearner.SubmissionDate.Should().Be(_learnerMatchApiData.IlrSubmissionDate);
-            createdLearner.RawJSON.Should().Be(JsonConvert.SerializeObject(_learnerMatchApiData));
+            createdLearner.SubmissionDate.Should().Be(_submissionDate);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_json);
             createdLearner.StartDate.Should().Be(_startDate);
+
+            createdLearner.DaysInLearning.Should().BeNull();
             createdLearner.HasDataLock.Should().BeFalse();
-            createdLearner.InLearning.Should().BeTrue();
-            createdLearner.DaysInLearning.Should().BeNull();            
+            createdLearner.LearningFound.Should().BeTrue();
+        }
+
+        [When(@"the locked price episode period matches the next pending payment period")]
+        public void TheLockedPriceEpisodePeriodMatchesTheNextPendingPaymentPeriod()
+        {
+            const byte lockedPeriod = 3; // see Course-Price-Dlock-R03.json.txt
+            var nextPaymentPeriod = _pendingPayments.Where(x => x.PaymentMadeDate == null)
+                .OrderBy(x => x.DueDate).First().PeriodNumber;
+            nextPaymentPeriod.Should().Be(lockedPeriod);
+        }
+
+        [Then(@"the apprenticeship incentive learner data is updated indicating data lock")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedIndicatingDataLock()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+
+            createdLearner.HasDataLock.Should().BeTrue();
+
+            createdLearner.SubmissionFound.Should().Be(true);
+            createdLearner.Id.Should().NotBeEmpty();
+            createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
+            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
+            createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
+            createdLearner.SubmissionDate.Should().Be(DateTime.Parse("2020-11-09 17:04:31.407", new CultureInfo("en-GB")));
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.Course_Price_Dlock_R03_json);
+            createdLearner.StartDate.Should().Be(_startDate);
+            createdLearner.DaysInLearning.Should().BeNull();
+        }
+
+        [Then(@"the apprenticeship incentive learner data is updated indicating learning not found")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedIndicatingLearningNotFound()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+
+            createdLearner.SubmissionFound.Should().Be(true);
+            createdLearner.LearningFound.Should().BeFalse();
+        }
+
+        private void SetupLearnerMatchApiResponse(string json)
+        {
+            _testContext.LearnerMatchApi.MockServer
+                .Given(
+                    Request
+                        .Create()
+                        .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
+                        .UsingGet()
+                )
+                .RespondWith(Response.Create()
+                    .WithStatusCode(HttpStatusCode.OK)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(json));
         }
     }
 }

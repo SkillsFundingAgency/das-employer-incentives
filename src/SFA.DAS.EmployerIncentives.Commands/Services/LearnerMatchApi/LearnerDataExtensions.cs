@@ -71,21 +71,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         public static bool HasProviderDataLocks(this LearnerSubmissionDto data, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             if (incentive == null) return false;
+            var nextPayment = incentive.NextDuePayment;
+            if (nextPayment == null) return false;
 
-            var pendingPayments = incentive.PendingPayments.Where(p => p.PaymentMadeDate == null);
-            if(!pendingPayments.Any())
-            {
-                return false;
-            }
-            var nextPayment = pendingPayments.OrderBy(p => p.DueDate).First();
-            if (nextPayment.PaymentYear != null && nextPayment.PeriodNumber.HasValue)
-            {
-                return data
+            var hasLock = data
                .PaymentsForApprenticeship(incentive.Apprenticeship.Id, nextPayment.DueDate)
                .Any(p => p.Period == nextPayment.PeriodNumber && !p.IsPayable);
-            }
 
-            return false;
+            return hasLock;
         }
 
         public static bool IsInLearning(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
@@ -99,19 +92,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             // to True ELSE set InLearning to False
 
             if (incentive == null) return false;
-
-            var pendingPayments = incentive.PendingPayments.Where(p => p.PaymentMadeDate == null);
-            if (!pendingPayments.Any())
-            {
-                return false;
-            }
-
-            var firstPendingPayment = pendingPayments.OrderBy(p => p.DueDate).FirstOrDefault();
-
-            if (firstPendingPayment == null)
-            {
-                return false;
-            }
+            var nextPayment = incentive.NextDuePayment;
+            if (nextPayment == null) return false;
 
             var matchedRecords =
                from tr in learnerData.Training
@@ -132,9 +114,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             {
                 foreach (var matchedRecord in matchedRecords)
                 {
-                    var endDate = matchedRecord.EndDate ?? firstPendingPayment.DueDate;
-                    if (firstPendingPayment.DueDate >= matchedRecord.StartDate &&
-                       firstPendingPayment.DueDate <= endDate)
+                    var endDate = matchedRecord.EndDate ?? nextPayment.DueDate;
+                    if (nextPayment.DueDate >= matchedRecord.StartDate &&
+                        nextPayment.DueDate <= endDate)
                     {
                         isInLearning = true;
                         break;

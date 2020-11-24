@@ -28,10 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         [AfterScenario()]
         public void CleanUpLearnerMatchApi()
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
             _testContext.LearnerMatchApi?.Dispose();
-            Console.WriteLine($"[{nameof(LearnerMatchApiPerTestRunHook)}] time it took to dispose of LearnerMatchApi: {stopwatch.Elapsed.Milliseconds} milliseconds");
         }
     }
 }
