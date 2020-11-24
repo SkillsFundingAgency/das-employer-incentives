@@ -9,5 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipInc
         public short? PaymentYear { get; set; }
         public long AccountLegalEntityId { get; set; }
         public DateTime? PaymentMadeDate { get; set; }
+        public Guid ApprenticeshipIncentiveId { get; set; }
+
     }
 }

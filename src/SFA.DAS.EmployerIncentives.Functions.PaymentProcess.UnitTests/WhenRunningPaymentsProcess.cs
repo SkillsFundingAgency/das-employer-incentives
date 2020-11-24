@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private CollectionPeriod _collectionPeriod;
         private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private IncentivePaymentOrchestrator _orchestrator;
-        private List<long> _legalEntities;
+        private List<PayableLegalEntityDto> _legalEntities;
 
         [SetUp]
         public void Setup()
@@ -27,8 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
             _mockOrchestrationContext.Setup(x => x.GetInput<CollectionPeriod>()).Returns(_collectionPeriod);
 
-            _legalEntities = _fixture.CreateMany<long>(3).ToList();
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<long>>("GetPayableLegalEntities", _collectionPeriod)).ReturnsAsync(_legalEntities);
+            _legalEntities = _fixture.CreateMany<PayableLegalEntityDto>(3).ToList();
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", _collectionPeriod)).ReturnsAsync(_legalEntities);
 
             _orchestrator = new IncentivePaymentOrchestrator(Mock.Of<ILogger<IncentivePaymentOrchestrator>>());
         }
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<long>>("GetPayableLegalEntities", _collectionPeriod), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", _collectionPeriod), Times.Once);
         }
 
         [Test]
@@ -46,20 +46,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[0]))), Times.Once);
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[1]))), Times.Once);
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync<object>("CalculatePaymentsForAccountLegalEntityOrchestrator", null, It.Is<object>(y => VerifyInputMatchesAccountAndCollectionPeriod(y, _legalEntities[2]))), Times.Once);
-        }
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                It.IsAny<AccountLegalEntityCollectionPeriod>()
+            ), Times.Exactly(_legalEntities.Count));
 
-        private bool VerifyInputMatchesAccountAndCollectionPeriod(object functionInput, long accountLegalEntityId)
-        {
-            var accountLegalEntityAndCollectionPeriod = functionInput as AccountLegalEntityCollectionPeriod;
-            if (accountLegalEntityAndCollectionPeriod == null)
+            foreach (var entity in _legalEntities)
             {
-                return false;
-            }
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                        "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                        It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                            input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                            input.AccountId == entity.AccountId &&
+                            input.CollectionPeriod.Period == _collectionPeriod.Period &&
+                            input.CollectionPeriod.Year == _collectionPeriod.Year)
 
-            return accountLegalEntityAndCollectionPeriod.AccountLegalEntityId == accountLegalEntityId && accountLegalEntityAndCollectionPeriod.CollectionPeriod == _collectionPeriod;
+                    ), Times.Once);
+            }
         }
     }
 }
