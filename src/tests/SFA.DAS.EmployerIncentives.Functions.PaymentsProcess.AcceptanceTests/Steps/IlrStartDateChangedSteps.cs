@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -48,10 +48,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
 
             _pendingPayment.PaymentMadeDate = null;
-            
-            _learnerMatchApiData = _fixture.Build<LearnerSubmissionDto>()
+
+            _learnerMatchApiData = _fixture
+                .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.Uln, _apprenticeshipIncentive.ULN)
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                                    .With(period => period.IsPayable, true)
+                                    .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                    .Create()
+                            })
+                            .With(pe => pe.StartDate, _plannedStartDate)
+                            .With(pe => pe.EndDate, _plannedStartDate.AddYears(1))
+                            .Create() }
+                        )
+                        .Create()}
+                )
                 .Create();
         }
 
@@ -69,7 +88,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive")]
         public async Task WhenTheLearnerIsRefreshedWithAValidStartDate()
         {
-            _learnerMatchApiData.StartDate = new DateTime(2020, 9, 1);
+            var actualStartDate = new DateTime(2020, 9, 1);
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
 
             SetupMockLearnerMatchResponse();
 
@@ -79,7 +100,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is refreshed with a new invalid start date for the apprenticeship incentive")]
         public async Task WhenTheLearnerIsRefreshedWithAnInvalidStartDate()
         {
-            _learnerMatchApiData.StartDate = new DateTime(2020, 7, 1);
+            var actualStartDate = new DateTime(2020, 7, 1);
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
 
             SetupMockLearnerMatchResponse();
 
@@ -92,7 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>();
 
-            incentive.Single().ActualStartDate.Should().Be(_learnerMatchApiData.StartDate);
+            incentive.Single().ActualStartDate.Should().Be(_learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate);
         }
 
         [Then(@"the pending payments are recalculated for the apprenticeship incentive")]
