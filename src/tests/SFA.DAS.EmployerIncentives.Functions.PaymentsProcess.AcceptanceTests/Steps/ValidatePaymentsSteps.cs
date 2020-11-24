@@ -2,10 +2,10 @@
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
@@ -74,6 +74,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                        ["collectionPeriodMonth"] = CollectionPeriod
                    }
                    ));
+
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]

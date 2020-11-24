@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
@@ -21,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private IJobHost Jobs => _host.Services.GetService<IJobHost>();
         public string HubName { get; }
+        public HttpResponseMessage LastResponse { get; private set; }
 
         public TestFunction(TestContext testContext, string hubName)
         {
@@ -33,8 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
-            _testContext = testContext;
-            object response = null;
+            _testContext = testContext;            
 
             _host = new HostBuilder()
                 .ConfigureAppConfiguration(a =>
@@ -43,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         a.AddInMemoryCollection(_appConfig);
                     })
                 .ConfigureWebJobs(builder => builder
-                       .AddHttp(options => options.SetResponse = (request, o) => response = o)
+                       .AddHttp(options => options.SetResponse = (request, o) => LastResponse = o as HttpResponseMessage)
                        //.AddTimers()                         
                        .AddDurableTask(options =>
                        {
@@ -52,7 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            options.UseGracefulShutdown = false;
                            options.ExtendedSessionsEnabled = false;
                            options.StorageProvider["maxQueuePollingInterval"] = new TimeSpan(0, 0, 0, 0, 500);
-                           options.StorageProvider["partitionCount"] = 1;
+                           options.StorageProvider["partitionCount"] = 1;                           
+                           options.NotificationUrl = new Uri("localhost:7071");
                            //options.StorageProvider["controlQueueBatchSize"] = 5;
                            //options.HttpSettings.DefaultAsyncRequestSleepTimeMilliseconds = 500;
                            //options.MaxConcurrentActivityFunctions = 10;
