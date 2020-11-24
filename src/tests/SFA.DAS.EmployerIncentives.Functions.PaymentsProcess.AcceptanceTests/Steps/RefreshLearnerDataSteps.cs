@@ -1,13 +1,17 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -78,7 +82,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     _fixture.Create<TrainingDto>() }
                    )
                .Create();
-
         }
 
         public async Task GivenAnApprenticeshipIncentiveExists()
@@ -110,8 +113,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         [Given(@"an apprenticeship incentive exists and with a corresponding learner match record")]
         public async Task GivenAnApprenticeshipIncentiveExistsWithACorrespondingLearnerMatchRecord()
-        {
-            await GivenAnApprenticeshipIncentiveExists();
+        {         
+            await GivenAnApprenticeshipIncentiveExists();            
 
             _testContext.LearnerMatchApi.MockServer
             .Given(
@@ -163,7 +166,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
         public async Task WhenTheLearnerDataIsRefreshedForTheApprenticeshipIncentive()
         {
-            await _testContext.PaymentsProcessFunctions.StartLearnerMatching();
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "LearnerMatchingOrchestrator_Start",
+                    "LearnerMatchingOrchestrator",
+                    new Dictionary<string, object>
+                    {
+                        ["timerInfo"] = new TimerInfo(new WeeklySchedule(), new ScheduleStatus())
+                    }
+                    ));
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application without any submission data")]
@@ -192,6 +203,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
         public void ThenTheApprenticeshipIncentiveLearnerDataIsCreatedForTheApplicationWithSubmissionData()
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();           
+
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var createdLearners = dbConnection.GetAll<Learner>();
 
@@ -209,7 +223,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.InLearning.Should().BeTrue();
             createdLearner.HasDataLock.Should().BeFalse();
             createdLearner.InLearning.Should().BeTrue();
-
+            
+            stopwatch.Stop();
+            Console.WriteLine($"Time it took to assert test datan: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");
         }
 
         [Then(@"the apprenticeship incentive learner data is updated for the application with submission data")]

@@ -6,22 +6,32 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Bindings
 {
     [Binding]
-    public static class LearnerMatchApiPerTestRunHook
+    public class LearnerMatchApiPerTestRunHook
     {
-        [BeforeTestRun(Order = 3)]
-        public static void InitialiseLearnerMatchApi(TestContext context)
+        private readonly TestContext _testContext;
+
+        public LearnerMatchApiPerTestRunHook(TestContext testContext)
+        {
+            _testContext = testContext;
+        }
+
+        [BeforeScenario(Order = 3)]
+        public void InitialiseLearnerMatchApi()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            context.LearnerMatchApi = new TestLearnerMatchApi();
+            _testContext.LearnerMatchApi = new TestLearnerMatchApi();
             stopwatch.Stop();
-            Console.WriteLine($"[{nameof(LearnerMatchApiPerTestRunHook)}] time it took to spin up LearnerMatchApi: {stopwatch.Elapsed.Seconds} seconds");
+            Console.WriteLine($"[{nameof(LearnerMatchApiPerTestRunHook)}] time it took to spin up LearnerMatchApi: {stopwatch.Elapsed.Milliseconds} milliseconds");
         }
 
-        [AfterTestRun()]
-        public static void CleanUpLearnerMatchApi(TestContext context)
+        [AfterScenario()]
+        public void CleanUpLearnerMatchApi()
         {
-            context.LearnerMatchApi?.Dispose();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            _testContext.LearnerMatchApi?.Dispose();
+            Console.WriteLine($"[{nameof(LearnerMatchApiPerTestRunHook)}] time it took to dispose of LearnerMatchApi: {stopwatch.Elapsed.Milliseconds} milliseconds");
         }
     }
 }

@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
-            return starter.CreateCheckStatusResponse(req, instanceId);
+            return null; // starter.CreateCheckStatusResponse(req, instanceId); // TODO : to fix
         }
     }
 }

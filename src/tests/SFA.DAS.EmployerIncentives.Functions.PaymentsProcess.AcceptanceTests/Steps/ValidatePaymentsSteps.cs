@@ -1,6 +1,9 @@
 ﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,9 +57,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await _validatePaymentData.Create();
 
-            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriod);
-
-            status.RuntimeStatus.Should().NotBe("Failed", status.Output);
+            await _testContext.TestFunction.Start(
+               new OrchestrationStarterInfo(
+                   "IncentivePaymentOrchestrator_HttpStart",
+                   "IncentivePaymentOrchestrator",
+                   new Dictionary<string, object>
+                   {
+                       ["req"] = new DummyHttpRequest
+                       {
+                           Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
+                       },
+                       ["collectionPeriodYear"] = CollectionPeriodYear,
+                       ["collectionPeriodMonth"] = CollectionPeriod
+                   }
+                   ));
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]

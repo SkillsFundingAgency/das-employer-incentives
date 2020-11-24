@@ -9,8 +9,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
     public class TestContext
     {
+        public string InstanceId { get; private set; }
         public DirectoryInfo TestDirectory { get; set; }
-        public TestPaymentsProcessFunctions PaymentsProcessFunctions { get; set; }
+        //public TestPaymentsProcessFunctions PaymentsProcessFunctions { get; set; }
+        public TestFunction TestFunction { get; set; }
+
         public TestData TestData { get; set; }
         public List<IHook> Hooks { get; set; }
         public SqlDatabase2 SqlDatabase { get; set; }
@@ -18,7 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 
         public TestContext()
         {
-            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString()));
+            InstanceId = Guid.NewGuid().ToString();
+            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), InstanceId));
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);

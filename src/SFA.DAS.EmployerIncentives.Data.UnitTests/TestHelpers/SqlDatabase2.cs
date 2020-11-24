@@ -10,16 +10,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         private bool _isDisposed;
         public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();
 
-        public SqlDatabase2()
+        public SqlDatabase2(string dbName)
         {
+            DatabaseInfo.SetDatabaseName(dbName);
             CreateTestDatabase();
         }
 
         private void CreateTestDatabase()
         {
-            DatabaseInfo.SetDatabaseName(Guid.NewGuid().ToString());
             DatabaseInfo.SetConnectionString(
-                @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30");
+                @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;Pooling=False;Connect Timeout=30;MultipleActiveResultSets=true");
 
             var sql = $"CREATE DATABASE [{DatabaseInfo.DatabaseName}]";
 
@@ -43,11 +43,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                 dbConn.Open();
                 var dbName = cmd.ExecuteScalar();
                 cmd.CommandText = "SELECT filename FROM sysfiles";
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (var reader = cmd.ExecuteReader())
                 {
-                    files.Add((string)reader["filename"]);
+                    while (reader.Read())
+                    {
+                        files.Add((string)reader["filename"]);
+                    }
                 }
+
                 cmd.CommandText = $"ALTER DATABASE [{dbName}] SET OFFLINE";
                 cmd.ExecuteNonQuery();
                 cmd.CommandText = $"EXEC sp_detach_db '{dbName}', 'true';";
@@ -56,9 +59,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
                 files.ForEach(DeleteFile);
             }
-            catch
+            catch(Exception ex)
             {
-                Console.WriteLine($"[{nameof(SqlDatabase2)}] {nameof(DeleteTestDatabase)} exception thrown");
+                Console.WriteLine($"[{nameof(SqlDatabase2)}] {nameof(DeleteTestDatabase)} exception thrown, {ex.Message} {ex.StackTrace}");
+                throw;
             }
         }
 
