@@ -10,11 +10,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
     public class TestContext
     {
         public DirectoryInfo TestDirectory { get; set; }
-        public TestMessageBus TestMessageBus { get; set; }
         public TestPaymentsProcessFunctions PaymentsProcessFunctions { get; set; }
         public TestData TestData { get; set; }
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
+        public TestLearnerMatchApi LearnerMatchApi { get; set; }
 
         public TestContext()
         {
@@ -28,5 +28,3 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         }
     }
 }
-
-
