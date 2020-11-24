@@ -11,13 +11,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class PayableLegalEntityQueryRepository : IPayableLegalEntityQueryRepository
     {
-        private class JoinedObject
-        {
-            public Models.ApprenticeshipIncentive ApprenticeshipIncentive { get; set; }
-            public Models.Payment Payment { get; set; }
-        }
-
-
         private Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
@@ -36,13 +29,33 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public Task<List<PaymentDto>> GetPaymentsToSendForAccountLegalEntity(long accountLegalEntity)
         {
-            var payments = _context.Set<Payment>().Where(p => !p.PaidDate.HasValue )
-                .Join(_context.Set<Models.ApprenticeshipIncentive>(), p => p.ApprenticeshipIncentiveId, ai => ai.Id, (p, ai) => 
-                    new { ApprenticeshipIncentive = ai, Payment = p})
-                .Join(_context.Set<Data.Models.Account>(), ap => ap.Payment.AccountId, a => a.Id, (ap, a) =>
-                    new { ApprenticeshipIncentive = ap.ApprenticeshipIncentive, Payment = ap.Payment, Account = a })
-                .Select(x => 
-                    new PaymentDto { PaymentId = x.Payment.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentive.IncentiveApplicationApprenticeshipId, VendorId = x.Account.VrfVendorId});
+            var payments = _context.Set<Payment>().Where(p => !p.PaidDate.HasValue && p.AccountLegalEntityId == accountLegalEntity)
+                .Join(_context.Set<Models.ApprenticeshipIncentive>(), p => p.ApprenticeshipIncentiveId, ai => ai.Id,
+                    (p, ai) => new {ApprenticeshipIncentive = ai, Payment = p})
+                .Join(_context.Set<Data.Models.Account>(), ap => ap.Payment.AccountLegalEntityId, a => a.AccountLegalEntityId, (ap, a) =>
+                    new { ap.ApprenticeshipIncentive, ap.Payment, Account = a})
+                .Join(_context.Set<PendingPayment>(), ap => ap.Payment.PendingPaymentId, pp => pp.Id, (ap, pp) =>
+                    new
+                    {
+                        ap.ApprenticeshipIncentive, 
+                        ap.Payment,
+                        ap.Account, 
+                        PendingPayment = pp
+                    })
+                .Select(x =>
+                    new PaymentDto
+                    {
+                        PaymentId = x.Payment.Id,
+                        ApprenticeshipIncentiveId = x.ApprenticeshipIncentive.Id,
+                        AccountLegalEntityId = x.Account.AccountLegalEntityId,
+                        VendorId = x.Account.VrfVendorId,
+                        DueDate = x.PendingPayment.DueDate,
+                        SubnominalCode = x.Payment.SubnominalCode,
+                        Amount = x.Payment.Amount,
+                        PaymentSequence = "First", // TODO needs to be updated to either first or Second
+                        ULN = x.ApprenticeshipIncentive.ULN,
+                        HashedLegalEntityId = x.Account.HashedLegalEntityId
+                    });
 
             return payments.ToListAsync();
         }
