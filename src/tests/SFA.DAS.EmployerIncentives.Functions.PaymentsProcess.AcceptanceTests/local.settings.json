@@ -8,7 +8,8 @@
     "Version": "1.0"
   },
   "ApplicationSettings": {
-    "DbConnectionString": "DB_CONNECTION_STRING"
+    "DbConnectionString": "DB_CONNECTION_STRING",
+    "NServiceBusConnectionString": "UseLearningEndpoint=true"
   },
   "TestSettings": {
     "FunctionHostPath": "C:\\Program Files\\Microsoft\\Azure Functions Core Tools\\func.exe",

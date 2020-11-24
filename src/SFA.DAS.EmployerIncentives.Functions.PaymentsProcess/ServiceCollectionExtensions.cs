@@ -1,6 +1,23 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using NServiceBus;
+using NServiceBus.Container;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using SFA.DAS.EmployerIncentives.Commands;
+using SFA.DAS.NServiceBus.Configuration;
+using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
+using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
+using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
+using SFA.DAS.NServiceBus.Hosting;
+using SFA.DAS.NServiceBus.SqlServer.Configuration;
+using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
@@ -25,6 +42,48 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 nLogConfiguration.ConfigureNLog();
             });
 
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddNServiceBus(
+            this IServiceCollection serviceCollection,
+            IConfiguration configuration)
+        {
+            var webBuilder = serviceCollection.AddWebJobs(x => { });
+            webBuilder.AddExecutionContextBinding();
+
+            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
+                .UseMessageConventions()
+                .UseNewtonsoftJsonSerializer()
+                .UseOutbox(true)
+                .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
+                .UseUnitOfWork();
+
+            endpointConfiguration.UseContainer<ServicesBuilder>((Action<ContainerCustomizations>)(c => c.ExistingServices(serviceCollection)));
+            
+            if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
+            {
+                endpointConfiguration
+                    .UseTransport<LearningTransport>()
+                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
+                endpointConfiguration.UseLearningTransport(s => s.AddRouting());
+            }
+            else
+            {
+                endpointConfiguration
+                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => r.AddRouting());
+            }
+
+            if (!string.IsNullOrEmpty(configuration["ApplicationSettings:NServiceBusLicense"]))
+            {
+                endpointConfiguration.License(configuration["ApplicationSettings:NServiceBusLicense"]);
+            }
+
+            var endpoint = Endpoint.Start(endpointConfiguration);
+            Task.WhenAll(endpoint);
+
+            serviceCollection.AddSingleton(p => endpoint.Result)
+                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>());
             return serviceCollection;
         }
     }

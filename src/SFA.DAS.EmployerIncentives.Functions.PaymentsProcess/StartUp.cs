@@ -15,6 +15,8 @@ using System.Data.Common;
 using System.IO;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -62,9 +64,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 return new SqlConnection(settings.Value.DbConnectionString);
             });
 
+            builder.Services.AddNServiceBus(config);
+
             builder.Services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
-                // This can be replaced if we ever use NServiceBus from within the durable functions.
                 .AddSqlServerUnitOfWork();
 
             builder.Services.AddPersistenceServices();
