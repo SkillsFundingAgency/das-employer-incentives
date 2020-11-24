@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Extensions
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
                     apprenticeship.DateOfBirth, apprenticeship.ULN, apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
-                    apprenticeship.UKPRN.Value)
+                    apprenticeship.UKPRN)
             );
         }
     }
