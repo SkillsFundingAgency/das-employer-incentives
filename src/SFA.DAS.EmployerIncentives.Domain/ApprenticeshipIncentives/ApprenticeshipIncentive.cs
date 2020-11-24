@@ -20,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public bool RefreshedLearnerForEarnings => Model.RefreshedLearnerForEarnings;
         public bool HasPossibleChangeOfCircumstances => Model.HasPossibleChangeOfCircumstances;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
+        public PendingPayment NextDuePayment => GetNextDuePayment();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
@@ -114,13 +115,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var payment = Payment.New(
-                Guid.NewGuid(), 
-                Model.Account, 
-                Model.Id, 
-                pendingPaymentId, 
+                Guid.NewGuid(),
+                Model.Account,
+                Model.Id,
+                pendingPaymentId,
                 pendingPayment.Amount,
-                paymentDate, 
-                collectionYear, 
+                paymentDate,
+                collectionYear,
                 collectionMonth);
 
             Model.PaymentModels.Add(payment.GetModel());
@@ -144,7 +145,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             return pendingPayment;
-		}
+        }
 
         public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {
@@ -229,6 +230,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ApprenticeshipId = model.Apprenticeship.Id
                 });
             }
+        }
+
+        private PendingPayment GetNextDuePayment()
+        {
+            var next = Model.PendingPaymentModels
+                .Where(pp => pp.PaymentMadeDate == null && pp.PaymentYear.HasValue && pp.PeriodNumber.HasValue)
+                .OrderBy(pp => pp.DueDate).FirstOrDefault();
+
+            return next?.Map();
         }
     }
 }

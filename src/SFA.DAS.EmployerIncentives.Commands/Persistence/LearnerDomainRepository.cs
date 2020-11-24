@@ -34,14 +34,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
-        public async Task<Learner> GetByApprenticeshipIncentiveId(Guid incentiveId)
+        public async Task<Learner> GetOrCreate(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
-            var learner = await _learnerDataRepository.GetByApprenticeshipIncentiveId(incentiveId);
-            if (learner != null)
+            var existing = await _learnerDataRepository.GetByApprenticeshipIncentiveId(incentive.Id);
+            if (existing != null)
             {
-                return _learnerFactory.GetExisting(learner);
+                return _learnerFactory.GetExisting(existing);
             }
-            return null;
+
+            return _learnerFactory.CreateNew(
+                Guid.NewGuid(),
+                incentive.Id,
+                incentive.Apprenticeship.Id,
+                incentive.Apprenticeship.Provider.Ukprn,
+                incentive.Apprenticeship.UniqueLearnerNumber,
+                DateTime.UtcNow
+            );
         }
 
         public async Task Save(Learner aggregate)
@@ -60,5 +68,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
                 await _domainEventDispatcher.Send(domainEvent);
             }
         }
+
     }
 }

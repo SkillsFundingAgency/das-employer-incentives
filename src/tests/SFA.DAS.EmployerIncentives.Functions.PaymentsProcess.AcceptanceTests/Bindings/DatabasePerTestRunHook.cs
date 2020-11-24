@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             stopwatch.Start();
             SqlDatabaseModel.Update();
             stopwatch.Stop();
-            Console.WriteLine($"[{nameof(DatabasePerTestRunHook)}] time it took to update `model` database: {stopwatch.Elapsed.Seconds} seconds");
+            Console.WriteLine($@"[{nameof(DatabasePerTestRunHook)}] time it took to update `model` database: {stopwatch.Elapsed.Seconds} seconds");
         }
     }
 }

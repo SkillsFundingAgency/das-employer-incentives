@@ -46,8 +46,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
-                new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1),
-                    DateTime.Now, DateTime.Now.Year.ToString(), true))
+                new CollectionPeriod(
+                    1, 
+                    (byte)DateTime.Now.Month, 
+                    (short)DateTime.Now.Year, 
+                    DateTime.Now.AddDays(-1),
+                    DateTime.Now.AddDays(-1),
+                    DateTime.Now.Year.ToString(),
+                    false)
             };
 
             _mockCollectionCalendarService
@@ -62,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var accountModel = _fixture.Build<AccountModel>()
                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() { legalEntity })
                .Create();
-
+                        
             var domainAccount = Domain.Accounts.Account.Create(accountModel);
             _account = new Account(accountModel.Id, legalEntity.AccountLegalEntityId);
 
@@ -82,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Create();
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
-
+            
             _fixture.Register(() => incentive);
 
             _mockIncentiveDomainRespository
@@ -101,13 +107,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)
                 .With(m => m.ApprenticeshipIncentiveId, incentive.Id)
                 .With(m => m.UniqueLearnerNumber, incentive.Apprenticeship.UniqueLearnerNumber)
-                .With(m => m.SubmissionData, submissionData)
+                .With(m=>m.SubmissionData, submissionData)
                 .Create();
 
             _learner = new LearnerFactory().GetExisting(_learnerModel);
 
             _mockLearnerDomainRepository
-                .Setup(m => m.GetByApprenticeshipIncentiveId(incentive.Id))
+                .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
 
 
@@ -162,7 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var accountModel = _fixture.Build<AccountModel>()
                 .With(a => a.Id, _account.Id)
-                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() { 
                    _fixture.Build<LegalEntityModel>()
                    .With(l => l.VrfVendorId, string.Empty)
                    .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
@@ -182,7 +188,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(1);
-            incentive.PendingPayments.First().IsValidated.Should().BeFalse();
+            incentive.PendingPayments.First().IsValidated.Should().BeFalse(); 
         }
 
         [Test]

@@ -9,7 +9,6 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-
 DELETE FROM incentives.CollectionCalendar
 GO
 INSERT INTO incentives.CollectionCalendar (Id, PeriodNumber, EIScheduledOpenDateUTC, CalendarMonth, CalendarYear, CensusDate, AcademicYear, Active) VALUES(12,12,'2021-07-08 00:00:00',7,2021, '2021-07-31 00:00:00', '2021', 0)
@@ -40,4 +39,4 @@ INSERT INTO incentives.CollectionCalendar (Id, PeriodNumber, EIScheduledOpenDate
 
 INSERT INTO incentives.CollectionCalendar (Id, PeriodNumber, EIScheduledOpenDateUTC, CalendarMonth, CalendarYear, CensusDate, AcademicYear, Active) VALUES(25,8,'2022-08-06 00:00:00',8,2022, '2022-08-31 00:00:00', '2223', 0)
 
-GO 
+GO
