@@ -28,7 +28,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly DateTime _startDate;
         private readonly DateTime _submissionDate;
         private readonly IList<PendingPayment> _pendingPayments;
-        private Data.ApprenticeshipIncentives.Models.CollectionPeriod _activePeriod;
 
         public RefreshLearnerDataSteps(TestContext testContext)
         {
@@ -132,18 +131,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await dbConnection.InsertAsync(learner);
         }
 
-        [Given(@"an active collection calendar period")]
-        public async Task GivenAnActiveCollectionCalendarPeriod()
-        {
-            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-
-            var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionPeriod>();
-            _activePeriod = calendar.Single(x => x.CalendarYear == 2020 && x.CalendarMonth == 8);
-            _activePeriod.Active = true;
-
-            await dbConnection.UpdateAsync(_activePeriod);
-        }
-
         [Given(@"the latest learner data has active in learning data")]
         public void AndTheLatestLearnerDataHasInLearningData()
         {
@@ -229,7 +216,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_json);
             createdLearner.StartDate.Should().Be(_startDate);
 
-            var expectedDaysInLearning = (int)(DateTime.Parse("2021-07-31T00:00:00") - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
+            var expectedDaysInLearning = (int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
             createdLearner.DaysInLearning.Should().Be(expectedDaysInLearning);
             createdLearner.InLearning.Should().BeTrue();
             createdLearner.HasDataLock.Should().BeFalse();
@@ -257,7 +244,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_json);
             createdLearner.StartDate.Should().Be(_startDate);
 
-            var expectedDaysInLearning = (int)(DateTime.Parse("2021-07-31T00:00:00") - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
+            var expectedDaysInLearning = (int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
             createdLearner.DaysInLearning.Should().Be(expectedDaysInLearning);
             createdLearner.HasDataLock.Should().BeFalse();
             createdLearner.LearningFound.Should().BeTrue();
@@ -309,7 +296,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
             var firstEpisodeDaysInLearning = (int)(DateTime.Parse("2020-07-30T00:00:00") - DateTime.Parse("2020-01-01T00:00:00")).TotalDays + 1;
-            var secondEpisodeDaysInLearning = (int)(DateTime.Parse("2020-01-01T00:00:00") - _activePeriod.CensusDate).TotalDays + 1;
+            var secondEpisodeDaysInLearning = (int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
             var expectedDaysInLearning = firstEpisodeDaysInLearning + secondEpisodeDaysInLearning;
             createdLearner.DaysInLearning.Should().Be(expectedDaysInLearning);
         }
