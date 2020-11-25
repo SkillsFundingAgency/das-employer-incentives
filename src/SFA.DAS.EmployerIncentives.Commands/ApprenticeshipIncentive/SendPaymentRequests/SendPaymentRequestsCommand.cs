@@ -1,15 +1,18 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests
 {
     public class SendPaymentRequestsCommand : DomainCommand, ILogWriter
     {
-        public long AccountLegalEntity { get; }
+        public long AccountLegalEntityId { get; }
+        public DateTime PaidDate { get; }
 
-        public SendPaymentRequestsCommand(long accountLegalEntity)
+        public SendPaymentRequestsCommand(long accountLegalEntityId, DateTime paidDate)
         {
-            AccountLegalEntity = accountLegalEntity;
+            AccountLegalEntityId = accountLegalEntityId;
+            PaidDate = paidDate;
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -17,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
         {
             get
             {
-                var message = $"IncentiveApplications SendPaymentRequestsCommand for AccountLegalEntity {AccountLegalEntity}";
+                var message = $"IncentiveApplications SendPaymentRequestsCommand for AccountLegalEntity {AccountLegalEntityId}";
                 return new Log
                 {
                     OnProcessing = () => message,

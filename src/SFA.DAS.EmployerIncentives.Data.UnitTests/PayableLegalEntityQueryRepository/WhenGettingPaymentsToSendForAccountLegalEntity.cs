@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             payments[0].AccountLegalEntityId.Should().Be(_account1.AccountLegalEntityId);
             payments[0].VendorId.Should().Be(_account1.VrfVendorId);
             payments[0].DueDate.Should().Be(_pendingPayment1.DueDate);
-            payments[0].PaymentSequence.Should().Be("First");
+            payments[0].PaymentSequence.Should().Be("first");
             payments[0].ULN.Should().Be(_apprenticeshipIncentive1.ULN);
             payments[0].HashedLegalEntityId.Should().Be(_account1.HashedLegalEntityId);
         }

@@ -1,35 +1,38 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
+using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests
 {
     public class SendPaymentRequestsCommandHandler : ICommandHandler<SendPaymentRequestsCommand>
     {
-        private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
+        private readonly IAccountDataRepository _accountRepository;
         private readonly IPayableLegalEntityQueryRepository _queryRepository;
         private readonly IBusinessCentralFinancePaymentsService _businessCentralFinancePaymentsService;
 
         public SendPaymentRequestsCommandHandler(
-            IApprenticeshipIncentiveDomainRepository domainRepository,
+            IAccountDataRepository accountRepository,
             IPayableLegalEntityQueryRepository queryRepository,
             IBusinessCentralFinancePaymentsService businessCentralFinancePaymentsService)
         {
-            _domainRepository = domainRepository;
+            _accountRepository = accountRepository;
             _queryRepository = queryRepository;
             _businessCentralFinancePaymentsService = businessCentralFinancePaymentsService;
         }
 
         public async Task Handle(SendPaymentRequestsCommand command, CancellationToken cancellationToken = default)
         {
-            var payments = await _queryRepository.GetPaymentsToSendForAccountLegalEntity(command.AccountLegalEntity);
+            var payments = await _queryRepository.GetPaymentsToSendForAccountLegalEntity(command.AccountLegalEntityId);
 
             var sent = await _businessCentralFinancePaymentsService.SendPaymentRequestsForLegalEntity(payments);
 
-            // update payments PaidDate
+            await _accountRepository.UpdatePaidDateForPaymentIds(sent.PaymentsSent.Select(s => s.PaymentId).ToList(), command.AccountLegalEntityId, command.PaidDate);
 
             // if not all payments sent sent command again
             if (!sent.AllPaymentsSent)
