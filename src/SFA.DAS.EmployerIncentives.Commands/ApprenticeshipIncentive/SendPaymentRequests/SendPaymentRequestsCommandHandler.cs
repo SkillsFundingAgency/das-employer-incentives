@@ -28,6 +28,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
         public async Task Handle(SendPaymentRequestsCommand command, CancellationToken cancellationToken = default)
         {
             var payments = await _queryRepository.GetPaymentsToSendForAccountLegalEntity(command.AccountLegalEntityId);
+            if (payments.Any() == false)
+            {
+                return;
+            }
 
             var sent = await _businessCentralFinancePaymentsService.SendPaymentRequestsForLegalEntity(payments);
 
