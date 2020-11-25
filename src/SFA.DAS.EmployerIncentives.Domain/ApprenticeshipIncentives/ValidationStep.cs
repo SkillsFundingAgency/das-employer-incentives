@@ -6,5 +6,6 @@
         public const string IsInLearning = "IsInLearning";
         public const string HasLearningRecord = "HasLearningRecord";
         public const string HasNoDataLocks = "HasNoDataLocks";
+        public const string HasIlrSubmission = "HasIlrSubmission";
     }
 }
