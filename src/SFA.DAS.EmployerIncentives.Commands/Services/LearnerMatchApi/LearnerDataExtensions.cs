@@ -18,17 +18,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             // this might be different to the “Start Date” for the “Training”, because the “Training” start date won’t update if there is a change of employer 
 
             var matchedRecords =
-                from tr in learnerData.Training
-                where tr.Reference == PROGRAM_REFERENCE
-                from pe in tr.PriceEpisodes
-                from p in pe.Periods
-                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-                     && p.IsPayable
-                select new
-                {
-                    p.ApprenticeshipId,
-                    pe.StartDate
-                };
+                (from tr in learnerData.Training
+                 where tr.Reference == PROGRAM_REFERENCE
+                 from pe in tr.PriceEpisodes
+                 from p in pe.Periods
+                 where p.ApprenticeshipId == incentive.Apprenticeship.Id
+                       && p.IsPayable
+                 select new
+                 {
+                     p.ApprenticeshipId,
+                     pe.StartDate
+                 }).ToArray();
 
             if (matchedRecords.Any())
             {
@@ -97,20 +97,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             if (nextPayment == null) return false;
 
             var matchedRecords =
-               from tr in learnerData.Training
-               where tr.Reference == PROGRAM_REFERENCE
-               from pe in tr.PriceEpisodes
-               from p in pe.Periods
-               where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new
-               {
-                   p.ApprenticeshipId,
-                   pe.StartDate,
-                   pe.EndDate,
-                   p.Period
-               };
+               (from tr in learnerData.Training
+                where tr.Reference == PROGRAM_REFERENCE
+                from pe in tr.PriceEpisodes
+                from p in pe.Periods
+                where p.ApprenticeshipId == incentive.Apprenticeship.Id
+                select new
+                {
+                    p.ApprenticeshipId,
+                    pe.StartDate,
+                    pe.EndDate,
+                    p.Period
+                }).ToArray();
 
-            bool isInLearning = false;
+            var isInLearning = false;
             if (matchedRecords.Any())
             {
                 foreach (var matchedRecord in matchedRecords)
