@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayable
 
         public async Task<GetPayableLegalEntitiesResponse> Handle(GetPayableLegalEntitiesRequest query, CancellationToken cancellationToken = default)
         {
-            var payableLegalEntities = await _queryRepository.GetList(query.CollectionPeriodYear, query.CollectionPeriodMonth);
+            var payableLegalEntities = await _queryRepository.GetList(query.PaymentYear, query.PeriodNumber);
 
             var response = new GetPayableLegalEntitiesResponse(payableLegalEntities);
 
