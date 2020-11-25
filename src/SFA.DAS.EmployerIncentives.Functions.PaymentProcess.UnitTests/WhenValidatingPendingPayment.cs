@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         public void Command_is_sent_to_validate_payment()
         {
             _commandDispatcherMock.Verify(x => x.Send(It.Is<ValidatePendingPaymentCommand>(c => c.ApprenticeshipIncentiveId == _payment.ApprenticeshipIncentiveId &&
-                c.CollectionMonth == _payment.Month && c.CollectionYear == _payment.Year && c.PendingPaymentId == _payment.PendingPaymentId), CancellationToken.None), Times.Once);
+                c.CollectionPeriod == _payment.Period && c.CollectionYear == _payment.Year && c.PendingPaymentId == _payment.PendingPaymentId), CancellationToken.None), Times.Once);
         }
     }
 }

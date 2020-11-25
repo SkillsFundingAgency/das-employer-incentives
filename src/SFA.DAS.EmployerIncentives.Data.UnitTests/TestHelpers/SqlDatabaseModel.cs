@@ -91,7 +91,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             policy.Execute(() =>
             {
                 Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(PublishModel)} attempted");
-                services.Deploy(dbPackage, "model", upgradeExisting: true);
+                var options = new DacDeployOptions() { BlockOnPossibleDataLoss = false };
+                services.Deploy(dbPackage, "model", upgradeExisting: true, options);
             });
         }
     }
