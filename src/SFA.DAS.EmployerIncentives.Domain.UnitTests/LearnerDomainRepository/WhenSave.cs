@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             // Arrange
             var model = _fixture.Create<LearnerModel>();
             var aggregate = _learnerFactory.CreateNew(model.Id, model.ApprenticeshipIncentiveId,
-                model.ApprenticeshipId, model.Ukprn, model.UniqueLearnerNumber, model.CreatedDate);
+                model.ApprenticeshipId, model.Ukprn, model.UniqueLearnerNumber);
 
             // Act
             await _sut.Save(aggregate);

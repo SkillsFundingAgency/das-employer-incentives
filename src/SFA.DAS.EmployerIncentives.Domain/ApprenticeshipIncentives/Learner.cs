@@ -21,8 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Guid apprenticeshipIncentiveId,
             long apprenticeshipId,
             long ukprn,
-            long uniqueLearnerNumber,
-            DateTime createdDate
+            long uniqueLearnerNumber
             )
         {
             return new Learner(
@@ -32,8 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                     ApprenticeshipId = apprenticeshipId,
                     Ukprn = ukprn,
-                    UniqueLearnerNumber = uniqueLearnerNumber,
-                    CreatedDate = createdDate
+                    UniqueLearnerNumber = uniqueLearnerNumber
                 }, true);
         }
 

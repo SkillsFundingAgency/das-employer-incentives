@@ -67,7 +67,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             result.SubmissionData.StartDate.Should().BeNull();
             result.SubmissionData.IsInlearning.Should().BeNull();
             result.SubmissionData.RawJson.Should().Be(testLearner.SubmissionData.RawJson);
-            result.CreatedDate.Should().Be(testLearner.CreatedDate);
         }
     }
 }

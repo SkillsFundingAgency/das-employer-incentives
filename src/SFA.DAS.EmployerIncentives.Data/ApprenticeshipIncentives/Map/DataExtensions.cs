@@ -194,8 +194,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
-                UniqueLearnerNumber = model.ULN,
-                CreatedDate = model.CreatedDate,
+                UniqueLearnerNumber = model.ULN
             };
 
             if (model.SubmissionFound)
@@ -229,8 +228,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
-                ULN = model.UniqueLearnerNumber,
-                CreatedDate = model.CreatedDate
+                ULN = model.UniqueLearnerNumber
             };
 
             if (model.SubmissionData != null)

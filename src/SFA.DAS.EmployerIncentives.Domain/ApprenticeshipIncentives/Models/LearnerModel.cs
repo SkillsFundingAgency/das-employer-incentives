@@ -11,7 +11,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public long ApprenticeshipId { get; set; }
         public long Ukprn { get; set; }
         public long UniqueLearnerNumber { get; set; }
-        public DateTime CreatedDate { get; set; }
         public SubmissionData SubmissionData { get; set; }
     }
 }

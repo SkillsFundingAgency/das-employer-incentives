@@ -48,8 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _sutModel.Id,
                 _sutModel.Apprenticeship.Id,
                 _sutModel.Apprenticeship.Provider.Ukprn,
-                _sutModel.Apprenticeship.UniqueLearnerNumber,
-                DateTime.Now);
+                _sutModel.Apprenticeship.UniqueLearnerNumber);
 
             _learner.SetSubmissionData(new SubmissionData(DateTime.Now));
 
