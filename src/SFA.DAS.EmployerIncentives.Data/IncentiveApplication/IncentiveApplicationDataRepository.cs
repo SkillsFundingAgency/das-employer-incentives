@@ -54,13 +54,13 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             var queryResult = (from result in (_dbContext.Applications.Include(x => x.Apprenticeships)
                                .Where(x => x.Status == Enums.IncentiveApplicationStatus.Submitted
                                && x.Apprenticeships.Any(y => !y.EarningsCalculated)))
-                        let item = ApplicationToIncentiveApplicatonModel(result)
+                        let item = ApplicationToIncentiveApplicationModel(result)
                         select item).ToList();
 
             return await Task.FromResult(queryResult);
         }
 
-        private static IncentiveApplicationModel ApplicationToIncentiveApplicatonModel(Models.IncentiveApplication application)
+        private static IncentiveApplicationModel ApplicationToIncentiveApplicationModel(Models.IncentiveApplication application)
         {
             return new IncentiveApplicationModel
             {
@@ -90,7 +90,8 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                                             LastName = apprenticeship.LastName,
                                             PlannedStartDate = apprenticeship.PlannedStartDate,
                                             TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
-                                            Uln = apprenticeship.Uln
+                                            Uln = apprenticeship.Uln,
+                                            UKPRN = apprenticeship.UKPRN
                                         }
                                         select apprenticeshipModel).ToList();
             return new Collection<ApprenticeshipModel>(apprenticeshipModels);
