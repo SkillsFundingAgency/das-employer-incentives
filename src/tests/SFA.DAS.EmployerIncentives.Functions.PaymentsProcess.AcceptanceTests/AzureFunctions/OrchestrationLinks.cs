@@ -1,6 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
+﻿namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.AzureFunctions
 {
-    public class AzureFunctionOrchestrationLinks
+    public class OrchestrationLinks
     {
         public string Id { get; set; }
         public string StatusQueryGetUri { get; set; }
