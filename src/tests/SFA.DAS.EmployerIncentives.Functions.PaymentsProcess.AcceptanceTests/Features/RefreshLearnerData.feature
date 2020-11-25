@@ -46,8 +46,7 @@ Scenario: Request to refresh learner data for a new Apprenticeship Incentive whe
 	Then the apprenticeship incentive learner data is updated indicating learning not found
 
 Scenario: Request to refresh learner data for a new Apprenticeship Incentive with a training episode with no end date
-	Given an active collection calendar period
-	And an apprenticeship incentive exists and with a corresponding learner match record
+	Given an apprenticeship incentive exists and with a corresponding learner match record
 	And the latest learner data has a matching training episode with no end date
 	When the learner data is refreshed for the apprenticeship incentive
 	Then the apprenticeship incentive learner data is updated with days in learning counted up until the census date

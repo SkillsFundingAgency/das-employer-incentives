@@ -127,65 +127,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
             return isInLearning;
         }
-
-        public static int? DaysInLearning(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, CollectionCalendar collectionCalendar)
+                
+        public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
-            // For the most recent price episode(there might only be one), if the price episode has a 
-            // null end date the count should be from the price episode start date to the census 
-            // date(inclusive) for the active period.Where the price episode has an end date, 
-            // the count should be from the price episode start date to the earlier of the end date 
-            // or the census date for the active period
-            // Sum day counts across price episodes
-
-            var startdate = learnerData.LearningStartDate(incentive);
-            if (!startdate.HasValue)
+            if(learnerData == null)
             {
-                return null;
+                return new List<LearningPeriod>();
             }
 
-            var censusDate = collectionCalendar.GetActivePeriod().CensusDate.Date;
-
-            var matchedRecords =
-               (from tr in learnerData.Training
+            return
+              (from tr in learnerData.Training
                where tr.Reference == PROGRAM_REFERENCE
                from pe in tr.PriceEpisodes
                from p in pe.Periods
                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new
-               {
-                   p.ApprenticeshipId,
-                   pe.StartDate,
-                   pe.EndDate,
-               }).Distinct().ToArray();
-
-            if (matchedRecords.Any())
-            {
-                int daysInLearning = 0;
-
-                foreach (var matchedRecord in matchedRecords)
-                {
-                    if (!matchedRecord.EndDate.HasValue)
-                    {
-                        daysInLearning += censusDate.Subtract(matchedRecord.StartDate.Date).Days + 1;
-                    }
-                    else
-                    {
-                        if (matchedRecord.EndDate.Value.Date < censusDate)
-                        {
-                            daysInLearning += matchedRecord.EndDate.Value.Date.Subtract(matchedRecord.StartDate.Date).Days + 1;
-                        }
-                        else
-                        {
-                            daysInLearning += censusDate.Subtract(matchedRecord.StartDate.Date).Days + 1;
-                        }
-                    }
-                }
-
-                return daysInLearning;
-            }
-
-            return null;
-
+               select new LearningPeriod(pe.StartDate, pe.EndDate)).Distinct();
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)

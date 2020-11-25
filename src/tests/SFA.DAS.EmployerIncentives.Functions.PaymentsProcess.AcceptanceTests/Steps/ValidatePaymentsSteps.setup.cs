@@ -24,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             public PendingPayment PendingPaymentModel2 { get; }
             public PendingPayment PendingPaymentModel3 { get; }
             public Learner LearnerModel { get; }
+            public ApprenticeshipDaysInLearning DaysInLearning { get; }
 
             private readonly TestContext _testContext;
 
@@ -82,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.PeriodNumber, (byte?)(CollectionPeriod + 1)) // next period
                     .With(p => p.PaymentYear, CollectionPeriodYear)
                     .Without(p => p.PaymentMadeDate)
-                    .Create();
+                    .Create();                
 
                 LearnerModel = fixture.Build<Learner>()
                     .With(l => l.ApprenticeshipId, ApprenticeshipIncentiveModel.ApprenticeshipId)
@@ -93,8 +94,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(l => l.LearningFound, true)
                     .With(l => l.InLearning, true)
                     .With(l => l.HasDataLock, false)
-                    .With(l => l.DaysInLearning, 90)
                     .With(l => l.StartDate, DateTime.Now.AddDays(-100))
+                    .Create();
+
+                DaysInLearning = fixture.Build<ApprenticeshipDaysInLearning>()
+                    .With(d => d.LearnerId, LearnerModel.Id)
+                    .With(d => d.NumberOfDaysInLearning, 90)
+                    .With(d => d.CollectionPeriodNumber, CollectionPeriod) // current period
+                    .With(d => d.CollectionPeriodYear, CollectionPeriodYear)
                     .Create();
             }
 
@@ -109,6 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await connection.InsertAsync(PendingPaymentModel2);
                 await connection.InsertAsync(PendingPaymentModel3);
                 await connection.InsertAsync(LearnerModel);
+                await connection.InsertAsync(DaysInLearning);
             }
         }
     }

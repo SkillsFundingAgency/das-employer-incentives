@@ -194,7 +194,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
-                UniqueLearnerNumber = model.ULN
+                UniqueLearnerNumber = model.ULN,
+                LearningPeriods = model.LearningPeriods.Map(),
+                DaysInLearnings = model.DaysInLearnings.Map()
             };
 
             if (model.SubmissionFound)
@@ -208,12 +210,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 if (model.HasDataLock.HasValue)
                 {
                     learner.SubmissionData.SetHasDataLock(model.HasDataLock.Value);
-                }
-                if (model.DaysInLearning.HasValue)
-                {
-                    learner.SubmissionData.SetDaysInLearning(model.DaysInLearning.Value);
-                }
+                }               
                 learner.SubmissionData.SetIsInLearning(model.InLearning);
+                learner.SubmissionData.SetStartDate(model.StartDate);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
@@ -228,7 +227,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
-                ULN = model.UniqueLearnerNumber
+                ULN = model.UniqueLearnerNumber,
+                LearningPeriods = model.LearningPeriods.Map(model.Id),
+                DaysInLearnings = model.DaysInLearnings.Map(model.Id)
             };
 
             if (model.SubmissionData != null)
@@ -239,11 +240,41 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 learner.StartDate = model.SubmissionData.StartDate;
                 learner.HasDataLock = model.SubmissionData.HasDataLock;
                 learner.InLearning = model.SubmissionData.IsInlearning;
-                learner.DaysInLearning = model.SubmissionData.DaysinLearning;
                 learner.RawJSON = model.SubmissionData.RawJson;
             }
 
             return learner;
+        }
+
+        private static ICollection<LearningPeriod> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod> models, Guid learnerId)
+        {
+            return models.Select(x => new LearningPeriod
+            {
+                LearnerId = learnerId,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate
+            }).ToList();
+        }
+
+        private static ICollection<ApprenticeshipDaysInLearning> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> models, Guid learnerId)
+        {
+            return models.Select(x => new ApprenticeshipDaysInLearning
+            {
+                LearnerId = learnerId,
+                CollectionPeriodNumber = x.CollectionPeriodNumber,
+                CollectionPeriodYear = x.CollectionYear,
+                NumberOfDaysInLearning = x.NumberOfDays
+            }).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod> Map(this ICollection<LearningPeriod> models)
+        {
+            return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod(x.StartDate, x.EndDate)).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> Map(this ICollection<ApprenticeshipDaysInLearning> models)
+        {
+            return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning(x.CollectionPeriodNumber, x.CollectionPeriodYear, x.NumberOfDaysInLearning)).ToList();
         }
     }
 }

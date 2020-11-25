@@ -14,18 +14,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         private readonly IApprenticeshipIncentiveDomainRepository _incentiveDomainRepository;
         private readonly ILearnerService _learnerService;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
-        private readonly ICollectionCalendarService _collectionCalendarService;
 
         public RefreshLearnerCommandHandler(
             IApprenticeshipIncentiveDomainRepository incentiveDomainRepository,
             ILearnerService learnerService,
-            ILearnerDomainRepository learnerDomainRepository,
-            ICollectionCalendarService collectionCalendarService)
+            ILearnerDomainRepository learnerDomainRepository)
         {
             _incentiveDomainRepository = incentiveDomainRepository;
             _learnerService = learnerService;
             _learnerDomainRepository = learnerDomainRepository;
-            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(RefreshLearnerCommand command, CancellationToken cancellationToken = default)
@@ -42,12 +39,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 submissionData.SetStartDate(learnerData.LearningStartDate(incentive));
                 submissionData.SetLearningFound(learnerData.LearningFound(incentive));
                 submissionData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
-                submissionData.SetIsInLearning(learnerData.IsInLearning(incentive));                
-                submissionData.SetDaysInLearning(learnerData.DaysInLearning(incentive, await _collectionCalendarService.Get()));
+                submissionData.SetIsInLearning(learnerData.IsInLearning(incentive));
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 
             learner.SetSubmissionData(submissionData);
+
+            learner.SetLearningPeriods(learnerData.LearningPeriods(incentive));
 
             await _learnerDomainRepository.Save(learner);
         }

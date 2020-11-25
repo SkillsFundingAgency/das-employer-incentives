@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _logger = logger;
         }
 
-        [FunctionName("ValidatePendingPayment")]
+        [FunctionName(nameof(ValidatePendingPayment))]
         public async Task Validate([ActivityTrigger] ValidatePendingPaymentData payment)
         {
             _logger.LogInformation($"Validating Pending Payment [PendingPaymentId={payment.PendingPaymentId}], [collection period={payment.Year}/{payment.Period}], [ApprenticeshipIncentiveId={payment.ApprenticeshipIncentiveId}]",

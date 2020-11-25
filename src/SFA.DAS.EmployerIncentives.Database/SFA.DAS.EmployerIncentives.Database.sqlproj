@@ -87,6 +87,8 @@
     <Build Include="Views\PendingPaymentsValidationStepFailure.sql" />
     <Build Include="Views\PendingPaymentsValidationStatus.sql" />
     <Build Include="Views\ValidationCounts.sql" />
+    <Build Include="Tables\ApprenticeshipDaysInLearning.sql" />
+    <Build Include="Tables\LearningPeriod.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />

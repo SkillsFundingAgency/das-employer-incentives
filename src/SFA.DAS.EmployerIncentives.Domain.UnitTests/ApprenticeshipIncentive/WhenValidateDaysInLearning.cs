@@ -55,26 +55,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
         }
 
-        [TestCase(89, false)]
-        [TestCase(90,true)]
-        [TestCase(91, true)]
-        public void Then_a_validation_result_is_created_for_the_days_in_learning(int daysInLearning, bool validationResult)
-        {
-            // arrange            
-            var pendingPayment = _sut.PendingPayments.First();
+        //[TestCase(89, false)]
+        //[TestCase(90,true)]
+        //[TestCase(91, true)]
+        //public void Then_a_validation_result_is_created_for_the_days_in_learning(int daysInLearning, bool validationResult)
+        //{
+        //    // arrange            
+        //    var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SubmissionData.SetDaysInLearning(daysInLearning);
+        //    _learner.SubmissionData.SetDaysInLearning(daysInLearning);
 
-            // act
-            _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
+        //    // act
+        //    _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
 
-            // assert            
-            pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
-            var validationresult = pendingPayment.PendingPaymentValidationResults.First();
-            validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
-            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
-            validationresult.Result.Should().Be(validationResult);
-        }
+        //    // assert            
+        //    pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
+        //    var validationresult = pendingPayment.PendingPaymentValidationResults.First();
+        //    validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
+        //    validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+        //    validationresult.Result.Should().Be(validationResult);
+        //}
 
         [Test()]
         public void Then_a_false_validation_result_is_created_when_the_matchedLearner_is_null()
@@ -112,24 +112,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Result.Should().Be(false);
         }
 
-        [Test()]
-        public void Then_a_false_validation_result_is_created_when_the_matchedLearner_DaysinLearning_is_null()
-        {
-            // arrange            
-            var pendingPayment = _sut.PendingPayments.First();
+        //[Test()]
+        //public void Then_a_false_validation_result_is_created_when_the_matchedLearner_DaysinLearning_is_null()
+        //{
+        //    // arrange            
+        //    var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SubmissionData.SetDaysInLearning(null);
+        //    _learner.SubmissionData.SetDaysInLearning(null);
 
-            // act
-            _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
+        //    // act
+        //    _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
 
-            // assert            
-            pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
-            var validationresult = pendingPayment.PendingPaymentValidationResults.First();
-            validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
-            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
-            validationresult.Result.Should().Be(false);
-        }
+        //    // assert            
+        //    pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
+        //    var validationresult = pendingPayment.PendingPaymentValidationResults.First();
+        //    validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
+        //    validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+        //    validationresult.Result.Should().Be(false);
+        //}
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {

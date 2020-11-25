@@ -43,15 +43,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             IsInlearning = isInLearning;
         }
 
-        public void SetDaysInLearning(int? daysInLearning)
-        {
-            if(daysInLearning.HasValue && daysInLearning.Value < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(daysInLearning), "DaysInLearning cannot be negative");
-            }
-            DaysinLearning = daysInLearning;
-        }
-
         public void SetRawJson(string rawJson)
         {
             RawJson = rawJson;

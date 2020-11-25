@@ -43,6 +43,7 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -123,7 +124,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())                
-                .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator());
+                .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<CalculateDaysInLearningCommand>), new NullValidator());
 
             return serviceCollection;
         }

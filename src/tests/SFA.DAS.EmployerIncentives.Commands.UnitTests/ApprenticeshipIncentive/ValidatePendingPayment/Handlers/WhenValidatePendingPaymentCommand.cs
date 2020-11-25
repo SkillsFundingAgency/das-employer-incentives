@@ -31,6 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Account _account;
         private LearnerModel _learnerModel;
         private Learner _learner;
+        private DaysInLearning _daysInLearning;
 
         private Fixture _fixture;
 
@@ -102,13 +103,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var submissionData = new SubmissionData(DateTime.UtcNow);
             submissionData.SetLearningFound(new LearningFoundStatus(true));
             submissionData.SetIsInLearning(true);
-            submissionData.SetDaysInLearning(90);
+
+            _daysInLearning = new DaysInLearning(1, (short)DateTime.Now.Year, 90);
 
             _learnerModel = _fixture.Build<LearnerModel>()
                 .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)
                 .With(m => m.ApprenticeshipIncentiveId, incentive.Id)
                 .With(m => m.UniqueLearnerNumber, incentive.Apprenticeship.UniqueLearnerNumber)
                 .With(m => m.SubmissionData, submissionData)
+                .With(m => m.DaysInLearnings, new List<DaysInLearning>() { _daysInLearning })
                 .Create();
 
             _learner = new LearnerFactory().GetExisting(_learnerModel);
