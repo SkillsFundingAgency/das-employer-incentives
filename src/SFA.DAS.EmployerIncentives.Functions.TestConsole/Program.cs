@@ -6,6 +6,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using WireMock.Server;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 #pragma warning disable 162
@@ -15,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
         // Tweak these to cater for your needs 👇
         private const bool StartServiceBus = false;
         private const bool StartFakeLearnerMatchApi = true;
+        private const bool StartFakeBusinessCentralFinanceApi = true;
 
         protected Program() { }
 
@@ -27,6 +30,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
         public static async Task Run(string[] args)
         {
+            WireMockServer learnerApi = null;
+            WireMockServer businessCentralApi = null;
+
             if (StartServiceBus)
             {
                 await StartTestServiceBus(args);
@@ -35,16 +41,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
             if (StartFakeLearnerMatchApi)
             {
                 var portNumber = GetMatchedLearnerApiPortNumberFromConfig();
-                var learnerApi = FakeLearnerMatchApiBuilder
+                learnerApi = FakeLearnerMatchApiBuilder
                     .Create(portNumber)
                     .WithLearnerMatchingApi()
                     .Build();
-
-                Console.WriteLine("Press any key to stop the servers");
-                Console.ReadKey();
-                learnerApi.Dispose();
             }
 
+            if (StartFakeBusinessCentralFinanceApi)
+            {
+                var portNumber = GetBusinessCentralApiPortNumberFromConfig();
+                businessCentralApi = FakeBusinessCentralApiBuilder
+                    .Create(portNumber)
+                    .WithPaymentRequestsEndpoint()
+                    .Build();
+            }
+
+            Console.WriteLine("Press any key to stop the servers");
+            Console.ReadKey();
+
+            StopAndDispose(businessCentralApi);
+            StopAndDispose(learnerApi);
+        }
+
+        private static void StopAndDispose(WireMockServer server)
+        {
+            if (server != null && server.IsStarted)
+            {
+                server.Stop();
+            }
+            server?.Dispose();
         }
 
         private static int GetMatchedLearnerApiPortNumberFromConfig()
@@ -59,6 +84,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
                 .AddEnvironmentVariables()
                 .Build()
                 .Bind("MatchedLearnerApi", settings);
+
+            var port = int.Parse(settings.ApiBaseUrl.Split(":").Last());
+
+            return port;
+        }
+
+        private static int GetBusinessCentralApiPortNumberFromConfig()
+        {
+            var functionsConfigFile = Path.Combine(
+                Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)), FunctionsBinFolder,
+                "local.settings.json");
+
+            var settings = new BusinessCentralApiClient();
+            new ConfigurationBuilder()
+                .AddJsonFile(functionsConfigFile, optional: false) // Must have it!
+                .AddEnvironmentVariables()
+                .Build()
+                .Bind("BusinessCentralApi", settings);
 
             var port = int.Parse(settings.ApiBaseUrl.Split(":").Last());
 

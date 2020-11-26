@@ -18,11 +18,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         private string _apiVersion;
         private int _paymentRequestsLimit;
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit = 1000, string apiVersion = "2020-10-01 ")
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion)
         {
             _client = client;
-            _apiVersion = apiVersion;
-            _paymentRequestsLimit = paymentRequestsLimit;
+            _apiVersion = apiVersion ?? "2020-10-01";
+            _paymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
 
         public async Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)

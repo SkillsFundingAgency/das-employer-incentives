@@ -8,6 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string ApiBaseUrl { get; set; }
         public string SubscriptionKey { get; set; }
         public string ApiVersion { get; set; }
+        public int PaymentRequestsLimit { get; set; }
     }
     
 }
