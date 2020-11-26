@@ -22,21 +22,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             foreach (var pendingPayment in pendingPayments)
             {
                 tasks.Add(
-                    context.CallActivityAsync("ValidatePendingPayment", 
-                    new ValidatePendingPaymentData(
-                        accountLegalEntityCollectionPeriod.CollectionPeriod.Year, 
-                        accountLegalEntityCollectionPeriod.CollectionPeriod.Month, 
-                        pendingPayment.ApprenticeshipIncentiveId, 
-                        pendingPayment.PendingPaymentId)
-                    ));
-                        // TOOD: moved to loop below
-                        //.ContinueWith(previous => context.CallActivityAsync("CreatePayment",
-                        //    new CreatePaymentInput
-                        //    {
-                        //        ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
-                        //        PendingPaymentId = pendingPayment.PendingPaymentId,
-                        //        CollectionPeriod = collectionPeriod
-                        //    }), TaskContinuationOptions.OnlyOnRanToCompletion)); ;
+                    context.CallActivityAsync("ValidatePendingPayment",
+                            new ValidatePendingPaymentData(
+                                accountLegalEntityCollectionPeriod.CollectionPeriod.Year,
+                                accountLegalEntityCollectionPeriod.CollectionPeriod.Period,
+                                pendingPayment.ApprenticeshipIncentiveId,
+                                pendingPayment.PendingPaymentId)));
             }
 
             await Task.WhenAll(tasks);

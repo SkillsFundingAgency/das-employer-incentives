@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
                        },
                        ["collectionPeriodYear"] = CollectionPeriodYear,
-                       ["collectionPeriodMonth"] = CollectionPeriod
+                       ["collectionPeriodNumber"] = CollectionPeriod
                    }
                    ));
 

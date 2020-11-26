@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPending
             var pendingPayments = await _queryRepository.GetList(dto =>
                 dto.AccountLegalEntityId == query.AccountLegalEntityId && 
                 !dto.PaymentMadeDate.HasValue &&
-                (dto.PaymentYear < query.CollectionPeriodYear || (dto.PaymentYear == query.CollectionPeriodYear && dto.PeriodNumber <= query.CollectionPeriodMonth)));
+                (dto.PaymentYear < query.PaymentYear || (dto.PaymentYear == query.PaymentYear && dto.PeriodNumber <= query.PeriodNumber)));
 
             return new GetPendingPaymentsForAccountLegalEntityResponse(pendingPayments);
         }
