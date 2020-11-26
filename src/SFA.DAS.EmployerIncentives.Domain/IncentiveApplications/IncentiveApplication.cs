@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -6,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("SFA.DAS.EmployerIncentives.Commands.UnitTests")]
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public sealed class IncentiveApplication : AggregateRoot<Guid, IncentiveApplicationModel>
@@ -47,15 +50,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.SubmittedByEmail = submittedByEmail;
             Model.SubmittedByName = submittedByName;
 
-            AddEvent(new Submitted
+            AddEvent(new Submitted(Model));
+        }
+
+        public void Resubmit()
+        {
+            if (Model.Status != IncentiveApplicationStatus.Submitted)
             {
-                 AccountId = AccountId,
-                 IncentiveApplicationId = Id,
-                 SubmittedAt = submittedAt,
-                 SubmittedBy = submittedByName,
-                 SubmittedByEmail = submittedByEmail,
-                 AccountLegalEntityId = Model.AccountLegalEntityId
-            });
+                return;
+            }
+
+            AddEvent(new Submitted(Model));
         }
 
         public void SetApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
@@ -79,5 +84,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
+
     }
 }

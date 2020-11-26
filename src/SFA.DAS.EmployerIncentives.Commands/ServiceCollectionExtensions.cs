@@ -20,6 +20,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
 using SFA.DAS.HashingService;
 using SFA.DAS.Http;
 using SFA.DAS.Http.TokenGenerators;
@@ -61,6 +62,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
+            .AddSingleton<IValidator<CreateApprenticeshipIncentiveCommand>, NullValidator>()
+            .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
+            .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
+            .AddSingleton<IValidator<EarningsResilienceApplicationsCheckCommand>, NullValidator>()
+            .AddSingleton<IValidator<EarningsResilienceIncentivesCheckCommand>, NullValidator>()
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
@@ -170,7 +176,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 endpointConfiguration
                     .UseTransport<LearningTransport>()
-                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
+                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory",
+                        Path.Combine(
+                            Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")),
+                            @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
                 endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
