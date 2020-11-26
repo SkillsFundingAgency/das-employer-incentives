@@ -24,4 +24,3 @@
 			q.status = 'Submitted'
 		group by 
 			month(PlannedStartDate), year(PlannedStartDate)
-		order by year(PlannedStartDate), month(PlannedStartDate)
