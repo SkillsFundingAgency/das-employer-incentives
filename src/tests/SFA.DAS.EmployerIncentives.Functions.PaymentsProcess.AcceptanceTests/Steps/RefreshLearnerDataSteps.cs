@@ -160,6 +160,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoZPROG001_json);
         }
 
+        [Given(@"the latest learner data has a matching in-break training episode")]
+        public void GivenTheLatestLearnerDataHasAMatchingIn_BreakTrainingEpisode()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InBreak_json);
+        }
+
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
         public async Task WhenTheLearnerDataIsRefreshedForTheApprenticeshipIncentive()
         {
@@ -314,6 +320,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be(expectedDaysInLearning);
+        }
+
+        [Then(@"the apprenticeship incentive learner data is updated with days in learning counted up until training end date")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedWithDaysInLearningCountedUpUntilTrainingEndDate()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+            var createdDaysInLearning = dbConnection.GetAll<ApprenticeshipDaysInLearning>().Single(d => d.LearnerId == createdLearner.Id);
+
+            var expectedDaysInLearning = (int)(DateTime.Parse("2020-08-20T00:00:00") - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
+
+            createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
+            createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
+            createdDaysInLearning.NumberOfDaysInLearning.Should().Be(expectedDaysInLearning);            
         }
 
         private void SetupLearnerMatchApiResponse(string json)
