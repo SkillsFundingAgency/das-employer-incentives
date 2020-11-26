@@ -78,7 +78,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 
         private string CreatePaymentLineDescription(PaymentDto payment)
         {
-            return $"Hire a new apprentice ({payment.PaymentSequence} payment). Employer: {payment.HashedLegalEntityId} ULN: {payment.ULN}";
+            return $"Hire a new apprentice ({PaymentType(payment.EarningType)} payment). Employer: {payment.HashedLegalEntityId} ULN: {payment.ULN}";
+        }
+
+        private string PaymentType(EarningType earningType)
+        {
+            switch (earningType)
+            {
+                case EarningType.FirstPayment:
+                    return "first";
+                case EarningType.SecondPayment:
+                    return "second";
+                default:
+                    throw new InvalidIncentiveException($"No mapping found for EarningType {earningType}");
+            }
+
         }
 
         private string MapToAccountCode(SubnominalCode subnominalCode)

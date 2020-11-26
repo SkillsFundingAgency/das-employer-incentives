@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipInc
         public DateTime DueDate { get; set; }
         public SubnominalCode SubnominalCode { get; set; }
         public decimal Amount { get; set; }
-        public string PaymentSequence { get; set; }
+        public EarningType EarningType { get; set; }
         public long ULN { get; set; }
         public string HashedLegalEntityId { get; set; }
     }

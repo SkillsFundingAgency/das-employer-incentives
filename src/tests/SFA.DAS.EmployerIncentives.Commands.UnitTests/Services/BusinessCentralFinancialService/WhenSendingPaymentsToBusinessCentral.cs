@@ -137,13 +137,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             paymentRequest.AccountCode.Should().Be(expectedAccountCode);
         }
 
-        [TestCase("first", "XXX", 12345, "Hire a new apprentice (first payment). Employer: XXX ULN: 12345")]
-        [TestCase("second", "XXX", 12345, "Hire a new apprentice (second payment). Employer: XXX ULN: 12345")]
-        public void Then_the_PaymentLineDescription_is_constructed_as_expected(string step, string hashedLegalEntityId, long uln, string expected)
+        [TestCase(EarningType.FirstPayment, "XXX", 12345, "Hire a new apprentice (first payment). Employer: XXX ULN: 12345")]
+        [TestCase(EarningType.SecondPayment, "XXX", 12345, "Hire a new apprentice (second payment). Employer: XXX ULN: 12345")]
+        public void Then_the_PaymentLineDescription_is_constructed_as_expected(EarningType earningType, string hashedLegalEntityId, long uln, string expected)
         {
 
             var payment = _fixture.Build<PaymentDto>()
-                .With(x => x.PaymentSequence, step)
+                .With(x => x.EarningType, earningType)
                 .With(x => x.HashedLegalEntityId, hashedLegalEntityId)
                 .With(x => x.ULN, uln)
                 .Create();
