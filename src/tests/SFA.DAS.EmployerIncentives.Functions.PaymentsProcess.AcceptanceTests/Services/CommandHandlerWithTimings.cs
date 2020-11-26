@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             timer.Stop();
 
-            _log.LogInformation($"'{typeof(T)}' command took : {timer.ElapsedMilliseconds}ms");
+            _log.LogInformation($"'{typeof(T)}' Command, Duration={timer.ElapsedMilliseconds}ms");
         }
     }
 }
