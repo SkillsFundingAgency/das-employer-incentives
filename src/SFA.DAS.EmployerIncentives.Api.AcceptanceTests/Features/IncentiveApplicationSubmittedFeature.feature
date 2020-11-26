@@ -12,7 +12,7 @@ Scenario: Incentive Application is submitted
 
 Scenario: Incentive Application is submitted with invalid application id
 	Given an employer has entered incentive claim application details
-	When the invalid application id is submittted
+	When the invalid application id is submitted
 	Then the application status is not updated
 	And the service responds with an error
 

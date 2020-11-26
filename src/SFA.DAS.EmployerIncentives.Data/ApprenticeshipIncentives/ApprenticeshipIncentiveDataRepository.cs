@@ -4,7 +4,9 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -22,6 +24,32 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             await _dbContext.AddAsync(apprenticeshipIncentive.Map());
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments()
+        {
+            var collectionPeriods = _dbContext.CollectionPeriods.AsEnumerable();
+
+            var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.PendingPayments.Count == 0);
+            var results = new List<ApprenticeshipIncentiveModel>();
+            foreach(var incentive in queryResults)
+            {
+                results.Add(incentive.Map(collectionPeriods));
+            }
+
+            return await Task.FromResult(results);
+        }
+
+        public async Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId)
+        {
+            var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
+               .Include(x => x.PendingPayments)
+               .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
+            if (apprenticeshipIncentive != null)
+            {
+                return apprenticeshipIncentive.Map(_dbContext.CollectionPeriods.AsEnumerable());
+            }
+            return null;
         }
 
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
