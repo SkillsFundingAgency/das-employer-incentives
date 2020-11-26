@@ -64,5 +64,51 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                     ), Times.Once);
             }
         }
+
+        [Test]
+        public async Task Then_process_pauses_after_generating_payments()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                "CalculatePaymentsForAccountLegalEntityOrchestrator",
+                It.IsAny<AccountLegalEntityCollectionPeriod>()
+            ), Times.Exactly(_legalEntities.Count));
+
+            _mockOrchestrationContext.Verify(x => x.WaitForExternalEvent<bool>("PaymentsApproved"), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_payments_are_not_sent_if_not_approved()
+        {
+            _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(false);
+
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Never);
+        }
+
+        [Test]
+        public async Task Then_payments_are_sent_when_they_are_approved()
+        {
+            _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(true);
+
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
+
+            foreach (var entity in _legalEntities)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallActivityAsync(
+                    "SendPaymentRequestsForAccountLegalEntity",
+                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                        input.AccountId == entity.AccountId &&
+                        input.CollectionPeriod.Month == _collectionPeriod.Month &&
+                        input.CollectionPeriod.Year == _collectionPeriod.Year)
+
+                ), Times.Once);
+            }
+        }
     }
 }
