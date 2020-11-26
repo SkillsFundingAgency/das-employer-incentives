@@ -62,11 +62,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
-            .AddSingleton<IValidator<CreateApprenticeshipIncentiveCommand>, NullValidator>()
-            .AddSingleton<IValidator<CalculateEarningsCommand>, NullValidator>()
-            .AddSingleton<IValidator<CompleteEarningsCalculationCommand>, NullValidator>()
-            .AddSingleton<IValidator<EarningsResilienceApplicationsCheckCommand>, NullValidator>()
-            .AddSingleton<IValidator<EarningsResilienceIncentivesCheckCommand>, NullValidator>()
+            .AddSingleton(typeof(IValidator<CreateApprenticeshipIncentiveCommand>), new NullValidator())
+            .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
+            .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
+            .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
+            .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
