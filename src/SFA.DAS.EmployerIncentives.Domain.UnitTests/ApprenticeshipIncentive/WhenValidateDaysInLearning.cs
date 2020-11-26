@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private ApprenticeshipIncentiveModel _sutModel;
         private CollectionPeriod _collectionPeriod;
         private Learner _learner;
+        private LearnerModel _learnerModel;
         private short _collectionYear;
         private byte _collectionMonth;
         private Fixture _fixture;
@@ -43,38 +44,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _sutModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
-            _learner = Learner.New(
-                Guid.NewGuid(),
-                _sutModel.Id,
-                _sutModel.Apprenticeship.Id,
-                _sutModel.Apprenticeship.Provider.Ukprn,
-                _sutModel.Apprenticeship.UniqueLearnerNumber);
+            _learnerModel = _fixture
+                .Build<LearnerModel>()
+                .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarYear, 90) })
+                .Create();
 
-            _learner.SetSubmissionData(new SubmissionData(DateTime.Now));
+            _learner = Learner.Get(_learnerModel);                
 
             _sut = Sut(_sutModel);
         }
-
-        //[TestCase(89, false)]
-        //[TestCase(90,true)]
-        //[TestCase(91, true)]
-        //public void Then_a_validation_result_is_created_for_the_days_in_learning(int daysInLearning, bool validationResult)
-        //{
-        //    // arrange            
-        //    var pendingPayment = _sut.PendingPayments.First();
-
-        //    _learner.SubmissionData.SetDaysInLearning(daysInLearning);
-
-        //    // act
-        //    _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
-
-        //    // assert            
-        //    pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
-        //    var validationresult = pendingPayment.PendingPaymentValidationResults.First();
-        //    validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
-        //    validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
-        //    validationresult.Result.Should().Be(validationResult);
-        //}
 
         [Test()]
         public void Then_a_false_validation_result_is_created_when_the_matchedLearner_is_null()
@@ -93,14 +71,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Result.Should().Be(false);
         }
 
-        [Test()]
-        public void Then_a_false_validation_result_is_created_when_the_matchedLearner_submissionFound_is_null()
+        [TestCase(89, false)]
+        [TestCase(90, true)]
+        [TestCase(91, true)]
+        public void Then_a_validation_result_is_created_for_the_days_in_learning(int daysInLearning, bool validationResult)
         {
             // arrange            
             var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SetSubmissionData(null);
-            
+            _learnerModel.DaysInLearnings = new List<DaysInLearning>() {
+                new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarYear, daysInLearning)
+            };
+
+            _learner = Learner.Get(_learnerModel);
+
             // act
             _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
 
@@ -109,28 +93,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
-            validationresult.Result.Should().Be(false);
+            validationresult.Result.Should().Be(validationResult);
         }
-
-        //[Test()]
-        //public void Then_a_false_validation_result_is_created_when_the_matchedLearner_DaysinLearning_is_null()
-        //{
-        //    // arrange            
-        //    var pendingPayment = _sut.PendingPayments.First();
-
-        //    _learner.SubmissionData.SetDaysInLearning(null);
-
-        //    // act
-        //    _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
-
-        //    // assert            
-        //    pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
-        //    var validationresult = pendingPayment.PendingPaymentValidationResults.First();
-        //    validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
-        //    validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
-        //    validationresult.Result.Should().Be(false);
-        //}
-
+        
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);
