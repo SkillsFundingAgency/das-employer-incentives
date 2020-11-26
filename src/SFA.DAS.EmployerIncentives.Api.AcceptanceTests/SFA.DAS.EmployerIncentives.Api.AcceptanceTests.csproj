@@ -46,6 +46,9 @@
 
 
   <ItemGroup>
+    <Compile Update="Features\ActivateCollectionCalendarPeriod.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <DependentUpon>ApplicationsForAccountRequested.feature</DependentUpon>
@@ -78,6 +81,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\ActivateCollectionCalendarPeriod.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ActivateCollectionCalendarPeriod.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\ApplicationsForAccountRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
