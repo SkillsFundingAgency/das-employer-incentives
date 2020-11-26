@@ -47,8 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                 x => x.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(
                     It.Is<GetPendingPaymentsForAccountLegalEntityRequest>(p =>
                         p.AccountLegalEntityId == _accountLegalEntityCollectionPeriod.AccountLegalEntityId &&
-                        p.CollectionPeriodMonth == _accountLegalEntityCollectionPeriod.CollectionPeriod.Month &&
-                        p.CollectionPeriodYear == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)), Times.Once);
+                        p.PeriodNumber == _accountLegalEntityCollectionPeriod.CollectionPeriod.Month &&
+                        p.PaymentYear == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)), Times.Once);
         }
 
         [Test]

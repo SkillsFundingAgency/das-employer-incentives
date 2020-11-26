@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
@@ -16,19 +17,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
-        private short _collectionYear;
-        private byte _collectionMonth;
+        private CollectionPeriod _collectionPeriod;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-
-            _collectionYear = _fixture.Create<short>();
-            _collectionMonth = _fixture.Create<byte>();
-
-            _fixture.Customize<PendingPaymentValidationResultModel>(x => x.With(y => y.Result, true));
+            _collectionPeriod = _fixture.Create<CollectionPeriod>();
+        
+            _fixture.Customize<PendingPaymentValidationResultModel>(x => 
+                x.With(y => y.Result, true)
+                    .With(x=>x.CollectionPeriod, _collectionPeriod));
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.PaymentModels, new List<PaymentModel>()).Create();
             
             _sut = Sut(_sutModel);
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_an_exception_is_thrown_when_the_pending_payment_does_not_exist()
         {
             // act
-            Action result = () => _sut.CreatePayment(Guid.NewGuid(), _collectionYear, _collectionMonth);
+            Action result = () => _sut.CreatePayment(Guid.NewGuid(), _collectionPeriod.CalendarYear, _collectionPeriod.PeriodNumber);
 
             // assert
             result.Should().Throw<ArgumentException>().WithMessage("Pending payment does not exist.");            
@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             pendingPayment.PendingPaymentValidationResultModels.First().Result = false;
 
             // act
-            _sut.CreatePayment(pendingPayment.Id, _collectionYear, _collectionMonth);
+            _sut.CreatePayment(pendingPayment.Id, _collectionPeriod.CalendarYear, _collectionPeriod.PeriodNumber);
 
             // assert
             _sut.Payments.Count.Should().Be(0);
@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            _sut.CreatePayment(pendingPayment.Id, _collectionYear, _collectionMonth);
+            _sut.CreatePayment(pendingPayment.Id, _collectionPeriod.CalendarYear, _collectionPeriod.PeriodNumber);
 
             // assert
             _sut.Payments.Count.Should().Be(1);
@@ -94,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            _sut.CreatePayment(pendingPayment.Id, _collectionYear, _collectionMonth);
+            _sut.CreatePayment(pendingPayment.Id, _collectionPeriod.CalendarYear, _collectionPeriod.PeriodNumber);
 
             // assert
             _sut.Payments.Count.Should().Be(1);
@@ -102,11 +102,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             actualPayment.Account.Id.Should().Be(_sut.Account.Id);
             actualPayment.Account.AccountLegalEntityId.Should().Be(_sut.Account.AccountLegalEntityId);
             actualPayment.Amount.Should().Be(pendingPayment.Amount);
-            actualPayment.PaymentPeriod.Should().Be(_collectionMonth);
-            actualPayment.PaymentYear.Should().Be(_collectionYear);
+            actualPayment.PaymentPeriod.Should().Be(_collectionPeriod.PeriodNumber);
+            actualPayment.PaymentYear.Should().Be(_collectionPeriod.CalendarYear);
         }
-
-
 
         [Test]
         public void Then_the_payment_is_created_and_the_existing_payment_is_replaced()
@@ -117,7 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PaymentModels.Add(existingPayment);
 
             // act
-            _sut.CreatePayment(pendingPayment.Id, _collectionYear, _collectionMonth);
+            _sut.CreatePayment(pendingPayment.Id, _collectionPeriod.CalendarYear, _collectionPeriod.PeriodNumber);
 
             // assert
             _sut.Payments.Count.Should().Be(1);
@@ -131,7 +129,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            _sut.CreatePayment(pendingPayment.Id, _collectionYear, _collectionMonth);
+            _sut.CreatePayment(pendingPayment.Id, _collectionPeriod.CalendarYear, _collectionPeriod.PeriodNumber);
 
             // assert
             pendingPayment.PaymentMadeDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
