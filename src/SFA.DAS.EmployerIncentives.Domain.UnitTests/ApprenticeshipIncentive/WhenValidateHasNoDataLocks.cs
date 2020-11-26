@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
         [TestCase(false)]
         [TestCase(true)]        
-        public void Then_a_validation_result_is_created_for_is_in_learning(bool hasDataLock)
+        public void Then_a_validation_result_is_created_for_has_no_datalocks(bool hasDataLock)
         {
             // arrange            
             var pendingPayment = _sut.PendingPayments.First();
