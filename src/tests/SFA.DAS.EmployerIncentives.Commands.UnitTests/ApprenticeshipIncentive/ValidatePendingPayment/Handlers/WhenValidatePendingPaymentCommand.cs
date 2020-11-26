@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
         private string _vrfVendorId;
         private Account _account;
 
@@ -39,15 +39,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
 
-            _collectionPeriods = new List<CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1)
+                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1)
                     ,DateTime.Now, DateTime.Now.Year.ToString(), true)
             };
 
             _mockCollectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new CollectionCalendar(_collectionPeriods));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
 
             _vrfVendorId = Guid.NewGuid().ToString();
             var legalEntity = _fixture.Build<LegalEntityModel>()

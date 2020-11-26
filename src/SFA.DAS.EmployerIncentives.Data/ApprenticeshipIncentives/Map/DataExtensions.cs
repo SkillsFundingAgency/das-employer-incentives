@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+﻿using Microsoft.VisualBasic;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
@@ -171,6 +172,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     x.AcademicYear,
                     x.Active)
             ).ToList();
+        }
+
+        internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
+        {
+            return models.Select(x =>
+                new CollectionPeriod                
+                { 
+                    AcademicYear = x.AcademicYear,
+                    Active = x.Active,
+                    CalendarMonth = x.CalendarMonth,
+                    CalendarYear = x.CalendarYear,
+                    CensusDate = x.CensusDate,
+                    EIScheduledOpenDateUTC = x.OpenDate,
+                    PeriodNumber = x.PeriodNumber
+                }).ToList();
         }
 
     }

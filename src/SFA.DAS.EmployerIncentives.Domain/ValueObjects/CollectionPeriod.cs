@@ -23,7 +23,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public DateTime OpenDate { get; }
         public DateTime CensusDate { get; }
         public string AcademicYear { get; }
-        public bool Active { get; }
+        public bool Active { get; private set; }
+
+        public void SetActive(bool active)
+        {
+            Active = active;
+        }
 
         protected override IEnumerable<object> GetAtomicValues()
         {

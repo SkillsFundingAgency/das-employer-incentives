@@ -32,6 +32,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 .Single(d => d.CalendarYear == collectionYear && d.PeriodNumber == periodNumber);
         }
 
+        public void ActivatePeriod(short collectionYear, byte periodNumber)
+        {
+            foreach(var collectionPeriod in _collectionPeriods)
+            {
+                collectionPeriod.SetActive(false);
+            }
+
+            var activeCollectionPeriod = _collectionPeriods.FirstOrDefault(x => x.CalendarYear == collectionYear && x.PeriodNumber == periodNumber);
+            activeCollectionPeriod.SetActive(true);
+        }
+
+        public IEnumerable<CollectionPeriod> GetAllPeriods()
+        {
+            return _collectionPeriods;
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             foreach (var collectionPeriod in _collectionPeriods)
