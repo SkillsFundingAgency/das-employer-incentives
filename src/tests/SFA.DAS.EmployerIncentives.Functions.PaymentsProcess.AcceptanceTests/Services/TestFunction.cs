@@ -3,8 +3,10 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -79,6 +81,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                                a.UseLearningEndpointStorageDirectory = Path.Combine(testContext.TestDirectory.FullName, ".learningtransport");
                            });
+
+                           s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
+                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
                        })
                        )
                     .ConfigureServices(s =>
