@@ -8,7 +8,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class CalculatePaymentsForAccountLegalEntityOrchestrator
     {
-
         [FunctionName("CalculatePaymentsForAccountLegalEntityOrchestrator")]
         public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
@@ -16,28 +15,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
-            var pendingPayments = await context.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
+            var pendingPayments =
+                await context.CallActivityAsync<List<PendingPaymentActivityDto>>(
+                    "GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
 
-            var tasks = new List<Task>();
+            var validatePaymentTasks = new List<Task>();
+            var createPaymentTasks = new List<Task>();
+
             foreach (var pendingPayment in pendingPayments)
             {
-                tasks.Add(
+                validatePaymentTasks.Add(
                     context.CallActivityAsync("ValidatePendingPayment",
-                            new ValidatePendingPaymentData(
-                                accountLegalEntityCollectionPeriod.CollectionPeriod.Year,
-                                accountLegalEntityCollectionPeriod.CollectionPeriod.Period,
-                                pendingPayment.ApprenticeshipIncentiveId,
-                                pendingPayment.PendingPaymentId))
-                        .ContinueWith(previous => context.CallActivityAsync("CreatePayment",
-                            new CreatePaymentInput
-                            {
-                                ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
-                                PendingPaymentId = pendingPayment.PendingPaymentId,
-                                CollectionPeriod = collectionPeriod
-                            }), TaskContinuationOptions.OnlyOnRanToCompletion));
+                        new ValidatePendingPaymentData(
+                            accountLegalEntityCollectionPeriod.CollectionPeriod.Year,
+                            accountLegalEntityCollectionPeriod.CollectionPeriod.Period,
+                            pendingPayment.ApprenticeshipIncentiveId,
+                            pendingPayment.PendingPaymentId)));
+
+                createPaymentTasks.Add(
+                    context.CallActivityAsync("CreatePayment",
+                        new CreatePaymentInput
+                        {
+                            ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
+                            PendingPaymentId = pendingPayment.PendingPaymentId,
+                            CollectionPeriod = collectionPeriod
+                        }));
             }
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(validatePaymentTasks);
+            await Task.WhenAll(createPaymentTasks);
         }
     }
 }
