@@ -20,14 +20,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                    Func<Task> func,
                    bool assertOnTimeout = true,
                    bool assertOnError = false,
-                   int timeoutInMs = 15000)
+                   int timeoutInMs = 15000,
+                   int numberOfOnProcessedEventsExpected = 1)
         {
             var waitForResult = new WaitForResult();
+            var messagesProcessed = 0;
 
             var hook = _testContext.Hooks.SingleOrDefault(h => h is Hook<T>) as Hook<T>;
 
             hook.OnReceived = (message) => { waitForResult.SetHasStarted(); };
-            hook.OnProcessed = (message) => { waitForResult.SetHasCompleted(); };
+            hook.OnProcessed = (message) => { messagesProcessed++; if (messagesProcessed >= numberOfOnProcessedEventsExpected) { waitForResult.SetHasCompleted(); } };
             hook.OnErrored = (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
 
             try
