@@ -5,9 +5,8 @@ Feature: EarningsResilienceCheck
 	As a service owner
 	I want to run a resilience check to identify and update any apprenticeships without earnings calculated
 
-#  TODO : Needs fixing
-#Scenario: Earnings Resilience Check is run
-#	Given the earnings resilience check is requested
-#	When there are apprenticeships that do not have earnings calculations
-#	Then the earnings recalculation is triggered
+Scenario: Earnings Resilience Check is run
+	Given there are apprenticeships that do not have earnings calculations
+	When the earnings resilience check is requested
+	Then the earnings recalculation is triggered
 

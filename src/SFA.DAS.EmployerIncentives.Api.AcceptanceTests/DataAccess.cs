@@ -1,6 +1,8 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -32,12 +34,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             return account;
         }
 
-        public void SetupAccount(Account account)
+        public async Task SetupAccount(Account account)
         {
             using var dbConnection = new SqlConnection(_connectionString);
-            dbConnection.Execute(
-                "insert into Accounts(id, accountLegalEntityId, legalEntityId, hashedLegalEntityId, legalEntityName, hasSignedIncentivesTerms, vrfCaseId, vrfVendorId, vrfCaseStatus, vrfCaseStatusLastUpdatedDateTime) values " +
-                "(@id, @accountLegalEntityId, @legalEntityId, @hashedLegalEntityId, @legalEntityName, @hasSignedIncentivesTerms, @vrfCaseId, @vrfVendorId, @vrfCaseStatus, @vrfCaseStatusLastUpdatedDateTime)", account);
+            await dbConnection.InsertAsync(account);           
         }
 
         public void SetupApplication(IncentiveApplication application)

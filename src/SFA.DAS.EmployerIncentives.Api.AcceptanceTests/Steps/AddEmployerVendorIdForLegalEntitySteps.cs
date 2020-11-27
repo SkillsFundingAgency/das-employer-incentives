@@ -25,21 +25,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Given(@"a legal entity exists with a vendor assigned within an account")]
-        public void GivenALegalEntityExistsWithAVendorAssignedWithinAnAccount()
+        public Task GivenALegalEntityExistsWithAVendorAssignedWithinAnAccount()
         {
             _account1 = TestContext.TestData.GetOrCreate<Account>("FirstAccount");
             _account1.HashedLegalEntityId = _hashedLegalEntityId;
             _account1.VrfVendorId = _existingVendorId;
-            DataAccess.SetupAccount(_account1);
+            return DataAccess.SetupAccount(_account1);
         }
 
         [Given(@"a the same legal entity exists without a vendor assigned for a seperate account")]
-        public void GivenATheSameLegalEntityExistsWithoutAVendorAssignedForASeperateAccount()
+        public Task GivenATheSameLegalEntityExistsWithoutAVendorAssignedForASeperateAccount()
         {
             _account2 = TestContext.TestData.GetOrCreate<Account>("SecondAccount");
             _account2.HashedLegalEntityId = _hashedLegalEntityId;
             _account2.VrfVendorId = null;
-            DataAccess.SetupAccount(_account2);
+            return  DataAccess.SetupAccount(_account2);
         }
 
         [When(@"we add the employer vendor for this legal entity")]
