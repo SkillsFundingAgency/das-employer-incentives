@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("collectionCalendar")]
     [ApiController]
     public class CollectionCalendarCommandController : ApiCommandControllerBase
     {
@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPost]
-        [Route("activate")]
+        [Route("period/activate")]
         public async Task ActivateCollectionPeriod(ActivateCollectionPeriodRequest request)
         {
             await SendCommandAsync(new ActivateCollectionPeriodCommand(request.CollectionPeriodNumber, request.CollectionPeriodYear));
