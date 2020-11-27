@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
+using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.UnitOfWork.Managers;
 
 namespace SFA.DAS.EmployerIncentives.Commands
@@ -42,6 +43,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 foreach (var command in commands)
                 {
+                    if(command is ILockIdentifier)
+                    {
+                        throw new NotSupportedException("Not currently possible to dispatch multiple commands if any implement the ILockIdentifier interface");
+                    }
                     await Send(command as dynamic, cancellationToken);
                 }
             }
