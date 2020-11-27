@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
+using SFA.DAS.UnitOfWork.Managers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispa
     {
         private EmployerIncentives.Commands.CommandDispatcher _sut;
         private Mock<IServiceProvider> _mockServiceProvider;
+        private Mock<IUnitOfWorkManager> _mockUnitOfWorkManager;
         private Mock<ICommandHandler<TestCommand>> _mockTestCommandHandler;
         private Mock<ICommandHandler<TestCommand2>> _mockTestCommand2Handler;
         private Mock<ICommandHandler<TestCommand3>> _mockTestCommand3Handler;
@@ -33,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispa
             _mockTestCommandHandler = new Mock<ICommandHandler<TestCommand>>();
             _mockTestCommand2Handler = new Mock<ICommandHandler<TestCommand2>>();
             _mockTestCommand3Handler = new Mock<ICommandHandler<TestCommand3>>();
+            _mockUnitOfWorkManager = new Mock<IUnitOfWorkManager>();
 
             _mockServiceProvider.Setup(m => m.GetService(typeof(ICommandHandler<TestCommand2>)))
                 .Returns(_mockTestCommand2Handler.Object);
@@ -41,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandDispa
             _mockServiceProvider.Setup(m => m.GetService(typeof(ICommandHandler<TestCommand3>)))
                 .Returns(_mockTestCommand3Handler.Object);
 
-            _sut = new EmployerIncentives.Commands.CommandDispatcher(_mockServiceProvider.Object);
+            _sut = new EmployerIncentives.Commands.CommandDispatcher(_mockServiceProvider.Object, _mockUnitOfWorkManager.Object);
         }
 
         [Test]

@@ -19,3 +19,5 @@ CREATE INDEX IX_IncentiveApplicationApprenticeship_ApplicationId ON IncentiveApp
 GO
 CREATE INDEX IX_IncentiveApplicationApprenticeship_Uln ON IncentiveApplicationApprenticeship ([ULN])
 GO
+
+CREATE INDEX [IX_IncentiveApplicationApprenticeship_EarningsCalculated] ON [dbo].[IncentiveApplicationApprenticeship] ([EarningsCalculated])
