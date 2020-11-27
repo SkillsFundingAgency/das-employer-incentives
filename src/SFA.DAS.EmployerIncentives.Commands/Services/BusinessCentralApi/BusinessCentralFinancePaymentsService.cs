@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -28,10 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         public async Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
         {
             var paymentsToSend = payments.Take(_paymentRequestsLimit).ToList();
-
-            var paymentRequests = paymentsToSend.Select(MapToBusinessCentralPaymentRequest);
-            var body = new PaymentRequestContainer { PaymentRequests = paymentRequests.ToArray()};
-            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.Default);
+            var content = CreateJsonContent(paymentsToSend);
             var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
             if (response.StatusCode == HttpStatusCode.Accepted)
@@ -74,6 +72,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 PaymentLineDescription = CreatePaymentLineDescription(payment),
                 Approver = @"AD.HQ.DEPT\JPOOLE"
             };
+        }
+
+        private HttpContent CreateJsonContent(List<PaymentDto> paymentsToSend)
+        {
+            var paymentRequests = paymentsToSend.Select(MapToBusinessCentralPaymentRequest);
+
+            var body = new PaymentRequestContainer { PaymentRequests = paymentRequests.ToArray() };
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default);
         }
 
         private string CreatePaymentLineDescription(PaymentDto payment)

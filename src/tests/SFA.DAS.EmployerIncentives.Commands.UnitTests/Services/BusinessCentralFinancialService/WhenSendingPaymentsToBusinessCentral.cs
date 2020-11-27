@@ -5,16 +5,9 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
-using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
-using SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.AccountDomainRepository;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
 
