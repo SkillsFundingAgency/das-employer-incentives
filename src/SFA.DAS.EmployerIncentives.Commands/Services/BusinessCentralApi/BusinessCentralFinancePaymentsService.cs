@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         {
             return new BusinessCentralFinancePaymentRequest
             {
-                RequestorUniquePaymentIdentifier = payment.PaymentId,
+                RequestorUniquePaymentIdentifier = payment.PaymentId.ToString("N"),
                 Requestor = "ApprenticeServiceEI",
                 FundingStream = new FundingStream
                 {

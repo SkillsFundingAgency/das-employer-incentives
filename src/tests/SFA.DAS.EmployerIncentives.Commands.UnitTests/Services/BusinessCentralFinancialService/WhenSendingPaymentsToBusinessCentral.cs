@@ -109,7 +109,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
 
             var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
 
-            paymentRequest.RequestorUniquePaymentIdentifier.Should().Be(payment.PaymentId);
+            paymentRequest.RequestorUniquePaymentIdentifier.Should().Be(payment.PaymentId.ToString("N"));
             paymentRequest.Requestor.Should().Be("ApprenticeServiceEI");
             paymentRequest.FundingStream.Code.Should().Be("EIAPP");
             paymentRequest.FundingStream.StartDate.Should().Be(new DateTime(2020, 9, 1));
