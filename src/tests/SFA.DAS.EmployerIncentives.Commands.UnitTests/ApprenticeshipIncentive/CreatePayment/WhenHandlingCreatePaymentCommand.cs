@@ -113,9 +113,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     (byte)DateTime.Now.Month, 
                     (short)DateTime.Now.Year, 
                     DateTime.Now.AddDays(-1),
-                    DateTime.Now.AddDays(-1),
+                    DateTime.Now,
                     DateTime.Now.Year.ToString(),
-                    false)
+                    true)
             };
 
             incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(collectionPeriods));

@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         {
             Directory.CreateDirectory("C:\\temp");
             DatabaseInfo.SetConnectionString(
-                @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;MultipleActiveResultSets=True;Pooling=False;Connect Timeout=30");
+                @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;MultipleActiveResultSets=True;Pooling=False;Connect Timeout=30;");
 
             using var dbConn = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;MultipleActiveResultSets=true");
             try
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                         files.Add((string)reader["filename"]);
                     }
                 }
-                cmd.CommandText = $"ALTER DATABASE [{dbName}] SET OFFLINE";
+                cmd.CommandText = $"ALTER DATABASE [{dbName}] SET OFFLINE WITH ROLLBACK IMMEDIATE";
                 cmd.ExecuteNonQuery();
                 cmd.CommandText = $"EXEC sp_detach_db '{dbName}', 'true';";
                 cmd.ExecuteNonQuery();

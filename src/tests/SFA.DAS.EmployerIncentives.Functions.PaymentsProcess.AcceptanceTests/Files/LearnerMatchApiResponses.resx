@@ -124,11 +124,17 @@
   <data name="Acrossyear_R04_InLearning_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>acrossyear-r04-inlearning.json.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="BL_R03_InBreak_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>bl-r03-inbreak.json.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="BL_R03_InLearning_DifferentApprenticeship_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bl-r03-inlearning-differentapprenticeship.json.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="BL_R03_InLearning_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bl-r03-inlearning.json.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="BL_R03_InLearning_NoEndDate_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>bl-r03-inlearning-noenddate.json.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="BL_R03_InLearning_NoTraining" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bl-r03-inlearning-notraining.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>

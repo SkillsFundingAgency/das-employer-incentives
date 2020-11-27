@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
         public TestLearnerMatchApi LearnerMatchApi { get; set; }
+        public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
 
         public TestContext()
         {

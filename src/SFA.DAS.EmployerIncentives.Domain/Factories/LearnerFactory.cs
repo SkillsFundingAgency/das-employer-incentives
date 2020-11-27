@@ -7,9 +7,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
 {
     public class LearnerFactory : ILearnerFactory
     {
-        public Learner CreateNew(Guid id, Guid applicationApprenticeshipId, long apprenticeshipId, long ukprn, long uniqueLearnerNumber, DateTime createdDate)
+        public Learner CreateNew(Guid id, Guid applicationApprenticeshipId, long apprenticeshipId, long ukprn, long uniqueLearnerNumber)
         {
-            return Learner.New(id, applicationApprenticeshipId, apprenticeshipId, ukprn, uniqueLearnerNumber, createdDate);
+            return Learner.New(id, applicationApprenticeshipId, apprenticeshipId, ukprn, uniqueLearnerNumber);
         }
 
         public Learner GetExisting(LearnerModel model)

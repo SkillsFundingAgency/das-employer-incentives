@@ -47,8 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
                 incentive.Id,
                 incentive.Apprenticeship.Id,
                 incentive.Apprenticeship.Provider.Ukprn,
-                incentive.Apprenticeship.UniqueLearnerNumber,
-                DateTime.UtcNow
+                incentive.Apprenticeship.UniqueLearnerNumber
             );
         }
 

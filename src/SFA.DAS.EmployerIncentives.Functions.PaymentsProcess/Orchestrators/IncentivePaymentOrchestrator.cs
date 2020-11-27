@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _logger = logger;
         }
 
-        [FunctionName("IncentivePaymentOrchestrator")]
+        [FunctionName(nameof(IncentivePaymentOrchestrator))]
         public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var collectionPeriod = context.GetInput<CollectionPeriod>();
@@ -25,12 +25,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             if(!context.IsReplaying)
                 _logger.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}", new {collectionPeriod});
 
-            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", collectionPeriod);
+            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);
 
             var calculatePaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
             {
-                var calculatePaymentTask = context.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+                var calculatePaymentTask = context.CallSubOrchestratorAsync(nameof(CalculatePaymentsForAccountLegalEntityOrchestrator), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
                 calculatePaymentTasks.Add(calculatePaymentTask);
             }
 
