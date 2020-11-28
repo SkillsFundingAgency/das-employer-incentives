@@ -34,13 +34,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public void ActivatePeriod(short collectionYear, byte periodNumber)
         {
-            foreach(var collectionPeriod in _collectionPeriods)
+            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.CalendarYear == collectionYear && x.PeriodNumber == periodNumber);
+
+            if (collectionPeriodToActivate == null)
+            {
+                return;
+            }
+
+            foreach (var collectionPeriod in _collectionPeriods)
             {
                 collectionPeriod.SetActive(false);
             }
 
-            var activeCollectionPeriod = _collectionPeriods.FirstOrDefault(x => x.CalendarYear == collectionYear && x.PeriodNumber == periodNumber);
-            activeCollectionPeriod.SetActive(true);
+            collectionPeriodToActivate.SetActive(true);
         }
 
         public IEnumerable<CollectionPeriod> GetAllPeriods()

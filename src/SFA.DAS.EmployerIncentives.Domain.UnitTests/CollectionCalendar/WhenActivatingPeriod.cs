@@ -52,6 +52,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeFalse();
             periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeTrue();
+            periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
+            periods.Count(x => x.Active == true).Should().Be(1);
+        }
+
+        [Test]
+        public void Then_the_active_period_is_not_changed_when_the_period_and_year_not_matched()
+        {
+            // Arrange / Act
+            _sut.ActivatePeriod((short)testDate.Year, 4);
+
+            var periods = _sut.GetAllPeriods().ToList();
+
+            periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeTrue();
+            periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeFalse();
+            periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
             periods.Count(x => x.Active == true).Should().Be(1);
         }
     }
