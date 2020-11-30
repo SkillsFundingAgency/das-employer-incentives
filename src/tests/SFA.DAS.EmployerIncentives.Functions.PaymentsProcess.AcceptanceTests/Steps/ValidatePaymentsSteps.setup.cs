@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.AccountId, ApprenticeshipIncentiveModel.AccountId)
                     .With(p => p.AccountLegalEntityId, ApprenticeshipIncentiveModel.AccountLegalEntityId)
                     .With(p => p.PeriodNumber, (byte?)(CollectionPeriod - 1)) // previous period
-                    .With(p => p.PaymentYear, CollectionPeriodYear)
+                    .With(p => p.PaymentYear, PaymentYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();
 
@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.AccountId, ApprenticeshipIncentiveModel.AccountId)
                     .With(p => p.AccountLegalEntityId, ApprenticeshipIncentiveModel.AccountLegalEntityId)
                     .With(p => p.PeriodNumber, CollectionPeriod) // current period
-                    .With(p => p.PaymentYear, CollectionPeriodYear)
+                    .With(p => p.PaymentYear, PaymentYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();
 
@@ -80,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.AccountId, ApprenticeshipIncentiveModel.AccountId)
                     .With(p => p.AccountLegalEntityId, ApprenticeshipIncentiveModel.AccountLegalEntityId)
                     .With(p => p.PeriodNumber, (byte?)(CollectionPeriod + 1)) // next period
-                    .With(p => p.PaymentYear, CollectionPeriodYear)
+                    .With(p => p.PaymentYear, PaymentYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();
 
