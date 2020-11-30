@@ -22,6 +22,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
                 throw new Exception("This hook requires a Learner Match Api");
             }
 
+            if (context.PaymentsApi?.BaseAddress != null == false)
+            {
+                throw new Exception("This hook requires a Learner Match Api");
+            }
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 

@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     {
         [FunctionName("PaymentRejection_HttpStart")]
         public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/IncentivePaymentOrchestrator/{instanceId}/rejectPayments")] HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/rejectPayments/{instanceId}")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
             string instanceId,
             ILogger log)

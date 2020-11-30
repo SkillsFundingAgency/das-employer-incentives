@@ -13,15 +13,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            context.LearnerMatchApi = new TestLearnerMatchApi();
+            if (context.LearnerMatchApi == null)
+                context.LearnerMatchApi = new MockApi();
             stopwatch.Stop();
             Console.WriteLine($@"[{nameof(LearnerMatchApiPerScenarioHook)}] time it took to spin up LearnerMatchApi: {stopwatch.Elapsed.Seconds} seconds");
-        }
-
-        [AfterScenario]
-        public void CleanUpLearnerMatchApi(TestContext context)
-        {
-            context.LearnerMatchApi?.Dispose();
         }
     }
 }

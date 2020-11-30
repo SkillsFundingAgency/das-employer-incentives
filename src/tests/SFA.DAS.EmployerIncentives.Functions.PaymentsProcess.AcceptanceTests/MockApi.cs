@@ -1,17 +1,17 @@
 ﻿using System;
 using WireMock.Server;
 
-namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
+namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
-    public class TestLearnerMatchApi : IDisposable
+    public class MockApi : IDisposable
     {
-        private bool isDisposed;
+        private bool _isDisposed;
 
         public string BaseAddress { get; private set; }
 
         public WireMockServer MockServer { get; private set; }
 
-        public TestLearnerMatchApi()
+        public MockApi()
         {
             MockServer = WireMockServer.Start();
             BaseAddress = MockServer.Urls[0];
@@ -23,9 +23,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             GC.SuppressFinalize(this);
         }
 
+        public void Reset()
+        {
+            MockServer.Reset();
+        }
+
         protected virtual void Dispose(bool disposing)
         {
-            if (isDisposed) return;
+            if (_isDisposed) return;
 
             if (disposing)
             {
@@ -36,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 MockServer.Dispose();
             }
 
-            isDisposed = true;
+            _isDisposed = true;
         }
     }
 }

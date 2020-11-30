@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _client = new HttpClient { BaseAddress = new Uri($"http://localhost:{Port}") };
             _functionsController = new FunctionsController();
             _configurator = new TestPaymentsProcessFunctionsConfigurator(context.SqlDatabase.DatabaseInfo.ConnectionString,
-                context.LearnerMatchApi.BaseAddress);
+                context.LearnerMatchApi.BaseAddress, context.PaymentsApi.BaseAddress);
         }
 
         public async Task Start()
@@ -62,6 +62,28 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await StartLearnerMatchingOrchestrator();
             Thread.Sleep(TimeSpan.FromSeconds(1)); // time it takes function host to update storage 🤷‍
+            await AllFunctionOrchestrationCompleted();
+        }
+
+        public async Task ApprovePayments(string orchestratorId)
+        {
+            var url = $"api/orchestrators/approvePayments/{orchestratorId}";
+            var orchestrationResponse = await _client.GetAsync(url);
+            orchestrationResponse.EnsureSuccessStatusCode();
+
+            Thread.Sleep(TimeSpan.FromSeconds(1)); // time it takes function host to update storage 🤷‍
+
+            await AllFunctionOrchestrationCompleted();
+        }
+
+        public async Task RejectPayments(string orchestratorId)
+        {
+            var url = $"api/orchestrators/rejectPayments/{orchestratorId}";
+            var orchestrationResponse = await _client.GetAsync(url);
+            orchestrationResponse.EnsureSuccessStatusCode();
+
+            Thread.Sleep(TimeSpan.FromSeconds(1)); // time it takes function host to update storage 🤷‍
+
             await AllFunctionOrchestrationCompleted();
         }
 
@@ -144,7 +166,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 var statusJson = await statusResponse.Content.ReadAsStringAsync();
                 orchestrationStatus = JsonConvert.DeserializeObject<OrchestrationStatus>(statusJson);
 
-                return orchestrationStatus.RuntimeStatus == "Pending" || orchestrationStatus.RuntimeStatus == "Running";
+                return (orchestrationStatus.RuntimeStatus == "Pending" || orchestrationStatus.RuntimeStatus == "Running") && orchestrationStatus.CustomStatus != "WaitingForPaymentApproval";
             });
             return orchestrationStatus;
         }

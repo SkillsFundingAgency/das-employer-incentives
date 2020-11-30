@@ -25,8 +25,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             if(!context.IsReplaying)
                 _logger.LogInformation("Incentive Payment process started for collection period {collectionPeriod}", collectionPeriod);
 
+            context.SetCustomStatus("GettingPayableLegalEntities");
             var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", collectionPeriod);
 
+            context.SetCustomStatus("CalculatingPayments");
             var calculatePaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
             {
@@ -36,13 +38,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             await Task.WhenAll(calculatePaymentTasks);
 
+            context.SetCustomStatus("WaitingForPaymentApproval");
+
             var paymentsApproved = await context.WaitForExternalEvent<bool>("PaymentsApproved");
             if (!paymentsApproved)
             {
+                context.SetCustomStatus("PaymentsRejected");
                 _logger.LogInformation("Calculated payments for collection period {collectionPeriod} have been rejected", collectionPeriod);
                 return;
             }
-            
+
+            context.SetCustomStatus("SendingPayments");
             _logger.LogInformation("Calculated payments for collection period {collectionPeriod} have been approved", collectionPeriod);
 
             var sendPaymentTasks = new List<Task>();
@@ -52,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 sendPaymentTasks.Add(sendPaymentTask);
             }
             await Task.WhenAll(sendPaymentTasks);
+            context.SetCustomStatus("PaymentsSent");
 
             _logger.LogInformation("Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);
         }

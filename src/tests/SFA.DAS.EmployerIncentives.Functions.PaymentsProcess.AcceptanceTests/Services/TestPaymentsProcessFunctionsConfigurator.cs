@@ -11,11 +11,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public TestSettings Settings { get; } = new TestSettings();
         private readonly string _databaseConnectionString;
         private readonly string _learnerMatchApiBaseUrl;
+        private readonly string _paymentsApiBaseUrl;
 
-        public TestPaymentsProcessFunctionsConfigurator(string databaseConnectionString, string learnerMatchApiBaseUrl)
+        public TestPaymentsProcessFunctionsConfigurator(string databaseConnectionString, string learnerMatchApiBaseUrl, string paymentsApiBaseUrl)
         {
             _databaseConnectionString = databaseConnectionString;
             _learnerMatchApiBaseUrl = learnerMatchApiBaseUrl;
+            _paymentsApiBaseUrl = paymentsApiBaseUrl;
         }
 
         public TestPaymentsProcessFunctionsConfigurator Setup()
@@ -26,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var functionConfig = ReplaceFunctionsConfig();
             ReplaceDbConnectionString(functionConfig);
             ReplaceLearnerMatchUrlString(functionConfig);
+            ReplacePaymentsUrlString(functionConfig);
 
             return this;
         }
@@ -72,6 +75,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             var baseAddress = HttpUtility.JavaScriptStringEncode(_learnerMatchApiBaseUrl);
             File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("LEARNER_MATCH_API_URL", baseAddress));
+        }
+
+        private void ReplacePaymentsUrlString(string pathToConfig)
+        {
+            var baseAddress = HttpUtility.JavaScriptStringEncode(_paymentsApiBaseUrl);
+            File.WriteAllText(pathToConfig, (File.ReadAllText(pathToConfig)).Replace("PAYMENTS_API_URL", baseAddress));
         }
     }
 }
