@@ -14,6 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public bool Result { get; set; }
         public byte PeriodNumber { get; set; }
         public short PaymentYear { get; set; }
-        public DateTime CollectionDateUtc { get; set; }
+        public DateTime CreatedDateUtc { get; set; }
     }
 }

@@ -16,25 +16,28 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
-            var pendingPayments = await context.CallActivityAsync<List<PendingPaymentActivityDto>>(nameof(GetPendingPaymentsForAccountLegalEntity), accountLegalEntityCollectionPeriod);
+            var pendingPayments =
+                await context.CallActivityAsync<List<PendingPaymentActivityDto>>(
+                    nameof(GetPendingPaymentsForAccountLegalEntity), accountLegalEntityCollectionPeriod);
 
-            var tasks = new List<Task>();
+            var validatePaymentTasks = new List<Task>();
+            var createPaymentTasks = new List<Task>();
+
             foreach (var pendingPayment in pendingPayments)
             {
-                tasks.Add(
+                validatePaymentTasks.Add(
                     context.CallActivityAsync(nameof(ValidatePendingPayment),
-                            new ValidatePendingPaymentData(
-                                accountLegalEntityCollectionPeriod.CollectionPeriod.Year,
-                                accountLegalEntityCollectionPeriod.CollectionPeriod.Period,
-                                pendingPayment.ApprenticeshipIncentiveId,
-                                pendingPayment.PendingPaymentId)));
+                        new ValidatePendingPaymentData(
+                            accountLegalEntityCollectionPeriod.CollectionPeriod.Year,
+                            accountLegalEntityCollectionPeriod.CollectionPeriod.Period,
+                            pendingPayment.ApprenticeshipIncentiveId,
+                            pendingPayment.PendingPaymentId)));
             }
-
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(validatePaymentTasks);
 
             foreach (var pendingPayment in pendingPayments)
             {
-                tasks.Add(
+                createPaymentTasks.Add(
                     context.CallActivityAsync(nameof(CreatePayment),
                         new CreatePaymentInput
                         {
@@ -43,8 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                             CollectionPeriod = collectionPeriod
                         }));
             }
-
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(createPaymentTasks);
         }
     }
 }
