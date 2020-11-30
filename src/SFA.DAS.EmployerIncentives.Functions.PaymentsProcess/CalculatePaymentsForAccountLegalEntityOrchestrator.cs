@@ -31,7 +31,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                             accountLegalEntityCollectionPeriod.CollectionPeriod.Month,
                             pendingPayment.ApprenticeshipIncentiveId,
                             pendingPayment.PendingPaymentId)));
+            }
+            await Task.WhenAll(validatePaymentTasks);
 
+            foreach (var pendingPayment in pendingPayments)
+            {
                 createPaymentTasks.Add(
                     context.CallActivityAsync("CreatePayment",
                         new CreatePaymentInput
@@ -41,8 +45,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                             CollectionPeriod = collectionPeriod
                         }));
             }
-
-            await Task.WhenAll(validatePaymentTasks);
             await Task.WhenAll(createPaymentTasks);
         }
     }
