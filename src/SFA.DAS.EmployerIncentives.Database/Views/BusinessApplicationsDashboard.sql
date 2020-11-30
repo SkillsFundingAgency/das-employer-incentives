@@ -1,4 +1,4 @@
-﻿CREATE VIEW [dbo].[BusinessDashboardApplications]
+﻿CREATE VIEW [dbo].[BusinessApplicationsDashboard]
 	AS 
 		select
 			month(PlannedStartDate) as [Planned Start Month],
