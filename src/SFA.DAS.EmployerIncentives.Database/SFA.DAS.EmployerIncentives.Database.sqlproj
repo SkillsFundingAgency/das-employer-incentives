@@ -98,6 +98,6 @@
   <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
     <None Include="update-model.publish.xml" />
-    <None Include="Views\BusinessDashboardApplications.sql" />
+    <None Include="Views\BusinessApplicationsDashboard.sql" />
   </ItemGroup>
 </Project>
