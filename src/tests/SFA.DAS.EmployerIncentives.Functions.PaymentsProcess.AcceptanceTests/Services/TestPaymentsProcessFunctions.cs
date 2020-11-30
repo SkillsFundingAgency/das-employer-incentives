@@ -52,9 +52,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _isDisposed = true;
         }
 
-        public async Task<OrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodMonth)
+        public async Task<OrchestrationStatus> StartPaymentsProcess(short collectionPeriodYear, byte collectionPeriodNumber)
         {
-            var orchestrationLinks = await StartIncentivePaymentOrchestrator(collectionPeriodYear, collectionPeriodMonth);
+            var orchestrationLinks = await StartIncentivePaymentOrchestrator(collectionPeriodYear, collectionPeriodNumber);
             return await FunctionOrchestrationCompleted(orchestrationLinks);
         }
 
@@ -65,9 +65,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await AllFunctionOrchestrationCompleted();
         }
 
-        private async Task<OrchestrationLinks> StartIncentivePaymentOrchestrator(short collectionPeriodYear, byte collectionPeriod)
+        private async Task<OrchestrationLinks> StartIncentivePaymentOrchestrator(short collectionPeriodYear, byte collectionPeriodNumber)
         {
-            var url = $"api/orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriod}";
+            var url = $"api/orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriodNumber}";
             var orchestrationResponse = await _client.GetAsync(url);
             orchestrationResponse.EnsureSuccessStatusCode();
             var json = await orchestrationResponse.Content.ReadAsStringAsync();
