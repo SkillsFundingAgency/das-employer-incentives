@@ -1,6 +1,9 @@
 ﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,7 +71,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
             results.Should().HaveCount(2);
-            results.All(r => !r.Result).Should().BeTrue();
+            results.Any(r => r.Result == false).Should().BeFalse();
+
+            var bankDetailsValidationResult = results.First(x => x.Step == "HasBankDetails");
+            bankDetailsValidationResult.Should().NotBeNull("Should have a bank details validation result");
+            bankDetailsValidationResult.PeriodNumber.Should().Be(CollectionPeriod);
+            bankDetailsValidationResult.PaymentYear.Should().Be(PaymentYear);
+            bankDetailsValidationResult.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(3));
+            bankDetailsValidationResult.Result.Should().BeTrue();
         }
 
         [Then(@"successful validation results are recorded")]
@@ -76,7 +86,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
-            results.All(r => r.Result).Should().BeTrue();
+            results.Should().HaveCount(2);
+            results.Any(r => r.Result == true).Should().BeFalse();
+
+            var bankDetailsValidationResult = results.First(x => x.Step == "HasBankDetails");
+            bankDetailsValidationResult.Should().NotBeNull("Should have a bank details validation result");
+            bankDetailsValidationResult.PeriodNumber.Should().Be(CollectionPeriod);
+            bankDetailsValidationResult.PaymentYear.Should().Be(PaymentYear);
+            bankDetailsValidationResult.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(3));
+            bankDetailsValidationResult.Result.Should().BeFalse();
         }
 
         [Then(@"payment records are created")]
@@ -111,24 +129,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task AndPendingPaymentAreMarkedAsPaid()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<PendingPayment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id &&
+            var payments = connection.GetAllAsync<PendingPayment>().Result
+                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id &&
                             x.PeriodNumber <= CollectionPeriod)
                 .ToList();
 
-            results.Count.Should().Be(2);
-            results.All(x => x.PaymentMadeDate.HasValue).Should().BeTrue();
+            payments.Count.Should().Be(2);
+            payments.All(x => x.PaymentMadeDate.HasValue).Should().BeTrue();
         }
 
         [Then(@"future payments are not marked as paid")]
         public async Task AndFuturePaymentsAreNotMarkedAsPaid()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<PendingPayment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id &&
-                            x.PeriodNumber > CollectionPeriod);
+            var payments = connection.GetAllAsync<PendingPayment>().Result
+                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id &&
+                            x.PeriodNumber > CollectionPeriod).ToArray();
 
-            results.All(x => x.PaymentMadeDate.HasValue).Should().BeFalse();
+            payments.All(x => x.PaymentMadeDate.HasValue).Should().BeFalse();
         }
     }
 }
