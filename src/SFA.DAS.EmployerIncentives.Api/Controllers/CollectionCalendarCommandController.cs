@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
         }
 
-        [HttpPost]
+        [HttpPatch]
         [Route("period/activate")]
         public async Task ActivateCollectionPeriod(ActivateCollectionPeriodRequest request)
         {

@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = "collectionCalendar/period/activate";
             var data = new ActivateCollectionPeriodRequest { CollectionPeriodNumber = 2, CollectionPeriodYear = (short)DateTime.Now.Year };
-            var apiResult = await EmployerIncentiveApi.Client.PostAsync(url, data.GetStringContent());
+            var apiResult = await EmployerIncentiveApi.Client.PatchAsync(url, data.GetStringContent());
 
             apiResult.StatusCode.Should().Be(HttpStatusCode.OK);
         }
