@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public byte? PeriodNumber => Model.PeriodNumber;
         public short? PaymentYear => Model.PaymentYear;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
+        public EarningType EarningType => Model.EarningType;
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
         internal static PendingPayment New(
@@ -25,8 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Guid apprenticeshipIncentiveId,
             decimal amount,
             DateTime dueDate,
-            DateTime calculatedDate
-            )
+            DateTime calculatedDate,
+            EarningType earningType)
         {
             return new PendingPayment(new PendingPaymentModel
             {
@@ -36,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Amount = amount,
                 CalculatedDate = calculatedDate,
                 DueDate = dueDate,
+                EarningType = earningType
             },
                 true);
         }

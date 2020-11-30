@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                               Model.Id,
                               payment.Amount,
                               payment.PaymentDate,
-                              DateTime.Now);
+                               DateTime.Now,
+                               payment.EarningType);
 
                 pendingPayment.SetPaymentPeriod(collectionCalendar);
 
@@ -74,6 +76,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
         }
 
+        public void CalculatePayments()
+        {
+            AddEvent(new PaymentsCalculationRequired(Model));
+        }
+        
         public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
