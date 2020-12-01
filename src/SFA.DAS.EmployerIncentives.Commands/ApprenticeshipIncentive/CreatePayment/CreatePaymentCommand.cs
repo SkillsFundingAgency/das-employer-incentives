@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePaym
         public Guid ApprenticeshipIncentiveId { get; }
         public Guid PendingPaymentId { get; }
         public short CollectionYear { get; }
-        public Byte CollectionPeriod { get; }
+        public byte CollectionPeriod { get; }
         public string LockId { get => $"{nameof(ApprenticeshipIncentiveId)}_{ApprenticeshipIncentiveId}"; }
 
         public CreatePaymentCommand(Guid apprenticeshipIncentiveId, Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePaym
         {
             get
             {
-                var message = $"IncentiveApplications CreatePaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, PendingPaymentId {PendingPaymentId}, CollectionYear {CollectionYear} and CollectionMonth {CollectionPeriod}";
+                var message = $"IncentiveApplications CreatePaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, PendingPaymentId {PendingPaymentId}, CollectionYear {CollectionYear} and CollectionPeriod {CollectionPeriod}";
                 return new Log
                 {
                     OnProcessing = () => message,
