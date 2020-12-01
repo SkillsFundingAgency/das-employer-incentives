@@ -32,14 +32,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, DateTime.Now.Year.ToString(), true);
 
-            _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+            var startDate = DateTime.Now.Date;
+            var dueDate = startDate.AddDays(90).Date;
 
             _sutModel = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
+                .With(a => a.PlannedStartDate, startDate)
                 .With(a => a.PendingPaymentModels, new List<PendingPaymentModel>() 
                     {
-                        _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create()
-                    })
+                        _fixture.Build<PendingPaymentModel>()
+                        .With(p => p.DueDate, dueDate)
+                        .With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create()
+                    })                
                 .Create();
 
             _sutModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());

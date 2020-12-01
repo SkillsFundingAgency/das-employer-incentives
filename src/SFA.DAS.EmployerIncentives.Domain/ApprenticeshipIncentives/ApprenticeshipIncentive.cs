@@ -193,7 +193,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var hasEnoughDaysInLearning = false;
             if (matchedLearner != null)
             {
-                hasEnoughDaysInLearning = PlannedStartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) > pendingPayment.DueDate.Date;
+                hasEnoughDaysInLearning = PlannedStartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) >= pendingPayment.DueDate.Date;
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasDaysInLearning, hasEnoughDaysInLearning));
