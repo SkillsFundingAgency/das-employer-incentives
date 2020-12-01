@@ -23,11 +23,34 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private CreatePaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Fixture _fixture;
-        
+        private List<CollectionPeriod> _collectionPeriods;
+        private CollectionPeriod _firstCollectionPeriod;
+
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+
+            _collectionPeriods = new List<CollectionPeriod>()
+            {
+                new CollectionPeriod(
+                    1,
+                    (byte)DateTime.Now.Month,
+                    (short)DateTime.Now.Year,
+                    DateTime.Now.AddDays(-1),
+                    DateTime.Now.AddDays(-1),
+                    DateTime.Now.Year.ToString(),
+                    false),
+                new CollectionPeriod(
+                1,
+                (byte)DateTime.Now.AddMonths(1).Month,
+                (short)DateTime.Now.AddMonths(1).Year,
+                DateTime.Now.AddMonths(1).AddDays(-1),
+                DateTime.Now.AddMonths(1).AddDays(-1),
+                DateTime.Now.AddMonths(1).Year.ToString(),
+                false)
+            };
+            _firstCollectionPeriod = _collectionPeriods.First();
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
 
@@ -42,7 +65,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _fixture.Create<short>(), _fixture.Create<byte>());
+            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id,
+                _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
@@ -54,12 +78,32 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
+        public async Task Then_a_payment_is_not_created_for_a_month_when_there_are_no_validation_records()
+        {
+            //Arrange
+            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
+
+            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id,
+                _collectionPeriods.Last().CalendarYear, _collectionPeriods.Last().PeriodNumber);
+
+            _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            incentive.Payments.Count.Should().Be(0);
+        }
+
+
+
+        [Test]
         public async Task Then_the_payment_is_persisted()
         {
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _fixture.Create<short>(), _fixture.Create<byte>());
+            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
@@ -69,7 +113,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                                             {
                                                 itemsPersisted++;
                                             });
-
 
             // Act
             await _sut.Handle(command);
@@ -106,23 +149,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     })
             };
 
-            var collectionPeriods = new List<CollectionPeriod>()
-            {
-                new CollectionPeriod(
-                    1, 
-                    (byte)DateTime.Now.Month, 
-                    (short)DateTime.Now.Year, 
-                    DateTime.Now.AddDays(-1),
-                    DateTime.Now.AddDays(-1),
-                    DateTime.Now.Year.ToString(),
-                    false)
-            };
-
-            incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(collectionPeriods));
+            incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(_collectionPeriods));
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();
             account.AddLegalEntity(incentive.PendingPayments.First().Account.AccountLegalEntityId, LegalEntity.Create(legalEntityModel));
-            incentive.ValidatePendingPaymentBankDetails(incentive.PendingPayments.First().Id, account, collectionPeriods.First());
+            incentive.ValidatePendingPaymentBankDetails(incentive.PendingPayments.First().Id, account, _collectionPeriods.First());
 
             return incentive;
         }
