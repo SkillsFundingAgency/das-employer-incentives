@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         public Guid ApprenticeshipIncentiveId { get; }
         public Guid PendingPaymentId { get; }
         public short CollectionYear { get; set; }
-        public byte CollectionPeriodNumber { get; set; }
+        public byte CollectionPeriod { get; set; }
 
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive)}_{ApprenticeshipIncentiveId}"; }
 
@@ -18,12 +18,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
             Guid apprenticeshipIncentiveId,
             Guid pendingPaymentId,
             short collectionYear,
-            byte collectionPeriodNumber)
+            byte collectionPeriod)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
             PendingPaymentId = pendingPaymentId;
             CollectionYear = collectionYear;
-            CollectionPeriodNumber = collectionPeriodNumber;
+            CollectionPeriod = collectionPeriod;
         }
 
         [Newtonsoft.Json.JsonIgnore]

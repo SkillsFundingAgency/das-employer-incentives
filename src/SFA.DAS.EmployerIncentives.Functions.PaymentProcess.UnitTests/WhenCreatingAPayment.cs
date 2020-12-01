@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                     It.Is<CreatePaymentCommand>(p =>
                         p.ApprenticeshipIncentiveId == input.ApprenticeshipIncentiveId &&
                         p.PendingPaymentId == input.PendingPaymentId &&
-                        p.CollectionMonth == input.CollectionPeriod.Month &&
+                        p.CollectionPeriod == input.CollectionPeriod.Month &&
                         p.CollectionYear == input.CollectionPeriod.Year), CancellationToken.None), Times.Once);
 
         }
