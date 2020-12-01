@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
                     a.DistributedLockStorage = "UseDevelopmentStorage=true";
                     a.AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY";
-                    a.Hashstring = "SFA: digital apprenticeship service";
+                    a.Hashstring = "Test Hashstring";
                     a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                     a.MinimumAgreementVersion = 4;
                     a.IncentivePaymentProfiles = _paymentProfiles;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 {
     public class HandleApprenticeshipIncentivesCreateCommand
-    {     
+    {
         private readonly ICommandService _commandService;
 
         public HandleApprenticeshipIncentivesCreateCommand(ICommandService commandService)
@@ -15,10 +15,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             _commandService = commandService;
         }
 
-        [FunctionName("HandleApprenticeshipIncentivesCreateCommand")]
+        [FunctionName(nameof(HandleApprenticeshipIncentivesCreateCommand))]
         public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.ApprenticeshipIncentivesCreate)] CreateIncentiveCommand command)
         {
-           await _commandService.Dispatch(command);
+            await _commandService.Dispatch(command);
         }
     }
 }

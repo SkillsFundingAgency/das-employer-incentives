@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly DateTime _startDate;
         private readonly List<Payment> _payments;
         private readonly IEnumerable<IncentivePaymentProfile> _incentivePaymentProfiles;
+        private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 1, 31);
@@ -57,9 +58,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {IncentiveType}");
             }
 
+            var paymentIndex = 0;
             foreach (var paymentProfile in incentivePaymentProfile.PaymentProfiles)
             {
-                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart)));
+                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart), _earningTypes[paymentIndex]));
+                paymentIndex++;
             }
 
             return payments;
@@ -71,9 +74,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             yield return _startDate;
 
             foreach (var payment in Payments)
-            {
+            {                
                 yield return payment.Amount;
                 yield return payment.PaymentDate;
+                yield return payment.EarningType;
             }
         }
     }

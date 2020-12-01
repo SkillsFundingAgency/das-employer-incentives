@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
 {
-    public class WhenRuningACommand
+    public class WhenRunningACommand
     {
         private CommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
@@ -35,7 +35,8 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
         {
             // Arrange
             var command = _fixture.Create<CreateIncentiveCommand>();
-            var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            var commandText = JsonConvert.SerializeObject(command,
+                new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 
             // Act
             await _sut.RunCommand("ApprenticeshipIncentive.CreateIncentiveCommand", commandText);
@@ -43,10 +44,15 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
             // Assert
             _mockCommandDispatcher
                 .Verify(m => m.Send(It.Is<CreateIncentiveCommand>(c =>
-                    c.AccountId == command.AccountId &&
-                    c.IncentiveApplicationId == command.IncentiveApplicationId),
-                It.IsAny<CancellationToken>())
-                , Times.Once);
+                            AreMatching(command, c)),
+                        It.IsAny<CancellationToken>())
+                    , Times.Once);
+        }
+
+        private static bool AreMatching(CreateIncentiveCommand expected, CreateIncentiveCommand actual)
+        {
+            expected.Should().BeEquivalentTo(actual, opt => opt.Excluding(x => x.Log));
+            return true;
         }
 
         [Test]
@@ -78,11 +84,11 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
                 .Verify(m => m.Send(It.IsAny<ICommand>(),
                 It.IsAny<CancellationToken>())
                 , Times.Never);
-        }       
+        }
     }
 
     public class TestCommand : DomainCommand
     {
         public string Test { get; set; }
-    }   
+    }
 }
