@@ -9,14 +9,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     {
         public HttpStatusCode? HttpStatusCode { get; }
 
-        public BusinessCentralApiException(string message, HttpStatusCode httpStatusCode) : base(message)
+        public BusinessCentralApiException(HttpStatusCode httpStatusCode) : base(BuildMessage(httpStatusCode))
         {
             HttpStatusCode = httpStatusCode;
         }
 
         protected BusinessCentralApiException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            this.HttpStatusCode = (HttpStatusCode?)info.GetValue("HttpStatusCode", typeof(HttpStatusCode));
+            HttpStatusCode = (HttpStatusCode?)info.GetValue("HttpStatusCode", typeof(HttpStatusCode));
+        }
+
+        private static string BuildMessage(HttpStatusCode httpStatusCode)
+        {
+            if (httpStatusCode >= System.Net.HttpStatusCode.InternalServerError)
+            {
+                return $"Business Central API is unavailable and returned an internal code of {httpStatusCode}";
+            }
+            return $"Business Central API returned a server code of {httpStatusCode}";
         }
     }
 }

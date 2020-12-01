@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             _paymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
 
-        public async Task<PaymentsSuccessfullySent> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
+        public async Task<SendPaymentsResponse> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
         {
             var paymentsToSend = payments.Take(_paymentRequestsLimit).ToList();
             var content = CreateJsonContent(paymentsToSend);
@@ -35,15 +35,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             if (response.StatusCode == HttpStatusCode.Accepted)
             {
                 var morePaymentsToSend = payments.Count > paymentsToSend.Count;
-                return new PaymentsSuccessfullySent(paymentsToSend, !morePaymentsToSend);
+                return new SendPaymentsResponse(paymentsToSend, !morePaymentsToSend);
             }
 
-            if (response.StatusCode >= HttpStatusCode.InternalServerError)
-            {
-                throw new BusinessCentralApiException($"Business Central API is unavailable and returned an internal code of {response.StatusCode}", response.StatusCode);
-            }
-
-            throw new BusinessCentralApiException($"Business Central API returned a server code of {response.StatusCode}", response.StatusCode);
+            throw new BusinessCentralApiException(response.StatusCode);
         }
 
         public BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)
@@ -102,7 +97,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 default:
                     throw new InvalidIncentiveException($"No mapping found for EarningType {earningType}");
             }
-
         }
 
         private string MapToAccountCode(SubnominalCode subnominalCode)

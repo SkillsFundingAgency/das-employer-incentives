@@ -3,9 +3,9 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncenti
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
-    public class PaymentsSuccessfullySent
+    public class SendPaymentsResponse
     {
-        public PaymentsSuccessfullySent(List<PaymentDto> paymentsSent, bool allPaymentsSent)
+        public SendPaymentsResponse(List<PaymentDto> paymentsSent, bool allPaymentsSent)
         {
             PaymentsSent = paymentsSent;
             AllPaymentsSent = allPaymentsSent;

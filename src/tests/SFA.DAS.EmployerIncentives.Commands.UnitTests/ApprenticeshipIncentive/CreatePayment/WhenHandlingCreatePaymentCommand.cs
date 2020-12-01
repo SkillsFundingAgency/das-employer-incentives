@@ -78,26 +78,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_a_payment_is_not_created_for_a_month_when_there_are_no_validation_records()
-        {
-            //Arrange
-            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
-
-            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id,
-                _collectionPeriods.Last().CalendarYear, _collectionPeriods.Last().PeriodNumber);
-
-            _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
-
-            // Act
-            await _sut.Handle(command);
-
-            // Assert
-            incentive.Payments.Count.Should().Be(0);
-        }
-
-
-
-        [Test]
         public async Task Then_the_payment_is_persisted()
         {
             //Arrange

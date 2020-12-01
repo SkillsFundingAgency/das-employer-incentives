@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(x => x.GetPaymentsToSendForAccountLegalEntity(It.Is<long>(id => id == _command.AccountLegalEntityId))).ReturnsAsync(_paymentsToSend);
 
             _mockBusinessCentralFinancePaymentsService.Setup(x => x.SendPaymentRequestsForLegalEntity(_paymentsToSend))
-                .ReturnsAsync(new PaymentsSuccessfullySent(_paymentsToSend, true));
+                .ReturnsAsync(new SendPaymentsResponse(_paymentsToSend, true));
         }
         public void SetupMultipleCallScenario()
         {
@@ -122,8 +122,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .ReturnsAsync(_unsentPayments);
 
             _mockBusinessCentralFinancePaymentsService.SetupSequence(x => x.SendPaymentRequestsForLegalEntity(It.IsAny<List<PaymentDto>>()))
-                .ReturnsAsync(new PaymentsSuccessfullySent(_paymentsSuccessfullySent, false))
-                .ReturnsAsync(new PaymentsSuccessfullySent(_unsentPayments, true));
+                .ReturnsAsync(new SendPaymentsResponse(_paymentsSuccessfullySent, false))
+                .ReturnsAsync(new SendPaymentsResponse(_unsentPayments, true));
         }
     }
 }

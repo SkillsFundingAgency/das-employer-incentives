@@ -83,9 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public bool IsValidated(short collectionYear, byte collectionPeriod)
         {
-            return Model.PendingPaymentValidationResultModels.Any(x =>
-                       x.CollectionPeriod.CalendarYear == collectionYear &&
-                       x.CollectionPeriod.PeriodNumber == collectionPeriod)
+            return Model.PendingPaymentValidationResultModels.Count() > 0
                    && AllPendingPaymentsForPeriodAreValid(collectionYear, collectionPeriod);
         }
 
