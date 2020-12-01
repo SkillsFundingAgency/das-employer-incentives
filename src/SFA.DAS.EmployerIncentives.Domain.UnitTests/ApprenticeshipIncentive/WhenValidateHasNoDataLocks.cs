@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionYear = _fixture.Create<short>();
             _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now);
+            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, DateTime.Now.Year.ToString(), true);
 
             _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
 
