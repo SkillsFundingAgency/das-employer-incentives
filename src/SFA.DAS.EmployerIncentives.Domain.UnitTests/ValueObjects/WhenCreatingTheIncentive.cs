@@ -21,17 +21,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             {
                 new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
                     new List<PaymentProfile>
-                        {new PaymentProfile(90, 1000)}),
+                        {new PaymentProfile(90, 1000), new PaymentProfile(365, 1000)}),
 
                 new IncentivePaymentProfile(IncentiveType.UnderTwentyFiveIncentive,
                     new List<PaymentProfile>
-                        {new PaymentProfile(90, 1200)})
+                        {new PaymentProfile(90, 1200), new PaymentProfile(365, 1200)})
             };
         }
 
-        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90)]
-        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90)]
-        public void Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount, int expectedDays)
+        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
+        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
+        public void Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);
             var result = new Incentive(date.AddYears(-1*age), date.AddDays(1), _incentivePaymentProfiles);
@@ -39,9 +39,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             result.IncentiveType.Should().Be(expectedIncentiveType);
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();
-            payments.Count.Should().Be(1);
-            payments[0].Amount.Should().Be(expectedAmount);
-            payments[0].PaymentDate.Should().Be(date.AddDays(1+expectedDays));
+            payments.Count.Should().Be(2);
+            payments[0].Amount.Should().Be(expectedAmount1);
+            payments[0].PaymentDate.Should().Be(date.AddDays(1+expectedDays1));
+            payments[0].EarningType.Should().Be(EarningType.FirstPayment);
+            payments[1].Amount.Should().Be(expectedAmount2);
+            payments[1].PaymentDate.Should().Be(date.AddDays(1 + expectedDays2));
+            payments[1].EarningType.Should().Be(EarningType.SecondPayment);
         }
 
         [Test]

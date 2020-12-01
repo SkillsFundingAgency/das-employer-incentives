@@ -28,5 +28,3 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         }
     }
 }
-
-

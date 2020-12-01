@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SFA.DAS.Common.Domain.Types;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
+    [Dapper.Contrib.Extensions.Table("IncentiveApplicationApprenticeship")]
     [Table("IncentiveApplicationApprenticeship")]
     public partial class IncentiveApplicationApprenticeship
     {

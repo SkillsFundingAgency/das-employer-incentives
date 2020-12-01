@@ -99,9 +99,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             foreach (var result in savedValidationResults)
             {
-                result.CollectionPeriodMonth.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarMonth);
-                result.CollectionPeriodYear.Should()
+                result.PeriodNumber.Should()
+                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
+                result.PaymentYear.Should()
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
             }
         }
