@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var collectionPeriod = context.GetInput<CollectionPeriod>();
 
             if(!context.IsReplaying)
-                _logger.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}", new {collectionPeriod});
+                _logger.LogInformation("Incentive Payment process started for collection period {collectionPeriod}", collectionPeriod);
 
             var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", collectionPeriod);
 
@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             await Task.WhenAll(calculatePaymentTasks);
 
-            _logger.LogInformation($"Incentive Payment process completed for collection period {collectionPeriod}", new { collectionPeriod });
+            _logger.LogInformation("Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);
         }
     }
 }
