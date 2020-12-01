@@ -17,25 +17,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     {
         private readonly HttpClient _client;
         private string _apiVersion;
-        private int _paymentRequestsLimit;
+        public int PaymentRequestsLimit { get; }
 
         public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion)
         {
             _client = client;
             _apiVersion = apiVersion ?? "2020-10-01";
-            _paymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
+            PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
 
-        public async Task<SendPaymentsResponse> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments)
+        public async Task SendPaymentRequests(List<PaymentDto> payments)
         {
-            var paymentsToSend = payments.Take(_paymentRequestsLimit).ToList();
-            var content = CreateJsonContent(paymentsToSend);
+            var content = CreateJsonContent(payments);
             var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
             if (response.StatusCode == HttpStatusCode.Accepted)
             {
-                var morePaymentsToSend = payments.Count > paymentsToSend.Count;
-                return new SendPaymentsResponse(paymentsToSend, !morePaymentsToSend);
+                return;
             }
 
             throw new BusinessCentralApiException(response.StatusCode);

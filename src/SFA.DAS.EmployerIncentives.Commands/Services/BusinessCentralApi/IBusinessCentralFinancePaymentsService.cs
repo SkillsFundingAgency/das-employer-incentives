@@ -6,6 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
     public interface IBusinessCentralFinancePaymentsService
     {
-        public Task<SendPaymentsResponse> SendPaymentRequestsForLegalEntity(List<PaymentDto> payments);
+        public int PaymentRequestsLimit { get; }
+        public Task SendPaymentRequests(List<PaymentDto> payments);
     }
 }

@@ -32,35 +32,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         }
 
         [Test]
-        public async Task Then_the_payment_is_posted_and_we_get_a_successful_completed_confirmation_response()
+        public async Task Then_the_payment_is_posted_successfully()
         {
             //Arrange
             _httpClient.SetUpPostAsAsync(System.Net.HttpStatusCode.Accepted);
             var payment = _fixture.Create<PaymentDto>();
 
             //Act
-            var response = await _sut.SendPaymentRequestsForLegalEntity(new List<PaymentDto> { payment });
-
-            response.AllPaymentsSent.Should().BeTrue();
-            response.PaymentsSent.Count.Should().Be(1);
-            response.PaymentsSent[0].Should().Be(payment);
-        }
-
-        [Test]
-        public async Task Then_the_payment_is_posted_and_we_get_a_successful_but_not_yet_fully_completed_confirmation_response()
-        {
-            //Arrange
-            _httpClient.SetUpPostAsAsync(System.Net.HttpStatusCode.Accepted);
-            var payments = _fixture.CreateMany<PaymentDto>(5).ToList();
-
-            //Act
-            var response = await _sut.SendPaymentRequestsForLegalEntity(payments);
-
-            response.AllPaymentsSent.Should().BeFalse();
-            response.PaymentsSent.Count.Should().Be(3);
-            response.PaymentsSent[0].Should().Be(payments[0]);
-            response.PaymentsSent[1].Should().Be(payments[1]);
-            response.PaymentsSent[2].Should().Be(payments[2]);
+            await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
         }
 
         [TestCase(HttpStatusCode.InternalServerError)]
@@ -73,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             var payment = _fixture.Create<PaymentDto>();
 
             //Act
-            Func<Task> act = async () => await _sut.SendPaymentRequestsForLegalEntity(new List<PaymentDto> { payment });
+            Func<Task> act = async () => await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
 
             act.Should().Throw<BusinessCentralApiException>().WithMessage("Business Central API is unavailable and returned an internal*");
         }
@@ -89,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             var payment = _fixture.Create<PaymentDto>();
 
             //Act
-            Func<Task> act = async () => await _sut.SendPaymentRequestsForLegalEntity(new List<PaymentDto> { payment });
+            Func<Task> act = async () => await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
 
             act.Should().Throw<BusinessCentralApiException>().WithMessage("Business Central API returned*");
         }

@@ -33,11 +33,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
                 return;
             }
 
-            var sent = await _businessCentralFinancePaymentsService.SendPaymentRequestsForLegalEntity(payments);
+            var paymentsToSend = payments.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
 
-            await _accountRepository.UpdatePaidDateForPaymentIds(sent.PaymentsSent.Select(s => s.PaymentId).ToList(), command.AccountLegalEntityId, command.PaidDate);
+            await _businessCentralFinancePaymentsService.SendPaymentRequests(paymentsToSend);
 
-            if (!sent.AllPaymentsSent)
+            await _accountRepository.UpdatePaidDateForPaymentIds(paymentsToSend.Select(s => s.PaymentId).ToList(), command.AccountLegalEntityId, command.PaidDate);
+
+            if (payments.Count > paymentsToSend.Count)
             {
                 await Handle(command, cancellationToken);
             }
