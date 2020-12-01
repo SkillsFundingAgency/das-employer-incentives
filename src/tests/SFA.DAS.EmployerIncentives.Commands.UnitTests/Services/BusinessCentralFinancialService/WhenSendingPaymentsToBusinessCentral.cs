@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -18,7 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         private BusinessCentralFinancePaymentsService _sut;
         private TestHttpClient _httpClient;
         private Uri _baseAddress;
-        private readonly string _apiVersion = "1.0";
         private Fixture _fixture;
 
         [SetUp]
