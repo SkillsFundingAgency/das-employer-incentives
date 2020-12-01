@@ -89,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             RemoveExistingPaymentIfExists(pendingPaymentId);
 
-            var paymentDate = DateTime.Now;
+            var paymentDate = DateTime.Today;
 
             AddPayment(pendingPaymentId, collectionYear, collectionPeriod, pendingPayment, paymentDate);
             pendingPayment.SetPaymentMadeDate(paymentDate);
