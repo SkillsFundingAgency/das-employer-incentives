@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
             _logger.LogInformation("Calculate Payments process started for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
 
-            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, collectionPeriod.Year, collectionPeriod.Month);
+            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, collectionPeriod.Year, collectionPeriod.Period);
             var pendingPayments = await _queryDispatcher.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(request);
             var pendingPaymentCount = pendingPayments.PendingPayments.Count;
             _logger.LogInformation("{pendingPaymentCount} pending payments returned for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", pendingPaymentCount, accountLegalEntityId, collectionPeriod);

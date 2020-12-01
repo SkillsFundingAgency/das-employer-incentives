@@ -11,13 +11,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     {
         [FunctionName("IncentivePaymentOrchestrator_HttpStart")]
         public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriodMonth}")] HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/IncentivePaymentOrchestrator/{collectionPeriodYear}/{collectionPeriodNumber}")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
             short collectionPeriodYear,
-            byte collectionPeriodMonth,
+            byte collectionPeriodNumber,
             ILogger log)
         {
-            var collectionPeriod = new CollectionPeriod { Year = collectionPeriodYear, Month = collectionPeriodMonth };
+            var collectionPeriod = new CollectionPeriod { Year = collectionPeriodYear, Period = collectionPeriodNumber };
 
             log.LogInformation($"Triggering IncentivePaymentOrchestrator for collection period {collectionPeriod}", new { collectionPeriod });
 

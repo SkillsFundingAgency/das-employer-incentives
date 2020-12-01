@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         public async Task Create([ActivityTrigger] CreatePaymentInput input)
         {
             _logger.LogInformation("Creating Payment for apprenticeship incentive id {apprenticeshipIncentiveId}, pending payment id {pendingPaymentId}, collection period {collectionPeriod}", input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod);
-            await _commandDispatcher.Send(new CreatePaymentCommand(input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod.Year, input.CollectionPeriod.Month));
+            await _commandDispatcher.Send(new CreatePaymentCommand(input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod.Year, input.CollectionPeriod.Period));
             _logger.LogInformation("Created Payment for apprenticeship incentive id {apprenticeshipIncentiveId}, pending payment id {pendingPaymentId}, collection period {collectionPeriod}", input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod);
         }
     }

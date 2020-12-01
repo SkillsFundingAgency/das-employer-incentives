@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                     context.CallActivityAsync("ValidatePendingPayment",
                         new ValidatePendingPaymentData(
                             accountLegalEntityCollectionPeriod.CollectionPeriod.Year,
-                            accountLegalEntityCollectionPeriod.CollectionPeriod.Month,
+                            accountLegalEntityCollectionPeriod.CollectionPeriod.Period,
                             pendingPayment.ApprenticeshipIncentiveId,
                             pendingPayment.PendingPaymentId)));
             }
