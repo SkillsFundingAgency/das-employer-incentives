@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateD
                 return;
             }
 
-            Learner learner = await _learnerDomainRepository.GetOrCreate(incentive);
+            Learner learner = await _learnerDomainRepository.Get(incentive);
             var calendar = await _collectionCalendarService.Get();
             var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionPeriodNumber);
 

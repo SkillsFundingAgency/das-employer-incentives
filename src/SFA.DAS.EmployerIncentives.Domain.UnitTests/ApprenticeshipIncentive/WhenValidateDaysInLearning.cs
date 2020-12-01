@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
-            validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
+            validationresult.Step.Should().Be(ValidationStep.HasDaysInLearning);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(false);
         }
@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
-            validationresult.Step.Should().Be(ValidationStep.Has90DaysInLearning);
+            validationresult.Step.Should().Be(ValidationStep.HasDaysInLearning);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(validationResult);
         }

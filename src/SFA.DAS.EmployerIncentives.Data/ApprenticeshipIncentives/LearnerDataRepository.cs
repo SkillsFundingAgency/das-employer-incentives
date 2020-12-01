@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -79,48 +80,65 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             RemoveDeletedLearningPeriods(updatedLearner, existingLearner);
             RemoveDeletedDaysinLearnings(updatedLearner, existingLearner);
 
-            foreach (var learningPeriod in updatedLearner.LearningPeriods)
-            {                
-                var existingLearningPeriod = existingLearner
-                    .LearningPeriods
-                    .SingleOrDefault(p => p.LearnerId == learningPeriod.LearnerId && 
+            UpdateLearningPeriods(updatedLearner.LearningPeriods, existingLearner.LearningPeriods);
+            UpdateDaysInLearnings(updatedLearner.DaysInLearnings, existingLearner.DaysInLearnings);
+        }
+
+        private void UpdateLearningPeriods(ICollection<Models.LearningPeriod> updatedLearningPeriods, ICollection<Models.LearningPeriod> existingLearningPeriods)
+        {
+            foreach (var learningPeriod in updatedLearningPeriods)
+            {
+                var existingLearningPeriod = existingLearningPeriods
+                    .SingleOrDefault(p => p.LearnerId == learningPeriod.LearnerId &&
                     p.StartDate == learningPeriod.StartDate);
 
-                if (existingLearningPeriod != null)
-                {
-                    learningPeriod.CreatedDate = existingLearningPeriod.CreatedDate;
-                    _dbContext.Entry(existingLearningPeriod).CurrentValues.SetValues(learningPeriod);                   
-                }
-                else
-                {
-                    learningPeriod.CreatedDate = DateTime.Now;
-                    _dbContext.LearningPeriods.Add(learningPeriod);
-                }
+                UpdateLearningPeriod(learningPeriod, existingLearningPeriod);
             }
+        }
 
-            foreach (var daysInLearning in updatedLearner.DaysInLearnings)
+        private void UpdateLearningPeriod(Models.LearningPeriod learningPeriod,  Models.LearningPeriod existingLearningPeriod)
+        {
+            if (existingLearningPeriod != null)
             {
-                var existingDaysInLearning = existingLearner
-                    .DaysInLearnings
-                    .SingleOrDefault(p => p.LearnerId == daysInLearning.LearnerId && 
-                    p.CollectionPeriodNumber == daysInLearning.CollectionPeriodNumber && 
+                learningPeriod.CreatedDate = existingLearningPeriod.CreatedDate;
+                _dbContext.Entry(existingLearningPeriod).CurrentValues.SetValues(learningPeriod);
+            }
+            else
+            {
+                learningPeriod.CreatedDate = DateTime.Now;
+                _dbContext.LearningPeriods.Add(learningPeriod);
+            }
+        }
+
+        private void UpdateDaysInLearnings(ICollection<Models.ApprenticeshipDaysInLearning> updatedDaysInLearnings, ICollection<Models.ApprenticeshipDaysInLearning> existingDaysInLearnings)
+        {
+            foreach (var daysInLearning in updatedDaysInLearnings)
+            {
+                var existingDaysInLearning = existingDaysInLearnings
+                    .SingleOrDefault(p => p.LearnerId == daysInLearning.LearnerId &&
+                    p.CollectionPeriodNumber == daysInLearning.CollectionPeriodNumber &&
                     p.CollectionPeriodYear == daysInLearning.CollectionPeriodYear);
 
-                if (existingDaysInLearning != null)
+                UpdateDaysInLearning(daysInLearning, existingDaysInLearning);                
+            }
+        }
+
+        private void UpdateDaysInLearning(ApprenticeshipDaysInLearning daysInLearning, ApprenticeshipDaysInLearning existingDaysInLearning)
+        {
+            if (existingDaysInLearning != null)
+            {
+                daysInLearning.CreatedDate = existingDaysInLearning.CreatedDate;
+
+                _dbContext.Entry(existingDaysInLearning).CurrentValues.SetValues(daysInLearning);
+                if (_dbContext.Entry(existingDaysInLearning).State == EntityState.Modified)
                 {
-                    daysInLearning.CreatedDate = existingDaysInLearning.CreatedDate;
-                    
-                    _dbContext.Entry(existingDaysInLearning).CurrentValues.SetValues(daysInLearning);
-                    if (_dbContext.Entry(existingDaysInLearning).State == EntityState.Modified)
-                    {
-                        existingDaysInLearning.UpdatedDate = DateTime.Now;
-                    }
+                    existingDaysInLearning.UpdatedDate = DateTime.Now;
                 }
-                else
-                {
-                    daysInLearning.CreatedDate = DateTime.Now;
-                    _dbContext.DaysInLearnings.Add(daysInLearning);
-                }
+            }
+            else
+            {
+                daysInLearning.CreatedDate = DateTime.Now;
+                _dbContext.DaysInLearnings.Add(daysInLearning);
             }
         }
 

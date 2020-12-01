@@ -25,4 +25,4 @@ Examples:
 	| IsInLearning        |
 	| HasLearningRecord   |
 	| HasNoDataLocks      |
-	| Has90DaysInLearning |
+	| HasDaysInLearning |
