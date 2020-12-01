@@ -7,12 +7,16 @@ using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
@@ -32,21 +36,18 @@ using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.NServiceBus.SqlServer.Data;
 using SFA.DAS.UnitOfWork.Context;
+using SFA.DAS.UnitOfWork.Managers;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
+    
+
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddCommandServices(this IServiceCollection serviceCollection)
@@ -76,6 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
+            .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()            
             .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
 
             serviceCollection

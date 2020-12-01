@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"An employer has selected the apprenticeships for their application")]
         public async Task GivenAnEmployerHasSelectedApprenticeships()
         {
-            DataAccess.SetupAccount(_testAccountTable);
+            await DataAccess.SetupAccount(_testAccountTable);
 
             var url = $"applications";
             await EmployerIncentiveApi.Post(url, _request);

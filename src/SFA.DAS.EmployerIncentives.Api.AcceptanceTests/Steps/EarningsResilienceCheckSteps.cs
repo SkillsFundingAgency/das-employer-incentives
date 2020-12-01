@@ -1,15 +1,10 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -27,15 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext = testContext;
             _fixture = new Fixture();
         }
-
-        [Given(@"the earnings resilience check is requested")]
-        public void GivenTheEarningsResilienceCheckIsRequested()
-        {
-            
-        }
-
-        [When(@"there are apprenticeships that do not have earnings calculations")]
-        public void WhenThereAreApprenticeshipsThatDoNotHaveEarningsCalculations()
+        
+        [Given(@"there are apprenticeships that do not have earnings calculations")]
+        public void GivenThereAreApprenticeshipsThatDoNotHaveEarningsCalculations()
         {
             var applications = _fixture.CreateMany<IncentiveApplication>(10);
             foreach(var application in applications)
@@ -51,15 +40,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
-        [Then(@"the earnings recalculation is triggered")]
-        public async Task ThenTheEarningsRecalculationIsTriggered()
+        [When(@"the earnings resilience check is requested")]
+        public async Task WhenTheEarningsResilienceCheckIsRequested()
         {
             var url = "earnings-resilience-check";
             var data = string.Empty;
             var apiResult = await EmployerIncentiveApi.Client.PostAsync(url, data.GetStringContent());
 
             apiResult.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
 
+        [Then(@"the earnings recalculation is triggered")]
+        public void ThenTheEarningsRecalculationIsTriggered()
+        {
             var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished).Select(c => c.Command)
                 .ToArray();
             publishedCommands.Count().Should().Be(10);
