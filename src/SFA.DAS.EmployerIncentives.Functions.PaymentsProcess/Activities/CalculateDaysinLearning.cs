@@ -21,9 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         [FunctionName(nameof(CalculateDaysInLearning))]
         public async Task Create([ActivityTrigger] CalculateDaysInLearningInput input)
         {
-            _logger.LogInformation($"Calculating DaysinLearning for apprenticeship incentive id {input.ApprenticeshipIncentiveId}", new { input.ApprenticeshipIncentiveId });
+            _logger.LogInformation("Calculating DaysinLearning for apprenticeship incentive id {apprenticeshipIncentiveId}, active period {activePeriod}", input.ApprenticeshipIncentiveId, input.ActivePeriod);
             await _commandDispatcher.Send(new CalculateDaysInLearningCommand(input.ApprenticeshipIncentiveId, input.ActivePeriod.CollectionPeriodNumber, input.ActivePeriod.CollectionYear ));
-            _logger.LogInformation($"Calculated DaysinLearning for apprenticeship incentive id {input.ApprenticeshipIncentiveId}", new { input.ApprenticeshipIncentiveId });
+            _logger.LogInformation("Calculated DaysinLearning for apprenticeship incentive id {apprenticeshipIncentiveId}, active period {activePeriod}", input.ApprenticeshipIncentiveId, input.ActivePeriod);
         }
     }
 }
