@@ -1,8 +1,11 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Timers;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -169,7 +172,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is refreshed for the apprenticeship incentive")]
         public async Task WhenTheLearnerDataIsRefreshedForTheApprenticeshipIncentive()
         {
-            await _testContext.PaymentsProcessFunctions.StartLearnerMatching();
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "LearnerMatchingOrchestrator_Start",
+                    "LearnerMatchingOrchestrator",
+                    new Dictionary<string, object>
+                    {
+                        ["timerInfo"] = new TimerInfo(new WeeklySchedule(), new ScheduleStatus())
+                    }
+                    ));
         }
 
         [Given(@"the latest learner data has a matching training episode with no end date")]
