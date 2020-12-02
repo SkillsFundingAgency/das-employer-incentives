@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 case ValidationStep.HasNoDataLocks:
                     _validatePaymentData.LearnerModel.HasDataLock = true;
                     break;
-                case ValidationStep.Has90DaysInLearning:
+                case ValidationStep.HasDaysInLearning:
                     _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 89;
                     break;
             }

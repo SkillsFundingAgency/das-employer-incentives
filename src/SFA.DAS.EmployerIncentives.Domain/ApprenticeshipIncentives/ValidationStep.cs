@@ -6,6 +6,6 @@
         public const string IsInLearning = "IsInLearning";
         public const string HasLearningRecord = "HasLearningRecord";
         public const string HasNoDataLocks = "HasNoDataLocks";
-        public const string Has90DaysInLearning = "Has90DaysInLearning";
+        public const string HasDaysInLearning = "HasDaysInLearning";
     }
 }

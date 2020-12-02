@@ -51,6 +51,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             );
         }
 
+        public async Task<Learner> Get(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            return _learnerFactory.GetExisting(await _learnerDataRepository.GetByApprenticeshipIncentiveId(incentive.Id));
+        }
+
         public async Task Save(Learner aggregate)
         {
             if (aggregate.IsNew)

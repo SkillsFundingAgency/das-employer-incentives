@@ -129,7 +129,7 @@ this.ScenarioInitialize(scenarioInfo);
         [NUnit.Framework.TestCaseAttribute("IsInLearning", null)]
         [NUnit.Framework.TestCaseAttribute("HasLearningRecord", null)]
         [NUnit.Framework.TestCaseAttribute("HasNoDataLocks", null)]
-        [NUnit.Framework.TestCaseAttribute("Has90DaysInLearning", null)]
+        [NUnit.Framework.TestCaseAttribute("HasDaysInLearning", null)]
         public virtual void WhenAtLeastOneValidationCheckFails(string validationStep, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
