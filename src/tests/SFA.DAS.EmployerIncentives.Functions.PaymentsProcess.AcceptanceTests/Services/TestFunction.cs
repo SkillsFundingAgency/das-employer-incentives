@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
@@ -64,7 +65,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            //options.MaxConcurrentOrchestratorFunctions = 5;
 #pragma warning restore S125
                        })
-
                        .AddAzureStorageCoreServices()
                        .ConfigureServices(s =>
                        {
@@ -98,7 +98,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartHost()
         {
-            await Task.WhenAll(_host.StartAsync(), Jobs.Terminate());
+            var timeout = new TimeSpan(0, 0, 5);
+            var delayTask = Task.Delay(timeout);
+            await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
+
+            if(delayTask.IsCompleted)
+            {
+                throw new Exception($"Failed to start test function host within {timeout.Seconds} seconds.  Check the AzureStorageEmulator is running. ");
+            }
         }
 
         public Task Start(OrchestrationStarterInfo starter)
