@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             AddEvent(new PaymentsCalculationRequired(Model));
         }
-        
+
         public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
@@ -144,6 +144,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var isValid = !string.IsNullOrEmpty(legalEntity.VrfVendorId);
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasBankDetails, isValid));
+        }
+
+        private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
+        {
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasIlrSubmission, learner.SubmissionFound));
         }
 
         public void ValidateIsInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
@@ -230,6 +237,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 .OrderBy(pp => pp.DueDate).FirstOrDefault();
 
             return next?.Map();
+        }
+
+        public void ValidateLearningData(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
+        {
+            ValidateSubmissionFound(pendingPaymentId, learner, collectionPeriod);
+            if (!learner.SubmissionFound) return;
+
+            ValidateHasLearningRecord(pendingPaymentId, learner, collectionPeriod);
+            ValidateIsInLearning(pendingPaymentId, learner, collectionPeriod);
+            ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
+            ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
         }
     }
 }

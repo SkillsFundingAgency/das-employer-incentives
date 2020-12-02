@@ -11,6 +11,15 @@ Scenario: When all validation checks are successful
 	And pending payments are marked as paid
 	And future payments are not marked as paid
 
+Scenario: When no ILR submission found
+	Given there are pending payments
+	And the ILR submission validation step will fail
+	When the payment process is run
+	Then the ILR Submission check will have a failed validation result
+	And no further ILR validation is performed
+	And no payment records are created
+	And pending payments are not marked as paid
+
 Scenario: When at least one validation check fails
 	Given there are pending payments
 	And the '<ValidationStep>' will fail
@@ -25,4 +34,5 @@ Examples:
 	| IsInLearning        |
 	| HasLearningRecord   |
 	| HasNoDataLocks      |
+	| HasIlrSubmission  |
 	| HasDaysInLearning |

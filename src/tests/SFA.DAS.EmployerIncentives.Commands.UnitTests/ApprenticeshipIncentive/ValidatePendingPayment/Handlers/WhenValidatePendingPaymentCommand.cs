@@ -253,5 +253,43 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(1);
             incentive.PendingPayments.First().IsValidated(collectionPeriod.CalendarYear, collectionPeriod.PeriodNumber).Should().BeTrue();
         }
+
+
+        [Test]
+        public async Task Then_a_failed_pendingPayment_validation_result_is_saved_and_no_further_validation_performed_when_no_ILR_submission_found()
+        {
+            // Arrange
+            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
+            _learner.SetSubmissionData(null);
+            Assert.IsFalse(_learner.SubmissionFound);
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionPeriods.First();
+
+            var accountModel = _fixture.Build<AccountModel>()
+                .With(a => a.Id, _account.Id)
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
+                    _fixture.Build<LegalEntityModel>()
+                        .With(l => l.VrfVendorId, "VENDORID")
+                        .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
+                        .Create()})
+                .Create();
+
+            var domainAccount = Domain.Accounts.Account.Create(accountModel);
+
+            _mockAccountDomainRepository
+                .Setup(m => m.Find(incentive.Account.Id))
+                .ReturnsAsync(domainAccount);
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.CalendarYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 2)
+                .PendingPaymentValidationResults.Single(x => x.Step == "HasIlrSubmission");
+            validationResult.Result.Should().BeFalse();
+        }
     }
 }

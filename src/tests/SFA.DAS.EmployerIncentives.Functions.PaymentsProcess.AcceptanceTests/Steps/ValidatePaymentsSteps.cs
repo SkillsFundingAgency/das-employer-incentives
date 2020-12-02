@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     [Scope(Feature = "ValidatePayments")]
     public partial class ValidatePaymentsSteps
     {
-        private readonly TestContext _testContext;        
+        private readonly TestContext _testContext;
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
 
@@ -51,6 +51,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     break;
                 case ValidationStep.HasNoDataLocks:
                     _validatePaymentData.LearnerModel.HasDataLock = true;
+                    break;
+                case ValidationStep.HasIlrSubmission:
+                    _validatePaymentData.LearnerModel.SubmissionFound = false;
                     break;
                 case ValidationStep.HasDaysInLearning:
                     _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 89;
@@ -148,6 +151,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             x.PeriodNumber > CollectionPeriod);
 
             results.All(x => x.PaymentMadeDate.HasValue).Should().BeFalse();
+        }
+
+        [Given(@"the ILR submission validation step will fail")]
+        public void GivenTheIlrSubmissionValidationStepWillFail()
+        {
+            GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
+        }
+
+        [Then(@"the ILR Submission check will have a failed validation result")]
+        public async Task ThenTheIlrSubmissionCheckWillHaveAFailedValidationResult()
+        {
+            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.HasIlrSubmission);
+        }
+
+        [Then(@"no further ILR validation is performed")]
+        public async Task ThenNoFurtherIlrValidationIsPerformed()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result
+                .Where(x => x.Step != ValidationStep.HasIlrSubmission && x.Step != ValidationStep.HasBankDetails);
+            results.Any().Should().BeFalse();
         }
     }
 }
