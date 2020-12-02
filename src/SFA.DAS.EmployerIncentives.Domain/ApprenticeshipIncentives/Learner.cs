@@ -2,7 +2,10 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -21,8 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Guid apprenticeshipIncentiveId,
             long apprenticeshipId,
             long ukprn,
-            long uniqueLearnerNumber,
-            DateTime createdDate
+            long uniqueLearnerNumber
             )
         {
             return new Learner(
@@ -32,8 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                     ApprenticeshipId = apprenticeshipId,
                     Ukprn = ukprn,
-                    UniqueLearnerNumber = uniqueLearnerNumber,
-                    CreatedDate = createdDate
+                    UniqueLearnerNumber = uniqueLearnerNumber
                 }, true);
         }
 
@@ -45,6 +46,57 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public void SetSubmissionData(SubmissionData submissionData)
         {
             Model.SubmissionData = submissionData;
+        }
+
+        public void SetLearningPeriods(IEnumerable<LearningPeriod> learningPeriods)
+        {
+            Model.LearningPeriods.Clear();
+
+            foreach (var learningPeriod in learningPeriods)
+            {   
+                Model.LearningPeriods.Add(learningPeriod);
+            }
+        }
+
+        public int GetDaysInLearning(CollectionPeriod collectionPeriod)
+        {
+            var daysInLearningForCollectionPeriod = Model.DaysInLearnings.FirstOrDefault(d => d.CollectionYear == collectionPeriod.CalendarYear && d.CollectionPeriodNumber == collectionPeriod.PeriodNumber);
+
+            return daysInLearningForCollectionPeriod != null ? daysInLearningForCollectionPeriod.NumberOfDays : 0;
+        }
+
+        public void SetDaysInLearning(CollectionPeriod collectionPeriod)
+        {
+            var censusDate = collectionPeriod.CensusDate;
+
+            int days = 0;
+            foreach (var learningPeriod in Model.LearningPeriods)
+            {
+                if(!learningPeriod.EndDate.HasValue)
+                {
+                    days += censusDate.Subtract(learningPeriod.StartDate.Date).Days + 1;
+                }
+                else
+                {
+                    if (learningPeriod.EndDate.Value.Date < censusDate)
+                    {
+                        days += learningPeriod.EndDate.Value.Date.Subtract(learningPeriod.StartDate.Date).Days + 1;
+                    }
+                    else
+                    {
+                        days += censusDate.Subtract(learningPeriod.StartDate.Date).Days + 1;
+                    }
+                }
+            }
+
+            var daysInLearning = new DaysInLearning(collectionPeriod.PeriodNumber, collectionPeriod.CalendarYear, days);
+            var existing = Model.DaysInLearnings.SingleOrDefault(d => d.CollectionPeriodNumber == collectionPeriod.PeriodNumber && d.CollectionYear == collectionPeriod.CalendarYear);
+            if (existing != null)
+            {
+                Model.DaysInLearnings.Remove(existing);
+            }
+            
+            Model.DaysInLearnings.Add(daysInLearning);
         }
 
         private Learner(LearnerModel model, bool isNew = false) : base(model.Id, model, isNew)

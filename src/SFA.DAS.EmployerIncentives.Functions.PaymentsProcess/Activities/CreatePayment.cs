@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _logger = logger;
         }
 
-        [FunctionName("CreatePayment")]
+        [FunctionName(nameof(CreatePayment))]
         public async Task Create([ActivityTrigger] CreatePaymentInput input)
         {
             _logger.LogInformation("Creating Payment for apprenticeship incentive id {apprenticeshipIncentiveId}, pending payment id {pendingPaymentId}, collection period {collectionPeriod}", input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod);

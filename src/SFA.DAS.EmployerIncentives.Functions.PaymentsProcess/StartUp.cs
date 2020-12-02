@@ -1,6 +1,8 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -10,12 +12,10 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
+using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 using System;
 using System.Data.Common;
 using System.IO;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Options;
-using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess

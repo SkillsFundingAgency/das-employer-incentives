@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LastName = model.Apprenticeship.LastName,
                 DateOfBirth = model.Apprenticeship.DateOfBirth,
                 ULN = model.Apprenticeship.UniqueLearnerNumber,
-                UKPRN =  model.Apprenticeship.Provider?.Ukprn,
+                UKPRN = model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
                 PlannedStartDate = model.PlannedStartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
@@ -194,8 +194,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
-                CreatedDate = model.CreatedDate,
-              };
+                LearningPeriods = model.LearningPeriods.Map(),
+                DaysInLearnings = model.DaysInLearnings.Map()
+            };
 
             if (model.SubmissionFound)
             {
@@ -208,8 +209,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 if (model.HasDataLock.HasValue)
                 {
                     learner.SubmissionData.SetHasDataLock(model.HasDataLock.Value);
-                }
+                }               
                 learner.SubmissionData.SetIsInLearning(model.InLearning);
+                learner.SubmissionData.SetStartDate(model.StartDate);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
@@ -225,10 +227,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
                 ULN = model.UniqueLearnerNumber,
-                CreatedDate = model.CreatedDate
+                LearningPeriods = model.LearningPeriods.Map(model.Id),
+                DaysInLearnings = model.DaysInLearnings.Map(model.Id)
             };
 
-            if(model.SubmissionData != null)
+            if (model.SubmissionData != null)
             {
                 learner.SubmissionFound = true;
                 learner.LearningFound = model.SubmissionData.LearningFoundStatus?.LearningFound;
@@ -240,6 +243,37 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             }
 
             return learner;
+        }
+
+        private static ICollection<LearningPeriod> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod> models, Guid learnerId)
+        {
+            return models.Select(x => new LearningPeriod
+            {
+                LearnerId = learnerId,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate
+            }).ToList();
+        }
+
+        private static ICollection<ApprenticeshipDaysInLearning> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> models, Guid learnerId)
+        {
+            return models.Select(x => new ApprenticeshipDaysInLearning
+            {
+                LearnerId = learnerId,
+                CollectionPeriodNumber = x.CollectionPeriodNumber,
+                CollectionPeriodYear = x.CollectionYear,
+                NumberOfDaysInLearning = x.NumberOfDays
+            }).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod> Map(this ICollection<LearningPeriod> models)
+        {
+            return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod(x.StartDate, x.EndDate)).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> Map(this ICollection<ApprenticeshipDaysInLearning> models)
+        {
+            return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning(x.CollectionPeriodNumber, x.CollectionPeriodYear, x.NumberOfDaysInLearning)).ToList();
         }
     }
 }
