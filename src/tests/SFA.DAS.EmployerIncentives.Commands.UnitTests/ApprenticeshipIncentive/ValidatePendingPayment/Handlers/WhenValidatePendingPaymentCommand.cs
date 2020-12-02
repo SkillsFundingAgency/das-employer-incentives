@@ -32,6 +32,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private LearnerModel _learnerModel;
         private Learner _learner;
         private DaysInLearning _daysInLearning;
+        private DateTime _startDate;
+        private DateTime _payment1DueDate;
 
         private Fixture _fixture;
 
@@ -44,6 +46,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
+
+            _startDate = DateTime.Today;
+            _payment1DueDate = _startDate.AddDays(10);
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
@@ -75,16 +80,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var pendingPayment1 = _fixture.Build<PendingPaymentModel>()
                 .With(m => m.Account, _account)
+                .With(m => m.DueDate, _payment1DueDate)
                 .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
 
             var pendingPayment2 = _fixture.Build<PendingPaymentModel>()
                 .With(m => m.Account, _account)
+                .With(m => m.DueDate, _payment1DueDate.AddDays(2))
                 .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
 
             var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
 
             var model = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(m => m.Account, _account)
+                .With(m => m.PlannedStartDate, _startDate)
                 .With(m => m.PendingPaymentModels, pendingPayments)
                 .Create();
 
