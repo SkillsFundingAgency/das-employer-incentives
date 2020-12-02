@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     public class GetPayableLegalEntities
     {
         private readonly IQueryDispatcher _queryDispatcher;
-        private ILogger<GetPayableLegalEntities> _logger;
+        private readonly ILogger<GetPayableLegalEntities> _logger;
 
         public GetPayableLegalEntities(IQueryDispatcher queryDispatcher, ILogger<GetPayableLegalEntities> logger)
         {

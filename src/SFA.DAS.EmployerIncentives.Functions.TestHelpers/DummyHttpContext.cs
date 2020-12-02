@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
         public override CancellationToken RequestAborted { get; set; }
         public override string TraceIdentifier { get; set; }
         public override ISession Session { get; set; }
+        [Obsolete("Is obselete")]
         public override AuthenticationManager Authentication { get; } = null;
     }
 }

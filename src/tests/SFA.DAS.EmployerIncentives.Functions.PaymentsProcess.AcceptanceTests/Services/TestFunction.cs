@@ -57,11 +57,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            options.StorageProvider["maxQueuePollingInterval"] = new TimeSpan(0, 0, 0, 0, 500);
                            options.StorageProvider["partitionCount"] = 1;                           
                            options.NotificationUrl = new Uri("localhost:7071");
+#pragma warning disable S125 // Sections of code should not be commented out
                            //options.StorageProvider["controlQueueBatchSize"] = 5;
                            //options.HttpSettings.DefaultAsyncRequestSleepTimeMilliseconds = 500;
                            //options.MaxConcurrentActivityFunctions = 10;
                            //options.MaxConcurrentOrchestratorFunctions = 5;
+#pragma warning restore S125
                        })
+
                        .AddAzureStorageCoreServices()
                        .ConfigureServices(s =>
                        {

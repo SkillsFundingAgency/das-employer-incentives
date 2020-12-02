@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System;
 using System.Collections.Generic;
@@ -175,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "LearnerMatchingOrchestrator_Start",
-                    "LearnerMatchingOrchestrator",
+                    nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
                         ["timerInfo"] = new TimerInfo(new WeeklySchedule(), new ScheduleStatus())

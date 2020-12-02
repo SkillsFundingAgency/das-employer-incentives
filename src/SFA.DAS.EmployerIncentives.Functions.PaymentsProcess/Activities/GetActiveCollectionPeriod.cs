@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     public class GetActiveCollectionPeriod
     {
         private readonly IQueryDispatcher _queryDispatcher;
-        private ILogger<GetActiveCollectionPeriod> _logger;
+        private readonly ILogger<GetActiveCollectionPeriod> _logger;
 
         public GetActiveCollectionPeriod(IQueryDispatcher queryDispatcher, ILogger<GetActiveCollectionPeriod> logger)
         {

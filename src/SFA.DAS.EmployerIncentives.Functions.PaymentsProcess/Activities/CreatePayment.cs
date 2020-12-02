@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
     public class CreatePayment
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private ILogger<CreatePayment> _logger;
+        private readonly ILogger<CreatePayment> _logger;
 
         public CreatePayment(ICommandDispatcher commandDispatcher, ILogger<CreatePayment> logger)
         {

@@ -11,8 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 {
     public class LearnerMatchingOrchestrator
     {
-        private ILogger<LearnerMatchingOrchestrator> _logger;
-
+        private readonly ILogger<LearnerMatchingOrchestrator> _logger;
         public LearnerMatchingOrchestrator(ILogger<LearnerMatchingOrchestrator> logger)
         {
             _logger = logger;

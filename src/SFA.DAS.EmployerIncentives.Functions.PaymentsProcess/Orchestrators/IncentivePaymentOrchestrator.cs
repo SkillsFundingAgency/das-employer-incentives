@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class IncentivePaymentOrchestrator
     {
-        private ILogger<IncentivePaymentOrchestrator> _logger;
+        private readonly ILogger<IncentivePaymentOrchestrator> _logger;
 
         public IncentivePaymentOrchestrator(ILogger<IncentivePaymentOrchestrator> logger)
         {
