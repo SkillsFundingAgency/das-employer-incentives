@@ -54,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     break;
                 case ValidationStep.HasIlrSubmission:
                     _validatePaymentData.LearnerModel.SubmissionFound = false;
+                    break;
                 case ValidationStep.HasDaysInLearning:
                     _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 89;
                     break;
