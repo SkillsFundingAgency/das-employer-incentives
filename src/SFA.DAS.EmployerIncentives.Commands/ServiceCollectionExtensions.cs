@@ -132,7 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<LearnerChangeOfCircumstanceCommand>), new NullValidator());
+                .AddSingleton(typeof(IValidator<LearnerChangeOfCircumstanceCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CalculateDaysInLearningCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator());

@@ -39,9 +39,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             matchingTasks = new List<Task>();
 
             var activePeriod = await context.CallActivityAsync<CollectionPeriodDto>(nameof(GetActiveCollectionPeriod), null);
-            foreach (var apprenticeshipIncentiveId in apprenticeshipIncentives)
+            foreach (var apprenticeshipIncentive in apprenticeshipIncentives)
             {
-                var task = context.CallActivityAsync(nameof(CalculateDaysInLearning), new CalculateDaysInLearningInput { ApprenticeshipIncentiveId = apprenticeshipIncentiveId, ActivePeriod = activePeriod });
+                var task = context.CallActivityAsync(nameof(CalculateDaysInLearning), new CalculateDaysInLearningInput { ApprenticeshipIncentiveId = apprenticeshipIncentive.Id, ActivePeriod = activePeriod });
                 matchingTasks.Add(task);
             }
 

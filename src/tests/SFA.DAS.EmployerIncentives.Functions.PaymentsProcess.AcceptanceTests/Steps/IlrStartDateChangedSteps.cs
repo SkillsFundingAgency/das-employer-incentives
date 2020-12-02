@@ -7,9 +7,13 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Timers;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -94,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             SetupMockLearnerMatchResponse();
 
-            await _testContext.PaymentsProcessFunctions.StartLearnerMatching();
+            await StartLearnerMatching();
         }
 
         [When(@"the learner data is refreshed with a new invalid start date for the apprenticeship incentive")]
@@ -106,7 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             SetupMockLearnerMatchResponse();
 
-            await _testContext.PaymentsProcessFunctions.StartLearnerMatching();
+            await StartLearnerMatching();
         }
 
         [Then(@"the actual start date is updated")]
@@ -157,6 +161,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .WithStatusCode(HttpStatusCode.OK)
                     .WithHeader("Content-Type", "application/json")
                     .WithBodyAsJson(_learnerMatchApiData));
+        }
+
+        private async Task StartLearnerMatching()
+        {
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "LearnerMatchingOrchestrator_Start",
+                    nameof(LearnerMatchingOrchestrator),
+                    new Dictionary<string, object>
+                    {
+                        ["timerInfo"] = new TimerInfo(new WeeklySchedule(), new ScheduleStatus())
+                    }
+                ));
         }
     }
 }

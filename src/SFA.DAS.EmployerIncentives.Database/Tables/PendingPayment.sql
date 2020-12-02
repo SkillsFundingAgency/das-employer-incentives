@@ -10,7 +10,6 @@
     [PeriodNumber] TINYINT NULL,
 	[PaymentYear] SMALLINT NULL,
     [AccountLegalEntityId] BIGINT NULL,
-    [AccountLegalEntityId] BIGINT NULL,
     [EarningType] VARCHAR(20) NULL
     CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id)
 )

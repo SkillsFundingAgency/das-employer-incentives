@@ -164,7 +164,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return SubnominalCode.NonLevy19Plus;
             }
 
-            throw new InvalidIncentiveException("Cannot determine SubnominalCode as EmployerType has not been assigned as Levy or Non Levy");
+            throw new ArgumentException("Cannot determine SubnominalCode as EmployerType has not been assigned as Levy or Non Levy");
         }
 
         private void RemoveExistingPaymentIfExists(Guid pendingPaymentId)
