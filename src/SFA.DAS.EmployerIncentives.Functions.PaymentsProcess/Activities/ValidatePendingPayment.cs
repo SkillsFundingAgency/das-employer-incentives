@@ -3,6 +3,8 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
+using System;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -18,13 +20,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _logger = logger;
         }
 
-        [FunctionName("ValidatePendingPayment")]
+        [FunctionName(nameof(ValidatePendingPayment))]
         public async Task Validate([ActivityTrigger] ValidatePendingPaymentData payment)
         {
-            _logger.LogInformation($"Validating Pending Payment [PendingPaymentId={payment.PendingPaymentId}], [collection period={payment.Year}/{payment.Month}], [ApprenticeshipIncentiveId={payment.ApprenticeshipIncentiveId}]",
-                new { payment });
-            await _commandDispatcher.Send(new ValidatePendingPaymentCommand(payment.ApprenticeshipIncentiveId,
-                payment.PendingPaymentId, payment.Year, payment.Month));
+            _logger.LogInformation("Validating Pending Payment [PendingPaymentId={pendingPaymentId}], [collection period={year}/{period}], [ApprenticeshipIncentiveId={apprenticeshipIncentiveId}]",
+               payment.PendingPaymentId, payment.Year, payment.Period, payment.ApprenticeshipIncentiveId);
+            try
+            {
+                await _commandDispatcher.Send(new ValidatePendingPaymentCommand(payment.ApprenticeshipIncentiveId,
+                    payment.PendingPaymentId, payment.Year, payment.Period));
+            }
+            catch (Exception ex)
+            {
+                throw new ValidatePendingPaymentException(payment.ApprenticeshipIncentiveId, payment.PendingPaymentId, ex);
+            }
         }
     }
 }

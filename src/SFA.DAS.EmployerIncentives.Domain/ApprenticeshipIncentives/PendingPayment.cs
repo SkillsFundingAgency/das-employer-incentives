@@ -19,9 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public short? PaymentYear => Model.PaymentYear;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
-
-        public bool IsValidated => Model.PendingPaymentValidationResultModels.Count > 0 && Model.PendingPaymentValidationResultModels.All(r => r.Result);
-
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
         internal static PendingPayment New(
@@ -56,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public void SetPaymentMadeDate(DateTime paymentDate)
         {
             Model.PaymentMadeDate = paymentDate;
-		}
+        }
 
         public void AddValidationResult(PendingPaymentValidationResult validationResult)
         {
@@ -81,6 +78,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private PendingPayment(PendingPaymentModel model, bool isNew = false) : base(model.Id, model, isNew)
         {
+        }
+
+        public bool IsValidated(short collectionYear, byte collectionPeriod)
+        {
+            return Model.PendingPaymentValidationResultModels.Count > 0
+                   && AllPendingPaymentsForPeriodAreValid(collectionYear, collectionPeriod);
+        }
+
+        private bool AllPendingPaymentsForPeriodAreValid(short collectionYear, byte collectionPeriod)
+        {
+            return Model.PendingPaymentValidationResultModels
+                .Where(v =>
+                    v.CollectionPeriod.CalendarYear == collectionYear &&
+                    v.CollectionPeriod.PeriodNumber == collectionPeriod)
+                .All(r => r.Result);
         }
     }
 }

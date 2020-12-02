@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
@@ -18,9 +19,19 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public bool? LearningFound { get; set; }
         public bool? HasDataLock { get; set; }
         public DateTime? StartDate { get; set; }
-        public int? DaysInLearning { get; set; }
         public bool? InLearning { get; set; }
         public string RawJSON { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<LearningPeriod> LearningPeriods { get; set; }
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<ApprenticeshipDaysInLearning> DaysInLearnings { get; set; }
+
+        public Learner()
+        {
+            LearningPeriods = new List<LearningPeriod>();
+            DaysInLearnings = new List<ApprenticeshipDaysInLearning>();
+        }
     }
 }

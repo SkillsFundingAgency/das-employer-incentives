@@ -9,27 +9,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
     {
         public string Step => Model.Step;
         public CollectionPeriod CollectionPeriod => Model.CollectionPeriod;
-
-        public DateTime DateTime => Model.DateTime;
         public bool Result => Model.Result;
 
         internal static PendingPaymentValidationResult New(
-            Guid id, 
-            CollectionPeriod collectionPeriod, 
-            string step, 
+            Guid id,
+            CollectionPeriod collectionPeriod,
+            string step,
             bool result)
-        {            
+        {
             return new PendingPaymentValidationResult(new PendingPaymentValidationResultModel
-            { 
+            {
                 Id = id,
                 CollectionPeriod = collectionPeriod,
                 Step = step,
-                Result = result,
-                DateTime = DateTime.UtcNow
+                Result = result
             },
                 true);
-            }
-    
+        }
+
         internal static PendingPaymentValidationResult Get(PendingPaymentValidationResultModel model)
         {
             return new PendingPaymentValidationResult(model);

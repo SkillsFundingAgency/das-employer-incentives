@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
     public class CreatePayment
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private ILogger<CreatePayment> _logger;
+        private readonly ILogger<CreatePayment> _logger;
 
         public CreatePayment(ICommandDispatcher commandDispatcher, ILogger<CreatePayment> logger)
         {
@@ -18,12 +18,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _logger = logger;
         }
 
-        [FunctionName("CreatePayment")]
+        [FunctionName(nameof(CreatePayment))]
         public async Task Create([ActivityTrigger] CreatePaymentInput input)
         {
-            _logger.LogInformation($"Creating Payment for apprenticeship incentive id {input.ApprenticeshipIncentiveId}, pending payment id {input.PendingPaymentId}, collection period {input.CollectionPeriod}", new { input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod });
-            await _commandDispatcher.Send(new CreatePaymentCommand(input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod.Year, input.CollectionPeriod.Month));
-            _logger.LogInformation($"Created Payment for apprenticeship incentive id {input.ApprenticeshipIncentiveId}, pending payment id {input.PendingPaymentId}, collection period {input.CollectionPeriod}", new { input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod });
+            _logger.LogInformation("Creating Payment for apprenticeship incentive id {apprenticeshipIncentiveId}, pending payment id {pendingPaymentId}, collection period {collectionPeriod}", input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod);
+            await _commandDispatcher.Send(new CreatePaymentCommand(input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod.Year, input.CollectionPeriod.Period));
+            _logger.LogInformation("Created Payment for apprenticeship incentive id {apprenticeshipIncentiveId}, pending payment id {pendingPaymentId}, collection period {collectionPeriod}", input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod);
         }
     }
 }

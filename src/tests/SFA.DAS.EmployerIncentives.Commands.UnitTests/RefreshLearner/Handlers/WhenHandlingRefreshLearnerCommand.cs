@@ -26,11 +26,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _apprenticeshipIncentive;
         private ApprenticeshipIncentiveModel _incentiveModel;
         private Learner _learner;
+        private DateTime _testStartDate;
+        private DateTime _censusDate;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+            _testStartDate = _fixture.Create<DateTime>();
+            _censusDate = _testStartDate.AddDays(5);
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
@@ -59,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockApprenticeshipIncentiveDomainRepository
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
                 .ReturnsAsync(_apprenticeshipIncentive);
-
+                        
             _learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
 
             _mockLearnerDomainRepository
@@ -172,8 +176,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                 .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){
                                     _fixture.Build<PriceEpisodeDto>()
                                     .With(pe => pe.Periods, new List<PeriodDto>(){
-                                        _fixture.Build<PeriodDto>().With(p => p.ApprenticeshipId, _apprenticeshipIncentive.Apprenticeship.Id).Create()
+                                        _fixture.Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.Apprenticeship.Id)                                        
+                                        .Create()
                                         })
+                                    .With(pe => pe.StartDate, _testStartDate)
+                                    .With(pe => pe.EndDate, _testStartDate.AddDays(2))
                                     .Create()
                                 })
                                 .Create(),
@@ -184,6 +192,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
+
+            _censusDate = _testStartDate.AddDays(5);
 
             //Act
             await _sut.Handle(command);
@@ -222,8 +232,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         [Test]
         public async Task Then_the_startdate_is_set_when_one_exists_for_the_learner_data()
         {
-            //Arrange
-            var testStartDate = _fixture.Create<DateTime>();
+            //Arrange            
 
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
@@ -241,7 +250,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                                        .With(period => period.IsPayable, true)
                                                        .Create()
                                                     })
-                                                    .With(pe => pe.StartDate, testStartDate)
+                                                    .With(pe => pe.StartDate, _testStartDate)
+                                                    .With(pe => pe.EndDate, _testStartDate.AddDays(2))
                                                     .Create() }
                         )
                         .Create(),
@@ -253,12 +263,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
+            _censusDate = _testStartDate.AddDays(5);
+
             //Act
             await _sut.Handle(command);
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.StartDate == testStartDate)
+                It.Is<Learner>(l => l.SubmissionData.StartDate == _testStartDate)
                 ), Times.Once);
         }
 
@@ -359,6 +371,68 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.IsInlearning == true)
+                ), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_LearningPeriods_are_set_when_there_are_price_episodes_with_periods_for_the_apprenticeship()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            var apprenticeship = _fixture.Create<Apprenticeship>();
+            apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+               .With(p => p.Apprenticeship, apprenticeship)
+               .Create();
+
+            _mockApprenticeshipIncentiveDomainRepository
+                .Setup(m => m.Find(_apprenticeshipIncentiveId))
+                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.ApplicationApprenticeshipId, apprenticeshipIncentiveModel));
+
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(apprenticeshipIncentive))
+                .ReturnsAsync(learner);
+
+            var learnerSubmissionDto = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(t => t.PriceEpisodes,
+                        new List<PriceEpisodeDto>{
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .Create()
+                            }).Create(),
+                        _fixture.Create<TrainingDto>()
+                   })
+               .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLearnerDomainRepository.Verify(m => m.Save(
+                It.Is<Learner>(l => l.GetModel().LearningPeriods.Count == 1)
                 ), Times.Once);
         }
     }

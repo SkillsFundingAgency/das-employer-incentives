@@ -9,6 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
     public class TestContext
     {
+        public string InstanceId { get; private set; }
         public DirectoryInfo TestDirectory { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
@@ -26,7 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
         public TestContext()
         {
-            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString()));
+            InstanceId = Guid.NewGuid().ToString();
+            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), InstanceId));
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);

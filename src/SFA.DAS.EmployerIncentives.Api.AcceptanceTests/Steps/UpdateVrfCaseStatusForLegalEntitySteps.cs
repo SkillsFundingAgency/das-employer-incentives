@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Given(@"an existing submitted incentive application")]
-        public void GivenAnExistingSubmittedIncentiveApplication()
+        public async Task GivenAnExistingSubmittedIncentiveApplication()
         {
             _account = TestContext.TestData.GetOrCreate<Account>();
             var application = TestContext.TestData.GetOrCreate<IncentiveApplication>();
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var apprenticeship = TestContext.TestData.GetOrCreate<IncentiveApplicationApprenticeship>();
             apprenticeship.IncentiveApplicationId = application.Id;
 
-            DataAccess.SetupAccount(_account);
+            await DataAccess.SetupAccount(_account);
             DataAccess.SetupApplication(application);
             DataAccess.SetupApprenticeship(apprenticeship);
         }

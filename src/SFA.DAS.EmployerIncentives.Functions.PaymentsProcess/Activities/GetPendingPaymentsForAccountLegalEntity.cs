@@ -21,16 +21,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _logger = logger;
         }
 
-        [FunctionName("GetPendingPaymentsForAccountLegalEntity")]
+        [FunctionName(nameof(GetPendingPaymentsForAccountLegalEntity))]
         public async Task<List<PendingPaymentActivityDto>> Get([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
-            _logger.LogInformation($"Calculate Payments process started for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod });
+            _logger.LogInformation("Calculate Payments process started for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
 
-            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, collectionPeriod.Year, collectionPeriod.Month);
+            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, collectionPeriod.Year, collectionPeriod.Period);
             var pendingPayments = await _queryDispatcher.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(request);
-            _logger.LogInformation($"{pendingPayments.PendingPayments.Count} pending payments returned for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", new { accountLegalEntityId, collectionPeriod });
+            var pendingPaymentCount = pendingPayments.PendingPayments.Count;
+            _logger.LogInformation("{pendingPaymentCount} pending payments returned for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", pendingPaymentCount, accountLegalEntityId, collectionPeriod);
             return pendingPayments.PendingPayments.Select(x => new PendingPaymentActivityDto { PendingPaymentId = x.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId }).ToList();
         }
     }

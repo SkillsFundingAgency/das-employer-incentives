@@ -33,12 +33,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
             var calendar = await _collectionCalendarService.Get();
-            var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionMonth);
+            var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionPeriod);
 
             incentive.ValidatePendingPaymentBankDetails(command.PendingPaymentId, account, collectionPeriod);
-            incentive.ValidateHasLearningRecord(command.PendingPaymentId, learner, collectionPeriod);
-            incentive.ValidateIsInLearning(command.PendingPaymentId, learner, collectionPeriod);
-            incentive.ValidateHasNoDataLocks(command.PendingPaymentId, learner, collectionPeriod);
+            incentive.ValidateLearningData(command.PendingPaymentId, learner, collectionPeriod);
 
             await _domainRepository.Save(incentive);
         }

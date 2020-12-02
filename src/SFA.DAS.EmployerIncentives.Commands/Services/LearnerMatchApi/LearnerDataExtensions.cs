@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,17 +18,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             // this might be different to the “Start Date” for the “Training”, because the “Training” start date won’t update if there is a change of employer 
 
             var matchedRecords =
-                from tr in learnerData.Training
-                where tr.Reference == PROGRAM_REFERENCE
-                from pe in tr.PriceEpisodes
-                from p in pe.Periods
-                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-                     && p.IsPayable
-                select new
-                {
-                    p.ApprenticeshipId,
-                    pe.StartDate
-                };
+                (from tr in learnerData.Training
+                 where tr.Reference == PROGRAM_REFERENCE
+                 from pe in tr.PriceEpisodes
+                 from p in pe.Periods
+                 where p.ApprenticeshipId == incentive.Apprenticeship.Id
+                       && p.IsPayable
+                 select new
+                 {
+                     p.ApprenticeshipId,
+                     pe.StartDate
+                 }).ToArray();
 
             if (matchedRecords.Any())
             {
@@ -96,20 +97,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             if (nextPayment == null) return false;
 
             var matchedRecords =
-               from tr in learnerData.Training
-               where tr.Reference == PROGRAM_REFERENCE
-               from pe in tr.PriceEpisodes
-               from p in pe.Periods
-               where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new
-               {
-                   p.ApprenticeshipId,
-                   pe.StartDate,
-                   pe.EndDate,
-                   p.Period
-               };
+               (from tr in learnerData.Training
+                where tr.Reference == PROGRAM_REFERENCE
+                from pe in tr.PriceEpisodes
+                from p in pe.Periods
+                where p.ApprenticeshipId == incentive.Apprenticeship.Id
+                select new
+                {
+                    p.ApprenticeshipId,
+                    pe.StartDate,
+                    pe.EndDate,
+                    p.Period
+                }).ToArray();
 
-            bool isInLearning = false;
+            var isInLearning = false;
             if (matchedRecords.Any())
             {
                 foreach (var matchedRecord in matchedRecords)
@@ -125,6 +126,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             }
 
             return isInLearning;
+        }
+                
+        public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            if(learnerData == null)
+            {
+                return new List<LearningPeriod>();
+            }
+
+            return
+              (from tr in learnerData.Training
+               where tr.Reference == PROGRAM_REFERENCE
+               from pe in tr.PriceEpisodes
+               from p in pe.Periods
+               where p.ApprenticeshipId == incentive.Apprenticeship.Id
+               select new LearningPeriod(pe.StartDate, pe.EndDate)).Distinct();
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)
