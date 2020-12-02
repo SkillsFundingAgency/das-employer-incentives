@@ -25,29 +25,54 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             var apprenticeshipIncentives = await context.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>(nameof(GetAllApprenticeshipIncentives), null);
 
+            await PerformLearnerMatch(context, apprenticeshipIncentives);
+
+            await PerformChangeOfCircumstances(context, apprenticeshipIncentives);
+
+            await CalculateDaysInLearning(context, apprenticeshipIncentives);
+
+            _logger.LogInformation("Learner matching process completed");
+        }
+
+        private static async Task CalculateDaysInLearning(IDurableOrchestrationContext context, List<ApprenticeshipIncentiveOutput> apprenticeshipIncentives)
+        {
             var matchingTasks = new List<Task>();
-            foreach (var apprenticeshipIncentive in apprenticeshipIncentives)
-            {
-                var task = context
-                    .CallActivityAsync(nameof(LearnerMatchAndUpdate),  new LearnerMatchInput {ApprenticeshipIncentiveId = apprenticeshipIncentive.Id})
-                    .ContinueWith(x => context.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator), new LearnerChangeOfCircumstanceInput(apprenticeshipIncentive.Id, apprenticeshipIncentive.ULN)));
-                matchingTasks.Add(task);
-            }
-
-            await Task.WhenAll(matchingTasks);
-
-            matchingTasks = new List<Task>();
 
             var activePeriod = await context.CallActivityAsync<CollectionPeriodDto>(nameof(GetActiveCollectionPeriod), null);
             foreach (var apprenticeshipIncentive in apprenticeshipIncentives)
             {
-                var task = context.CallActivityAsync(nameof(CalculateDaysInLearning), new CalculateDaysInLearningInput { ApprenticeshipIncentiveId = apprenticeshipIncentive.Id, ActivePeriod = activePeriod });
+                var task = context.CallActivityAsync(nameof(Activities.CalculateDaysInLearning),
+                    new CalculateDaysInLearningInput
+                        {ApprenticeshipIncentiveId = apprenticeshipIncentive.Id, ActivePeriod = activePeriod});
                 matchingTasks.Add(task);
             }
 
             await Task.WhenAll(matchingTasks);
+        }
 
-            _logger.LogInformation("Learner matching process completed");
+        private static async Task PerformChangeOfCircumstances(IDurableOrchestrationContext context, List<ApprenticeshipIncentiveOutput> apprenticeshipIncentives)
+        {
+            var matchingTasks = new List<Task>();
+            foreach (var apprenticeshipIncentive in apprenticeshipIncentives)
+            {
+                var task = context.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator),
+                    new LearnerChangeOfCircumstanceInput(apprenticeshipIncentive.Id, apprenticeshipIncentive.ULN));
+                matchingTasks.Add(task);
+            }
+            await Task.WhenAll(matchingTasks);
+        }
+
+        private static async Task PerformLearnerMatch(IDurableOrchestrationContext context, List<ApprenticeshipIncentiveOutput> apprenticeshipIncentives)
+        {
+            var matchingTasks = new List<Task>();
+            foreach (var apprenticeshipIncentive in apprenticeshipIncentives)
+            {
+                var task = context.CallActivityAsync(nameof(LearnerMatchAndUpdate),
+                    new LearnerMatchInput {ApprenticeshipIncentiveId = apprenticeshipIncentive.Id});
+                matchingTasks.Add(task);
+            }
+
+            await Task.WhenAll(matchingTasks);
         }
     }
 }

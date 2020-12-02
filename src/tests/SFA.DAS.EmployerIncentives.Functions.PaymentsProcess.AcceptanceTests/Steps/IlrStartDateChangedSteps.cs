@@ -12,6 +12,7 @@ using Microsoft.Azure.WebJobs.Extensions.Timers;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using TechTalk.SpecFlow;
