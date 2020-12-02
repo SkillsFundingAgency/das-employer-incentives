@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
     public class WhenHandlingSubmitIncentiveApplicationCommand
     {
         private SubmitIncentiveApplicationCommandHandler _sut;
-        private Mock<IIncentiveApplicationDomainRepository> _mockDomainRespository;
+        private Mock<IIncentiveApplicationDomainRepository> _mockDomainRepository;
 
         private Fixture _fixture;
 
@@ -27,9 +27,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             _fixture = new Fixture();
             _fixture.Customize(new IncentiveApplicationCustomization());
 
-            _mockDomainRespository = new Mock<IIncentiveApplicationDomainRepository>();
+            _mockDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
 
-            _sut = new SubmitIncentiveApplicationCommandHandler(_mockDomainRespository.Object);
+            _sut = new SubmitIncentiveApplicationCommandHandler(_mockDomainRepository.Object);
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
-            _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
+            _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
 
             // Act
@@ -50,7 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             incentiveApplication.DateSubmitted.Should().Be(command.DateSubmitted);
             incentiveApplication.SubmittedByEmail.Should().Be(command.SubmittedByEmail);
             incentiveApplication.SubmittedByName.Should().Be(command.SubmittedByName);
-            _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Once);
+
+            _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Once);
         }
 
         [Test]
@@ -61,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             var command = new SubmitIncentiveApplicationCommand(_fixture.Create<Guid>(), incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             IncentiveApplication nullResponse = null;
-            _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
+            _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(nullResponse);
 
             // Act
@@ -69,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
 
             // Assert
             action.Should().Throw<InvalidRequestException>();
-            _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Never);
+            _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
 
         [Test]
@@ -79,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
-            _mockDomainRespository.Setup(x => x.Find(command.IncentiveApplicationId))
+            _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
 
             // Act
@@ -87,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
 
             // Assert
             action.Should().Throw<InvalidRequestException>();
-            _mockDomainRespository.Verify(m => m.Save(incentiveApplication), Times.Never);
+            _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
     }
 }

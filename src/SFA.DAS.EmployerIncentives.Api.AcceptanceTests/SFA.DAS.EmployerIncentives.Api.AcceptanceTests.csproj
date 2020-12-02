@@ -22,6 +22,7 @@
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.4.0" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="Moq" Version="4.14.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
@@ -48,6 +49,9 @@
     <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <DependentUpon>ApplicationsForAccountRequested.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\EarningsResilienceCheck.feature.cs">
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Update="Features\IncentiveDetailsRequested.feature.cs">
       <DesignTime>True</DesignTime>
@@ -77,6 +81,10 @@
     <SpecFlowFeatureFiles Update="Features\ApplicationsForAccountRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\EarningsResilienceCheck.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>EarningsResilienceCheck.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>

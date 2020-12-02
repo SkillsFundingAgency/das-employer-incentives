@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
-    public class Settings
+    public class TestSettings
     {
         public string DotnetExecutablePath { get; set; }
         public string FunctionHostPath { get; set; }

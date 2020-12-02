@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                               Model.Id,
                               payment.Amount,
                               payment.PaymentDate,
-                              DateTime.Now);
+                               DateTime.Now,
+                               payment.EarningType);
 
                 pendingPayment.SetPaymentPeriod(collectionCalendar);
 
@@ -71,10 +73,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
         }
 
-        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth)
+        public void CalculatePayments()
+        {
+            AddEvent(new PaymentsCalculationRequired(Model));
+        }
+        
+        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
-            if (!pendingPayment.IsValidated)
+            if (!pendingPayment.IsValidated(collectionYear, collectionPeriod))
             {
                 return;
             }
@@ -83,21 +90,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var paymentDate = DateTime.Now;
 
-            AddPayment(pendingPaymentId, collectionYear, collectionMonth, pendingPayment, paymentDate);
+            AddPayment(pendingPaymentId, collectionYear, collectionPeriod, pendingPayment, paymentDate);
             pendingPayment.SetPaymentMadeDate(paymentDate);
         }
 
-        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionMonth, PendingPayment pendingPayment, DateTime paymentDate)
+        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var payment = Payment.New(
-                Guid.NewGuid(), 
-                Model.Account, 
-                Model.Id, 
-                pendingPaymentId, 
+                Guid.NewGuid(),
+                Model.Account,
+                Model.Id,
+                pendingPaymentId,
                 pendingPayment.Amount,
-                paymentDate, 
-                collectionYear, 
-                collectionMonth);
+                paymentDate,
+                collectionYear,
+                collectionPeriod);
 
             Model.PaymentModels.Add(payment.GetModel());
         }
@@ -120,7 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             return pendingPayment;
-		}
+        }
 
         public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {

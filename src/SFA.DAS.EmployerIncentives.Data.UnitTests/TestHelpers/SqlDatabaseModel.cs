@@ -1,119 +1,98 @@
 ﻿using Microsoft.SqlServer.Dac;
 using Polly;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
-using System.Xml;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
     public static class SqlDatabaseModel
     {
         public const string ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True";
+        public const string DatabaseProjectName = "SFA.DAS.EmployerIncentives.Database";
+        private static string _dacpacFileLocation;
 
         public static void Update()
         {
+            SetDacpacLocation();
+
             var modelNeedsUpdating = false;
             try
             {
-                var operationKeys = FetchRefactorLogRecords();
-                modelNeedsUpdating = CheckModelNeedsUpdating(operationKeys);
+                modelNeedsUpdating = DacpacFileHasBeenModified();
                 Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(Update)}: ModelNeedsUpdating={modelNeedsUpdating}");
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                if (ex.Message.Contains("RefactorLog"))
-                    modelNeedsUpdating = true;
-            }
-
-            if (modelNeedsUpdating) PublishModel();
-        }
-
-        private static bool CheckModelNeedsUpdating(HashSet<Guid> operationKeys)
-        {
-            var refactorlog =
-                Path.Combine(
-                    Directory.GetCurrentDirectory()
-                        .Substring(0, Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
-                    "src\\SFA.DAS.EmployerIncentives.Database\\SFA.DAS.EmployerIncentives.Database.refactorlog");
-            var document = new XmlDocument();
-            document.Load(refactorlog);
-            var nodes = document.GetElementsByTagName("Operation");
-            var modelNeedsUpdating = false;
-            // ReSharper disable once PossibleNullReferenceException
-            for (var i = 0; i < nodes.Count; i++)
-            {
-                if (operationKeys.Contains(Guid.Parse(nodes[i].Attributes["Key"].Value))) continue;
                 modelNeedsUpdating = true;
-                break;
+                Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(Update)}: Exception={ex.Message}");
             }
 
-            return modelNeedsUpdating;
+            if (!modelNeedsUpdating) return;
+
+            PublishModel();
+            SaveModifiedDateTime();
         }
 
-        private static HashSet<Guid> FetchRefactorLogRecords()
+        private static bool DacpacFileHasBeenModified()
         {
-            var operationKeys = new HashSet<Guid>();
-            using var dbConn = new SqlConnection(ConnectionString);
+            var current = File.GetLastWriteTime(_dacpacFileLocation);
+            var previous = GetSavedModifiedDateTime();
+
+            return (current - previous).Seconds != 0; // a way to compare 2 dates while ignoring milliseconds
+        }
+
+        private static DateTime GetSavedModifiedDateTime()
+        {
+            var stored = File.ReadAllText(_dacpacFileLocation + ".tmp");
+
+            return DateTime.TryParse(stored, out var result) ? result : DateTime.MinValue;
+        }
+
+        private static void SaveModifiedDateTime()
+        {
             try
             {
-                using var cmd = new SqlCommand("SELECT * FROM [model].[dbo].[__RefactorLog] WITH (NOLOCK)", dbConn);
-                dbConn.Open();
-                var reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    operationKeys.Add(Guid.Parse(reader[0].ToString()!));
-                }
+                var current = File.GetLastWriteTime(_dacpacFileLocation);
+                File.WriteAllText(_dacpacFileLocation + ".tmp", current.ToString(CultureInfo.CurrentCulture));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine(e);
-                throw;
+                Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(SaveModifiedDateTime)}: Exception={ex.Message}");
             }
-            finally
-            {
-                dbConn.Close();
-            }
-
-            return operationKeys;
         }
 
-        private static void PublishModel()
+        private static void SetDacpacLocation()
         {
 #if DEBUG
             const string environment = "debug";
 #else
             const string environment = "release";
 #endif
-            var dacpacFileLocation =
-                Path.Combine(
-                    Directory.GetCurrentDirectory().Substring(0,
-                        Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
-                    $"src\\SFA.DAS.EmployerIncentives.Database\\bin\\{environment}\\SFA.DAS.EmployerIncentives.Database.dacpac");
+            _dacpacFileLocation = Path.Combine(
+                Directory.GetCurrentDirectory().Substring(0,
+                    Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
+                $"src\\{DatabaseProjectName}\\bin\\{environment}\\{DatabaseProjectName}.dacpac");
 
-            if (!File.Exists(dacpacFileLocation))
-                throw new FileNotFoundException($"⚠ DACPAC File not found in: {dacpacFileLocation}");
+            if (!File.Exists(_dacpacFileLocation))
+                throw new FileNotFoundException($"DACPAC file not found in: {_dacpacFileLocation}");
+        }
 
-            var dbPackage = DacPackage.Load(dacpacFileLocation);
+        private static void PublishModel()
+        {
+            var dbPackage = DacPackage.Load(_dacpacFileLocation);
             var services = new DacServices(ConnectionString);
 
             var policy = Policy
                 .Handle<DacServicesException>()
-                .WaitAndRetry(new[]
-                {
-                    // ℹ Tweak these time-outs if you're still getting errors 👇
-                    TimeSpan.FromMilliseconds(250),
-                    TimeSpan.FromMilliseconds(500),
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromSeconds(2),
-                    TimeSpan.FromSeconds(4),
-                });
+                .WaitAndRetry(Enumerable.Repeat(TimeSpan.FromMilliseconds(250), 40));
 
             policy.Execute(() =>
             {
                 Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(PublishModel)} attempted");
-                services.Deploy(dbPackage, "model", upgradeExisting: true);
+                var options = new DacDeployOptions() { BlockOnPossibleDataLoss = false };
+                services.Deploy(dbPackage, "model", upgradeExisting: true, options);
             });
         }
     }

@@ -1,9 +1,12 @@
 using AutoFixture;
+using FluentAssertions;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -77,12 +80,64 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             foreach (var p in _pendingPayments)
                 _mockOrchestrationContext.Verify(
-                    x => x.CallActivityAsync("ValidatePendingPayment", It.Is<ValidatePendingPaymentData>(
+                    x => x.CallActivityAsync(nameof(ValidatePendingPayment), It.Is<ValidatePendingPaymentData>(
                         d => d.ApprenticeshipIncentiveId == p.ApprenticeshipIncentiveId
                         && d.PendingPaymentId == p.PendingPaymentId
-                        && d.Month == _accountLegalEntityCollectionPeriod.CollectionPeriod.Month
+                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
                         && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)),
                     Times.Once);
+        }
+
+        [Test]
+        public void Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_a_ValidatePendingPaymentException()
+        {
+            // Arrange
+            var failedValidation = _pendingPayments.First();
+            var exceptionMessage = Guid.NewGuid().ToString();
+            var testException = new AggregateException(new List<Exception>() { new ValidatePendingPaymentException(failedValidation.ApprenticeshipIncentiveId, failedValidation.PendingPaymentId, new Exception(exceptionMessage))});
+            
+            _mockOrchestrationContext
+                .Setup(x => x.CallActivityAsync(nameof(ValidatePendingPayment)
+                 , It.Is<ValidatePendingPaymentData>(
+                        d => d.ApprenticeshipIncentiveId == failedValidation.ApprenticeshipIncentiveId
+                        && d.PendingPaymentId == failedValidation.PendingPaymentId
+                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
+                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)))
+                .ThrowsAsync(testException);
+
+            //Act
+            Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            //Assert
+            action.Should()
+                .Throw<AggregateException>()
+                .WithMessage($"Error ValidatePendingPayments (failed to validate ApprenticeshipIncentiveId : {failedValidation.ApprenticeshipIncentiveId}, PendingPaymentId : {failedValidation.PendingPaymentId}, Message : {exceptionMessage} )");
+        }
+
+        [Test]
+        public void Then_an_exception_is_thrown_if_validation_fails_for_pending_payments_due_to_an_exception_other_than_a_ValidatePendingPaymentException()
+        {
+            // Arrange
+            var failedValidation = _pendingPayments.First();
+            var exceptionMessage = Guid.NewGuid().ToString();
+            var testException = new Exception(exceptionMessage);
+
+            _mockOrchestrationContext
+                .Setup(x => x.CallActivityAsync(nameof(ValidatePendingPayment)
+                 , It.Is<ValidatePendingPaymentData>(
+                        d => d.ApprenticeshipIncentiveId == failedValidation.ApprenticeshipIncentiveId
+                        && d.PendingPaymentId == failedValidation.PendingPaymentId
+                        && d.Period == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period
+                        && d.Year == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)))
+                .ThrowsAsync(testException);
+
+            //Act
+            Func<Task> action = async () => await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            //Assert
+            action.Should()
+                .Throw<Exception>()
+                .WithMessage(exceptionMessage);
         }
     }
 }
