@@ -17,26 +17,26 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _logger = logger;
         }
 
-        [FunctionName("IncentivePaymentOrchestrator")]
+        [FunctionName(nameof(IncentivePaymentOrchestrator))]
         public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var collectionPeriod = context.GetInput<CollectionPeriod>();
 
             if(!context.IsReplaying)
-                _logger.LogInformation($"Incentive Payment process started for collection period {collectionPeriod}", new {collectionPeriod});
+                _logger.LogInformation("Incentive Payment process started for collection period {collectionPeriod}", collectionPeriod);
 
-            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", collectionPeriod);
+            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);
 
             var calculatePaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
             {
-                var calculatePaymentTask = context.CallSubOrchestratorAsync("CalculatePaymentsForAccountLegalEntityOrchestrator", new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+                var calculatePaymentTask = context.CallSubOrchestratorAsync(nameof(CalculatePaymentsForAccountLegalEntityOrchestrator), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
                 calculatePaymentTasks.Add(calculatePaymentTask);
             }
 
             await Task.WhenAll(calculatePaymentTasks);
 
-            _logger.LogInformation($"Incentive Payment process completed for collection period {collectionPeriod}", new { collectionPeriod });
+            _logger.LogInformation("Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);
         }
     }
 }

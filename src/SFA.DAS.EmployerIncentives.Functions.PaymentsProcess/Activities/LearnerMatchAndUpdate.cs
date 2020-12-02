@@ -18,12 +18,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _logger = logger;
         }
 
-        [FunctionName("LearnerMatchAndUpdate")]
+        [FunctionName(nameof(LearnerMatchAndUpdate))]
         public async Task Create([ActivityTrigger] LearnerMatchInput input)
         {
-            _logger.LogInformation($"Creating Learner Match record for apprenticeship incentive id {input.ApprenticeshipIncentiveId}", new { input.ApprenticeshipIncentiveId });
+            _logger.LogInformation("Creating Learner Match record for apprenticeship incentive id {apprenticeshipIncentiveId}", input.ApprenticeshipIncentiveId);
             await _commandDispatcher.Send(new RefreshLearnerCommand(input.ApprenticeshipIncentiveId));
-            _logger.LogInformation($"Created Learner Match record for apprenticeship incentive id {input.ApprenticeshipIncentiveId}", new { input.ApprenticeshipIncentiveId });
+            _logger.LogInformation("Created Learner Match record for apprenticeship incentive id {apprenticeshipIncentiveId}", input.ApprenticeshipIncentiveId);
         }
     }
 }

@@ -182,6 +182,7 @@ this.ScenarioInitialize(scenarioInfo);
         [NUnit.Framework.TestCaseAttribute("HasLearningRecord", null)]
         [NUnit.Framework.TestCaseAttribute("HasNoDataLocks", null)]
         [NUnit.Framework.TestCaseAttribute("HasIlrSubmission", null)]
+        [NUnit.Framework.TestCaseAttribute("HasDaysInLearning", null)]
         public virtual void WhenAtLeastOneValidationCheckFails(string validationStep, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;

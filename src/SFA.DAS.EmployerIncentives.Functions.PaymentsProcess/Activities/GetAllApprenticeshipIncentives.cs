@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _logger = logger;
         }
 
-        [FunctionName("GetAllApprenticeshipIncentives")]
+        [FunctionName(nameof(GetAllApprenticeshipIncentives))]
         public async Task<List<Guid>> Get([ActivityTrigger]object input)
         {
             _logger.LogInformation($"Getting all Apprenticeship Incentives");

@@ -1,8 +1,11 @@
 ﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
@@ -51,6 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     break;
                 case ValidationStep.HasIlrSubmission:
                     _validatePaymentData.LearnerModel.SubmissionFound = false;
+                case ValidationStep.HasDaysInLearning:
+                    _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 89;
                     break;
             }
         }
@@ -60,9 +65,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await _validatePaymentData.Create();
 
-            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriod);
+            await _testContext.TestFunction.Start(
+               new OrchestrationStarterInfo(
+                   "IncentivePaymentOrchestrator_HttpStart",
+                   "IncentivePaymentOrchestrator",
+                   new Dictionary<string, object>
+                   {
+                       ["req"] = new DummyHttpRequest
+                       {
+                           Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
+                       },
+                       ["collectionPeriodYear"] = CollectionPeriodYear,
+                       ["collectionPeriodNumber"] = CollectionPeriod
+                   }
+                   ));
 
-            status.RuntimeStatus.Should().NotBe("Failed", status.Output);
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]

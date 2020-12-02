@@ -29,6 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators
             return _domainRepository.GetOrCreate(incentive);
         }
 
+        public Task<Learner> Get(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            return _domainRepository.Get(incentive);
+        }
+
         public Task Save(Learner aggregate)
         {
             return _aggregateLogger.Save(aggregate);
