@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -115,6 +116,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             return Jobs.Start(starter);
         }
 
+        public async Task<OrchestratorStartResponse> GetOrchestratorStartResponse()
+        {
+            var responseString = await LastResponse.Content.ReadAsStringAsync();
+            var responseValue = JsonConvert.DeserializeObject<OrchestratorStartResponse>(responseString);
+            return responseValue;
+        }
         public async Task<DurableOrchestrationStatus> GetStatus(string instanceId)
         {
             await Jobs.RefreshStatus(instanceId);

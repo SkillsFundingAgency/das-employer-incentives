@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
@@ -85,8 +84,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
            
             _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
-            var response = JsonSerializer.Deserialize<OrchestrationResponse>(await _testContext.TestFunction.LastResponse.Content.ReadAsStringAsync());
-            var status = await _testContext.TestFunction.GetStatus(response.id);
+            var response = await _testContext.TestFunction.GetOrchestratorStartResponse();
+            var status = await _testContext.TestFunction.GetStatus(response.Id);
             status.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
         }
 
