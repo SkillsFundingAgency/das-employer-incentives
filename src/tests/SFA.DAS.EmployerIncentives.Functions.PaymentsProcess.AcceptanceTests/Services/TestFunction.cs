@@ -13,6 +13,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
@@ -77,6 +78,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                l.Version = "1.0";
                            });
 
+                           s.Configure<BusinessCentralApiClient>(c =>
+                           {
+                               c.ApiBaseUrl = _testContext.PaymentsApi.BaseAddress;
+                           });
+
                            s.Configure<ApplicationSettings>(a =>
                            {
                                a.DbConnectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
@@ -111,6 +117,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public Task Start(OrchestrationStarterInfo starter)
         {
             return Jobs.Start(starter);
+        }
+
+        public async Task<OrchestratorStartResponse> GetOrchestratorStartResponse()
+        {
+            var responseString = await LastResponse.Content.ReadAsStringAsync();
+            var responseValue = JsonConvert.DeserializeObject<OrchestratorStartResponse>(responseString);
+            return responseValue;
         }
 
         public async Task DisposeAsync()

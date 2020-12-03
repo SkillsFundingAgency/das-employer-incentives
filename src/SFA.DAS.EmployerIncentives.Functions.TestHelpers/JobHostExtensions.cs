@@ -24,16 +24,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
         {
             await jobs.CallAsync(starterInfo.StarterName, starterInfo.StarterArgs);
 
-            await jobs.WaitFor(starterInfo.OrchestrationName, starterInfo.Timeout).ThrowIfFailed();
+            await jobs.WaitFor(starterInfo.OrchestrationName, starterInfo.Timeout, starterInfo.ExpectedCustomStatus).ThrowIfFailed();
 
             return jobs;
         }
-        public static async Task<IJobHost> WaitFor(this IJobHost jobs, string orchestration, TimeSpan? timeout = null)
+        public static async Task<IJobHost> WaitFor(this IJobHost jobs, string orchestration, TimeSpan? timeout = null, string expectedCustomStatus = null)
         {
             await jobs.CallAsync(nameof(WaitForFunction), new Dictionary<string, object>
             {
                 ["timeout"] = timeout,
-                ["name"] = orchestration
+                ["name"] = orchestration,
+                ["expectedCustomStatus"] = expectedCustomStatus
             });
 
             return jobs;

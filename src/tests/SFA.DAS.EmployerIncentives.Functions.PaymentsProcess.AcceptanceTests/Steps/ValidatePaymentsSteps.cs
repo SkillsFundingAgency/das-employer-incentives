@@ -78,7 +78,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                        },
                        ["collectionPeriodYear"] = CollectionPeriodYear,
                        ["collectionPeriodNumber"] = CollectionPeriod
-                   }
+                   },
+                   expectedCustomStatus: "WaitingForPaymentApproval"
                    ));
 
             _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);

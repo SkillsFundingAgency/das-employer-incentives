@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.EarningType, EarningType.FirstPayment)
                     .With(p => p.DueDate, dueDate)
                     .With(p => p.PeriodNumber, (byte?)(CollectionPeriod - 1)) // previous period
-                    .With(p => p.PaymentYear, PaymentYear)
+                    .With(p => p.PaymentYear, CollectionPeriodYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();
 
@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.EarningType, EarningType.FirstPayment)
                     .With(p => p.DueDate, dueDate)
                     .With(p => p.PeriodNumber, CollectionPeriod) // current period
-                    .With(p => p.PaymentYear, PaymentYear)
+                    .With(p => p.PaymentYear, CollectionPeriodYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();
 
@@ -89,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.EarningType, EarningType.FirstPayment)
                     .With(p => p.DueDate, startDate.AddDays(89))
                     .With(p => p.PeriodNumber, (byte?)(CollectionPeriod + 1)) // next period
-                    .With(p => p.PaymentYear, PaymentYear)
+                    .With(p => p.PaymentYear, CollectionPeriodYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();                
 

@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
     {
         [FunctionName(nameof(WaitForFunction))]
         [NoAutomaticTrigger]
-        public static async Task Run([DurableClient] IDurableOrchestrationClient client, string name, TimeSpan? timeout)
+        public static async Task Run([DurableClient] IDurableOrchestrationClient client, string name, TimeSpan? timeout, string expectedCustomStatus)
         {
             using var cts = new CancellationTokenSource();
             if (timeout != null)
@@ -19,7 +19,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
                 cts.CancelAfter(timeout.Value);
             }
 
-            await client.Wait(status => status.All(x => x.Name != name), cts.Token);
+            await client.Wait(status => status.All(x => OrchestrationsCompleteOrAwaitingInput(name, expectedCustomStatus, x)), cts.Token);
+        }
+
+        private static bool OrchestrationsCompleteOrAwaitingInput(string orchestratorName, string expectedCustomStatus, DurableOrchestrationStatus orchestrationStatus)
+        {
+            var customStatus = orchestrationStatus.CustomStatus.ToObject<string>();
+            return orchestrationStatus.Name != orchestratorName || (expectedCustomStatus != null && customStatus == expectedCustomStatus);
         }
     }
 }
