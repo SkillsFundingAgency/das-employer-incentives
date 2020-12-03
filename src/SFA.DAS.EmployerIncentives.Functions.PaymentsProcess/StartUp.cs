@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             builder.Services.AddPersistenceServices();
             builder.Services.AddQueryServices();
-            builder.Services.AddCommandServices();
+            builder.Services.AddCommandServices(config);
             builder.Services.AddEventServices();
         }
     }

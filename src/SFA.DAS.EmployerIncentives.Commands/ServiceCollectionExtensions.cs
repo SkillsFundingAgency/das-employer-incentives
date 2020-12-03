@@ -42,14 +42,12 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using Polly;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
-using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
+using SFA.DAS.Http.Configuration;
+using SFA.DAS.Http.MessageHandlers;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -57,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddCommandServices(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddCommandServices(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             serviceCollection
                 .AddDistributedLockProvider()
@@ -99,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
-            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit) => new BusinessCentralFinancePaymentsService(c, limit, version));
+            serviceCollection.AddBusinessCentralClient(configuration);
 
             return serviceCollection;
         }
@@ -192,29 +190,21 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceCollection;
         }
 
-        private static IServiceCollection AddBusinessCentralClient<T>(this IServiceCollection serviceCollection, Func<HttpClient, IServiceProvider, string, int, T> instance) where T : class
+        public static IServiceCollection AddBusinessCentralClient(this IServiceCollection services, IConfiguration configuration)
         {
-            serviceCollection.AddTransient(s =>
-            {
-                var settings = s.GetService<IOptions<BusinessCentralApiClient>>().Value;
+            var settings = configuration.GetSection(BusinessCentralApiClient.BusinessCentralApi).Get<BusinessCentralApiClient>();
 
-                var clientBuilder = new HttpClientBuilder()
-                    .WithDefaultHeaders()
-                    .WithApimAuthorisationHeader(settings)
-                    .WithLogging(s.GetService<ILoggerFactory>());
-
-                var httpClient = clientBuilder.Build();
-
-                if (!settings.ApiBaseUrl.EndsWith("/"))
+            services.AddHttpClient("BusinessCentralApiClient", (sp, c) =>
                 {
-                    settings.ApiBaseUrl += "/";
-                }
-                httpClient.BaseAddress = new Uri(settings.ApiBaseUrl);
+                    c.BaseAddress = new Uri(settings.ApiBaseUrl);
+                })
+                .AddTypedClient<IBusinessCentralFinancePaymentsService>((c, sp) => new BusinessCentralFinancePaymentsService(c, settings.PaymentRequestsLimit, settings.ApiVersion))
+                .AddDefaultHeaders()
+                .AddLogging()
+                .AddApimHeadersHandler(settings)
+                .AddTransientHttpErrorPolicy(p => p.RetryAsync(3));
 
-                return instance.Invoke(httpClient, s, settings.ApiVersion, settings.PaymentRequestsLimit);
-            });
-
-            return serviceCollection;
+            return services;
         }
 
         public static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
@@ -314,5 +304,28 @@ namespace SFA.DAS.EmployerIncentives.Commands
             });
         }
 
+        //TODO Add these to SFA.DAS.Http Package as IHttpClientBuilder Extensions
+        public static IHttpClientBuilder AddLogging(this IHttpClientBuilder httpBuilder)
+        {
+            httpBuilder.AddHttpMessageHandler(sp =>
+            {
+                var loggerFactory = sp.GetService<ILoggerFactory>();
+                return new LoggingMessageHandler(loggerFactory.CreateLogger<LoggingMessageHandler>());
+            });
+
+            return httpBuilder;
+        }
+
+        public static IHttpClientBuilder AddApimHeadersHandler(this IHttpClientBuilder httpBuilder, IApimClientConfiguration config)
+        {
+            httpBuilder.AddHttpMessageHandler(sp => new ApimHeadersHandler(config));
+            return httpBuilder;
+        }
+
+        public static IHttpClientBuilder AddDefaultHeaders(this IHttpClientBuilder httpBuilder)
+        {
+            httpBuilder.AddHttpMessageHandler(sp => new DefaultHeadersHandler());
+            return httpBuilder;
+        }
     }
 }
