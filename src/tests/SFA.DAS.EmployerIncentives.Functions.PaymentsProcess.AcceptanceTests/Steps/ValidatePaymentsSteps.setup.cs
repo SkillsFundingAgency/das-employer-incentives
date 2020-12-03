@@ -24,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             public PendingPayment PendingPaymentModel2 { get; }
             public PendingPayment PendingPaymentModel3 { get; }
             public Learner LearnerModel { get; }
+            public ApprenticeshipDaysInLearning DaysInLearning { get; }
 
             private readonly TestContext _testContext;
 
@@ -34,6 +35,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 Fixture fixture = new Fixture();
 
                 AccountModel = fixture.Create<Account>();
+                var startDate = DateTime.Today.AddDays(1);
+                var dueDate = startDate.AddDays(90);
 
                 IncentiveApplicationModel = fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
@@ -43,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                 IncentiveApplicationApprenticeshipModels = fixture.Build<IncentiveApplicationApprenticeship>()
                 .With(p => p.IncentiveApplicationId, IncentiveApplicationModel.Id)
-                .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
+                .With(p => p.PlannedStartDate, startDate)
                 .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
                 .With(p => p.EarningsCalculated, false)
                 .CreateMany(NumberOfApprenticeships).ToList();
@@ -53,16 +56,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.AccountId, IncentiveApplicationModel.AccountId)
                     .With(p => p.AccountLegalEntityId, IncentiveApplicationModel.AccountLegalEntityId)
                     .With(p => p.ApprenticeshipId, IncentiveApplicationApprenticeshipModels.First().ApprenticeshipId)
-                    .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
-                    .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
+                    .With(p => p.PlannedStartDate, startDate)                    
+                    .With(p => p.DateOfBirth, startDate.AddYears(-20))
                     .Create();
 
                 PendingPaymentModel1 = fixture.Build<PendingPayment>()
                     .With(p => p.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
                     .With(p => p.AccountId, ApprenticeshipIncentiveModel.AccountId)
                     .With(p => p.AccountLegalEntityId, ApprenticeshipIncentiveModel.AccountLegalEntityId)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.DueDate, dueDate)
                     .With(p => p.PeriodNumber, (byte?)(CollectionPeriod - 1)) // previous period
-                    .With(p => p.PaymentYear, PaymentYear)
+                    .With(p => p.PaymentYear, CollectionPeriodYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();
 
@@ -70,8 +75,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
                     .With(p => p.AccountId, ApprenticeshipIncentiveModel.AccountId)
                     .With(p => p.AccountLegalEntityId, ApprenticeshipIncentiveModel.AccountLegalEntityId)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.DueDate, dueDate)
                     .With(p => p.PeriodNumber, CollectionPeriod) // current period
-                    .With(p => p.PaymentYear, PaymentYear)
+                    .With(p => p.PaymentYear, CollectionPeriodYear)
                     .Without(p => p.PaymentMadeDate)
                     .Create();
 
@@ -79,22 +86,30 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
                     .With(p => p.AccountId, ApprenticeshipIncentiveModel.AccountId)
                     .With(p => p.AccountLegalEntityId, ApprenticeshipIncentiveModel.AccountLegalEntityId)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.DueDate, startDate.AddDays(89))
                     .With(p => p.PeriodNumber, (byte?)(CollectionPeriod + 1)) // next period
-                    .With(p => p.PaymentYear, PaymentYear)
+                    .With(p => p.PaymentYear, CollectionPeriodYear)
                     .Without(p => p.PaymentMadeDate)
-                    .Create();
+                    .Create();                
 
                 LearnerModel = fixture.Build<Learner>()
                     .With(l => l.ApprenticeshipId, ApprenticeshipIncentiveModel.ApprenticeshipId)
                     .With(l => l.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
-                    .With(l => l.CreatedDate, DateTime.Now.AddDays(-1))
+                    .With(l => l.CreatedDate, DateTime.Today.AddDays(-1))
                     .With(l => l.ULN, ApprenticeshipIncentiveModel.ULN)
                     .With(l => l.SubmissionFound, true)
                     .With(l => l.LearningFound, true)
                     .With(l => l.InLearning, true)
                     .With(l => l.HasDataLock, false)
-                    .With(l => l.DaysInLearning, 100)
-                    .With(l => l.StartDate, DateTime.Now.AddDays(-100))
+                    .With(l => l.StartDate, DateTime.Today.AddDays(-100))
+                    .Create();
+
+                DaysInLearning = fixture.Build<ApprenticeshipDaysInLearning>()
+                    .With(d => d.LearnerId, LearnerModel.Id)
+                    .With(d => d.NumberOfDaysInLearning, 90)
+                    .With(d => d.CollectionPeriodNumber, CollectionPeriod) // current period
+                    .With(d => d.CollectionPeriodYear, CollectionPeriodYear)
                     .Create();
             }
 
@@ -109,6 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await connection.InsertAsync(PendingPaymentModel2);
                 await connection.InsertAsync(PendingPaymentModel3);
                 await connection.InsertAsync(LearnerModel);
+                await connection.InsertAsync(DaysInLearning);
             }
         }
     }

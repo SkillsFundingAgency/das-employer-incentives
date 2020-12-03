@@ -47,9 +47,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
                 incentive.Id,
                 incentive.Apprenticeship.Id,
                 incentive.Apprenticeship.Provider.Ukprn,
-                incentive.Apprenticeship.UniqueLearnerNumber,
-                DateTime.UtcNow
+                incentive.Apprenticeship.UniqueLearnerNumber
             );
+        }
+
+        public async Task<Learner> Get(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            return _learnerFactory.GetExisting(await _learnerDataRepository.GetByApprenticeshipIncentiveId(incentive.Id));
         }
 
         public async Task Save(Learner aggregate)

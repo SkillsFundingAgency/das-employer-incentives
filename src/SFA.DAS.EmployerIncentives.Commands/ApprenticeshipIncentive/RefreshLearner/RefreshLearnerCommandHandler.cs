@@ -1,6 +1,8 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,9 +27,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
         public async Task Handle(RefreshLearnerCommand command, CancellationToken cancellationToken = default)
         {
-            var incentive = await _incentiveDomainRepository.Find(command.ApprenticeshipIncentiveId);
+            Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive = await _incentiveDomainRepository.Find(command.ApprenticeshipIncentiveId);
 
-            var learner = await _learnerDomainRepository.GetOrCreate(incentive);
+            Learner learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
             SubmissionData submissionData = null;
             var learnerData = await _learnerService.Get(learner);
@@ -42,6 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             }
 
             learner.SetSubmissionData(submissionData);
+
+            learner.SetLearningPeriods(learnerData.LearningPeriods(incentive));
 
             await _learnerDomainRepository.Save(learner);
         }

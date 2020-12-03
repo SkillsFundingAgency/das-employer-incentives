@@ -18,5 +18,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             if (_context.PaymentsApi == null)
                 _context.PaymentsApi = new MockApi();
         }
+
+        [AfterScenario()]
+        public void CleanUpPaymentsApi()
+        {
+            _context.PaymentsApi.Reset();
+        }
     }
 }

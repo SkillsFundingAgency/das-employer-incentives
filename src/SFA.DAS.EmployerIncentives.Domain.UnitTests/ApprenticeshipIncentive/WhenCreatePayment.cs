@@ -132,7 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.CreatePayment(pendingPayment.Id, _collectionPeriod.CalendarYear, _collectionPeriod.PeriodNumber);
 
             // assert
-            pendingPayment.PaymentMadeDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            pendingPayment.PaymentMadeDate.Should().Be(DateTime.Today);
         }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)

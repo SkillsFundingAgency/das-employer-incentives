@@ -73,6 +73,7 @@
     <Build Include="Tables\IncentiveApplication.sql" />
     <Build Include="Tables\IncentiveApplicationApprenticeship.sql" />
     <Build Include="Views\ApplicationsDashboard.sql" />
+    <Build Include="Views\BusinessApplicationsDashboard.sql" />
     <Build Include="Tables\CollectionCalendar.sql" />
     <Build Include="Schemas\Incentives.sql" />
     <None Include="Scripts\Data.CollectionCalendar.sql">
@@ -87,6 +88,8 @@
     <Build Include="Views\PendingPaymentsValidationStepFailure.sql" />
     <Build Include="Views\PendingPaymentsValidationStatus.sql" />
     <Build Include="Views\ValidationCounts.sql" />
+    <Build Include="Tables\ApprenticeshipDaysInLearning.sql" />
+    <Build Include="Tables\LearningPeriod.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
@@ -98,6 +101,5 @@
   <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
     <None Include="update-model.publish.xml" />
-    <None Include="Views\BusinessApplicationsDashboard.sql" />
   </ItemGroup>
 </Project>

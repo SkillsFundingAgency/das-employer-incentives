@@ -7,6 +7,7 @@ using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
@@ -51,8 +52,6 @@ using SFA.DAS.Http.MessageHandlers;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
-    
-
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddCommandServices(this IServiceCollection serviceCollection, IConfiguration configuration)
@@ -75,11 +74,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             })
-            .AddSingleton(typeof(IValidator<CreateIncentiveCommand>), new NullValidator())
-            .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
-            .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
-            .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
-            .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
             .AddCommandHandlerDecorators()
             .AddScoped<ICommandDispatcher, CommandDispatcher>()
             .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()            
@@ -136,8 +130,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())                
+                .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<CalculateDaysInLearningCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator());
 
             return serviceCollection;

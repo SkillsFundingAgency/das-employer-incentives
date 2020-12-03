@@ -9,12 +9,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
     public class TestMessageBus
     {
+        private readonly TestContext _testContext;
         private IEndpointInstance _endpointInstance;
         public bool IsRunning { get; private set; }
         public DirectoryInfo StorageDirectory { get; private set; }
-        public async Task Start(DirectoryInfo testDirectory)
+
+        public TestMessageBus(TestContext testContext)
         {
-            StorageDirectory = new DirectoryInfo(Path.Combine(testDirectory.FullName, ".learningtransport"));
+            _testContext = testContext;
+        }
+
+        public async Task Start()
+        {
+            StorageDirectory = new DirectoryInfo(Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport"));
             if (!StorageDirectory.Exists)
             {
                 Directory.CreateDirectory(StorageDirectory.FullName);

@@ -1,10 +1,13 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using FluentAssertions;
 using System.Threading.Tasks;
 using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -30,15 +33,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"payments exist for a legal entity")]
         public async Task GivenPaymentsExistForALegalEntity()
         {
-            //TODO: Move/rename the ValidatePaymentData
             _validatePaymentData = new ValidatePaymentsSteps.ValidatePaymentData(_testContext);
             await _validatePaymentData.Create();
 
-            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(CollectionPeriodYear, CollectionPeriod);
-
-            status.RuntimeStatus.Should().NotBe("Failed", status.Output);
-
-            _orchestratorInstanceId = status.InstanceId;
+            await RunPaymentsProcess();
         }
 
         [When(@"the payments have been approved")]
@@ -56,13 +54,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .WithStatusCode(HttpStatusCode.Accepted)
                     .WithHeader("Content-Type", "application/json"));
 
-            await _testContext.PaymentsProcessFunctions.ApprovePayments(_orchestratorInstanceId);
+            await ApprovePayments();
         }
 
         [When(@"the payments have been rejected")]
         public async Task WhenPaymentsAreRejected()
         {
-            await _testContext.PaymentsProcessFunctions.RejectPayments(_orchestratorInstanceId);
+            await RejectPayments();
         }
 
         [Then(@"the payments are sent to Business Central")]
@@ -89,6 +87,67 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.PaymentPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(2);
             results.Any(x => x.PaidDate.HasValue).Should().BeFalse();
+        }
+
+        private async Task RunPaymentsProcess()
+        {
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "IncentivePaymentOrchestrator_HttpStart",
+                    nameof(IncentivePaymentOrchestrator),
+                    new Dictionary<string, object>
+                    {
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
+                        },
+                        ["collectionPeriodYear"] = CollectionPeriodYear,
+                        ["collectionPeriodNumber"] = CollectionPeriod
+                    },
+                    expectedCustomStatus: "WaitingForPaymentApproval"
+                ));
+
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            var orchestratorStartResponse = await _testContext.TestFunction.GetOrchestratorStartResponse();
+            _orchestratorInstanceId = orchestratorStartResponse.Id;
+        }
+
+        private async Task ApprovePayments()
+        {
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "PaymentApproval_HttpStart",
+                    nameof(IncentivePaymentOrchestrator),
+                    new Dictionary<string, object>
+                    {
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/approvePayments/{_orchestratorInstanceId}"
+                        },
+                        ["instanceId"] = _orchestratorInstanceId
+                    }
+                ));
+
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        private async Task RejectPayments()
+        {
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "PaymentRejection_HttpStart",
+                    nameof(IncentivePaymentOrchestrator),
+                    new Dictionary<string, object>
+                    {
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/rejectPayments/{_orchestratorInstanceId}"
+                        },
+                        ["instanceId"] = _orchestratorInstanceId
+                    }
+                ));
+
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }

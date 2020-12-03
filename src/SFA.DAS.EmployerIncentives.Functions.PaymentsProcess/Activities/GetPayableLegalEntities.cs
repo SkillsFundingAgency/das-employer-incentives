@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     public class GetPayableLegalEntities
     {
         private readonly IQueryDispatcher _queryDispatcher;
-        private ILogger<GetPayableLegalEntities> _logger;
+        private readonly ILogger<GetPayableLegalEntities> _logger;
 
         public GetPayableLegalEntities(IQueryDispatcher queryDispatcher, ILogger<GetPayableLegalEntities> logger)
         {
@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _logger = logger;
         }
 
-        [FunctionName("GetPayableLegalEntities")]
+        [FunctionName(nameof(GetPayableLegalEntities))]
         public async Task<List<PayableLegalEntityDto>> Get([ActivityTrigger]CollectionPeriod collectionPeriod)
         {
             _logger.LogInformation("Getting payable legal entities for collection period {collectionPeriod}.", collectionPeriod);

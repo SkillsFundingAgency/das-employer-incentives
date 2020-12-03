@@ -6,17 +6,32 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Bindings
 {
     [Binding]
-    public class LearnerMatchApiPerScenarioHook
+    public class LearnerMatchApiPerTestRunHook
     {
+        private readonly TestContext _testContext;
+
+        public LearnerMatchApiPerTestRunHook(TestContext testContext)
+        {
+            _testContext = testContext;
+        }
+
         [BeforeScenario(Order = 3)]
-        public void InitialiseLearnerMatchApi(TestContext context)
+        public void InitialiseLearnerMatchApi()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            if (context.LearnerMatchApi == null)
-                context.LearnerMatchApi = new MockApi();
+
+            if (_testContext.LearnerMatchApi == null)
+                _testContext.LearnerMatchApi = new MockApi();
+
             stopwatch.Stop();
-            Console.WriteLine($@"[{nameof(LearnerMatchApiPerScenarioHook)}] time it took to spin up LearnerMatchApi: {stopwatch.Elapsed.Seconds} seconds");
+            Console.WriteLine($"[{nameof(LearnerMatchApiPerTestRunHook)}] time it took to spin up LearnerMatchApi: {stopwatch.Elapsed.Milliseconds} milliseconds");
+        }
+
+        [AfterScenario()]
+        public void CleanUpLearnerMatchApi()
+        {
+            _testContext.LearnerMatchApi.Reset();
         }
     }
 }
