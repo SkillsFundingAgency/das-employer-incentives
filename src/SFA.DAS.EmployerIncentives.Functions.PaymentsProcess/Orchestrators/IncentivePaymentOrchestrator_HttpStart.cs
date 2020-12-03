@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             log.LogInformation($"Triggering IncentivePaymentOrchestrator for collection period {collectionPeriod}", new { collectionPeriod });
 
-            string instanceId = await starter.StartNewAsync("IncentivePaymentOrchestrator", null, collectionPeriod);
+            string instanceId = await starter.StartNewAsync(nameof(IncentivePaymentOrchestrator), null, collectionPeriod);
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 

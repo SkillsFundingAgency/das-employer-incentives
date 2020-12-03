@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             log.LogInformation("Triggering LearnerMatchingOrchestrator");
 
-            string instanceId = await starter.StartNewAsync("LearnerMatchingOrchestrator");
+            string instanceId = await starter.StartNewAsync(nameof(LearnerMatchingOrchestrator));
 
             log.LogInformation($"Started LearnerMatchingOrchestrator with ID = '{instanceId}'.");
         }

@@ -129,7 +129,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     })
             };
 
-            incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(_collectionPeriods));
+            var collectionPeriods = new List<CollectionPeriod>()
+            {
+                new CollectionPeriod(
+                    1, 
+                    (byte)DateTime.Now.Month, 
+                    (short)DateTime.Now.Year, 
+                    DateTime.Now.AddDays(-1),
+                    DateTime.Now,
+                    DateTime.Now.Year.ToString(),
+                    true)
+            };
+
+            incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(collectionPeriods));
+
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();
             account.AddLegalEntity(incentive.PendingPayments.First().Account.AccountLegalEntityId, LegalEntity.Create(legalEntityModel));

@@ -3,12 +3,12 @@
 		select
 			month(PlannedStartDate) as [Planned Start Month],
 			year(PlannedStartDate) as [Planned Start Year],
-			count(distinct(iaa.incentiveapplicationid)) as Applications, 
+			count(distinct(iaa.IncentiveApplicationId)) as Applications, 
 			avg(cast(Learners as float)) as [Mean learners per app],
 			count(Learners) as [Num Learners],
-			sum(iaa.totalincentiveamount) as [Total Value], 
-			sum(case when iaa.totalincentiveamount < '2000.00' then iaa.totalincentiveamount else 0 end) as [<£2000],
-			sum(case when iaa.totalincentiveamount >= '2000.00' then iaa.totalincentiveamount else 0 end) as [>=£2000]
+			sum(iaa.TotalIncentiveAmount) as [Total Value], 
+			sum(case when iaa.TotalIncentiveAmount < '2000.00' then iaa.TotalIncentiveAmount else 0 end) as [<£2000],
+			sum(case when iaa.TotalIncentiveAmount >= '2000.00' then iaa.TotalIncentiveAmount else 0 end) as [>=£2000]
 		from
 			[dbo].[IncentiveApplicationApprenticeship] iaa
 			left join [dbo].[IncentiveApplication] ia on ia.Id=iaa.IncentiveApplicationId

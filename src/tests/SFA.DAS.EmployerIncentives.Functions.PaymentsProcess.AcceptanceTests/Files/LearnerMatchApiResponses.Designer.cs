@@ -115,6 +115,31 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///   Looks up a localized string similar to {
         ///    &quot;StartDate&quot;: &quot;2020-08-10T00:00:00+00:00&quot;,
         ///    &quot;EventTime&quot;: &quot;0001-01-01T00:00:00+00:00&quot;,
+        ///    &quot;IlrSubmissionDate&quot;: &quot;2020-11-09T17:58:57.863+00:00&quot;,
+        ///    &quot;IlrSubmissionWindowPeriod&quot;: 4,
+        ///    &quot;AcademicYear&quot;: 2021,
+        ///    &quot;Ukprn&quot;: 10036143,
+        ///    &quot;Uln&quot;: 9900084607,
+        ///    &quot;Training&quot;: [
+        ///        {
+        ///            &quot;Reference&quot;: &quot;ZPROG001&quot;,
+        ///            &quot;ProgrammeType&quot;: 25,
+        ///            &quot;StandardCode&quot;: 61,
+        ///            &quot;FrameworkCode&quot;: 0,
+        ///            &quot;PathwayCode&quot;: 0,
+        ///            &quot;FundingLineType&quot;: null,
+        ///        [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string BL_R03_InBreak_json {
+            get {
+                return ResourceManager.GetString("BL_R03_InBreak_json", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;StartDate&quot;: &quot;2020-08-10T00:00:00+00:00&quot;,
+        ///    &quot;EventTime&quot;: &quot;0001-01-01T00:00:00+00:00&quot;,
         ///    &quot;IlrSubmissionDate&quot;: &quot;2020-11-09T16:53:17.293+00:00&quot;,
         ///    &quot;IlrSubmissionWindowPeriod&quot;: 3,
         ///    &quot;AcademicYear&quot;: 2021,
@@ -158,6 +183,31 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         internal static string BL_R03_InLearning_json {
             get {
                 return ResourceManager.GetString("BL_R03_InLearning_json", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;StartDate&quot;: &quot;2020-08-10T00:00:00+00:00&quot;,
+        ///    &quot;EventTime&quot;: &quot;0001-01-01T00:00:00+00:00&quot;,
+        ///    &quot;IlrSubmissionDate&quot;: &quot;2020-11-09T16:53:17.293+00:00&quot;,
+        ///    &quot;IlrSubmissionWindowPeriod&quot;: 3,
+        ///    &quot;AcademicYear&quot;: 2021,
+        ///    &quot;Ukprn&quot;: 10036143,
+        ///    &quot;Uln&quot;: 9900084607,
+        ///    &quot;Training&quot;: [
+        ///        {
+        ///            &quot;Reference&quot;: &quot;ZPROG001&quot;,
+        ///            &quot;ProgrammeType&quot;: 25,
+        ///            &quot;StandardCode&quot;: 61,
+        ///            &quot;FrameworkCode&quot;: 0,
+        ///            &quot;PathwayCode&quot;: 0,
+        ///            &quot;FundingLineType&quot;: null,
+        ///        [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string BL_R03_InLearning_NoEndDate_json {
+            get {
+                return ResourceManager.GetString("BL_R03_InLearning_NoEndDate_json", resourceCulture);
             }
         }
         

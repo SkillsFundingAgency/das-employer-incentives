@@ -10,10 +10,6 @@
   "ApplicationSettings": {
     "DbConnectionString": "DB_CONNECTION_STRING"
   },
-  "TestSettings": {
-    "FunctionHostPath": "C:\\Program Files\\Microsoft\\Azure Functions Core Tools\\func.exe",
-    "FunctionApplicationPath": "src\\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\\bin\\Debug\\netcoreapp3.1"
-  },
   "MatchedLearnerApi": {
     "ApiBaseUrl": "LEARNER_MATCH_API_URL",
     "ClientId": "",

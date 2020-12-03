@@ -1,8 +1,11 @@
 ﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
@@ -15,8 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     [Scope(Feature = "ValidatePayments")]
     public partial class ValidatePaymentsSteps
     {
-        private readonly TestContext _testContext;        
-        private const short PaymentYear = 2021;
+        private readonly TestContext _testContext;
+        private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
 
         private ValidatePaymentData _validatePaymentData;
@@ -49,6 +52,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 case ValidationStep.HasNoDataLocks:
                     _validatePaymentData.LearnerModel.HasDataLock = true;
                     break;
+                case ValidationStep.HasIlrSubmission:
+                    _validatePaymentData.LearnerModel.SubmissionFound = false;
+                    break;
+                case ValidationStep.HasDaysInLearning:
+                    _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 89;
+                    break;
             }
         }
 
@@ -57,9 +66,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await _validatePaymentData.Create();
 
-            var status = await _testContext.PaymentsProcessFunctions.StartPaymentsProcess(PaymentYear, CollectionPeriod);
+            await _testContext.TestFunction.Start(
+               new OrchestrationStarterInfo(
+                   "IncentivePaymentOrchestrator_HttpStart",
+                   nameof(IncentivePaymentOrchestrator),
+                   new Dictionary<string, object>
+                   {
+                       ["req"] = new DummyHttpRequest
+                       {
+                           Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
+                       },
+                       ["collectionPeriodYear"] = CollectionPeriodYear,
+                       ["collectionPeriodNumber"] = CollectionPeriod
+                   }
+                   ));
 
-            status.RuntimeStatus.Should().NotBe("Failed", status.Output);
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]
@@ -129,6 +151,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             x.PeriodNumber > CollectionPeriod);
 
             results.All(x => x.PaymentMadeDate.HasValue).Should().BeFalse();
+        }
+
+        [Given(@"the ILR submission validation step will fail")]
+        public void GivenTheIlrSubmissionValidationStepWillFail()
+        {
+            GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
+        }
+
+        [Then(@"the ILR Submission check will have a failed validation result")]
+        public async Task ThenTheIlrSubmissionCheckWillHaveAFailedValidationResult()
+        {
+            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.HasIlrSubmission);
+        }
+
+        [Then(@"no further ILR validation is performed")]
+        public async Task ThenNoFurtherIlrValidationIsPerformed()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result
+                .Where(x => x.Step != ValidationStep.HasIlrSubmission && x.Step != ValidationStep.HasBankDetails);
+            results.Any().Should().BeFalse();
         }
     }
 }

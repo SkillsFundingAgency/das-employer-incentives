@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
     public class GetAllApprenticeshipIncentives
     {
         private readonly IQueryDispatcher _queryDispatcher;
-        private ILogger<GetAllApprenticeshipIncentives> _logger;
+        private readonly ILogger<GetAllApprenticeshipIncentives> _logger;
 
         public GetAllApprenticeshipIncentives(IQueryDispatcher queryDispatcher, ILogger<GetAllApprenticeshipIncentives> logger)
         {
@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _logger = logger;
         }
 
-        [FunctionName("GetAllApprenticeshipIncentives")]
+        [FunctionName(nameof(GetAllApprenticeshipIncentives))]
         public async Task<List<Guid>> Get([ActivityTrigger]object input)
         {
             _logger.LogInformation($"Getting all Apprenticeship Incentives");

@@ -75,10 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
             storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
             storedLearner.HasDataLock.Should().BeTrue();
-            storedLearner.DaysInLearning.Should().BeNull();
             storedLearner.InLearning.Should().BeTrue();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
-            storedLearner.CreatedDate.Should().Be(testLearner.CreatedDate);
         }
     }
 }
