@@ -7,7 +7,13 @@ using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
-    public class TestContext
+    public static class MockServers
+    {
+        public static MockApi PaymentsApi { get; set; }
+        public static MockApi LearnerMatchApi { get; set; }
+    }
+
+    public class TestContext : IDisposable
     {
         public string InstanceId { get; private set; }
         public DirectoryInfo TestDirectory { get; set; }
@@ -16,7 +22,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public TestData TestData { get; set; }
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
-        public TestLearnerMatchApi LearnerMatchApi { get; set; }
+
+        public MockApi LearnerMatchApi
+        {
+            get => MockServers.LearnerMatchApi;
+            set => MockServers.LearnerMatchApi = value;
+        }
+
+        public MockApi PaymentsApi
+        {
+            get => MockServers.PaymentsApi;
+            set => MockServers.PaymentsApi = value;
+        }
         public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
 
         public TestContext()
@@ -29,6 +46,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             }
             TestData = new TestData();
             Hooks = new List<IHook>();
+        }
+
+        private bool _isDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+
+            if (disposing)
+            {
+                LearnerMatchApi?.Reset();
+                PaymentsApi?.Reset();
+            }
+
+            _isDisposed = true;
         }
     }
 }

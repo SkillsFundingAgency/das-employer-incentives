@@ -28,6 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\SendPayments.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Update="Files\LearnerMatchApiResponses.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -50,4 +53,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\SendPayments.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>SendPayments.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+  </ItemGroup>
 </Project>

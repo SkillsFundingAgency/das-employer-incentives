@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public short? PaymentYear => Model.PaymentYear;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
+
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
         internal static PendingPayment New(
@@ -82,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public bool IsValidated(short collectionYear, byte collectionPeriod)
         {
-            return Model.PendingPaymentValidationResultModels.Count > 0
+            return Model.PendingPaymentValidationResultModels.Count() > 0
                    && AllPendingPaymentsForPeriodAreValid(collectionYear, collectionPeriod);
         }
 

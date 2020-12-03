@@ -12,20 +12,18 @@ using WireMock.Server;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 {
-    public class FakeLearnerMatchApiBuilder
+    public class FakeBusinessCentralApiBuilder
     {
+
         private readonly WireMockServer _server;
         private readonly Fixture _fixture = new Fixture();
-        private object _learnerMatchApiData;
-        private ApprenticeshipIncentive _apprenticeshipIncentive;
-        private Account _accountModel;
 
-        public static FakeLearnerMatchApiBuilder Create(int port)
+        public static FakeBusinessCentralApiBuilder Create(int port)
         {
-            return new FakeLearnerMatchApiBuilder(port);
+            return new FakeBusinessCentralApiBuilder(port);
         }
 
-        private FakeLearnerMatchApiBuilder(int port)
+        private FakeBusinessCentralApiBuilder(int port)
         {
             _server = WireMockServer.StartWithAdminInterface(port);
         }
@@ -40,41 +38,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
         {
             foreach (LogEntry newItem in e.NewItems)
             {
-                Debug.WriteLine("============================= TestLearnerApi MockServer called ================================");
+                Debug.WriteLine("============================= FakeBusinessCentralApi MockServer called ================================");
                 Debug.WriteLine(JsonConvert.SerializeObject(newItem), Formatting.Indented);
                 Debug.WriteLine("==========================================================================================================");
             }
         }
 
-        public FakeLearnerMatchApiBuilder WithLearnerMatchingApi()
+        public FakeBusinessCentralApiBuilder WithPaymentRequestsEndpoint()
         {
-            _accountModel = _fixture.Create<Account>();
-
-            _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
-                .With(p => p.AccountId, _accountModel.Id)
-                .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
-                .Create();
-
-
-            _learnerMatchApiData = _fixture.Build<LearnerSubmissionDto>()
-                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
-                .Create();
-
             _server
                 .Given(
                     Request
                         .Create()
-                        .WithPath($"/api/v1.0/*/*")
-                        .UsingGet()
+                        .WithPath($"/payments/requests")
+                        .UsingPost()
                 )
                 .RespondWith(Response.Create()
-                    .WithStatusCode(HttpStatusCode.OK)
-                    .WithHeader("Content-Type", "application/json")
-                    .WithBodyAsJson(_learnerMatchApiData));
+                    .WithStatusCode(HttpStatusCode.Accepted));
 
             return this;
         }
     }
-
 }
