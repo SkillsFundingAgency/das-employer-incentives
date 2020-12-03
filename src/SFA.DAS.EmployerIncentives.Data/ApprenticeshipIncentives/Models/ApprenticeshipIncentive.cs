@@ -19,10 +19,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public long ULN { get; set; }
         public long? UKPRN { get; set; }
         public ApprenticeshipEmployerType EmployerType { get; set; }
-        public DateTime PlannedStartDate { get; set; }
+        public DateTime StartDate { get; set; }
         public Guid IncentiveApplicationApprenticeshipId { get; set; }
         public long? AccountLegalEntityId { get; set; }
-        public DateTime? ActualStartDate { get; set; }
         public bool RefreshedLearnerForEarnings { get; set; }
         public bool HasPossibleChangeOfCircumstances { get; set; }
 

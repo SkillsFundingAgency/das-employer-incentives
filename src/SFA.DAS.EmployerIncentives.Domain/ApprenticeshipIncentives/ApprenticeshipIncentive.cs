@@ -19,15 +19,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
     {
         public Account Account => Model.Account;
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
-        public DateTime PlannedStartDate => Model.PlannedStartDate;
-        public DateTime? ActualStartDate => Model.ActualStartDate;
+        public DateTime StartDate => Model.StartDate;
         public bool RefreshedLearnerForEarnings => Model.RefreshedLearnerForEarnings;
         public bool HasPossibleChangeOfCircumstances => Model.HasPossibleChangeOfCircumstances;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public PendingPayment NextDuePayment => GetNextDuePayment();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
 
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime startDate)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -37,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ApplicationApprenticeshipId = applicationApprenticeshipId,
                     Account = account,
                     Apprenticeship = apprenticeship,
-                    PlannedStartDate = plannedStartDate
+                    StartDate = startDate
                 }, true);
         }
 
@@ -53,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            var incentive = new Incentive(Apprenticeship.DateOfBirth, ActualStartDate ?? PlannedStartDate, paymentProfiles);
+            var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {
                 return;
@@ -107,11 +106,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.SetPaymentMadeDate(paymentDate);
         }
 
-        public void SetActualStartDate(DateTime? startDate)
+        public void SetStartDate(DateTime startDate)
         {
-            if (startDate != Model.ActualStartDate)
+            if (startDate != Model.StartDate)
             {
-                Model.ActualStartDate = startDate;
+                Model.StartDate = startDate;
                 Model.PendingPaymentModels.Clear();
             }
         }
@@ -141,7 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private SubnominalCode DetermineSubnominalCode()
         {
-            var age = Model.Apprenticeship.DateOfBirth.AgeOnThisDay(Model.PlannedStartDate);
+            var age = Model.Apprenticeship.DateOfBirth.AgeOnThisDay(Model.StartDate);
             var employerType = Model.Apprenticeship.EmployerType;
 
             if (employerType == ApprenticeshipEmployerType.Levy)
@@ -262,7 +261,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var hasEnoughDaysInLearning = false;
             if (matchedLearner != null)
             {
-                hasEnoughDaysInLearning = PlannedStartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) >= pendingPayment.DueDate.Date;
+                hasEnoughDaysInLearning = StartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) >= pendingPayment.DueDate.Date;
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasDaysInLearning, hasEnoughDaysInLearning));

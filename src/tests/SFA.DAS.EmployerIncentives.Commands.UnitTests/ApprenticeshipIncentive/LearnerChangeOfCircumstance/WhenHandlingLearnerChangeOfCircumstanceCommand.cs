@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            _incentive.ActualStartDate.Should().Be(_learner.SubmissionData.StartDate.Value);
+            _incentive.StartDate.Should().Be(_learner.SubmissionData.StartDate.Value);
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_start_date_is_not_updated_when_submission_data_was_not_found()
         {
             //Arrange
-            var originalStartDate = _incentive.ActualStartDate;
+            var originalStartDate = _incentive.StartDate;
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
             _learner.SetSubmissionData(null);
 
@@ -107,14 +107,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            _incentive.ActualStartDate.Should().Be(originalStartDate);
+            _incentive.StartDate.Should().Be(originalStartDate);
         }
 
         [Test]
         public async Task Then_the_start_date_is_not_updated_when_submission_has_no_start_date()
         {
             //Arrange
-            var originalStartDate = _incentive.ActualStartDate;
+            var originalStartDate = _incentive.StartDate;
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
             _learner.SubmissionData.SetStartDate(null);
 
@@ -122,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            _incentive.ActualStartDate.Should().Be(originalStartDate);
+            _incentive.StartDate.Should().Be(originalStartDate);
         }
 
         [Test]

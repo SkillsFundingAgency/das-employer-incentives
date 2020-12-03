@@ -8,11 +8,10 @@
 	[DateOfBirth] DATETIME2 NOT NULL,
 	[ULN] BIGINT NOT NULL,	
 	[EmployerType] INT NOT NULL,
-	[PlannedStartDate] DATETIME2 NOT NULL,
+	[StartDate] DATETIME2 NOT NULL,
 	[IncentiveApplicationApprenticeshipId] UNIQUEIDENTIFIER NOT NULL,
 	[AccountLegalEntityId] BIGINT NULL, 
     [UKPRN] BIGINT NULL, 
-    [ActualStartDate] DATETIME2 NULL,
 	[RefreshedLearnerForEarnings] BIT NOT NULL DEFAULT(0), 
     [HasPossibleChangeOfCircumstances] BIT NOT NULL DEFAULT (0)
 )

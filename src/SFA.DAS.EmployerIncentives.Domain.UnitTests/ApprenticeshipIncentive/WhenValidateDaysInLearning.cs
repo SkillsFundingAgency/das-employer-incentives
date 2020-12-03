@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _sutModel = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
-                .With(a => a.PlannedStartDate, startDate)
+                .With(a => a.StartDate, startDate)
                 .With(a => a.PendingPaymentModels, new List<PendingPaymentModel>() 
                     {
                         _fixture.Build<PendingPaymentModel>()

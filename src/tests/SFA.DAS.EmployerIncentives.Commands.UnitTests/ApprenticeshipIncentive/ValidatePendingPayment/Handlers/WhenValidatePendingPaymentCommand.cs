@@ -92,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var model = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(m => m.Account, _account)
-                .With(m => m.PlannedStartDate, _startDate)
+                .With(m => m.StartDate, _startDate)
                 .With(m => m.PendingPaymentModels, pendingPayments)
                 .Create();
 

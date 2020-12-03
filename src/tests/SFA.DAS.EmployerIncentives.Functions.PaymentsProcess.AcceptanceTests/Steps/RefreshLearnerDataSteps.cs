@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.ApprenticeshipId, 511526)
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
-                .With(p => p.ActualStartDate, _startDate)
+                .With(p => p.StartDate, _startDate)
                 .Create();
 
             _pendingPayments = new List<PendingPayment>

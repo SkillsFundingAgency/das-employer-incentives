@@ -21,12 +21,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ULN = model.Apprenticeship.UniqueLearnerNumber,
                 UKPRN = model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
-                PlannedStartDate = model.PlannedStartDate,
+                StartDate = model.StartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
                 Payments = model.PaymentModels.Map(),
                 AccountLegalEntityId = model.Account.AccountLegalEntityId,
-                ActualStartDate = model.ActualStartDate,
                 RefreshedLearnerForEarnings = model.RefreshedLearnerForEarnings,
                 HasPossibleChangeOfCircumstances = model.HasPossibleChangeOfCircumstances
             };
@@ -53,11 +52,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = entity.Id,
                 Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
                 Apprenticeship = apprenticeship,
-                PlannedStartDate = entity.PlannedStartDate,
+                StartDate = entity.StartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
                 PaymentModels = entity.Payments.Map(),
-                ActualStartDate = entity.ActualStartDate,
                 RefreshedLearnerForEarnings = entity.RefreshedLearnerForEarnings,
                 HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances
             };

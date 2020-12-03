@@ -57,9 +57,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.AccountId, _applicationModel.AccountId)
                 .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
-                .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
+                .With(p => p.StartDate, DateTime.Today.AddDays(1))
                 .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
-                .With(p => p.ActualStartDate, (DateTime?)null)
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()

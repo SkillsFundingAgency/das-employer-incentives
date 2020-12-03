@@ -120,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>();
 
-            incentive.Single().ActualStartDate.Should().Be(_learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate);
+            incentive.Single().StartDate.Should().Be(_learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate);
         }
 
         [Then(@"the pending payments are recalculated for the apprenticeship incentive")]
