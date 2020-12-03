@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Azure.WebJobs;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
-{    
+{
 
     public static class JobHostExtensions
     {
@@ -12,6 +12,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
         {
             await jobs.CallAsync(nameof(ReadyFunction), new Dictionary<string, object> { ["timeout"] = timeout });
             return jobs;
+        }
+
+        public static async Task RefreshStatus(this IJobHost jobs, string instanceId)
+        {
+            await jobs.CallAsync(nameof(GetStatusFunction), new Dictionary<string, object>
+            {
+                ["instanceId"] = instanceId
+            });
         }
 
         public static async Task<IJobHost> Ready(this Task<IJobHost> task, TimeSpan? timeout = null)
@@ -39,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
 
             return jobs;
         }
-        
+
         public static async Task<IJobHost> WaitFor(this Task<IJobHost> task, string orchestration, TimeSpan? timeout = null)
         {
             var jobs = await task;

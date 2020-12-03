@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System.Collections.Generic;
@@ -83,6 +84,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                    ));
 
             _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+            var response = await _testContext.TestFunction.GetOrchestratorStartResponse();
+            var status = await _testContext.TestFunction.GetStatus(response.Id);
+            status.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]
