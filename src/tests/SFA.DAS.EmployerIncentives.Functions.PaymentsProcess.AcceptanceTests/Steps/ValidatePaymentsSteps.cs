@@ -1,11 +1,13 @@
 ﻿using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
@@ -79,9 +81,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                        ["collectionPeriodYear"] = CollectionPeriodYear,
                        ["collectionPeriodNumber"] = CollectionPeriod
                    }
-                   ));
-
+                   ));                   
+           
             _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+            var response = JsonSerializer.Deserialize<OrchestrationResponse>(await _testContext.TestFunction.LastResponse.Content.ReadAsStringAsync());
+            var status = await _testContext.TestFunction.GetStatus(response.id);
+            status.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]

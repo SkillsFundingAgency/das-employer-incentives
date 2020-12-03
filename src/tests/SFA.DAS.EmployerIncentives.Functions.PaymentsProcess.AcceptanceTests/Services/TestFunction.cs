@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
@@ -21,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly TestContext _testContext;
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
+        private readonly OrchestrationData _orchestrationData;
         private bool isDisposed;
 
         private IJobHost Jobs => _host.Services.GetService<IJobHost>();
@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public TestFunction(TestContext testContext, string hubName)
         {
             HubName = hubName;
+            _orchestrationData = new OrchestrationData();
 
             _appConfig = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
@@ -86,6 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            });
 
                            s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
+                           s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);                           
                            s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
                        })
                        )
@@ -111,6 +113,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public Task Start(OrchestrationStarterInfo starter)
         {
             return Jobs.Start(starter);
+        }
+
+        public async Task<DurableOrchestrationStatus> GetStatus(string instanceId)
+        {
+            await Jobs.RefreshStatus(instanceId);
+            return _orchestrationData.Status;
         }
 
         public async Task DisposeAsync()
