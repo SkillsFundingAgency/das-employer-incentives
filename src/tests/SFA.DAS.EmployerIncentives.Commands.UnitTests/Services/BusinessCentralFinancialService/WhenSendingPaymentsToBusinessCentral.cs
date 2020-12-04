@@ -82,9 +82,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             paymentRequest.RequestorUniquePaymentIdentifier.Should().Be(payment.PaymentId.ToString("N"));
             paymentRequest.Requestor.Should().Be("ApprenticeServiceEI");
             paymentRequest.FundingStream.Code.Should().Be("EIAPP");
-            paymentRequest.FundingStream.StartDate.Should().Be(new DateTime(2020, 9, 1));
-            paymentRequest.FundingStream.EndDate.Should().Be(new DateTime(2021, 8, 30));
-            paymentRequest.DueDate.Should().Be(payment.DueDate);
+            paymentRequest.FundingStream.StartDate.Should().Be("2020-09-01");
+            paymentRequest.FundingStream.EndDate.Should().Be("2021-08-30");
+            paymentRequest.DueDate.Should().Be(payment.DueDate.ToString("yyyy-MM-dd"));
             paymentRequest.VendorNo.Should().Be(payment.VendorId);
             paymentRequest.CostCentreCode.Should().Be("AAA40");
             paymentRequest.Amount.Should().Be(payment.Amount);

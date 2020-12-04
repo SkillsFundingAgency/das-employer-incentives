@@ -48,10 +48,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 FundingStream = new FundingStream
                 {
                     Code = "EIAPP",
-                    StartDate = new DateTime(2020, 9, 1),
-                    EndDate = new DateTime(2021, 8, 30),
+                    StartDate = "2020-09-01",
+                    EndDate = "2021-08-30",
                 },
-                DueDate = payment.DueDate,
+                DueDate = payment.DueDate.ToString("yyyy-MM-dd"),
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
                 CostCentreCode = "AAA40",
