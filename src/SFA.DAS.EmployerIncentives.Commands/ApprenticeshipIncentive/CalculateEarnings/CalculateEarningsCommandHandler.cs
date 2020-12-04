@@ -1,9 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateEarnings
 {
@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
         private readonly ICollectionCalendarService _collectionCalendarService;
 
         public CalculateEarningsCommandHandler(
-            IApprenticeshipIncentiveDomainRepository domainRepository, 
+            IApprenticeshipIncentiveDomainRepository domainRepository,
             IIncentivePaymentProfilesService incentivePaymentProfilesService,
             ICollectionCalendarService collectionCalendarService)
         {
@@ -26,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
         public async Task Handle(CalculateEarningsCommand command, CancellationToken cancellationToken = default)
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
+            if (incentive.Withdrawn) return;
 
             var paymentProfiles = await _incentivePaymentProfilesService.Get();
             var collectionCalendar = await _collectionCalendarService.Get();

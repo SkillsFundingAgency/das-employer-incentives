@@ -104,6 +104,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
                 result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             }
+
+            var updated = await _sut.Get(_testIncentive.Id);
+            updated.Withdrawn.Should().BeTrue();
         }
     }
 }

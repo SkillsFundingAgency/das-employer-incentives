@@ -25,7 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
                 Payments = model.PaymentModels.Map(),
-                AccountLegalEntityId = model.Account.AccountLegalEntityId
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                Withdrawn = model.Withdrawn
             };
         }
 
@@ -53,7 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PlannedStartDate = entity.PlannedStartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
-                PaymentModels = entity.Payments.Map()
+                PaymentModels = entity.Payments.Map(),
+                Withdrawn = entity.Withdrawn
             };
         }
 
@@ -159,9 +161,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             if (model != null)
             {
                 return new Domain.ValueObjects.CollectionPeriod(
-                    model.PeriodNumber, 
-                    model.CalendarMonth, 
-                    model.CalendarYear, 
+                    model.PeriodNumber,
+                    model.CalendarMonth,
+                    model.CalendarYear,
                     model.EIScheduledOpenDateUTC,
                     model.CensusDate,
                     model.AcademicYear,
@@ -209,7 +211,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 if (model.HasDataLock.HasValue)
                 {
                     learner.SubmissionData.SetHasDataLock(model.HasDataLock.Value);
-                }               
+                }
                 learner.SubmissionData.SetIsInLearning(model.InLearning);
                 learner.SubmissionData.SetStartDate(model.StartDate);
                 learner.SubmissionData.SetRawJson(model.RawJSON);

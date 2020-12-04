@@ -239,5 +239,33 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.EarningsCalculated.Should().BeTrue();
             }
         }
+
+        [When(@"the apprenticeship incentive is withdrawn")]
+        public async Task WhenTheApprenticeshipIncentiveIsWithdrawn()
+        {
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                _apprenticeshipIncentive.Withdrawn = true;
+                await dbConnection.UpdateAsync(_apprenticeshipIncentive);
+            }
+        }
+
+        [Then(@"no earnings are created for the withdrawn apprenticeship")]
+        public void ThenNoEarningsAreCreatedForTheWithdrawnApprenticeship()
+        {
+            _testContext.CommandsPublished
+                .Any(c => c.IsPublished && c.Command.GetType() == typeof(CalculateEarningsCommand))
+                .Should().BeFalse();
+
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var apprenticeshipApplications = dbConnection.GetAll<IncentiveApplicationApprenticeship>();
+                apprenticeshipApplications.Count().Should().Be(0);
+                var createdIncentives = dbConnection.GetAll<ApprenticeshipIncentive>().ToList();
+                createdIncentives.Count().Should().Be(1);
+                createdIncentives.First().PendingPayments.Any().Should().BeFalse();
+            }
+        }
+
     }
 }

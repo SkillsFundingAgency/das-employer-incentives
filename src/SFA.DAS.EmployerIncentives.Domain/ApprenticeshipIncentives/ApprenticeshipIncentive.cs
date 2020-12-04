@@ -1,17 +1,17 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Domain.Extensions;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -23,6 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public PendingPayment NextDuePayment => GetNextDuePayment();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
+
+        public bool Withdrawn => Model.Withdrawn;
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
@@ -108,7 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Model.Id,
                 pendingPaymentId,
                 pendingPayment.Amount,
-                paymentDate, 
+                paymentDate,
                 collectionYear,
                 collectionPeriod,
                 subnominalCode);

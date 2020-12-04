@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
@@ -74,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         ApprenticeshipEmployerType.Levy
                         ),
                     DateTime.Today);
-            
+
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
             _fixture.Register(() => incentive);
@@ -88,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         [Test]
         public async Task Then_a_earnings_calculated_event_is_raised()
         {
-            //Arrange
+            // Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
@@ -102,6 +103,31 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             incentive.FlushEvents().OfType<EarningsCalculated>().ToList().Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_a_earnings_calculated_event_is_not_raised_for_withdrawn_applications()
+        {
+            // Arrange
+            var incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(i => i.Withdrawn, true).Create();
+
+            var incentive = new ApprenticeshipIncentiveFactory()
+                .GetExisting(incentiveModel.Id, incentiveModel);
+
+            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
+
+            _mockIncentiveDomainRespository.Setup(x => x
+                    .Find(command.ApprenticeshipIncentiveId))
+                .ReturnsAsync(incentive);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            incentive.FlushEvents().OfType<EarningsCalculated>().ToList().Count.Should().Be(0);
         }
 
         [Test]
@@ -136,7 +162,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .ReturnsAsync(incentive);
 
             int itemsPersisted = 0;
-            _mockIncentiveDomainRespository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>( a => a.Id == command.ApprenticeshipIncentiveId)))
+            _mockIncentiveDomainRespository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.Id == command.ApprenticeshipIncentiveId)))
                                             .Callback(() =>
                                             {
                                                 itemsPersisted++;
