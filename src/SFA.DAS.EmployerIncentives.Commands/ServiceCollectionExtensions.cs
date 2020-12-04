@@ -45,11 +45,10 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using Microsoft.Extensions.Http;
+using Polly;
+using Polly.Extensions.Http;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
-using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 
 namespace SFA.DAS.EmployerIncentives.Commands
@@ -198,7 +197,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()
                     .WithApimAuthorisationHeader(settings)
-                    .WithLogging(s.GetService<ILoggerFactory>());
+                    .WithLogging(s.GetService<ILoggerFactory>())
+                    .WithHandler(new TransientRetryHandler(p => p.RetryAsync(3)));
 
                 var httpClient = clientBuilder.Build();
 
@@ -310,6 +310,14 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 return dbContext;
             });
         }
-
     }
+
+    public sealed class TransientRetryHandler : PolicyHttpMessageHandler
+    {
+        public TransientRetryHandler(Func<PolicyBuilder<HttpResponseMessage>, IAsyncPolicy<HttpResponseMessage>> configurePolicy)
+            : base(configurePolicy(HttpPolicyExtensions.HandleTransientHttpError()))
+        {
+        }
+    }
+
 }
