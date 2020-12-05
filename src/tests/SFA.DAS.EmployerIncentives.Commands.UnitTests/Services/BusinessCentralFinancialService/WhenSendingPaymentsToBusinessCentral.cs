@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentralFinancialService
 {
@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             paymentRequest.Amount.Should().Be(payment.Amount);
             paymentRequest.Currency.Should().Be("GBP");
             paymentRequest.ExternalReference.Type.Should().Be("ApprenticeIdentifier");
-            paymentRequest.ExternalReference.Value.Should().Be(payment.AccountLegalEntityId.ToString());
+            paymentRequest.ExternalReference.Value.Should().Be(payment.HashedLegalEntityId);
         }
 
         [TestCase(SubnominalCode.Levy16To18, "2240147")]

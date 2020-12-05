@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 ExternalReference = new ExternalReference
                 {
                     Type = "ApprenticeIdentifier",
-                    Value = payment.AccountLegalEntityId.ToString()
+                    Value = payment.HashedLegalEntityId
                 },
                 PaymentLineDescription = CreatePaymentLineDescription(payment),
                 Approver = @"AD.HQ.DEPT\JPOOLE"
