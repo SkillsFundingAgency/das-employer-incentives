@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
+using SFA.DAS.EmployerIncentives.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -36,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 return;
             }
 
-            throw new BusinessCentralApiException(response.StatusCode);
+            throw new BusinessCentralApiException(response.StatusCode, content);
         }
 
         public BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)

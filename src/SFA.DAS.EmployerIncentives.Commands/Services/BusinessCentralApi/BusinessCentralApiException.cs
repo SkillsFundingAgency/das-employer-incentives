@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.Serialization;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
@@ -9,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     {
         public HttpStatusCode? HttpStatusCode { get; }
 
-        public BusinessCentralApiException(HttpStatusCode httpStatusCode) : base(BuildMessage(httpStatusCode))
+        public BusinessCentralApiException(HttpStatusCode httpStatusCode, HttpContent httpContent) : base(BuildMessage(httpStatusCode, httpContent))
         {
             HttpStatusCode = httpStatusCode;
         }
@@ -19,13 +20,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             HttpStatusCode = (HttpStatusCode?)info.GetValue("HttpStatusCode", typeof(HttpStatusCode));
         }
 
-        private static string BuildMessage(HttpStatusCode httpStatusCode)
+        private static string BuildMessage(HttpStatusCode httpStatusCode, HttpContent httpContent)
         {
+            var dataSent = httpContent.ReadAsStringAsync().Result;
             if (httpStatusCode >= System.Net.HttpStatusCode.InternalServerError)
             {
-                return $"Business Central API is unavailable and returned an internal code of {httpStatusCode}";
+                return $"Business Central API is unavailable and returned an internal code of {httpStatusCode}. Data sent: {dataSent}";
             }
-            return $"Business Central API returned a server code of {httpStatusCode}";
+            return $"Business Central API returned a server code of {httpStatusCode}. Data sent: {dataSent}";
         }
     }
 }
