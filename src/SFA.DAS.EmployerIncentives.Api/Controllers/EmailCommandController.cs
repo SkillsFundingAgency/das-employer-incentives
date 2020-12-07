@@ -18,12 +18,12 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [Route("bank-details-required")]
         public async Task SendBankDetailRequiredEmail([FromBody] SendBankDetailsEmailRequest request)
         {
-            await SendCommandAsync(new SendBankDetailsRequiredEmailCommand(request.AccountId, 
-                                                                   request.AccountLegalEntityId, 
+            await SendCommandAsync(new SendBankDetailsRequiredEmailCommand(request.AccountId,
+                                                                   request.AccountLegalEntityId,
                                                                    request.EmailAddress,
                                                                    request.AddBankDetailsUrl));
         }
-        
+
         [HttpPost]
         [Route("bank-details-reminder")]
         public async Task SendBankDetailReminderEmail([FromBody] SendBankDetailsEmailRequest request)
@@ -32,6 +32,16 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                                                                    request.AccountLegalEntityId,
                                                                    request.EmailAddress,
                                                                    request.AddBankDetailsUrl));
+        }
+
+        [HttpPost]
+        [Route("bank-details-repeat-reminder")]
+        public async Task SendBankDetailsRepeatReminderEmail([FromBody] SendBankDetailsEmailRequest request)
+        {
+            await SendCommandAsync(new SendBankDetailsRepeatReminderEmailCommand(request.AccountId,
+                                                                                 request.AccountLegalEntityId,
+                                                                                 request.EmailAddress,
+                                                                                 request.AddBankDetailsUrl));
         }
     }
 }

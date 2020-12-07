@@ -87,6 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
                 if (_context.AccountApi != null)
                 {
