@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default);
+            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default, "application/json");
         }
 
         private string CreatePaymentLineDescription(PaymentDto payment)
