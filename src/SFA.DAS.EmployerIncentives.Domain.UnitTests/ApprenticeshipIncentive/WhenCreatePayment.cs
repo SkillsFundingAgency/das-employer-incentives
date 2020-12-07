@@ -7,6 +7,9 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -52,6 +55,36 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.Payments.Count.Should().Be(0);
         }
 
+        [TestCase("2000-07-30", "2020-08-01", ApprenticeshipEmployerType.Levy, SubnominalCode.Levy19Plus)]
+        [TestCase("2000-07-30", "2020-08-01", ApprenticeshipEmployerType.NonLevy, SubnominalCode.NonLevy19Plus)]
+        [TestCase("2002-08-30", "2020-08-01", ApprenticeshipEmployerType.Levy, SubnominalCode.Levy16To18)]
+        [TestCase("2002-08-30", "2020-08-01", ApprenticeshipEmployerType.NonLevy, SubnominalCode.NonLevy16To18)]
+        [TestCase("2001-08-02", "2020-08-01", ApprenticeshipEmployerType.NonLevy, SubnominalCode.NonLevy16To18)]
+        [TestCase("2001-08-01", "2020-08-01", ApprenticeshipEmployerType.NonLevy, SubnominalCode.NonLevy19Plus)]
+        public void Then_the_payment_is_created(DateTime dob, DateTime plannedStartDate, ApprenticeshipEmployerType employerType, SubnominalCode expectedSubnominalCode)
+        {
+            // arrange
+            var apprenticeship = new Apprenticeship(_fixture.Create<long>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), dob, _fixture.Create<long>(), employerType);
+
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x=>x.PlannedStartDate, plannedStartDate)
+                .With(x=>x.Apprenticeship, apprenticeship)
+                .With(x => x.PaymentModels, new List<PaymentModel>()).Create();
+
+            _sut = Sut(_sutModel);
+
+            var pendingPayment = _sut.PendingPayments.First();
+
+            // act
+            _sut.CreatePayment(pendingPayment.Id, _collectionPeriod.CalendarYear, _collectionPeriod.CalendarMonth);
+
+            // assert
+            _sut.Payments.Count.Should().Be(1);
+            var actualPayment = _sut.Payments.First();
+            actualPayment.SubnominalCode.Should().Be(expectedSubnominalCode);
+        }
+
         [Test]
         public void Then_the_payment_is_created_when_the_pending_payment_is_not_valid_in_a_different_period()
         {
@@ -83,6 +116,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             actualPayment.PaymentPeriod.Should().Be(_collectionPeriod.PeriodNumber);
             actualPayment.PaymentYear.Should().Be(_collectionPeriod.CalendarYear);
         }
+
+
 
         [Test]
         public void Then_the_payment_is_created_and_the_existing_payment_is_replaced()

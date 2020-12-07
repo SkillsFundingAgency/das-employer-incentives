@@ -23,7 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             decimal amount,
             DateTime calculatedDate,
             short paymentYear,
-            byte paymentPeriod
+            byte paymentPeriod,
+            SubnominalCode subnominalCode
         )
         {
             return new Payment(new PaymentModel
@@ -35,7 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Amount = amount,
                     CalculatedDate = calculatedDate,
                     PaymentYear = paymentYear,
-                    PaymentPeriod = paymentPeriod
+                    PaymentPeriod = paymentPeriod,
+                    SubnominalCode = subnominalCode
                 },
                 true);
         }
