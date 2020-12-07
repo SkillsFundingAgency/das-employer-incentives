@@ -24,9 +24,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
                 result.AddError("Email Address", "Is not set");
             }
 
-            if (item.AddBankDetailsUrl == default)
+            if (item.ApplicationId == default)
             {
-                result.AddError("Add Bank Details", "Is not set");
+                result.AddError("Application Id", "Is not set");
             }
 
             return Task.FromResult(result);

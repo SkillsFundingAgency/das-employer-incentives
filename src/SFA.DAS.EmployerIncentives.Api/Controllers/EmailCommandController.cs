@@ -36,12 +36,12 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPost]
         [Route("bank-details-repeat-reminder")]
-        public async Task SendBankDetailsRepeatReminderEmail([FromBody] SendBankDetailsEmailRequest request)
+        public async Task SendBankDetailsRepeatReminderEmail([FromBody] BankDetailsReminderEmailRequest request)
         {
             await SendCommandAsync(new SendBankDetailsRepeatReminderEmailCommand(request.AccountId,
                                                                                  request.AccountLegalEntityId,
-                                                                                 request.EmailAddress,
-                                                                                 request.AddBankDetailsUrl));
+                                                                                 request.ApplicationId,
+                                                                                 request.EmailAddress));
         }
     }
 }
