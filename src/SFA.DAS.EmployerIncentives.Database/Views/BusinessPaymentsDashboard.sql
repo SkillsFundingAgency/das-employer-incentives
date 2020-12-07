@@ -8,7 +8,7 @@ SELECT
   SUM(CASE WHEN pp.paymentmadedate is not null THEN 1 else 0 END) as [Num EI Payment Records],
   (SUM(lastval.FailedValidation)+cast(SUM(CASE WHEN pp.paymentmadedate is not null THEN 1 else 0 END) as float)*100)/nullif(count(pp.Id),0) as [% Earnings Handled],
   SUM(CASE WHEN p.PaidDate is not null THEN 1 else 0 END) as [Num BC Payments Sent], 
-  isnull((cast(count(pp.Id) as float)/nullif(0,SUM(CASE WHEN p.PaidDate is not null THEN 1 else 0 END)))*100,0) as [% Earning to BC Payments],
+  isnull(SUM(CASE WHEN p.PaidDate is not null THEN 1 else 0 END)/nullif((cast(count(pp.Id) as float)),0)*100,0) as [% Earning to BC Payments],
   count(distinct p.AccountId) as [Num EI Accounts expecting payment],
   count(distinct CASE WHEN p.PaidDate is null THEN p.AccountId else 0 END) as [Num Accounts with missing BC payments],
   count(distinct a.VrfVendorId) as [Num Vendors expecting payment],
