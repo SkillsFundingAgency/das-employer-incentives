@@ -18,7 +18,7 @@ SELECT
   FORMAT(sum(pp.amount),'C','en-gb') as [EI Pending Payments Value], 
   FORMAT(sum(CASE WHEN lastval.FailedValidation = 1 then pp.Amount else 0 END),'C','en-gb') as [EI Validation Failed Value],
   FORMAT(sum(case when pp.paymentmadedate is not null then pp.amount else 0 end),'C','en-gb') as [EI Payments Made Value],
-  FORMAT(sum(case when p.amount >= 0 then p.amount else 0 end),'C','en-gb') as [EI Postive Payments Value], 
+  FORMAT(sum(case when p.amount >= 0 then p.amount else 0 end),'C','en-gb') as [EI Positive Payments Value], 
   FORMAT(sum(case when p.amount < 0 then p.amount else 0 end),'C','en-gb') as [EI Negative Payments Value], 
   FORMAT(SUM(CASE WHEN p.PaidDate is not null THEN p.Amount else 0 END),'C','en-gb') as [BC Payments Sent Value]
 
