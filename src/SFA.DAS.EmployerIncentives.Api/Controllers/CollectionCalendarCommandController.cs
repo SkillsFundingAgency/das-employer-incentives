@@ -15,10 +15,12 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPatch]
-        [Route("period/activate")]
+        [Route("period/active")]
         public async Task ActivateCollectionPeriod(ActivateCollectionPeriodRequest request)
         {
-            await SendCommandAsync(new ActivateCollectionPeriodCommand(request.CollectionPeriodNumber, request.CollectionPeriodYear));
+            await SendCommandAsync(new ActivateCollectionPeriodCommand(request.CollectionPeriodNumber, 
+                                                                       request.CollectionPeriodYear,
+                                                                       request.Active));
         }
     
     }
