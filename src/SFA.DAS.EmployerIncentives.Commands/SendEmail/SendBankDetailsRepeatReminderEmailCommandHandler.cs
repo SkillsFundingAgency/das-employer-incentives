@@ -59,7 +59,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
         private string GenerateBankDetailsUrl(SendBankDetailsRepeatReminderEmailCommand command)
         {
             var hashedAccountId = _hashingService.HashValue(command.AccountId);
-            var bankDetailsUrl = $"{_applicationSettings.EmployerIncentivesWebBaseUrl}/{hashedAccountId}/bank-details/{command.ApplicationId}/add-bank-details";
+            var host = _applicationSettings.EmployerIncentivesWebBaseUrl;
+            if (!host.EndsWith("/"))
+            {
+                host = $"{host}/";
+            }
+            var bankDetailsUrl = $"{host}{hashedAccountId}/bank-details/{command.ApplicationId}/add-bank-details";
             return bankDetailsUrl;
         }
     }
