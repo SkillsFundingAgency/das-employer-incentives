@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -47,10 +48,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 FundingStream = new FundingStream
                 {
                     Code = "EIAPP",
-                    StartDate = "2020-09-01",
-                    EndDate = "2021-08-30",
+                    StartDate = new DateTime(2020, 9, 1),
+                    EndDate = new DateTime(2021, 8, 30),
                 },
-                DueDate = payment.DueDate.ToString("yyyy-MM-dd"),
+                DueDate = payment.DueDate,
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
                 CostCentreCode = "AAA40",
