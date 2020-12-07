@@ -73,6 +73,7 @@
     <Build Include="Tables\IncentiveApplication.sql" />
     <Build Include="Tables\IncentiveApplicationApprenticeship.sql" />
     <Build Include="Views\ApplicationsDashboard.sql" />
+    <Build Include="Views\BusinessApplicationsDashboard.sql" />
     <Build Include="Tables\CollectionCalendar.sql" />
     <Build Include="Schemas\Incentives.sql" />
     <None Include="Scripts\Data.CollectionCalendar.sql">
