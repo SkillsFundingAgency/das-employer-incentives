@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -57,5 +58,16 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
             return NotFound();
         }
+
+        [HttpGet("/accounts/vendorregistrationform/status")]
+        public async Task<IActionResult> GetAccountsWithVrfCaseStatus(string vrfCaseStatus)
+        {
+            var request = new GetAccountsWithVrfCaseStatusRequest(vrfCaseStatus);
+
+            var response = await QueryAsync<GetAccountsWithVrfCaseStatusRequest, GetAccountsWithVrfCaseStatusResponse>(request);
+
+            return Ok(response.Accounts);
+        }
+                
     }
 }

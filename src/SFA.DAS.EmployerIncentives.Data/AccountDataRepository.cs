@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
@@ -65,6 +66,29 @@ namespace SFA.DAS.EmployerIncentives.Data
             var accountIds = _dbContext.Accounts.Where(y => y.HashedLegalEntityId == hashedLegalEntityId).Select(z => z.Id).Distinct();
             var accounts = await _dbContext.Accounts.Where(x => accountIds.Contains(x.Id)).ToListAsync();
             return accounts?.Map();
+        }
+
+        public async Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus)
+        {
+            var accountsWithApplications = await (from account in _dbContext.Accounts
+                                           join application in _dbContext.Applications
+                                           on account.AccountLegalEntityId equals application.AccountLegalEntityId
+                                           where account.VrfCaseStatus == vrfCaseStatus
+                                           select new Models.Account
+                                           {
+                                               AccountLegalEntityId = account.AccountLegalEntityId,
+                                               HashedLegalEntityId = account.HashedLegalEntityId,
+                                               HasSignedIncentivesTerms = account.HasSignedIncentivesTerms,
+                                               Id = account.Id,
+                                               LegalEntityId = account.LegalEntityId,
+                                               LegalEntityName = account.LegalEntityName,
+                                               VrfCaseId = account.VrfCaseId,
+                                               VrfCaseStatus = account.VrfCaseStatus,
+                                               VrfCaseStatusLastUpdatedDateTime = account.VrfCaseStatusLastUpdatedDateTime,
+                                               VrfVendorId = account.VrfVendorId
+                                           }).ToListAsync();
+
+            return accountsWithApplications?.MapDto();
         }
     }
 }
