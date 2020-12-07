@@ -86,6 +86,7 @@
     <Build Include="Views\PendingPaymentsValidationStepFailure.sql" />
     <Build Include="Views\PendingPaymentsValidationStatus.sql" />
     <Build Include="Views\ValidationCounts.sql" />
+    <Build Include="Views\BusinessPaymentsDashboard.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
@@ -96,6 +97,6 @@
   <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
     <None Include="update-model.publish.xml" />
-    <None Include="Views\BusinessApplicationsDashboard.sql" />
+    <Build Include="Views\BusinessApplicationsDashboard.sql" />
   </ItemGroup>
 </Project>
