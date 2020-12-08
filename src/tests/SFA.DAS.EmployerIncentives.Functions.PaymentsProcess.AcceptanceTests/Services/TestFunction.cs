@@ -107,17 +107,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartHost()
         {
-            //var timeout = new TimeSpan(0, 0, 25);
-            //var delayTask = Task.Delay(timeout);
-            //await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
+            var timeout = new TimeSpan(0, 0, 10);
+            var delayTask = Task.Delay(timeout);
+            await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
 
-            //if(delayTask.IsCompleted)
-            //{
-            //    throw new Exception($"Failed to start test function host within {timeout.Seconds} seconds.  Check the AzureStorageEmulator is running. ");
-            //}
-
-            _host.StartAsync();
-
+            if (delayTask.IsCompleted)
+            {
+                throw new Exception($"Failed to start test function host within {timeout.Seconds} seconds.  Check the AzureStorageEmulator is running. ");
+            }
         }
 
         public Task Start(OrchestrationStarterInfo starter)
