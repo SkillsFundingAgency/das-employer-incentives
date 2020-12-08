@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _config = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
+                    { "ApplicationSettings:EmployerIncentivesWebBaseUrl", "https://localhost:5001" },
                     { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
                     { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(_context.TestDirectory.FullName, ".learningtransport") },
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
