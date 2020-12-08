@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public decimal TotalIncentiveAmount => Model.TotalIncentiveAmount;
         public long? UKPRN => Model.UKPRN;
         public bool EarningsCalculated => Model.EarningsCalculated;
+        public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
