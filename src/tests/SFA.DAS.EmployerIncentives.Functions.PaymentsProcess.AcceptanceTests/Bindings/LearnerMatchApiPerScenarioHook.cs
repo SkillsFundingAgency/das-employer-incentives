@@ -20,7 +20,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            _testContext.LearnerMatchApi = new TestLearnerMatchApi();
+
+            if (_testContext.LearnerMatchApi == null)
+                _testContext.LearnerMatchApi = new MockApi();
+
             stopwatch.Stop();
             Console.WriteLine($"[{nameof(LearnerMatchApiPerTestRunHook)}] time it took to spin up LearnerMatchApi: {stopwatch.Elapsed.Milliseconds} milliseconds");
         }
@@ -28,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         [AfterScenario()]
         public void CleanUpLearnerMatchApi()
         {
-            _testContext.LearnerMatchApi?.Dispose();
+            _testContext.LearnerMatchApi.Reset();
         }
     }
 }

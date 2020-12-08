@@ -26,5 +26,38 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             return accountLegalEntities.Select(x=> new PayableLegalEntityDto {AccountLegalEntityId = x.AccountLegalEntityId, AccountId = x.AccountId }).ToListAsync();
         }
+
+        public Task<List<PaymentDto>> GetPaymentsToSendForAccountLegalEntity(long accountLegalEntity)
+        {
+            var payments = _context.Set<Payment>().Where(p => !p.PaidDate.HasValue && p.AccountLegalEntityId == accountLegalEntity)
+                .Join(_context.Set<Models.ApprenticeshipIncentive>(), p => p.ApprenticeshipIncentiveId, ai => ai.Id,
+                    (p, ai) => new {ApprenticeshipIncentive = ai, Payment = p})
+                .Join(_context.Set<Data.Models.Account>(), ap => ap.Payment.AccountLegalEntityId, a => a.AccountLegalEntityId, (ap, a) =>
+                    new { ap.ApprenticeshipIncentive, ap.Payment, Account = a})
+                .Join(_context.Set<PendingPayment>(), ap => ap.Payment.PendingPaymentId, pp => pp.Id, (ap, pp) =>
+                    new
+                    {
+                        ap.ApprenticeshipIncentive, 
+                        ap.Payment,
+                        ap.Account, 
+                        PendingPayment = pp
+                    })
+                .Select(x =>
+                    new PaymentDto
+                    {
+                        PaymentId = x.Payment.Id,
+                        ApprenticeshipIncentiveId = x.ApprenticeshipIncentive.Id,
+                        AccountLegalEntityId = x.Account.AccountLegalEntityId,
+                        VendorId = x.Account.VrfVendorId,
+                        DueDate = x.PendingPayment.DueDate,
+                        SubnominalCode = x.Payment.SubnominalCode,
+                        Amount = x.Payment.Amount,
+                        EarningType = x.PendingPayment.EarningType, 
+                        ULN = x.ApprenticeshipIncentive.ULN,
+                        HashedLegalEntityId = x.Account.HashedLegalEntityId
+                    });
+
+            return payments.ToListAsync();
+        }
     }
 }

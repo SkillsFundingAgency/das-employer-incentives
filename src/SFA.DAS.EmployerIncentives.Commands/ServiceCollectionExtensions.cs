@@ -43,7 +43,14 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
+using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
+using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
+using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -85,6 +92,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
+
+            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit) => new BusinessCentralFinancePaymentsService(c, limit, version));
 
             return serviceCollection;
         }
@@ -130,6 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<CalculateDaysInLearningCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator());
                 .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator());
 
             return serviceCollection;
@@ -177,6 +187,31 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
                 return new AccountService(client);
+            });
+
+            return serviceCollection;
+        }
+
+        private static IServiceCollection AddBusinessCentralClient<T>(this IServiceCollection serviceCollection, Func<HttpClient, IServiceProvider, string, int, T> instance) where T : class
+        {
+            serviceCollection.AddTransient(s =>
+            {
+                var settings = s.GetService<IOptions<BusinessCentralApiClient>>().Value;
+
+                var clientBuilder = new HttpClientBuilder()
+                    .WithDefaultHeaders()
+                    .WithApimAuthorisationHeader(settings)
+                    .WithLogging(s.GetService<ILoggerFactory>());
+
+                var httpClient = clientBuilder.Build();
+
+                if (!settings.ApiBaseUrl.EndsWith("/"))
+                {
+                    settings.ApiBaseUrl += "/";
+                }
+                httpClient.BaseAddress = new Uri(settings.ApiBaseUrl);
+
+                return instance.Invoke(httpClient, s, settings.ApiVersion, settings.PaymentRequestsLimit);
             });
 
             return serviceCollection;

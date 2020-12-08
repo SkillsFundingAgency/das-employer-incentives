@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
@@ -79,6 +80,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                l.Version = "1.0";
                            });
 
+                           s.Configure<BusinessCentralApiClient>(c =>
+                           {
+                               c.ApiBaseUrl = _testContext.PaymentsApi.BaseAddress;
+                           });
+
                            s.Configure<ApplicationSettings>(a =>
                            {
                                a.DbConnectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
@@ -101,11 +107,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartHost()
         {
-            var timeout = new TimeSpan(0, 0, 5);
+            var timeout = new TimeSpan(0, 0, 10);
             var delayTask = Task.Delay(timeout);
             await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
 
-            if(delayTask.IsCompleted)
+            if (delayTask.IsCompleted)
             {
                 throw new Exception($"Failed to start test function host within {timeout.Seconds} seconds.  Check the AzureStorageEmulator is running. ");
             }
@@ -122,6 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var responseValue = JsonConvert.DeserializeObject<OrchestratorStartResponse>(responseString);
             return responseValue;
         }
+
         public async Task<DurableOrchestrationStatus> GetStatus(string instanceId)
         {
             await Jobs.RefreshStatus(instanceId);

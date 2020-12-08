@@ -87,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             var response = await _testContext.TestFunction.GetOrchestratorStartResponse();
             var status = await _testContext.TestFunction.GetStatus(response.Id);
-            status.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
+            status.CustomStatus.ToObject<string>().Should().Be("WaitingForPaymentApproval");
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]
