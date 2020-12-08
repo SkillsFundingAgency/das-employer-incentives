@@ -59,6 +59,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             {
                 await _apprenticeshipIncentiveDataRepository.Add(aggregate.GetModel());
             }
+            else if(aggregate.IsDeleted)
+            {
+                await _apprenticeshipIncentiveDataRepository.Delete(aggregate.GetModel());
+            }
             else
             {
                 await _apprenticeshipIncentiveDataRepository.Update(aggregate.GetModel());

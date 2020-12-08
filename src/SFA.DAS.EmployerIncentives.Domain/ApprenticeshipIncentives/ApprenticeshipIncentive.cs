@@ -82,6 +82,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEvent(new PaymentsCalculationRequired(Model));
         }
 
+        public void Delete()
+        {
+            if(Model.PaymentModels.Count > 0)
+            {
+                throw new DeleteIncentiveException("Cannot delete an incentive that has made a Payment");
+            }
+            IsDeleted = true;
+        }
+
         public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);

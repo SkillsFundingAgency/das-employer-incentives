@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -108,6 +109,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
                 EarningsCalculated = x.EarningsCalculated,
+                WithdrawnByEmployer = x.WithdrawnByEmployer,
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN
@@ -144,8 +146,23 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 EarningsCalculated = x.EarningsCalculated,
+                WithdrawnByEmployer = x.WithdrawnByEmployer,
                 UKPRN = x.UKPRN
             }).ToList();
+        }
+
+        internal static IncentiveApplicationStatusAudit Map(this IncentiveApplicationAudit entity)
+        {
+            return new IncentiveApplicationStatusAudit
+            {
+                Id = entity.Id,
+                IncentiveApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
+                Process = entity.Process,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now
+            };
         }
     }
 }

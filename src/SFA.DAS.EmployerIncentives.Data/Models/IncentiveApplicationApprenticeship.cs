@@ -21,5 +21,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public decimal TotalIncentiveAmount { get; set; }
         public long? UKPRN { get; set; }
         public bool EarningsCalculated { get; set; }
+        public bool WithdrawnByEmployer { get; set; }
     }
 }

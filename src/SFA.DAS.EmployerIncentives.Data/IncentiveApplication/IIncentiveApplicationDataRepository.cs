@@ -11,5 +11,6 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         Task<IncentiveApplicationModel> Get(Guid incentiveApplicationId);
         Task Update(IncentiveApplicationModel incentiveApplication);
         Task<List<IncentiveApplicationModel>> FindApplicationsWithoutEarningsCalculated();
+        Task<IEnumerable<IncentiveApplicationModel>> FindApplicationsByAccountLegalEntityAndUln(long accountLegalEntity, long uln);
     }
 }

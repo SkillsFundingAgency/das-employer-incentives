@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -72,6 +71,19 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 UpdateApprenticeshipIncentive(updatedIncentive, existingIncentive);
             }
+        }
+
+        public async Task Delete(ApprenticeshipIncentiveModel apprenticeshipIncentive)
+        {
+            var deletedIncentive = apprenticeshipIncentive.Map();
+
+            var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == deletedIncentive.Id);
+
+            foreach(var pendingPayment in existingIncentive.PendingPayments)
+            {
+                _dbContext.Remove(pendingPayment);
+            }
+            _dbContext.Remove(existingIncentive);
         }
 
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
