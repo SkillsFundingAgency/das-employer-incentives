@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         }
 
         [Test]
-        public async Task Then_legal_entities_with_payments_in_the_current_period_are_returned()
+        public async Task Then_legal_entities_with_pending_payments_in_the_current_period_are_returned()
         {
             short collectionPeriodYear = 2020;
             byte collectionPeriod = 5;
@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         }
 
         [Test]
-        public async Task Then_legal_entities_with_payments_in_the_previous_year_are_returned()
+        public async Task Then_legal_entities_with_pending_payments_in_the_previous_year_are_returned()
         {
             short collectionPeriodYear = 2020;
             byte collectionPeriod = 5;
@@ -80,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         }
 
         [Test]
-        public async Task Then_legal_entities_with_payments_in_a_previous_period_are_returned()
+        public async Task Then_legal_entities_with_pending_payments_in_a_previous_period_are_returned()
         {
             short collectionPeriodYear = 2020;
             byte collectionPeriod = 5;
@@ -102,7 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         }
 
         [Test]
-        public async Task Then_a_legal_entity_with_multiple_payments_is_only_returned_once()
+        public async Task Then_a_legal_entity_with_multiple_pending_payments_is_only_returned_once()
         {
             short collectionPeriodYear = 2020;
             byte collectionPeriod = 5;
@@ -123,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         }
 
         [Test]
-        public async Task Then_a_legal_entity_where_payments_are_already_made_is_not_returned()
+        public async Task Then_a_legal_entity_where_pending_payments_are_already_made_is_not_returned()
         {
             short collectionPeriodYear = 2020;
             byte collectionPeriod = 5;
@@ -142,6 +142,57 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             actual.Count.Should().Be(2);
             actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
             actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[1].AccountLegalEntityId);
+        }
+
+        [Test]
+        public async Task Then_legal_entities_with_unsent_payments_are_returned()
+        {
+            var payments = new List<Payment>
+            {
+                _fixture.Build<Payment>().With(x => x.PaidDate, (DateTime?)null).Create(),
+                _fixture.Build<Payment>().With(x => x.PaidDate, DateTime.Now).Create(),
+                _fixture.Build<Payment>().With(x => x.PaidDate, (DateTime?)null).Create(),
+            };
+
+            _context.Payments.AddRange(payments);
+            _context.SaveChanges();
+
+            var actual = await _sut.GetList(2020, 1);
+
+            actual.Count.Should().Be(2);
+            actual.Should().Contain(x => x.AccountLegalEntityId == payments[0].AccountLegalEntityId);
+            actual.Should().Contain(x => x.AccountLegalEntityId == payments[2].AccountLegalEntityId);
+        }
+
+        [Test]
+        public async Task Then_a_legal_entity_with_unsent_payments_and_pending_payments_is_only_returned_once()
+        {
+            short collectionPeriodYear = 2020;
+            byte collectionPeriod = 5;
+            var accountLegalEntityId = _fixture.Create<long>();
+            var accountId = _fixture.Create<long>();
+
+            var payment = _fixture.Build<Payment>()
+                .With(x => x.PaidDate, (DateTime?) null)
+                .With(x => x.AccountLegalEntityId, accountLegalEntityId)
+                .With(x => x.AccountId, accountId)
+                .Create();
+
+            var pendingPayment = _fixture.Build<PendingPayment>()
+                .With(x => x.PaymentYear, collectionPeriodYear)
+                .With(x => x.PeriodNumber, collectionPeriod)
+                .With(x => x.PaymentMadeDate, (DateTime?) null)
+                .With(x => x.AccountLegalEntityId, accountLegalEntityId)
+                .With(x => x.AccountId, accountId)
+                .Create();
+
+            _context.Payments.Add(payment);
+            _context.PendingPayments.Add(pendingPayment);
+            _context.SaveChanges();
+
+            var actual = await _sut.GetList(collectionPeriodYear, collectionPeriod);
+
+            actual.Count.Should().Be(1);
         }
     }
 }
