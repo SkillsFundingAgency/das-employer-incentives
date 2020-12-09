@@ -27,8 +27,4 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Withdrawls\EmployerWithdrawl\Validators\" />
-  </ItemGroup>
-
 </Project>
