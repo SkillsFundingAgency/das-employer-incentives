@@ -1,8 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Extensions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System.Linq;
 using System.Threading;
@@ -26,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl
             {
                 throw new EmployerWithdrawlException($"Unable to handle Employer withdrawl command.  No matching incentive applications found for {command}");
             }
+
             foreach(var application in applications)
             {
                 foreach(var apprenticeship in application.Apprenticeships)
