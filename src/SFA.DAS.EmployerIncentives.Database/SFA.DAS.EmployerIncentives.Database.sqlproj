@@ -90,6 +90,7 @@
     <Build Include="Views\ValidationCounts.sql" />
     <Build Include="Tables\ApprenticeshipDaysInLearning.sql" />
     <Build Include="Tables\LearningPeriod.sql" />
+    <Build Include="Tables\IncentiveApplicationStatusAudit.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />

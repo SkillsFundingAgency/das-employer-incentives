@@ -2,6 +2,7 @@
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
@@ -18,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public decimal TotalIncentiveAmount => Model.TotalIncentiveAmount;
         public long? UKPRN => Model.UKPRN;
         public bool EarningsCalculated => Model.EarningsCalculated;
+        public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
@@ -45,6 +47,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public void SetEarningsCalculated(bool isCalculated = true)
         {
             Model.EarningsCalculated = isCalculated;
+        }
+
+        public void Withdraw(IncentiveApplicationStatus incentiveApplicationStatus)
+        {
+            switch (incentiveApplicationStatus)
+            {
+                case IncentiveApplicationStatus.EmployerWithdrawn:
+                    Model.WithdrawnByEmployer = true;
+                    break;                
+                default:
+                    throw new InvalidOperationException($"Unsupported IncentiveApplicationStatus:{incentiveApplicationStatus} for withdrawl");
+            }
         }
 
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)

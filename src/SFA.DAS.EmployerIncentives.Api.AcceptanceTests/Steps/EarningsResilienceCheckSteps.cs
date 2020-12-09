@@ -29,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var applications = _fixture.CreateMany<IncentiveApplication>(10);
             foreach(var application in applications)
             {
+                application.Status = Enums.IncentiveApplicationStatus.Submitted;
                 DataAccess.SetupApplication(application);
                 var apprenticeships = _fixture.CreateMany<IncentiveApplicationApprenticeship>(2);
                 application.Apprenticeships = new Collection<IncentiveApplicationApprenticeship>(apprenticeships.ToList());
@@ -55,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished).Select(c => c.Command)
                 .ToArray();
-            publishedCommands.Count().Should().Be(10);
+            publishedCommands.Count().Should().Be(20);
             foreach (var publishedCommand in publishedCommands)
             {
                 publishedCommand.Should().BeOfType<CreateIncentiveCommand>();
