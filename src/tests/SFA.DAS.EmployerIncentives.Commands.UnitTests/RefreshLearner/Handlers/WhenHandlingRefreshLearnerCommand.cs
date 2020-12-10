@@ -1,6 +1,8 @@
 ﻿using AutoFixture;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Application.UnitTests;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
@@ -20,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockApprenticeshipIncentiveDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ILearnerService> _mockLearnerService;
+        private Mock<ILogger<RefreshLearnerCommandHandler>> _mockLogger;
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
         private LearnerSubmissionDto _learnerSubmissionDto;
@@ -39,6 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
             _mockLearnerService = new Mock<ILearnerService>();
+            _mockLogger = new Mock<ILogger<RefreshLearnerCommandHandler>>();
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
             apprenticeship.SetProvider(_fixture.Create<Provider>());
@@ -63,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockApprenticeshipIncentiveDomainRepository
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
                 .ReturnsAsync(_apprenticeshipIncentive);
-                        
+
             _learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
 
             _mockLearnerDomainRepository
@@ -71,6 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .ReturnsAsync(_learner);
 
             _sut = new RefreshLearnerCommandHandler(
+                _mockLogger.Object,
                 _mockApprenticeshipIncentiveDomainRepository.Object,
                 _mockLearnerService.Object,
                 _mockLearnerDomainRepository.Object);
@@ -177,7 +182,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                     _fixture.Build<PriceEpisodeDto>()
                                     .With(pe => pe.Periods, new List<PeriodDto>(){
                                         _fixture.Build<PeriodDto>()
-                                        .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.Apprenticeship.Id)                                        
+                                        .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.Apprenticeship.Id)
                                         .Create()
                                         })
                                     .With(pe => pe.StartDate, _testStartDate)
@@ -434,6 +439,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.GetModel().LearningPeriods.Count == 1)
                 ), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_learning_not_found_reason_is_logged() // EI-490
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+            var learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Start Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
+            _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
+            _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Matching ILR record not found for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber} with reason: {_learner.SubmissionData.LearningFoundStatus.NotFoundReason}");
+
         }
     }
 }
