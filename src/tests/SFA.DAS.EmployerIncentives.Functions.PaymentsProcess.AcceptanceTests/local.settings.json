@@ -19,6 +19,7 @@
     "ApiBaseUrl": "PAYMENTS_API_URL",
     "SubscriptionKey": "",
     "ApiVersion": "2020-10-01",
-    "PaymentRequestsLimit": 1000
+    "PaymentRequestsLimit": 1000,
+    "ObfuscateSensitiveData": false
   }
 }
