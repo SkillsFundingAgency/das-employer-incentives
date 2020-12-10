@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
@@ -49,6 +50,23 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 return apprenticeshipIncentive.Map(_dbContext.CollectionPeriods.AsEnumerable());
             }
             return null;
+        }
+
+        public async Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
+        {
+            var apprenticeships = _dbContext.ApprenticeshipIncentives.Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId);
+
+            var matches = await apprenticeships.Select(x => x.Map(_dbContext.CollectionPeriods.AsEnumerable())).ToListAsync();
+
+            switch (matches.Count)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return matches[0];
+                default:
+                    throw new InvalidIncentiveException($"Found duplicate ULNs {uln} within account legal entity {accountLegalEntityId}");
+            }
         }
 
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
