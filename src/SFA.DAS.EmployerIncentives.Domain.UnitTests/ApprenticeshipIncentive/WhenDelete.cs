@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     {
                         _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create()
                     })
+                .With(a => a.PaymentModels, new List<PaymentModel>())
                 .Create();
                         
             _sut = Sut(_sutModel);
