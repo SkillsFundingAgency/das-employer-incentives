@@ -255,7 +255,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (Model.PausePayments == false)
             {
                 Model.PausePayments = true;
-                AddEvent(new PaymentsPaused(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship, serviceRequest));
+                AddEvent(new PaymentsPaused(Model.Account.Id, Model.Account.AccountLegalEntityId, Model, serviceRequest));
             }
         }
 
