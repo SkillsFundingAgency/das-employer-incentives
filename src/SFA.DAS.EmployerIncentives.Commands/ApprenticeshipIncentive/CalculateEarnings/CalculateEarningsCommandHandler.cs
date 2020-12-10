@@ -1,9 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateEarnings
 {
@@ -27,9 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
 
-            var paymentProfiles = await _incentivePaymentProfilesService.Get();
-            var collectionCalendar = await _collectionCalendarService.Get();
-            incentive.CalculateEarnings(paymentProfiles, collectionCalendar);
+            await incentive.CalculateEarnings(_incentivePaymentProfilesService, _collectionCalendarService);
 
             await _domainRepository.Save(incentive);
         }

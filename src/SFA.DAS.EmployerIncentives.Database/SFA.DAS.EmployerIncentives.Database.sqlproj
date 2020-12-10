@@ -90,6 +90,7 @@
     <Build Include="Views\ValidationCounts.sql" />
     <Build Include="Tables\ApprenticeshipDaysInLearning.sql" />
     <Build Include="Tables\LearningPeriod.sql" />
+    <Build Include="Views\BusinessPaymentsDashboard.sql" />
     <Build Include="Tables\IncentiveApplicationStatusAudit.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -102,5 +103,6 @@
   <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
     <None Include="update-model.publish.xml" />
+    <Build Include="Views\BusinessApplicationsDashboard.sql" />
   </ItemGroup>
 </Project>

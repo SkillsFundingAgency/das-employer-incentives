@@ -12,6 +12,8 @@ using System.Linq;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -44,8 +46,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ApprenticeshipIncentive(id, model);
         }
 
-        public void CalculateEarnings(IEnumerable<IncentivePaymentProfile> paymentProfiles, CollectionCalendar collectionCalendar)
+        public async Task CalculateEarnings(
+            IIncentivePaymentProfilesService incentivePaymentProfilesService,
+            ICollectionCalendarService collectionCalendarService)
         {
+            var paymentProfiles = await incentivePaymentProfilesService.Get();
+            var collectionCalendar = await collectionCalendarService.Get();
+
             var incentive = new Incentive(Apprenticeship.DateOfBirth, PlannedStartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {

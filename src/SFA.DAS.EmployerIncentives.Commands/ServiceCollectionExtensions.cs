@@ -51,6 +51,7 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
 using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
