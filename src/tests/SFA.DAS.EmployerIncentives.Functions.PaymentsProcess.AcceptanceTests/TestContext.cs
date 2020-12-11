@@ -7,12 +7,6 @@ using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
-    public static class MockServers
-    {
-        public static MockApi PaymentsApi { get; set; }
-        public static MockApi LearnerMatchApi { get; set; }
-    }
-
     public class TestContext : IDisposable
     {
         public string InstanceId { get; private set; }
@@ -23,17 +17,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
 
-        public MockApi LearnerMatchApi
-        {
-            get => MockServers.LearnerMatchApi;
-            set => MockServers.LearnerMatchApi = value;
-        }
-
-        public MockApi PaymentsApi
-        {
-            get => MockServers.PaymentsApi;
-            set => MockServers.PaymentsApi = value;
-        }
+        public MockApi LearnerMatchApi { get; set; }
+        
+        public MockApi PaymentsApi { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
 
         public TestContext()
