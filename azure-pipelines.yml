@@ -98,7 +98,7 @@ stages:
         command: test
         projects: |
           src/**/*.AcceptanceTests.csproj
-          !src/**/*.PaymentsProcess.AcceptanceTests.csproj
+          src/**/*.PaymentsProcess.AcceptanceTests.csproj
         arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
     - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
