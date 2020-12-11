@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -15,12 +16,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     public class BusinessCentralFinancePaymentsService : IBusinessCentralFinancePaymentsService
     {
         private readonly HttpClient _client;
-        private string _apiVersion;
+        private readonly bool _obfuscateSensitiveData;
+        private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion)
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData)
         {
             _client = client;
+            _obfuscateSensitiveData = obfuscateSensitiveData;
             _apiVersion = apiVersion ?? "2020-10-01";
             PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
@@ -80,7 +83,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 
         private string CreatePaymentLineDescription(PaymentDto payment)
         {
-            return $"Hire a new apprentice ({PaymentType(payment.EarningType)} payment). Employer: {payment.HashedLegalEntityId} ULN: {payment.ULN}";
+            var uln = payment.ULN.ToString().ToCharArray();
+            if (_obfuscateSensitiveData)
+            {
+                for (var i = 0; i < uln.Length - 4; i++)
+                {
+                    uln[i] = '*';
+                }
+            }
+
+            return $"Hire a new apprentice ({PaymentType(payment.EarningType)} payment). Employer: {payment.HashedLegalEntityId} ULN: {new string(uln)}";
         }
 
         private string PaymentType(EarningType earningType)
