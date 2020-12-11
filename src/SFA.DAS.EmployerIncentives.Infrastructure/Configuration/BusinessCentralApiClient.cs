@@ -9,6 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string SubscriptionKey { get; set; }
         public string ApiVersion { get; set; }
         public int PaymentRequestsLimit { get; set; }
+        public bool ObfuscateSensitiveData { get; set; }
     }
     
 }

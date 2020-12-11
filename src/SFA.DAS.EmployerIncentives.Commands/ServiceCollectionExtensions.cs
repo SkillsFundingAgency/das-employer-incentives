@@ -45,11 +45,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
-using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 
 namespace SFA.DAS.EmployerIncentives.Commands
@@ -93,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
-            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit) => new BusinessCentralFinancePaymentsService(c, limit, version));
+            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, _obfuscateSensitiveData) => new BusinessCentralFinancePaymentsService(c, limit, version, _obfuscateSensitiveData));
 
             return serviceCollection;
         }
@@ -189,7 +185,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceCollection;
         }
 
-        private static IServiceCollection AddBusinessCentralClient<T>(this IServiceCollection serviceCollection, Func<HttpClient, IServiceProvider, string, int, T> instance) where T : class
+        private static IServiceCollection AddBusinessCentralClient<T>(this IServiceCollection serviceCollection, Func<HttpClient, IServiceProvider, string, int, bool, T> instance) where T : class
         {
             serviceCollection.AddTransient(s =>
             {
@@ -208,7 +204,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 }
                 httpClient.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return instance.Invoke(httpClient, s, settings.ApiVersion, settings.PaymentRequestsLimit);
+                return instance.Invoke(httpClient, s, settings.ApiVersion, settings.PaymentRequestsLimit, settings.ObfuscateSensitiveData);
             });
 
             return serviceCollection;
