@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
@@ -22,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayme
 
             if(incentive == null)
             {
-                throw new PausePaymentsException($"Unable to handle pause payments command as no incentive was found for ULN {command.ULN} and Account Legal Entity {command.AccountLegalEntityId}");
+                throw new KeyNotFoundException($"Unable to handle pause payments command as no incentive was found for ULN {command.ULN} and Account Legal Entity {command.AccountLegalEntityId}");
             }
 
             var serviceRequest = new ServiceRequest(command.ServiceRequestId, command.DecisionReferenceNumber, command.DateServiceRequestTaskCreated);

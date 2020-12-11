@@ -14,6 +14,7 @@ using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -263,6 +264,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 Model.PausePayments = true;
                 AddEvent(new PaymentsPaused(Model.Account.Id, Model.Account.AccountLegalEntityId, Model, serviceRequest));
+            }
+            else
+            {
+                throw new PausePaymentsException("Payments already paused");
             }
         }
 

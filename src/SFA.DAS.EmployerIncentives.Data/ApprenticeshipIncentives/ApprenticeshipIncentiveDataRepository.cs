@@ -54,16 +54,14 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
         {
-            var apprenticeships = _dbContext.ApprenticeshipIncentives.Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId);
+            var apprenticeships = await _dbContext.ApprenticeshipIncentives.Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
 
-            var matches = await apprenticeships.Select(x => x.Map(_dbContext.CollectionPeriods.AsEnumerable())).ToListAsync();
-
-            switch (matches.Count)
+            switch (apprenticeships.Count)
             {
                 case 0:
                     return null;
                 case 1:
-                    return matches[0];
+                    return apprenticeships[0].Map(_dbContext.CollectionPeriods.AsEnumerable());
                 default:
                     throw new InvalidIncentiveException($"Found duplicate ULNs {uln} within account legal entity {accountLegalEntityId}");
             }
