@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                         request.ULN,
                         request.ServiceRequest.TaskId,
                         request.ServiceRequest.DecisionReference,
-                        request.ServiceRequest.TaskCreatedDate??DateTime.Now));
+                        request.ServiceRequest.TaskCreatedDate??DateTime.UtcNow));
                 return Accepted();
             }
             else

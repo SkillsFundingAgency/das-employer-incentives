@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
                 {
                     if(apprenticeship.ULN == command.ULN)
                     {
-                        application.EmployerWithdrawn(
+                        application.EmployerWithdrawal(
                             apprenticeship, 
                             new ServiceRequest(
                                 command.ServiceRequestTaskId, 
