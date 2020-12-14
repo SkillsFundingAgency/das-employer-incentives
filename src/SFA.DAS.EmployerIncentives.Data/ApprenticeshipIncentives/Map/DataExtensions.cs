@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x => new PendingPaymentValidationResult
             {
                 Id = x.Id,
-                CollectionDateUtc = x.CollectionPeriod.OpenDate,
+                CreatedDateUtc = DateTime.UtcNow,
                 PeriodNumber = x.CollectionPeriod.PeriodNumber,
                 PaymentYear = x.CollectionPeriod.CalendarYear,
                 Result = x.Result,
@@ -109,7 +109,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = x.Id,
                 CollectionPeriod = collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
                 Result = x.Result,
-                DateTime = x.CollectionDateUtc,
                 Step = x.Step
             }).ToList();
         }

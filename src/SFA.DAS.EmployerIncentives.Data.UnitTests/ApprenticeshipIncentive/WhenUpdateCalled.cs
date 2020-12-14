@@ -89,7 +89,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
                 x.PendingPaymentId == storedIncentive.PendingPaymentModels.First().Id);
             savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
-                .Excluding(x => x.DateTime)
                 .Excluding(x => x.CollectionPeriod)
             );
 
@@ -102,6 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
                 result.PaymentYear.Should()
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
+                result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             }
         }
     }

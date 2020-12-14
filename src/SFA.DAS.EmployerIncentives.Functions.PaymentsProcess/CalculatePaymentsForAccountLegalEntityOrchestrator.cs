@@ -1,43 +1,80 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class CalculatePaymentsForAccountLegalEntityOrchestrator
     {
-
-        [FunctionName("CalculatePaymentsForAccountLegalEntityOrchestrator")]
+        [FunctionName(nameof(CalculatePaymentsForAccountLegalEntityOrchestrator))]
         public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var accountLegalEntityCollectionPeriod = context.GetInput<AccountLegalEntityCollectionPeriod>();
 
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
-            var pendingPayments = await context.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
+            var pendingPayments =
+                await context.CallActivityAsync<List<PendingPaymentActivityDto>>(
+                    "GetPendingPaymentsForAccountLegalEntity", accountLegalEntityCollectionPeriod);
 
-            var tasks = new List<Task>();
-            foreach (var pendingPayment in pendingPayments)
+            Task allValidatePaymentTasks = null;
+            var failedPendingPayments = new List<ValidatePendingPaymentException>();
+
+            try
             {
-                tasks.Add(
-                    context.CallActivityAsync("ValidatePendingPayment",
+                var validatePaymentTasks = new List<Task>();
+
+                foreach (var pendingPayment in pendingPayments)
+                {
+                    validatePaymentTasks.Add(
+                        context.CallActivityAsync(nameof(ValidatePendingPayment),
                             new ValidatePendingPaymentData(
                                 accountLegalEntityCollectionPeriod.CollectionPeriod.Year,
                                 accountLegalEntityCollectionPeriod.CollectionPeriod.Period,
                                 pendingPayment.ApprenticeshipIncentiveId,
-                                pendingPayment.PendingPaymentId))
-                        .ContinueWith(previous => context.CallActivityAsync("CreatePayment",
-                            new CreatePaymentInput
-                            {
-                                ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
-                                PendingPaymentId = pendingPayment.PendingPaymentId,
-                                CollectionPeriod = collectionPeriod
-                            }), TaskContinuationOptions.OnlyOnRanToCompletion));
+                                pendingPayment.PendingPaymentId)));
+                }
+
+                allValidatePaymentTasks = Task.WhenAll(validatePaymentTasks);
+                await allValidatePaymentTasks;
+            }
+            catch(Exception)
+            {
+                allValidatePaymentTasks?.Exception?.InnerExceptions.ToList().ForEach(e =>
+                {
+                    if (e.InnerException is ValidatePendingPaymentException)
+                    {
+                        failedPendingPayments.Add(e.InnerException as ValidatePendingPaymentException);
+                    }
+                });
+                   
+                if(!failedPendingPayments.Any())
+                {
+                    throw;
+                }
+
+                throw new AggregateException("Error ValidatePendingPayments", failedPendingPayments);
             }
 
-            await Task.WhenAll(tasks);
+            var createPaymentTasks = new List<Task>();
+            foreach (var pendingPayment in pendingPayments)
+            {
+                createPaymentTasks.Add(
+                    context.CallActivityAsync(nameof(CreatePayment),
+                        new CreatePaymentInput
+                        {
+                            ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
+                            PendingPaymentId = pendingPayment.PendingPaymentId,
+                            CollectionPeriod = collectionPeriod
+                        }));
+            }
+            await Task.WhenAll(createPaymentTasks);
         }
     }
 }
