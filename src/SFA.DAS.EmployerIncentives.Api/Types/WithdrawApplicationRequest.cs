@@ -4,7 +4,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Types
 {
     public class WithdrawApplicationRequest
     {
-        public WithdrawlType WithdrawlType { get; set; }
+        public WithdrawalType WithdrawalType { get; set; }
         public long AccountLegalEntityId { get; set; }
         public long ULN { get; set; }
         public ServiceRequest ServiceRequest { get; set; }

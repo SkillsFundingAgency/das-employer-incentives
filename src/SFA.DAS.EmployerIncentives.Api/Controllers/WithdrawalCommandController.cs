@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,21 +9,21 @@ using System.Threading.Tasks;
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
     [ApiController]
-    public class WithdrawlCommandController : ApiCommandControllerBase
+    public class WithdrawalCommandController : ApiCommandControllerBase
     {
-        public WithdrawlCommandController(ICommandDispatcher commandDispatcher) : base(commandDispatcher)
+        public WithdrawalCommandController(ICommandDispatcher commandDispatcher) : base(commandDispatcher)
         {
         }
 
-        [HttpPost("/withdrawls")]
+        [HttpPost("/withdrawals")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> WithdrawlIncentiveApplication([FromBody] WithdrawApplicationRequest request)
+        public async Task<IActionResult> WithdrawalIncentiveApplication([FromBody] WithdrawApplicationRequest request)
         {
-            if (request.WithdrawlType == WithdrawlType.Employer)
+            if (request.WithdrawalType == WithdrawalType.Employer)
             {
                 await SendCommandAsync(
-                    new EmployerWithdrawlCommand(
+                    new EmployerWithdrawalCommand(
                         request.AccountLegalEntityId, 
                         request.ULN,
                         request.ServiceRequest.TaskId,

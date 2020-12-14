@@ -1,15 +1,15 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using System;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawls.EmployerWithdrawl.Validators
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWithdrawal.Validators
 {
-    public class WhenValidatingEmployerWithdrawlCommand
+    public class WhenValidatingEmployerWithdrawalCommand
     {
-        private EmployerWithdrawlCommandValidator _sut;
+        private EmployerWithdrawalCommandValidator _sut;
         
         private Fixture _fixture;
 
@@ -18,14 +18,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawls.EmployerWithd
         {
             _fixture = new Fixture();
 
-            _sut = new EmployerWithdrawlCommandValidator();
+            _sut = new EmployerWithdrawalCommandValidator();
         }
 
         [Test]
         public async Task Then_the_command_is_invalid_when_the_AccountLegalEntityId_has_a_default_value()
         {
             //Arrange
-            var command = new EmployerWithdrawlCommand(
+            var command = new EmployerWithdrawalCommand(
                 default, 
                 _fixture.Create<long>(), 
                 _fixture.Create<string>(),
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawls.EmployerWithd
         public async Task Then_the_command_is_invalid_when_the_ULN_has_a_default_value()
         {
             //Arrange
-            var command = new EmployerWithdrawlCommand(                
+            var command = new EmployerWithdrawalCommand(                
                 _fixture.Create<long>(),
                 default,
                 _fixture.Create<string>(),

@@ -6,20 +6,19 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawls.EmployerWithdrawl.Handlers
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWithdrawal.Handlers
 {
-    public class WhenHandlingEmployerWithdrawlCommand
+    public class WhenHandlingEmployerWithdrawalCommand
     {
-        private EmployerWithdrawlCommandHandler _sut;
+        private EmployerWithdrawalCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRepository;
          
         private Fixture _fixture;
@@ -32,14 +31,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawls.EmployerWithd
 
             _mockDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
             
-            _sut = new EmployerWithdrawlCommandHandler(_mockDomainRepository.Object);
+            _sut = new EmployerWithdrawalCommandHandler(_mockDomainRepository.Object);
         }
 
         [Test]
         public async Task Then_changes_to_the_application_are_persisted_to_the_domain_repository_for_matching_ULNs()
         {
             //Arrange            
-            var command = _fixture.Create<EmployerWithdrawlCommand>();
+            var command = _fixture.Create<EmployerWithdrawalCommand>();
 
             var apprenticeshipModel = _fixture
                 .Build<ApprenticeshipModel>()
@@ -83,10 +82,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawls.EmployerWithd
         }
 
         [Test]
-        public void Then_a_EmployerWithdrawlException_is_thrown_when_there_are_no_matching_apprenticeships()
+        public void Then_a_EmployerWithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
         {
             //Arrange            
-            var command = _fixture.Create<EmployerWithdrawlCommand>();
+            var command = _fixture.Create<EmployerWithdrawalCommand>();
 
             _mockDomainRepository
                 .Setup(m => m.Find(command))
@@ -97,8 +96,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawls.EmployerWithd
 
             //Assert
             action.Should()
-                .Throw<EmployerWithdrawlException>()
-                .WithMessage("Unable to handle Employer withdrawl command.*");           
+                .Throw<EmployerWithdrawalException>()
+                .WithMessage("Unable to handle Employer withdrawal command.*");           
         }
     }
 }
