@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public void Then_the_start_date_is_null_when_there_are_no_payable_periods()
+        public void Then_the_start_date_is_not_null_when_there_are_no_payable_periods()
         {
             //Arrange
             _testPriceEpisodeDto.Periods.ToList().ForEach(p => p.IsPayable = false);
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             var startDate = _sut.LearningStartDate(_incentive);
 
             //Assert
-            startDate.Should().BeNull();
+            startDate.Should().NotBeNull();
         }
 
         [Test]
