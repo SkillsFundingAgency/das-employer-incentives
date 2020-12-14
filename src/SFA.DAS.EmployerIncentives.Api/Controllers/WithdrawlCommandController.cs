@@ -15,7 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPost("/withdrawls")]
-        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.Accepted)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> WithdrawlIncentiveApplication([FromBody] WithdrawApplicationRequest request)
         {
             if (request.WithdrawlType == WithdrawlType.Employer)
