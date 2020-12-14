@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -25,9 +26,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                     new EmployerWithdrawlCommand(
                         request.AccountLegalEntityId, 
                         request.ULN,
-                        request.ServiceRequestTaskId,
-                        request.ServiceRequestDecisionNumber,
-                        request.ServiceRequestCreatedDate));
+                        request.ServiceRequest.TaskId,
+                        request.ServiceRequest.DecisionReference,
+                        request.ServiceRequest.TaskCreatedDate??DateTime.Now));
                 return Accepted();
             }
             else

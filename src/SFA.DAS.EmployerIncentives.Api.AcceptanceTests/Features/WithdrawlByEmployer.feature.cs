@@ -88,12 +88,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Withdrawl status set against an application")]
-        public virtual void WithdrawlStatusSetAgainstAnApplication()
+        [NUnit.Framework.DescriptionAttribute("Withdrawl status set against an apprenticeship in an application")]
+        public virtual void WithdrawlStatusSetAgainstAnApprenticeshipInAnApplication()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawl status set against an application", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawl status set against an apprenticeship in an application", null, tagsOfScenario, argumentsOfScenario);
 #line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -128,12 +128,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Withdrawl status set against a ULN with multiple applications")]
-        public virtual void WithdrawlStatusSetAgainstAULNWithMultipleApplications()
+        [NUnit.Framework.DescriptionAttribute("Withdrawl status set against a ULN with multiple apprenticeships in applications")]
+        public virtual void WithdrawlStatusSetAgainstAULNWithMultipleApprenticeshipsInApplications()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawl status set against a ULN with multiple applications", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawl status set against a ULN with multiple apprenticeships in applications", null, tagsOfScenario, argumentsOfScenario);
 #line 15
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -169,12 +169,14 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Employer withdrawl removes incentive after an application has been submitted")]
-        public virtual void EmployerWithdrawlRemovesIncentiveAfterAnApplicationHasBeenSubmitted()
+        [NUnit.Framework.DescriptionAttribute("Employer withdrawl removes incentive after an apprenticeship application has been" +
+            " submitted")]
+        public virtual void EmployerWithdrawlRemovesIncentiveAfterAnApprenticeshipApplicationHasBeenSubmitted()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawl removes incentive after an application has been submitted", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawl removes incentive after an apprenticeship application has been" +
+                    " submitted", null, tagsOfScenario, argumentsOfScenario);
 #line 20
 this.ScenarioInitialize(scenarioInfo);
 #line hidden

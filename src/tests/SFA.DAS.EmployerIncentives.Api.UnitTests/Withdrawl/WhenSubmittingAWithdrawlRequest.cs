@@ -48,9 +48,9 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawl
                 .Verify(m => m.Send(It.Is<EmployerWithdrawlCommand>(c => 
                     c.AccountLegalEntityId == request.AccountLegalEntityId &&
                     c.ULN == request.ULN && 
-                    c.ServiceRequestTaskId == request.ServiceRequestTaskId &&
-                    c.ServiceRequestCreated == request.ServiceRequestCreatedDate &&
-                    c.DecisionReference == request.ServiceRequestDecisionNumber), 
+                    c.ServiceRequestTaskId == request.ServiceRequest.TaskId &&
+                    c.ServiceRequestCreated == request.ServiceRequest.TaskCreatedDate.Value &&
+                    c.DecisionReference == request.ServiceRequest.DecisionReference), 
                 It.IsAny<CancellationToken>())
                 ,Times.Once);                
         }

@@ -119,9 +119,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             incentiveApplicationAudits.Should().HaveCount(1);
             var auditRecord = incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship.Id);
             auditRecord.Process.Should().Be(IncentiveApplicationStatus.EmployerWithdrawn);
-            auditRecord.ServiceRequestTaskId.Should().Be(_withdrawApplicationRequest.ServiceRequestTaskId);
-            auditRecord.ServiceRequestDecisionReference.Should().Be(_withdrawApplicationRequest.ServiceRequestDecisionNumber);
-            auditRecord.ServiceRequestCreatedDate.Should().Be(_withdrawApplicationRequest.ServiceRequestCreatedDate);
+            auditRecord.ServiceRequestTaskId.Should().Be(_withdrawApplicationRequest.ServiceRequest.TaskId);
+            auditRecord.ServiceRequestDecisionReference.Should().Be(_withdrawApplicationRequest.ServiceRequest.DecisionReference);
+            auditRecord.ServiceRequestCreatedDate.Should().Be(_withdrawApplicationRequest.ServiceRequest.TaskCreatedDate.Value);
 
             var publishedCommand = _testContext
                 .CommandsPublished

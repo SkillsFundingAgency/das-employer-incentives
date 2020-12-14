@@ -7,8 +7,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Types
         public WithdrawlType WithdrawlType { get; set; }
         public long AccountLegalEntityId { get; set; }
         public long ULN { get; set; }
-        public string ServiceRequestTaskId { get; set; }
-        public string ServiceRequestDecisionNumber { get; set; }
-        public DateTime ServiceRequestCreatedDate { get; set; }
+        public ServiceRequest ServiceRequest { get; set; }
+    }
+
+    public class ServiceRequest
+    {
+        public string TaskId { get; set; }
+        public string DecisionReference { get; set; }
+        public DateTime? TaskCreatedDate { get; set; }
     }
 }
