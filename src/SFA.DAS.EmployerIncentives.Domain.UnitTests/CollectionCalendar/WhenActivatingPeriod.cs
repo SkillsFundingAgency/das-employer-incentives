@@ -46,7 +46,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_active_period_is_changed()
         {
             // Arrange / Act
-            _sut.ActivatePeriod((short)testDate.Year, 2, true);
+            var period = new CollectionPeriod(2, (short)testDate.Year);
+            _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();
 
@@ -60,7 +61,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_active_period_is_not_changed_when_the_period_and_year_not_matched()
         {
             // Arrange / Act
-            _sut.ActivatePeriod((short)testDate.Year, 4, true);
+            var period = new CollectionPeriod(4, (short)testDate.Year);
+            _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();
 
@@ -68,34 +70,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeFalse();
             periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
             periods.Count(x => x.Active == true).Should().Be(1);
-        }
-
-        [Test]
-        public void Then_the_active_period_is_set_to_inactive()
-        {
-            // Arrange / Act
-            _sut.ActivatePeriod((short)testDate.Year, 1, false);
-
-            var periods = _sut.GetAllPeriods().ToList();
-
-            periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
-            periods.Count(x => x.Active == true).Should().Be(0);
-        }
-
-        [Test]
-        public void Then_setting_one_period_to_inactive_does_not_deactivate_other_periods()
-        {
-            // Arrange / Act
-            _sut.ActivatePeriod((short)testDate.Year, 2, false);
-
-            var periods = _sut.GetAllPeriods().ToList();
-
-            periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeTrue();
-            periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
-            periods.Count(x => x.Active == true).Should().Be(1);
-        }
+        }      
     }
 }

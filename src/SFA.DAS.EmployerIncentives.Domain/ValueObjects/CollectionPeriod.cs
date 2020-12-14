@@ -17,6 +17,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             Active = active;
         }
 
+        public CollectionPeriod(byte periodNumber, short calendarYear)
+        {
+            PeriodNumber = periodNumber;
+            CalendarYear = calendarYear;
+        }
+
         public byte PeriodNumber { get; }
         public byte CalendarMonth { get; }
         public short CalendarYear { get; }

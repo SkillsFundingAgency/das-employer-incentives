@@ -20,10 +20,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.4.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("ActivateCollectionCalendarPeriod")]
+    [NUnit.Framework.DescriptionAttribute("UpdateCollectionCalendarPeriod")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
-    public partial class ActivateCollectionCalendarPeriodFeature
+    public partial class UpdateCollectionCalendarPeriodFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -32,14 +32,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "database",
                 "api"};
         
-#line 1 "ActivateCollectionCalendarPeriod.feature"
+#line 1 "UpdateCollectionCalendarPeriod.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ActivateCollectionCalendarPeriod", "\tIn order to ensure that payments are calculated correctly\r\n\tAs a service owner\r\n" +
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "UpdateCollectionCalendarPeriod", "\tIn order to ensure that payments are calculated correctly\r\n\tAs a service owner\r\n" +
                     "\tI want to set the active collection period for the payment process", ProgrammingLanguage.CSharp, new string[] {
                         "database",
                         "api"});
@@ -81,12 +81,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Change of active collection period is requested")]
-        public virtual void ChangeOfActiveCollectionPeriodIsRequested()
+        [NUnit.Framework.DescriptionAttribute("Change of collection period status is requested")]
+        public virtual void ChangeOfCollectionPeriodStatusIsRequested()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Change of active collection period is requested", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Change of collection period status is requested", null, tagsOfScenario, argumentsOfScenario);
 #line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden

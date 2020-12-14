@@ -22,17 +22,17 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.CollectionCalendar
             _sut = new CollectionCalendarCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<ActivateCollectionPeriodCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<UpdateCollectionPeriodCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
         [Test]
         public async Task Then_the_required_collection_calendar_period_is_set_to_active()
         {
-            var request = new ActivateCollectionPeriodRequest { CollectionPeriodYear = 2020, CollectionPeriodNumber = 1 };
-            await _sut.ActivateCollectionPeriod(request);
+            var request = new UpdateCollectionPeriodRequest { CollectionPeriodYear = 2020, CollectionPeriodNumber = 1 };
+            await _sut.UpdateCollectionPeriod(request);
 
-            _mockCommandDispatcher.Verify(m => m.Send(It.Is<ActivateCollectionPeriodCommand>(
+            _mockCommandDispatcher.Verify(m => m.Send(It.Is<UpdateCollectionPeriodCommand>(
                 x => x.CollectionPeriodNumber == request.CollectionPeriodNumber 
                 && x.CollectionPeriodYear == request.CollectionPeriodYear),
                 It.IsAny<CancellationToken>()), Times.Once);

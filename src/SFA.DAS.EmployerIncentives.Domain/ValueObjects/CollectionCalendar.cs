@@ -1,6 +1,8 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using Microsoft.VisualBasic;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -32,29 +34,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 .Single(d => d.CalendarYear == collectionYear && d.PeriodNumber == periodNumber);
         }
 
-        public void ActivatePeriod(short collectionYear, byte periodNumber, bool setToActive)
+        public void SetActive(CollectionPeriod collectionPeriod)
         {
-            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.CalendarYear == collectionYear && x.PeriodNumber == periodNumber);
-
+            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.CalendarYear == collectionPeriod.CalendarYear 
+                                                                                 && x.PeriodNumber == collectionPeriod.PeriodNumber);
             if (collectionPeriodToActivate == null)
             {
                 return;
             }
 
-            if (setToActive)
+            foreach (var collectionCalendarPeriod in _collectionPeriods)
             {
-                foreach (var collectionPeriod in _collectionPeriods)
-                {
-                    collectionPeriod.SetActive(false);
-                }
-            }
+                collectionCalendarPeriod.SetActive(false);
+            }           
 
-            collectionPeriodToActivate.SetActive(setToActive);
+            collectionPeriodToActivate.SetActive(true);
         }
 
-        public IEnumerable<CollectionPeriod> GetAllPeriods()
+        public ReadOnlyCollection<CollectionPeriod> GetAllPeriods()
         {
-            return _collectionPeriods;
+            return new ReadOnlyCollection<CollectionPeriod>(_collectionPeriods.ToList());
         }
 
         protected override IEnumerable<object> GetAtomicValues()

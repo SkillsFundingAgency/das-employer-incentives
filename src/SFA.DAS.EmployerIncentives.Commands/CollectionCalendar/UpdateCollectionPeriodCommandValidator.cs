@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CollectionCalendar
 {
-    public class ActivateCollectionPeriodCommandValidator : IValidator<ActivateCollectionPeriodCommand>
+    public class UpdateCollectionPeriodCommandValidator : IValidator<UpdateCollectionPeriodCommand>
     {
-        public Task<ValidationResult> Validate(ActivateCollectionPeriodCommand item)
+        public Task<ValidationResult> Validate(UpdateCollectionPeriodCommand item)
         {
             var result = new ValidationResult();
             if (item.CollectionPeriodNumber < 1 || item.CollectionPeriodNumber > 12)

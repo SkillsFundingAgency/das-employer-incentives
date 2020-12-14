@@ -11,10 +11,10 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "ActivateCollectionCalendarPeriod")]
-    public class ActiveCollectionCalendarPeriodSteps : StepsBase
+    [Scope(Feature = "UpdateCollectionCalendarPeriod")]
+    public class UpdateCollectionCalendarPeriodSteps : StepsBase
     {
-        public ActiveCollectionCalendarPeriodSteps(TestContext testContext) : base(testContext)
+        public UpdateCollectionCalendarPeriodSteps(TestContext testContext) : base(testContext)
         {
         }
 
@@ -27,8 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the change of active collection period is requested")]
         public async Task WhenTheChangeOfActiveCollectionPeriodIsRequested()
         {
-            var url = "collectionCalendar/period/active";
-            var data = new ActivateCollectionPeriodRequest { CollectionPeriodNumber = 2, CollectionPeriodYear = (short)DateTime.Now.Year, Active = true };
+            var url = "collectionPeriods";
+            var data = new UpdateCollectionPeriodRequest { CollectionPeriodNumber = 2, CollectionPeriodYear = (short)DateTime.Now.Year, Active = true };
             var apiResult = await EmployerIncentiveApi.Client.PatchAsync(url, data.GetStringContent());
 
             apiResult.StatusCode.Should().Be(HttpStatusCode.OK);
