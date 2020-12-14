@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
         public bool PausePayments => Model.PausePayments;
 
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, bool pausePayments)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -38,7 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ApplicationApprenticeshipId = applicationApprenticeshipId,
                     Account = account,
                     Apprenticeship = apprenticeship,
-                    PlannedStartDate = plannedStartDate
+                    PlannedStartDate = plannedStartDate,
+                    PausePayments = pausePayments
                 }, true);
         }
 
