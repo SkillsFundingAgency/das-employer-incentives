@@ -23,7 +23,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                  from pe in tr.PriceEpisodes
                  from p in pe.Periods
                  where p.ApprenticeshipId == incentive.Apprenticeship.Id
-                       && p.IsPayable
                  select new
                  {
                      p.ApprenticeshipId,
