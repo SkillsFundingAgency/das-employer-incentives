@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
-        public void EmployerWithdrawn(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
+        public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
         {
             var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
             apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.EmployerWithdrawn);

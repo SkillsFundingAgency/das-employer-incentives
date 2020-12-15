@@ -7,15 +7,15 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawl
+namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
 {
-    public class WhenSubmittingAWithdrawlRequest
+    public class WhenSubmittingAWithdrawalRequest
     {
-        private WithdrawlCommandController _sut;
+        private WithdrawalCommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
         private Fixture _fixture;
 
@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawl
         {
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             _fixture = new Fixture();
-            _sut = new WithdrawlCommandController(_mockCommandDispatcher.Object);
+            _sut = new WithdrawalCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
                 .Setup(m => m.Send(It.IsAny<UpsertLegalEntityCommand>(), It.IsAny<CancellationToken>()))
@@ -32,25 +32,25 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawl
         }
 
         [Test]
-        public async Task Then_a_EmployerWithdrawlCommand_command_is_dispatched_when_the_WithdrawlType_is_Employer()
+        public async Task Then_a_EmployerWithdrawalCommand_command_is_dispatched_when_the_WithdrawalType_is_Employer()
         {
             // Arrange
             var request = _fixture
                 .Build<WithdrawApplicationRequest>()
-                .With(r => r.WithdrawlType, WithdrawlType.Employer)
+                .With(r => r.WithdrawalType, WithdrawalType.Employer)
                 .Create();
 
             // Act
-            await _sut.WithdrawlIncentiveApplication(request);
+            await _sut.WithdrawalIncentiveApplication(request);
 
             // Assert
             _mockCommandDispatcher
-                .Verify(m => m.Send(It.Is<EmployerWithdrawlCommand>(c => 
+                .Verify(m => m.Send(It.Is<EmployerWithdrawalCommand>(c => 
                     c.AccountLegalEntityId == request.AccountLegalEntityId &&
                     c.ULN == request.ULN && 
-                    c.ServiceRequestTaskId == request.ServiceRequestTaskId &&
-                    c.ServiceRequestCreated == request.ServiceRequestCreatedDate &&
-                    c.DecisionReference == request.ServiceRequestDecisionNumber), 
+                    c.ServiceRequestTaskId == request.ServiceRequest.TaskId &&
+                    c.ServiceRequestCreated == request.ServiceRequest.TaskCreatedDate.Value &&
+                    c.DecisionReference == request.ServiceRequest.DecisionReference), 
                 It.IsAny<CancellationToken>())
                 ,Times.Once);                
         }
@@ -61,11 +61,11 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawl
             // Arrange
             var request = _fixture
                 .Build<WithdrawApplicationRequest>()
-                .With(r => r.WithdrawlType, WithdrawlType.Employer)
+                .With(r => r.WithdrawalType, WithdrawalType.Employer)
                 .Create();
 
             // Act
-            var actual = await _sut.WithdrawlIncentiveApplication(request) as AcceptedResult;
+            var actual = await _sut.WithdrawalIncentiveApplication(request) as AcceptedResult;
 
             // Assert
             actual.Should().NotBeNull();

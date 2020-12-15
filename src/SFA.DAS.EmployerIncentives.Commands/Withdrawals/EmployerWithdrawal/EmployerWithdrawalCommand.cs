@@ -1,9 +1,9 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl
+namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
 {
-    public class EmployerWithdrawlCommand : ICommand
+    public class EmployerWithdrawalCommand : ICommand
     {   
         public long AccountLegalEntityId { get; }
         public long ULN { get; }
@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl
             return $"AccountLegalEntityId:{AccountLegalEntityId}, ULN:{ULN}, ServiceRequestTaskId:{ServiceRequestTaskId}";
         }
 
-        public EmployerWithdrawlCommand(            
+        public EmployerWithdrawalCommand(            
             long accountLegalEntityId,
             long uln,
             string serviceRequestTaskId,

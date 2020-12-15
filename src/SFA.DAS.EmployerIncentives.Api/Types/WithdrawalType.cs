@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.EmployerIncentives.Api.Types
 {
-    public enum WithdrawlType
+    public enum WithdrawalType
     {
         Employer = 1
     }

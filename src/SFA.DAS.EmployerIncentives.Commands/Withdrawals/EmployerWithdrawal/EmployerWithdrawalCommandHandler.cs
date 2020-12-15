@@ -6,23 +6,23 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl
+namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
 {
-    public class EmployerWithdrawlCommandHandler : ICommandHandler<EmployerWithdrawlCommand>
+    public class EmployerWithdrawalCommandHandler : ICommandHandler<EmployerWithdrawalCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _domainRepository;
 
-        public EmployerWithdrawlCommandHandler(IIncentiveApplicationDomainRepository domainRepository)
+        public EmployerWithdrawalCommandHandler(IIncentiveApplicationDomainRepository domainRepository)
         {
             _domainRepository = domainRepository;
         }
 
-        public async Task Handle(EmployerWithdrawlCommand command, CancellationToken cancellationToken = default)
+        public async Task Handle(EmployerWithdrawalCommand command, CancellationToken cancellationToken = default)
         {
             var applications = await _domainRepository.Find(command);
             if(!applications.Any())
             {
-                throw new EmployerWithdrawlException($"Unable to handle Employer withdrawl command.  No matching incentive applications found for {command}");
+                throw new EmployerWithdrawalException($"Unable to handle Employer withdrawal command.  No matching incentive applications found for {command}");
             }
 
             foreach(var application in applications)
@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl
                 {
                     if(apprenticeship.ULN == command.ULN)
                     {
-                        application.EmployerWithdrawn(
+                        application.EmployerWithdrawal(
                             apprenticeship, 
                             new ServiceRequest(
                                 command.ServiceRequestTaskId, 

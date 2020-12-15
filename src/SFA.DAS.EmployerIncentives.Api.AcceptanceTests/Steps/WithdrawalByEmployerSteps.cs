@@ -16,8 +16,8 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "WithdrawlByEmployer")]
-    public class WithdrawlByEmployerSteps : StepsBase
+    [Scope(Feature = "WithdrawalByEmployer")]
+    public class WithdrawalByEmployerSteps : StepsBase
     {
         private readonly TestContext _testContext;
         private readonly Fixture _fixture;
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
 
-        public WithdrawlByEmployerSteps(TestContext testContext) : base(testContext)
+        public WithdrawalByEmployerSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
@@ -94,19 +94,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _withdrawApplicationRequest = _fixture
                 .Build<WithdrawApplicationRequest>()
-                .With(r => r.WithdrawlType, WithdrawlType.Employer)
+                .With(r => r.WithdrawalType, WithdrawalType.Employer)
                 .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
                 .With(r => r.ULN, _apprenticeship.ULN)
                 .Create();           
             
-            var url = $"withdrawls";
+            var url = $"withdrawals";
 
             await _testContext.WaitFor<MessageContext>(async () =>
                      await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
         }             
 
-        [Then(@"the incentive application status is updated to indicate the employer withdrawl")]
-        public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawl()
+        [Then(@"the incentive application status is updated to indicate the employer withdrawal")]
+        public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
         {
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
@@ -119,9 +119,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             incentiveApplicationAudits.Should().HaveCount(1);
             var auditRecord = incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship.Id);
             auditRecord.Process.Should().Be(IncentiveApplicationStatus.EmployerWithdrawn);
-            auditRecord.ServiceRequestTaskId.Should().Be(_withdrawApplicationRequest.ServiceRequestTaskId);
-            auditRecord.ServiceRequestDecisionReference.Should().Be(_withdrawApplicationRequest.ServiceRequestDecisionNumber);
-            auditRecord.ServiceRequestCreatedDate.Should().Be(_withdrawApplicationRequest.ServiceRequestCreatedDate);
+            auditRecord.ServiceRequestTaskId.Should().Be(_withdrawApplicationRequest.ServiceRequest.TaskId);
+            auditRecord.ServiceRequestDecisionReference.Should().Be(_withdrawApplicationRequest.ServiceRequest.DecisionReference);
+            auditRecord.ServiceRequestCreatedDate.Should().Be(_withdrawApplicationRequest.ServiceRequest.TaskCreatedDate.Value);
 
             var publishedCommand = _testContext
                 .CommandsPublished
@@ -132,8 +132,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             publishedCommand.IncentiveApplicationApprenticeshipId.Should().Be(_apprenticeship.Id);
         }
 
-        [Then(@"each incentive application status is updated to indicate the employer withdrawl")]
-        public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawl()
+        [Then(@"each incentive application status is updated to indicate the employer withdrawal")]
+        public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
         {
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
@@ -158,7 +158,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive and it's pending payments are removed from the system")]
         public async Task ThenTheIncentiveAndPendingPaymentsAreremovedFromTheSystem()
         {
-            await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawl();
+            await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal();
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();

@@ -1,11 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl
+namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
 {
-    public class EmployerWithdrawlCommandValidator : IValidator<EmployerWithdrawlCommand>
+    public class EmployerWithdrawalCommandValidator : IValidator<EmployerWithdrawalCommand>
     {
-        public Task<ValidationResult> Validate(EmployerWithdrawlCommand item)
+        public Task<ValidationResult> Validate(EmployerWithdrawalCommand item)
         {
             var result = new ValidationResult();
 

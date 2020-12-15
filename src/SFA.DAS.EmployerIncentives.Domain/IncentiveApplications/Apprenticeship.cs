@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                     Model.WithdrawnByEmployer = true;
                     break;                
                 default:
-                    throw new InvalidOperationException($"Unsupported IncentiveApplicationStatus:{incentiveApplicationStatus} for withdrawl");
+                    throw new InvalidOperationException($"Unsupported IncentiveApplicationStatus:{incentiveApplicationStatus} for withdrawal");
             }
         }
 

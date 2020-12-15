@@ -45,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             apprenticeship.WithdrawnByEmployer.Should().BeFalse();
 
             // Act
-            _sut.EmployerWithdrawn(apprenticeship, serviceRequest);
+            _sut.EmployerWithdrawal(apprenticeship, serviceRequest);
 
             // Assert
             apprenticeship.WithdrawnByEmployer.Should().BeTrue();
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             var apprenticeship = _sut.Apprenticeships.Single();
       
             // Act
-            _sut.EmployerWithdrawn(apprenticeship, serviceRequest);
+            _sut.EmployerWithdrawal(apprenticeship, serviceRequest);
 
             // Assert
             var raisedEvent = _sut.FlushEvents().Single() as EmployerWithdrawn;

@@ -20,12 +20,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.5.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("WithdrawlByEmployer")]
+    [NUnit.Framework.DescriptionAttribute("WithdrawalByEmployer")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
     [NUnit.Framework.CategoryAttribute("domainMessageHandlers")]
     [NUnit.Framework.CategoryAttribute("messageBus")]
-    public partial class WithdrawlByEmployerFeature
+    public partial class WithdrawalByEmployerFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
@@ -36,14 +36,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "domainMessageHandlers",
                 "messageBus"};
         
-#line 1 "WithdrawlByEmployer.feature"
+#line 1 "WithdrawalByEmployer.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "WithdrawlByEmployer", "\tIn order to handle an Employer withdrawing an apprenticeship from the incentive " +
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "WithdrawalByEmployer", "\tIn order to handle an Employer withdrawing an apprenticeship from the incentive " +
                     "scheme\r\n\tAs the employer incentive sheme\r\n\tI want to enable the apprenticeship t" +
                     "o be removed from the scheme to prevent payments from being made", ProgrammingLanguage.CSharp, new string[] {
                         "database",
@@ -88,12 +88,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Withdrawl status set against an apprenticeship in an application")]
-        public virtual void WithdrawlStatusSetAgainstAnApprenticeshipInAnApplication()
+        [NUnit.Framework.DescriptionAttribute("Withdrawal status set against an apprenticeship in an application")]
+        public virtual void WithdrawalStatusSetAgainstAnApprenticeshipInAnApplication()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawl status set against an apprenticeship in an application", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawal status set against an apprenticeship in an application", null, tagsOfScenario, argumentsOfScenario);
 #line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -121,19 +121,21 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 13
- testRunner.Then("the incentive application status is updated to indicate the employer withdrawl", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the incentive application status is updated to indicate the employer withdrawal", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Withdrawl status set against a ULN with multiple apprenticeships in applications")]
-        public virtual void WithdrawlStatusSetAgainstAULNWithMultipleApprenticeshipsInApplications()
+        [NUnit.Framework.DescriptionAttribute("Withdrawal status set against a ULN with multiple apprenticeships in applications" +
+            "")]
+        public virtual void WithdrawalStatusSetAgainstAULNWithMultipleApprenticeshipsInApplications()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawl status set against a ULN with multiple apprenticeships in applications", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawal status set against a ULN with multiple apprenticeships in applications" +
+                    "", null, tagsOfScenario, argumentsOfScenario);
 #line 15
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -162,21 +164,21 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 18
- testRunner.Then("each incentive application status is updated to indicate the employer withdrawl", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("each incentive application status is updated to indicate the employer withdrawal", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Employer withdrawl removes incentive after an apprenticeship application has been" +
-            " submitted")]
-        public virtual void EmployerWithdrawlRemovesIncentiveAfterAnApprenticeshipApplicationHasBeenSubmitted()
+        [NUnit.Framework.DescriptionAttribute("Employer withdrawal removes incentive after an apprenticeship application has bee" +
+            "n submitted")]
+        public virtual void EmployerWithdrawalRemovesIncentiveAfterAnApprenticeshipApplicationHasBeenSubmitted()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawl removes incentive after an apprenticeship application has been" +
-                    " submitted", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawal removes incentive after an apprenticeship application has bee" +
+                    "n submitted", null, tagsOfScenario, argumentsOfScenario);
 #line 20
 this.ScenarioInitialize(scenarioInfo);
 #line hidden

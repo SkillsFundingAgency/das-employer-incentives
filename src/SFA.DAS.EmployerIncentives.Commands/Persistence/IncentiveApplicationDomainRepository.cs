@@ -1,5 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawls.EmployerWithdrawl;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
@@ -37,9 +37,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
-        public async Task<IEnumerable<IncentiveApplication>> Find(EmployerWithdrawlCommand withdrawlCommand)
+        public async Task<IEnumerable<IncentiveApplication>> Find(EmployerWithdrawalCommand withdrawalCommand)
         {
-            var applications = await _incentiveApplicationDataRepository.FindApplicationsByAccountLegalEntityAndUln(withdrawlCommand.AccountLegalEntityId, withdrawlCommand.ULN);
+            var applications = await _incentiveApplicationDataRepository.FindApplicationsByAccountLegalEntityAndUln(withdrawalCommand.AccountLegalEntityId, withdrawalCommand.ULN);
 
             return (from app in applications
                     select _incentiveApplicationFactory.GetExisting(app.Id, app));
