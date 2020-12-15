@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 {
-    public class EmployerWithdrawnHandler :  IDomainEventHandler<EmployerWithdrawn>
+    public class ComplianceWithdrawnHandler : IDomainEventHandler<ComplianceWithdrawn>
     {
         private readonly ICommandPublisher _commandPublisher;
 
-        public EmployerWithdrawnHandler(ICommandPublisher commandPublisher)
+        public ComplianceWithdrawnHandler(ICommandPublisher commandPublisher)
         {
             _commandPublisher = commandPublisher;
         }
 
-        public Task Handle(EmployerWithdrawn @event, CancellationToken cancellationToken = default)
+        public Task Handle(ComplianceWithdrawn @event, CancellationToken cancellationToken = default)
         {
             return _commandPublisher.Publish(
                 new WithdrawCommand(

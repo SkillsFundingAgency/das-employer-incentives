@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using System;
 using System.Net;
@@ -29,6 +30,17 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                         request.ServiceRequest.TaskId,
                         request.ServiceRequest.DecisionReference,
                         request.ServiceRequest.TaskCreatedDate??DateTime.UtcNow));
+                return Accepted();
+            }
+            else if(request.WithdrawalType == WithdrawalType.Compliance)
+            {
+                await SendCommandAsync(
+                    new ComplianceWithdrawalCommand(
+                        request.AccountLegalEntityId,
+                        request.ULN,
+                        request.ServiceRequest.TaskId,
+                        request.ServiceRequest.DecisionReference,
+                        request.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow));
                 return Accepted();
             }
             else

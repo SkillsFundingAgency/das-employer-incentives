@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,12 +57,52 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
         }
 
         [Test]
-        public async Task Then_an_accepted_response_is_returned()
+        public async Task Then_an_accepted_response_is_returned_when_the_WithdrawalType_is_Employer()
         {
             // Arrange
             var request = _fixture
                 .Build<WithdrawApplicationRequest>()
                 .With(r => r.WithdrawalType, WithdrawalType.Employer)
+                .Create();
+
+            // Act
+            var actual = await _sut.WithdrawalIncentiveApplication(request) as AcceptedResult;
+
+            // Assert
+            actual.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task Then_a_ComplianceWithdrawalCommand_command_is_dispatched_when_the_WithdrawalType_is_Compliance()
+        {
+            // Arrange
+            var request = _fixture
+                .Build<WithdrawApplicationRequest>()
+                .With(r => r.WithdrawalType, WithdrawalType.Compliance)
+                .Create();
+
+            // Act
+            await _sut.WithdrawalIncentiveApplication(request);
+
+            // Assert
+            _mockCommandDispatcher
+                .Verify(m => m.Send(It.Is<ComplianceWithdrawalCommand>(c =>
+                    c.AccountLegalEntityId == request.AccountLegalEntityId &&
+                    c.ULN == request.ULN &&
+                    c.ServiceRequestTaskId == request.ServiceRequest.TaskId &&
+                    c.ServiceRequestCreated == request.ServiceRequest.TaskCreatedDate.Value &&
+                    c.DecisionReference == request.ServiceRequest.DecisionReference),
+                It.IsAny<CancellationToken>())
+                , Times.Once);
+        }
+
+        [Test]
+        public async Task Then_an_accepted_response_is_returned_when_the_WithdrawalType_is_Compliance()
+        {
+            // Arrange
+            var request = _fixture
+                .Build<WithdrawApplicationRequest>()
+                .With(r => r.WithdrawalType, WithdrawalType.Compliance)
                 .Create();
 
             // Act

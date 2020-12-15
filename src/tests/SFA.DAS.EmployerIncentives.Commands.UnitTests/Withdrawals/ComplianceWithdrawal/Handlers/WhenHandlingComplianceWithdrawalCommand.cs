@@ -7,18 +7,18 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWithdrawal.Handlers
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWithdrawal.Handlers
 {
-    public class WhenHandlingEmployerWithdrawalCommand
+    public class WhenHandlingComplianceWithdrawalCommand
     {
-        private EmployerWithdrawalCommandHandler _sut;
+        private ComplianceWithdrawalCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRepository;
          
         private Fixture _fixture;
@@ -31,14 +31,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
 
             _mockDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
             
-            _sut = new EmployerWithdrawalCommandHandler(_mockDomainRepository.Object);
+            _sut = new ComplianceWithdrawalCommandHandler(_mockDomainRepository.Object);
         }
 
         [Test]
         public async Task Then_changes_to_the_application_are_persisted_to_the_domain_repository_for_matching_ULNs()
         {
             //Arrange            
-            var command = _fixture.Create<EmployerWithdrawalCommand>();
+            var command = _fixture.Create<ComplianceWithdrawalCommand>();
 
             var apprenticeshipModel = _fixture
                 .Build<ApprenticeshipModel>()
@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
                  a.Id == testApplication.Id &&
                  a.Apprenticeships.Count(a => 
                     a.ULN == command.ULN &&
-                    a.WithdrawnByEmployer) == 1)),
+                    a.WithdrawnByCompliance) == 1)),
                  Times.Once);
         }
 
@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
         public void Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
         {
             //Arrange            
-            var command = _fixture.Create<EmployerWithdrawalCommand>();
+            var command = _fixture.Create<ComplianceWithdrawalCommand>();
 
             _mockDomainRepository
                 .Setup(m => m.Find(command))
@@ -97,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
             //Assert
             action.Should()
                 .Throw<WithdrawalException>()
-                .WithMessage("Unable to handle Employer withdrawal command.*");           
+                .WithMessage("Unable to handle Compliance withdrawal command.*");           
         }
     }
 }

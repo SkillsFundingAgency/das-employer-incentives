@@ -4,15 +4,15 @@ using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
 {
-    public class EmployerWithdrawn : ApplicationWithdrawn
+    public class ComplianceWithdrawn : ApplicationWithdrawn
     {
-        public EmployerWithdrawn(
+        public ComplianceWithdrawn(
             long accountId,
             long accountLegalEntityId,
             ApprenticeshipModel model,
             ServiceRequest serviceRequest)
             : base(
-                  IncentiveApplicationStatus.EmployerWithdrawn,
+                  IncentiveApplicationStatus.ComplianceWithdrawn,
                   accountId,
                   accountLegalEntityId,
                   model,
