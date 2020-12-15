@@ -56,3 +56,9 @@ Scenario: Request to refresh learner data for a new Apprenticeship Incentive wit
 	And the latest learner data has a matching in-break training episode
 	When the learner data is refreshed for the apprenticeship incentive
 	Then the apprenticeship incentive learner data is updated with days in learning counted up until training end date
+
+Scenario: Request to refresh learner data for a new Apprenticeship Incentive with no payable price episodes
+	Given an apprenticeship incentive exists and has previously been refreshed
+	And the latest learner data has no payable price episodes
+	When the learner data is refreshed for the apprenticeship incentive
+	Then the apprenticeship incentive learner data is updated for the application with submission data with no payable price episodes
