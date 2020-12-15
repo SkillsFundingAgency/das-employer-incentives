@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
@@ -27,7 +29,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private IJobHost Jobs => _host.Services.GetService<IJobHost>();
         public string HubName { get; }
-        public HttpResponseMessage LastResponse { get; private set; }
+        public HttpResponseMessage LastResponse => ResponseObject as HttpResponseMessage;
+        public ObjectResult HttpObjectResult => ResponseObject as ObjectResult;
+        public object ResponseObject { get; private set; }
 
         public TestFunction(TestContext testContext, string hubName)
         {
@@ -50,8 +54,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         a.AddInMemoryCollection(_appConfig);
                     })
                 .ConfigureWebJobs(builder => builder
-                       .AddHttp(options => options.SetResponse = (request, o) => LastResponse = o as HttpResponseMessage)
-                       //.AddTimers()                         
+                       .AddHttp(options => options.SetResponse = (request, o) =>
+                       {
+                           ResponseObject = o;
+                       })
                        .AddDurableTask(options =>
                        {
                            options.HubName = HubName;
@@ -121,6 +127,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             return Jobs.Start(starter);
         }
+
+        public async Task<ObjectResult> CallEndpoint(EndpointInfo endpoint)
+        {
+            await Jobs.Start(endpoint);
+            return ResponseObject as ObjectResult;
+        }
+
 
         public async Task<OrchestratorStartResponse> GetOrchestratorStartResponse()
         {

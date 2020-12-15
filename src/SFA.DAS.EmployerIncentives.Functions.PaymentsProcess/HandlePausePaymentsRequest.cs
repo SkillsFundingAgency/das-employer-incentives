@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+// ReSharper disable once RedundantUsingDirective
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -27,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         }
 
         [FunctionName("PausePaymentsRequest")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = "accountlegalentity/{accountLegalEntityId}/ULN/{uln}/payments")] HttpRequest req, 
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = "accountlegalentity/{accountLegalEntityId}/ULN/{uln}/payments")] HttpRequestMessage req, 
             long accountLegalEntityId,
             long uln,
             ILogger log)
@@ -40,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 log.LogInformation("Calling Pause Payment Command Handler");
                 await _commandDispatcher.Send(command);
 
-                return new OkObjectResult(new { mesage = "Payments have been successfully paused"});
+                return new OkObjectResult(new { Message = "Payments have been successfully paused" });
             }
             catch (InvalidRequestException e)
             {
@@ -48,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
             catch (KeyNotFoundException e)
             {
-                return new NotFoundObjectResult(new { e.Message });
+                return new NotFoundObjectResult(new { Message = e.Message });
             }
             catch (PausePaymentsException e)
             {
@@ -61,14 +62,21 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
         }
 
-        private async Task<PausePaymentsCommand> CreateCommandFromRequest(HttpRequest req, long accountLegalEntityId, long uln, ILogger log)
+        private async Task<PausePaymentsCommand> CreateCommandFromRequest(HttpRequestMessage req, long accountLegalEntityId, long uln, ILogger log)
         {
-            log.LogInformation("Creating Pause Payment Command");
+            try
+            {
+                log.LogInformation("Creating Pause Payment Command");
+                string requestBody = await req.Content.ReadAsStringAsync();
+                var pauseRequest = JsonConvert.DeserializeObject<PausePaymentsRequest>(requestBody) ?? new PausePaymentsRequest();
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var pauseRequest = JsonConvert.DeserializeObject<PausePaymentsRequest>(requestBody);
-
-            return new PausePaymentsCommand(uln, accountLegalEntityId, pauseRequest.ServiceRequestId, pauseRequest.DecisionReferenceNumber, pauseRequest.DateServiceRequestTaskCreated);
+                return new PausePaymentsCommand(uln, accountLegalEntityId, pauseRequest.ServiceRequestId, pauseRequest.DecisionReferenceNumber, pauseRequest.DateServiceRequestTaskCreated);
+            }
+            catch (Exception e)
+            {
+                log.LogError(e.Message, e);
+                throw new PausePaymentsException("Error deserialising content");
+            }
         }
     }
 }
