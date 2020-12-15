@@ -46,7 +46,6 @@ INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYea
 INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (22, 10, 5, 2022, CAST(N'2022-05-08T00:00:00.0000000' AS DateTime2), CAST(N'2022-05-31T00:00:00.000' AS DateTime), N'2122', 0)
 INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (23, 11, 6, 2022, CAST(N'2022-06-08T00:00:00.0000000' AS DateTime2), CAST(N'2022-06-30T00:00:00.000' AS DateTime), N'2122', 0)
 INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (24, 12, 7, 2022, CAST(N'2022-07-08T00:00:00.0000000' AS DateTime2), CAST(N'2022-07-31T00:00:00.000' AS DateTime), N'2122', 0)
-INSERT @COLLECTION_CALENDAR ([Id], [PeriodNumber], [CalendarMonth], [CalendarYear], [EIScheduledOpenDateUTC], [CensusDate], [AcademicYear], [Active]) VALUES (25, 8, 8, 2022, CAST(N'2022-08-06T00:00:00.0000000' AS DateTime2), CAST(N'2022-08-31T00:00:00.000' AS DateTime), N'2223', 0)
 
 PRINT '********************* Updating table [incentives].[CollectionCalendar] *****************************'
 
