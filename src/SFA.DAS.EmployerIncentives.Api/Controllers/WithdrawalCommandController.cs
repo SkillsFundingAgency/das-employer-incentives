@@ -3,7 +3,9 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -12,8 +14,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class WithdrawalCommandController : ApiCommandControllerBase
     {
-        public WithdrawalCommandController(ICommandDispatcher commandDispatcher) : base(commandDispatcher)
+        private readonly IApprenticeshipIncentiveQueryRepository _queryRepository;
+
+        public WithdrawalCommandController(
+            ICommandDispatcher commandDispatcher,
+            IApprenticeshipIncentiveQueryRepository queryRepository) : base(commandDispatcher)
         {
+            _queryRepository = queryRepository;
         }
 
         [HttpPost("/withdrawals")]
@@ -21,6 +28,15 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> WithdrawalIncentiveApplication([FromBody] WithdrawApplicationRequest request)
         {
+            var incentiveModel = await _queryRepository.Get((a => 
+                a.AccountLegalEntityId == request.AccountLegalEntityId &&
+                a.ULN == request.ULN), includePayments:true);
+            
+            if(incentiveModel != null && incentiveModel.Payments.Any())
+            {
+                return BadRequest(new { Error = "Cannot withdraw an application that has been submitted and has received payments" });
+            }
+
             if (request.WithdrawalType == WithdrawalType.Employer)
             {
                 await SendCommandAsync(
