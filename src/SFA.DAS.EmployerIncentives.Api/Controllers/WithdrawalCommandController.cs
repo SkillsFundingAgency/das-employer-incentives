@@ -4,10 +4,8 @@ using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.HasPayments;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
