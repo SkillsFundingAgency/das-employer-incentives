@@ -119,5 +119,25 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
             // Assert
             actual.Should().NotBeNull();
         }
+
+        [Test]
+        public async Task Then_a_BadRequest_response_is_returned_when_there_are_payments_against_the_uln()
+        {
+            // Arrange
+            var request = _fixture
+                .Build<WithdrawApplicationRequest>()
+                .With(r => r.WithdrawalType, WithdrawalType.Compliance)
+                .Create();
+
+            _mockQueryDispatcher
+                .Setup(m => m.Send<UlnHasPaymentsRequest, UlnHasPaymentsResponse>(It.IsAny<UlnHasPaymentsRequest>()))
+                .ReturnsAsync(new UlnHasPaymentsResponse(true));
+
+            // Act
+            var actual = await _sut.WithdrawalIncentiveApplication(request) as BadRequestObjectResult;
+
+            // Assert
+            actual.Should().NotBeNull();
+        }
     }
 }
