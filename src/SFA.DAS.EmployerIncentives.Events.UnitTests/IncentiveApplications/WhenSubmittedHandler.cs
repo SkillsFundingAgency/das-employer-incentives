@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Events.IncentiveApplications;
@@ -41,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
 
             //Assert
             @event.Model.ApprenticeshipModels.Count.Should().BeGreaterThan(0);
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
+            foreach (var apprenticeship in @event.EligibleApprenticeships())
             {
                 _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
                     i.AccountId == @event.Model.AccountId &&
@@ -63,12 +64,27 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
         public async Task Then_a_CreateIncentiveCommand_is_not_published_for_withdrawn_apprenticeships()
         {
             //Arrange
-            var apprenticeships = _fixture.CreateMany<ApprenticeshipModel>(5).ToList();
+            var apprenticeships = _fixture.CreateMany<ApprenticeshipModel>(7).ToList();
             apprenticeships[0].WithdrawnByEmployer = true;
+            apprenticeships[0].WithdrawnByCompliance = false;
+
             apprenticeships[1].WithdrawnByEmployer = false;
+            apprenticeships[1].WithdrawnByCompliance = false;
+
             apprenticeships[2].WithdrawnByEmployer = false;
+            apprenticeships[2].WithdrawnByCompliance = false;
+
             apprenticeships[3].WithdrawnByEmployer = true;
+            apprenticeships[3].WithdrawnByCompliance = false;
+
             apprenticeships[4].WithdrawnByEmployer = true;
+            apprenticeships[4].WithdrawnByCompliance = false;
+
+            apprenticeships[5].WithdrawnByEmployer = false;
+            apprenticeships[5].WithdrawnByCompliance = true;
+
+            apprenticeships[6].WithdrawnByEmployer = false;
+            apprenticeships[6].WithdrawnByCompliance = true;
 
             var model = _fixture.Build<IncentiveApplicationModel>()
                 .With(x => x.ApprenticeshipModels, apprenticeships).Create();
@@ -78,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             await _sut.Handle(@event);
 
             //Assert
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels.Where(a => a.WithdrawnByEmployer == false))
+            foreach (var apprenticeship in @event.Model.ApprenticeshipModels.Where(a => a.WithdrawnByEmployer == false && a.WithdrawnByCompliance == false))
             {
                 _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
                     i.AccountId == @event.Model.AccountId &&
@@ -100,6 +116,15 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                     i.IncentiveApplicationApprenticeshipId == apprenticeship.Id
                 ), It.IsAny<CancellationToken>()), Times.Never);
             }
+
+            foreach (var apprenticeship in @event.Model.ApprenticeshipModels.Where(a => a.WithdrawnByCompliance == true))
+            {
+                _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
+                    i.IncentiveApplicationApprenticeshipId == apprenticeship.Id
+                ), It.IsAny<CancellationToken>()), Times.Never);
+            }
         }
+
+
     }
 }

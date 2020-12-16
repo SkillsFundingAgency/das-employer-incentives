@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
         {
 
             var commands = new List<Task>();
-            foreach (var apprenticeship in @event.Model.EligibleApprenticeships())
+            foreach (var apprenticeship in @event.EligibleApprenticeships())
             {
                 var command = new CreateIncentiveCommand(
                     @event.Model.AccountId,
