@@ -86,7 +86,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _testContext.TestFunction.HttpObjectResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
             var content = _testContext.TestFunction.HttpObjectResult.Value;
             JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Paused");
-
         }
 
         [Then(@"the requester is informed the apprenticeship incentive is already paused")]

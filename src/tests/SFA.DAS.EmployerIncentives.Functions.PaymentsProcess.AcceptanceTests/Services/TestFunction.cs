@@ -134,7 +134,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             return ResponseObject as ObjectResult;
         }
 
-
         public async Task<OrchestratorStartResponse> GetOrchestratorStartResponse()
         {
             var responseString = await LastResponse.Content.ReadAsStringAsync();

@@ -121,8 +121,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             response.StatusCode.Should().Be((int) HttpStatusCode.InternalServerError);
         }
 
-
-
         private Task<IActionResult> SendRequestToEndpoint(PausePaymentsRequest request)
         {
             var httpRequest = new HttpRequestMessage();
@@ -131,6 +129,5 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             return _sut.Run(httpRequest, _accountLegalEntityId, _mockLogger.Object);
         }
-
     }
 }
