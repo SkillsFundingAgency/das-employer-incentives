@@ -34,7 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
                     apprenticeship.DateOfBirth,
                     apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
-                    apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                    apprenticeship.UKPRN
                 );
 
                 var task = _commandPublisher.Publish(command);

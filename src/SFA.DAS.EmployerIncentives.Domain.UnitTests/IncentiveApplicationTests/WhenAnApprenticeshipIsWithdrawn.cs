@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 {
@@ -29,7 +28,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
                 .With(i => i.ApprenticeshipModels,
                 new List<ApprenticeshipModel>()
                 {
-                    _fixture.Create<ApprenticeshipModel>()
+                    _fixture
+                    .Build<ApprenticeshipModel>()
+                    .With(a => a.WithdrawnByEmployer, false)
+                    .With(a => a.WithdrawnByCompliance, false)
+                    .Create()
                 })
                 .Create();
 
@@ -63,6 +66,41 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 
             // Assert
             var raisedEvent = _sut.FlushEvents().Single() as EmployerWithdrawn;
+            raisedEvent.WithdrawalStatus.Should().Be(IncentiveApplicationStatus.EmployerWithdrawn);
+            raisedEvent.AccountId.Should().Be(_sut.AccountId);
+            raisedEvent.AccountLegalEntityId.Should().Be(_sut.AccountLegalEntityId);
+            raisedEvent.Model.Should().Be(apprenticeship.GetModel());
+            raisedEvent.ServiceRequest.Should().Be(serviceRequest);
+        }
+
+        [Test]
+        public void Then_apprenticeship_is_marked_as_compliance_withdrawn_when_compliance_withdraws_the_application()
+        {
+            // Arrange
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+            var apprenticeship = _sut.Apprenticeships.Single();
+            apprenticeship.WithdrawnByCompliance.Should().BeFalse();
+
+            // Act
+            _sut.ComplianceWithdrawal(apprenticeship, serviceRequest);
+
+            // Assert
+            apprenticeship.WithdrawnByCompliance.Should().BeTrue();
+        }
+
+        [Test]
+        public void Then_a_ComplianceWithdrawn_event_is_raised_when_compliance_withdraws_the_application()
+        {
+            // Arrange
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+            var apprenticeship = _sut.Apprenticeships.Single();
+
+            // Act
+            _sut.ComplianceWithdrawal(apprenticeship, serviceRequest);
+
+            // Assert
+            var raisedEvent = _sut.FlushEvents().Single() as ComplianceWithdrawn;
+            raisedEvent.WithdrawalStatus.Should().Be(IncentiveApplicationStatus.ComplianceWithdrawn);
             raisedEvent.AccountId.Should().Be(_sut.AccountId);
             raisedEvent.AccountLegalEntityId.Should().Be(_sut.AccountLegalEntityId);
             raisedEvent.Model.Should().Be(apprenticeship.GetModel());

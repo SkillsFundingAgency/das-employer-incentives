@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
 {
-    public class WhenEmployerWithdrawnAuditHandler
+    public class WhenApplicationWithdrawnAuditHandler
     {
-        private EmployerWithdrawnAuditHandler _sut;
         private Mock<IIncentiveApplicationStatusAuditDataRepository> _mockAuditDataRepository;
 
         private Fixture _fixture;
@@ -22,24 +21,42 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             _fixture = new Fixture();
 
             _mockAuditDataRepository = new Mock<IIncentiveApplicationStatusAuditDataRepository>();
-
-            _sut = new EmployerWithdrawnAuditHandler(_mockAuditDataRepository.Object);
         }
 
         [Test]
-        public async Task Then_an_audit_is_persisted()
+        public async Task Then_an_audit_is_persisted_for_an_employer_withdrawal()
         {
             //Arrange
+            var sut = new EmployerWithdrawnAuditHandler(_mockAuditDataRepository.Object);
             var @event = _fixture.Create<EmployerWithdrawn>();
 
             //Act
-            await _sut.Handle(@event);
+            await sut.Handle(@event);
 
             //Assert
             _mockAuditDataRepository.Verify(m =>
             m.Add(It.Is<IncentiveApplicationAudit>(i =>
                    i.IncentiveApplicationApprenticeshipId == @event.Model.Id &&
                    i.Process == Enums.IncentiveApplicationStatus.EmployerWithdrawn &&
+                   i.ServiceRequest == @event.ServiceRequest)),
+                   Times.Once);
+        }
+
+        [Test]
+        public async Task Then_an_audit_is_persisted_for_a_compliance_withdrawal()
+        {
+            //Arrange
+            var sut = new ComplianceWithdrawnAuditHandler(_mockAuditDataRepository.Object);
+            var @event = _fixture.Create<ComplianceWithdrawn>();
+
+            //Act
+            await sut.Handle(@event);
+
+            //Assert
+            _mockAuditDataRepository.Verify(m =>
+            m.Add(It.Is<IncentiveApplicationAudit>(i =>
+                   i.IncentiveApplicationApprenticeshipId == @event.Model.Id &&
+                   i.Process == Enums.IncentiveApplicationStatus.ComplianceWithdrawn &&
                    i.ServiceRequest == @event.ServiceRequest)),
                    Times.Once);
         }

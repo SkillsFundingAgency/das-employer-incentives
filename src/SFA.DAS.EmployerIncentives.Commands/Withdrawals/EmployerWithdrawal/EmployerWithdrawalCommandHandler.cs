@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
             var applications = await _domainRepository.Find(command);
             if(!applications.Any())
             {
-                throw new EmployerWithdrawalException($"Unable to handle Employer withdrawal command.  No matching incentive applications found for {command}");
+                throw new WithdrawalException($"Unable to handle Employer withdrawal command.  No matching incentive applications found for {command}");
             }
 
             foreach(var application in applications)

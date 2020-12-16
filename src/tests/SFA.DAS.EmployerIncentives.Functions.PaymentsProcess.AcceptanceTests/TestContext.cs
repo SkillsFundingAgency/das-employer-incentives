@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public DirectoryInfo TestDirectory { get; set; }
         public TestFunction TestFunction { get; set; }
 
-        public TestData TestData { get; set; }
+        public TestData TestData { get; set; }        
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
 

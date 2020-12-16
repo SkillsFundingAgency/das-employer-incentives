@@ -4,6 +4,7 @@
     {
         InProgress,
         Submitted,
-        EmployerWithdrawn
+        EmployerWithdrawn,
+        ComplianceWithdrawn
     }
 }

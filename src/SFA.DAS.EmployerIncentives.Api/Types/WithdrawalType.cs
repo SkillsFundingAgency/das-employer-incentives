@@ -2,6 +2,7 @@
 {
     public enum WithdrawalType
     {
-        Employer = 1
+        Employer = 1,
+        Compliance = 2
     }
 }

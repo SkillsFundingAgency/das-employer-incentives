@@ -82,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
         }
 
         [Test]
-        public void Then_a_EmployerWithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
+        public void Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
         {
             //Arrange            
             var command = _fixture.Create<EmployerWithdrawalCommand>();
@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
 
             //Assert
             action.Should()
-                .Throw<EmployerWithdrawalException>()
+                .Throw<WithdrawalException>()
                 .WithMessage("Unable to handle Employer withdrawal command.*");           
         }
     }

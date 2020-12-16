@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 {
-    public class EmployerWithdrawnHandler : IDomainEventHandler<EmployerWithdrawn>
+    public class EmployerWithdrawnHandler :  IDomainEventHandler<EmployerWithdrawn>
     {
         private readonly ICommandPublisher _commandPublisher;
 
