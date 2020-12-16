@@ -1,17 +1,23 @@
+using System;
 using AutoFixture;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
+using SFA.DAS.EmployerIncentives.Commands.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -21,98 +27,110 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
         private Mock<ILogger> _mockLogger;
         private HandlePausePaymentsRequest _sut;
-        private PausePaymentsRequest _request;
+        private long _accountLegalEntityId;
 
         [SetUp]
         public void Setup()
         {
             _fixture = new Fixture();
 
+            _accountLegalEntityId = _fixture.Create<long>();
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             _mockLogger = new Mock<ILogger>();
 
             _sut = new HandlePausePaymentsRequest(_mockCommandDispatcher.Object);
         }
 
-        //[Test]
-        //public async Task Then_PausePaymentsCommand_is_created_and_dispatched()
-        //{
-        //    var _request = _fixture.Create<PausePaymentsRequest>();
-        //    var httpRequest = new DummyHttpRequest(JsonConvert.SerializeObject(_request));
+        [Test]
+        public async Task Then_PausePaymentsCommand_is_created_and_dispatched()
+        {
+            var request = _fixture.Create<PausePaymentsRequest>();
+            
+            await SendRequestToEndpoint(request);
 
-        //    await _sut.Run(httpRequest, 999, _mockLogger.Object);
+            _mockCommandDispatcher.Verify(x =>
+                x.Send(It.Is<PausePaymentsCommand>(c =>
+                        c.AccountLegalEntityId == _accountLegalEntityId && c.Action == request.Action &&
+                        c.DateServiceRequestTaskCreated == request.DateServiceRequestTaskCreated &&
+                        c.DecisionReferenceNumber == request.DecisionReferenceNumber &&
+                        c.ServiceRequestId == request.ServiceRequestId && c.ULN == request.ULN),
+                    It.IsAny<CancellationToken>()));
+        }
 
-        //    _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", _collectionPeriod), Times.Once);
-        //}
+        [TestCase(PausePaymentsAction.Pause)]
+        [TestCase(PausePaymentsAction.Resume)]
+        public async Task Then_returns_expected_successful_response(PausePaymentsAction action)
+        {
+            var request = _fixture.Build<PausePaymentsRequest>().With(x=>x.Action, action).Create();
 
-        //[Test]
-        //public async Task Then_sub_orchestrator_is_called_to_calculate_payments_for_each_legal_entity()
-        //{
-        //    await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            var response = (await SendRequestToEndpoint(request)) as OkObjectResult;
 
-        //    _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-        //        "CalculatePaymentsForAccountLegalEntityOrchestrator",
-        //        It.IsAny<AccountLegalEntityCollectionPeriod>()
-        //    ), Times.Exactly(_legalEntities.Count));
+            response.Should().NotBeNull();
+            JsonConvert.SerializeObject(response.Value).Should().Contain($"Payments have been successfully {action}d");
+        }
 
-        //    foreach (var entity in _legalEntities)
-        //    {
-        //        _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-        //                "CalculatePaymentsForAccountLegalEntityOrchestrator",
-        //                It.Is<AccountLegalEntityCollectionPeriod>(input =>
-        //                    input.AccountLegalEntityId == entity.AccountLegalEntityId &&
-        //                    input.AccountId == entity.AccountId &&
-        //                    input.CollectionPeriod.Period == _collectionPeriod.Period &&
-        //                    input.CollectionPeriod.Year == _collectionPeriod.Year)
+        [Test]
+        public async Task Then_returns_bad_request_response_when_InvalidRequestException_is_thrown()
+        {
+            _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidRequestException(new Dictionary<string, string> {{"ULN", "Is not set"}}));           
+            var request = _fixture.Create<PausePaymentsRequest>();
 
-        //            ), Times.Once);
-        //    }
-        //}
+            var response = (await SendRequestToEndpoint(request)) as BadRequestObjectResult;
 
-        //[Test]
-        //public async Task Then_process_pauses_after_generating_payments()
-        //{
-        //    await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+            response.Should().NotBeNull();
+            JsonConvert.SerializeObject(response.Value).Should().Contain("Is not set");
+        }
 
-        //    _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-        //        "CalculatePaymentsForAccountLegalEntityOrchestrator",
-        //        It.IsAny<AccountLegalEntityCollectionPeriod>()
-        //    ), Times.Exactly(_legalEntities.Count));
+        [Test]
+        public async Task Then_returns_not_found_response_when_no_matching_record_is_found()
+        {
+            _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new KeyNotFoundException("Not Found"));
+            var request = _fixture.Create<PausePaymentsRequest>();
 
-        //    _mockOrchestrationContext.Verify(x => x.WaitForExternalEvent<bool>("PaymentsApproved"), Times.Once);
-        //}
+            var response = (await SendRequestToEndpoint(request)) as NotFoundObjectResult;
 
-        //[Test]
-        //public async Task Then_payments_are_not_sent_if_not_approved()
-        //{
-        //    _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(false);
+            response.Should().NotBeNull();
+            JsonConvert.SerializeObject(response.Value).Should().Contain("Not Found");
+        }
 
-        //    await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_returns_bad_request_response_when_PausePaymentException_is_thrown()
+        {
+            _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new PausePaymentsException("Problem"));
+            var request = _fixture.Create<PausePaymentsRequest>();
 
-        //    _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Never);
-        //}
+            var response = (await SendRequestToEndpoint(request)) as BadRequestObjectResult;
 
-        //[Test]
-        //public async Task Then_payments_are_sent_when_they_are_approved()
-        //{
-        //    _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(true);
+            response.Should().NotBeNull();
+            JsonConvert.SerializeObject(response.Value).Should().Contain("Problem");
+        }
 
-        //    await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+        [Test]
+        public async Task Then_returns_internal_server_error_response_when_any_other_exception_is_thrown()
+        {
+            _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("Internal error"));
+            var request = _fixture.Create<PausePaymentsRequest>();
 
-        //    _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
+            var response = (await SendRequestToEndpoint(request)) as InternalServerErrorResult;
 
-        //    foreach (var entity in _legalEntities)
-        //    {
-        //        _mockOrchestrationContext.Verify(x => x.CallActivityAsync(
-        //            "SendPaymentRequestsForAccountLegalEntity",
-        //            It.Is<AccountLegalEntityCollectionPeriod>(input =>
-        //                input.AccountLegalEntityId == entity.AccountLegalEntityId &&
-        //                input.AccountId == entity.AccountId &&
-        //                input.CollectionPeriod.Period == _collectionPeriod.Period &&
-        //                input.CollectionPeriod.Year == _collectionPeriod.Year)
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be((int) HttpStatusCode.InternalServerError);
+        }
 
-        //        ), Times.Once);
-        //    }
-        //}
+
+
+        private Task<IActionResult> SendRequestToEndpoint(PausePaymentsRequest request)
+        {
+            var httpRequest = new HttpRequestMessage();
+            var body = JsonConvert.SerializeObject(request);
+            httpRequest.Content = new StringContent(body);
+
+            return _sut.Run(httpRequest, _accountLegalEntityId, _mockLogger.Object);
+        }
+
     }
 }
