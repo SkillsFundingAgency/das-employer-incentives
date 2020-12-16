@@ -28,11 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> WithdrawalIncentiveApplication([FromBody] WithdrawApplicationRequest request)
         {
-            var incentiveModel = await _queryRepository.Get((a => 
-                a.AccountLegalEntityId == request.AccountLegalEntityId &&
-                a.ULN == request.ULN), includePayments:true);
-            
-            if(incentiveModel != null && incentiveModel.Payments.Any())
+            if(await HasPayments(request.AccountLegalEntityId, request.ULN))
             {
                 return BadRequest(new { Error = "Cannot withdraw an application that has been submitted and has received payments" });
             }
@@ -64,5 +60,19 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 return BadRequest();
             }
         }       
+
+        private async Task<bool> HasPayments(long accountLegalEntityId, long uln)
+        {
+            var incentiveModel = await _queryRepository.Get((a =>
+               a.AccountLegalEntityId == accountLegalEntityId &&
+               a.ULN == uln), includePayments: true);
+
+            if (incentiveModel != null && incentiveModel.Payments.Any())
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
