@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayme
 
             if (item.Action == default)
             {
-                result.AddError("Action", "Is not set (it must be Pause or Resume");
+                result.AddError("Action", "Is not set (it must be Pause or Resume)");
             }
 
             return Task.FromResult(result);
