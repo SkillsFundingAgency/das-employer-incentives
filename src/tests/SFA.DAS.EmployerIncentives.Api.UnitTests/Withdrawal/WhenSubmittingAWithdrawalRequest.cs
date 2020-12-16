@@ -10,7 +10,6 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,16 +19,16 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
     {
         private WithdrawalCommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
-        private Mock<IApprenticeshipIncentiveQueryRepository> _mockQueryRepository;
+        private Mock<IQueryDispatcher> _mockQueryDispatcher;
         private Fixture _fixture;
 
         [SetUp]
         public void Setup()
         {
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
-            _mockQueryRepository = new Mock<IApprenticeshipIncentiveQueryRepository>();
+            _mockQueryDispatcher = new Mock<IQueryDispatcher>();
             _fixture = new Fixture();
-            _sut = new WithdrawalCommandController(_mockCommandDispatcher.Object, _mockQueryRepository.Object);
+            _sut = new WithdrawalCommandController(_mockCommandDispatcher.Object, _mockQueryDispatcher.Object);
 
             _mockCommandDispatcher
                 .Setup(m => m.Send(It.IsAny<UpsertLegalEntityCommand>(), It.IsAny<CancellationToken>()))

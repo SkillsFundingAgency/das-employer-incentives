@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.HasPayments;
 using System;
 using System.Linq;
 using System.Net;
@@ -14,21 +16,21 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class WithdrawalCommandController : ApiCommandControllerBase
     {
-        private readonly IApprenticeshipIncentiveQueryRepository _queryRepository;
+        private readonly IQueryDispatcher _queryDispatcher;
 
         public WithdrawalCommandController(
             ICommandDispatcher commandDispatcher,
-            IApprenticeshipIncentiveQueryRepository queryRepository) : base(commandDispatcher)
+            IQueryDispatcher queryDispatcher) : base(commandDispatcher)
         {
-            _queryRepository = queryRepository;
+            _queryDispatcher = queryDispatcher;
         }
 
         [HttpPost("/withdrawals")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> WithdrawalIncentiveApplication([FromBody] WithdrawApplicationRequest request)
-        {
-            if(await HasPayments(request.AccountLegalEntityId, request.ULN))
+        {            
+            if (await HasPayments(request.AccountLegalEntityId, request.ULN))
             {
                 return BadRequest(new { Error = "Cannot withdraw an application that has been submitted and has received payments" });
             }
@@ -63,11 +65,12 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         private async Task<bool> HasPayments(long accountLegalEntityId, long uln)
         {
-            var incentiveModel = await _queryRepository.Get((a =>
-               a.AccountLegalEntityId == accountLegalEntityId &&
-               a.ULN == uln), includePayments: true);
-
-            if (incentiveModel != null && incentiveModel.Payments.Any())
+            var hasPaymentResponse = await _queryDispatcher
+                .Send<HasPaymentsRequest, HasPaymentsResponse>(
+                 new HasPaymentsRequest(accountLegalEntityId, uln)
+                 );
+            
+            if (hasPaymentResponse.HasPayments)
             {
                 return true;
             }
