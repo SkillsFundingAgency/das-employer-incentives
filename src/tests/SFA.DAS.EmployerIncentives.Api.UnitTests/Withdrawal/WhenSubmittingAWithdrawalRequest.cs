@@ -10,6 +10,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
+using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.UlnHasPayments;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +34,10 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
             _mockCommandDispatcher
                 .Setup(m => m.Send(It.IsAny<UpsertLegalEntityCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
+
+            _mockQueryDispatcher
+                .Setup(m => m.Send<UlnHasPaymentsRequest, UlnHasPaymentsResponse>(It.IsAny<UlnHasPaymentsRequest>()))
+                .ReturnsAsync(new UlnHasPaymentsResponse(false));                
         }
 
         [Test]

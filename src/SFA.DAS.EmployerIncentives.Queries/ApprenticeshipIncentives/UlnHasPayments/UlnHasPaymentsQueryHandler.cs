@@ -4,18 +4,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.HasPayments
+namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.UlnHasPayments
 {
-    public class HasPaymentsQueryHandler : IQueryHandler<HasPaymentsRequest, HasPaymentsResponse>
+    public class UlnHasPaymentsQueryHandler : IQueryHandler<UlnHasPaymentsRequest, UlnHasPaymentsResponse>
     {
         private readonly IApprenticeshipIncentiveQueryRepository _queryRepository;
 
-        public HasPaymentsQueryHandler(IApprenticeshipIncentiveQueryRepository queryRepository)
+        public UlnHasPaymentsQueryHandler(IApprenticeshipIncentiveQueryRepository queryRepository)
         {
             _queryRepository = queryRepository;
         }
 
-        public async Task<HasPaymentsResponse> Handle(HasPaymentsRequest query, CancellationToken cancellationToken = default)
+        public async Task<UlnHasPaymentsResponse> Handle(UlnHasPaymentsRequest query, CancellationToken cancellationToken = default)
         {
             var incentiveModel = await _queryRepository.Get((a =>
               a.AccountLegalEntityId == query.AccountLegalEntityId &&
@@ -23,10 +23,10 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.HasPayment
 
             if (incentiveModel != null && incentiveModel.Payments.Any())
             {
-                return new HasPaymentsResponse(true);
+                return new UlnHasPaymentsResponse(true);
             }
 
-            return new HasPaymentsResponse(false);
+            return new UlnHasPaymentsResponse(false);
         }
     }
 }

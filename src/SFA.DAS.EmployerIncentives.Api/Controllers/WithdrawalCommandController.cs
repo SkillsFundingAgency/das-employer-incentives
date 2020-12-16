@@ -4,7 +4,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
-using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.HasPayments;
+using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.UlnHasPayments;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -64,8 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         private async Task<bool> HasPayments(long accountLegalEntityId, long uln)
         {
             var hasPaymentResponse = await _queryDispatcher
-                .Send<HasPaymentsRequest, HasPaymentsResponse>(
-                 new HasPaymentsRequest(accountLegalEntityId, uln)
+                .Send<UlnHasPaymentsRequest, UlnHasPaymentsResponse>(
+                 new UlnHasPaymentsRequest(accountLegalEntityId, uln)
                  );
             
             if (hasPaymentResponse.HasPayments)
