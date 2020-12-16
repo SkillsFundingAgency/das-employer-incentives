@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments
 {
@@ -27,7 +28,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayme
             }
 
             var serviceRequest = new ServiceRequest(command.ServiceRequestId, command.DecisionReferenceNumber, command.DateServiceRequestTaskCreated);
-            incentive.PauseSubsequentPayments(serviceRequest);
+
+            switch (command.Action)
+            {
+                case PausePaymentsAction.Pause:
+                    incentive.PauseSubsequentPayments(serviceRequest);
+                    break;
+
+                case PausePaymentsAction.Resume:
+                    incentive.ResumePayments(serviceRequest);
+                    break;
+                default:
+                    throw new PausePaymentsException("Pause and Resume are the only supported actions");
+            }
 
             await _incentiveDomainRepository.Save(incentive);
         }

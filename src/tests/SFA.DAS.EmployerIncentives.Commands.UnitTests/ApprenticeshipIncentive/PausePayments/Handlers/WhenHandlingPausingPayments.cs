@@ -11,11 +11,13 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.PausePayments.Handlers
 {
-    public class WhenHandlingPausePaymentsCommand
+    public class WhenHandlingPausingPayments
     {
         private PausePaymentsCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockDomainRepository;
@@ -47,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_PausePayments_flag_for_this_incentive_is_set_on()
         {
             // Arrange
-            var command = _fixture.Create<PausePaymentsCommand>();
+            var command = CreatePausedPaymentsCommandWithActionPause();
             var apprenticeshipIncentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             _mockDomainRepository
@@ -65,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_an_PaymentPaused_event_is_raised_when_the_incentive_is_paused()
         {
             // Arrange
-            var command = _fixture.Create<PausePaymentsCommand>();
+            var command = CreatePausedPaymentsCommandWithActionPause();
             var apprenticeshipIncentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             _mockDomainRepository
@@ -88,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_PausePaymentsException_is_thrown_when_the_incentive_is_already_paused()
         {
             // Arrange
-            var command = _fixture.Create<PausePaymentsCommand>();
+            var command = CreatePausedPaymentsCommandWithActionPause();
             var apprenticeshipIncentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(
                 _fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(),
                 _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), true);
@@ -101,6 +103,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             act.Should().Throw<PausePaymentsException>().WithMessage("Payments already paused");
+        }
+
+        private PausePaymentsCommand CreatePausedPaymentsCommandWithActionPause()
+        {
+            return new PausePaymentsCommand(_fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), _fixture.Create<DateTime>(), PausePaymentsAction.Pause);
         }
     }
 }

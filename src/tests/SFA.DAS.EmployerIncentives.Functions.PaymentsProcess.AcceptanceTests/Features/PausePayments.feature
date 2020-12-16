@@ -1,9 +1,9 @@
 ﻿Feature: PausePayments
-	In order to stop future payments for this apprenticeship
+	In order to stop future payments for an apprenticeship
 	As a employer incentives service
-	I want to be able to pause incentives payments for a apprenticeship
+	I want to be able to pause incentives payments for an apprenticeship
 
-Scenario: When an apprenticeship incentive does not exists then we should inform the requester
+Scenario: When an apprenticeship incentive does not exist then we should inform the requester
 	Given apprenticeship incentive does not exist
 	When the pause payments request is sent
 	Then the requester is informed no apprenticeship incentive is found

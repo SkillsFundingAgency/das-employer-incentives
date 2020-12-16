@@ -34,6 +34,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayme
                 result.AddError("DecisionReferenceNumber", "Is not set");
             }
 
+            if (item.Action == default)
+            {
+                result.AddError("Action", "Is not set (it must be Pause or Resume");
+            }
+
             return Task.FromResult(result);
         }      
     }

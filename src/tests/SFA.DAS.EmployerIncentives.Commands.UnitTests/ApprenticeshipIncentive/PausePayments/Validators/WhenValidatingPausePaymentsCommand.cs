@@ -4,6 +4,7 @@ using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.PausePayments.Validators
 {
@@ -15,7 +16,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private string _serviceRequestId;
         private DateTime _dateServiceRequestTaskCreated;
         private string _decisionReferenceNumber;
-        private Func<PausePaymentsCommand> CreateCommand => () => new PausePaymentsCommand(_uln, _accountLegalEntityId, _serviceRequestId, _decisionReferenceNumber, _dateServiceRequestTaskCreated);
+        private PausePaymentsAction? _action;
+        private Func<PausePaymentsCommand> CreateCommand => () => new PausePaymentsCommand(_uln, _accountLegalEntityId, _serviceRequestId, _decisionReferenceNumber, _dateServiceRequestTaskCreated, _action);
 
         private Fixture _fixture;
 
@@ -28,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _serviceRequestId = _fixture.Create<string>();
             _decisionReferenceNumber = _fixture.Create<string>();
             _dateServiceRequestTaskCreated = _fixture.Create<DateTime>();
+            _action = _fixture.Create<PausePaymentsAction>();
 
             _sut = new PausePaymentsCommandValidator();
         }
@@ -95,6 +98,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             _decisionReferenceNumber = decisionReferenceNumber;
+            var command = CreateCommand();
+
+            //Act
+            var result = await _sut.Validate(command);
+
+            //Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_the_PausedPaymentsAction_has_a_default_value()
+        {
+            //Arrange
+            _action = default;
             var command = CreateCommand();
 
             //Act

@@ -28,20 +28,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         }
 
         [FunctionName("PausePaymentsRequest")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = "accountlegalentity/{accountLegalEntityId}/ULN/{uln}/payments")] HttpRequestMessage req, 
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "patch", Route = "accountlegalentity/{accountLegalEntityId}/payments")] HttpRequestMessage req, 
             long accountLegalEntityId,
-            long uln,
             ILogger log)
         {
             try
             {
                 log.LogInformation("Started Processing Pause Payment");
-                var command = await CreateCommandFromRequest(req, accountLegalEntityId, uln, log);
+                var command = await CreateCommandFromRequest(req, accountLegalEntityId, log);
 
                 log.LogInformation("Calling Pause Payment Command Handler");
                 await _commandDispatcher.Send(command);
 
-                return new OkObjectResult(new { Message = "Payments have been successfully paused" });
+                return new OkObjectResult(new { Message = $"Payments have been successfully {command.Action}d" });
             }
             catch (InvalidRequestException e)
             {
@@ -62,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
         }
 
-        private async Task<PausePaymentsCommand> CreateCommandFromRequest(HttpRequestMessage req, long accountLegalEntityId, long uln, ILogger log)
+        private async Task<PausePaymentsCommand> CreateCommandFromRequest(HttpRequestMessage req, long accountLegalEntityId,ILogger log)
         {
             try
             {
@@ -70,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 string requestBody = await req.Content.ReadAsStringAsync();
                 var pauseRequest = JsonConvert.DeserializeObject<PausePaymentsRequest>(requestBody) ?? new PausePaymentsRequest();
 
-                return new PausePaymentsCommand(uln, accountLegalEntityId, pauseRequest.ServiceRequestId, pauseRequest.DecisionReferenceNumber, pauseRequest.DateServiceRequestTaskCreated);
+                return new PausePaymentsCommand(pauseRequest.ULN, accountLegalEntityId, pauseRequest.ServiceRequestId, pauseRequest.DecisionReferenceNumber, pauseRequest.DateServiceRequestTaskCreated, pauseRequest.Action);
             }
             catch (Exception e)
             {

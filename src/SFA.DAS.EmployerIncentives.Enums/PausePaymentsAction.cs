@@ -1,4 +1,4 @@
-namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
+namespace SFA.DAS.EmployerIncentives.Enums
 {
     public enum PausePaymentsAction
     {

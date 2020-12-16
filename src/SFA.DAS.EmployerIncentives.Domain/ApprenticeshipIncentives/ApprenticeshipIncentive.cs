@@ -15,6 +15,8 @@ using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
+using PaymentsResumed = SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events.PaymentsResumed;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -269,6 +271,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             else
             {
                 throw new PausePaymentsException("Payments already paused");
+            }
+        }
+
+        public void ResumePayments(ServiceRequest serviceRequest)
+        {
+            if (Model.PausePayments)
+            {
+                Model.PausePayments = false;
+                AddEvent(new PaymentsResumed(Model.Account.Id, Model.Account.AccountLegalEntityId, Model, serviceRequest));
+            }
+            else
+            {
+                throw new PausePaymentsException("Payments are already paused");
             }
         }
 

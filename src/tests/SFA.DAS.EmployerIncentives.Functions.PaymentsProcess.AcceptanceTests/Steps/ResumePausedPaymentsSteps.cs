@@ -16,8 +16,8 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "PausePayments")]
-    public partial class PausePaymentsSteps
+    [Scope(Feature = "ResumePausedPayments")]
+    public partial class ResumePausedPaymentsSteps
     {
         private readonly TestContext _testContext;
 
@@ -25,24 +25,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private PausePaymentsRequest _request;
         private ValidatePaymentsSteps.ValidatePaymentData _paymentData;
 
-        public PausePaymentsSteps(TestContext testContext)
+        public ResumePausedPaymentsSteps(TestContext testContext)
         {
             _testContext = testContext;
         }
 
-        [Given(@"apprenticeship incentive does not exist")]
-        public void GivenApprenticeshipIncentiveDoesNotExist()
-        {
-            _accountLegalEntityId = 3453434;
-            _request = CreatePausePaymentsRequest(6566, PausePaymentsAction.Pause);
-        }
-
-        [Given(@"an apprenticeship incentive exists")]
+        [Given(@"a non paused apprenticeship incentive exists")]
         public async Task GivenApprenticeshipIncentiveExists()
         {
             _paymentData = new ValidatePaymentsSteps.ValidatePaymentData(_testContext);
-            _request = CreatePausePaymentsRequest(_paymentData.ApprenticeshipIncentiveModel.ULN, PausePaymentsAction.Pause);
-            _accountLegalEntityId = _paymentData.AccountModel.AccountLegalEntityId;
             await _paymentData.Create();
         }
 
@@ -50,14 +41,79 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task GivenAPausedApprenticeshipIncentiveExists()
         {
             _paymentData = new ValidatePaymentsSteps.ValidatePaymentData(_testContext);
-            _request = CreatePausePaymentsRequest(_paymentData.ApprenticeshipIncentiveModel.ULN, PausePaymentsAction.Pause);
-            _accountLegalEntityId = _paymentData.AccountModel.AccountLegalEntityId;
             _paymentData.ApprenticeshipIncentiveModel.PausePayments = true;
             await _paymentData.Create();
         }
 
-        [When(@"the pause payments request is sent")]
-        public async Task WhenThePausePaymentsRequestIsSent()
+        [When(@"the resume payments request is sent")]
+        public async Task WhenTheResumePausedPaymentsRequestIsSent()
+        {
+            _request = CreatePausePaymentsRequest(_paymentData.ApprenticeshipIncentiveModel.ULN, PausePaymentsAction.Resume);
+            _accountLegalEntityId = _paymentData.AccountModel.AccountLegalEntityId;
+
+            await SendRequestToEndpoint();
+        }
+
+        [When(@"an invalid request is sent")]
+        public async Task WhenAnInvalidRequestIsSent()
+        {
+            _request = CreatePausePaymentsRequest(_paymentData.ApprenticeshipIncentiveModel.ULN, null);
+            _accountLegalEntityId = _paymentData.AccountModel.AccountLegalEntityId;
+
+            await SendRequestToEndpoint();
+        }
+
+
+        [Then(@"the requester is informed the apprenticeship incentive has resumed")]
+        public void ThenTheRequesterIsInformedTheApprenticeshipIncentiveHasResumed()
+        {
+            _testContext.TestFunction.HttpObjectResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            var content = _testContext.TestFunction.HttpObjectResult.Value;
+            JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Resumed");
+        }
+
+        [Then(@"the requester is informed the apprenticeship incentive is not paused")]
+        public void ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsAlreadyPaused()
+        {
+            _testContext.TestFunction.HttpObjectResult.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            var content = _testContext.TestFunction.HttpObjectResult.Value;
+            JsonConvert.SerializeObject(content).Should().Contain("Payments are already paused");
+        }
+
+        [Then(@"the PausePayment status is set to false")]
+        public void ThenThePausePaymentStatusIsSetToFalse()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var incentives = dbConnection.GetAll<ApprenticeshipIncentive>();
+
+            incentives.Count().Should().Be(1);
+            incentives.First().PausePayments.Should().BeFalse();
+        }
+
+        [Then(@"an Audit record has been added to record this resume request")]
+        public void ThenAnAuditRecordHasBeenAddedToRecordThisResumePaymentsRequest()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var statusAudits = dbConnection.GetAll<IncentiveApplicationStatusAudit>();
+
+            statusAudits.Count().Should().Be(1);
+            var statusAudit = statusAudits.First();
+            statusAudit.Process.Should().Be(IncentiveApplicationStatus.PaymentsResumed);
+            statusAudit.IncentiveApplicationApprenticeshipId.Should().Be(_paymentData.ApprenticeshipIncentiveModel.IncentiveApplicationApprenticeshipId);
+            statusAudit.ServiceRequestCreatedDate.Should().Be(_request.DateServiceRequestTaskCreated);
+            statusAudit.ServiceRequestDecisionReference.Should().Be(_request.DecisionReferenceNumber);
+            statusAudit.ServiceRequestTaskId.Should().Be(_request.ServiceRequestId);
+        }
+
+        [Then(@"the requester is informed the request is invalid")]
+        public void ThenTheRequesterIsInformedTheRequestIsInvalid()
+        {
+            _testContext.TestFunction.HttpObjectResult.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            var content = _testContext.TestFunction.HttpObjectResult.Value;
+            JsonConvert.SerializeObject(content).Should().Contain("Is not set");
+        }
+
+        public async Task SendRequestToEndpoint()
         {
             await _testContext.TestFunction.CallEndpoint(
                 new EndpointInfo(
@@ -71,58 +127,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         },
                         ["accountLegalEntityId"] = _accountLegalEntityId
                     })
-                );
+            );
         }
 
-        [Then(@"the requester is informed no apprenticeship incentive is found")]
-        public void ThenTheRequesterIsInformedNoApprenticeshipIncentiveIsFound()
-        {
-            _testContext.TestFunction.HttpObjectResult.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
-        }
-
-        [Then(@"the requester is informed the apprenticeship incentive is paused")]
-        public void ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsPaused()
-        {
-            _testContext.TestFunction.HttpObjectResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            var content = _testContext.TestFunction.HttpObjectResult.Value;
-            JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Paused");
-
-        }
-
-        [Then(@"the requester is informed the apprenticeship incentive is already paused")]
-        public void ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsAlreadyPaused()
-        {
-            _testContext.TestFunction.HttpObjectResult.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-            var content = _testContext.TestFunction.HttpObjectResult.Value;
-            JsonConvert.SerializeObject(content).Should().Contain("Payments already paused");
-        }
-
-        [Then(@"the PausePayment status is set to true")]
-        public void ThenThePausePaymentStatusIsSetToTrue()
-        {
-            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var incentives = dbConnection.GetAll<ApprenticeshipIncentive>();
-
-            incentives.Count().Should().Be(1);
-            incentives.First().PausePayments.Should().BeTrue();
-        }
-
-        [Then(@"an Audit record has been added to record this pause request")]
-        public void ThenAnAuditRecordHasBeenAddedToRecordThisPauseRequest()
-        {
-            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var statusAudits = dbConnection.GetAll<IncentiveApplicationStatusAudit>();
-
-            statusAudits.Count().Should().Be(1);
-            var statusAudit = statusAudits.First();
-            statusAudit.Process.Should().Be(IncentiveApplicationStatus.PaymentsPaused);
-            statusAudit.IncentiveApplicationApprenticeshipId.Should().Be(_paymentData.ApprenticeshipIncentiveModel.IncentiveApplicationApprenticeshipId);
-            statusAudit.ServiceRequestCreatedDate.Should().Be(_request.DateServiceRequestTaskCreated);
-            statusAudit.ServiceRequestDecisionReference.Should().Be(_request.DecisionReferenceNumber);
-            statusAudit.ServiceRequestTaskId.Should().Be(_request.ServiceRequestId);
-        }
-
-        private PausePaymentsRequest CreatePausePaymentsRequest(long uln, PausePaymentsAction action)
+        private PausePaymentsRequest CreatePausePaymentsRequest(long uln, PausePaymentsAction? action)
         {
             return new PausePaymentsRequest
             {
