@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             Func<Task> act = async () => await _sut.Handle(command);
 
             // Assert
-            act.Should().Throw<PausePaymentsException>().WithMessage("Payments are not paused");
+            act.Should().Throw<PausePaymentsException>().WithMessage("Payments are already paused");
         }
 
         private PausePaymentsCommand CreatePausedPaymentsCommandWithActionResume()
