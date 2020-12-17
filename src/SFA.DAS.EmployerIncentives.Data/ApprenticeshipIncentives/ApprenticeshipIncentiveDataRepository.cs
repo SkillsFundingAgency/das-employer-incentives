@@ -13,17 +13,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class ApprenticeshipIncentiveDataRepository : IApprenticeshipIncentiveDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private readonly Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public ApprenticeshipIncentiveDataRepository(EmployerIncentivesDbContext dbContext)
+        public ApprenticeshipIncentiveDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task Add(ApprenticeshipIncentiveModel apprenticeshipIncentive)
         {
             await _dbContext.AddAsync(apprenticeshipIncentive.Map());
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments()
@@ -71,9 +71,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             if (existingIncentive != null)
             {
                 UpdateApprenticeshipIncentive(updatedIncentive, existingIncentive);
-
-
-                await _dbContext.SaveChangesAsync();
             }
         }
 

@@ -1,7 +1,7 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
@@ -25,9 +25,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return period;
         }
 
-        public CollectionPeriod GetPeriod(short collectionYear, byte periodNumber)
+        public CollectionPeriod GetActivePeriod()
         {
             return
+                _collectionPeriods
+                .Single(d => d.Active);
+        }
+
+        public CollectionPeriod GetPeriod(short collectionYear, byte periodNumber)
+        {
+            return 
                 _collectionPeriods
                 .Single(d => d.CalendarYear == collectionYear && d.PeriodNumber == periodNumber);
         }

@@ -47,8 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockQueryDispatcher.Verify(
                 x => x.Send<GetPayableLegalEntitiesRequest, GetPayableLegalEntitiesResponse>(
                     It.Is<GetPayableLegalEntitiesRequest>(p =>
-                        p.PeriodNumber == _collectionPeriod.Period &&
-                        p.PaymentYear == _collectionPeriod.Year)), Times.Once);
+                        p.CollectionPeriodMonth == _collectionPeriod.Period &&
+                        p.CollectionPeriodYear == _collectionPeriod.Year)), Times.Once);
         }
 
         [Test]

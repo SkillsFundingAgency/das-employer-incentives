@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -60,6 +61,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 
                 throw;
             }
+        }
+
+        public Task SendMany<TCommands>(TCommands commands, CancellationToken cancellationToken = default) where TCommands : IEnumerable<ICommand>
+        {
+            return _dispatcher.SendMany(commands, cancellationToken);
         }
     }
 }

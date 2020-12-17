@@ -19,9 +19,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         [BeforeScenario(Order = 2)]
         public Task InitialiseMessageBus()
         {
-            _context.MessageBus = new TestMessageBus();
+            _context.MessageBus = new TestMessageBus(_context);
              _context.Hooks.Add(new Hook<MessageContext>());
-            return _context.MessageBus.Start(_context.TestDirectory);
+            return _context.MessageBus.Start();
         }
     }
 }

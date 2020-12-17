@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _incentiveApplication = Fixture.Build<IncentiveApplication>().Without(x => x.Apprenticeships).Create();
             _incentiveApprenticeship =
                 Fixture.Build<IncentiveApplicationApprenticeship>()
-                    .With(x => x.Uln, _uln)
+                    .With(x => x.ULN, _uln)
                     .With(x => x.IncentiveApplicationId, _incentiveApplication.Id)
                     .Create();
 
