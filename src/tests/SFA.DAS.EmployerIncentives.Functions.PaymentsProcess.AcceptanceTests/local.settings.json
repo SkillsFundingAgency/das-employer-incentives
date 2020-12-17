@@ -19,5 +19,12 @@
     "ApiBaseUrl": "LEARNER_MATCH_API_URL",
     "ClientId": "",
     "Version": "1.0"
+  },
+  "BusinessCentralApi": {
+    "ApiBaseUrl": "PAYMENTS_API_URL",
+    "SubscriptionKey": "",
+    "ApiVersion": "2020-10-01",
+    "PaymentRequestsLimit": 1000,
+    "ObfuscateSensitiveData": false
   }
 }

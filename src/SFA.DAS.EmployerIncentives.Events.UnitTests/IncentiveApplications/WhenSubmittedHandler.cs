@@ -49,7 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                     i.DateOfBirth == apprenticeship.DateOfBirth &&
                     i.Uln == apprenticeship.ULN &&
                     i.PlannedStartDate == apprenticeship.PlannedStartDate &&
-                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval &&
+                    i.UKPRN == apprenticeship.UKPRN
                 ), It.IsAny<CancellationToken>()), Times.Once);
             }
         }

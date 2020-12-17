@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             var current = File.GetLastWriteTime(_dacpacFileLocation);
             var previous = GetSavedModifiedDateTime();
 
-            return (current - previous).Seconds != 0; // a way to compare 2 dates while ignoring milliseconds
+            return Math.Floor((current - previous).TotalSeconds) != 0; 
         }
 
         private static DateTime GetSavedModifiedDateTime()

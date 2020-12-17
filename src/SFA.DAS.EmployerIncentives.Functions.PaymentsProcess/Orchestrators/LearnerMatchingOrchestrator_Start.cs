@@ -1,22 +1,18 @@
+using System.Net.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 {
     public static class LearnerMatchingOrchestratorStart
     {
-        private const string FarFuture = "0 0 0 29 2 1"; // Next Monday Feb 29 (29/02/2044)
         [FunctionName("LearnerMatchingOrchestrator_Start")]
-        public static async Task TimerStart(
-#if DEBUG
-            [TimerTrigger(FarFuture, RunOnStartup = false)] TimerInfo timerInfo,
-#else
-            [TimerTrigger("%LearnerMatchingOrchestratorTriggerTime%")] TimerInfo timerInfo,
-#endif
+        public static async Task<HttpResponseMessage> HttpStart(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/LearnerMatchingOrchestrator")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
-
             ILogger log)
         {
 
@@ -25,6 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             string instanceId = await starter.StartNewAsync(nameof(LearnerMatchingOrchestrator));
 
             log.LogInformation($"Started LearnerMatchingOrchestrator with ID = '{instanceId}'.");
+
+            return starter.CreateCheckStatusResponse(req, instanceId);
         }
     }
 }

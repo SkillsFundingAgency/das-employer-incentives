@@ -14,7 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 {
     public class FakeLearnerMatchApiBuilder
     {
-
         private readonly WireMockServer _server;
         private readonly Fixture _fixture = new Fixture();
         private object _learnerMatchApiData;
@@ -31,10 +30,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
             _server = WireMockServer.StartWithAdminInterface(port);
         }
 
-        public FakeLearnerMatchApi Build()
+        public WireMockServer Build()
         {
             _server.LogEntriesChanged += _server_LogEntriesChanged;
-            return new FakeLearnerMatchApi(_server);
+            return _server;
         }
 
         private void _server_LogEntriesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

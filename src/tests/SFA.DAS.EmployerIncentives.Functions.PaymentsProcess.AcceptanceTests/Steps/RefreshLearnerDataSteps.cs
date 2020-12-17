@@ -180,7 +180,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["timerInfo"] = new TimerInfo(new WeeklySchedule(), new ScheduleStatus())
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/LearnerMatchingOrchestrator"
+                        }
                     }
                     ));
         }
@@ -189,6 +192,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void GivenTheLatestLearnerDataHasAMatchingTrainingEpisodeWithNoEndDate()
         {
             SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoEndDate_json);
+        }
+
+        [Given(@"the latest learner data has no payable price episodes")]
+        public void GivenTheLatestLearnerDataHasNoPayablePriceEpisodes()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoPayable_json);
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application without any submission data")]
@@ -347,6 +356,40 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be(expectedDaysInLearning);            
+        }
+
+        [Then(@"the apprenticeship incentive learner data is updated for the application with submission data with no payable price episodes")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedForTheApplicationWithSubmissionDataWithNoPayablePriceEpisodes()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearners = dbConnection.GetAll<Learner>();
+
+            var createdLearner = createdLearners.Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+            var createdPeriod = dbConnection.GetAll<LearningPeriod>().Single(p => p.LearnerId == createdLearner.Id);
+            var createdDaysInLearning = dbConnection.GetAll<ApprenticeshipDaysInLearning>().Single(d => d.LearnerId == createdLearner.Id);
+
+            var testLearner = _testContext.TestData.Get<Learner>("ExistingLearner");
+
+            createdLearner.Id.Should().Be(testLearner.Id);
+            createdLearner.SubmissionFound.Should().Be(true);
+            createdLearner.Id.Should().NotBeEmpty();
+            createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
+            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
+            createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
+            createdLearner.SubmissionDate.Should().Be(_submissionDate);
+            createdLearner.RawJSON.Should().Be(LearnerMatchApiResponses.BL_R03_InLearning_NoPayable_json);
+            createdLearner.StartDate.Should().Be(_startDate);
+
+            createdPeriod.StartDate.Should().Be(DateTime.Parse("2020-08-10T00:00:00"));
+            createdPeriod.EndDate.Should().Be(DateTime.Parse("2021-07-31T00:00:00"));
+
+            createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
+            createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
+            createdDaysInLearning.NumberOfDaysInLearning.Should().Be((int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1);
+
+            createdLearner.HasDataLock.Should().BeTrue();
+            createdLearner.LearningFound.Should().BeTrue();
         }
 
         private void SetupLearnerMatchApiResponse(string json)
