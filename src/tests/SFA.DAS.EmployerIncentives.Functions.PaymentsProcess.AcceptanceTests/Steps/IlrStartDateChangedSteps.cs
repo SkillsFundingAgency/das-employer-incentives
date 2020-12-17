@@ -172,7 +172,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
-                        ["timerInfo"] = new TimerInfo(new WeeklySchedule(), new ScheduleStatus())
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/LearnerMatchingOrchestrator"
+                        }
                     }
                 ));
         }
