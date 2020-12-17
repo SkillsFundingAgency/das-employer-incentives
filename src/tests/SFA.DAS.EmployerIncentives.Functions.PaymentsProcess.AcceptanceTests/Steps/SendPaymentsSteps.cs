@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     Request
                         .Create()
                         .WithPath($"/payments/requests")
+                        .WithHeader("Content-Type", "application/payments-data")
                         .WithParam("api-version", "2020-10-01")
                         .UsingPost()
                 )

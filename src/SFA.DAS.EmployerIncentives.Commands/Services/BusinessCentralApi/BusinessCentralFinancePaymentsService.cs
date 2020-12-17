@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -31,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         public async Task SendPaymentRequests(List<PaymentDto> payments)
         {
             var content = CreateJsonContent(payments);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/payments-data");
             var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
             if (response.StatusCode == HttpStatusCode.Accepted)

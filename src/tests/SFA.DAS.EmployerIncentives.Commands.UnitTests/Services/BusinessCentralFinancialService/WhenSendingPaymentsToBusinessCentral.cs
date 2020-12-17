@@ -40,6 +40,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
         }
 
+        [Test]
+        public async Task Then_the_payment_is_posted_with_the_correct_content_type()
+        {
+            //Arrange
+            _httpClient.SetUpPostAsAsync(System.Net.HttpStatusCode.Accepted);
+            var payment = _fixture.Create<PaymentDto>();
+
+            //Act
+            await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+
+            // Assert
+            _httpClient.VerifyContentType("application/payments-data");
+        }
+
         [TestCase(HttpStatusCode.InternalServerError)]
         [TestCase(HttpStatusCode.ServiceUnavailable)]
         [TestCase(HttpStatusCode.BadGateway)]
