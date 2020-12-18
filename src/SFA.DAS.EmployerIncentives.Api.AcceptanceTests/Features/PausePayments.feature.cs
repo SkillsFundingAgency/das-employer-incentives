@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Features
+namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
 {
     using TechTalk.SpecFlow;
     using System;
@@ -20,24 +20,30 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.5.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("ResumePausedPayments")]
-    public partial class ResumePausedPaymentsFeature
+    [NUnit.Framework.DescriptionAttribute("PausePayments")]
+    [NUnit.Framework.CategoryAttribute("database")]
+    [NUnit.Framework.CategoryAttribute("api")]
+    public partial class PausePaymentsFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = ((string[])(null));
+        private string[] _featureTags = new string[] {
+                "database",
+                "api"};
         
-#line 1 "ResumePausedPayments.feature"
+#line 1 "PausePayments.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ResumePausedPayments", "\tIn order to resume payments for a apprenticeship\r\n\tAs a employer incentives serv" +
-                    "ice\r\n\tI want to be able to resume a previously paused incentives payments for a " +
-                    "apprenticeship", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "PausePayments", "\tIn order to stop future payments for an apprenticeship\r\n\tAs a employer incentive" +
+                    "s service\r\n\tI want to be able to pause incentives payments for an apprenticeship" +
+                    "", ProgrammingLanguage.CSharp, new string[] {
+                        "database",
+                        "api"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -76,13 +82,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("When an apprenticeship incentive exists and is already paused")]
-        public virtual void WhenAnApprenticeshipIncentiveExistsAndIsAlreadyPaused()
+        [NUnit.Framework.DescriptionAttribute("When an apprenticeship incentive does not exist then we should inform the request" +
+            "er")]
+        public virtual void WhenAnApprenticeshipIncentiveDoesNotExistThenWeShouldInformTheRequester()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an apprenticeship incentive exists and is already paused", null, tagsOfScenario, argumentsOfScenario);
-#line 6
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an apprenticeship incentive does not exist then we should inform the request" +
+                    "er", null, tagsOfScenario, argumentsOfScenario);
+#line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -102,32 +110,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 7
- testRunner.Given("a paused apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 8
- testRunner.When("the resume payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
 #line 9
- testRunner.Then("the requester is informed the apprenticeship incentive has resumed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Given("apprenticeship incentive does not exist", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 10
- testRunner.And("the PausePayment status is set to false", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("the pause payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 11
- testRunner.And("an Audit record has been added to record this resume request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("the requester is informed no apprenticeship incentive is found", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("When an apprenticeship incentive exists, but it\'s not paused")]
-        public virtual void WhenAnApprenticeshipIncentiveExistsButItsNotPaused()
+        [NUnit.Framework.DescriptionAttribute("When an apprenticeship incentive exists then future payments should be paused")]
+        public virtual void WhenAnApprenticeshipIncentiveExistsThenFuturePaymentsShouldBePaused()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an apprenticeship incentive exists, but it\'s not paused", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an apprenticeship incentive exists then future payments should be paused", null, tagsOfScenario, argumentsOfScenario);
 #line 13
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -149,26 +151,32 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 14
- testRunner.Given("a non paused apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("an apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 15
- testRunner.When("the resume payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("the pause payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 16
- testRunner.Then("the requester is informed the apprenticeship incentive is not paused", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the requester is informed the apprenticeship incentive is paused", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 17
+ testRunner.And("the PausePayment status is set to true", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 18
+ testRunner.And("an Audit record has been added to record this pause request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("When an invalid request is sent")]
-        public virtual void WhenAnInvalidRequestIsSent()
+        [NUnit.Framework.DescriptionAttribute("When an apprenticeship incentive exists, but it\'s already paused")]
+        public virtual void WhenAnApprenticeshipIncentiveExistsButItsAlreadyPaused()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an invalid request is sent", null, tagsOfScenario, argumentsOfScenario);
-#line 18
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an apprenticeship incentive exists, but it\'s already paused", null, tagsOfScenario, argumentsOfScenario);
+#line 20
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -188,14 +196,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 19
+#line 21
  testRunner.Given("a paused apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 20
- testRunner.When("an invalid request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 22
+ testRunner.When("the pause payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 21
- testRunner.Then("the requester is informed the request is invalid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 23
+ testRunner.Then("the requester is informed the apprenticeship incentive is already paused", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

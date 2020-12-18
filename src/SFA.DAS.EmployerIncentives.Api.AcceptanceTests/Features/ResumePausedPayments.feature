@@ -1,4 +1,6 @@
-﻿Feature: ResumePausedPayments
+﻿@database
+@api
+Feature: ResumePausedPayments
 	In order to resume payments for a apprenticeship
 	As a employer incentives service
 	I want to be able to resume a previously paused incentives payments for a apprenticeship

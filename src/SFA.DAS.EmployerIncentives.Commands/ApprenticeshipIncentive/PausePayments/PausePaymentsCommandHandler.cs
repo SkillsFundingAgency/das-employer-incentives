@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayme
                 throw new KeyNotFoundException($"Unable to handle pause payments command as no incentive was found for ULN {command.ULN} and Account Legal Entity {command.AccountLegalEntityId}");
             }
 
-            var serviceRequest = new ServiceRequest(command.ServiceRequestId, command.DecisionReferenceNumber, command.DateServiceRequestTaskCreated);
+            var serviceRequest = new ServiceRequest(command.ServiceRequestId, command.DecisionReferenceNumber, command.DateServiceRequestTaskCreated.Value);
 
             switch (command.Action)
             {

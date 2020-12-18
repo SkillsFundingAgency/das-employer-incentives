@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var raisedEvent = apprenticeshipIncentive.FlushEvents().OfType<PaymentsResumed>().Single();
             raisedEvent.AccountId.Should().Be(apprenticeshipIncentive.Account.Id);
             raisedEvent.AccountLegalEntityId.Should().Be(apprenticeshipIncentive.Account.AccountLegalEntityId);
-            raisedEvent.ServiceRequest.Created.Should().Be(command.DateServiceRequestTaskCreated);
+            raisedEvent.ServiceRequest.Created.Should().Be(command.DateServiceRequestTaskCreated.Value);
             raisedEvent.ServiceRequest.DecisionReference.Should().Be(command.DecisionReferenceNumber);
             raisedEvent.ServiceRequest.TaskId.Should().Be(command.ServiceRequestId);
         }
@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             Func<Task> act = async () => await _sut.Handle(command);
 
             // Assert
-            act.Should().Throw<PausePaymentsException>().WithMessage("Payments are already paused");
+            act.Should().Throw<PausePaymentsException>().WithMessage("Payments are not paused");
         }
 
         private PausePaymentsCommand CreatePausedPaymentsCommandWithActionResume()

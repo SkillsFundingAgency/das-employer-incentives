@@ -1,4 +1,6 @@
-﻿Feature: PausePayments
+﻿@database
+@api
+Feature: PausePayments
 	In order to stop future payments for an apprenticeship
 	As a employer incentives service
 	I want to be able to pause incentives payments for an apprenticeship

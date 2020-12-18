@@ -11,10 +11,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayme
         public long AccountLegalEntityId { get; }
         public string ServiceRequestId { get; }
         public string DecisionReferenceNumber { get; }
-        public DateTime DateServiceRequestTaskCreated { get; }
+        public DateTime? DateServiceRequestTaskCreated { get; }
         public PausePaymentsAction? Action { get; }
 
-        public PausePaymentsCommand(long uln, long accountLegalEntityId, string serviceRequestId, string decisionReferenceNumber, DateTime dateServiceRequestTaskCreated, PausePaymentsAction? action)
+        public PausePaymentsCommand(long uln, long accountLegalEntityId, string serviceRequestId, string decisionReferenceNumber, DateTime? dateServiceRequestTaskCreated, PausePaymentsAction? action)
         {
             ULN = uln;
             AccountLegalEntityId = accountLegalEntityId;

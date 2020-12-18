@@ -283,7 +283,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
             else
             {
-                throw new PausePaymentsException("Payments are already paused");
+                throw new PausePaymentsException("Payments are not paused");
             }
         }
 
