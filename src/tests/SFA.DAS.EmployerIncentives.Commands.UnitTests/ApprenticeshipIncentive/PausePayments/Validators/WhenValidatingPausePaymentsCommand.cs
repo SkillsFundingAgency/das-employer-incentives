@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private long _accountLegalEntityId;
         private long _uln;
         private string _serviceRequestId;
-        private DateTime _dateServiceRequestTaskCreated;
+        private DateTime? _dateServiceRequestTaskCreated;
         private string _decisionReferenceNumber;
         private PausePaymentsAction? _action;
         private Func<PausePaymentsCommand> CreateCommand => () => new PausePaymentsCommand(_uln, _accountLegalEntityId, _serviceRequestId, _decisionReferenceNumber, _dateServiceRequestTaskCreated, _action);
