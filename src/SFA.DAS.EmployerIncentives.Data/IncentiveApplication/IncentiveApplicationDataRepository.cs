@@ -13,11 +13,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
     public class IncentiveApplicationDataRepository : IIncentiveApplicationDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public IncentiveApplicationDataRepository(EmployerIncentivesDbContext dbContext)
+        public IncentiveApplicationDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task Add(IncentiveApplicationModel incentiveApplication)
@@ -90,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                                             LastName = apprenticeship.LastName,
                                             PlannedStartDate = apprenticeship.PlannedStartDate,
                                             TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
-                                            Uln = apprenticeship.Uln,
+                                            ULN = apprenticeship.ULN,
                                             UKPRN = apprenticeship.UKPRN
                                         }
                                         select apprenticeshipModel).ToList();

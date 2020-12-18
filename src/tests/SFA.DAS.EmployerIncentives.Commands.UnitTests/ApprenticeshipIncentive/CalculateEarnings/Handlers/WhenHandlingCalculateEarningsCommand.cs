@@ -61,19 +61,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(m => m.Get())
                 .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
 
-            _fixture.Register(() => new ApprenticeshipIncentiveFactory()
-                    .CreateNew(_fixture.Create<Guid>(), 
-                    _fixture.Create<Guid>(), 
-                    _fixture.Create<Account>(), 
+            var incentive = new ApprenticeshipIncentiveFactory()
+                    .CreateNew(_fixture.Create<Guid>(),
+                    _fixture.Create<Guid>(),
+                    _fixture.Create<Account>(),
                     new Apprenticeship(
-                        _fixture.Create<long>(), 
+                        _fixture.Create<long>(),
                         _fixture.Create<string>(),
                         _fixture.Create<string>(),
                         DateTime.Today.AddYears(-26),
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy
                         ),
-                    DateTime.Today));
+                    DateTime.Today);
+            
+            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            _fixture.Register(() => incentive);
 
             _sut = new CalculateEarningsCommandHandler(
                 _mockIncentiveDomainRespository.Object,

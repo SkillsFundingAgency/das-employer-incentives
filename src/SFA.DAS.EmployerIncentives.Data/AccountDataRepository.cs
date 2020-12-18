@@ -1,20 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
     public class AccountDataRepository : IAccountDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public AccountDataRepository(EmployerIncentivesDbContext dbContext)
+        public AccountDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task Update(AccountModel account)
@@ -66,5 +69,21 @@ namespace SFA.DAS.EmployerIncentives.Data
             var accounts = await _dbContext.Accounts.Where(x => accountIds.Contains(x.Id)).ToListAsync();
             return accounts?.Map();
         }
+
+        public async Task UpdatePaidDateForPaymentIds(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate)
+        {
+            var payments = await _dbContext.Payments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
+            foreach (var paymentId in paymentIds)
+            {
+                var payment = payments.SingleOrDefault(p => p.Id == paymentId);
+                if (payment != null)
+                {
+                    payment.PaidDate ??= paidDate;
+                }
+            }
+        }
+
+
+
     }
 }

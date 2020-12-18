@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 {
     public class WhenHandlingCreateApprenticeshipIncentiveCommand
     {
-        private CreateApprenticeshipIncentiveCommandHandler _sut;
+        private CreateIncentiveCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
         private ApprenticeshipIncentiveFactory _factory;
         private Fixture _fixture;
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _fixture.Customize(new ApprenticeshipIncentiveCustomization());
             _fixture.Customize(new IncentiveApplicationCustomization());
             _factory = new ApprenticeshipIncentiveFactory();
-            _sut = new CreateApprenticeshipIncentiveCommandHandler(
+            _sut = new CreateIncentiveCommandHandler(
                 _factory,
                 _mockIncentiveDomainRepository.Object);
         }
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_an_apprenticeship_incentive_created_event_is_raised_for_each_apprenticeship_in_the_application()
         {
             // Arrange
-            var command = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
+            var command = _fixture.Create<CreateIncentiveCommand>();
             Domain.ApprenticeshipIncentives.ApprenticeshipIncentive noExistingApprenticeshipIncentive = null;
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(noExistingApprenticeshipIncentive);
 
@@ -62,8 +62,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         [Test]
         public async Task Then_the_apprenticeship_incentive_is_not_created_if_one_exists_for_the_apprenticeship_id()
         {
-            var command = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
-            var existingAppenticeshipIncentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>());
+            var command = _fixture.Create<CreateIncentiveCommand>();
+            var existingAppenticeshipIncentive = (new ApprenticeshipIncentiveFactory()).CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>());
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(existingAppenticeshipIncentive);
 
             // Act

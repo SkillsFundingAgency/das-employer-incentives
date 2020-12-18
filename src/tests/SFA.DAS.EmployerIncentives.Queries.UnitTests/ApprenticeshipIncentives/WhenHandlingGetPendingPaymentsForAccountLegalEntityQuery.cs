@@ -1,13 +1,13 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPendingPaymentsForAccountLegalEntity;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
 {

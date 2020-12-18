@@ -17,11 +17,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplicationLegalEntity
             public Models.Account Account { get; set; }
         }
 
-        private readonly EmployerIncentivesDbContext _context;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public IncentiveApplicationLegalEntityQueryRepository(EmployerIncentivesDbContext context)
+        public IncentiveApplicationLegalEntityQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
-            _context = context;
+            _lazyContext = context;
         }
 
         public Task<IncentiveApplicationLegalEntityDto> Get(Expression<Func<IncentiveApplicationLegalEntityDto, bool>> predicate)

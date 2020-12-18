@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
