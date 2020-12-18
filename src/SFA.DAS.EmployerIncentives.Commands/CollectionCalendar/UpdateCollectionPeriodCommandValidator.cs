@@ -9,14 +9,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.CollectionCalendar
         public Task<ValidationResult> Validate(UpdateCollectionPeriodCommand item)
         {
             var result = new ValidationResult();
-            if (item.CollectionPeriodNumber < 1 || item.CollectionPeriodNumber > 12)
+            if (item.PeriodNumber < 1 || item.PeriodNumber > 12)
             {
-                result.AddError("CollectionPeriodNumber", "Should be between 1 and 12");
+                result.AddError("PeriodNumber", "Should be between 1 and 12");
             }
-            var startYear = ValueObjects.NewApprenticeIncentive.EligibilityStartDate.Year;
-            if (item.CollectionPeriodYear < startYear)
+            if (item.AcademicYear == default)
             {
-                result.AddError("CollectionPeriodYear", $"Should be at least {startYear}");
+                result.AddError("AcademicYear", "Should be set");
+            }
+            else if (item.AcademicYear.Length < 4)
+            {
+                result.AddError("AcademicYear", "Should be 4 digits");
+            }
+            else
+            {
+                int academicYear;
+                var isNumeric = int.TryParse(item.AcademicYear, out academicYear);
+                if (!isNumeric)
+                {
+                    result.AddError("AcademicYear", "Should be numeric");
+                }
             }
 
             return Task.FromResult(result);

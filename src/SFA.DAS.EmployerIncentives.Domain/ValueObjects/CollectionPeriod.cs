@@ -17,10 +17,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             Active = active;
         }
 
-        public CollectionPeriod(byte periodNumber, short calendarYear)
+        public CollectionPeriod(byte periodNumber, string academicYear)
         {
             PeriodNumber = periodNumber;
-            CalendarYear = calendarYear;
+            AcademicYear = academicYear;
         }
 
         public byte PeriodNumber { get; }

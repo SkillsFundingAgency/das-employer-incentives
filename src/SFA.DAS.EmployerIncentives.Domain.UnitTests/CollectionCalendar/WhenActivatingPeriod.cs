@@ -23,9 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             testDate = DateTime.Now;
 
-            var period1 = new CollectionPeriod(1, (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), true);
-            var period2 = new CollectionPeriod(2, (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), _fixture.Create<string>(), false);
-            var period3 = new CollectionPeriod(3, (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), false);
+            var period1 = new CollectionPeriod(1, (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), "2021", true);
+            var period2 = new CollectionPeriod(2, (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), "2021", false);
+            var period3 = new CollectionPeriod(3, (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), "2021", false);
 
             _collectionPeriods = new List<CollectionPeriod>() { period1, period2, period3 };
 
@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_active_period_is_changed()
         {
             // Arrange / Act
-            var period = new CollectionPeriod(2, (short)testDate.Year);
+            var period = new CollectionPeriod(2, "2021");
             _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();
@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_active_period_is_not_changed_when_the_period_and_year_not_matched()
         {
             // Arrange / Act
-            var period = new CollectionPeriod(4, (short)testDate.Year);
+            var period = new CollectionPeriod(4, "2021");
             _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();

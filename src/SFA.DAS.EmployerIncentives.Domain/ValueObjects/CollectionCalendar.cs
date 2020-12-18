@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public void SetActive(CollectionPeriod collectionPeriod)
         {
-            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.CalendarYear == collectionPeriod.CalendarYear 
+            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.AcademicYear == collectionPeriod.AcademicYear 
                                                                                  && x.PeriodNumber == collectionPeriod.PeriodNumber);
             if (collectionPeriodToActivate == null)
             {

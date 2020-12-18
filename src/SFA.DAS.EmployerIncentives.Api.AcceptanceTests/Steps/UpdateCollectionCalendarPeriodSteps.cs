@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheChangeOfActiveCollectionPeriodIsRequested()
         {
             var url = "collectionPeriods";
-            var data = new UpdateCollectionPeriodRequest { CollectionPeriodNumber = 2, CollectionPeriodYear = (short)DateTime.Now.Year, Active = true };
+            var data = new UpdateCollectionPeriodRequest { PeriodNumber = 2, AcademicYear = "2021", Active = true };
             var apiResult = await EmployerIncentiveApi.Client.PatchAsync(url, data.GetStringContent());
 
             apiResult.StatusCode.Should().Be(HttpStatusCode.OK);

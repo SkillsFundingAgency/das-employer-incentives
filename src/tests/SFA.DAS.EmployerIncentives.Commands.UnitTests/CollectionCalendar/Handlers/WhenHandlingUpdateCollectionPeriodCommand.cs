@@ -28,9 +28,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
 
             var calendarPeriods = new List<Domain.ValueObjects.CollectionPeriod>
             {
-                new Domain.ValueObjects.CollectionPeriod(1, 2020),
-                new Domain.ValueObjects.CollectionPeriod(2, 2020),
-                new Domain.ValueObjects.CollectionPeriod(3, 2020)
+                new Domain.ValueObjects.CollectionPeriod(1, "2021"),
+                new Domain.ValueObjects.CollectionPeriod(2, "2021"),
+                new Domain.ValueObjects.CollectionPeriod(3, "2021")
             };
 
             var collectionCalendar = new Domain.ValueObjects.CollectionCalendar(calendarPeriods);
@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
         public async Task Then_the_active_period_is_updated()
         {
             // Arrange
-            var command = new UpdateCollectionPeriodCommand(2, 2020, true);
+            var command = new UpdateCollectionPeriodCommand(2, "2021", true);
 
             // Act
             await _sut.Handle(command);
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
         public async Task Then_the_active_period_is_not_updated_if_active_flag_is_false() 
         {
             // Arrange
-            var command = new UpdateCollectionPeriodCommand(1, 2020, false);
+            var command = new UpdateCollectionPeriodCommand(1, "2021", false);
 
             // Act
             await _sut.Handle(command);
