@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId;
+using SFA.DAS.HashingService;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -12,8 +14,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class AccountQueryController : ApiQueryControllerBase
     {
-        public AccountQueryController(IQueryDispatcher queryDispatcher) : base(queryDispatcher)
+        private readonly IHashingService _hashingService;
+
+        public AccountQueryController(IQueryDispatcher queryDispatcher, IHashingService hashingService) : base(queryDispatcher)
         {
+            _hashingService = hashingService;
         }
 
         [HttpGet("/accounts/{accountId}/LegalEntities")]
@@ -56,6 +61,20 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
 
             return NotFound();
+        }
+
+        [HttpGet("/legalentities/{hashedLegalEntityId}/employervendorid")]
+        public async Task<IActionResult> GetEmployerVendorId(string hashedLegalEntityId)
+        {
+            var request = new GetVendorIdRequest(_hashingService.DecodeValue(hashedLegalEntityId));
+            var response = await QueryAsync<GetVendorIdRequest, GetVendorIdResponse>(request);
+
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(response.VendorId);
         }
     }
 }
