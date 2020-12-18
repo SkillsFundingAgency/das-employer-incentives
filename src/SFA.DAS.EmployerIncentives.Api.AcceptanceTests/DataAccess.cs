@@ -34,16 +34,23 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             return account;
         }
 
-        public async Task SetupAccount(Account account)
+        public async Task Insert<T>(T entity) where T : class
         {
-            using var dbConnection = new SqlConnection(_connectionString);
-            await dbConnection.InsertAsync(account);           
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync<T>(entity);
         }
 
-        public void SetupApplication(IncentiveApplication application)
+        public async Task SetupAccount(Account account)
         {
-            using var dbConnection = new SqlConnection(_connectionString);
-            dbConnection.Execute(
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(account);
+        }
+
+        // Use this method to add `Status` column data as string as dapper would insert numeric enum value
+        public async Task InsertApplication(IncentiveApplication application)
+        {
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.ExecuteAsync(
                 "insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByEmail, submittedByName) values " +
                 "(@id, @accountId, @accountLegalEntityId, @dateCreated, @status, @dateSubmitted, @submittedByEmail, @submittedByName)",
                 new
@@ -59,15 +66,5 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 });
         }
 
-        public void SetupApprenticeship(IncentiveApplicationApprenticeship apprenticeship)
-        {
-            using var dbConnection = new SqlConnection(_connectionString);
-            dbConnection.Execute(
-                "insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
-                "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
-                "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
-                "@uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount)",
-                apprenticeship);
-        }
     }
 }
