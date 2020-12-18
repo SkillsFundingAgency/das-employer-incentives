@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpPost("/commands/{type}")]
         public async Task<IActionResult> RunCommand(string type, [FromBody] string commandText)
         {
-            var objectType = typeof(CreateApprenticeshipIncentiveCommand).Assembly.GetType($"{TypesPrefix}{type}");
+            var objectType = typeof(CreateIncentiveCommand).Assembly.GetType($"{TypesPrefix}{type}");
             var command = JsonConvert.DeserializeObject(commandText, objectType);
 
             if (objectType != null && objectType.IsSubclassOf(typeof(DomainCommand)))

@@ -12,12 +12,12 @@ using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Events;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.EmployerIncentives.Infrastructure.Extensions;
-using SFA.DAS.EmployerIncentives.Infrastructure.UnitOfWork;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api
@@ -78,17 +78,18 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
             services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
+            services.Configure<MatchedLearnerApi>(Configuration.GetSection("MatchedLearnerApi"));
+            services.Configure<BusinessCentralApiClient>(Configuration.GetSection("BusinessCentralApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
-            services.AddPersistenceServices();
-            services.AddCommandServices();
-            services.AddQueryServices();
-            services.AddEventServices();
-
+            
             services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
 
-            services.AddTransient<UnitOfWorkManagerMiddleware>();
+            services.AddPersistenceServices();
+            services.AddCommandServices();
+            services.AddQueryServices();
+            services.AddEventServices();
 
             services
                 .AddMvc(o =>
@@ -117,8 +118,6 @@ namespace SFA.DAS.EmployerIncentives.Api
             }
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
-
-            app.UseUnitOfWork();
 
             app.UseRouting();            
 

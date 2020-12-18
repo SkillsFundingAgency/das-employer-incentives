@@ -54,6 +54,17 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared
              ), ItExpr.IsAny<CancellationToken>());
         }
 
+        public void VerifyGetAsAsync(string relativePath, Times times)
+        {
+            _mockHttpMessageHandler
+             .Protected()
+             .Verify("SendAsync", times,
+             ItExpr.Is<HttpRequestMessage>(r =>
+             r.Method == HttpMethod.Get &&
+             r.RequestUri.AbsoluteUri == $"{BaseAddress.AbsoluteUri}{relativePath}"
+             ), ItExpr.IsAny<CancellationToken>());
+        }
+
         public void VerifyDeleteAsync(string relativePath, Times times)
         {
             _mockHttpMessageHandler
@@ -63,6 +74,28 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared
              r.Method == HttpMethod.Delete &&
              r.RequestUri.AbsoluteUri == $"{BaseAddress.AbsoluteUri}{relativePath}"
              ), ItExpr.IsAny<CancellationToken>());
+        }
+
+        public void SetUpGetAsAsync(HttpStatusCode statusCode)
+        {
+            _mockHttpMessageHandler
+                  .Protected()
+                  .Setup<Task<HttpResponseMessage>>("SendAsync",
+                      ItExpr.IsAny<HttpRequestMessage>(),
+                      ItExpr.IsAny<CancellationToken>())
+                  .ReturnsAsync(new HttpResponseMessage(statusCode)).Verifiable("");
+        }
+
+        public void SetUpGetAsAsync<T>(T response, HttpStatusCode statusCode)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(response));
+
+            _mockHttpMessageHandler
+                  .Protected()
+                  .Setup<Task<HttpResponseMessage>>("SendAsync",
+                  ItExpr.IsAny<HttpRequestMessage>(),
+                      ItExpr.IsAny<CancellationToken>())
+                  .ReturnsAsync(new HttpResponseMessage(statusCode) { Content = content }).Verifiable("");
         }
 
         public void SetUpPostAsAsync(HttpStatusCode statusCode)

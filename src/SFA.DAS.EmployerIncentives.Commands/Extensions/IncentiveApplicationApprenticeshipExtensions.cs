@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Extensions
             return dto.Select(
                 apprenticeship => factory.CreateApprenticeship(
                     apprenticeship.ApprenticeshipId, apprenticeship.FirstName, apprenticeship.LastName,
-                    apprenticeship.DateOfBirth, apprenticeship.Uln, apprenticeship.PlannedStartDate,
+                    apprenticeship.DateOfBirth, apprenticeship.ULN, apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
                     apprenticeship.UKPRN)
             );

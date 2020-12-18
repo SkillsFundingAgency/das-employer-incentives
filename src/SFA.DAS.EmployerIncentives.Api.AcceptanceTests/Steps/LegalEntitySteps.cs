@@ -44,9 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         [Given(@"a legal entity that is in employer incentives")]
         [Given(@"the legal entity is already available in Employer Incentives")]
-        public void GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
+        public Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
-            DataAccess.SetupAccount(_testAccountTable);
+            return DataAccess.SetupAccount(_testAccountTable);
         }
 
         [Then(@"the legal entity should no longer be available in employer incentives")]
