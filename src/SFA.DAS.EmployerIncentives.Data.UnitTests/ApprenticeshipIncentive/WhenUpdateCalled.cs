@@ -101,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 result.PeriodNumber.Should()
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
                 result.PaymentYear.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
+                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
                 result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             }
         }

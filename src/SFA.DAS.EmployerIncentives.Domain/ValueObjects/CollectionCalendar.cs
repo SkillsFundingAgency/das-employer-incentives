@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             return 
                 _collectionPeriods
-                .Single(d => d.CalendarYear == collectionYear && d.PeriodNumber == periodNumber);
+                .Single(d => d.AcademicYear == collectionYear && d.PeriodNumber == periodNumber);
         }
 
         public void SetActive(CollectionPeriod collectionPeriod)
@@ -69,6 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 yield return collectionPeriod.PeriodNumber;
                 yield return collectionPeriod.CalendarMonth;
                 yield return collectionPeriod.CalendarYear;
+                yield return collectionPeriod.AcademicYear;
                 yield return collectionPeriod.OpenDate;
             }
         }
