@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public short CalendarYear { get; set; }
         public DateTime EIScheduledOpenDateUTC { get; set; }
         public DateTime CensusDate { get; set; }
-        public short AcademicYear { get; set; }
+        public string AcademicYear { get; set; }
         public bool Active { get; set; }
     }
 }
