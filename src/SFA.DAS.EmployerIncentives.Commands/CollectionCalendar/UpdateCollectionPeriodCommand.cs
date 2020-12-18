@@ -4,14 +4,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.CollectionPeriod
 {
     public class UpdateCollectionPeriodCommand : ICommand
     {
-        public byte CollectionPeriodNumber { get; private set; }
-        public short CollectionPeriodYear { get; private set; }
+        public byte PeriodNumber { get; private set; }
+        public short AcademicYear { get; private set; }
         public bool Active { get; private set; }
 
-        public UpdateCollectionPeriodCommand(byte collectionPeriodNumber, short collectionPeriodYear, bool active)
+        public UpdateCollectionPeriodCommand(byte periodNumber, short academicYear, bool active)
         {
-            CollectionPeriodNumber = collectionPeriodNumber;
-            CollectionPeriodYear = collectionPeriodYear;
+            PeriodNumber = periodNumber;
+            AcademicYear = academicYear;
             Active = active;
         }
     }
