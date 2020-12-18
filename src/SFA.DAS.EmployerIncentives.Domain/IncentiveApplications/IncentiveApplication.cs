@@ -85,6 +85,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 serviceRequest));
         }
 
+        public void ComplianceWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
+        {
+            var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.ComplianceWithdrawn);
+
+            AddEvent(new ComplianceWithdrawn(
+                Model.AccountId,
+                Model.AccountLegalEntityId,
+                apprenticeToWithdraw.GetModel(),
+                serviceRequest));
+        }
+
         public void EarningsCalculated(Guid apprenticeshipId)
         {
             var apprenticeship = _apprenticeships.Single(a => a.Id == apprenticeshipId);

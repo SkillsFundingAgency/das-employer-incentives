@@ -20,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public long? UKPRN => Model.UKPRN;
         public bool EarningsCalculated => Model.EarningsCalculated;
         public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
+        public bool WithdrawnByCompliance => Model.WithdrawnByCompliance;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
@@ -55,7 +56,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             {
                 case IncentiveApplicationStatus.EmployerWithdrawn:
                     Model.WithdrawnByEmployer = true;
-                    break;                
+                    break;
+
+                case IncentiveApplicationStatus.ComplianceWithdrawn:
+                    Model.WithdrawnByCompliance = true;
+                    break;
                 default:
                     throw new InvalidOperationException($"Unsupported IncentiveApplicationStatus:{incentiveApplicationStatus} for withdrawal");
             }

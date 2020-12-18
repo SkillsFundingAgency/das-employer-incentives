@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using Newtonsoft.Json;
 using NServiceBus.Transport;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
@@ -17,8 +16,8 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "WithdrawalByEmployer")]
-    public class WithdrawalByEmployerSteps : StepsBase
+    [Scope(Feature = "WithdrawalByCompliance")]
+    public class WithdrawalByComplianceSteps : StepsBase
     {
         private readonly TestContext _testContext;
         private readonly Fixture _fixture;
@@ -30,10 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
-        private readonly Payment _payment;
-        private bool waitForMessage = true;
 
-        public WithdrawalByEmployerSteps(TestContext testContext) : base(testContext)
+        public WithdrawalByComplianceSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
@@ -43,30 +40,23 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeship = _fixture
                 .Build<IncentiveApplicationApprenticeship>()
                 .With(a => a.IncentiveApplicationId, _application.Id)
-                .With(a => a.WithdrawnByEmployer, false)
+                .With(a => a.WithdrawnByCompliance, false)
                 .Create();
 
             _apprenticeship2 = _fixture
                 .Build<IncentiveApplicationApprenticeship>()
                 .With(a => a.IncentiveApplicationId, _application.Id)
                 .With(a => a.ULN, _apprenticeship.ULN)
-                .With(a => a.WithdrawnByEmployer, false)
+                .With(a => a.WithdrawnByCompliance, false)
                 .Create();
 
             _apprenticeshipIncentive = _fixture
                 .Build<ApprenticeshipIncentive>()
                 .With(i => i.IncentiveApplicationApprenticeshipId, _apprenticeship.Id)
-                .With(i => i.AccountLegalEntityId, _application.AccountLegalEntityId)
-                .With(i => i.ULN, _apprenticeship.ULN)
                 .Create();
 
             _pendingPayment = _fixture
                 .Build<PendingPayment>()
-                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                .Create();
-
-            _payment = _fixture
-                .Build<Payment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .Create();
         }
@@ -79,21 +69,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeship);
         }
 
-        [Given(@"an incentive application has been made, submitted and has payments")]
-        public async Task GivenAnIncentiveApplicationHasBeenMadeSubmitteAndHasPayments()
-        {
-            using var dbConnection = new SqlConnection(_connectionString);
-            await dbConnection.InsertAsync(_application);
-            await dbConnection.InsertAsync(_apprenticeship);
-            await dbConnection.InsertAsync(_apprenticeshipIncentive);
-            await dbConnection.InsertAsync(_payment);
-
-            waitForMessage = false;
-        }
-
         [Given(@"multiple incentive applications have been made for the same ULN without being submitted")]
-        public async Task GivenMultipleIncentiveApplicationsHaveBeenMadeWithoutBeingSubmitted()
-        {
+        public async Task GivenMultiplwIncentiveApplicationsHaveBeenMadeWithoutBeingSubmitted()
+        {            
             using var dbConnection = new SqlConnection(_connectionString);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
@@ -108,45 +86,39 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             await dbConnection.InsertAsync(_pendingPayment);
-        }
+        }       
+
 
         [When(@"the apprenticeship application is withdrawn from the scheme")]
         public async Task WhenTheApprenticeshipApplicationIsWithdrawnFromTheScheme()
         {
             _withdrawApplicationRequest = _fixture
                 .Build<WithdrawApplicationRequest>()
-                .With(r => r.WithdrawalType, WithdrawalType.Employer)
+                .With(r => r.WithdrawalType, WithdrawalType.Compliance)
                 .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
                 .With(r => r.ULN, _apprenticeship.ULN)
-                .Create();
-
+                .Create();           
+            
             var url = $"withdrawals";
 
-            if (waitForMessage)
-            {
-                await _testContext.WaitFor<MessageContext>(async () =>
-                         await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
-            }
-            else
-            {
-                await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
-            }
-        }
+            await _testContext.WaitFor<MessageContext>(async () =>
+                     await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
+        }             
 
-        [Then(@"the incentive application status is updated to indicate the employer withdrawal")]
-        public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
+        [Then(@"the incentive application status is updated to indicate the Compliance withdrawal")]
+        public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()
         {
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
             apprenticeships.Should().HaveCount(1);
-            apprenticeships.Single(a => a.Id == _apprenticeship.Id).WithdrawnByEmployer.Should().BeTrue();
-
+            apprenticeships.Single(a => a.Id == _apprenticeship.Id).WithdrawnByCompliance.Should().BeTrue();
+            
             var incentiveApplicationAudits = await dbConnection.GetAllAsync<IncentiveApplicationStatusAudit>();
             incentiveApplicationAudits.Should().HaveCount(1);
             var auditRecord = incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship.Id);
-            auditRecord.Process.Should().Be(IncentiveApplicationStatus.EmployerWithdrawn);
+            auditRecord.Process.Should().Be(IncentiveApplicationStatus.ComplianceWithdrawn);
             auditRecord.ServiceRequestTaskId.Should().Be(_withdrawApplicationRequest.ServiceRequest.TaskId);
             auditRecord.ServiceRequestDecisionReference.Should().Be(_withdrawApplicationRequest.ServiceRequest.DecisionReference);
             auditRecord.ServiceRequestCreatedDate.Should().Be(_withdrawApplicationRequest.ServiceRequest.TaskCreatedDate.Value);
@@ -155,27 +127,27 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .CommandsPublished
                 .Single(c => c.IsPublished &&
                 c.Command is WithdrawCommand).Command as WithdrawCommand;
-
+                       
             publishedCommand.AccountId.Should().Be(_application.AccountId);
             publishedCommand.IncentiveApplicationApprenticeshipId.Should().Be(_apprenticeship.Id);
         }
 
-        [Then(@"each incentive application status is updated to indicate the employer withdrawal")]
-        public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
+        [Then(@"each incentive application status is updated to indicate the Compliance withdrawal")]
+        public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()
         {
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
             apprenticeships.Should().HaveCount(2);
-            apprenticeships.Single(a => a.Id == _apprenticeship.Id).WithdrawnByEmployer.Should().BeTrue();
-            apprenticeships.Single(a => a.Id == _apprenticeship2.Id).WithdrawnByEmployer.Should().BeTrue();
+            apprenticeships.Single(a => a.Id == _apprenticeship.Id).WithdrawnByCompliance.Should().BeTrue();
+            apprenticeships.Single(a => a.Id == _apprenticeship2.Id).WithdrawnByCompliance.Should().BeTrue();
 
             var incentiveApplicationAudits = await dbConnection.GetAllAsync<IncentiveApplicationStatusAudit>();
             incentiveApplicationAudits.Should().HaveCount(2);
 
-            incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship.Id).Process.Should().Be(IncentiveApplicationStatus.EmployerWithdrawn);
-            incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship2.Id).Process.Should().Be(IncentiveApplicationStatus.EmployerWithdrawn);
+            incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship.Id).Process.Should().Be(IncentiveApplicationStatus.ComplianceWithdrawn);
+            incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship2.Id).Process.Should().Be(IncentiveApplicationStatus.ComplianceWithdrawn);
 
             _testContext
                 .CommandsPublished
@@ -183,11 +155,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 c.Command is WithdrawCommand)
                 .Should().Be(2);
         }
-
         [Then(@"the apprenticeship incentive and it's pending payments are removed from the system")]
         public async Task ThenTheIncentiveAndPendingPaymentsAreremovedFromTheSystem()
         {
-            await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal();
+            await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal();
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
@@ -195,20 +166,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             incentives.Should().HaveCount(0);
             pendingPayments.Should().HaveCount(0);
-        }
-
-        [Then(@"an error is returned")]
-        public async Task ThenAnErrorIsReturned()
-        {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-            var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(await EmployerIncentiveApi.Response.Content.ReadAsStringAsync());
-            badRequestResponse.Error.Should().Be("Cannot withdraw an application that has been submitted and has received payments");
-        }
-
-        public class BadRequestResponse
-        {
-            public string Error {get; set;}
-        }
+        }        
     }
 }

@@ -110,6 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 PlannedStartDate = x.PlannedStartDate,
                 EarningsCalculated = x.EarningsCalculated,
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
+                WithdrawnByCompliance = x.WithdrawnByCompliance,
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN
@@ -147,6 +148,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 EarningsCalculated = x.EarningsCalculated,
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
+                WithdrawnByCompliance = x.WithdrawnByCompliance,
                 UKPRN = x.UKPRN
             }).ToList();
         }

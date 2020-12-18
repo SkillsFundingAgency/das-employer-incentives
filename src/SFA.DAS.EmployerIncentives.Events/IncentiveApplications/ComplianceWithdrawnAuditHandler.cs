@@ -3,9 +3,9 @@ using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 
 namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 {
-    public class EmployerWithdrawnAuditHandler : ApplicationWithdrawnAuditHandler<EmployerWithdrawn>
+    public class ComplianceWithdrawnAuditHandler : ApplicationWithdrawnAuditHandler<ComplianceWithdrawn>
     {
-        public EmployerWithdrawnAuditHandler(IIncentiveApplicationStatusAuditDataRepository auditRepository)
+        public ComplianceWithdrawnAuditHandler(IIncentiveApplicationStatusAuditDataRepository auditRepository)
             : base(auditRepository)
         {
         }
