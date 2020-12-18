@@ -84,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = x.Id,
                 CreatedDateUtc = DateTime.UtcNow,
                 PeriodNumber = x.CollectionPeriod.PeriodNumber,
-                PaymentYear = x.CollectionPeriod.CalendarYear,
+                PaymentYear = x.CollectionPeriod.AcademicYear,
                 Result = x.Result,
                 Step = x.Step,
                 PendingPaymentId = paymentId
@@ -114,7 +114,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x => new PendingPaymentValidationResultModel
             {
                 Id = x.Id,
-                CollectionPeriod = collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
+                CollectionPeriod = collectionPeriods.SingleOrDefault(p => Convert.ToInt16(p.AcademicYear) == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
                 Result = x.Result,
                 Step = x.Step
             }).ToList();
@@ -164,7 +164,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     model.CalendarYear, 
                     model.EIScheduledOpenDateUTC,
                     model.CensusDate,
-                    model.AcademicYear,
+                    Convert.ToInt16(model.AcademicYear),
                     model.Active);
             }
 
@@ -180,7 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     x.CalendarYear,
                     x.EIScheduledOpenDateUTC,
                     x.CensusDate,
-                    x.AcademicYear,
+                    Convert.ToInt16(x.AcademicYear),
                     x.Active)
             ).ToList();
         }

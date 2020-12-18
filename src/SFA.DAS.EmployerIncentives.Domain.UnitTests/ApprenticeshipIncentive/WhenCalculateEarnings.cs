@@ -59,9 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
-                new CollectionPeriod(1, (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _collectionPeriod.AddMonths(1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<string>(), false),
-                new CollectionPeriod(2, (byte)_collectionPeriod.Month, (short)_collectionPeriod.Year, _collectionPeriod.AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<string>(), false),
-                new CollectionPeriod(3, (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _collectionPeriod.AddMonths(-1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<string>(), false)
+                new CollectionPeriod(1, (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _collectionPeriod.AddMonths(1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
+                new CollectionPeriod(2, (byte)_collectionPeriod.Month, (short)_collectionPeriod.Year, _collectionPeriod.AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
+                new CollectionPeriod(3, (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _collectionPeriod.AddMonths(-1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
             };
 
             _collectionCalendar = new CollectionCalendar(_collectionPeriods);
@@ -113,10 +113,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             secondPayment.DueDate.Should().Be(_plannedStartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
             firstPayment.PeriodNumber.Should().Be(2);
-            firstPayment.PaymentYear.Should().Be((short)_collectionPeriod.Year);
+            firstPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 2).AcademicYear);
             firstPayment.Amount.Should().Be(100);
             secondPayment.PeriodNumber.Should().Be(1);
-            secondPayment.PaymentYear.Should().Be((short)_collectionPeriod.AddMonths(1).Year);
+            secondPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 1).AcademicYear);
             secondPayment.Amount.Should().Be(300);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
