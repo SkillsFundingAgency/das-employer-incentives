@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.CollectionCalendar
         [Test]
         public async Task Then_the_required_collection_calendar_period_is_set_to_active()
         {
-            var request = new UpdateCollectionPeriodRequest { AcademicYear = "2021", PeriodNumber = 1 };
+            var request = new UpdateCollectionPeriodRequest { AcademicYear = 2021, PeriodNumber = 1 };
             await _sut.UpdateCollectionPeriod(request);
 
             _mockCommandDispatcher.Verify(m => m.Send(It.Is<UpdateCollectionPeriodCommand>(

@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Valid
         public async Task Then_invalid_calendar_periods_result_in_validation_failure(byte collectionPeriod)
         {
             // Arrange
-            var command = new UpdateCollectionPeriodCommand(collectionPeriod, "2021", true);
+            var command = new UpdateCollectionPeriodCommand(collectionPeriod, 2021, true);
 
             // Act
             var result = await _sut.Validate(command);
@@ -33,11 +33,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Valid
             result.ValidationDictionary.Count.Should().Be(1);
         }
 
-        [TestCase("")]
-        [TestCase(null)]
-        [TestCase("202")]
-        [TestCase("202A")]
-        public async Task Then_invalid_academic_year_results_in_validation_failure(string academicYear)
+        [TestCase(0)]
+        [TestCase(10000)]
+        [TestCase(202)]
+        [TestCase(21)]
+        public async Task Then_invalid_academic_year_results_in_validation_failure(short academicYear)
         {
             // Arrange
             var command = new UpdateCollectionPeriodCommand(1, academicYear, true);

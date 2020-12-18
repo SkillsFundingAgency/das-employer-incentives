@@ -191,7 +191,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x =>
                 new CollectionPeriod                
                 { 
-                    AcademicYear = x.AcademicYear,
+                    AcademicYear = x.AcademicYear.ToString(),
                     Active = x.Active,
                     CalendarMonth = x.CalendarMonth,
                     CalendarYear = x.CalendarYear,

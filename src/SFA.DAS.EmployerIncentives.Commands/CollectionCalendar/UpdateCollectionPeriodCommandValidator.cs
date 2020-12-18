@@ -17,18 +17,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.CollectionCalendar
             {
                 result.AddError("AcademicYear", "Should be set");
             }
-            else if (item.AcademicYear.Length < 4)
+            else if (item.AcademicYear < 1000 || item.AcademicYear > 9999)
             {
                 result.AddError("AcademicYear", "Should be 4 digits");
-            }
-            else
-            {
-                int academicYear;
-                var isNumeric = int.TryParse(item.AcademicYear, out academicYear);
-                if (!isNumeric)
-                {
-                    result.AddError("AcademicYear", "Should be numeric");
-                }
             }
 
             return Task.FromResult(result);
