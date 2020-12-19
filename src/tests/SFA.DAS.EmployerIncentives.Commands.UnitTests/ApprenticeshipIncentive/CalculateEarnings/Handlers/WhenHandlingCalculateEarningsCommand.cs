@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
@@ -82,7 +83,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new CalculateEarningsCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockPaymentProfilesService.Object,
-                _mockCollectionCalendarService.Object);
+                _mockCollectionCalendarService.Object,
+                new Mock<ILogger<CalculateEarningsCommandHandler>>().Object);
         }
 
         [Test]
