@@ -12,7 +12,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public string LastName { get; }
         public DateTime DateOfBirth { get; }
         public long UniqueLearnerNumber { get; }
-        public ApprenticeshipEmployerType EmployerType { get; }      
+        public Provider Provider { get; private set; }
+        public ApprenticeshipEmployerType EmployerType { get; }
 
         public Apprenticeship(
             long id, 
@@ -34,6 +35,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             UniqueLearnerNumber = uniqueLearnerNumber;
             EmployerType = employerType;
         }
+
+        public void SetProvider(Provider provider)
+        {
+            Provider = provider;
+        }
       
         protected override IEnumerable<object> GetAtomicValues()
         {
@@ -43,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return DateOfBirth;
             yield return UniqueLearnerNumber;
             yield return EmployerType;
+            yield return Provider;
         }
     }
 }

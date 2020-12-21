@@ -24,8 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private CalculateEarningsCommandHandler _sut;
         private Mock<IIncentivePaymentProfilesService> _mockPaymentProfilesService;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
         private List<IncentivePaymentProfile> _paymentProfiles;
+        private List<CollectionPeriod> _collectionPeriods;
 
         [SetUp]
         public void Arrange()
@@ -34,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
             _paymentProfiles = new List<IncentivePaymentProfile>
             {
@@ -49,23 +52,37 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                .Setup(m => m.Get())
                .ReturnsAsync(_paymentProfiles);
 
-            _fixture.Register(() => new ApprenticeshipIncentiveFactory()
-                    .CreateNew(_fixture.Create<Guid>(), 
-                    _fixture.Create<Guid>(), 
-                    _fixture.Create<Account>(), 
+            _collectionPeriods = new List<CollectionPeriod>()
+            {
+                new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<string>(), false)
+            };
+
+            _mockCollectionCalendarService
+                .Setup(m => m.Get())
+                .ReturnsAsync(new CollectionCalendar(_collectionPeriods));
+
+            var incentive = new ApprenticeshipIncentiveFactory()
+                    .CreateNew(_fixture.Create<Guid>(),
+                    _fixture.Create<Guid>(),
+                    _fixture.Create<Account>(),
                     new Apprenticeship(
-                        _fixture.Create<long>(), 
+                        _fixture.Create<long>(),
                         _fixture.Create<string>(),
                         _fixture.Create<string>(),
                         DateTime.Today.AddYears(-26),
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy
                         ),
-                    DateTime.Today));
+                    DateTime.Today);
+            
+            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            _fixture.Register(() => incentive);
 
             _sut = new CalculateEarningsCommandHandler(
                 _mockIncentiveDomainRespository.Object,
-                _mockPaymentProfilesService.Object);
+                _mockPaymentProfilesService.Object,
+                _mockCollectionCalendarService.Object);
         }
 
         [Test]

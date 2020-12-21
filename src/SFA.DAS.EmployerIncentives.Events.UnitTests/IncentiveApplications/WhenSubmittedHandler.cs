@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
     {
         private SubmittedHandler _sut;
         private Mock<ICommandPublisher> _mockCommandPublisher;
-        
+
         private Fixture _fixture;
 
         [SetUp]
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             _fixture = new Fixture();
 
             _mockCommandPublisher = new Mock<ICommandPublisher>();
-            
+
             _sut = new SubmittedHandler(_mockCommandPublisher.Object);
         }
 
@@ -37,9 +37,22 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             await _sut.Handle(@event);
 
             //Assert
-            _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i => 
-                i.AccountId == @event.AccountId &&
-                i.IncentiveApplicationId == @event.IncentiveApplicationId), It.IsAny<CancellationToken>()), Times.Once);
+            foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
+            {
+                _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
+                    i.AccountId == @event.Model.AccountId &&
+                    i.AccountLegalEntityId == @event.Model.AccountLegalEntityId &&
+                    i.IncentiveApplicationApprenticeshipId == apprenticeship.Id &&
+                    i.ApprenticeshipId == apprenticeship.ApprenticeshipId &&
+                    i.FirstName == apprenticeship.FirstName &&
+                    i.LastName == apprenticeship.LastName &&
+                    i.DateOfBirth == apprenticeship.DateOfBirth &&
+                    i.Uln == apprenticeship.ULN &&
+                    i.PlannedStartDate == apprenticeship.PlannedStartDate &&
+                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval &&
+                    i.UKPRN == apprenticeship.UKPRN
+                ), It.IsAny<CancellationToken>()), Times.Once);
+            }
         }
     }
 }

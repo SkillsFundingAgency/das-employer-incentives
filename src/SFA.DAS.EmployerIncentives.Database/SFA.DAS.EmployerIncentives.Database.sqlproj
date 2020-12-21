@@ -64,6 +64,7 @@
     <Folder Include="Views" />
     <Folder Include="Schemas" />
     <Folder Include="Scripts" />
+    <Folder Include="Functions" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Accounts.sql" />
@@ -72,14 +73,35 @@
     <Build Include="Tables\IncentiveApplication.sql" />
     <Build Include="Tables\IncentiveApplicationApprenticeship.sql" />
     <Build Include="Views\ApplicationsDashboard.sql" />
+    <Build Include="Views\BusinessApplicationsDashboard.sql" />
+    <Build Include="Tables\CollectionCalendar.sql" />
+    <Build Include="Schemas\Incentives.sql" />
+    <None Include="Scripts\Data.CollectionCalendar.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Build Include="Tables\ApprenticeshipIncentive.sql" />
     <Build Include="Tables\PendingPayment.sql" />
-    <Build Include="Schemas\Incentives.sql" />
+    <Build Include="Tables\PendingPaymentValidationResult.sql" />
+    <Build Include="Tables\Learner.sql" />
+    <Build Include="Tables\Payment.sql" />
+    <Build Include="Functions\GetNextCollectionPeriod.sql" />
+    <Build Include="Views\PendingPaymentsValidationStepFailure.sql" />
+    <Build Include="Views\PendingPaymentsValidationStatus.sql" />
+    <Build Include="Views\ValidationCounts.sql" />
+    <Build Include="Tables\ApprenticeshipDaysInLearning.sql" />
+    <Build Include="Tables\LearningPeriod.sql" />
+    <Build Include="Views\BusinessPaymentsDashboard.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
   </ItemGroup>
   <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment.sql" />
+    <None Include="Scripts\Update.ApprenticeshipIncentives.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
+    <None Include="update-model.publish.xml" />
+    <Build Include="Views\BusinessApplicationsDashboard.sql" />
   </ItemGroup>
 </Project>

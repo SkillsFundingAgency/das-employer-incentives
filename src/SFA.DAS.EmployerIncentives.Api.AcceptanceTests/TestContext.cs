@@ -6,16 +6,18 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
-{    
+{
     public class TestContext
     {
+        public string InstanceId { get; private set; }
         public DirectoryInfo TestDirectory { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
+        public TestLearnerMatchApi LearnerMatchApi { get; set; }
         public TestMessageBus MessageBus { get; set; }
         public TestDomainMessageHandlers DomainMessageHandlers { get; set; }
-        
+
         public TestData TestData { get; set; }
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }
@@ -25,7 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
         public TestContext()
         {
-            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString()));
+            InstanceId = Guid.NewGuid().ToString();
+            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), InstanceId));
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);

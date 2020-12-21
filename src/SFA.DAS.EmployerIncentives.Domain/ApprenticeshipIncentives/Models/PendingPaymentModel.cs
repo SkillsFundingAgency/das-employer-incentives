@@ -1,6 +1,8 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
 {
@@ -13,5 +15,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public decimal Amount { get; set; }
         public DateTime CalculatedDate { get; set; }
         public DateTime? PaymentMadeDate { get; set; }
+        public byte? PeriodNumber { get; set; }
+        public short? PaymentYear { get; set; }
+        public ICollection<PendingPaymentValidationResultModel> PendingPaymentValidationResultModels { get; set; }
+        public EarningType EarningType { get; set; }
+
+        public PendingPaymentModel()
+        {
+            PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+        }
     }
 }

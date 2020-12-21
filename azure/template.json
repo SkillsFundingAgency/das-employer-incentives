@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "apiCustomHostName": {
@@ -95,15 +95,19 @@
             "defaultValue": 2
         },
         "nServiceBusConnectionString": {
-            "type": "string"
+            "type": "securestring"
         },
         "nServiceBusLicense": {
             "type": "string"
         },
+        "paymentProcessorSkuName": {
+            "type": "string",
+            "defaultValue": "EP1"
+        },
         "sharedEnvVirtualNetworkName": {
             "type": "string"
         },
-        "subnetObject": {
+        "messageHandlerSubnetObject": {
             "type": "object"
         },
         "subnetServiceEndpointList": {
@@ -111,6 +115,15 @@
         },
         "subnetDelegations": {
             "type": "array"
+        },
+        "paySubnetObject": {
+            "type": "object"
+        },
+        "resourceGroupLocation": {
+            "type": "string"
+        },
+        "tags": {
+            "type": "object"
         }
     },
     "variables": {
@@ -119,13 +132,25 @@
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
         "storageContainerNames": [ "employer-incentives-distributed-locks" ],
-        "functionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
-        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]"
+        "messageHandlerFunctionAppName": "[concat(variables('resourceNamePrefix'),'-dmh-fa')]",
+        "messageHandlerFunctionAspName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "paymentProcessFunctionAppName": "[concat(variables('resourceNamePrefix'),'-pay-fa')]",
+        "paymentProcessFunctionAspName": "[concat(variables('resourceNamePrefix'),'-pay-asp')]",
+        "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]"
     },
     "resources": [
         {
+            "apiVersion": "2020-06-01",
+            "name": "[variables('resourceGroupName')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "location": "[parameters('resourceGroupLocation')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+            }
+        },
+        {
             "condition": "[greater(length(parameters('apiCustomHostName')), 0)]",
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
             "name": "api-app-service-certificate",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
@@ -149,9 +174,10 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
             "name": "api-application-insights",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -169,13 +195,14 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
             "name": "api-app-service",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-v2.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -192,44 +219,46 @@
                         "value": "[parameters('sharedBackEndSubnetResourceId')]"
                     },
                     "appServiceAppSettings": {
-                        "value": [
-                            {
-                                "name": "ASPNETCORE_ENVIRONMENT",
-                                "value": "[toUpper(parameters('environmentName'))]"
-                            },
-                            {
-                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('api-application-insights').outputs.InstrumentationKey.value]"
-                            },
-                            {
-                                "name": "ConfigNames",
-                                "value": "[parameters('configNames')]"
-                            },
-                            {
-                                "name": "ConfigurationStorageConnectionString",
-                                "value": "[parameters('configurationStorageConnectionString')]"
-                            },
-                            {
-                                "name": "EnvironmentName",
-                                "value": "[toUpper(parameters('environmentName'))]"
-                            },
-                            {
-                                "name": "Environment",
-                                "value": "[toUpper(parameters('environmentName'))]"
-                            },
-                            {
-                                "name": "LoggingRedisConnectionString",
-                                "value": "[parameters('loggingRedisConnectionString')]"
-                            },
-                            {
-                                "name": "LoggingRedisKey",
-                                "value": "[parameters('loggingRedisKey')]"
-                            },
-                            {
-                                "name": "Version",
-                                "value": "[parameters('version')]"
-                            }
-                        ]
+                        "value": {
+                            "array": [
+                                {
+                                    "name": "ASPNETCORE_ENVIRONMENT",
+                                    "value": "[toUpper(parameters('environmentName'))]"
+                                },
+                                {
+                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                    "value": "[reference('api-application-insights').outputs.InstrumentationKey.value]"
+                                },
+                                {
+                                    "name": "ConfigNames",
+                                    "value": "[parameters('configNames')]"
+                                },
+                                {
+                                    "name": "ConfigurationStorageConnectionString",
+                                    "value": "[parameters('configurationStorageConnectionString')]"
+                                },
+                                {
+                                    "name": "EnvironmentName",
+                                    "value": "[toUpper(parameters('environmentName'))]"
+                                },
+                                {
+                                    "name": "Environment",
+                                    "value": "[toUpper(parameters('environmentName'))]"
+                                },
+                                {
+                                    "name": "LoggingRedisConnectionString",
+                                    "value": "[parameters('loggingRedisConnectionString')]"
+                                },
+                                {
+                                    "name": "LoggingRedisKey",
+                                    "value": "[parameters('loggingRedisKey')]"
+                                },
+                                {
+                                    "name": "Version",
+                                    "value": "[parameters('version')]"
+                                }
+                            ]
+                        }
                     },
                     "customHostName": {
                         "value": "[parameters('apiCustomHostName')]"
@@ -247,14 +276,14 @@
             ]
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
             "name": "api-app-service-sb-role-assignment",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -274,7 +303,7 @@
             ]
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
             "name": "[concat('storage-account-container-',variables('storageContainerNames')[copyIndex()])]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
@@ -299,7 +328,7 @@
             }
         },
         {
-            "apiVersion": "2018-02-01",
+            "apiVersion": "2019-05-01",
             "name": "employer-incentives-sql-database",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
@@ -338,8 +367,8 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
-            "name": "function-subnet",
+            "apiVersion": "2020-06-01",
+            "name": "message-handler-function-subnet",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -353,10 +382,10 @@
                         "value": "[parameters('sharedEnvVirtualNetworkName')]"
                     },
                     "subnetName": {
-                        "value": "[parameters('subnetObject').name]"
+                        "value": "[parameters('messageHandlerSubnetObject').name]"
                     },
                     "subnetAddressPrefix": {
-                        "value": "[parameters('subnetObject').addressSpace]"
+                        "value": "[parameters('messageHandlerSubnetObject').addressSpace]"
                     },
                     "serviceEndpointList": {
                         "value": "[parameters('subnetServiceEndpointList')]"
@@ -368,9 +397,10 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
-            "name": "function-app-service-plan",
+            "apiVersion": "2020-06-01",
+            "name": "message-handler-function-app-service-plan",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -379,7 +409,7 @@
                 },
                 "parameters": {
                     "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
+                        "value": "[variables('messageHandlerFunctionAspName')]"
                     },
                     "aspSize": {
                         "value": "[parameters('appServicePlanSize')]"
@@ -391,9 +421,10 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
-            "name": "function-application-insights",
+            "apiVersion": "2020-06-01",
+            "name": "message-handler-function-application-insights",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -402,107 +433,110 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('messageHandlerFunctionAppName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('messageHandlerFunctionAppName')]"
                     }
                 }
             }
         },
         {
-            "apiVersion": "2017-05-10",
-            "name": "function-app",
+            "apiVersion": "2020-06-01",
+            "name": "message-handler-function-app",
             "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'function-app.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "functionAppName": {
-                        "value": "[variables('functionAppName')]"
+                        "value": "[variables('messageHandlerFunctionAppName')]"
                     },
                     "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
+                        "value": "[variables('messageHandlerFunctionAspName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[resourceGroup().name]"
+                        "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('function-subnet').outputs.SubnetResourceId.value]"
+                        "value": "[reference('message-handler-function-subnet').outputs.SubnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
-                        "value": [
-                            {
-                                "name": "ConfigurationStorageConnectionString",
-                                "value": "[parameters('configurationStorageConnectionString')]"
-                            },
-                            {
-                                "name": "ConfigNames",
-                                "value": "[parameters('configNames')]"
-                            },
-                            {
-                                "name": "EnvironmentName",
-                                "value": "[parameters('environmentName')]"
-                            },
-                            {
-                                "name": "Version",
-                                "value": "[parameters('version')]"
-                            },
-                            {
-                                "name": "AzureWebJobsStorage",
-                                "value": "[parameters('sharedStorageAccountConnectionString')]"
-                            },
-                            {
-                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('function-application-insights').outputs.InstrumentationKey.value]"
-                            },
-                            {
-                                "name": "FUNCTIONS_EXTENSION_VERSION",
-                                "value": "~3"
-                            },
-                            {
-                                "name": "LoggingRedisConnectionString",
-                                "value": "[parameters('loggingRedisConnectionString')]"
-                            },
-                            {
-                                "name": "FUNCTIONS_WORKER_RUNTIME",
-                                "value": "dotnet"
-                            },
-                            {
-                                "name": "NServiceBusConnectionString",
-                                "value": "[parameters('nServiceBusConnectionString')]"
-                            },
-                            {
-                                "name": "NServiceBusLicense",
-                                "value": "[parameters('nServiceBusLicense')]"
-                            }
-                        ]
+                        "value": {
+                            "array": [
+                                {
+                                    "name": "ConfigurationStorageConnectionString",
+                                    "value": "[parameters('configurationStorageConnectionString')]"
+                                },
+                                {
+                                    "name": "ConfigNames",
+                                    "value": "[parameters('configNames')]"
+                                },
+                                {
+                                    "name": "EnvironmentName",
+                                    "value": "[parameters('environmentName')]"
+                                },
+                                {
+                                    "name": "Version",
+                                    "value": "[parameters('version')]"
+                                },
+                                {
+                                    "name": "AzureWebJobsStorage",
+                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
+                                },
+                                {
+                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                    "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                                    "value": "~3"
+                                },
+                                {
+                                    "name": "LoggingRedisConnectionString",
+                                    "value": "[parameters('loggingRedisConnectionString')]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet"
+                                },
+                                {
+                                    "name": "NServiceBusConnectionString",
+                                    "value": "[parameters('nServiceBusConnectionString')]"
+                                },
+                                {
+                                    "name": "NServiceBusLicense",
+                                    "value": "[parameters('nServiceBusLicense')]"
+                                }
+                            ]
+                        }
                     }
                 }
             },
 
             "dependsOn": [
-                "function-app-service-plan",
-                "function-application-insights"
+                "message-handler-function-app-service-plan",
+                "message-handler-function-application-insights"
             ]
         },
         {
-            "apiVersion": "2017-05-10",
-            "name": "function-app-sb-role-assignment",
+            "apiVersion": "2020-06-01",
+            "name": "message-handler-function-app-sb-role-assignment",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[reference('function-app').outputs.managedServiceIdentityId.value]"
+                        "value": "[reference('message-handler-function-app').outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusOwner"
@@ -513,7 +547,188 @@
                 }
             },
             "dependsOn": [
-                "function-app"
+                "message-handler-function-app"
+            ]
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "payment-process-function-subnet",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'subnet.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "virtualNetworkName": {
+                        "value": "[parameters('sharedEnvVirtualNetworkName')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('paySubnetObject').name]"
+                    },
+                    "subnetAddressPrefix": {
+                        "value": "[parameters('paySubnetObject').addressSpace]"
+                    },
+                    "serviceEndpointList": {
+                        "value": "[parameters('subnetServiceEndpointList')]"
+                    },
+                    "delegations": {
+                        "value": "[parameters('subnetDelegations')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "payment-process-function-app-service-plan",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'premium-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "premiumPlanName": {
+                        "value": "[variables('paymentProcessFunctionAspName')]"
+                    },
+                    "skuName": {
+                        "value": "[parameters('paymentProcessorSkuName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "payment-process-function-application-insights",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('paymentProcessFunctionAppName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('paymentProcessFunctionAppName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "payment-process-function-app",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[variables('resourceGroupName')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "functionAppName": {
+                        "value": "[variables('paymentProcessFunctionAppName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[variables('paymentProcessFunctionAspName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[variables('resourceGroupName')]"
+                    },
+                    "subnetResourceId": {
+                        "value": "[reference('payment-process-function-subnet').outputs.SubnetResourceId.value]"
+                    },
+                    "functionAppAppSettings": {
+                        "value": {
+                            "array": [
+                                {
+                                    "name": "ConfigurationStorageConnectionString",
+                                    "value": "[parameters('configurationStorageConnectionString')]"
+                                },
+                                {
+                                    "name": "ConfigNames",
+                                    "value": "[parameters('configNames')]"
+                                },
+                                {
+                                    "name": "EnvironmentName",
+                                    "value": "[parameters('environmentName')]"
+                                },
+                                {
+                                    "name": "Version",
+                                    "value": "[parameters('version')]"
+                                },
+                                {
+                                    "name": "AzureWebJobsStorage",
+                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
+                                },
+                                                            {
+                                    "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
+                                },
+                                                            {
+                                    "name": "WEBSITE_CONTENTSHARE",
+                                    "value": "[variables('paymentProcessFunctionAppName')]"
+                                },
+                                {
+                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                    "value": "[reference('payment-process-function-application-insights').outputs.InstrumentationKey.value]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                                    "value": "~3"
+                                },
+                                {
+                                    "name": "LoggingRedisConnectionString",
+                                    "value": "[parameters('loggingRedisConnectionString')]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "payment-process-function-app-service-plan",
+                "payment-process-function-application-insights",
+                "payment-process-function-subnet"
+            ]
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "payment-process-function-app-sb-role-assignment",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[reference('payment-process-function-app').outputs.managedServiceIdentityId.value]"
+                    },
+                    "assignmentType": {
+                        "value": "ServiceBusOwner"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "payment-process-function-app"
             ]
         }
     ],
@@ -526,9 +741,13 @@
             "type": "string",
             "value": "[variables('databaseName')]"
         },
-        "FunctionAppName": {
+        "MessageHandlerFunctionAppName": {
             "type": "string",
-            "value": "[variables('functionAppName')]"
+            "value": "[variables('messageHandlerFunctionAppName')]"
+        },
+        "PaymentProcessFunctionAppName": {
+            "type": "string",
+            "value": "[variables('paymentProcessFunctionAppName')]"
         }
     }
 }

@@ -98,6 +98,7 @@ stages:
         command: test
         projects: |
           src/**/*.AcceptanceTests.csproj
+          !src/**/*.PaymentsProcess.AcceptanceTests.csproj
         arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
     - template: azure-pipelines-templates/dependency-check.yml@das-platform-building-blocks
@@ -153,6 +154,14 @@ stages:
       inputs:
         command: 'publish'
         projects: 'src/$(SolutionBaseName).Functions.DomainMessageHandlers/$(SolutionBaseName).Functions.DomainMessageHandlers.csproj'
+        arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
+        publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish - dotnet publish application $(SolutionBaseName).Functions.PaymentsProcess'
+      inputs:
+        command: 'publish'
+        projects: 'src/$(SolutionBaseName).Functions.PaymentsProcess/$(SolutionBaseName).Functions.PaymentsProcess.csproj'
         arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
         publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
 

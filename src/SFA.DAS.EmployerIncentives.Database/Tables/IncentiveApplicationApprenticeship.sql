@@ -10,6 +10,7 @@
 	[PlannedStartDate] DATETIME2 NOT NULL,
 	[ApprenticeshipEmployerTypeOnApproval] INT NOT NULL,
 	[TotalIncentiveAmount] MONEY NOT NULL, 
+    [UKPRN] BIGINT NULL, 
 	[EarningsCalculated] [bit] NOT NULL  DEFAULT 0,	
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
@@ -18,3 +19,5 @@ CREATE INDEX IX_IncentiveApplicationApprenticeship_ApplicationId ON IncentiveApp
 GO
 CREATE INDEX IX_IncentiveApplicationApprenticeship_Uln ON IncentiveApplicationApprenticeship ([ULN])
 GO
+
+CREATE INDEX [IX_IncentiveApplicationApprenticeship_EarningsCalculated] ON [dbo].[IncentiveApplicationApprenticeship] ([EarningsCalculated])

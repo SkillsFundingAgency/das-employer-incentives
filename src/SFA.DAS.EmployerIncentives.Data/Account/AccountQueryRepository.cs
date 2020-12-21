@@ -11,11 +11,12 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
 {
     public class AccountQueryRepository : IQueryRepository<LegalEntityDto>
     {
-        private readonly EmployerIncentivesDbContext _context;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public AccountQueryRepository(EmployerIncentivesDbContext context)
+        public AccountQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
-            _context = context;
+            _lazyContext = context;
         }
 
         public Task<LegalEntityDto> Get(Expression<Func<LegalEntityDto, bool>> predicate)
@@ -38,7 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
                 AccountLegalEntityId = x.AccountLegalEntityId,
                 LegalEntityId = x.LegalEntityId,
                 LegalEntityName = x.LegalEntityName,
-                HasSignedIncentivesTerms = x.HasSignedIncentivesTerms
+                HasSignedIncentivesTerms = x.HasSignedIncentivesTerms,
+                VrfVendorId = x.VrfVendorId
             };
         }
     }

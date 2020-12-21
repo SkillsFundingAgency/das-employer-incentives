@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -8,16 +9,36 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
     public class CreateIncentiveCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
-        public long AccountId { get; private set; }
-        public Guid IncentiveApplicationId { get; private set; }
+        public long AccountId { get; }
+        public long AccountLegalEntityId { get; }
         public string LockId { get => $"{nameof(Account)}_{AccountId}"; }
+        public Guid IncentiveApplicationApprenticeshipId { get; }
+        public long ApprenticeshipId { get; }
+        public string FirstName { get; }
+        public string LastName { get; }
+        public DateTime DateOfBirth { get; }
+        public long Uln { get; }
+        public DateTime PlannedStartDate { get; }
+        public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; }
+        public long? UKPRN { get; }
 
         public CreateIncentiveCommand(
             long accountId,
-            Guid incentiveApplicationId)
-        {         
+            long accountLegalEntityId, Guid incentiveApplicationApprenticeshipId, long apprenticeshipId,
+            string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate,
+            ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn)
+        {
             AccountId = accountId;
-            IncentiveApplicationId = incentiveApplicationId;
+            AccountLegalEntityId = accountLegalEntityId;
+            IncentiveApplicationApprenticeshipId = incentiveApplicationApprenticeshipId;
+            ApprenticeshipId = apprenticeshipId;
+            FirstName = firstName;
+            LastName = lastName;
+            DateOfBirth = dateOfBirth;
+            Uln = uln;
+            PlannedStartDate = plannedStartDate;
+            ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval;
+            UKPRN = ukprn;
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -25,7 +46,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         {
             get
             {
-                var message = $"ApprenticeshipIncentive CreateIncentiveCommand for AccountId {AccountId} and IncentiveApplicationId {IncentiveApplicationId}";
+                var message =
+                    $"ApprenticeshipIncentive CreateApprenticeshipIncentiveCommand for AccountId {AccountId}, " +
+                    $"AccountLegalEntityId {AccountLegalEntityId} " +
+                    $"and IncentiveApplicationApprenticeshipId {IncentiveApplicationApprenticeshipId}";
                 return new Log
                 {
                     OnProcessing = () => message,
@@ -33,5 +57,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
                 };
             }
         }
+
     }
 }
