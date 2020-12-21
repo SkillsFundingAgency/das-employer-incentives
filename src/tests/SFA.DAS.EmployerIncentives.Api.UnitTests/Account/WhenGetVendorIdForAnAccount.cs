@@ -19,7 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         private Mock<IHashingService> _hashingServiceMock;
         private Fixture _fixture;
         private string _hashedLegalEntityId;
-        private long _unhashedLegalEntityId;
 
         [SetUp]
         public void Setup()
@@ -28,10 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             _hashingServiceMock = new Mock<IHashingService>();
             _fixture = new Fixture();
             _hashedLegalEntityId = _fixture.Create<string>();
-            _unhashedLegalEntityId = _fixture.Create<long>();
-            _hashingServiceMock.Setup(x => x.DecodeValue(_hashedLegalEntityId)).Returns(_unhashedLegalEntityId);
             
-            _sut = new AccountQueryController(_queryDispatcherMock.Object, _hashingServiceMock.Object);
+            _sut = new AccountQueryController(_queryDispatcherMock.Object);
         }
 
         [Test]
@@ -40,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             var expected = new GetVendorIdResponse { VendorId = _fixture.Create<string>() };
             _queryDispatcherMock.Setup(x => x.Send<GetVendorIdRequest, GetVendorIdResponse>(
-                    It.Is<GetVendorIdRequest>(r => r.LegalEntityId == _unhashedLegalEntityId)))
+                    It.Is<GetVendorIdRequest>(r => r.HashedLegalEntityId == _hashedLegalEntityId)))
                 .ReturnsAsync(expected);
 
             // Act
@@ -57,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             var expected = new GetVendorIdResponse();
             _queryDispatcherMock.Setup(x => x.Send<GetVendorIdRequest, GetVendorIdResponse>(
-                    It.Is<GetVendorIdRequest>(r => r.LegalEntityId == _unhashedLegalEntityId)))
+                    It.Is<GetVendorIdRequest>(r => r.HashedLegalEntityId == _hashedLegalEntityId)))
                 .ReturnsAsync(expected);
 
             // Act

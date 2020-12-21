@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
                 VendorId = data.VrfVendorId
             };
 
-            _repositoryMock.Setup(x => x.Get(dto => dto.LegalEntityId == query.LegalEntityId)).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.Get(dto => dto.HashedLegalEntityId == query.HashedLegalEntityId)).ReturnsAsync(data);
 
             // Act
             var result = await _sut.Handle(query, CancellationToken.None);

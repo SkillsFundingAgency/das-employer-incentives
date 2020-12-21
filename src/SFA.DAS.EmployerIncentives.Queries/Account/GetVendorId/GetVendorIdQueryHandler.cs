@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId
 
         public async Task<GetVendorIdResponse> Handle(GetVendorIdRequest query, CancellationToken cancellationToken = default)
         {
-            var legalEntity = await _repository.Get(x => x.LegalEntityId == query.LegalEntityId);
+            var legalEntity = await _repository.Get(x => x.HashedLegalEntityId == query.HashedLegalEntityId);
             if (legalEntity == null)
             {
                 return null;

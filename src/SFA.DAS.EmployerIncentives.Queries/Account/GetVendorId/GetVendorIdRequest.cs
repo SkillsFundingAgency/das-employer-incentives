@@ -5,11 +5,11 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId
 {
     public class GetVendorIdRequest : IQuery
     {
-        public long LegalEntityId { get; private set; }
+        public string HashedLegalEntityId { get; private set; }
 
-        public GetVendorIdRequest(long legalEntityId)
+        public GetVendorIdRequest(string hashedLegalEntityId)
         {
-            LegalEntityId = legalEntityId;
+            HashedLegalEntityId = hashedLegalEntityId;
         }
     }
 }

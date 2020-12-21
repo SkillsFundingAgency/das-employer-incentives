@@ -17,16 +17,14 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
     {
         private AccountQueryController _sut;
         private Mock<IQueryDispatcher> _queryDispatcher;
-        private Mock<IHashingService> _hashingService;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _queryDispatcher = new Mock<IQueryDispatcher>();
-            _hashingService = new Mock<IHashingService>();
             _fixture = new Fixture();
-            _sut = new AccountQueryController(_queryDispatcher.Object, _hashingService.Object);
+            _sut = new AccountQueryController(_queryDispatcher.Object);
         }
 
         [Test]

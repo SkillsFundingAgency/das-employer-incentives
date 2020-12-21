@@ -14,11 +14,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class AccountQueryController : ApiQueryControllerBase
     {
-        private readonly IHashingService _hashingService;
-
-        public AccountQueryController(IQueryDispatcher queryDispatcher, IHashingService hashingService) : base(queryDispatcher)
+        public AccountQueryController(IQueryDispatcher queryDispatcher) : base(queryDispatcher)
         {
-            _hashingService = hashingService;
+            
         }
 
         [HttpGet("/accounts/{accountId}/LegalEntities")]
@@ -66,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpGet("/legalentities/{hashedLegalEntityId}/employervendorid")]
         public async Task<IActionResult> GetEmployerVendorId(string hashedLegalEntityId)
         {
-            var request = new GetVendorIdRequest(_hashingService.DecodeValue(hashedLegalEntityId));
+            var request = new GetVendorIdRequest(hashedLegalEntityId);
             var response = await QueryAsync<GetVendorIdRequest, GetVendorIdResponse>(request);
 
             if (response?.VendorId == null)
