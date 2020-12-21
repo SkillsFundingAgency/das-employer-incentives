@@ -16,8 +16,6 @@ using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
-using System.Data.Common;
-using System.Data.SqlClient;
 using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Api

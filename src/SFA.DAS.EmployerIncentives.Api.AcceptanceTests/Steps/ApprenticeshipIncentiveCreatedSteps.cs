@@ -97,6 +97,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
+                await dbConnection.InsertAsync(_applicationModel);
+                await dbConnection.InsertAsync(_apprenticeshipsModels);                
             }
         }
 
