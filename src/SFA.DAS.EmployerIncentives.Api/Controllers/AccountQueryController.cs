@@ -69,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             var request = new GetVendorIdRequest(_hashingService.DecodeValue(hashedLegalEntityId));
             var response = await QueryAsync<GetVendorIdRequest, GetVendorIdResponse>(request);
 
-            if (response == null)
+            if (response?.VendorId == null)
             {
                 return NotFound();
             }

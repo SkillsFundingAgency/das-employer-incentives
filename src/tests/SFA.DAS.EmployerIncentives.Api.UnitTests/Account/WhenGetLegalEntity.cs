@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
+using SFA.DAS.HashingService;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
@@ -15,14 +16,16 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
     {
         private AccountQueryController _sut;
         private Mock<IQueryDispatcher> _queryDispatcherMock;
+        private Mock<IHashingService> _hashingService;
         private Fixture _fixture;
 
         [SetUp]
         public void Setup()
         {
             _queryDispatcherMock = new Mock<IQueryDispatcher>();
+            _hashingService = new Mock<IHashingService>();
             _fixture = new Fixture();
-            _sut = new AccountQueryController(_queryDispatcherMock.Object);
+            _sut = new AccountQueryController(_queryDispatcherMock.Object, _hashingService.Object);
         }
 
         [Test]
