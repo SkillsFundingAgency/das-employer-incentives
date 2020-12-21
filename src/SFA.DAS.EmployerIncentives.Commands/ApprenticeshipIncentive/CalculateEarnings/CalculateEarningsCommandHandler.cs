@@ -13,18 +13,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly IIncentivePaymentProfilesService _incentivePaymentProfilesService;
         private readonly ICollectionCalendarService _collectionCalendarService;
-        private readonly ILogger<CalculateEarningsCommandHandler> _logger;
 
         public CalculateEarningsCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository, 
             IIncentivePaymentProfilesService incentivePaymentProfilesService,
-            ICollectionCalendarService collectionCalendarService,
-            ILogger<CalculateEarningsCommandHandler> logger)
+            ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
             _incentivePaymentProfilesService = incentivePaymentProfilesService;
             _collectionCalendarService = collectionCalendarService;
-            _logger = logger;
         }
 
         public async Task Handle(CalculateEarningsCommand command, CancellationToken cancellationToken = default)
@@ -32,16 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
 
             var paymentProfiles = await _incentivePaymentProfilesService.Get();
-
-            // for testing
-            foreach(var incentiveType in paymentProfiles)
-            {
-                foreach(var profile in incentiveType.PaymentProfiles)
-                {
-                    _logger.LogInformation($"Incentive {incentiveType.IncentiveType} Profile {profile.DaysAfterApprenticeshipStart} days {profile.AmountPayable} paid");
-                }
-            }
-            // for testing
 
             var collectionCalendar = await _collectionCalendarService.Get();
             incentive.CalculateEarnings(paymentProfiles, collectionCalendar);

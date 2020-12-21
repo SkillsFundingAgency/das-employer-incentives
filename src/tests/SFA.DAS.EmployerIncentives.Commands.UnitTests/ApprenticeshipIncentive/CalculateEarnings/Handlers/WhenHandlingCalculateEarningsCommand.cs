@@ -83,8 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new CalculateEarningsCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockPaymentProfilesService.Object,
-                _mockCollectionCalendarService.Object,
-                new Mock<ILogger<CalculateEarningsCommandHandler>>().Object);
+                _mockCollectionCalendarService.Object);
         }
 
         [Test]
