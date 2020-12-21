@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
 using System.Collections.Generic;
@@ -48,13 +49,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 
         public async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
         {
-            var apprenticeship = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(uln, accountLegalEntityId);
-            if (apprenticeship != null)
-            {
-                return _apprenticeshipIncentiveFactory.GetExisting(apprenticeship.Id, apprenticeship);
-            }
+            var apprenticeships = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(uln, accountLegalEntityId);
 
-            return null;
+            switch (apprenticeships.Count)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return _apprenticeshipIncentiveFactory.GetExisting(apprenticeships[0].Id, apprenticeships[0]); 
+                default:
+                    throw new InvalidIncentiveException($"Found duplicate ULNs {uln} within account legal entity {accountLegalEntityId}");
+            }
         }
 
         public async Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindIncentivesWithoutPendingPayments()

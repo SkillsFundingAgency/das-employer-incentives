@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -48,35 +49,23 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         public async Task Then_when_the_apprenticeship_incentive_exists_it_is_returned_from_the_database()
         {
             // Act
-            var matchingIncentive = await _sut.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(_uln, _accountLegalEntityId);
+            var matchingIncentives = await _sut.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(_uln, _accountLegalEntityId);
 
             // Assert
-            matchingIncentive.Should().NotBeNull();
-            matchingIncentive.Apprenticeship.UniqueLearnerNumber.Should().Be(_uln);
-            matchingIncentive.Account.AccountLegalEntityId.Should().Be(_accountLegalEntityId);
+            matchingIncentives.Should().NotBeNull();
+            matchingIncentives.Count.Should().Be(1);
+            matchingIncentives.First().Apprenticeship.UniqueLearnerNumber.Should().Be(_uln);
+            matchingIncentives.First().Account.AccountLegalEntityId.Should().Be(_accountLegalEntityId);
         }
 
         [Test]
-        public async Task Then_when_the_apprenticeship_incentive_does_not_exist_it_returns_null()
+        public async Task Then_when_the_apprenticeship_incentive_does_not_exist_it_returns_an_empty_list()
         {
             // Act
-            var matchingIncentive = await _sut.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(_uln-1, _accountLegalEntityId-1);
+            var matchingIncentives = await _sut.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(_uln-1, _accountLegalEntityId-1);
 
             // Assert
-            matchingIncentive.Should().BeNull();
-        }
-
-        [Test]
-        public async Task Then_when_multiple_matches_exist_it_throws_is_InvalidIncentiveException()
-        {
-            // Arrange
-            await AddApprenticeshipIncentiveModel(_accountLegalEntityId, _uln);
-
-            // Act
-            Func<Task> act = async () => await _sut.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(_uln, _accountLegalEntityId);
-
-            // Assert
-            act.Should().Throw<InvalidIncentiveException>();
+            matchingIncentives.Count.Should().Be(0);
         }
 
         private async Task AddApprenticeshipIncentiveModel(long accountLegalEntityId, long uln)
