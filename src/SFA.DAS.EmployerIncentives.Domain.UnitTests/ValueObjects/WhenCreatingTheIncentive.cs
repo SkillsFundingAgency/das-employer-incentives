@@ -34,6 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         public void Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);
+            var endOfMonth = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
+
             var result = new Incentive(date.AddYears(-1*age), date.AddDays(1), _incentivePaymentProfiles);
 
             result.IncentiveType.Should().Be(expectedIncentiveType);
@@ -41,10 +43,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var payments = result.Payments.ToList();
             payments.Count.Should().Be(2);
             payments[0].Amount.Should().Be(expectedAmount1);
-            payments[0].PaymentDate.Should().Be(date.AddDays(1+expectedDays1));
+            payments[0].PaymentDate.Should().Be(endOfMonth.AddDays(expectedDays1));
             payments[0].EarningType.Should().Be(EarningType.FirstPayment);
             payments[1].Amount.Should().Be(expectedAmount2);
-            payments[1].PaymentDate.Should().Be(date.AddDays(1 + expectedDays2));
+            payments[1].PaymentDate.Should().Be(endOfMonth.AddDays(expectedDays2));
             payments[1].EarningType.Should().Be(EarningType.SecondPayment);
         }
 
