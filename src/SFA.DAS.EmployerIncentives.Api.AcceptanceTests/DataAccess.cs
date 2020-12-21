@@ -37,7 +37,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public async Task Insert<T>(T entity) where T : class
         {
             await using var dbConnection = new SqlConnection(_connectionString);
-            await dbConnection.InsertAsync<T>(entity);
+            await dbConnection.InsertAsync(entity);
+        }
+
+        public async Task Update<T>(T entity) where T : class
+        {
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.UpdateAsync(entity);
         }
 
         public async Task SetupAccount(Account account)

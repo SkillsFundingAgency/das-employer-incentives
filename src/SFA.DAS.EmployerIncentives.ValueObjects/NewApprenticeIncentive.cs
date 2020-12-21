@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using System;
 using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 
 namespace SFA.DAS.EmployerIncentives.ValueObjects
 {
@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
 
         public bool IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            if (IsStartDateWithinSchemeRange(apprenticeship) || !apprenticeship.IsApproved)
+            if (IsStartDateOutsideSchemeRange(apprenticeship) || !apprenticeship.IsApproved)
             {
                 return false;
             }
@@ -33,12 +33,12 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
             return TwentyFiveOrOverIncentiveAmount;
         }
 
-        private bool IsStartDateWithinSchemeRange(Apprenticeship apprenticeship)
+        private static bool IsStartDateOutsideSchemeRange(Apprenticeship apprenticeship)
         {
             return apprenticeship.StartDate < EligibilityStartDate || apprenticeship.StartDate > EligibilityEndDate;
         }
 
-        private int CalculateAgeAtStartOfApprenticeship(in DateTime apprenticeDateOfBirth, in DateTime plannedStartDate)
+        private static int CalculateAgeAtStartOfApprenticeship(in DateTime apprenticeDateOfBirth, in DateTime plannedStartDate)
         {
             var age = plannedStartDate.Year - apprenticeDateOfBirth.Year;
 
