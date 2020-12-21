@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -42,14 +43,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the vendor id associated with the account legal entity is returned")]
         public async Task ThenTheVendorIdAssociatedWithTheAccountLegalEntityIsReturned()
         {
-            var url = $"/legalentities/{_hashedLegalEntityId}/employervendorid";
+            var url = $"/legalentities/{_hashedLegalEntityId}";
 
             var (status, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<string>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<GetLegalEntityResponse>(url);
 
             status.Should().Be(HttpStatusCode.OK);
 
-            data.Should().Be(_vendorId);
+            data.LegalEntity.VrfVendorId.Should().Be(_vendorId);
         }
 
         [Given(@"the legal entity does not have a vendor id assigned")]
@@ -62,14 +63,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"no vendor id is returned")]
         public async Task ThenNoVendorIdIsReturned()
         {
-            var url = $"/legalentities/{_hashedLegalEntityId}/employervendorid";
+            var url = $"/legalentities/{_hashedLegalEntityId}";
 
             var (status, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<string>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<GetLegalEntityResponse>(url);
 
-            status.Should().Be(HttpStatusCode.NotFound);
+            status.Should().Be(HttpStatusCode.OK);
 
-            data.Should().BeNull();
+            data.LegalEntity.VrfVendorId.Should().BeNull();
         }
 
     }

@@ -5,18 +5,17 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
-using SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using SFA.DAS.HashingService;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
     [TestFixture]
-    public class WhenGetVendorIdForAnAccount
+    public class WhenGetLegalEntityByHashedId
     {
         private AccountQueryController _sut;
         private Mock<IQueryDispatcher> _queryDispatcherMock;
-        private Mock<IHashingService> _hashingServiceMock;
         private Fixture _fixture;
         private string _hashedLegalEntityId;
 
@@ -24,7 +23,6 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         public void Setup()
         {
             _queryDispatcherMock = new Mock<IQueryDispatcher>();
-            _hashingServiceMock = new Mock<IHashingService>();
             _fixture = new Fixture();
             _hashedLegalEntityId = _fixture.Create<string>();
             
@@ -35,9 +33,9 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         public async Task Then_data_is_returned_for_existing_account()
         {
             // Arrange
-            var expected = new GetVendorIdResponse { VendorId = _fixture.Create<string>() };
-            _queryDispatcherMock.Setup(x => x.Send<GetVendorIdRequest, GetVendorIdResponse>(
-                    It.Is<GetVendorIdRequest>(r => r.HashedLegalEntityId == _hashedLegalEntityId)))
+            var expected = _fixture.Create<GetLegalEntityResponse>();
+            _queryDispatcherMock.Setup(x => x.Send<GetLegalEntityByHashedIdRequest, GetLegalEntityResponse>(
+                    It.Is<GetLegalEntityByHashedIdRequest>(r => r.HashedLegalEntityId == _hashedLegalEntityId)))
                 .ReturnsAsync(expected);
 
             // Act
@@ -45,23 +43,24 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 
             // Assert
             actual.Should().NotBeNull();
-            actual.Value.Should().Be(expected.VendorId);
+            actual.Value.Should().Be(expected);
         }
 
         [Test]
         public async Task Then_error_returned_for_non_existing_account()
         {
             // Arrange
-            var expected = new GetVendorIdResponse();
-            _queryDispatcherMock.Setup(x => x.Send<GetVendorIdRequest, GetVendorIdResponse>(
-                    It.Is<GetVendorIdRequest>(r => r.HashedLegalEntityId == _hashedLegalEntityId)))
+            var expected = new GetLegalEntityResponse();
+            _queryDispatcherMock.Setup(x => x.Send<GetLegalEntityByHashedIdRequest, GetLegalEntityResponse>(
+                    It.Is<GetLegalEntityByHashedIdRequest>(r => r.HashedLegalEntityId == _hashedLegalEntityId)))
                 .ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetEmployerVendorId(_hashedLegalEntityId) as NotFoundResult;
+            var actual = await _sut.GetEmployerVendorId(_hashedLegalEntityId) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();
+            actual.Value.Should().Be(expected);
         }
     }
 }

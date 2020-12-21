@@ -4,16 +4,16 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
 {
     [TestFixture]
-    public class WhenHandlingGetVendorIdQuery
+    public class WhenHandlingGetLegalEntityByHashedIdQuery
     {
-        private GetVendorIdQueryHandler _sut;
+        private GetLegalEntityByHashedIdQueryHandler _sut;
         private Mock<IQueryRepository<LegalEntityDto>> _repositoryMock;
         private Fixture _fixture;
 
@@ -22,18 +22,18 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
         {
             _fixture = new Fixture();
             _repositoryMock = new Mock<IQueryRepository<LegalEntityDto>>();
-            _sut = new GetVendorIdQueryHandler(_repositoryMock.Object);
+            _sut = new GetLegalEntityByHashedIdQueryHandler(_repositoryMock.Object);
         }
 
         [Test]
         public async Task Then_data_is_fetched_via_data_repository()
         {
             // Arrange
-            var query = _fixture.Create<GetVendorIdRequest>();
+            var query = _fixture.Create<GetLegalEntityByHashedIdRequest>();
             var data = _fixture.Create<LegalEntityDto>();
-            var expected = new GetVendorIdResponse
+            var expected = new GetLegalEntityResponse
             {
-                VendorId = data.VrfVendorId
+                LegalEntity = data
             };
 
             _repositoryMock.Setup(x => x.Get(dto => dto.HashedLegalEntityId == query.HashedLegalEntityId)).ReturnsAsync(data);

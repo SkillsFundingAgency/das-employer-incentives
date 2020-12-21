@@ -4,18 +4,18 @@ using SFA.DAS.EmployerIncentives.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId
+namespace SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity
 {
-    public class GetVendorIdQueryHandler : IQueryHandler<GetVendorIdRequest, GetVendorIdResponse>
+    public class GetLegalEntityByHashedIdQueryHandler : IQueryHandler<GetLegalEntityByHashedIdRequest, GetLegalEntityResponse>
     {
         private readonly IQueryRepository<LegalEntityDto> _repository;
 
-        public GetVendorIdQueryHandler(IQueryRepository<LegalEntityDto> repository)
+        public GetLegalEntityByHashedIdQueryHandler(IQueryRepository<LegalEntityDto> repository)
         {
             _repository = repository;
         }
 
-        public async Task<GetVendorIdResponse> Handle(GetVendorIdRequest query, CancellationToken cancellationToken = default)
+        public async Task<GetLegalEntityResponse> Handle(GetLegalEntityByHashedIdRequest query, CancellationToken cancellationToken = default)
         {
             var legalEntity = await _repository.Get(x => x.HashedLegalEntityId == query.HashedLegalEntityId);
             if (legalEntity == null)
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId
                 return null;
             }
 
-            return new GetVendorIdResponse { VendorId = legalEntity.VrfVendorId };
+            return new GetLegalEntityResponse { LegalEntity = legalEntity };
         }
     }
 }

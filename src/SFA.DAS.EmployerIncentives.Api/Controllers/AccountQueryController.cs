@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
-using SFA.DAS.EmployerIncentives.Queries.Account.GetVendorId;
 using SFA.DAS.HashingService;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
@@ -61,18 +60,18 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NotFound();
         }
 
-        [HttpGet("/legalentities/{hashedLegalEntityId}/employervendorid")]
+        [HttpGet("/legalentities/{hashedLegalEntityId}")]
         public async Task<IActionResult> GetEmployerVendorId(string hashedLegalEntityId)
         {
-            var request = new GetVendorIdRequest(hashedLegalEntityId);
-            var response = await QueryAsync<GetVendorIdRequest, GetVendorIdResponse>(request);
+            var request = new GetLegalEntityByHashedIdRequest(hashedLegalEntityId);
+            var response = await QueryAsync<GetLegalEntityByHashedIdRequest, GetLegalEntityResponse>(request);
 
-            if (response?.VendorId == null)
+            if (response == null)
             {
                 return NotFound();
             }
 
-            return Ok(response.VendorId);
+            return Ok(response);
         }
     }
 }
