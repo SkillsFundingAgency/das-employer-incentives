@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NotFound();
         }
 
-        [HttpGet("/legalentities/{hashedLegalEntityId}")]
+        [HttpGet("/legalentities")]
         public async Task<IActionResult> GetLegalEntityByHashedId(string hashedLegalEntityId)
         {
             var request = new GetLegalEntityByHashedIdRequest(hashedLegalEntityId);
