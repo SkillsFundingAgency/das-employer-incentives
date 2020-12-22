@@ -179,8 +179,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
-            var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished).Select(c => c.Command)
+            var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CreateIncentiveCommand)).Select(c => c.Command)
                 .ToArray();
+
+            publishedCommands.Should().NotBeEmpty();
 
             foreach (var publishedCommand in publishedCommands)
             {
