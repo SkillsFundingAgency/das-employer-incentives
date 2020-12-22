@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -26,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       && application.AccountLegalEntityId == accountLegalEntityId
                                       select new { application, account, apprentice };
             
-            var dtoList = (from accountApplication in accountApplications
+            return await (from accountApplication in accountApplications
                            let dto = new ApprenticeApplicationDto
                            {
                                AccountId = accountApplication.application.AccountId,
@@ -35,13 +36,13 @@ namespace SFA.DAS.EmployerIncentives.Data
                                ApplicationId = accountApplication.application.Id,
                                FirstName = accountApplication.apprentice.FirstName,
                                LastName = accountApplication.apprentice.LastName,
+                               ULN = accountApplication.apprentice.Uln,
                                LegalEntityName = accountApplication.account.LegalEntityName,
                                Status = accountApplication.application.Status.ToString(),
                                SubmittedByEmail = accountApplication.application.SubmittedByEmail,
                                TotalIncentiveAmount = accountApplication.apprentice.TotalIncentiveAmount
                            }
-                           select dto).ToList();
-            return await Task.FromResult(dtoList);
+                           select dto).ToListAsync();
         }
     }
 }
