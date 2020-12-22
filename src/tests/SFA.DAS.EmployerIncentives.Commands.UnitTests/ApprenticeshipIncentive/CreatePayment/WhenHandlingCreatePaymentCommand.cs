@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     (short)DateTime.Now.Year,
                     DateTime.Now.AddDays(-1),
                     DateTime.Now.AddDays(-1),
-                    DateTime.Now.Year.ToString(),
+                    (short)DateTime.Now.Year,
                     false),
                 new CollectionPeriod(
                 1,
@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 (short)DateTime.Now.AddMonths(1).Year,
                 DateTime.Now.AddMonths(1).AddDays(-1),
                 DateTime.Now.AddMonths(1).AddDays(-1),
-                DateTime.Now.AddMonths(1).Year.ToString(),
+                (short)DateTime.Now.AddMonths(1).Year,
                 false)
             };
             _firstCollectionPeriod = _collectionPeriods.First();
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id,
-                _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
+                _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
@@ -83,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
+            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
@@ -137,7 +137,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     (short)DateTime.Now.Year, 
                     DateTime.Now.AddDays(-1),
                     DateTime.Now,
-                    DateTime.Now.Year.ToString(),
+                    (short)DateTime.Now.Year,
                     true)
             };
 

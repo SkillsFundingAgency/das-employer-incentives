@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
@@ -28,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
 
             var paymentProfiles = await _incentivePaymentProfilesService.Get();
+
             var collectionCalendar = await _collectionCalendarService.Get();
             incentive.CalculateEarnings(paymentProfiles, collectionCalendar);
 
