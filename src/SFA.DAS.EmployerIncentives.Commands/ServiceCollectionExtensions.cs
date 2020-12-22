@@ -124,7 +124,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 
             serviceCollection
-                .AddSingleton(typeof(IValidator<CreateIncentiveCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
