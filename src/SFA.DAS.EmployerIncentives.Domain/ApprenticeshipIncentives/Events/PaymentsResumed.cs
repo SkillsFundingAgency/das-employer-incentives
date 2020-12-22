@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
             get
             {
                 var message =
-                    $"Paused Apprenticeship Incentive has been resumed for ApprenticeshipIncentiveId {Model.ApplicationApprenticeshipId} and " +
+                    $"Paused Apprenticeship Incentive is being resumed for ApprenticeshipIncentiveId {Model.ApplicationApprenticeshipId} and " +
                     $"AccountLegalEntityId {AccountLegalEntityId} and ULN {Model.Apprenticeship.UniqueLearnerNumber}" + 
                     $"ServiceRequest TaskId {ServiceRequest.TaskId}";
                 return new Log
