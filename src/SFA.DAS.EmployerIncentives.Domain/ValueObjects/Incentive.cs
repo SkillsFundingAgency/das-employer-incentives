@@ -56,7 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in incentivePaymentProfile.PaymentProfiles)
             {
-                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart), _earningTypes[paymentIndex]));
+                var endOfStartMonth = new DateTime(_startDate.Year, _startDate.Month, DateTime.DaysInMonth(_startDate.Year, _startDate.Month));
+                payments.Add(new Payment(paymentProfile.AmountPayable, endOfStartMonth.AddDays(paymentProfile.DaysAfterApprenticeshipStart), _earningTypes[paymentIndex]));
                 paymentIndex++;
             }
 
