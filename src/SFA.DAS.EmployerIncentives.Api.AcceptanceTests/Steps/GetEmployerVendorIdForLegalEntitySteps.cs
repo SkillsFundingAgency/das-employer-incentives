@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the vendor id associated with the account legal entity is returned")]
         public async Task ThenTheVendorIdAssociatedWithTheAccountLegalEntityIsReturned()
         {
-            var url = $"/legalentities/{_hashedLegalEntityId}";
+            var url = $"/legalentities?hashedLegalEntityId={_hashedLegalEntityId}";
 
             var (status, data) =
                 await EmployerIncentiveApi.Client.GetValueAsync<GetLegalEntityResponse>(url);
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"no vendor id is returned")]
         public async Task ThenNoVendorIdIsReturned()
         {
-            var url = $"/legalentities/{_hashedLegalEntityId}";
+            var url = $"/legalentities?hashedLegalEntityId={_hashedLegalEntityId}";
 
             var (status, data) =
                 await EmployerIncentiveApi.Client.GetValueAsync<GetLegalEntityResponse>(url);
