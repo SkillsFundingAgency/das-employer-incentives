@@ -123,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_actual_start_date_when_there_is_an_actual_start_date()
         {
             // arrange           
-            _sutModel.StartDate = DateTime.Now.AddDays(5);
+            _sutModel.StartDate = DateTime.Now.Date.AddDays(6);
 
             // act
             _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
@@ -134,8 +134,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var firstPayment = _sut.PendingPayments.First();
             var secondPayment = _sut.PendingPayments.Last();
 
-            firstPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
-            secondPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
+            var endOfPlannedStartMonth = new DateTime(_plannedStartDate.Year, _plannedStartDate.Month, DateTime.DaysInMonth(_plannedStartDate.Year, _plannedStartDate.Month));
+
+            firstPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
+            secondPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
             firstPayment.PeriodNumber.Should().Be(2);
             firstPayment.PaymentYear.Should().Be((short)_collectionPeriod.Year);
