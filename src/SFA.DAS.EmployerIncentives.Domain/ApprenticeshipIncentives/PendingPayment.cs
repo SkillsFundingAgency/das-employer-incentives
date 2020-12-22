@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             var period = collectionCalendar.GetPeriod(DueDate);
             Model.PeriodNumber = period.PeriodNumber;
-            Model.PaymentYear = period.CalendarYear;
+            Model.PaymentYear = period.AcademicYear;
         }
 
         public void SetPaymentMadeDate(DateTime paymentDate)
@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 .PendingPaymentValidationResultModels
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
                                       v.CollectionPeriod.CalendarMonth == validationResult.CollectionPeriod.CalendarMonth &&
-                                      v.CollectionPeriod.CalendarYear == validationResult.CollectionPeriod.CalendarYear);
+                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear);
 
             if (existing != null)
             {
@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             return Model.PendingPaymentValidationResultModels
                 .Where(v =>
-                    v.CollectionPeriod.CalendarYear == collectionYear &&
+                    v.CollectionPeriod.AcademicYear == collectionYear &&
                     v.CollectionPeriod.PeriodNumber == collectionPeriod)
                 .All(r => r.Result);
         }
