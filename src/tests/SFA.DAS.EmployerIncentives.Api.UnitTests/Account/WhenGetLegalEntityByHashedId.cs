@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                 .ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetEmployerVendorId(_hashedLegalEntityId) as OkObjectResult;
+            var actual = await _sut.GetLegalEntityByHashedId(_hashedLegalEntityId) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();
@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                 .ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetEmployerVendorId(_hashedLegalEntityId) as OkObjectResult;
+            var actual = await _sut.GetLegalEntityByHashedId(_hashedLegalEntityId) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();

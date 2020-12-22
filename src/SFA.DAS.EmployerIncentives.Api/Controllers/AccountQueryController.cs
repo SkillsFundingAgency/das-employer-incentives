@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpGet("/legalentities/{hashedLegalEntityId}")]
-        public async Task<IActionResult> GetEmployerVendorId(string hashedLegalEntityId)
+        public async Task<IActionResult> GetLegalEntityByHashedId(string hashedLegalEntityId)
         {
             var request = new GetLegalEntityByHashedIdRequest(hashedLegalEntityId);
             var response = await QueryAsync<GetLegalEntityByHashedIdRequest, GetLegalEntityResponse>(request);
