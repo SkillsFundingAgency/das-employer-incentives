@@ -140,10 +140,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             secondPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
             firstPayment.PeriodNumber.Should().Be(2);
-            firstPayment.PaymentYear.Should().Be((short)_collectionPeriod.Year);
+            firstPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 2).AcademicYear);
             firstPayment.Amount.Should().Be(100);
             secondPayment.PeriodNumber.Should().Be(1);
-            secondPayment.PaymentYear.Should().Be((short)_collectionPeriod.AddMonths(1).Year);
+            secondPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 1).AcademicYear);
             secondPayment.Amount.Should().Be(300);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
