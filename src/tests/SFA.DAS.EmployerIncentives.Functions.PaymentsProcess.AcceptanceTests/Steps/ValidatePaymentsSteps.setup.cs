@@ -58,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.ApprenticeshipId, IncentiveApplicationApprenticeshipModels.First().ApprenticeshipId)
                     .With(p => p.PlannedStartDate, startDate)                    
                     .With(p => p.DateOfBirth, startDate.AddYears(-20))
+                    .With(p => p.PausePayments, false)
                     .Create();
 
                 PendingPaymentModel1 = fixture.Build<PendingPayment>()
