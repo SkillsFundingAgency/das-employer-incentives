@@ -38,8 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         public async Task Then_the_learner_is_retrieved()
         {
             var submissionData = _fixture.Create<SubmissionData>();
-            submissionData.SetLearningFound(new LearningFoundStatus());
-            submissionData.SetHasDataLock(true);
+            submissionData.LearningData.SetLearningFound(true);
+            submissionData.LearningData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
 
             var testLearner =
@@ -62,10 +62,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             result.UniqueLearnerNumber.Should().Be(testLearner.UniqueLearnerNumber);
             result.SubmissionData.Should().NotBeNull();
             result.SubmissionData.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
-            result.SubmissionData.LearningFoundStatus.Should().Be(new  LearningFoundStatus(testLearner.SubmissionData.LearningFoundStatus.LearningFound));
-            result.SubmissionData.HasDataLock.Should().BeTrue();
-            result.SubmissionData.StartDate.Should().BeNull();
-            result.SubmissionData.IsInlearning.Should().BeNull();
+            result.SubmissionData.LearningData.IsInlearning.Should().Be(testLearner.SubmissionData.LearningData.IsInlearning);
+            result.SubmissionData.LearningData.HasDataLock.Should().BeTrue();
+            result.SubmissionData.LearningData.StartDate.Should().BeNull();
+            result.SubmissionData.LearningData.IsInlearning.Should().BeNull();
             result.SubmissionData.RawJson.Should().Be(testLearner.SubmissionData.RawJson);
         }
     }

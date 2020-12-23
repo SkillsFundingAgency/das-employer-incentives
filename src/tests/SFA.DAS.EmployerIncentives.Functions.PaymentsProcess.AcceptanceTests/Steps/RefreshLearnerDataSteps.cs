@@ -126,7 +126,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.ULN, _apprenticeshipIncentive.ULN)
-                .With(s => s.SubmissionFound, false)
+                .With(s => s.SubmissionFound, false) 
+                .With(s => s.SubmissionDate, (DateTime?)null)
+                .With(s => s.StartDate, (DateTime?)null)
+                .With(s => s.InLearning, (bool?)null)
+                .With(s => s.HasDataLock, (bool?)null)
                 .Create();
             });
 

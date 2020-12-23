@@ -46,11 +46,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             await _dbContext.SaveChangesAsync();
 
             var submissionData = _fixture.Create<SubmissionData>();
-            submissionData.SetLearningFound(new LearningFoundStatus());
-            submissionData.SetHasDataLock(true);            
+            submissionData.LearningData.SetLearningFound(true);
+            submissionData.LearningData.SetHasDataLock(true);            
             submissionData.SetRawJson(_fixture.Create<string>());
-            submissionData.SetStartDate(_fixture.Create<DateTime>());
-            submissionData.SetIsInLearning(true);
+            submissionData.LearningData.SetStartDate(_fixture.Create<DateTime>());
+            submissionData.LearningData.SetIsInLearning(true);
 
             var testLearner =
                 _fixture.Build<LearnerModel>()
@@ -72,8 +72,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             storedLearner.ULN.Should().Be(testLearner.UniqueLearnerNumber);
             storedLearner.SubmissionFound.Should().Be(true);
             storedLearner.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
-            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningFoundStatus.LearningFound);
-            storedLearner.StartDate.Should().Be(testLearner.SubmissionData.StartDate);
+            storedLearner.LearningFound.Should().Be(testLearner.SubmissionData.LearningData.LearningFound);
+            storedLearner.StartDate.Should().Be(testLearner.SubmissionData.LearningData.StartDate);
             storedLearner.HasDataLock.Should().BeTrue();
             storedLearner.InLearning.Should().BeTrue();
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);

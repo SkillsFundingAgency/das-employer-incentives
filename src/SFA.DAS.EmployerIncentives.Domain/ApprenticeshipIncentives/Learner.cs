@@ -17,7 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;
 
         public SubmissionData SubmissionData => Model.SubmissionData;
-        public bool SubmissionFound => Model.SubmissionData != null;
 
         internal static Learner New(
             Guid id,
@@ -34,7 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                     ApprenticeshipId = apprenticeshipId,
                     Ukprn = ukprn,
-                    UniqueLearnerNumber = uniqueLearnerNumber
+                    UniqueLearnerNumber = uniqueLearnerNumber,
+                    SubmissionData = new SubmissionData()
                 }, true);
         }
 
@@ -45,7 +45,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetSubmissionData(SubmissionData submissionData)
         {
-            Model.SubmissionData = submissionData;
+            if (submissionData == null)
+            {
+                Model.SubmissionData = new SubmissionData();
+            }
+            else
+            {
+                Model.SubmissionData = submissionData;
+            }
         }
 
         public void SetLearningPeriods(IEnumerable<LearningPeriod> learningPeriods)
@@ -109,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 var message = $"Learner data IsNew : {IsNew} : ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} and ApprenticeshipId {ApprenticeshipId} with Ukprn {Ukprn} and UniqueLearnerNumber {UniqueLearnerNumber}. ";
 
-                if (SubmissionFound)
+                if (SubmissionData.SubmissionFound)
                 {
                     message += ((ILogWriter)SubmissionData).Log.OnProcessed;
                 }
