@@ -17,13 +17,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             Active = active;
         }
 
+        public CollectionPeriod(byte periodNumber, short academicYear)
+        {
+            PeriodNumber = periodNumber;
+            AcademicYear = academicYear;
+        }
+
         public byte PeriodNumber { get; }
         public byte CalendarMonth { get; }
         public short CalendarYear { get; }
         public DateTime OpenDate { get; }
         public DateTime CensusDate { get; }
         public short AcademicYear { get; }
-        public bool Active { get; }
+        public bool Active { get; private set; }
+
+        public void SetActive(bool active)
+        {
+            Active = active;
+        }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
