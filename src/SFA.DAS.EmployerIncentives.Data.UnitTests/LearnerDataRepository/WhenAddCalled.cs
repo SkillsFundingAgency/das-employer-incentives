@@ -40,7 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
         {
             // Arrange
             var submissionData = _fixture.Create<SubmissionData>();
-            submissionData.LearningData.SetLearningFound(true);
+            submissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            submissionData.SetLearningData(new LearningData(true));
             submissionData.LearningData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
             submissionData.LearningData.SetStartDate(_fixture.Create<DateTime>());

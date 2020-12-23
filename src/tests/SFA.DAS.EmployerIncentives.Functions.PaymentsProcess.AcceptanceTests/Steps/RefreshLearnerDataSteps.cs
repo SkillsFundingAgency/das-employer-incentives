@@ -222,9 +222,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.SubmissionDate.Should().BeNull();
             createdLearner.RawJSON.Should().BeNull();
             createdLearner.InLearning.Should().BeNull();
-            createdLearner.LearningFound.Should().BeNull();
-
+            createdLearner.LearningFound.Should().BeFalse();
             createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.DaysInLearnings.Should().BeEmpty();
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
@@ -327,8 +327,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
-            createdLearner.SubmissionFound.Should().Be(true);
+            createdLearner.SubmissionFound.Should().Be(true);            
             createdLearner.LearningFound.Should().BeFalse();
+            createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.StartDate.Should().BeNull();
+            createdLearner.DaysInLearnings.Should().BeEmpty();
+            createdLearner.InLearning.Should().BeNull();
+            createdLearner.RawJSON.Should().NotBeNullOrEmpty();
         }
 
         [Then(@"the apprenticeship incentive learner data is updated with days in learning counted up until the census date")]

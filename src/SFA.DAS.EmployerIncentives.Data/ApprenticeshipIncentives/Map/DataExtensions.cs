@@ -200,7 +200,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
 
             learner.SubmissionData.SetSubmissionDate(model.SubmissionDate);
-            learner.SubmissionData.LearningData.SetLearningFound(model.LearningFound.Value);
+            learner.SubmissionData.SetLearningData(new Domain.ApprenticeshipIncentives.ValueTypes.LearningData(model.LearningFound.Value));
             learner.SubmissionData.LearningData.SetStartDate(model.StartDate);
 
             if (model.HasDataLock.HasValue)

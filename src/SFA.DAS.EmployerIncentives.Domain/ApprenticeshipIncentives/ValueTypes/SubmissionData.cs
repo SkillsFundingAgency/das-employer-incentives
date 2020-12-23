@@ -13,9 +13,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
         public SubmissionData()
         {
-            LearningData = new LearningData();
+            LearningData = new LearningData(false);
         }
-
+        public void SetLearningData(LearningData learningData)
+        {
+            LearningData = learningData;
+        }
+        
         public void SetSubmissionDate(DateTime? submissionDate)
         {
             SubmissionDate = submissionDate;
@@ -29,42 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             }
         }
 
-        //public bool? IsInlearning { get; private set; }
-        //public int? DaysinLearning { get; private set; }
-
-        
-
-        //public LearningFoundStatus LearningFoundStatus { get; private set; }
-
-        //public DateTime? StartDate { get; private set; }
-        //public bool HasDataLock { get; private set; }
-
         public string RawJson { get; private set; }
-
-        //public void SetStartDate(DateTime? startDate)
-        //{
-        //    StartDate = startDate;
-        //}
-
-        //public void SetLearningData(LearningData learningData)
-        //{
-        //    LearningData = learningData;
-        //}
-
-        //public void SetLearningFound(LearningFoundStatus learningFoundStatus)
-        //{
-        //    LearningFoundStatus = learningFoundStatus;
-        //}
-
-        //public void SetHasDataLock(bool hasDataLock)
-        //{
-        //    HasDataLock = hasDataLock;
-        //}
-
-        //public void SetIsInLearning(bool? isInLearning)
-        //{
-        //    IsInlearning = isInLearning;
-        //}
 
         public void SetRawJson(string rawJson)
         {
@@ -78,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
                 return new Log
                 {
-                    // TODO : OnProcessed = () => $"Submission data : LearningFound {LearningFoundStatus?.LearningFound}, StartDate {StartDate}, IsInlearning {IsInlearning}, HasDataLock {HasDataLock} "
+                    OnProcessed = () => $"Submission data : SubmissionFound {SubmissionFound}, SubmissionDate {SubmissionDate}, {LearningData.Log.OnProcessed()} "
                 };
             }
         }
@@ -88,9 +57,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
             yield return SubmissionDate;
             yield return SubmissionFound;
-            //yield return LearningFoundStatus;
-            //yield return IsInlearning;            
-            //yield return HasDataLock;
             yield return LearningData;
         }
     }

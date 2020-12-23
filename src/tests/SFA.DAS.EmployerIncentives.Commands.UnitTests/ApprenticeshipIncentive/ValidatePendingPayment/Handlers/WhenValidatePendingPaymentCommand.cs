@@ -110,7 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var submissionData = new SubmissionData();
             submissionData.SetSubmissionDate(DateTime.UtcNow);
-            submissionData.LearningData.SetLearningFound(true);
+            submissionData.SetLearningData(new LearningData(true));
             submissionData.LearningData.SetIsInLearning(true);
 
             _daysInLearning = new DaysInLearning(1, (short)DateTime.Now.Year, 90);

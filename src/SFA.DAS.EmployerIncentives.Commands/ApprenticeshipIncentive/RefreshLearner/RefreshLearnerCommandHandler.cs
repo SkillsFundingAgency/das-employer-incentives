@@ -45,9 +45,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             {
                 submissionData.SetSubmissionDate(learnerData.IlrSubmissionDate);
 
-                //submissionData = new SubmissionData(learnerData.IlrSubmissionDate);
                 var learningFoundStatus = learnerData.LearningFound(incentive);
-                submissionData.LearningData.SetLearningFound(learningFoundStatus.LearningFound, learningFoundStatus.NotFoundReason);
+                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound, learningFoundStatus.NotFoundReason));
 
                 if (learningFoundStatus.LearningFound)
                 {
@@ -55,10 +54,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
                     submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
                 }
-                //submissionData.SetStartDate(learnerData.LearningStartDate(incentive));
-                //submissionData.SetLearningFound(learnerData.LearningFound(incentive));
-                //submissionData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
-                //submissionData.SetIsInLearning(learnerData.IsInLearning(incentive));
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 

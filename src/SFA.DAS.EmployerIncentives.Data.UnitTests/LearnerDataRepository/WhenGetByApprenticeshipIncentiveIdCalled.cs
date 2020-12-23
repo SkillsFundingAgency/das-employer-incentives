@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         public async Task Then_the_learner_is_retrieved()
         {
             var submissionData = _fixture.Create<SubmissionData>();
-            submissionData.LearningData.SetLearningFound(true);
+            submissionData.SetLearningData(new LearningData(true));
             submissionData.LearningData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
 

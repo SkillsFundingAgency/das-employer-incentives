@@ -64,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
             var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SubmissionData.LearningData.SetLearningFound(true);
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
             _learner.SubmissionData.LearningData.SetHasDataLock(hasDataLock);
 
             // act
