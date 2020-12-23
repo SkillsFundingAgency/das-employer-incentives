@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_the_plannedStartDate_is_set()
+        public void Then_the_startDate_is_set()
         {
             // Arrange
             var plannedStartDate = _fixture.Create<DateTime>();
@@ -67,8 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var incentive = new ApprenticeshipIncentiveFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), plannedStartDate);
 
             // Assert
-            incentive.PlannedStartDate.Should().Be(plannedStartDate);
-            incentive.GetModel().PlannedStartDate.Should().Be(plannedStartDate);            
+            incentive.StartDate.Should().Be(plannedStartDate);
+            incentive.GetModel().StartDate.Should().Be(plannedStartDate);            
         }
 
         [Test]
