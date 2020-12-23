@@ -59,6 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 case ValidationStep.HasDaysInLearning:
                     _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 89;
                     break;
+                case ValidationStep.PaymentsNotPaused:
+                    _validatePaymentData.ApprenticeshipIncentiveModel.PausePayments = true;
+                    break;
             }
         }
 
@@ -176,7 +179,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result
-                .Where(x => x.Step != ValidationStep.HasIlrSubmission && x.Step != ValidationStep.HasBankDetails);
+                .Where(x => x.Step != ValidationStep.HasIlrSubmission && x.Step != ValidationStep.HasBankDetails && x.Step != ValidationStep.PaymentsNotPaused);
             results.Any().Should().BeFalse();
         }
     }
