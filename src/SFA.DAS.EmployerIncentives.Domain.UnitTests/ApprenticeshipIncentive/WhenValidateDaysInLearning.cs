@@ -30,14 +30,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionYear = _fixture.Create<short>();
             _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, DateTime.Now.Year.ToString(), true);
+            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true);
 
             var startDate = DateTime.Now.Date;
             var dueDate = startDate.AddDays(90).Date;
 
             _sutModel = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
-                .With(a => a.PlannedStartDate, startDate)
+                .With(a => a.StartDate, startDate)
                 .With(a => a.PendingPaymentModels, new List<PendingPaymentModel>() 
                     {
                         _fixture.Build<PendingPaymentModel>()
@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _learnerModel = _fixture
                 .Build<LearnerModel>()
-                .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarYear, 90) })
+                .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear, 90) })
                 .Create();
 
             _learner = Learner.Get(_learnerModel);                
@@ -84,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             _learnerModel.DaysInLearnings = new List<DaysInLearning>() {
-                new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarYear, daysInLearning)
+                new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear, daysInLearning)
             };
 
             _learner = Learner.Get(_learnerModel);

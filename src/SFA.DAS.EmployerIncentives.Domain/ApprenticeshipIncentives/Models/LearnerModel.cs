@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public SubmissionData SubmissionData { get; set; }
         public ICollection<LearningPeriod> LearningPeriods { get; set; }
         public ICollection<DaysInLearning> DaysInLearnings { get; set; }
+        public DateTime? CreatedDate { get; set; }
 
         public LearnerModel()
         {

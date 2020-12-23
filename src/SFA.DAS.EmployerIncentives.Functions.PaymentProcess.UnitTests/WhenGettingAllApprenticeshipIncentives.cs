@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             var list = await _sut.Get(null);
 
-            list.Should().BeEquivalentTo(_apprenticeshipIncentives.Select(x=>x.Id));
+            list.Should().BeEquivalentTo(_apprenticeshipIncentives.Select(x=> new ApprenticeshipIncentiveOutput { Id = x.Id, ULN = x.ULN }));
         }
     }
 }

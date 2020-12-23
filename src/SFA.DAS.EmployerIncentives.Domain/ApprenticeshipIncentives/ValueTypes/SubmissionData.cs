@@ -54,10 +54,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
         protected override IEnumerable<object> GetAtomicValues()
         {
-
             yield return SubmissionDate;
             yield return SubmissionFound;
             yield return LearningData;
+        }
+
+        public bool HasChangeOfCircumstances(SubmissionData submissionData)
+        {
+            if (submissionData == null)
+            {
+                return false;
+            }
+
+            return LearningData.HasDataLock == submissionData.LearningData.HasDataLock &&
+                   LearningData.StartDate == submissionData.LearningData.StartDate &&
+                   LearningData.IsInlearning == submissionData.LearningData.IsInlearning &&
+                   LearningData.LearningFound == submissionData.LearningData.LearningFound;
         }
     }
 }
