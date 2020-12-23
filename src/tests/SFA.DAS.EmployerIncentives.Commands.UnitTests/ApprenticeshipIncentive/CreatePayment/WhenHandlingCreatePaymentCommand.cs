@@ -23,31 +23,31 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private CreatePaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Fixture _fixture;
-        private List<CollectionPeriod> _collectionPeriods;
-        private CollectionPeriod _firstCollectionPeriod;
+        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private Domain.ValueObjects.CollectionPeriod _firstCollectionPeriod;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
 
-            _collectionPeriods = new List<CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(
+                new Domain.ValueObjects.CollectionPeriod(
                     1,
                     (byte)DateTime.Now.Month,
                     (short)DateTime.Now.Year,
                     DateTime.Now.AddDays(-1),
                     DateTime.Now.AddDays(-1),
-                    DateTime.Now.Year.ToString(),
+                    (short)DateTime.Now.Year,
                     false),
-                new CollectionPeriod(
+                new Domain.ValueObjects.CollectionPeriod(
                 1,
                 (byte)DateTime.Now.AddMonths(1).Month,
                 (short)DateTime.Now.AddMonths(1).Year,
                 DateTime.Now.AddMonths(1).AddDays(-1),
                 DateTime.Now.AddMonths(1).AddDays(-1),
-                DateTime.Now.AddMonths(1).Year.ToString(),
+                (short)DateTime.Now.AddMonths(1).Year,
                 false)
             };
             _firstCollectionPeriod = _collectionPeriods.First();
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id,
-                _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
+                _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
@@ -83,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
+            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
@@ -129,19 +129,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     })
             };
 
-            var collectionPeriods = new List<CollectionPeriod>()
+            var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(
+                new Domain.ValueObjects.CollectionPeriod(
                     1, 
                     (byte)DateTime.Now.Month, 
                     (short)DateTime.Now.Year, 
                     DateTime.Now.AddDays(-1),
                     DateTime.Now,
-                    DateTime.Now.Year.ToString(),
+                    (short)DateTime.Now.Year,
                     true)
             };
 
-            incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(collectionPeriods));
+            incentive.CalculateEarnings(paymentProfiles, new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
 
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();

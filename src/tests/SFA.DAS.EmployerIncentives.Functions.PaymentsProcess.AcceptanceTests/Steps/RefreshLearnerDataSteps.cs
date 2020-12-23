@@ -247,7 +247,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdPeriod.StartDate.Should().Be(DateTime.Parse("2020-08-10T00:00:00"));
             createdPeriod.EndDate.Should().Be(DateTime.Parse("2021-07-31T00:00:00"));
 
-            createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
+            createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be((int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1);
             
@@ -282,7 +282,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdPeriod.StartDate.Should().Be(DateTime.Parse("2020-08-10T00:00:00"));
             createdPeriod.EndDate.Should().Be(DateTime.Parse("2021-07-31T00:00:00"));
 
-            createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
+            createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be((int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1);
 
@@ -339,7 +339,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var secondEpisodeDaysInLearning = (int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
             var expectedDaysInLearning = firstEpisodeDaysInLearning + secondEpisodeDaysInLearning;
 
-            createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
+            createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be(expectedDaysInLearning);
         }
@@ -353,7 +353,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             var expectedDaysInLearning = (int)(DateTime.Parse("2020-08-20T00:00:00") - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
 
-            createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
+            createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be(expectedDaysInLearning);            
         }
@@ -384,7 +384,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdPeriod.StartDate.Should().Be(DateTime.Parse("2020-08-10T00:00:00"));
             createdPeriod.EndDate.Should().Be(DateTime.Parse("2021-07-31T00:00:00"));
 
-            createdDaysInLearning.CollectionPeriodYear.Should().Be(_testContext.ActivePeriod.CalendarYear);
+            createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be((int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1);
 
