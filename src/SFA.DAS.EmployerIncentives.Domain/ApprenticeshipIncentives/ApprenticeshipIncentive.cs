@@ -120,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 throw new InvalidOperationException();
             }
-
+                       
             if (learner.SubmissionData.SubmissionFound && learner.SubmissionData.LearningData.StartDate.HasValue)
             {
                 SetStartDate(learner.SubmissionData.LearningData.StartDate.Value);

@@ -44,6 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             if (learnerData != null)
             {
+                if (LearnerAndEarningsHaveNotChanged(learnerData, learner, incentive))
+                {
+                    return;
+                }
+
                 submissionData.SetSubmissionDate(learnerData.IlrSubmissionDate);
 
                 var learningFoundStatus = learnerData.LearningFound(incentive);
