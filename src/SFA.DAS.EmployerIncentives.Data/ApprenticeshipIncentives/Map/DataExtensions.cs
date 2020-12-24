@@ -22,10 +22,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ULN = model.Apprenticeship.UniqueLearnerNumber,
                 UKPRN = model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
-                PlannedStartDate = model.PlannedStartDate,
+                StartDate = model.StartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
-                Payments = model.PaymentModels.Map(),
+                Payments = model.PaymentModels.Map(),                
+                RefreshedLearnerForEarnings = model.RefreshedLearnerForEarnings,
+                HasPossibleChangeOfCircumstances = model.HasPossibleChangeOfCircumstances,
                 AccountLegalEntityId = model.Account.AccountLegalEntityId,
                 PausePayments = model.PausePayments
             };
@@ -52,10 +54,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = entity.Id,
                 Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
                 Apprenticeship = apprenticeship,
-                PlannedStartDate = entity.PlannedStartDate,
+                StartDate = entity.StartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
                 PaymentModels = entity.Payments.Map(),
+                RefreshedLearnerForEarnings = entity.RefreshedLearnerForEarnings,
+                HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,                
                 PausePayments = entity.PausePayments
             };
         }
@@ -212,6 +216,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
+                CreatedDate = model.CreatedDate,
                 LearningPeriods = model.LearningPeriods.Map(),
                 DaysInLearnings = model.DaysInLearnings.Map()
             };
@@ -231,6 +236,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 learner.SubmissionData.SetIsInLearning(model.InLearning);
                 learner.SubmissionData.SetStartDate(model.StartDate);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
+                learner.SubmissionData.SetStartDate(model.StartDate);
             }
 
             return learner;

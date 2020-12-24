@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), plannedStartDate);
 
             // Assert
-            incentive.PlannedStartDate.Should().Be(plannedStartDate);
+            incentive.StartDate.Should().Be(plannedStartDate);
         }
     }
 }

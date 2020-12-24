@@ -72,31 +72,32 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_paymentProfiles);
 
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();            
             _apprenticehip = _sutModel.Apprenticeship;
-            _sutModel.PlannedStartDate = _plannedStartDate;
+            _sutModel.StartDate = _plannedStartDate;
+            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sut = Sut(_sutModel);
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_when_the_incentive_does_not_pass_the_eligibility_check()
+        public async Task Then_earnings_are_not_calculated_when_the_incentive_does_not_pass_the_eligibility_check()
         {
             // arrange            
             var apprentiveshipDob = DateTime.Now.AddYears(-24);
-            _sutModel.PlannedStartDate = Incentive.EligibilityStartDate.AddDays(-1);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);            
-
+            _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);
+            
             _sut = Sut(_sutModel);
 
             // act
-            Func<Task> result = async () => await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
-            result.Should().Throw<InvalidIncentiveException>().WithMessage("Incentive does not pass the eligibility checks");            
+            _sut.PendingPayments.Should().BeEmpty();
         }
 
         [Test]
-        public async Task Then_the_earnings_are_calculated_and_the_pending_payments_created()
+        public async Task Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_planned_start_date_when_no_actual_start_date()
         {
             // arrange                        
 
@@ -131,7 +132,40 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public async Task Then_the_earnings_are_calculated_and_any_existing_pending_payments_are_replaced()
+        public async Task Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_actual_start_date_when_there_is_an_actual_start_date()
+        {
+            // arrange           
+            _sutModel.StartDate = DateTime.Now.Date.AddDays(6);
+
+            // act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            _sut.PendingPayments.Count.Should().Be(2);
+
+            var firstPayment = _sut.PendingPayments.First();
+            var secondPayment = _sut.PendingPayments.Last();
+
+            var endOfPlannedStartMonth = new DateTime(_plannedStartDate.Year, _plannedStartDate.Month, DateTime.DaysInMonth(_plannedStartDate.Year, _plannedStartDate.Month));
+
+            firstPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
+            secondPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
+
+            firstPayment.PeriodNumber.Should().Be(2);
+            firstPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 2).AcademicYear);
+            firstPayment.Amount.Should().Be(100);
+            secondPayment.PeriodNumber.Should().Be(1);
+            secondPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 1).AcademicYear);
+            secondPayment.Amount.Should().Be(300);
+
+            firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
+            firstPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
+            secondPayment.Account.Id.Should().Be(_sutModel.Account.Id);
+            secondPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
+        }
+
+        [Test]
+        public async Task Then_the_earnings_are_not_recalculated_if_earnings_already_exist()
         {
             // Arrange
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(_fixture.CreateMany<PendingPaymentModel>(3));
@@ -144,8 +178,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // Assert
-            _sut.PendingPayments.Count.Should().Be(2);
-            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeFalse());
+            _sut.PendingPayments.Count.Should().Be(3);
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeTrue());
         }
 
         [Test]
@@ -166,10 +200,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             expectedEvent.ApplicationApprenticeshipId.Should().Be(_sutModel.ApplicationApprenticeshipId);
         }
 
+        [Test]
+        public async Task Then_RefreshedLearnerForEarnings_is_set_to_false_when_earnings_are_calculated()
+        {
+            // arrange
+            _sutModel.RefreshedLearnerForEarnings = true;
+
+            // act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            _sut.RefreshedLearnerForEarnings.Should().BeFalse();
+        }
+
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);
-        }      
+        }
 
         [Test]
         public void Then_there_are_no_pending_payments()

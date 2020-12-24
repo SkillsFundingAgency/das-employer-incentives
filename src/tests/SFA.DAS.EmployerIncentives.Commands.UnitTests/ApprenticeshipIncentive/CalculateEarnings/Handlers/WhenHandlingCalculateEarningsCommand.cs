@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
+            var command = new CalculateEarningsCommand(incentive.Id);
 
             _mockIncentiveDomainRespository.Setup(x => x
             .Find(command.ApprenticeshipIncentiveId))
@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
+            var command = new CalculateEarningsCommand(incentive.Id);
 
             _mockIncentiveDomainRespository.Setup(x => x
             .Find(command.ApprenticeshipIncentiveId))
@@ -131,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
+            var command = new CalculateEarningsCommand(incentive.Id);
 
             _mockIncentiveDomainRespository.Setup(x => x
             .Find(command.ApprenticeshipIncentiveId))

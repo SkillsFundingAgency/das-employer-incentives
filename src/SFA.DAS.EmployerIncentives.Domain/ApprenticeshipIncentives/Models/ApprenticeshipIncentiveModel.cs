@@ -10,8 +10,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public Guid Id { get; set; }
         public Account Account { get; set; }        
         public Apprenticeship Apprenticeship { get; set; }
-        public DateTime PlannedStartDate { get; set; }
+        public DateTime StartDate { get; set; }
         public Guid ApplicationApprenticeshipId { get; set; }
+        public bool RefreshedLearnerForEarnings { get; set; }
+        public bool HasPossibleChangeOfCircumstances { get; set; }
         public ICollection<PendingPaymentModel> PendingPaymentModels { get; set; }
         public ICollection<PaymentModel> PaymentModels { get; set; }
         public bool PausePayments { get; set; }

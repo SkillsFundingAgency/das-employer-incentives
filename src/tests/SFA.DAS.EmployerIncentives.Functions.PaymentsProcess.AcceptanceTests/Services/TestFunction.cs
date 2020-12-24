@@ -45,7 +45,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
-            _testContext = testContext;            
+            _testContext = testContext;
+
+            var paymentProfiles = new List<IncentivePaymentProfile>
+            {
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile{ AmountPayable = 100, DaysAfterApprenticeshipStart = 10},
+                        new PaymentProfile{ AmountPayable = 200, DaysAfterApprenticeshipStart = 20},
+                    }
+                },
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile{ AmountPayable = 300, DaysAfterApprenticeshipStart = 30},
+                        new PaymentProfile{ AmountPayable = 400, DaysAfterApprenticeshipStart = 40},
+                    }
+                }
+            };
 
             _host = new HostBuilder()
                 .ConfigureAppConfiguration(a =>
@@ -97,6 +119,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.DistributedLockStorage = "UseDevelopmentStorage=true";
                                a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                                a.UseLearningEndpointStorageDirectory = Path.Combine(testContext.TestDirectory.FullName, ".learningtransport");
+                               a.IncentivePaymentProfiles = paymentProfiles;
                            });
 
                            s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
