@@ -53,6 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeshipIncentive = _fixture
                 .Build<ApprenticeshipIncentive>()
                 .With(i => i.IncentiveApplicationApprenticeshipId, _apprenticeship.Id)
+                .With(i => i.AccountLegalEntityId, _application.AccountLegalEntityId)
+                .With(i => i.ULN, _apprenticeship.ULN)
                 .Create();
 
             _pendingPayment = _fixture
