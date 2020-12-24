@@ -53,7 +53,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRespository.Object, _mockLearnerDomainRespository.Object);
 
             _incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
-            _learner = new LearnerFactory().GetExisting(_fixture.Build<LearnerModel>().With(x => x.SubmissionData, _fixture.Create<SubmissionData>()).Create());
+            _learner = new LearnerFactory().GetExisting(
+                _fixture.Build<LearnerModel>()
+                .With(x => x.SubmissionData, _fixture.Create<SubmissionData>())
+                .With(x=> x.ApprenticeshipIncentiveId, _incentive.Id)
+                .Create());
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(incentive.Id)).ReturnsAsync(_incentive);
             _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(incentive)).ReturnsAsync(_learner);

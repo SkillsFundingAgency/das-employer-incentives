@@ -114,7 +114,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Model.PendingPaymentModels.Clear();
             }
         }
+        public void SetChangeOfCircumstances(Learner learner)
+        {
+            if(Id != learner.ApprenticeshipIncentiveId)
+            {
+                throw new InvalidOperationException();
+            }
 
+            if (learner.SubmissionData.SubmissionFound && learner.SubmissionData.LearningData.StartDate.HasValue)
+            {
+                SetStartDate(learner.SubmissionData.LearningData.StartDate.Value);
+            }
+            SetHasPossibleChangeOfCircumstances(false);
+        }
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
         {
             Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
