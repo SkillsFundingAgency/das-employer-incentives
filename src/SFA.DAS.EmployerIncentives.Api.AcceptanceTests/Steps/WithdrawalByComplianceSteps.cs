@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -29,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
+        private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
 
         public WithdrawalByComplianceSteps(TestContext testContext) : base(testContext)
         {
@@ -61,6 +63,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Build<PendingPayment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .Create();
+
+            _pendingPaymentValidationResult = _fixture
+                .Build<PendingPaymentValidationResult>()
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.Step, "Invalid")
+                .With(p => p.PeriodNumber, 1)
+                .With(p => p.PaymentYear, 2021)
+                .Create();
         }
 
         [Given(@"an incentive application has been made without being submitted")]
@@ -87,9 +97,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
-            await dbConnection.InsertAsync(_pendingPayment);
-        }       
-
+            await dbConnection.InsertAsync(_pendingPayment);            
+            await dbConnection.InsertAsync(_pendingPaymentValidationResult);
+        }
 
         [When(@"the apprenticeship application is withdrawn from the scheme")]
         public async Task WhenTheApprenticeshipApplicationIsWithdrawnFromTheScheme()
@@ -164,9 +174,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
+            var pendingPaymentValidationResults = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
             var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
 
             incentives.Should().HaveCount(0);
+            pendingPaymentValidationResults.Should().HaveCount(0);
             pendingPayments.Should().HaveCount(0);
         }        
     }
