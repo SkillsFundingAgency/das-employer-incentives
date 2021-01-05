@@ -37,9 +37,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the active collection period is changed")]
         public async Task ThenTheActiveCollectionPeriodIsChanged()
         {
-            var newCollectionPeriodActive = await GetCollectionPeriodActive((short)2021, 2);
+            var newCollectionPeriodActive = await GetCollectionPeriodActive(2021, 2);
             newCollectionPeriodActive.Should().BeTrue();
-            var oldCollectionPeriodActive = await GetCollectionPeriodActive((short)2021, 1);
+            var oldCollectionPeriodActive = await GetCollectionPeriodActive(2021, 1);
             oldCollectionPeriodActive.Should().BeFalse();
         }
 
