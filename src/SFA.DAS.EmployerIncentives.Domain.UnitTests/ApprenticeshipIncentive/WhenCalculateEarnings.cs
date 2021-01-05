@@ -53,9 +53,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
-                new CollectionPeriod(1, (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _collectionPeriod.AddMonths(1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
-                new CollectionPeriod(2, (byte)_collectionPeriod.AddMonths(2).Month, (short)_collectionPeriod.AddMonths(2).Year, _collectionPeriod.AddMonths(2).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
-                new CollectionPeriod(3, (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _collectionPeriod.AddMonths(-1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
+                new CollectionPeriod(1, (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _collectionPeriod.AddMonths(-1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
+                new CollectionPeriod(2, (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _collectionPeriod.AddMonths(1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
+                new CollectionPeriod(3, (byte)_collectionPeriod.AddMonths(2).Month, (short)_collectionPeriod.AddMonths(2).Year, _collectionPeriod.AddMonths(2).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
             };
 
             _collectionCalendar = new CollectionCalendar(_collectionPeriods);
