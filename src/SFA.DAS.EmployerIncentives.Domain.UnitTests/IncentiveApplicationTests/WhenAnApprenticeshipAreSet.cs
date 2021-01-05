@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System;
+using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
@@ -47,6 +48,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 
             // Assert
             _sut.Apprenticeships.Should().BeEquivalentTo(newApprenticeships);
+        }
+
+        [Test]
+        public void Then_the_apprenticeship_start_dates_are_set_to_the_end_of_the_month()
+        {
+            // Arrange
+            var apprenticeships = _fixture.CreateMany<Apprenticeship>(1).ToList();
+            var originalStartDate = apprenticeships.First().PlannedStartDate;
+
+            // Act
+            _sut.SetApprenticeships(apprenticeships);
+
+            // Assert
+            var endOfStartMonth = new DateTime(originalStartDate.Year, originalStartDate.Month, DateTime.DaysInMonth(originalStartDate.Year, originalStartDate.Month));
+            _sut.Apprenticeships.First().PlannedStartDate.Should().Be(endOfStartMonth);
         }
     }
 }
