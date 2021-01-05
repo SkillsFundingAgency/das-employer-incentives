@@ -1,6 +1,7 @@
 ﻿@database
 @api
-@accountApi
+@domainMessageHandlers
+@messageBus
 
 Feature: UpdateVrfCaseStatusForLegalEntity
 	When Vendor Regisgtration Form Status for Legal Entity is changed
