@@ -37,9 +37,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the active collection period is changed")]
         public async Task ThenTheActiveCollectionPeriodIsChanged()
         {
-            var newCollectionPeriodActive = await GetCollectionPeriodActive((short)DateTime.Now.Year, 2);
+            var newCollectionPeriodActive = await GetCollectionPeriodActive(2021, 2);
             newCollectionPeriodActive.Should().BeTrue();
-            var oldCollectionPeriodActive = await GetCollectionPeriodActive((short)DateTime.Now.Year, 1);
+            var oldCollectionPeriodActive = await GetCollectionPeriodActive(2021, 1);
             oldCollectionPeriodActive.Should().BeFalse();
         }
 
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 await dbConnection.ExecuteAsync($"update incentives.CollectionCalendar set Active = 0");
 
-                await dbConnection.ExecuteAsync($"update incentives.CollectionCalendar set Active = 1 where PeriodNumber = @period and CalendarYear = @year", new { year, period });
+                await dbConnection.ExecuteAsync($"update incentives.CollectionCalendar set Active = 1 where PeriodNumber = @period and AcademicYear = @year", new { year, period });
             }
         }
 
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                var sql = "select Active from incentives.CollectionCalendar where PeriodNumber = @period and CalendarYear = @year";
+                var sql = "select Active from incentives.CollectionCalendar where PeriodNumber = @period and AcademicYear = @year";
 
                 var active = await dbConnection.QueryAsync<bool>(sql, new { year, period });
 
