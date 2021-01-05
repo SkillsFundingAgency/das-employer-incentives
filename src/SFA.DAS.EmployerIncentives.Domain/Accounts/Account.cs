@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
@@ -56,12 +56,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 
         public void UpdateVendorRegistrationCaseStatus(string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
         {
+            if (HasLegalEntitiesWithIncompleteVrf(hashedLegalEntityId))
+            {
+                AddEvent(new VendorRegistrationCaseStatusUpdatedForLegalEntity(hashedLegalEntityId, caseId, status, lastUpdatedDate));
+            }
+        }
+
+        private bool HasLegalEntitiesWithIncompleteVrf(string hashedLegalEntityId)
+        {
+            return LegalEntities.Any(x => x.HashedLegalEntityId == hashedLegalEntityId &&
+                                          LegalEntity.VrfStatusIsCompleted(x.VrfCaseStatus));
+        }
+
+        public void SetVendorRegistrationCaseDetails(string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
+        {
             foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
             {
                 legalEntity.UpdateVendorRegistrationCaseStatus(caseId, status, lastUpdatedDate);
             }
 
-            if (status.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
+            if (LegalEntity.VrfStatusIsCompleted(status))
             {
                 AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
             }
