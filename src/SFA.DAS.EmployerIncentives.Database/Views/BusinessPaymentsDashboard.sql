@@ -24,7 +24,7 @@ SELECT
 FROM
   [incentives].[PendingPayment] pp
   left join [incentives].[Payment] p on p.PendingPaymentId = pp.Id
-  left join [dbo].accounts a on a.id=p.AccountId
+  left join [dbo].accounts a on a.AccountLegalEntityId=p.AccountLegalEntityId
   left join [incentives].PendingPaymentValidationResult pv1  on pv1.PendingPaymentId = p.PendingPaymentId
 GROUP BY 
   p.PaymentPeriod,p.PaymentYear
