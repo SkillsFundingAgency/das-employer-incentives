@@ -34,8 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             _fixture = new Fixture();
 
-            _plannedStartDate = DateTime.Now.AddDays(5);
-            _collectionPeriod = DateTime.Now;
+            _collectionPeriod = new DateTime(2021, 1, 1);
+            _plannedStartDate = _collectionPeriod.AddDays(5);
 
             _firstPaymentDaysAfterApprenticeshipStart = 10;
             _secondPaymentDaysAfterApprenticeshipStart = 50;
@@ -123,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_actual_start_date_when_there_is_an_actual_start_date()
         {
             // arrange           
-            _sutModel.StartDate = DateTime.Now.Date.AddDays(6);
+            _sutModel.StartDate = _collectionPeriod.Date.AddDays(6);
 
             // act
             _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
