@@ -5,7 +5,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Commands
 {
     public interface ICommandPublisher
     {
-        Task Publish<T>(T command, CancellationToken cancellationToken = default(CancellationToken)) where T : ICommand;
+        Task Publish<T>(T command, CancellationToken cancellationToken = default(CancellationToken)) where T : class, ICommand;
         Task Publish(object command, CancellationToken cancellationToken = default(CancellationToken));
     }
 }
