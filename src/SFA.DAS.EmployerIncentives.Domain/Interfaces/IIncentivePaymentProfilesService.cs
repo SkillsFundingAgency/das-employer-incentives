@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Services
+namespace SFA.DAS.EmployerIncentives.Domain.Interfaces
 {
     public interface IIncentivePaymentProfilesService
     {

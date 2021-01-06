@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
+        public async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
+        {
+            var apprenticeships = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(uln, accountLegalEntityId);
+
+            switch (apprenticeships.Count)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return _apprenticeshipIncentiveFactory.GetExisting(apprenticeships[0].Id, apprenticeships[0]); 
+                default:
+                    throw new InvalidIncentiveException($"Found duplicate ULNs {uln} within account legal entity {accountLegalEntityId}");
+            }
+        }
+
         public async Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindIncentivesWithoutPendingPayments()
         {
             var incentives = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentivesWithoutPendingPayments();
@@ -58,6 +74,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             if (aggregate.IsNew)
             {
                 await _apprenticeshipIncentiveDataRepository.Add(aggregate.GetModel());
+            }
+            else if(aggregate.IsDeleted)
+            {
+                await _apprenticeshipIncentiveDataRepository.Delete(aggregate.GetModel());
             }
             else
             {

@@ -1,16 +1,20 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -18,6 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Mock<IIncentivePaymentProfilesService> _mockPaymentProfilesService;
         private Fixture _fixture;
 
         private List<IncentivePaymentProfile> _paymentProfiles;
@@ -60,37 +66,43 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionCalendar = new CollectionCalendar(_collectionPeriods);
 
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
-            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
+            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(_collectionCalendar);
+
+            _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
+            _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_paymentProfiles);
+
+            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();            
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.StartDate = _plannedStartDate;
+            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sut = Sut(_sutModel);
         }
 
         [Test]
-        public void Then_earnings_are_not_calculated_when_the_incentive_does_not_pass_the_eligibility_check()
+        public async Task Then_earnings_are_not_calculated_when_the_incentive_does_not_pass_the_eligibility_check()
         {
             // arrange            
             var apprentiveshipDob = DateTime.Now.AddYears(-24);
             _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);            
-
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);
+            
             _sut = Sut(_sutModel);
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
             _sut.PendingPayments.Should().BeEmpty();
         }
 
         [Test]
-        public void Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_planned_start_date_when_no_actual_start_date()
+        public async Task Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_planned_start_date_when_no_actual_start_date()
         {
             // arrange                        
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
             _sut.PendingPayments.Count.Should().Be(2);
@@ -118,13 +130,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_actual_start_date_when_there_is_an_actual_start_date()
+        public async Task Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_actual_start_date_when_there_is_an_actual_start_date()
         {
             // arrange           
             _sutModel.StartDate = _collectionPeriod.Date.AddDays(6);
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
             _sut.PendingPayments.Count.Should().Be(2);
@@ -149,7 +161,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_the_earnings_are_not_recalculated_if_earnings_already_exist()
+        public async Task Then_the_earnings_are_not_recalculated_if_earnings_already_exist()
         {
             // Arrange
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(_fixture.CreateMany<PendingPaymentModel>(3));
@@ -159,7 +171,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.PendingPayments.ToList().ForEach(p => hashCodes.Add(p.GetHashCode()));
 
             // Act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // Assert
             _sut.PendingPayments.Count.Should().Be(3);
@@ -167,10 +179,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_an_EarningsCalculated_event_is_raised_after_the_earnings_are_calculated()
+        public async Task Then_an_EarningsCalculated_event_is_raised_after_the_earnings_are_calculated()
         {
             // arrange                        
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // act
             var events = _sut.FlushEvents();
@@ -185,13 +197,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_RefreshedLearnerForEarnings_is_set_to_false_when_earnings_are_calculated()
+        public async Task Then_RefreshedLearnerForEarnings_is_set_to_false_when_earnings_are_calculated()
         {
             // arrange
             _sutModel.RefreshedLearnerForEarnings = true;
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
             _sut.RefreshedLearnerForEarnings.Should().BeFalse();
@@ -200,7 +212,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);
-        }      
+        }
 
         [Test]
         public void Then_there_are_no_pending_payments()

@@ -48,6 +48,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>IncentiveDetailsRequested.feature</DependentUpon>
     </Compile>
+    <Compile Update="Features\PausePayments.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Features\ResumePausedPayments.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
     </Compile>
@@ -84,6 +90,14 @@
     <SpecFlowFeatureFiles Update="Features\IncentiveDetailsRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\PausePayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ResumePausedPayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsReminderEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
