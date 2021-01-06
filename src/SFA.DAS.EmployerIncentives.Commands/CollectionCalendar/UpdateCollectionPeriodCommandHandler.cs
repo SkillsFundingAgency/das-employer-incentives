@@ -1,8 +1,8 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.CollectionPeriod;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CollectionCalendar
 {

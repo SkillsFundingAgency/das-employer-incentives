@@ -10,3 +10,13 @@ Scenario: Earnings Resilience Check is run
 	When the earnings resilience check is requested
 	Then the earnings recalculation is triggered
 
+Scenario: Earnings Resilience Check is run for applications with apprenticeships withdrawn by employer
+	Given apprenticeships have been withdrawn by employer
+	When the earnings resilience check is requested
+	Then the earnings recalculation is not triggered
+
+Scenario: Earnings Resilience Check is run for applications with apprenticeships withdrawn by compliance
+	Given apprenticeships have been withdrawn by compliance
+	When the earnings resilience check is requested
+	Then the earnings recalculation is not triggered
+
