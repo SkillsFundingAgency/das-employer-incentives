@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.AccountId, IncentiveApplicationModel.AccountId)
                     .With(p => p.AccountLegalEntityId, IncentiveApplicationModel.AccountLegalEntityId)
                     .With(p => p.ApprenticeshipId, IncentiveApplicationApprenticeshipModels.First().ApprenticeshipId)
-                    .With(p => p.PlannedStartDate, startDate)                    
+                    .With(p => p.StartDate, startDate)                    
                     .With(p => p.DateOfBirth, startDate.AddYears(-20))
                     .Create();
 

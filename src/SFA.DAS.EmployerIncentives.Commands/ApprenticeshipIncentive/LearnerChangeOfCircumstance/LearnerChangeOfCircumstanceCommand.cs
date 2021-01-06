@@ -1,18 +1,17 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance
 {
-    public class CalculateEarningsCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class LearnerChangeOfCircumstanceCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
-        public Guid ApprenticeshipIncentiveId { get; private set; }
+        public Guid ApprenticeshipIncentiveId { get; }
 
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive)}_{ApprenticeshipIncentiveId}"; }
 
-        public CalculateEarningsCommand(
-            Guid apprenticeshipIncentiveId)
+        public LearnerChangeOfCircumstanceCommand(Guid apprenticeshipIncentiveId)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
         }
@@ -22,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         {
             get
             {
-                var message = $"ApprenticeshipIncentive CalculateEarningsCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}";
+                var message = $"ApprenticeshipIncentive LearnerChangeOfCircumstanceCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}";
                 return new Log
                 {
                     OnProcessing = () => message,
