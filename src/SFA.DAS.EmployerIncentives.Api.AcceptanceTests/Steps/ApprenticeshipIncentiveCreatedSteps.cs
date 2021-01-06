@@ -50,6 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
                 .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
                 .With(p => p.EarningsCalculated, false)
+                .With(p => p.WithdrawnByCompliance, false)
+                .With(p => p.WithdrawnByEmployer, false)
                 .CreateMany(NumberOfApprenticeships).ToList();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
