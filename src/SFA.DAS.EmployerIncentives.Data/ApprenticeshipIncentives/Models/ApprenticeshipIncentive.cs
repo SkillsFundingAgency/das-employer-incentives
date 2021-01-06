@@ -24,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public long? AccountLegalEntityId { get; set; }
         public bool RefreshedLearnerForEarnings { get; set; }
         public bool HasPossibleChangeOfCircumstances { get; set; }
+        public bool PausePayments { get; set; }
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPayment> PendingPayments { get; set; }

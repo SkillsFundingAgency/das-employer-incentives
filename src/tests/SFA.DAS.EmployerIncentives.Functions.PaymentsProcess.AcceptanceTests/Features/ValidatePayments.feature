@@ -29,10 +29,11 @@ Scenario: When at least one validation check fails
 	And pending payments are not marked as paid
 
 Examples:
-	| ValidationStep      |
-	| HasBankDetails      |
-	| IsInLearning        |
-	| HasLearningRecord   |
-	| HasNoDataLocks      |
+	| ValidationStep    |
+	| HasBankDetails    |
+	| IsInLearning      |
+	| HasLearningRecord |
+	| HasNoDataLocks    |
 	| HasIlrSubmission  |
 	| HasDaysInLearning |
+	| PaymentsNotPaused |

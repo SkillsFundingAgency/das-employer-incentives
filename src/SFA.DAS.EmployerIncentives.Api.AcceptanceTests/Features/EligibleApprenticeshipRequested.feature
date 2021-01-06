@@ -21,3 +21,17 @@ Scenario: Apprenticeship eligibility is requested for a ULN on a draft applicati
 	And the ULN has been used on a draft Incentive Application
 	When I request the eligibility of an apprenticeship
 	Then the status of the apprenticeship is returned as eligible
+
+Scenario: Apprenticeship eligibility is requested for a ULN withdrawn by Employer
+	Given I am applying for the New Apprenticeship Incentive
+	And the ULN has been used on a previously submitted Incentive
+	And the ULN has been withdrawn by Employer
+	When I request the eligibility of an apprenticeship
+	Then the status of the apprenticeship is returned as eligible
+
+Scenario: Apprenticeship eligibility is requested for a ULN withdrawn by Compliance
+	Given I am applying for the New Apprenticeship Incentive
+	And the ULN has been used on a previously submitted Incentive
+	And the ULN has been withdrawn by Compliance
+	When I request the eligibility of an apprenticeship
+	Then the status of the apprenticeship is returned as not eligible
