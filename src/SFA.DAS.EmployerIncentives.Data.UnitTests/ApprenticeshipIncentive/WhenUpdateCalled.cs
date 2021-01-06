@@ -30,8 +30,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .Build<ApprenticeshipIncentiveModel>()
                 .Create();
 
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContext);
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
             await _sut.Add(_testIncentive);
+            await _dbContext.SaveChangesAsync();
         }
 
         [TearDown]
@@ -76,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                      x.FirstName == storedIncentive.Apprenticeship.FirstName &&
                      x.LastName == storedIncentive.Apprenticeship.LastName &&
                      x.DateOfBirth == storedIncentive.Apprenticeship.DateOfBirth &&
-                     x.Uln == storedIncentive.Apprenticeship.UniqueLearnerNumber &&
+                     x.ULN == storedIncentive.Apprenticeship.UniqueLearnerNumber &&
                      x.EmployerType == storedIncentive.Apprenticeship.EmployerType
                 )
                 .Should().Be(1);
@@ -100,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 result.PeriodNumber.Should()
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
                 result.PaymentYear.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.CalendarYear);
+                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
                 result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             }
         }

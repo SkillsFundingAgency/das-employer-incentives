@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -81,9 +80,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
+            var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
+            apprenticeship.SetPlannedStartDate(endOfStartMonth);
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
-
     }
 }

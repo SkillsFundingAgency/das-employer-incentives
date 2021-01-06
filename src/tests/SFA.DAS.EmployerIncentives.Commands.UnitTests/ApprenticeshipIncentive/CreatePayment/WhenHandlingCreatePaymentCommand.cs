@@ -1,4 +1,8 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -10,10 +14,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using LegalEntity = SFA.DAS.EmployerIncentives.Domain.Accounts.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CreatePayment
@@ -23,11 +23,34 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private CreatePaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Fixture _fixture;
+        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private Domain.ValueObjects.CollectionPeriod _firstCollectionPeriod;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            {
+                new Domain.ValueObjects.CollectionPeriod(
+                    1,
+                    (byte)DateTime.Now.Month,
+                    (short)DateTime.Now.Year,
+                    DateTime.Now.AddDays(-1),
+                    DateTime.Now.AddDays(-1),
+                    (short)DateTime.Now.Year,
+                    false),
+                new Domain.ValueObjects.CollectionPeriod(
+                1,
+                (byte)DateTime.Now.AddMonths(1).Month,
+                (short)DateTime.Now.AddMonths(1).Year,
+                DateTime.Now.AddMonths(1).AddDays(-1),
+                DateTime.Now.AddMonths(1).AddDays(-1),
+                (short)DateTime.Now.AddMonths(1).Year,
+                false)
+            };
+            _firstCollectionPeriod = _collectionPeriods.First();
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
 
@@ -42,7 +65,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _fixture.Create<short>(), _fixture.Create<byte>());
+            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id,
+                _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
@@ -59,17 +83,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _fixture.Create<short>(), _fixture.Create<byte>());
+            var command = new CreatePaymentCommand(incentive.Id, incentive.PendingPayments.First().Id, _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(incentive);
 
             int itemsPersisted = 0;
-            _mockIncentiveDomainRespository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.Id == command.ApprenticeshipIncentiveId)))
+            _mockIncentiveDomainRespository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>( a => a.Id == command.ApprenticeshipIncentiveId)))
                                             .Callback(() =>
                                             {
                                                 itemsPersisted++;
                                             });
-
 
             // Act
             await _sut.Handle(command);
@@ -94,6 +117,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     ),
                     DateTime.Today);
 
+            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+
             var paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
@@ -104,17 +129,24 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     })
             };
 
-            var collectionPeriods = new List<CollectionPeriod>()
+            var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1)
-                    ,DateTime.Now, DateTime.Now.Year.ToString(), true)
+                new Domain.ValueObjects.CollectionPeriod(
+                    1, 
+                    (byte)DateTime.Now.Month, 
+                    (short)DateTime.Now.Year, 
+                    DateTime.Now.AddDays(-1),
+                    DateTime.Now,
+                    (short)DateTime.Now.Year,
+                    true)
             };
 
-            incentive.CalculateEarnings(paymentProfiles, new CollectionCalendar(collectionPeriods));
+            incentive.CalculateEarnings(paymentProfiles, new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
+
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();
             account.AddLegalEntity(incentive.PendingPayments.First().Account.AccountLegalEntityId, LegalEntity.Create(legalEntityModel));
-            incentive.ValidatePendingPaymentBankDetails(incentive.PendingPayments.First().Id, account, collectionPeriods.First());
+            incentive.ValidatePendingPaymentBankDetails(incentive.PendingPayments.First().Id, account, _collectionPeriods.First());
 
             return incentive;
         }

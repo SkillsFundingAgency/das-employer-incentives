@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck
             var commands = new List<Task>();
             foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
             {
-                var command = new CreateApprenticeshipIncentiveCommand(
+                var command = new CreateIncentiveCommand(
                     @event.Model.AccountId,
                     @event.Model.AccountLegalEntityId,
                     apprenticeship.Id,
@@ -30,9 +30,10 @@ namespace SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck
                     apprenticeship.FirstName,
                     apprenticeship.LastName,
                     apprenticeship.DateOfBirth,
-                    apprenticeship.Uln,
+                    apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
-                    apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                    apprenticeship.UKPRN
                 );
 
                 var task = _commandPublisher.Publish(command);

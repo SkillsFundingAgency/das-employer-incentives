@@ -69,9 +69,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
                 result.AddError("Apprenticeship.PlannedStartDate", "Is not set");
             }
 
-            if (apprenticeship.Uln == default)
+            if (apprenticeship.ULN == default)
             {
-                result.AddError("Apprenticeship.Uln", "Is not set");
+                result.AddError("Apprenticeship.ULN", "Is not set");
             }
 
             if (string.IsNullOrEmpty(apprenticeship.FirstName))

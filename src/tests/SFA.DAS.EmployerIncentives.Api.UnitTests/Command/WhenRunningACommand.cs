@@ -34,22 +34,22 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
         public async Task Then_a_DomainCommand_command_is_dispatched()
         {
             // Arrange
-            var command = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
+            var command = _fixture.Create<CreateIncentiveCommand>();
             var commandText = JsonConvert.SerializeObject(command,
                 new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 
             // Act
-            await _sut.RunCommand("ApprenticeshipIncentive.CreateApprenticeshipIncentiveCommand", commandText);
+            await _sut.RunCommand("ApprenticeshipIncentive.CreateIncentiveCommand", commandText);
 
             // Assert
             _mockCommandDispatcher
-                .Verify(m => m.Send(It.Is<CreateApprenticeshipIncentiveCommand>(c =>
+                .Verify(m => m.Send(It.Is<CreateIncentiveCommand>(c =>
                             AreMatching(command, c)),
                         It.IsAny<CancellationToken>())
                     , Times.Once);
         }
 
-        private static bool AreMatching(CreateApprenticeshipIncentiveCommand expected, CreateApprenticeshipIncentiveCommand actual)
+        private static bool AreMatching(CreateIncentiveCommand expected, CreateIncentiveCommand actual)
         {
             expected.Should().BeEquivalentTo(actual, opt => opt.Excluding(x => x.Log));
             return true;
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Command
         public async Task Then_an_OK_result_is_returned_on_dispatch()
         {
             // Arrange
-            var command = _fixture.Create<CreateApprenticeshipIncentiveCommand>();
+            var command = _fixture.Create<CreateIncentiveCommand>();
             var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 
             // Act

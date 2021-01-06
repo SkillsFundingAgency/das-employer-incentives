@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public short? PaymentYear => Model.PaymentYear;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
+
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
         internal static PendingPayment New(
@@ -47,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             var period = collectionCalendar.GetPeriod(DueDate);
             Model.PeriodNumber = period.PeriodNumber;
-            Model.PaymentYear = period.CalendarYear;
+            Model.PaymentYear = period.AcademicYear;
         }
 
         public void SetPaymentMadeDate(DateTime paymentDate)
@@ -61,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 .PendingPaymentValidationResultModels
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
                                       v.CollectionPeriod.CalendarMonth == validationResult.CollectionPeriod.CalendarMonth &&
-                                      v.CollectionPeriod.CalendarYear == validationResult.CollectionPeriod.CalendarYear);
+                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear);
 
             if (existing != null)
             {
@@ -82,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public bool IsValidated(short collectionYear, byte collectionPeriod)
         {
-            return Model.PendingPaymentValidationResultModels.Count > 0
+            return Model.PendingPaymentValidationResultModels.Count() > 0
                    && AllPendingPaymentsForPeriodAreValid(collectionYear, collectionPeriod);
         }
 
@@ -90,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             return Model.PendingPaymentValidationResultModels
                 .Where(v =>
-                    v.CollectionPeriod.CalendarYear == collectionYear &&
+                    v.CollectionPeriod.AcademicYear == collectionYear &&
                     v.CollectionPeriod.PeriodNumber == collectionPeriod)
                 .All(r => r.Result);
         }

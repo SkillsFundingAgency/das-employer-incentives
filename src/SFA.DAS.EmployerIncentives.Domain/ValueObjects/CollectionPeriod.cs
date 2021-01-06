@@ -6,7 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
     public class CollectionPeriod : ValueObject
     {
-        public CollectionPeriod(byte periodNumber, byte calendarMonth, short calendarYear, DateTime openDate, DateTime censusDate, string academicYear, bool active)
+        public CollectionPeriod(byte periodNumber, byte calendarMonth, short calendarYear, DateTime openDate, DateTime censusDate, short academicYear, bool active)
         {
             PeriodNumber = periodNumber;
             CalendarMonth = calendarMonth;
@@ -17,13 +17,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             Active = active;
         }
 
+        public CollectionPeriod(byte periodNumber, short academicYear)
+        {
+            PeriodNumber = periodNumber;
+            AcademicYear = academicYear;
+        }
+
         public byte PeriodNumber { get; }
         public byte CalendarMonth { get; }
         public short CalendarYear { get; }
         public DateTime OpenDate { get; }
         public DateTime CensusDate { get; }
-        public string AcademicYear { get; }
-        public bool Active { get; }
+        public short AcademicYear { get; }
+        public bool Active { get; private set; }
+
+        public void SetActive(bool active)
+        {
+            Active = active;
+        }
 
         protected override IEnumerable<object> GetAtomicValues()
         {

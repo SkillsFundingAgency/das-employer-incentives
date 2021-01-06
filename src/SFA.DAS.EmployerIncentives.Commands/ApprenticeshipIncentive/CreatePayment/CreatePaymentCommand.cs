@@ -1,7 +1,7 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment
 {
