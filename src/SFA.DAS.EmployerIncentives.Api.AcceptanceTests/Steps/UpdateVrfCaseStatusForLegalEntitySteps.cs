@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
-using NServiceBus.Transport;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -56,34 +55,35 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 CaseStatusLastUpdatedDate = _newVrfStatusUpdateDate
             };
 
-            await EmployerIncentiveApi.Patch(url, data);
+            var expectedEvents = 3;
+            if(status == "Case Request Completed")
+            {
+                expectedEvents = 4;
+            }
+
+            await TestContext.WaitFor<ICommand>(async () =>
+               await EmployerIncentiveApi.Patch(url, data), numberOfOnProcessedEventsExpected: expectedEvents);
+
+            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Then(@"Employer Incentives account legal entity record is updated")]
-        public async Task ThenEmployerIncentivesAccountLegalEntityRecordIsUpdated()
+        public void ThenEmployerIncentivesAccountLegalEntityRecordIsUpdated()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-            var publishedCommands = TestContext.CommandsPublished.Where(c =>
+            var publishedCommands = TestContext.DomainCommandsPublished.Where(c =>
                     c.IsPublished &&
-                    c.Command is UpdateVendorRegistrationCaseStatusForAccountCommand
-                ).Select(c => c.Command)
-                .ToArray();
-
-            publishedCommands.Should().NotBeEmpty();
+                    c.Command is UpdateVendorRegistrationCaseStatusForAccountCommand                    
+                ).ToList();
 
             foreach (var publishedCommand in publishedCommands)
             {
-                var command = publishedCommand as UpdateVendorRegistrationCaseStatusForAccountCommand;
-                Debug.Assert(command != null, nameof(command) + " != null");
+                var command = publishedCommand.Command as UpdateVendorRegistrationCaseStatusForAccountCommand;
                 command.AccountId.Should().Be(_account.Id);
                 command.HashedLegalEntityId.Should().Be(_account.HashedLegalEntityId);
                 command.Status.Should().Be(_newVrfStatus);
                 command.CaseId.Should().Be(_newVrfCaseId);
                 command.LastUpdatedDate.Should().Be(_newVrfStatusUpdateDate);
                 command.LockId.Should().Be($"{nameof(Account)}_{command.AccountId}");
-
-                await TestContext.WaitFor<MessageContext>(async () => await TestContext.MessageBus.Send(command));
             }
 
             var account = DataAccess.GetAccountByLegalEntityId(_account.LegalEntityId);

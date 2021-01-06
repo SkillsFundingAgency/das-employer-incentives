@@ -28,9 +28,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             var hook = _testContext.Hooks.SingleOrDefault(h => h is Hook<T>) as Hook<T>;
 
-            hook.OnReceived = (message) => { waitForResult.SetHasStarted(); };
-            hook.OnProcessed = (message) => { messagesProcessed++; if (messagesProcessed >= numberOfOnProcessedEventsExpected) { waitForResult.SetHasCompleted(); } };
-            hook.OnErrored = (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
+            hook.OnReceived += (message) => { waitForResult.SetHasStarted(); };
+            hook.OnProcessed += (message) => { messagesProcessed++; if (messagesProcessed >= numberOfOnProcessedEventsExpected) { waitForResult.SetHasCompleted(); } };
+            hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
 
             try
             {

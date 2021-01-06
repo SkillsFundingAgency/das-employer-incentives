@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public List<IHook> Hooks { get; set; }
         public List<object> EventsPublished { get; set; }
         public List<PublishedCommand> CommandsPublished { get; set; }
+        public List<PublishedCommand> DomainCommandsPublished { get; set; }        
         public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
 
         public TestContext()
@@ -40,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             Hooks = new List<IHook>();
             EventsPublished = new List<object>();
             CommandsPublished = new List<PublishedCommand>();
+            DomainCommandsPublished = new List<PublishedCommand>();
         }
     }
 }

@@ -12,6 +12,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Functions.TestConsole", "SFA.DAS.EmployerIncentives.Functions.TestConsole\SFA.DAS.EmployerIncentives.Functions.TestConsole.csproj", "{30B734EE-999C-4573-ACD7-99AED8B72D4E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AcceptanceTests", "AcceptanceTests", "{19B5E22A-31B8-4F4A-B759-F82B368F81A9}"
+	ProjectSection(SolutionItems) = preProject
+		SFA.DAS.EmployerIncentives.Api.AcceptanceTests\PublishedCommand.cs = SFA.DAS.EmployerIncentives.Api.AcceptanceTests\PublishedCommand.cs
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Api.AcceptanceTests", "SFA.DAS.EmployerIncentives.Api.AcceptanceTests\SFA.DAS.EmployerIncentives.Api.AcceptanceTests.csproj", "{41F9D3B2-BE56-425A-8057-FE3D4C6AAE33}"
 EndProject
