@@ -26,9 +26,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             var hook = _testContext.Hooks.SingleOrDefault(h => h is Hook<T>) as Hook<T>;
 
-            hook.OnReceived = (message) => { waitForResult.SetHasStarted(); };
-            hook.OnProcessed = (message) => { waitForResult.SetHasCompleted(); };
-            hook.OnErrored = (ex, message) => { waitForResult.SetHasErrored(ex); };
+            hook.OnReceived += (message) => { waitForResult.SetHasStarted(); };
+            hook.OnProcessed += (message) => { waitForResult.SetHasCompleted(); };
+            hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); };
 
             try
             {

@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
@@ -41,29 +42,60 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             if (commandsHook != null)
             {
-                commandsHook.OnReceived = (command) =>
+                commandsHook.OnReceived += (command) =>
                 {
-                    testContext.CommandsPublished.Add(new PublishedCommand(command) { IsReceived = true } );                    
+                    if (command is DomainCommand)
+                    {
+                        testContext.DomainCommandsPublished.Add(new PublishedCommand(command) { IsReceived = true });
+                    }
+                    else
+                    {
+                        testContext.CommandsPublished.Add(new PublishedCommand(command) { IsReceived = true });
+                    }
                 };
-                commandsHook.OnProcessed = (command) =>
+
+                commandsHook.OnProcessed += (command) =>
                 {
-                    testContext.CommandsPublished.Single(c => c.Command == command).IsPublished = true;
+                    if (command is DomainCommand)
+                    {
+                        testContext.DomainCommandsPublished.Where(c => c.Command == command).ToList().ForEach(c => c.IsPublished = true);
+                    }
+                    else
+                    {
+                        testContext.CommandsPublished.Where(c => c.Command == command).ToList().ForEach(c => c.IsPublished = true);
+                    }
                     var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishCommand");
                     if (throwError)
                     {
                         throw new ApplicationException("Unexpected exception, should force a rollback");
                     }
                 };
-                commandsHook.OnErrored = (ex, command) =>
+                commandsHook.OnErrored += (ex, command) =>
                 {
-                    var publishedCommand = testContext.CommandsPublished.Single(c => c.Command == command);
-                    publishedCommand.IsErrored = true;
-                    publishedCommand.LastError = ex;                    
+                    List<PublishedCommand> publishedCommands;
+                    if (command is DomainCommand)
+                    {
+                        publishedCommands = testContext.DomainCommandsPublished.Where(c => c.Command == command).ToList();
+                    }
+                    else
+                    {
+                        publishedCommands = testContext.CommandsPublished.Where(c => c.Command == command).ToList();
+                    }
+                    publishedCommands.ForEach(c =>
+                    {
+                        c.IsErrored = true;
+                        c.LastError = ex;
+                        if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
+                        {
+                            c.IsPublishedWithNoListener = true;                            
+                        }
+                    });
+
                     if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
                     {
-                        publishedCommand.IsPublishedWithNoListener = true;
                         return true;
                     }
+                    
                     return false;
                 };
             }
