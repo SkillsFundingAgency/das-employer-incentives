@@ -34,8 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             _fixture = new Fixture();
 
-            _plannedStartDate = DateTime.Now.AddDays(5);
-            _collectionPeriod = DateTime.Now;
+            _collectionPeriod = new DateTime(2021, 1, 1);
+            _plannedStartDate = _collectionPeriod.AddDays(5);
 
             _firstPaymentDaysAfterApprenticeshipStart = 10;
             _secondPaymentDaysAfterApprenticeshipStart = 50;
@@ -53,9 +53,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
-                new CollectionPeriod(1, (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _collectionPeriod.AddMonths(1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
-                new CollectionPeriod(2, (byte)_collectionPeriod.Month, (short)_collectionPeriod.Year, _collectionPeriod.AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
-                new CollectionPeriod(3, (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _collectionPeriod.AddMonths(-1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
+                new CollectionPeriod(1, (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _collectionPeriod.AddMonths(-1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
+                new CollectionPeriod(2, (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _collectionPeriod.AddMonths(1).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false),
+                new CollectionPeriod(3, (byte)_collectionPeriod.AddMonths(2).Month, (short)_collectionPeriod.AddMonths(2).Year, _collectionPeriod.AddMonths(2).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
             };
 
             _collectionCalendar = new CollectionCalendar(_collectionPeriods);
@@ -98,16 +98,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var firstPayment = _sut.PendingPayments.First();
             var secondPayment = _sut.PendingPayments.Last();
 
-            var endOfPlannedStartMonth = new DateTime(_plannedStartDate.Year, _plannedStartDate.Month, DateTime.DaysInMonth(_plannedStartDate.Year, _plannedStartDate.Month));
+            firstPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
+            secondPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
-            firstPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
-            secondPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
-
-            firstPayment.PeriodNumber.Should().Be(2);
-            firstPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 2).AcademicYear);
+            firstPayment.PeriodNumber.Should().Be(1);
+            firstPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 1).AcademicYear);
             firstPayment.Amount.Should().Be(100);
-            secondPayment.PeriodNumber.Should().Be(1);
-            secondPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 1).AcademicYear);
+            secondPayment.PeriodNumber.Should().Be(2);
+            secondPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 2).AcademicYear);
             secondPayment.Amount.Should().Be(300);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
@@ -123,7 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_the_earnings_are_calculated_and_the_pending_payments_created_using_the_actual_start_date_when_there_is_an_actual_start_date()
         {
             // arrange           
-            _sutModel.StartDate = DateTime.Now.Date.AddDays(6);
+            _sutModel.StartDate = _collectionPeriod.Date.AddDays(6);
 
             // act
             _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
@@ -134,16 +132,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var firstPayment = _sut.PendingPayments.First();
             var secondPayment = _sut.PendingPayments.Last();
 
-            var endOfPlannedStartMonth = new DateTime(_plannedStartDate.Year, _plannedStartDate.Month, DateTime.DaysInMonth(_plannedStartDate.Year, _plannedStartDate.Month));
+            firstPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
+            secondPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
-            firstPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
-            secondPayment.DueDate.Should().Be(endOfPlannedStartMonth.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
-
-            firstPayment.PeriodNumber.Should().Be(2);
-            firstPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 2).AcademicYear);
+            firstPayment.PeriodNumber.Should().Be(1);
+            firstPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 1).AcademicYear);
             firstPayment.Amount.Should().Be(100);
-            secondPayment.PeriodNumber.Should().Be(1);
-            secondPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 1).AcademicYear);
+            secondPayment.PeriodNumber.Should().Be(2);
+            secondPayment.PaymentYear.Should().Be(_collectionPeriods.Single(x => x.PeriodNumber == 2).AcademicYear);
             secondPayment.Amount.Should().Be(300);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);

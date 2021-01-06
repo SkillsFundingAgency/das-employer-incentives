@@ -47,6 +47,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.EarningsCalculated = isCalculated;
         }
 
+        public void SetPlannedStartDate(DateTime plannedStartDate)
+        {
+            Model.PlannedStartDate = plannedStartDate;
+        }
+
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)
         {
         }
