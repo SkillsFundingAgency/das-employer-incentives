@@ -50,6 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
                 .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
                 .With(p => p.EarningsCalculated, false)
+                .With(p => p.WithdrawnByCompliance, false)
+                .With(p => p.WithdrawnByEmployer, false)
                 .CreateMany(NumberOfApprenticeships).ToList();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -96,6 +98,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_accountModel);
+                await dbConnection.InsertAsync(_applicationModel);
+                await dbConnection.InsertAsync(_apprenticeshipsModels);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
             }
         }
@@ -174,8 +178,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
-            var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished).Select(c => c.Command)
+            var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CreateIncentiveCommand)).Select(c => c.Command)
                 .ToArray();
+
+            publishedCommands.Should().NotBeEmpty();
 
             foreach (var publishedCommand in publishedCommands)
             {
