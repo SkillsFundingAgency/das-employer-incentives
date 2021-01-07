@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -50,6 +51,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> AddEmployerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] AddEmployerVendorIdRequest request)
         {
             await SendCommandAsync(new AddEmployerVendorIdForLegalEntityCommand(hashedLegalEntityId, request.EmployerVendorId));
+            return NoContent();
+        }
+
+        [HttpPatch("/legalentities/refresh")]
+        public async Task<IActionResult> RefreshLegalEntities([FromBody] RefreshLegalEntitiesRequest request)
+        {
+            await SendCommandAsync(new RefreshLegalEntitiesCommand(request.AccountLegalEntities, request.PageNumber, request.PageSize, request.TotalPages));
             return NoContent();
         }
     }
