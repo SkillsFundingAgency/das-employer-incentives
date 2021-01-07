@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Data.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
 {
