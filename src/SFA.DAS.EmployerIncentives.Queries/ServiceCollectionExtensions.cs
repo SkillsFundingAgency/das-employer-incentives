@@ -44,7 +44,6 @@ namespace SFA.DAS.EmployerIncentives.Queries
             return serviceCollection;
         }
 
-
         public static IServiceCollection AddQueryHandlerDecorators(this IServiceCollection serviceCollection)
         {
             serviceCollection

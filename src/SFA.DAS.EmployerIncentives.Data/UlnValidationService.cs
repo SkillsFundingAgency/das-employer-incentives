@@ -1,20 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
     public class UlnValidationService : IUlnValidationService
     {
-        private Lazy<EmployerIncentivesDbContext> _lazyContext;
-        private EmployerIncentivesDbContext _context => _lazyContext.Value;
+        private readonly EmployerIncentivesDbContext _context;
 
         public UlnValidationService(Lazy<EmployerIncentivesDbContext> context)
         {
-            _lazyContext = context;
+            _context = context.Value;
         }
 
         public Task<bool> UlnAlreadyOnSubmittedIncentiveApplication(long uln)
@@ -23,7 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                 from apprentices in _context.ApplicationApprenticeships
                 join applications in _context.Applications on apprentices.IncentiveApplicationId equals applications.Id
                 where apprentices.ULN == uln && applications.Status == IncentiveApplicationStatus.Submitted
-                select new {apprentices, applications};
+                && !apprentices.WithdrawnByEmployer
+                select new { apprentices, applications };
 
             return query.AnyAsync();
         }

@@ -3,13 +3,9 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.CollectionCalendar;
 using SFA.DAS.EmployerIncentives.Commands.CollectionPeriod;
-using SFA.DAS.EmployerIncentives.Commands.Services;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handlers
 {
