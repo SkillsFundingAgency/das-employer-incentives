@@ -19,7 +19,7 @@ SELECT
   sum(pp.amount) as [Earnings Value], 
   sum(CASE WHEN CASE WHEN pv.validationResult = 0 then 1 else 0 end = 1 then pp.Amount else 0 END) as [Validation Failed Value],
   sum(case when pp.paymentmadedate is not null then pp.amount else 0 end) as [Payments Made Value],
-  sum(case when p.amount >= 0 then p.amount else 0 end) as [Postive Payments Value], 
+  sum(case when p.amount >= 0 then p.amount else 0 end) as [Positive Payments Value], 
   sum(case when p.amount < 0 then p.amount else 0 end) as [Negative Payments Value], 
   SUM(CASE WHEN p.PaidDate is not null THEN p.Amount else 0 END) as [BC Payments Sent Value]
 FROM
