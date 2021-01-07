@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+﻿using System;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Linq;
 using System.Collections.Generic;
@@ -8,11 +9,12 @@ namespace SFA.DAS.EmployerIncentives.Data
 {
     public class ApprenticeApplicationDataRepository : IApprenticeApplicationDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public ApprenticeApplicationDataRepository(EmployerIncentivesDbContext dbContext)
+        public ApprenticeApplicationDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)

@@ -11,43 +11,45 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
 {
     public class CreateIncentiveCommandHandler : ICommandHandler<CreateIncentiveCommand>
     {
-        private readonly IIncentiveApplicationDomainRepository _applicationDomainRepository;
         private readonly IApprenticeshipIncentiveFactory _apprenticeshipIncentiveFactory;
         private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;
-        
 
         public CreateIncentiveCommandHandler(
-            IIncentiveApplicationDomainRepository applicationDomainRepository,
             IApprenticeshipIncentiveFactory apprenticeshipIncentiveFactory,
             IApprenticeshipIncentiveDomainRepository apprenticeshipIncentiveDomainRepository)
         {
-            _applicationDomainRepository = applicationDomainRepository;
             _apprenticeshipIncentiveFactory = apprenticeshipIncentiveFactory;
             _apprenticeshipIncentiveDomainRepository = apprenticeshipIncentiveDomainRepository;
         }
 
         public async Task Handle(CreateIncentiveCommand command, CancellationToken cancellationToken = default)
         {
-            var application = await _applicationDomainRepository.Find(command.IncentiveApplicationId);
-
-            foreach (var apprenticeship in application.Apprenticeships)
+            var existing = await _apprenticeshipIncentiveDomainRepository.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId);
+            if (existing != null)
             {
-                var incentive = _apprenticeshipIncentiveFactory.CreateNew(
-                    Guid.NewGuid(),
-                    apprenticeship.Id,
-                    new Account(application.AccountId, command.AccountLegalEntityId),
-                    new Apprenticeship(
-                        apprenticeship.ApprenticeshipId,
-                        apprenticeship.FirstName,
-                        apprenticeship.LastName,
-                        apprenticeship.DateOfBirth,
-                        apprenticeship.Uln,
-                        apprenticeship.ApprenticeshipEmployerTypeOnApproval
-                    ),
-                    apprenticeship.PlannedStartDate);
-
-                await _apprenticeshipIncentiveDomainRepository.Save(incentive);
+                return;
             }
+
+            var incentive = _apprenticeshipIncentiveFactory.CreateNew(
+                Guid.NewGuid(),
+                command.IncentiveApplicationApprenticeshipId,
+                new Account(command.AccountId, command.AccountLegalEntityId),
+                new Apprenticeship(
+                    command.ApprenticeshipId,
+                    command.FirstName,
+                    command.LastName,
+                    command.DateOfBirth,
+                    command.Uln,
+                    command.ApprenticeshipEmployerTypeOnApproval
+                ),
+                command.PlannedStartDate);
+
+            if (command.UKPRN.HasValue)
+            {
+                incentive.Apprenticeship.SetProvider(new Provider(command.UKPRN.Value));
+            }
+
+            await _apprenticeshipIncentiveDomainRepository.Save(incentive);
         }
     }
 }

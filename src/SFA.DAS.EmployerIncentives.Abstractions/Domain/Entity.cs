@@ -7,6 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
         public IdType Id => Model.Id;
         protected EntityModel Model { get; set; }
         public bool IsNew { get; protected set; }
+        public bool IsDeleted { get; protected set; }
 
         protected Entity(IdType id, EntityModel model, bool isNew)
         {
@@ -14,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
             Model = model;
             Model.Id = id;
             IsNew = isNew;
+            IsDeleted = false;
         }
 
         protected Entity()

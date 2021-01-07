@@ -5,5 +5,6 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipInc
     public class PayableLegalEntityDto
     {
         public long AccountLegalEntityId { get; set; }
+        public long AccountId { get; set; }
     }
 }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SFA.DAS.Common.Domain.Types;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
+    [Dapper.Contrib.Extensions.Table("IncentiveApplicationApprenticeship")]
     [Table("IncentiveApplicationApprenticeship")]
     public partial class IncentiveApplicationApprenticeship
     {
@@ -14,11 +15,13 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public long Uln { get; set; }
+        public long ULN { get; set; }
         public DateTime PlannedStartDate { get; set; }
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
         public long? UKPRN { get; set; }
         public bool EarningsCalculated { get; set; }
+        public bool WithdrawnByEmployer { get; set; }
+        public bool WithdrawnByCompliance { get; set; }
     }
 }

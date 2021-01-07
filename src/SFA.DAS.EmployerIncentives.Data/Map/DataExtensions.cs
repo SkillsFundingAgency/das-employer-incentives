@@ -2,6 +2,8 @@
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -110,7 +112,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
                 EarningsCalculated = x.EarningsCalculated,
-                Uln = x.Uln,
+                WithdrawnByEmployer = x.WithdrawnByEmployer,
+                WithdrawnByCompliance = x.WithdrawnByCompliance,
+                ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN
             }).ToList();
@@ -143,9 +147,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 DateOfBirth = x.DateOfBirth,
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
-                Uln = x.Uln,
+                ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 EarningsCalculated = x.EarningsCalculated,
+                WithdrawnByEmployer = x.WithdrawnByEmployer,
+                WithdrawnByCompliance = x.WithdrawnByCompliance,
                 UKPRN = x.UKPRN
             }).ToList();
         }
@@ -170,6 +176,21 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             }
 
             return BankDetailsStatus.InProgress;
+        }
+      
+        internal static IncentiveApplicationStatusAudit Map(this IncentiveApplicationAudit entity)
+        {
+            return new IncentiveApplicationStatusAudit
+            {
+                Id = entity.Id,
+                IncentiveApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
+                Process = entity.Process,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now
+            };
+
         }
     }
 }

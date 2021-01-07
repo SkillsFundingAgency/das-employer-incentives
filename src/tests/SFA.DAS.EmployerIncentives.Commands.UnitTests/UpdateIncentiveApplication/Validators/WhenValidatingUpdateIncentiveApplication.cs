@@ -183,7 +183,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         {
             //Arrange
             var apprenticeship = _fixture.Create<IncentiveApplicationApprenticeshipDto>();
-            apprenticeship.Uln = default;
+            apprenticeship.ULN = default;
             var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto> { apprenticeship });
 
             //Act

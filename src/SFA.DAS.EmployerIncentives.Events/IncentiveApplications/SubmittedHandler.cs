@@ -1,7 +1,9 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,13 +20,29 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public Task Handle(Submitted @event, CancellationToken cancellationToken = default)
         {
-            var command = new CreateIncentiveCommand(
-                @event.AccountId,
-                @event.IncentiveApplicationId,
-                @event.AccountLegalEntityId
+
+            var commands = new List<Task>();
+            foreach (var apprenticeship in @event.EligibleApprenticeships())
+            {
+                var command = new CreateIncentiveCommand(
+                    @event.Model.AccountId,
+                    @event.Model.AccountLegalEntityId,
+                    apprenticeship.Id,
+                    apprenticeship.ApprenticeshipId,
+                    apprenticeship.FirstName,
+                    apprenticeship.LastName,
+                    apprenticeship.DateOfBirth,
+                    apprenticeship.ULN,
+                    apprenticeship.PlannedStartDate,
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                    apprenticeship.UKPRN
                 );
 
-            return _commandPublisher.Publish(command);
+                var task = _commandPublisher.Publish(command);
+                commands.Add(task);
+            }
+
+            return Task.WhenAll(commands);
         }
     }
 }

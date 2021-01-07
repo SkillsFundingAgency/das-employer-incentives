@@ -92,15 +92,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         {
                             o.OnMessageReceived = (message) =>
                             {
-                                hook?.OnReceived(message);
+                                if (hook?.OnReceived != null)
+                                {
+                                    hook?.OnReceived(message);
+                                }
                             };
                             o.OnMessageProcessed = (message) =>
                             {
-                                hook?.OnProcessed(message);
+                                if (hook?.OnProcessed != null)
+                                {
+                                    hook?.OnProcessed(message);
+                                }
                             };
                             o.OnMessageErrored = (exception, message) =>
                             {
-                                hook?.OnErrored(exception, message);
+                                if (hook?.OnErrored != null)
+                                {
+                                    hook?.OnErrored(exception, message);
+                                }
                             };
                         }
                     });

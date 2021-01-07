@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             }
             _context.EmployerIncentivesWebApiFactory?.Dispose();
             _context.EmployerIncentiveApi?.Dispose();
+            _context.LearnerMatchApi?.Dispose();
             _context.AccountApi?.Dispose();
             _context.DomainMessageHandlers?.Dispose();
             _context.SqlDatabase?.Dispose();

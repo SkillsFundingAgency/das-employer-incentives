@@ -70,4 +70,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="DueDate" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="002f57af-e6b2-4a3e-9a73-8836cfe98eb4" ChangeDateTime="10/23/2020 16:15:31">
+    <Property Name="ElementName" Value="[incentives].[PendingPaymentValidationResult].[CollectionDateUTC]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[incentives].[PendingPaymentValidationResult]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CollectionDateUtc" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="326d61ee-fc92-4238-b430-a91b67c8a5b7" ChangeDateTime="10/23/2020 17:20:06">
+    <Property Name="ElementName" Value="[incentives].[PendingPaymentValidationResult].[ValidationStep]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[incentives].[PendingPaymentValidationResult]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Step" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f18dc832-d479-4f9c-b35b-7f21b9918794" ChangeDateTime="10/23/2020 17:20:11">
+    <Property Name="ElementName" Value="[incentives].[PendingPaymentValidationResult].[ValidationResult]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[incentives].[PendingPaymentValidationResult]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Result" />
+  </Operation>
 </Operations>

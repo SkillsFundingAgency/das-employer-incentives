@@ -15,18 +15,19 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.5" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="Polly" Version="7.2.1" />
-    <PackageReference Include="Scrutor" Version="3.2.1" />
+    <PackageReference Include="Scrutor" Version="3.3.0" />
     <PackageReference Include="SFA.DAS.Account.Api.Client" Version="1.6.2933" />
     <PackageReference Include="SFA.DAS.HashingService" Version="1.0.183" />
     <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.20" />
     <PackageReference Include="SFA.DAS.NServiceBus.SqlServer" Version="16.0.20" />
-    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.20" />
+    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.24" />
     
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands.Types\SFA.DAS.EmployerIncentives.Commands.Types.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data\SFA.DAS.EmployerIncentives.Data.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Domain\SFA.DAS.EmployerIncentives.Domain.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Messages\SFA.DAS.EmployerIncentives.Messages.csproj" />
   </ItemGroup>

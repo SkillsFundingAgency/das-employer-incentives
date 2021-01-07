@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _hook = hook;
         }
 
-        public async Task Publish<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
+        public async Task Publish<T>(T command, CancellationToken cancellationToken = default) where T : class, ICommand
         {
             if (_hook != null)
             {

@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var query = $"SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = '{ _updateApplicationRequest.IncentiveApplicationId}'";
             var apprenticeships = dbConnection.Query<IncentiveApplicationApprenticeship>(query).ToList();
 
-            apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships);
+            apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships, opts => opts.Excluding(x => x.PlannedStartDate));
         }
 
     }
