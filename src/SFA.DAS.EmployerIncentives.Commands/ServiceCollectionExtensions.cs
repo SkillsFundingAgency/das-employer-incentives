@@ -64,7 +64,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddHashingService()
-                .AddAccountService()
                 .AddLearnerService();
 
             // set up the command handlers and command validators
@@ -163,31 +162,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 var settings = c.GetService<IOptions<ApplicationSettings>>().Value;
                 return new HashingService.HashingService(settings.AllowedHashstringCharacters, settings.Hashstring);
-            });
-
-            return serviceCollection;
-        }
-
-        public static IServiceCollection AddAccountService(this IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddTransient<IAccountService>(s =>
-            {
-                var settings = s.GetService<IOptions<AccountApi>>().Value;
-
-                var clientBuilder = new HttpClientBuilder()
-                    .WithDefaultHeaders()
-                    .WithLogging(s.GetService<ILoggerFactory>());
-
-                if (!string.IsNullOrEmpty(settings.ClientId))
-                {
-                    clientBuilder.WithBearerAuthorisationHeader(new AzureActiveDirectoryBearerTokenGenerator(settings));
-                }
-
-                var client = clientBuilder.Build();
-
-                client.BaseAddress = new Uri(settings.ApiBaseUrl);
-
-                return new AccountService(client);
             });
 
             return serviceCollection;
