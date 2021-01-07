@@ -72,6 +72,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return daysInLearningForCollectionPeriod != null ? daysInLearningForCollectionPeriod.NumberOfDays : 0;
         }
 
+        public void ClearDaysInLearning()
+        {
+            Model.DaysInLearnings.Clear();
+        }
+        
         public void SetDaysInLearning(CollectionPeriod collectionPeriod)
         {
             var censusDate = collectionPeriod.CensusDate;
