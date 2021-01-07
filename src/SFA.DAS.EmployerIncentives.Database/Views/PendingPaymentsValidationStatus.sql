@@ -7,6 +7,6 @@ SELECT
 	END AS ValidStatus
 FROM incentives.PendingPaymentValidationResult VR
 JOIN incentives.GetNextCollectionPeriod(GETDATE()) CP 
-ON VR.PeriodNumber = CP.PeriodNumber AND VR.PaymentYear = CP.CalendarYear
+ON VR.PeriodNumber = CP.PeriodNumber AND VR.PaymentYear = CP.AcademicYear
 GROUP BY VR.PendingPaymentId
 GO
