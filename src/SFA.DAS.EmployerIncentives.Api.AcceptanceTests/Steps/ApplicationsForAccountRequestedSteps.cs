@@ -2,6 +2,7 @@
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class ApplicationsForAccountRequestedSteps : StepsBase
     {
         private TestContext _testContext;
-        private IEnumerable<ApprenticeApplicationDto> _apiResponse;
+        private GetApplicationsResponse _apiResponse;
         private Account _account;
         private IncentiveApplication _application;
         private IncentiveApplicationApprenticeship _apprenticeship;
@@ -44,9 +45,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"a client requests the apprenticeships for the account")]
         public async Task WhenAClientRequestsTheApprenticeshipApplicationsForTheAccount()
         {
-            var url = $"/accounts/{_account.Id}/applications";
+            var url = $"/accounts/{_account.Id}/legalentity/{_account.AccountLegalEntityId}/applications";
             var (status, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<ApprenticeApplicationDto>>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<GetApplicationsResponse>(url);
 
             status.Should().Be(HttpStatusCode.OK);
 
@@ -56,8 +57,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeships are returned")]
         public void ThenTheApprenticeshipApplicationsAreReturned()
         {
-            _apiResponse.Should().NotBeEmpty();
-            var apprenticeshipApplication = _apiResponse.First();
+            _apiResponse.ApprenticeApplications.Should().NotBeEmpty();
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
 
             apprenticeshipApplication.AccountId.Should().Be(_account.Id);
             apprenticeshipApplication.ApplicationId.Should().Be(_application.Id);
