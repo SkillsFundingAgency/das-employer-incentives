@@ -1,5 +1,6 @@
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
@@ -34,11 +35,11 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                     It.IsAny<GetLatestVendorRegistrationCaseUpdateDateTimeRequest>())).ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetLatestVendorRegistrationCaseUpdateDateTime();
+            var actual = await _sut.GetLatestVendorRegistrationCaseUpdateDateTime() as OkObjectResult;
 
             // Assert
-            actual.Should().NotBeNull();
-            actual.Value.Should().Be(expected.LastUpdateDateTime);
+            actual?.Value.Should().NotBeNull();
+            if (actual != null) ((GetLatestVendorRegistrationCaseUpdateDateTimeResponse)actual.Value).LastUpdateDateTime.Should().Be(expected.LastUpdateDateTime);
         }
 
     }
