@@ -17,9 +17,12 @@ using System;
 using System.Data.Common;
 using System.IO;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using SFA.DAS.NServiceBus.Services;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
+using SFA.DAS.UnitOfWork.NServiceBus.Services;
 using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -72,7 +75,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             builder.Services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
-                .AddNServiceBusClientUnitOfWork();
+                .AddSqlServerUnitOfWork();
+
+            builder.Services.TryAddScoped<IEventPublisher, EventPublisher>();
 
             builder.Services.AddPersistenceServices();
             builder.Services.AddQueryServices();
