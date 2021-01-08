@@ -107,6 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var applicationId = Guid.NewGuid();
 
             var account = _fixture.Create<Models.Account>();
+            account.VrfVendorId = "";
             account.VrfCaseStatus = vrfCaseStatus;
 
             var application = _fixture.Create<Models.IncentiveApplication>();
@@ -131,7 +132,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             // Arrange
             var applicationId = Guid.NewGuid();
 
-            var account = _fixture.Create<Models.Account>();            
+            var account = _fixture.Create<Models.Account>();
+            account.VrfVendorId = "";
             account.VrfCaseStatus = vrfStatus;
 
             var application = _fixture.Create<Models.IncentiveApplication>();
