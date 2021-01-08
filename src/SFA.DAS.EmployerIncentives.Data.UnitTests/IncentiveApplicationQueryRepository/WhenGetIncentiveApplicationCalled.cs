@@ -149,5 +149,58 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             //Assert
             actual.BankDetailsRequired.Should().BeTrue();
         }
+
+        [TestCase("", "")]
+        [TestCase(null, null)]
+        [TestCase("", "000000")]
+        public async Task Then_bank_details_required_is_true_if_no_vendor_id_or_vrf_status(string vrfStatus, string vrfVendorId)
+        {
+            // Arrange
+            var applicationId = Guid.NewGuid();
+
+            var account = _fixture.Create<Models.Account>();
+            account.VrfCaseStatus = vrfStatus;
+            account.VrfVendorId = vrfVendorId;
+
+            var application = _fixture.Create<Models.IncentiveApplication>();
+
+            application.Id = applicationId;
+            application.AccountLegalEntityId = account.AccountLegalEntityId;
+
+            _context.Accounts.Add(account);
+            _context.Applications.Add(application);
+            _context.SaveChanges();
+
+            // Act
+            var actual = await _sut.Get(x => x.Id == applicationId);
+
+            //Assert
+            actual.BankDetailsRequired.Should().BeTrue();
+        }
+
+        [TestCase("ABC123")]
+        public async Task Then_bank_details_required_is_false_if_vendor_id_present(string vrfVendorId)
+        {
+            // Arrange
+            var applicationId = Guid.NewGuid();
+
+            var account = _fixture.Create<Models.Account>();
+            account.VrfVendorId = vrfVendorId;
+
+            var application = _fixture.Create<Models.IncentiveApplication>();
+
+            application.Id = applicationId;
+            application.AccountLegalEntityId = account.AccountLegalEntityId;
+
+            _context.Accounts.Add(account);
+            _context.Applications.Add(application);
+            _context.SaveChanges();
+
+            // Act
+            var actual = await _sut.Get(x => x.Id == applicationId);
+
+            //Assert
+            actual.BankDetailsRequired.Should().BeFalse();
+        }
     }
 }
