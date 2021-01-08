@@ -60,12 +60,12 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpGet("/accounts/last-vrf-update-date")]
-        public async Task<OkObjectResult> GetLatestVendorRegistrationCaseUpdateDateTime()
+        public async Task<IActionResult> GetLatestVendorRegistrationCaseUpdateDateTime()
         {
             var request = new GetLatestVendorRegistrationCaseUpdateDateTimeRequest();
             var response = await QueryAsync<GetLatestVendorRegistrationCaseUpdateDateTimeRequest, GetLatestVendorRegistrationCaseUpdateDateTimeResponse>(request);
 
-            return Ok(response.LastUpdateDateTime);
+            return Ok(response);
         }
     }
 }
