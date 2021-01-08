@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                ApplicationId = accountApplication.application.Id,
                                FirstName = accountApplication.apprentice.FirstName,
                                LastName = accountApplication.apprentice.LastName,
-                               ULN = accountApplication.apprentice.Uln,
+                               ULN = accountApplication.apprentice.ULN,
                                LegalEntityName = accountApplication.account.LegalEntityName,
                                Status = accountApplication.application.Status.ToString(),
                                TotalIncentiveAmount = accountApplication.apprentice.TotalIncentiveAmount
