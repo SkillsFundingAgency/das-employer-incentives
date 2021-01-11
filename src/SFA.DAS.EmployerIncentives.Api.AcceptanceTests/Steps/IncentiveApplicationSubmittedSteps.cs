@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the application is submitted and the system errors")]
         public async Task WhenTheApplicationIsSubmittedAndTheSystemErrors()
         {
-            _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
+            _testContext.TestData.Set("ThrowErrorAfterProcessedCommand", true);
 
             await WhenTheApplicationIsSubmitted();
         }
@@ -79,7 +79,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
 
-            var publishedCommand = _testContext.DomainCommandsPublished.Where(c => c.IsPublished)
+            var publishedCommand = _testContext.CommandsPublished
+                .Where(c => c.IsPublished && c.IsDomainCommand)
                 .Select(c => c.Command).ToArray();
 
             Debug.Assert(publishedCommand != null, nameof(publishedCommand) + " != null");

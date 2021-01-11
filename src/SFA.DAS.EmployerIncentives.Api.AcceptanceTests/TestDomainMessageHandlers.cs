@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
 using NServiceBus.Transport;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -73,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.Identifier = "";
                 });
 
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
                 s.Replace(new ServiceDescriptor(typeof(ICommandService), new CommandService(_testContext.EmployerIncentiveApi.Client)));
                 s.Decorate<ICommandService, CommandServiceWithLogging>();
 
@@ -119,6 +121,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             host = await hostBuilder.StartAsync();
         }
+
+        public IServiceCollection AddDecorators(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandler<>));
+
+            return Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
+        }
+
 
         public void Dispose()
         {

@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"VRF case status is changed to '(.*)'")]
         public async Task WhenVrfCaseStatusIsChangedTo(string status)
         {
-            var url = $"/legalentities/{_account.HashedLegalEntityId}/vendorregistrationform/status";
+            var url = $"/legalentities/{_account.HashedLegalEntityId}/vendorregistrationform";
 
             _newVrfStatus = status;
 
@@ -55,14 +55,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 CaseStatusLastUpdatedDate = _newVrfStatusUpdateDate
             };
 
-            var expectedEvents = 3;
-            if(status == "Case Request Completed")
+            var expectedProcessedEvents = 2;
+            var expectedPublishedEvents = 1;
+            if (status == "Case Request Completed")
             {
-                expectedEvents = 4;
+                expectedProcessedEvents = 2;
+                expectedPublishedEvents = 2;
             }
 
             await TestContext.WaitFor<ICommand>(async () =>
-               await EmployerIncentiveApi.Patch(url, data), numberOfOnProcessedEventsExpected: expectedEvents);
+               await EmployerIncentiveApi.Patch(url, data), 
+               numberOfOnProcessedEventsExpected: expectedProcessedEvents,
+               numberOfOnPublishedEventsExpected: expectedPublishedEvents);
 
             EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
@@ -70,8 +74,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"Employer Incentives account legal entity record is updated")]
         public void ThenEmployerIncentivesAccountLegalEntityRecordIsUpdated()
         {
-            var publishedCommands = TestContext.DomainCommandsPublished.Where(c =>
+            var publishedCommands = TestContext.CommandsPublished
+                .Where(c =>
                     c.IsPublished &&
+                    c.IsDomainCommand &&
                     c.Command is UpdateVendorRegistrationCaseStatusForAccountCommand                    
                 ).ToList();
 

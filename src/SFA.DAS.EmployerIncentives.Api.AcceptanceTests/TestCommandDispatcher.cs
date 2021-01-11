@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         _hook.OnReceived(command);
                     }
+                    
                     await _commandDispatcher.Send(command);
 
                     if (_hook?.OnProcessed != null)

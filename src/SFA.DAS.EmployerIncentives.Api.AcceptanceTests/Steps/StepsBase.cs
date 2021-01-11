@@ -44,26 +44,27 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 commandsHook.OnReceived += (command) =>
                 {
-                    if (command is DomainCommand)
-                    {
-                        testContext.DomainCommandsPublished.Add(new PublishedCommand(command) { IsReceived = true });
-                    }
-                    else
-                    {
-                        testContext.CommandsPublished.Add(new PublishedCommand(command) { IsReceived = true });
-                    }
+                    testContext.CommandsPublished.Add(
+                        new PublishedCommand(command) { 
+                            IsReceived = true,
+                            IsDomainCommand = command is DomainCommand
+                        });
                 };
 
                 commandsHook.OnProcessed += (command) =>
                 {
-                    if (command is DomainCommand)
+                    testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsProcessed = true);
+
+                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
+                    if (throwError)
                     {
-                        testContext.DomainCommandsPublished.Where(c => c.Command == command).ToList().ForEach(c => c.IsPublished = true);
+                        throw new ApplicationException("Unexpected exception, should force a rollback");
                     }
-                    else
-                    {
-                        testContext.CommandsPublished.Where(c => c.Command == command).ToList().ForEach(c => c.IsPublished = true);
-                    }
+                };
+                commandsHook.OnPublished += (command) =>
+                {
+                    testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsPublished = true);
+
                     var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishCommand");
                     if (throwError)
                     {
@@ -73,14 +74,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 commandsHook.OnErrored += (ex, command) =>
                 {
                     List<PublishedCommand> publishedCommands;
-                    if (command is DomainCommand)
-                    {
-                        publishedCommands = testContext.DomainCommandsPublished.Where(c => c.Command == command).ToList();
-                    }
-                    else
-                    {
-                        publishedCommands = testContext.CommandsPublished.Where(c => c.Command == command).ToList();
-                    }
+                    publishedCommands = testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList();
+
                     publishedCommands.ForEach(c =>
                     {
                         c.IsErrored = true;

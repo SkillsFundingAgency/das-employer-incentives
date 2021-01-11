@@ -21,15 +21,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                    bool assertOnTimeout = true,
                    bool assertOnError = false,
                    int timeoutInMs = 15000,
-                   int numberOfOnProcessedEventsExpected = 1)
+                   int numberOfOnProcessedEventsExpected = 1,
+                   int numberOfOnPublishedEventsExpected = 0)
         {
             var waitForResult = new WaitForResult();
             var messagesProcessed = 0;
+            var messagesPublished = 0;
 
             var hook = _testContext.Hooks.SingleOrDefault(h => h is Hook<T>) as Hook<T>;
 
             hook.OnReceived += (message) => { waitForResult.SetHasStarted(); };
-            hook.OnProcessed += (message) => { messagesProcessed++; if (messagesProcessed >= numberOfOnProcessedEventsExpected) { waitForResult.SetHasCompleted(); } };
+            hook.OnProcessed += (message) => { messagesProcessed++; if (messagesProcessed >= numberOfOnProcessedEventsExpected && messagesPublished >= numberOfOnPublishedEventsExpected) { waitForResult.SetHasCompleted(); } };
+            hook.OnPublished += (message) => { messagesPublished++; if (messagesProcessed >= numberOfOnProcessedEventsExpected && messagesPublished >= numberOfOnPublishedEventsExpected) { waitForResult.SetHasCompleted(); } };
             hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
 
             try

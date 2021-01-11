@@ -62,22 +62,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddAccountService()
                 .AddLearnerService();
 
-            // set up the command handlers and command validators
-            serviceCollection.Scan(scan =>
-            {
-                scan.FromAssembliesOf(typeof(ServiceCollectionExtensions))
-                    .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
-                    .AsImplementedInterfaces()
-                    .WithTransientLifetime()
-
-                    .AddClasses(classes => classes.AssignableTo(typeof(IValidator<>)))
-                    .AsImplementedInterfaces()
-                    .WithSingletonLifetime();
-            })
-            .AddCommandHandlerDecorators()
-            .AddScoped<ICommandDispatcher, CommandDispatcher>()
-            .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()
-            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
+            serviceCollection
+                .AddCommandHandlers(addDecorators: AddCommandHandlerDecorators)
+                .AddDomainCommandHandlerValidators()
+                .AddScoped<ICommandDispatcher, CommandDispatcher>()
+                .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()
+                .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
@@ -92,6 +82,29 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
             serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, _obfuscateSensitiveData) => new BusinessCentralFinancePaymentsService(c, limit, version, _obfuscateSensitiveData));
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddCommandHandlers(this IServiceCollection serviceCollection, Func<IServiceCollection, IServiceCollection> addDecorators = null)
+        {
+            // set up the command handlers and command validators
+            serviceCollection.Scan(scan =>
+            {
+                scan.FromAssembliesOf(typeof(ServiceCollectionExtensions))
+                    .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
+                    .AsImplementedInterfaces()
+                    .WithTransientLifetime()
+
+                    .AddClasses(classes => classes.AssignableTo(typeof(IValidator<>)))
+                    .AsImplementedInterfaces()
+                    .WithSingletonLifetime();
+            });
+            
+            if (addDecorators != null)
+            {
+                serviceCollection = addDecorators(serviceCollection);
+            }
 
             return serviceCollection;
         }
@@ -124,7 +137,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+          
+            return serviceCollection;
+        }
 
+        public static IServiceCollection AddDomainCommandHandlerValidators(this IServiceCollection serviceCollection)
+        {
             serviceCollection
                 .AddSingleton(typeof(IValidator<CreateIncentiveCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())

@@ -103,10 +103,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);                
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
-                s.Decorate<ICommandDispatcher>((handler, sp) => new TestCommandDispatcher(handler, _commandMessageHook));
+                s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>
             {
@@ -114,6 +116,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 a.AddInMemoryCollection(_config);
             });
             builder.UseEnvironment("LOCAL");
+        }
+
+        public IServiceCollection AddDecorators(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandler<>));
+            
+            return Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
         }
     }
 }

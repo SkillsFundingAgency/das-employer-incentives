@@ -11,10 +11,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     bool assertOnTimeout = true,
                     bool assertOnError = false,
                     int timeoutInMs = 60000,
-                    int numberOfOnProcessedEventsExpected = 1)
+                    int numberOfOnProcessedEventsExpected = 1,
+                    int numberOfOnPublishedEventsExpected = 0)
         {
             return new TestHelper(context)
-                .WaitFor<T>(func, assertOnTimeout: assertOnTimeout, assertOnError: assertOnError, timeoutInMs: timeoutInMs, numberOfOnProcessedEventsExpected: numberOfOnProcessedEventsExpected);
+                .WaitFor<T>(
+                func, 
+                assertOnTimeout: assertOnTimeout, 
+                assertOnError: assertOnError, 
+                timeoutInMs: timeoutInMs, 
+                numberOfOnProcessedEventsExpected: numberOfOnProcessedEventsExpected,
+                numberOfOnPublishedEventsExpected: numberOfOnPublishedEventsExpected);
         }
     }
 }
