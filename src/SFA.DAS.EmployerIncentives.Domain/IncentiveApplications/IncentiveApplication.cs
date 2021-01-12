@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
@@ -70,6 +71,30 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             {
                 AddApprenticeship(a);
             }
+        }
+
+        public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
+        {
+            var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.EmployerWithdrawn);
+            
+            AddEvent(new EmployerWithdrawn(
+                Model.AccountId,
+                Model.AccountLegalEntityId, 
+                apprenticeToWithdraw.GetModel(),
+                serviceRequest));
+        }
+
+        public void ComplianceWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
+        {
+            var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.ComplianceWithdrawn);
+
+            AddEvent(new ComplianceWithdrawn(
+                Model.AccountId,
+                Model.AccountLegalEntityId,
+                apprenticeToWithdraw.GetModel(),
+                serviceRequest));
         }
 
         public void EarningsCalculated(Guid apprenticeshipId)

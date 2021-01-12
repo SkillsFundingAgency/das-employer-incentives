@@ -36,8 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             apprenticeship.IncentiveApplicationId = application.Id;
 
             await DataAccess.SetupAccount(_account);
-            DataAccess.SetupApplication(application);
-            DataAccess.SetupApprenticeship(apprenticeship);
+            await DataAccess.InsertApplication(application);
+            await DataAccess.Insert(apprenticeship);
         }
 
         [When(@"VRF case status is changed to '(.*)'")]

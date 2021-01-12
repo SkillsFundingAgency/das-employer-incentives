@@ -45,15 +45,15 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NotFound();
         }
 
-        [HttpGet("/accounts/{accountId}/applications")]
-        public async Task<IActionResult> GetApplications(long accountId)
+        [HttpGet("/accounts/{accountId}/legalentity/{accountLegalEntityId}/applications")]
+        public async Task<IActionResult> GetApplications(long accountId, long accountLegalEntityId)
         {
-            var request = new GetApplicationsRequest(accountId);
+            var request = new GetApplicationsRequest(accountId, accountLegalEntityId);
             var response = await QueryAsync<GetApplicationsRequest, GetApplicationsResponse>(request);
 
             if (response?.ApprenticeApplications != null)
             {
-                return Ok(response.ApprenticeApplications);
+                return Ok(response);
             }
 
             return NotFound();

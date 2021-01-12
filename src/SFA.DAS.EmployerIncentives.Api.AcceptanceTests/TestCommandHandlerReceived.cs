@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
-    public class TestCommandHandler<T> : ICommandHandler<T> where T : ICommand
+    public class TestCommandHandlerReceived<T> : ICommandHandler<T> where T : ICommand
     {
         private readonly ICommandHandler<T> _handler;
         private readonly IHook<ICommand> _hook;
 
-        public TestCommandHandler(
+        public TestCommandHandlerReceived(
             ICommandHandler<T> handler,
             IHook<ICommand> hook)
         {
@@ -30,11 +30,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         _hook.OnReceived(command);
                     }
                     await _handler.Handle(command, cancellationToken);
-
-                    if (_hook?.OnProcessed != null)
-                    {
-                        _hook.OnProcessed(command);
-                    }
                 }
                 catch (Exception ex)
                 {

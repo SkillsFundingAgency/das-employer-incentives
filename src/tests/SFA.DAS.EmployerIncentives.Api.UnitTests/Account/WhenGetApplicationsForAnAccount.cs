@@ -31,22 +31,24 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
 
             var apprenticeApplicationList = new GetApplicationsResponse
             {
-                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplicationDto>()
+                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplicationDto>(),
+                BankDetailsStatus = Enums.BankDetailsStatus.InProgress
             };
 
             _queryDispatcher.Setup(x => x.Send<GetApplicationsRequest, GetApplicationsResponse>(
-                It.Is<GetApplicationsRequest>(y => y.AccountId == accountId)))
+                It.Is<GetApplicationsRequest>(y => y.AccountId == accountId && y.AccountLegalEntityId == accountLegalEntityId)))
                 .ReturnsAsync(apprenticeApplicationList);
 
             // Act
-            var result = await _sut.GetApplications(accountId) as OkObjectResult;
+            var result = await _sut.GetApplications(accountId, accountLegalEntityId) as OkObjectResult;
 
             // Assert
             result.Should().NotBeNull();
-            result.Value.Should().Be(apprenticeApplicationList.ApprenticeApplications);
+            result.Value.Should().Be(apprenticeApplicationList);
         }
 
         [Test]
@@ -54,6 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
             var apprenticeApplicationList = new GetApplicationsResponse();
 
             _queryDispatcher.Setup(x => x.Send<GetApplicationsRequest, GetApplicationsResponse>(
@@ -61,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                 .ReturnsAsync(apprenticeApplicationList);
 
             // Act
-            var actual = await _sut.GetApplications(accountId) as NotFoundResult;
+            var actual = await _sut.GetApplications(accountId, accountLegalEntityId) as NotFoundResult;
 
             // Assert
             actual.Should().NotBeNull();

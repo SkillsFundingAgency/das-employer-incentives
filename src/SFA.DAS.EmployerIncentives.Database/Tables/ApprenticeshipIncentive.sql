@@ -13,7 +13,8 @@
 	[AccountLegalEntityId] BIGINT NULL, 
     [UKPRN] BIGINT NULL, 
 	[RefreshedLearnerForEarnings] BIT NOT NULL DEFAULT(0), 
-    [HasPossibleChangeOfCircumstances] BIT NOT NULL DEFAULT (0)
+    [HasPossibleChangeOfCircumstances] BIT NOT NULL DEFAULT (0),    
+    [PausePayments] BIT NOT NULL DEFAULT 0
 )
 GO
 CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, ApprenticeshipId)

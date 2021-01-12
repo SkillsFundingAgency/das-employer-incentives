@@ -121,9 +121,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public IServiceCollection AddDecorators(IServiceCollection serviceCollection)
         {
             serviceCollection
-                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandler<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerReceived<>));
+
+            Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
             
-            return Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerProcessed<>));
+
+            return serviceCollection;
         }
     }
 }

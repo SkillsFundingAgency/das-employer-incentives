@@ -14,3 +14,5 @@
 )
 GO
 CREATE INDEX IX_Payment_ApprenticeshipIncentiveId ON [incentives].[Payment] (ApprenticeshipIncentiveId)
+GO
+CREATE INDEX IX_Payment_PaidDate ON [incentives].[Payment] (PaidDate)
