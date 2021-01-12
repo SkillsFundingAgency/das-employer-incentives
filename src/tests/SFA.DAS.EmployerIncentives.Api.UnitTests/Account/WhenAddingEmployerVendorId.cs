@@ -6,9 +6,9 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
