@@ -1,8 +1,10 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +32,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.AccountVrfCaseStatus
 
             foreach(var account in accountsWithoutVrfStatus)
             {
-                var applications = await _applicationDataRepository.GetList(account.AccountId);
+                var applications = new List<ApprenticeApplicationDto>();
+
+                foreach (var legalEntity in account.LegalEntities)
+                {
+                    var applicationsForLegalEntity = await _applicationDataRepository.GetList(account.AccountId, legalEntity.AccountLegalEntityId);
+                    applications.AddRange(applicationsForLegalEntity);
+                }
 
                 var submittedApplications = applications.Where(x => x.Status == IncentiveApplicationStatus.Submitted.ToString()
                                                                && x.ApplicationDate < command.ApplicationCutOffDate)

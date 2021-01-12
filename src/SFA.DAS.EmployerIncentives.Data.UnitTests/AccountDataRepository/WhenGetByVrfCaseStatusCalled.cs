@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
-            _sut = new Data.AccountDataRepository(_context);
+            _sut = new Data.AccountDataRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
         [TearDown]
