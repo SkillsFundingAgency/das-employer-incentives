@@ -30,6 +30,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         _hook.OnReceived(command);
                     }
                     await _handler.Handle(command, cancellationToken);
+
+                    if (_hook?.OnHandled != null)
+                    {
+                        _hook.OnHandled(command);
+                    }
                 }
                 catch (Exception ex)
                 {

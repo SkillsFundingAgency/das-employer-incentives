@@ -61,6 +61,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         throw new ApplicationException("Unexpected exception, should force a rollback");
                     }
                 };
+                commandsHook.OnHandled += (command) =>
+                {
+                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
+                    if (throwError)
+                    {
+                        throw new ApplicationException("Unexpected exception, should force a rollback");
+                    }
+                };
                 commandsHook.OnPublished += (command) =>
                 {
                     testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsPublished = true);
@@ -71,6 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         throw new ApplicationException("Unexpected exception, should force a rollback");
                     }
                 };
+
                 commandsHook.OnErrored += (ex, command) =>
                 {
                     List<PublishedCommand> publishedCommands;
