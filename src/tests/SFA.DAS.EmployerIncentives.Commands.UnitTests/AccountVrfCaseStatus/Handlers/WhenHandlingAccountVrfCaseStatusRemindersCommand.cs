@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             }
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
-            _applicationRepository.Setup(x => x.GetList(It.IsAny<long>())).ReturnsAsync(applications);
+            _applicationRepository.Setup(x => x.GetList(It.IsAny<long>(), It.IsAny<long>())).ReturnsAsync(applications);
 
             // Act
             await _sut.Handle(new AccountVrfCaseStatusRemindersCommand(_cutOffDate));
@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             }
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
-            _applicationRepository.Setup(x => x.GetList(It.IsAny<long>())).ReturnsAsync(applications);
+            _applicationRepository.Setup(x => x.GetList(It.IsAny<long>(), It.IsAny<long>())).ReturnsAsync(applications);
 
             // Act
             await _sut.Handle(new AccountVrfCaseStatusRemindersCommand(_cutOffDate));
@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             var applications = new List<ApprenticeApplicationDto>();
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
-            _applicationRepository.Setup(x => x.GetList(It.IsAny<long>())).ReturnsAsync(applications);
+            _applicationRepository.Setup(x => x.GetList(It.IsAny<long>(), It.IsAny<long>())).ReturnsAsync(applications);
 
             // Act
             await _sut.Handle(new AccountVrfCaseStatusRemindersCommand(_cutOffDate));
@@ -113,6 +113,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             string vrfCaseStatus = null;
 
             var accounts = _fixture.CreateMany<AccountDto>(2).ToList();
+            accounts[0].LegalEntities = _fixture.CreateMany<LegalEntityDto>(1).ToList();
+            accounts[1].LegalEntities = _fixture.CreateMany<LegalEntityDto>(1).ToList();
             var applications1 = _fixture.CreateMany<ApprenticeApplicationDto>(1).ToList();
             var applications2 = _fixture.CreateMany<ApprenticeApplicationDto>(1).ToList();
 
@@ -124,8 +126,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             applications2[0].ApplicationDate = _cutOffDate.AddDays(-1);
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
-            _applicationRepository.Setup(x => x.GetList(It.Is<long>(x => x == accounts[0].AccountId))).ReturnsAsync(applications1);
-            _applicationRepository.Setup(x => x.GetList(It.Is<long>(x => x == accounts[1].AccountId))).ReturnsAsync(applications2);
+            _applicationRepository.Setup(x => x.GetList(It.Is<long>(x => x == accounts[0].AccountId), It.Is<long>(x => x == accounts[0].LegalEntities[0].AccountLegalEntityId))).ReturnsAsync(applications1);
+            _applicationRepository.Setup(x => x.GetList(It.Is<long>(x => x == accounts[1].AccountId), It.Is<long>(x => x == accounts[1].LegalEntities[0].AccountLegalEntityId))).ReturnsAsync(applications2);
 
             // Act
             await _sut.Handle(new AccountVrfCaseStatusRemindersCommand(_cutOffDate));
