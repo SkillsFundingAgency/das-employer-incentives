@@ -20,6 +20,12 @@ Scenario: When no ILR submission found
 	And no payment records are created
 	And pending payments are not marked as paid
 
+Scenario: When learning not found
+	Given there are pending payments
+	And learning data does not exist
+	When the payment process is run
+	Then no further ILR validation is performed
+	
 Scenario: When at least one validation check fails
 	Given there are pending payments
 	And the '<ValidationStep>' will fail

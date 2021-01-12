@@ -169,6 +169,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
         }
 
+        [Given(@"learning data does not exist")]
+        public void GivenLearningDataDoesNotExist()
+        {
+            GivenTheValidationStepWillFail(ValidationStep.HasLearningRecord);
+        }
+
         [Then(@"the ILR Submission check will have a failed validation result")]
         public async Task ThenTheIlrSubmissionCheckWillHaveAFailedValidationResult()
         {
