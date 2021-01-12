@@ -45,8 +45,16 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
+using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
+using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -111,6 +119,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ILearnerDomainRepository, LearnerDomainRepository>();
             serviceCollection.Decorate<ILearnerDomainRepository, LearnerDomainRepositoryWithLogging>();
 
+            serviceCollection.AddScoped<IIncentiveApplicationStatusAuditDataRepository, IncentiveApplicationStatusAuditDataRepository>();
+
             return serviceCollection;
         }
 
@@ -128,12 +138,14 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<LearnerChangeOfCircumstanceCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CalculateDaysInLearningCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator());
+                .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator());
 
             return serviceCollection;
         }

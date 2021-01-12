@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
-    public interface IApprenticeshipIncentiveQueryRepository
+    public interface IApprenticeshipIncentiveQueryRepository : IQueryRepository<Models.ApprenticeshipIncentive>
     {
         Task<List<ApprenticeshipIncentiveDto>> GetList();
+
+        Task<Models.ApprenticeshipIncentive> Get(Expression<Func<Models.ApprenticeshipIncentive, bool>> predicate, bool includePayments = false);
     }
 }

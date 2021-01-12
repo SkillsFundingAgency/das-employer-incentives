@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
@@ -72,6 +73,30 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
+        public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
+        {
+            var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.EmployerWithdrawn);
+            
+            AddEvent(new EmployerWithdrawn(
+                Model.AccountId,
+                Model.AccountLegalEntityId, 
+                apprenticeToWithdraw.GetModel(),
+                serviceRequest));
+        }
+
+        public void ComplianceWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
+        {
+            var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.ComplianceWithdrawn);
+
+            AddEvent(new ComplianceWithdrawn(
+                Model.AccountId,
+                Model.AccountLegalEntityId,
+                apprenticeToWithdraw.GetModel(),
+                serviceRequest));
+        }
+
         public void EarningsCalculated(Guid apprenticeshipId)
         {
             var apprenticeship = _apprenticeships.Single(a => a.Id == apprenticeshipId);
@@ -80,9 +105,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
+            var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
+            apprenticeship.SetPlannedStartDate(endOfStartMonth);
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
-
     }
 }
