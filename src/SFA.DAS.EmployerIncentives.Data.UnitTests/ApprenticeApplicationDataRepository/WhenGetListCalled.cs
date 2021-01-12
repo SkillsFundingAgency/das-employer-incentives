@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
-            _sut = new Data.ApprenticeApplicationDataRepository(_context);
+            _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
         [TearDown]
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _context.SaveChanges();
 
             // Act
-            var result = (await _sut.GetList(accountId)).ToArray();
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
             result.All(x => x.AccountId == accountId).Should().BeTrue();

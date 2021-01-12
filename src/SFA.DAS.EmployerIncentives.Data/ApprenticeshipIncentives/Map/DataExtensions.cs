@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+﻿using Microsoft.VisualBasic;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
@@ -18,34 +19,48 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 FirstName = model.Apprenticeship.FirstName,
                 LastName = model.Apprenticeship.LastName,
                 DateOfBirth = model.Apprenticeship.DateOfBirth,
-                Uln = model.Apprenticeship.UniqueLearnerNumber,
+                ULN = model.Apprenticeship.UniqueLearnerNumber,
+                UKPRN = model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
-                PlannedStartDate = model.PlannedStartDate,
+                StartDate = model.StartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
-                Payments = model.PaymentModels.Map(),
-                AccountLegalEntityId = model.Account.AccountLegalEntityId
+                Payments = model.PaymentModels.Map(),                
+                RefreshedLearnerForEarnings = model.RefreshedLearnerForEarnings,
+                HasPossibleChangeOfCircumstances = model.HasPossibleChangeOfCircumstances,
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                PausePayments = model.PausePayments
             };
         }
 
         internal static ApprenticeshipIncentiveModel Map(this ApprenticeshipIncentive entity, IEnumerable<CollectionPeriod> collectionPeriods)
         {
-            return new ApprenticeshipIncentiveModel
-            {
-                Id = entity.Id,
-                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId ?? 0),
-                Apprenticeship = new Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship(
+            var apprenticeship = new Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship(
                      entity.ApprenticeshipId,
                      entity.FirstName,
                      entity.LastName,
                      entity.DateOfBirth,
-                     entity.Uln,
+                     entity.ULN,
                      entity.EmployerType
-                     ),
-                PlannedStartDate = entity.PlannedStartDate,
+                     );
+
+            if (entity.UKPRN.HasValue)
+            {
+                apprenticeship.SetProvider(new Domain.ApprenticeshipIncentives.ValueTypes.Provider(entity.UKPRN.Value));
+            }
+
+            return new ApprenticeshipIncentiveModel
+            {
+                Id = entity.Id,
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
+                Apprenticeship = apprenticeship,
+                StartDate = entity.StartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
-                PaymentModels = entity.Payments.Map()
+                PaymentModels = entity.Payments.Map(),
+                RefreshedLearnerForEarnings = entity.RefreshedLearnerForEarnings,
+                HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,                
+                PausePayments = entity.PausePayments
             };
         }
 
@@ -76,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = x.Id,
                 CreatedDateUtc = DateTime.UtcNow,
                 PeriodNumber = x.CollectionPeriod.PeriodNumber,
-                PaymentYear = x.CollectionPeriod.CalendarYear,
+                PaymentYear = x.CollectionPeriod.AcademicYear,
                 Result = x.Result,
                 Step = x.Step,
                 PendingPaymentId = paymentId
@@ -106,7 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x => new PendingPaymentValidationResultModel
             {
                 Id = x.Id,
-                CollectionPeriod = collectionPeriods.SingleOrDefault(p => p.CalendarYear == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
+                CollectionPeriod = collectionPeriods.SingleOrDefault(p => Convert.ToInt16(p.AcademicYear) == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
                 Result = x.Result,
                 Step = x.Step
             }).ToList();
@@ -150,9 +165,14 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             if (model != null)
             {
-                return new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, model.CalendarMonth,
-                    model.CalendarYear, model.EIScheduledOpenDateUTC,
-                    model.CensusDate, model.AcademicYear, model.Active);
+                return new Domain.ValueObjects.CollectionPeriod(
+                    model.PeriodNumber, 
+                    model.CalendarMonth, 
+                    model.CalendarYear, 
+                    model.EIScheduledOpenDateUTC,
+                    model.CensusDate,
+                    Convert.ToInt16(model.AcademicYear),
+                    model.Active);
             }
 
             return null;
@@ -167,10 +187,117 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     x.CalendarYear,
                     x.EIScheduledOpenDateUTC,
                     x.CensusDate,
-                    x.AcademicYear,
+                    Convert.ToInt16(x.AcademicYear),
                     x.Active)
             ).ToList();
         }
 
+        internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
+        {
+            return models.Select(x =>
+                new CollectionPeriod                
+                { 
+                    AcademicYear = x.AcademicYear.ToString(),
+                    Active = x.Active,
+                    CalendarMonth = x.CalendarMonth,
+                    CalendarYear = x.CalendarYear,
+                    CensusDate = x.CensusDate,
+                    EIScheduledOpenDateUTC = x.OpenDate,
+                    PeriodNumber = x.PeriodNumber
+                }).ToList();
+        }
+
+        internal static LearnerModel Map(this Learner model)
+        {
+            var learner = new LearnerModel
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                ApprenticeshipId = model.ApprenticeshipId,
+                Ukprn = model.Ukprn,
+                UniqueLearnerNumber = model.ULN,
+                CreatedDate = model.CreatedDate,
+                LearningPeriods = model.LearningPeriods.Map(),
+                DaysInLearnings = model.DaysInLearnings.Map()
+            };
+
+            if (model.SubmissionFound)
+            {
+                learner.SubmissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(model.SubmissionDate.Value);
+
+                if (model.LearningFound.HasValue)
+                {
+                    learner.SubmissionData.SetLearningFound(new Domain.ApprenticeshipIncentives.ValueTypes.LearningFoundStatus(model.LearningFound.Value));
+                }
+                if (model.HasDataLock.HasValue)
+                {
+                    learner.SubmissionData.SetHasDataLock(model.HasDataLock.Value);
+                }               
+                learner.SubmissionData.SetIsInLearning(model.InLearning);
+                learner.SubmissionData.SetStartDate(model.StartDate);
+                learner.SubmissionData.SetRawJson(model.RawJSON);
+                learner.SubmissionData.SetStartDate(model.StartDate);
+            }
+
+            return learner;
+        }
+
+        internal static Learner Map(this LearnerModel model)
+        {
+            var learner = new Learner
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                ApprenticeshipId = model.ApprenticeshipId,
+                Ukprn = model.Ukprn,
+                ULN = model.UniqueLearnerNumber,
+                LearningPeriods = model.LearningPeriods.Map(model.Id),
+                DaysInLearnings = model.DaysInLearnings.Map(model.Id)
+            };
+
+            if (model.SubmissionData != null)
+            {
+                learner.SubmissionFound = true;
+                learner.LearningFound = model.SubmissionData.LearningFoundStatus?.LearningFound;
+                learner.SubmissionDate = model.SubmissionData.SubmissionDate;
+                learner.StartDate = model.SubmissionData.StartDate;
+                learner.HasDataLock = model.SubmissionData.HasDataLock;
+                learner.InLearning = model.SubmissionData.IsInlearning;
+                learner.RawJSON = model.SubmissionData.RawJson;
+            }
+
+            return learner;
+        }
+
+        private static ICollection<LearningPeriod> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod> models, Guid learnerId)
+        {
+            return models.Select(x => new LearningPeriod
+            {
+                LearnerId = learnerId,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate
+            }).ToList();
+        }
+
+        private static ICollection<ApprenticeshipDaysInLearning> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> models, Guid learnerId)
+        {
+            return models.Select(x => new ApprenticeshipDaysInLearning
+            {
+                LearnerId = learnerId,
+                CollectionPeriodNumber = x.CollectionPeriodNumber,
+                CollectionPeriodYear = x.CollectionYear,
+                NumberOfDaysInLearning = x.NumberOfDays
+            }).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod> Map(this ICollection<LearningPeriod> models)
+        {
+            return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod(x.StartDate, x.EndDate)).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> Map(this ICollection<ApprenticeshipDaysInLearning> models)
+        {
+            return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning(x.CollectionPeriodNumber, x.CollectionPeriodYear, x.NumberOfDaysInLearning)).ToList();
+        }
     }
 }

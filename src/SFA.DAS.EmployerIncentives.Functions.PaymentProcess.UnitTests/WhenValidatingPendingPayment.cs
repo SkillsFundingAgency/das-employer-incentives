@@ -1,13 +1,14 @@
 using AutoFixture;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -19,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private ValidatePendingPaymentData _payment;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
             var fixture = new Fixture();
 
@@ -28,16 +29,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _payment = fixture.Create<ValidatePendingPaymentData>();
 
             _sut = new ValidatePendingPayment(_commandDispatcherMock.Object, _loggerMock.Object);
-
-            // Act
-            await _sut.Validate(_payment);
+           
         }
 
         [Test]
-        public void Command_is_sent_to_validate_payment()
+        public async Task Command_is_sent_to_validate_payment()
         {
+            // Act
+            await _sut.Validate(_payment);
+
+            // Assert
             _commandDispatcherMock.Verify(x => x.Send(It.Is<ValidatePendingPaymentCommand>(c => c.ApprenticeshipIncentiveId == _payment.ApprenticeshipIncentiveId &&
                 c.CollectionPeriod == _payment.Period && c.CollectionYear == _payment.Year && c.PendingPaymentId == _payment.PendingPaymentId), CancellationToken.None), Times.Once);
+        }
+
+        [Test]
+        public void ValidatePendingPaymentException_is_thrown_on_error()
+        {
+            // Arrange
+            var testException = new Exception(Guid.NewGuid().ToString());
+
+            _commandDispatcherMock
+                .Setup(m => m.Send(It.IsAny<ValidatePendingPaymentCommand>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(testException);                
+
+            //Act
+            Func<Task> action = async () => await _sut.Validate(_payment);
+
+            //Assert
+            action.Should().Throw<Exception>().WithMessage($"failed to validate ApprenticeshipIncentiveId : {_payment.ApprenticeshipIncentiveId}, PendingPaymentId : {_payment.PendingPaymentId}, Message : {testException.Message} ");
         }
     }
 }

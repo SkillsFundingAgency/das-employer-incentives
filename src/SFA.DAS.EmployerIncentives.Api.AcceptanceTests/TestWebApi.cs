@@ -90,6 +90,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
+                s.Configure<MatchedLearnerApi>(l =>
+                {
+                    l.ApiBaseUrl = _context.LearnerMatchApi.BaseAddress;
+                    l.Identifier = "";
+                    l.Version = "1.0";
+                });
                 if (_context.AccountApi != null)
                 {
                     s.Configure<AccountApi>(a =>
@@ -98,7 +104,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                         a.ClientId = "";
                     });
                 }
-
 
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));

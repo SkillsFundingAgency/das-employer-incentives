@@ -10,10 +10,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
     {
         public static void AddRouting(this RoutingSettings routingSettings)
         {
-            routingSettings.RouteToEndpoint(typeof(CreateApprenticeshipIncentiveCommand), QueueNames.ApprenticeshipIncentivesCreate);
+            routingSettings.RouteToEndpoint(typeof(CreateIncentiveCommand), QueueNames.ApprenticeshipIncentivesCreate);
             routingSettings.RouteToEndpoint(typeof(CalculateEarningsCommand), QueueNames.ApprenticeshipIncentivesCalculateEarnings);
             routingSettings.RouteToEndpoint(typeof(CompleteEarningsCalculationCommand), QueueNames.CompleteEarningsCalculation);
             routingSettings.RouteToEndpoint(typeof(AddEmployerVendorIdCommand), QueueNames.AddEmployerVendorId);
+            routingSettings.RouteToEndpoint(typeof(WithdrawCommand), QueueNames.ApprenticeshipIncentivesWithdraw);
         }
     }
 }

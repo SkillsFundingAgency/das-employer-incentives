@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
             _sut = new EarningsResilienceCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<EarningsResilienceApplicationsCheckCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.SendMany(It.IsAny<List<ICommand>>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
@@ -32,7 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
             await _sut.CheckApplications();
 
             // Assert
-            _mockCommandDispatcher.Verify(m => m.Send(It.IsAny<EarningsResilienceApplicationsCheckCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockCommandDispatcher.Verify(m => m.SendMany(It.IsAny<List<ICommand>>(),
+            It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

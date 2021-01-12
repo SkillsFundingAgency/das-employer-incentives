@@ -6,18 +6,18 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
     public class IncentiveApplicationDataRepository : IIncentiveApplicationDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public IncentiveApplicationDataRepository(EmployerIncentivesDbContext dbContext)
+        public IncentiveApplicationDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext;
+            _lazyContext = dbContext;
         }
 
         public async Task Add(IncentiveApplicationModel incentiveApplication)
@@ -58,6 +58,17 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                         select item).ToList();
 
             return await Task.FromResult(queryResult);
+        }        
+
+        public async Task<IEnumerable<IncentiveApplicationModel>> FindApplicationsByAccountLegalEntityAndUln(long accountLegalEntity, long uln)
+        {
+            var queryResult = (from result in (_dbContext.Applications.Include(x => x.Apprenticeships)
+                                           .Where(x => x.AccountLegalEntityId == accountLegalEntity
+                                           && x.Apprenticeships.Any(y => y.ULN  == uln)))
+                               let item = ApplicationToIncentiveApplicationModel(result)
+                               select item);
+
+            return await Task.FromResult(queryResult);
         }
 
         private static IncentiveApplicationModel ApplicationToIncentiveApplicationModel(Models.IncentiveApplication application)
@@ -90,8 +101,10 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                                             LastName = apprenticeship.LastName,
                                             PlannedStartDate = apprenticeship.PlannedStartDate,
                                             TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
-                                            Uln = apprenticeship.Uln,
-                                            UKPRN = apprenticeship.UKPRN
+                                            ULN = apprenticeship.ULN,
+                                            UKPRN = apprenticeship.UKPRN,
+                                            WithdrawnByEmployer = apprenticeship.WithdrawnByEmployer,
+                                            WithdrawnByCompliance = apprenticeship.WithdrawnByCompliance
                                         }
                                         select apprenticeshipModel).ToList();
             return new Collection<ApprenticeshipModel>(apprenticeshipModels);

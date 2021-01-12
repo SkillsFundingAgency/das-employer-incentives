@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System.Threading.Tasks;
 
@@ -13,10 +14,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
             _collectionPeriodDataRepository = collectionPeriodDataRepository;
         }
 
-        public async Task<CollectionCalendar> Get()
+        public async Task<Domain.ValueObjects.CollectionCalendar> Get()
         {
             var periods = await _collectionPeriodDataRepository.GetAll();
-            return new CollectionCalendar(periods);
+            return new Domain.ValueObjects.CollectionCalendar(periods);
+        }
+
+        public async Task Save(Domain.ValueObjects.CollectionCalendar collectionCalendar)
+        {
+            await _collectionPeriodDataRepository.Save(collectionCalendar.GetAllPeriods());
         }
     }
 }

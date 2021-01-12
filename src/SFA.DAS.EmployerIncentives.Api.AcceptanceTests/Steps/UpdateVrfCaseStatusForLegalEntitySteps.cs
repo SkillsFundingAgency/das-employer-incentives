@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Given(@"an existing submitted incentive application")]
-        public void GivenAnExistingSubmittedIncentiveApplication()
+        public async Task GivenAnExistingSubmittedIncentiveApplication()
         {
             _account = TestContext.TestData.GetOrCreate<Account>();
             var application = TestContext.TestData.GetOrCreate<IncentiveApplication>();
@@ -35,9 +35,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var apprenticeship = TestContext.TestData.GetOrCreate<IncentiveApplicationApprenticeship>();
             apprenticeship.IncentiveApplicationId = application.Id;
 
-            DataAccess.SetupAccount(_account);
-            DataAccess.SetupApplication(application);
-            DataAccess.SetupApprenticeship(apprenticeship);
+            await DataAccess.SetupAccount(_account);
+            await DataAccess.InsertApplication(application);
+            await DataAccess.Insert(apprenticeship);
         }
 
         [When(@"VRF case status is changed to '(.*)'")]
@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var url = $"/legalentities/{_account.HashedLegalEntityId}/vendorregistrationform/status";
 
             _newVrfStatus = status;
-            
+
             var data = new
             {
                 CaseId = _newVrfCaseId,
@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"a command to add an Employer Vendor Id Command is sent")]
         public void ThenACommandToAddAnEmployerVendorIdCommandIsSent()
         {
-            var command = TestContext.CommandsPublished.Single(c => c.IsPublished).Command; 
+            var command = TestContext.CommandsPublished.Single(c => c.IsPublished).Command;
             command.Should().BeOfType<AddEmployerVendorIdCommand>();
             ((AddEmployerVendorIdCommand)command).HashedLegalEntityId.Should().Be(_account.HashedLegalEntityId);
         }

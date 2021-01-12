@@ -22,7 +22,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<CollectionPeriod> CollectionPeriods { get; set; }
         public virtual DbSet<PendingPaymentValidationResult> PendingPaymentValidationResults { get; set; }
-
+        public virtual DbSet<Learner> Learners { get; set; }
+        public virtual DbSet<LearningPeriod> LearningPeriods { get; set; }
+        public virtual DbSet<ApprenticeshipDaysInLearning> DaysInLearnings { get; set; }
+        public virtual DbSet<IncentiveApplicationStatusAudit> IncentiveApplicationStatusAudits { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -38,6 +42,16 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
             modelBuilder.Entity<IncentiveApplicationApprenticeship>().Property(x => x.ApprenticeshipEmployerTypeOnApproval).HasConversion<int>();
             modelBuilder.Entity<ApprenticeshipIncentive>().Property(x => x.EmployerType).HasConversion<int>();
             modelBuilder.Entity<Payment>().Property(x => x.SubnominalCode).HasConversion<int>();
+
+            modelBuilder.Entity<LearningPeriod>(entity =>
+            {
+                entity.HasKey(e => new { e.LearnerId, e.StartDate });
+            });
+
+            modelBuilder.Entity<ApprenticeshipDaysInLearning>(entity =>
+            {
+                entity.HasKey(e => new { e.LearnerId, e.CollectionPeriodYear, e.CollectionPeriodNumber });
+            });
 
             OnModelCreatingPartial(modelBuilder);
         }

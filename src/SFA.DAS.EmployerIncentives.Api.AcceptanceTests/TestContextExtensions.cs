@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     Func<Task> func,
                     bool assertOnTimeout = true,
                     bool assertOnError = false,
-                    int timeoutInMs = 60000,
+                    int timeoutInMs = 90000,
                     int numberOfOnProcessedEventsExpected = 1)
         {
             return new TestHelper(context)

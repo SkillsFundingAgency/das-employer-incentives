@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
         }
 
         [FunctionName(nameof(HandleApprenticeshipIncentivesCreateCommand))]
-        public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.ApprenticeshipIncentivesCreate)] CreateApprenticeshipIncentiveCommand command)
+        public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.ApprenticeshipIncentivesCreate)] CreateIncentiveCommand command)
         {
             await _commandService.Dispatch(command);
         }

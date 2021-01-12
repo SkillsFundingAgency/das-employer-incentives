@@ -3,6 +3,8 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
-            _sut = new Data.AccountDataRepository(_dbContext);
+            _sut = new Data.AccountDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 
         [TearDown]
@@ -69,6 +71,81 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 
             // Assert            
             account.Should().BeNull();
+        }
+
+        [TestCase(LegalEntityVrfCaseStatus.Completed)]
+        public async Task Then_the_correct_bank_details_status_is_set_for_completed_bank_details_journey(string vrfCaseStatus)
+        {
+            // Arrange
+            var testAccount = _fixture.Create<Models.Account>();
+            testAccount.VrfCaseStatus = vrfCaseStatus;
+            _dbContext.Add(testAccount);
+            _dbContext.SaveChanges();
+
+            // Act
+            var account = await _sut.Find(testAccount.Id);
+
+
+            // Assert
+            var legalEntity = account.LegalEntityModels.First();
+            legalEntity.BankDetailsStatus.Should().Be(BankDetailsStatus.Completed);
+        }
+
+        [TestCase(LegalEntityVrfCaseStatus.RejectedDataValidation)]
+        [TestCase(LegalEntityVrfCaseStatus.RejectedVer1)]
+        [TestCase(LegalEntityVrfCaseStatus.RejectedVerification)]
+        public async Task Then_the_correct_bank_details_status_is_set_for_rejected_bank_details(string vrfCaseStatus)
+        {
+            // Arrange
+            var testAccount = _fixture.Create<Models.Account>();
+            testAccount.VrfCaseStatus = vrfCaseStatus;
+            _dbContext.Add(testAccount);
+            _dbContext.SaveChanges();
+
+            // Act
+            var account = await _sut.Find(testAccount.Id);
+
+
+            // Assert
+            var legalEntity = account.LegalEntityModels.First();
+            legalEntity.BankDetailsStatus.Should().Be(BankDetailsStatus.Rejected);
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        public async Task Then_the_correct_bank_details_status_is_set_for_not_started_bank_details_journey(string vrfCaseStatus)
+        {
+            // Arrange
+            var testAccount = _fixture.Create<Models.Account>();
+            testAccount.VrfCaseStatus = vrfCaseStatus;
+            _dbContext.Add(testAccount);
+            _dbContext.SaveChanges();
+
+            // Act
+            var account = await _sut.Find(testAccount.Id);
+
+
+            // Assert
+            var legalEntity = account.LegalEntityModels.First();
+            legalEntity.BankDetailsStatus.Should().Be(BankDetailsStatus.NotSupplied);
+        }
+
+        [TestCase(LegalEntityVrfCaseStatus.ToProcess)]
+        public async Task Then_the_correct_bank_details_status_is_set_for_in_progress_bank_details_journey(string vrfCaseStatus)
+        {
+            // Arrange
+            var testAccount = _fixture.Create<Models.Account>();
+            testAccount.VrfCaseStatus = vrfCaseStatus;
+            _dbContext.Add(testAccount);
+            _dbContext.SaveChanges();
+
+            // Act
+            var account = await _sut.Find(testAccount.Id);
+
+
+            // Assert
+            var legalEntity = account.LegalEntityModels.First();
+            legalEntity.BankDetailsStatus.Should().Be(BankDetailsStatus.InProgress);
         }
     }
 }

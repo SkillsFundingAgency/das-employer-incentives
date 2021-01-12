@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,10 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public Task Handle(Submitted @event, CancellationToken cancellationToken = default)
         {
+
             var commands = new List<Task>();
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
+            foreach (var apprenticeship in @event.EligibleApprenticeships())
             {
-                var command = new CreateApprenticeshipIncentiveCommand(
+                var command = new CreateIncentiveCommand(
                     @event.Model.AccountId,
                     @event.Model.AccountLegalEntityId,
                     apprenticeship.Id,
@@ -30,9 +32,10 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
                     apprenticeship.FirstName,
                     apprenticeship.LastName,
                     apprenticeship.DateOfBirth,
-                    apprenticeship.Uln,
+                    apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
-                    apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                    apprenticeship.UKPRN
                 );
 
                 var task = _commandPublisher.Publish(command);

@@ -8,10 +8,19 @@
     "Version": "1.0"
   },
   "ApplicationSettings": {
-    "DbConnectionString": "DB_CONNECTION_STRING"
+    "DbConnectionString": "DB_CONNECTION_STRING",
+    "NServiceBusConnectionString": "UseLearningEndpoint=true"
   },
-  "TestSettings": {
-    "FunctionHostPath": "%APPDATA%\\npm\\node_modules\\azure-functions-core-tools\\bin\\func.exe",
-    "FunctionApplicationPath": "src\\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\\bin\\Debug\\netcoreapp3.1"
+  "MatchedLearnerApi": {
+    "ApiBaseUrl": "LEARNER_MATCH_API_URL",
+    "ClientId": "",
+    "Version": "1.0"
+  },
+  "BusinessCentralApi": {
+    "ApiBaseUrl": "PAYMENTS_API_URL",
+    "SubscriptionKey": "",
+    "ApiVersion": "2020-10-01",
+    "PaymentRequestsLimit": 1000,
+    "ObfuscateSensitiveData": false
   }
 }
