@@ -80,14 +80,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
 
             var publishedCommand = _testContext.CommandsPublished
-                .Where(c => c.IsPublished && c.IsDomainCommand)
+                .Where(c => c.IsPublished && 
+                c.IsDomainCommand &&
+                c.Command is CreateIncentiveCommand)
                 .Select(c => c.Command).ToArray();
 
-            Debug.Assert(publishedCommand != null, nameof(publishedCommand) + " != null");
             publishedCommand.Count().Should().Be(_createRequest.Apprenticeships.Count());
 
             var cmd = publishedCommand.First() as CreateIncentiveCommand;
-            cmd.Should().NotBeNull();
             cmd.AccountId.Should().Be(_submitRequest.AccountId);
         }
 

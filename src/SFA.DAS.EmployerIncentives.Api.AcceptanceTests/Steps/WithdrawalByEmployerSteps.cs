@@ -135,7 +135,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             if (waitForMessage)
             {
                 await _testContext.WaitFor<MessageContext>(async () =>
-                         await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
+                         await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest),
+                         numberOfOnProcessedEventsExpected: 1);
             }
             else
             {
