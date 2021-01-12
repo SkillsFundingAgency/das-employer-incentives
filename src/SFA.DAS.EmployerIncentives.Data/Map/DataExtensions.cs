@@ -199,6 +199,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId
             };
         }
+        
         private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
         {
             if (String.IsNullOrWhiteSpace(model.VrfCaseStatus))
