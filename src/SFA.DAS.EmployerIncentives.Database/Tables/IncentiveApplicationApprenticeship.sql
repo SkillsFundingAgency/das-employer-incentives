@@ -11,7 +11,9 @@
 	[ApprenticeshipEmployerTypeOnApproval] INT NOT NULL,
 	[TotalIncentiveAmount] MONEY NOT NULL, 
     [UKPRN] BIGINT NULL, 
-	[EarningsCalculated] [bit] NOT NULL  DEFAULT 0,	
+	[EarningsCalculated] [bit] NOT NULL  DEFAULT 0,
+	[WithdrawnByEmployer] BIT NOT NULL DEFAULT 0,
+	[WithdrawnByCompliance] BIT NOT NULL DEFAULT 0,
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
 GO

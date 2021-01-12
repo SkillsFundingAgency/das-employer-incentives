@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
@@ -43,6 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             if (learnerData != null)
             {
+                if (LearnerAndEarningsHaveNotChanged(learnerData, learner, incentive))
+                {
+                    return;
+                }
+
                 submissionData = new SubmissionData(learnerData.IlrSubmissionDate);
                 submissionData.SetStartDate(learnerData.LearningStartDate(incentive));
                 submissionData.SetLearningFound(learnerData.LearningFound(incentive));
@@ -51,7 +57,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 
+            if (submissionData != null && !submissionData.Equals(learner.SubmissionData))
+            {
+                incentive.SetHasPossibleChangeOfCircumstances(true);
+            }
+
             learner.SetSubmissionData(submissionData);
+            incentive.LearnerRefreshCompleted();
 
             learner.SetLearningPeriods(learnerData.LearningPeriods(incentive));
 
@@ -63,6 +75,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             }
 
             await _learnerDomainRepository.Save(learner);
+            await _incentiveDomainRepository.Save(incentive);
+        }
+
+        private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            return learnerData.IlrSubmissionDate == learner.SubmissionData?.SubmissionDate &&
+                   incentive.RefreshedLearnerForEarnings;
         }
     }
 }

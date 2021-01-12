@@ -1,10 +1,14 @@
-﻿using SFA.DAS.EmployerIncentives.Data.Models;
+﻿using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Data.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
 {
@@ -62,7 +66,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfCaseId = model.VrfCaseId,
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
-                VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime
+                VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
+                BankDetailsStatus = MapBankDetailsStatus(model)
             };
         }
 
@@ -108,6 +113,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
                 EarningsCalculated = x.EarningsCalculated,
+                WithdrawnByEmployer = x.WithdrawnByEmployer,
+                WithdrawnByCompliance = x.WithdrawnByCompliance,
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN
@@ -144,8 +151,47 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 EarningsCalculated = x.EarningsCalculated,
+                WithdrawnByEmployer = x.WithdrawnByEmployer,
+                WithdrawnByCompliance = x.WithdrawnByCompliance,
                 UKPRN = x.UKPRN
             }).ToList();
+        }
+
+        private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
+        {
+            if (String.IsNullOrWhiteSpace(model.VrfCaseStatus))
+            {
+                return BankDetailsStatus.NotSupplied;
+            }
+
+            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
+             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return BankDetailsStatus.Rejected;
+            }
+
+            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return BankDetailsStatus.Completed;
+            }
+
+            return BankDetailsStatus.InProgress;
+        }
+      
+        internal static IncentiveApplicationStatusAudit Map(this IncentiveApplicationAudit entity)
+        {
+            return new IncentiveApplicationStatusAudit
+            {
+                Id = entity.Id,
+                IncentiveApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
+                Process = entity.Process,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now
+            };
+
         }
     }
 }

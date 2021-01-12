@@ -6,6 +6,6 @@ namespace SFA.DAS.EmployerIncentives.Data
 {
     public interface IApprenticeApplicationDataRepository
     {
-        Task<List<ApprenticeApplicationDto>> GetList(long accountId);
+        Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId);
     }
 }

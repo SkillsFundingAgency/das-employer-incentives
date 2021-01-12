@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
+﻿using SFA.DAS.EmployerIncentives.Enums;
+
+namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
 {
     public class LegalEntityDto
     {

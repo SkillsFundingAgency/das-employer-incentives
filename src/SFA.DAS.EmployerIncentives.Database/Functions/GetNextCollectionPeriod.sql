@@ -10,6 +10,7 @@ RETURN SELECT Top 1
       ,[CalendarMonth]
       ,[CalendarYear]
       ,[EIScheduledOpenDateUTC]
+      ,[AcademicYear]
   FROM [incentives].[CollectionCalendar]
   WHERE @today <= EIScheduledOpenDateUTC  
   ORDER BY EIScheduledOpenDateUTC

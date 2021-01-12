@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _context.SaveChanges();
 
             // Act
-            var result = (await _sut.GetList(accountId)).ToArray();
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
             result.All(x => x.AccountId == accountId).Should().BeTrue();

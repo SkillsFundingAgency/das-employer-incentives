@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck
 
         public async Task Handle(PaymentsCalculationRequired @event, CancellationToken cancellationToken = default)
         {
-            var command = new CalculateEarningsCommand(@event.Model.Id, @event.Model.Account.Id, @event.Model.Apprenticeship.Id);
+            var command = new CalculateEarningsCommand(@event.Model.Id);
             
             await _commandPublisher.Publish(command);            
         }
