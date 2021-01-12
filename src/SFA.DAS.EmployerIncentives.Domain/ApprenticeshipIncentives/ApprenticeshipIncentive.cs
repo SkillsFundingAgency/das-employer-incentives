@@ -372,9 +372,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             ValidateSubmissionFound(pendingPaymentId, learner, collectionPeriod);
             if (!learner.SubmissionData.SubmissionFound) return;
+
+            ValidateHasLearningRecord(pendingPaymentId, learner, collectionPeriod); 
             if (!learner.SubmissionData.LearningData.LearningFound) return;
 
-            ValidateHasLearningRecord(pendingPaymentId, learner, collectionPeriod);
             ValidateIsInLearning(pendingPaymentId, learner, collectionPeriod);
             ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
