@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -99,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var invalidApplicationId = _fixture.Create<Guid>();
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
         [Then(@"the application changes are not saved")]
@@ -152,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var invalidAccountId = _fixture.Create<long>();
             _submitRequest.AccountId = invalidAccountId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _response =  await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
     }
