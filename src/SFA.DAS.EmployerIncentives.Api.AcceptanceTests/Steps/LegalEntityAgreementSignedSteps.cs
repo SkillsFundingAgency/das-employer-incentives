@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the employer can apply for incentives")]
         public async Task TheEmployerCanApplyForIncentives()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.NoContent);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {

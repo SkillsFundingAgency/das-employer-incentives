@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"applications";
             await EmployerIncentiveApi.Post(url, _createRequest);
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Created);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Created);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the application status is updated to reflect completion")]
         public async Task ThenTheApplicationStatusIsUpdatedToReflectCompletion()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.OK);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
@@ -123,13 +123,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the service responds with an error")]
         public void ThenTheServiceRespondsWithAnError()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Then(@"the service responds with an internal error")]
         public void ThenTheServiceRespondsWithAnInternalError()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
 
         [Then(@"there are no events in the outbox")]

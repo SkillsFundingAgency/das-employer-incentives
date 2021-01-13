@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the application is updated with new selection of apprenticeships")]
         public void ThenTheApplicationIsUpdatedWithNewSelectionOfApprenticeships()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.OK);
 
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var query = $"SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = '{ _updateApplicationRequest.IncentiveApplicationId}'";

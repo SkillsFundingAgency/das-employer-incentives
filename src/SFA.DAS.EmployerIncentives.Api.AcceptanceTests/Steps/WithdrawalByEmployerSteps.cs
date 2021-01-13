@@ -149,7 +149,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the incentive application status is updated to indicate the employer withdrawal")]
         public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
@@ -176,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"each incentive application status is updated to indicate the employer withdrawal")]
         public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
@@ -213,9 +213,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"an error is returned")]
         public async Task ThenAnErrorIsReturned()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(await EmployerIncentiveApi.Response.Content.ReadAsStringAsync());
+            var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(await EmployerIncentiveApi.GetLastResponse().Content.ReadAsStringAsync());
             badRequestResponse.Error.Should().Be("Cannot withdraw an application that has been submitted and has received payments");
         }
 

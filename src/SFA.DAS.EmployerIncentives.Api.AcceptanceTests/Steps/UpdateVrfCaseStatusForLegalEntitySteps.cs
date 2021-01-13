@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                numberOfOnProcessedEventsExpected: expectedProcessedEvents,
                numberOfOnPublishedEventsExpected: expectedPublishedEvents);
 
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Then(@"Employer Incentives account legal entity record is updated")]

@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the employer is sent a reminder email to supply their bank details with a link in case they do not complete the journey")]
         public void ThenTheEmployerIsSentAReminderEmailToSupplyTheirBankDetailsWithALinkInCaseTheyDoNotCompleteTheJourney()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.OK);
 
             var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
             var recentFiles = directoryInfo.GetFiles().OrderByDescending(x => x.CreationTimeUtc >= DateTime.Now.AddMinutes(-2));
@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the email is not set and an error response returned")]
         public void ThenTheEmailIsNotSetAndAnErrorResponseReturned()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [When(@"A bank details required email is sent with an invalid account id")]

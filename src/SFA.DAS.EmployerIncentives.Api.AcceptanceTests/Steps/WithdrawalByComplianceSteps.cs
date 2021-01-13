@@ -122,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the incentive application status is updated to indicate the Compliance withdrawal")]
         public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
@@ -149,7 +149,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"each incentive application status is updated to indicate the Compliance withdrawal")]
         public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();

@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the application is saved")]
         public async Task ThenTheApplicationIsSaved()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(_expectedResult);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(_expectedResult);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {

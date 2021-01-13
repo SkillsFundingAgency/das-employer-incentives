@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     $"/jobs",
                    new JobRequest { Type = JobType.RefreshLegalEntities, Data = data });
 
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(_expectedResult);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(_expectedResult);
         }
 
         [Then(@"the legal entities are available in employer incentives")]

@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         OrganisationName = _testAccountTable.LegalEntityName
                     });
 
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(_expectedResult);
+            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(_expectedResult);
         }
     }
 }
