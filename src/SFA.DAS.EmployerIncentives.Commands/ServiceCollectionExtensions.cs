@@ -52,6 +52,7 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Commands.AccountVrfCaseStatus;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
