@@ -61,10 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
                 legalEntity.UpdateVendorRegistrationCaseStatus(caseId, status, lastUpdatedDate);
             }
 
-            if (VrfStatusIsCompleted(status))
-            {
-                AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
-            }
+            AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
         }
 
         private IEnumerable<LegalEntity> LegalEntitiesWithIncompleteVendorRegistration(string hashedLegalEntityId)

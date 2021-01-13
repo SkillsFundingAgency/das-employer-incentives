@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly PendingPayment _pendingPayment;
         private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
         private readonly Payment _payment;
-        private bool waitForMessage = true;
+        private bool _waitForMessage = true;
 
         public WithdrawalByEmployerSteps(TestContext testContext) : base(testContext)
         {
@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Given(@"an incentive application has been made, submitted and has payments")]
-        public async Task GivenAnIncentiveApplicationHasBeenMadeSubmitteAndHasPayments()
+        public async Task GivenAnIncentiveApplicationHasBeenMadeSubmittedAndHasPayments()
         {
             using var dbConnection = new SqlConnection(_connectionString);
             await dbConnection.InsertAsync(_application);
@@ -98,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             await dbConnection.InsertAsync(_payment);
 
-            waitForMessage = false;
+            _waitForMessage = false;
         }
 
         [Given(@"multiple incentive applications have been made for the same ULN without being submitted")]
@@ -133,7 +133,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var url = $"withdrawals";
 
-            if (waitForMessage)
+            if (_waitForMessage)
             {
                 await _testContext.WaitFor<ICommand>(async () =>
                          await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest)
@@ -198,7 +198,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Then(@"the apprenticeship incentive and it's pending payments are removed from the system")]
-        public async Task ThenTheIncentiveAndPendingPaymentsAreremovedFromTheSystem()
+        public async Task ThenTheIncentiveAndPendingPaymentsAreRemovedFromTheSystem()
         {
             await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal();
 
@@ -221,7 +221,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         public class BadRequestResponse
         {
-            public string Error {get; set;}
+            public string Error { get; set; }
         }
     }
 }
