@@ -179,7 +179,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
             var publishedCommands = _testContext.CommandsPublished
-                .Where(c => c.IsPublished && c.IsDomainCommand )
+                .Where(c => c.IsPublished && 
+                c.IsDomainCommand &&
+                c.Command is CreateIncentiveCommand)
                 .Select(c => c.Command)
                 .ToArray();
 
