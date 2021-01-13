@@ -7,7 +7,6 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
-using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -83,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         [Given(@"multiple incentive applications have been made for the same ULN without being submitted")]
         public async Task GivenMultiplwIncentiveApplicationsHaveBeenMadeWithoutBeingSubmitted()
-        {            
+        {
             using var dbConnection = new SqlConnection(_connectionString);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
@@ -97,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
-            await dbConnection.InsertAsync(_pendingPayment);            
+            await dbConnection.InsertAsync(_pendingPayment);
             await dbConnection.InsertAsync(_pendingPaymentValidationResult);
         }
 
@@ -109,13 +108,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(r => r.WithdrawalType, WithdrawalType.Compliance)
                 .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
                 .With(r => r.ULN, _apprenticeship.ULN)
-                .Create();           
-            
+                .Create();
+
             var url = $"withdrawals";
 
-            await _testContext.WaitFor<MessageContext>(async () =>
-                     await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
-        }             
+            await _testContext.WaitFor<MessageContext>(() => EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
+        }
 
         [Then(@"the incentive application status is updated to indicate the Compliance withdrawal")]
         public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()
@@ -126,7 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
             apprenticeships.Should().HaveCount(1);
             apprenticeships.Single(a => a.Id == _apprenticeship.Id).WithdrawnByCompliance.Should().BeTrue();
-            
+
             var incentiveApplicationAudits = await dbConnection.GetAllAsync<IncentiveApplicationStatusAudit>();
             incentiveApplicationAudits.Should().HaveCount(1);
             var auditRecord = incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship.Id);
@@ -139,7 +137,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .CommandsPublished
                 .Single(c => c.IsPublished &&
                 c.Command is WithdrawCommand).Command as WithdrawCommand;
-                       
+
             publishedCommand.AccountId.Should().Be(_application.AccountId);
             publishedCommand.IncentiveApplicationApprenticeshipId.Should().Be(_apprenticeship.Id);
         }
@@ -180,6 +178,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             incentives.Should().HaveCount(0);
             pendingPaymentValidationResults.Should().HaveCount(0);
             pendingPayments.Should().HaveCount(0);
-        }        
+        }
     }
 }
