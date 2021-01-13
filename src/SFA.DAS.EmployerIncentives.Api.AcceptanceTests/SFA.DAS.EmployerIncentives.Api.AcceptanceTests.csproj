@@ -6,6 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="%2a%2a\**" />
+    <EmbeddedResource Remove="%2a%2a\**" />
+    <None Remove="%2a%2a\**" />
+    <SpecFlowFeatureFiles Remove="%2a%2a\**" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="%2a%2a\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Remove="%2a%2a\%2a.feature" />
+  </ItemGroup>
+ 
+  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
@@ -33,6 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\UpdateCollectionCalendarPeriod.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Update="Features\ApplicationsForAccountRequested.feature.cs">
       <DesignTime>True</DesignTime>
       <DependentUpon>ApplicationsForAccountRequested.feature</DependentUpon>
@@ -45,8 +60,17 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>IncentiveDetailsRequested.feature</DependentUpon>
     </Compile>
+    <Compile Update="Features\PausePayments.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Features\ResumePausedPayments.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\SendBankDetailsRepeatReminderEmails.feature.cs">
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Update="Features\SendBankDetailsRequiredEmail.feature.cs">
       <DependentUpon>SendBankDetailsRequiredEmail.feature</DependentUpon>
@@ -66,6 +90,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\UpdateCollectionCalendarPeriod.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>UpdateCollectionCalendarPeriod.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\ApplicationsForAccountRequested.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>ApplicationsForAccountRequested.feature.cs</LastGenOutput>
@@ -78,11 +106,23 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\PausePayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ResumePausedPayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsReminderEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <LastGenOutput>SendBankDetailsRequiredEmail.feature.cs</LastGenOutput>
       <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\SendBankDetailsRepeatReminderEmails.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>SendBankDetailsRepeatReminderEmails.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsRequiredEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

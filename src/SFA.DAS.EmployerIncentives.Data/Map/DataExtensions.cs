@@ -1,6 +1,9 @@
-﻿using SFA.DAS.EmployerIncentives.Data.Models;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -63,7 +66,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfCaseId = model.VrfCaseId,
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
-                VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime
+                VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
+                BankDetailsStatus = MapBankDetailsStatus(model)
             };
         }
 
@@ -78,6 +82,36 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             accounts.ToList().ForEach(i => model.LegalEntityModels.Add(MapLegalEntity(i)));
 
             return model;
+        }
+
+        public static IEnumerable<AccountDto> MapDto(this IEnumerable<Models.Account> models)
+        {
+            var accounts = new List<AccountDto>();
+
+            foreach (var model in models)
+            {
+                var account = accounts.SingleOrDefault(a => a.AccountId == model.Id);
+                if (account == null)
+                {
+                    account = new AccountDto { AccountId = model.Id, LegalEntities = new List<LegalEntityDto>() };
+                    accounts.Add(account);
+                }
+                account.LegalEntities.Add(MapLegalEntityDto(model));
+            }
+
+            return accounts;
+        }
+
+        private static LegalEntityDto MapLegalEntityDto(Models.Account model)
+        {
+            return new LegalEntityDto
+            {
+                AccountId = model.Id,
+                AccountLegalEntityId = model.AccountLegalEntityId,
+                HasSignedIncentivesTerms = model.HasSignedIncentivesTerms,
+                LegalEntityName = model.LegalEntityName,
+                VrfVendorId = model.VrfVendorId
+            };
         }
 
         internal static Models.IncentiveApplication Map(this IncentiveApplicationModel model)
@@ -153,6 +187,41 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             }).ToList();
         }
 
+        public static LegalEntityDto Map(this LegalEntityModel model, long accountId)
+        {
+            return new LegalEntityDto
+            {
+                AccountId = accountId,
+                AccountLegalEntityId = model.AccountLegalEntityId,
+                HasSignedIncentivesTerms = model.HasSignedAgreementTerms,
+                LegalEntityId = model.Id,
+                LegalEntityName = model.Name,
+                VrfVendorId = model.VrfVendorId
+            };
+        }
+        
+        private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
+        {
+            if (String.IsNullOrWhiteSpace(model.VrfCaseStatus))
+            {
+                return BankDetailsStatus.NotSupplied;
+            }
+
+            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
+             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return BankDetailsStatus.Rejected;
+            }
+
+            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return BankDetailsStatus.Completed;
+            }
+
+            return BankDetailsStatus.InProgress;
+        }
+      
         internal static IncentiveApplicationStatusAudit Map(this IncentiveApplicationAudit entity)
         {
             return new IncentiveApplicationStatusAudit
@@ -165,6 +234,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 CreatedDateTime = DateTime.Now
             };
+
         }
     }
 }

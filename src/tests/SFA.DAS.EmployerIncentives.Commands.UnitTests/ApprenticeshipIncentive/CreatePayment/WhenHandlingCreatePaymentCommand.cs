@@ -26,8 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfilesService;
         private Fixture _fixture;
-        private List<CollectionPeriod> _collectionPeriods;
-        private CollectionPeriod _firstCollectionPeriod;
+        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private Domain.ValueObjects.CollectionPeriod _firstCollectionPeriod;
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
 
         [SetUp]
@@ -35,9 +35,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             _fixture = new Fixture();
 
-            _collectionPeriods = new List<CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(
+                new Domain.ValueObjects.CollectionPeriod(
                     1,
                     (byte)DateTime.Now.Month,
                     (short)DateTime.Now.Year,
@@ -45,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     DateTime.Now.AddDays(-1),
                     (short)DateTime.Now.Year,
                     false),
-                new CollectionPeriod(
+                new Domain.ValueObjects.CollectionPeriod(
                 1,
                 (byte)DateTime.Now.AddMonths(1).Month,
                 (short)DateTime.Now.AddMonths(1).Year,
@@ -131,9 +131,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     })
             };
 
-            var collectionPeriods = new List<CollectionPeriod>()
+            var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(
+                new Domain.ValueObjects.CollectionPeriod(
                     1, 
                     (byte)DateTime.Now.Month, 
                     (short)DateTime.Now.Year, 
@@ -143,7 +143,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     true)
             };
 
-            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new CollectionCalendar(collectionPeriods));
+            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
             _mockIncentivePaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
 
             await incentive.CalculateEarnings(_mockIncentivePaymentProfilesService.Object, _mockCollectionCalendarService.Object);

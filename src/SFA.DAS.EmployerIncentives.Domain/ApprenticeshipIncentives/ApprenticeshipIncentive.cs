@@ -14,6 +14,9 @@ using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
+using PaymentsResumed = SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events.PaymentsResumed;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -21,12 +24,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
     {
         public Account Account => Model.Account;
         public Apprenticeship Apprenticeship => Model.Apprenticeship;
-        public DateTime PlannedStartDate => Model.PlannedStartDate;
+        public DateTime StartDate => Model.StartDate;
+        public bool RefreshedLearnerForEarnings => Model.RefreshedLearnerForEarnings;
+        public bool HasPossibleChangeOfCircumstances => Model.HasPossibleChangeOfCircumstances;
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public PendingPayment NextDuePayment => GetNextDuePayment();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
+        public bool PausePayments => Model.PausePayments;
 
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, bool pausePayments)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -36,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ApplicationApprenticeshipId = applicationApprenticeshipId,
                     Account = account,
                     Apprenticeship = apprenticeship,
-                    PlannedStartDate = plannedStartDate
+                    StartDate = plannedStartDate,
+                    PausePayments = pausePayments
                 }, true);
         }
 
@@ -49,16 +56,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             IIncentivePaymentProfilesService incentivePaymentProfilesService,
             ICollectionCalendarService collectionCalendarService)
         {
+            if (Model.PendingPaymentModels.Any())
+            {
+                return;
+            }
+
             var paymentProfiles = await incentivePaymentProfilesService.Get();
             var collectionCalendar = await collectionCalendarService.Get();
 
-            var incentive = new Incentive(Apprenticeship.DateOfBirth, PlannedStartDate, paymentProfiles);
+            var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {
-                throw new InvalidIncentiveException("Incentive does not pass the eligibility checks");
+                return;
             }
 
-            Model.PendingPaymentModels.Clear();
             foreach (var payment in incentive.Payments)
             {
                 var pendingPayment = PendingPayment.New(
@@ -82,6 +93,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApprenticeshipId = Apprenticeship.Id,
                 ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
             });
+
+            Model.RefreshedLearnerForEarnings = false;
         }
 
         public void CalculatePayments()
@@ -114,6 +127,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.SetPaymentMadeDate(paymentDate);
         }
 
+        public void SetStartDate(DateTime startDate)
+        {
+            if (startDate != Model.StartDate)
+            {
+                Model.StartDate = startDate;
+                Model.PendingPaymentModels.Clear();
+            }
+        }
+
+        public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
+        {
+            Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
+        }
+
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var subnominalCode = DetermineSubnominalCode();
@@ -134,7 +161,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private SubnominalCode DetermineSubnominalCode()
         {
-            var age = Model.Apprenticeship.DateOfBirth.AgeOnThisDay(Model.PlannedStartDate);
+            var age = Model.Apprenticeship.DateOfBirth.AgeOnThisDay(Model.StartDate);
             var employerType = Model.Apprenticeship.EmployerType;
 
             if (employerType == ApprenticeshipEmployerType.Levy)
@@ -157,7 +184,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return SubnominalCode.NonLevy19Plus;
             }
 
-            throw new InvalidIncentiveException("Cannot determine SubnominalCode as EmployerType has not been assigned as Levy or Non Levy");
+            throw new ArgumentException("Cannot determine SubnominalCode as EmployerType has not been assigned as Levy or Non Levy");
         }
 
         private void RemoveExistingPaymentIfExists(Guid pendingPaymentId)
@@ -194,6 +221,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var isValid = !string.IsNullOrEmpty(legalEntity.VrfVendorId);
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasBankDetails, isValid));
+        }
+
+        public void ValidatePaymentsNotPaused(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
+        {
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            var isValid = !Model.PausePayments;
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.PaymentsNotPaused, isValid));
         }
 
         private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
@@ -243,6 +279,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
         }
 
+        public void LearnerRefreshCompleted()
+        {
+            Model.RefreshedLearnerForEarnings = true;
+		}
+
         public void ValidateDaysInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
@@ -250,10 +291,36 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var hasEnoughDaysInLearning = false;
             if (matchedLearner != null)
             {
-                hasEnoughDaysInLearning = PlannedStartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) >= pendingPayment.DueDate.Date;
+                hasEnoughDaysInLearning = StartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) >= pendingPayment.DueDate.Date;
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasDaysInLearning, hasEnoughDaysInLearning));
+        }
+
+        public void PauseSubsequentPayments(ServiceRequest serviceRequest)
+        {
+            if (Model.PausePayments == false)
+            {
+                Model.PausePayments = true;
+                AddEvent(new PaymentsPaused(Model.Account.Id, Model.Account.AccountLegalEntityId, Model, serviceRequest));
+            }
+            else
+            {
+                throw new PausePaymentsException("Payments already paused");
+            }
+        }
+
+        public void ResumePayments(ServiceRequest serviceRequest)
+        {
+            if (Model.PausePayments)
+            {
+                Model.PausePayments = false;
+                AddEvent(new PaymentsResumed(Model.Account.Id, Model.Account.AccountLegalEntityId, Model, serviceRequest));
+            }
+            else
+            {
+                throw new PausePaymentsException("Payments are not paused");
+            }
         }
 
         private PendingPayment GetPendingPaymentForValidationCheck(Guid pendingPaymentId)

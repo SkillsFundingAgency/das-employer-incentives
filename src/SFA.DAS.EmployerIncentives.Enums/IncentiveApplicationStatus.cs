@@ -5,6 +5,8 @@
         InProgress,
         Submitted,
         EmployerWithdrawn,
-        ComplianceWithdrawn
+        ComplianceWithdrawn,
+        PaymentsPaused,
+        PaymentsResumed
     }
 }

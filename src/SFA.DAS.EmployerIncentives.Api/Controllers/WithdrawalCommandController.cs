@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest(new { Error = "Invalid WithdrawalType of {request.WithdrawalType} passed in" });
             }
         }       
 

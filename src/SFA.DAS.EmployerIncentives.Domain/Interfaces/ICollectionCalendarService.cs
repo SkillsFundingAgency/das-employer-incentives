@@ -5,6 +5,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.Interfaces
 {
     public interface ICollectionCalendarService
     {
-        Task<CollectionCalendar> Get();
+        Task<Domain.ValueObjects.CollectionCalendar> Get();
+
+        Task Save(Domain.ValueObjects.CollectionCalendar collectionCalendar);
     }
 }

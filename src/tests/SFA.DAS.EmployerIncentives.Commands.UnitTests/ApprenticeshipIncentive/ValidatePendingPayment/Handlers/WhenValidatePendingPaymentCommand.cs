@@ -4,7 +4,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePendingPayment;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
@@ -27,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
         private string _vrfVendorId;
         private Account _account;
         private LearnerModel _learnerModel;
@@ -51,9 +50,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
 
-            _collectionPeriods = new List<CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(
+                new Domain.ValueObjects.CollectionPeriod(
                     1,
                     (byte)DateTime.Now.Month,
                     (short)DateTime.Now.Year,
@@ -65,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockCollectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new CollectionCalendar(_collectionPeriods));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
 
             _vrfVendorId = Guid.NewGuid().ToString();
             var legalEntity = _fixture.Build<LegalEntityModel>()
@@ -93,8 +92,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var model = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(m => m.Account, _account)
-                .With(m => m.PlannedStartDate, _startDate)
+                .With(m => m.StartDate, _startDate)
                 .With(m => m.PendingPaymentModels, pendingPayments)
+                .With(m => m.PausePayments, false)
                 .Create();
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
@@ -285,7 +285,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 2)
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 3)
                 .PendingPaymentValidationResults.Single(x => x.Step == "HasIlrSubmission");
             validationResult.Result.Should().BeFalse();
         }

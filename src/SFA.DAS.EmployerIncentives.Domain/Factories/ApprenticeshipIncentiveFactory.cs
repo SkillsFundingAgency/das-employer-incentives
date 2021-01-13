@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
     {
         public ApprenticeshipIncentive CreateNew(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate)
         {
-            return ApprenticeshipIncentive.New(id, applicationApprenticeshipId, account, apprenticeship, plannedStartDate);
+            return ApprenticeshipIncentive.New(id, applicationApprenticeshipId, account, apprenticeship, plannedStartDate, false);
         }
 
         public ApprenticeshipIncentive GetExisting(Guid id, ApprenticeshipIncentiveModel model)

@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+﻿using Microsoft.VisualBasic;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,14 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ULN = model.Apprenticeship.UniqueLearnerNumber,
                 UKPRN = model.Apprenticeship.Provider?.Ukprn,
                 EmployerType = model.Apprenticeship.EmployerType,
-                PlannedStartDate = model.PlannedStartDate,
+                StartDate = model.StartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
-                Payments = model.PaymentModels.Map(),
-                AccountLegalEntityId = model.Account.AccountLegalEntityId
+                Payments = model.PaymentModels.Map(),                
+                RefreshedLearnerForEarnings = model.RefreshedLearnerForEarnings,
+                HasPossibleChangeOfCircumstances = model.HasPossibleChangeOfCircumstances,
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                PausePayments = model.PausePayments
             };
         }
 
@@ -50,10 +54,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = entity.Id,
                 Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
                 Apprenticeship = apprenticeship,
-                PlannedStartDate = entity.PlannedStartDate,
+                StartDate = entity.StartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
-                PaymentModels = entity.Payments.Map()
+                PaymentModels = entity.Payments.Map(),
+                RefreshedLearnerForEarnings = entity.RefreshedLearnerForEarnings,
+                HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,                
+                PausePayments = entity.PausePayments
             };
         }
 
@@ -185,6 +192,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             ).ToList();
         }
 
+        internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
+        {
+            return models.Select(x =>
+                new CollectionPeriod                
+                { 
+                    AcademicYear = x.AcademicYear.ToString(),
+                    Active = x.Active,
+                    CalendarMonth = x.CalendarMonth,
+                    CalendarYear = x.CalendarYear,
+                    CensusDate = x.CensusDate,
+                    EIScheduledOpenDateUTC = x.OpenDate,
+                    PeriodNumber = x.PeriodNumber
+                }).ToList();
+        }
+
         internal static LearnerModel Map(this Learner model)
         {
             var learner = new LearnerModel
@@ -194,6 +216,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipId = model.ApprenticeshipId,
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
+                CreatedDate = model.CreatedDate,
                 LearningPeriods = model.LearningPeriods.Map(),
                 DaysInLearnings = model.DaysInLearnings.Map()
             };
@@ -213,6 +236,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 learner.SubmissionData.SetIsInLearning(model.InLearning);
                 learner.SubmissionData.SetStartDate(model.StartDate);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
+                learner.SubmissionData.SetStartDate(model.StartDate);
             }
 
             return learner;

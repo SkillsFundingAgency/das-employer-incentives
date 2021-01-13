@@ -7,5 +7,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
     public interface ICollectionPeriodDataRepository
     {
         Task<IEnumerable<CollectionPeriod>> GetAll();
+        Task Save(IEnumerable<CollectionPeriod> collectionPeriods);
     }
 }

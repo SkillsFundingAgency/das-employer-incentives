@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
+        private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
         private readonly Payment _payment;
         private bool waitForMessage = true;
 
@@ -68,6 +69,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _payment = _fixture
                 .Build<Payment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .Create();
+
+            _pendingPaymentValidationResult = _fixture
+                .Build<PendingPaymentValidationResult>()
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.Step, "Invalid")
+                .With(p => p.PeriodNumber, 1)
+                .With(p => p.PaymentYear, 2021)
                 .Create();
         }
 
@@ -108,6 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             await dbConnection.InsertAsync(_pendingPayment);
+            await dbConnection.InsertAsync(_pendingPaymentValidationResult);
         }
 
         [When(@"the apprenticeship application is withdrawn from the scheme")]
