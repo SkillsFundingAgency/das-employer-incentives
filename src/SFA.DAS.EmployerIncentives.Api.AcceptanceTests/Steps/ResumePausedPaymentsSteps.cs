@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TechTalk.SpecFlow;
+using System.Net.Http;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -24,8 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly IncentiveApplication _application;
         private readonly IncentiveApplicationApprenticeship _apprenticeship;
         private PausePaymentsRequest _pausePaymentsRequest;
-
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
+        private HttpResponseMessage _response;
 
         public ResumePausedPaymentsSteps(TestContext testContext) : base(testContext)
         {
@@ -79,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             
             var url = "pause-payments";
 
-            await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);
+            _response = await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);
         }
 
         [When(@"an invalid request is sent")]
@@ -93,30 +94,30 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var url = "pause-payments";
 
-            await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);
+            _response = await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);
         }
 
         [Then(@"the requester is informed the apprenticeship incentive has resumed")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveHasResumed()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be((int)HttpStatusCode.OK);
-            var content = await EmployerIncentiveApi.GetLastResponse().Content.ReadAsStringAsync();
+            _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Resumed");
         }
 
         [Then(@"the requester is informed the apprenticeship incentive is not paused")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsNotPaused()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-            var content = await EmployerIncentiveApi.GetLastResponse().Content.ReadAsStringAsync();
+            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments are not paused");
         }
 
         [Then(@"the requester is informed the request is invalid")]
         public async Task ThenTheRequesterIsInformedTheRequestIsInvalid()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-            var content = await EmployerIncentiveApi.GetLastResponse().Content.ReadAsStringAsync();
+            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("not set");
         }
 

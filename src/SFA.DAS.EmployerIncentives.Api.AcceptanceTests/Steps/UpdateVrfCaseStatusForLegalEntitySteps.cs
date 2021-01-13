@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -20,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private string _newVrfStatus;
         private readonly DateTime _newVrfStatusUpdateDate = DateTime.Parse("01-01-2020");
         private Account _account;
+        private HttpResponseMessage _response;
 
         public UpdateVrfCaseStatusForLegalEntitySteps(TestContext testContext) : base(testContext)
         {
@@ -64,11 +66,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
 
             await TestContext.WaitFor<ICommand>(async () =>
-               await EmployerIncentiveApi.Patch(url, data), 
+                {
+                    _response = await EmployerIncentiveApi.Patch(url, data);
+                },
                numberOfOnProcessedEventsExpected: expectedProcessedEvents,
                numberOfOnPublishedEventsExpected: expectedPublishedEvents);
 
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.NoContent);
+            _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Then(@"Employer Incentives account legal entity record is updated")]

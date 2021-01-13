@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -31,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
         private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
+        private HttpResponseMessage _response;
 
         public WithdrawalByComplianceSteps(TestContext testContext) : base(testContext)
         {
@@ -114,7 +116,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var url = $"withdrawals";
 
             await _testContext.WaitFor<ICommand>(async () =>
-                     await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest)
+                    {
+                        _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
+                    }
                      ,numberOfOnProcessedEventsExpected : 2
                      ,numberOfOnPublishedEventsExpected : 1);
         }             
@@ -122,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the incentive application status is updated to indicate the Compliance withdrawal")]
         public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
+            _response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
@@ -149,7 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"each incentive application status is updated to indicate the Compliance withdrawal")]
         public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
+            _response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();

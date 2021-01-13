@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -14,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly TestContext _testContext;
         private readonly Account _testAccountTable;
         private HttpStatusCode _expectedResult = HttpStatusCode.Created;
+        private HttpResponseMessage _response;
 
         public LegalEntityCreatedSteps(TestContext testContext) : base(testContext)
         {
@@ -31,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the legal entity is added to an account")]
         public async Task WhenAddedLegalEntityEventIsTriggered()
         {
-            await EmployerIncentiveApi.Post(
+            _response = await EmployerIncentiveApi.Post(
                     $"/accounts/{_testAccountTable.Id}/legalEntities",
                     new AddLegalEntityRequest
                     {
@@ -40,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         OrganisationName = _testAccountTable.LegalEntityName
                     });
 
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(_expectedResult);
+            _response.StatusCode.Should().Be(_expectedResult);
         }
     }
 }

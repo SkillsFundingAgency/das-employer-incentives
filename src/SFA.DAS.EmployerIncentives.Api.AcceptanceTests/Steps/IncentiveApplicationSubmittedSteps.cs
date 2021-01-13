@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -22,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly Fixture _fixture;
         private readonly CreateIncentiveApplicationRequest _createRequest;
         private readonly SubmitIncentiveApplicationRequest _submitRequest;
+        private HttpResponseMessage _response;
 
         public IncentiveApplicationSubmittedSteps(TestContext testContext) : base(testContext)
         {
@@ -37,8 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnEmployerHasEnteredIncentiveClaimApplicationDetails()
         {
             var url = $"applications";
-            await EmployerIncentiveApi.Post(url, _createRequest);
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Created);
+            _response = await EmployerIncentiveApi.Post(url, _createRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.Created);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
@@ -54,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheApplicationIsSubmitted()
         {
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
         [When(@"the application is submitted and the system errors")]
@@ -68,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the application status is updated to reflect completion")]
         public async Task ThenTheApplicationStatusIsUpdatedToReflectCompletion()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
@@ -123,13 +125,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the service responds with an error")]
         public void ThenTheServiceRespondsWithAnError()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Then(@"the service responds with an internal error")]
         public void ThenTheServiceRespondsWithAnInternalError()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            _response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
 
         [Then(@"there are no events in the outbox")]

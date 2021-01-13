@@ -12,41 +12,37 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         
         public Uri BaseAddress { get; private set; }
         private bool isDisposed;
-        private HttpResponseMessage _response;
 
         public EmployerIncentiveApi(HttpClient client)
         {
             Client = client;
             BaseAddress = client.BaseAddress;
         }
-        public HttpResponseMessage GetLastResponse()
-        {
-            return _response;
-        }
-        public async Task PostCommand<T>(string url, T command) where T : ICommand
+      
+        public Task<HttpResponseMessage> PostCommand<T>(string url, T command) where T : ICommand
         {
             var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-            _response = await Client.PostAsJsonAsync(url, commandText);
+            return Client.PostAsJsonAsync(url, commandText);
         }
 
-        public async Task Post<T>(string url, T data)
+        public Task<HttpResponseMessage> Post<T>(string url, T data)
         {
-            _response = await Client.PostValueAsync(url, data);            
+            return Client.PostValueAsync(url, data);
         }
 
-        public async Task Put<T>(string url, T data)
+        public Task<HttpResponseMessage> Put<T>(string url, T data)
         {
-            _response = await Client.PutValueAsync(url, data);            
+            return Client.PutValueAsync(url, data);            
         }
 
-        public async Task Patch<T>(string url, T data)
+        public Task<HttpResponseMessage> Patch<T>(string url, T data)
         {
-            _response = await Client.PatchValueAsync(url, data);
+            return Client.PatchValueAsync(url, data);
         }
 
-        public async Task Delete(string url)
+        public Task<HttpResponseMessage> Delete(string url)
         {
-            _response = await Client.DeleteAsync(url);
+            return Client.DeleteAsync(url);
         }
 
         public void Dispose()
@@ -61,7 +57,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             if (disposing)
             {
-                _response?.Dispose();
                 Client.Dispose();
             }
 

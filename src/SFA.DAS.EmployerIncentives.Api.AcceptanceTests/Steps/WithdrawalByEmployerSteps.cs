@@ -12,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -34,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
         private readonly Payment _payment;
         private bool _waitForMessage = true;
+        private HttpResponseMessage _response;
 
         public WithdrawalByEmployerSteps(TestContext testContext) : base(testContext)
         {
@@ -132,24 +134,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Create();
 
             var url = $"withdrawals";
-
+                        
             if (_waitForMessage)
             {
                 await _testContext.WaitFor<ICommand>(async () =>
-                         await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest)
+                    {
+                        _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
+                    }
                          ,numberOfOnProcessedEventsExpected: 2
                          ,numberOfOnPublishedEventsExpected: 1);
             }
             else
             {
-                await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
+                _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
             }
         }
 
         [Then(@"the incentive application status is updated to indicate the employer withdrawal")]
         public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
+            _response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
@@ -176,7 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"each incentive application status is updated to indicate the employer withdrawal")]
         public async Task ThenEachIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.Accepted);
+            _response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
@@ -213,9 +217,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"an error is returned")]
         public async Task ThenAnErrorIsReturned()
         {
-            EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(await EmployerIncentiveApi.GetLastResponse().Content.ReadAsStringAsync());
+            var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(await _response.Content.ReadAsStringAsync());
             badRequestResponse.Error.Should().Be("Cannot withdraw an application that has been submitted and has received payments");
         }
 
