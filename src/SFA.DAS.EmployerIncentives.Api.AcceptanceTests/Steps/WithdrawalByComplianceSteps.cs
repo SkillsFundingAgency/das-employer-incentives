@@ -2,6 +2,7 @@
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using NServiceBus.Transport;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
@@ -113,8 +114,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             
             var url = $"withdrawals";
 
-            await _testContext.WaitFor<MessageContext>(async () =>
-                     await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
+            await _testContext.WaitFor<ICommand>(async () =>
+                     await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest)
+                     ,numberOfOnProcessedEventsExpected : 2
+                     ,numberOfOnPublishedEventsExpected : 1);
         }             
 
         [Then(@"the incentive application status is updated to indicate the Compliance withdrawal")]
