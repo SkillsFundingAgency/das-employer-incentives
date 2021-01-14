@@ -1,4 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services

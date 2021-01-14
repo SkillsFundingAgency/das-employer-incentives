@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,10 +34,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateD
             }
 
             Learner learner = await _learnerDomainRepository.Get(incentive);
-            var calendar = await _collectionCalendarService.Get();
-            var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionPeriodNumber);
+            if (learner.SubmissionData.SubmissionFound)
+            {
+                var calendar = await _collectionCalendarService.Get();
+                var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionPeriodNumber);
 
-            learner.SetDaysInLearning(collectionPeriod);
+                learner.SetDaysInLearning(collectionPeriod);
+            }
+            else
+            {
+                learner.ClearDaysInLearning();
+            }
 
             await _learnerDomainRepository.Save(learner);
         }

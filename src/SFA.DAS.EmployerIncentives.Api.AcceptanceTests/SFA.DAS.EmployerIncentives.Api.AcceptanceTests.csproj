@@ -60,8 +60,17 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>IncentiveDetailsRequested.feature</DependentUpon>
     </Compile>
+    <Compile Update="Features\PausePayments.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Features\ResumePausedPayments.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\SendBankDetailsRepeatReminderEmails.feature.cs">
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Update="Features\SendBankDetailsRequiredEmail.feature.cs">
       <DependentUpon>SendBankDetailsRequiredEmail.feature</DependentUpon>
@@ -97,11 +106,23 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>IncentiveDetailsRequested.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\PausePayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ResumePausedPayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsReminderEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <LastGenOutput>SendBankDetailsRequiredEmail.feature.cs</LastGenOutput>
       <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\SendBankDetailsRepeatReminderEmails.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>SendBankDetailsRepeatReminderEmails.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsRequiredEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

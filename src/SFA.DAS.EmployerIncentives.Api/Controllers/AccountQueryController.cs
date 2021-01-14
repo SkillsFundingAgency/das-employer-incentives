@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -44,18 +45,29 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NotFound();
         }
 
-        [HttpGet("/accounts/{accountId}/applications")]
-        public async Task<IActionResult> GetApplications(long accountId)
+        [HttpGet("/accounts/{accountId}/legalentity/{accountLegalEntityId}/applications")]
+        public async Task<IActionResult> GetApplications(long accountId, long accountLegalEntityId)
         {
-            var request = new GetApplicationsRequest(accountId);
+            var request = new GetApplicationsRequest(accountId, accountLegalEntityId);
             var response = await QueryAsync<GetApplicationsRequest, GetApplicationsResponse>(request);
 
             if (response?.ApprenticeApplications != null)
             {
-                return Ok(response.ApprenticeApplications);
+                return Ok(response);
             }
 
             return NotFound();
         }
+
+        [HttpGet("/accounts/vendorregistrationform/status")]
+        public async Task<IActionResult> GetAccountsWithVrfCaseStatus(string vrfCaseStatus)
+        {
+            var request = new GetAccountsWithVrfCaseStatusRequest(vrfCaseStatus);
+
+            var response = await QueryAsync<GetAccountsWithVrfCaseStatusRequest, GetAccountsWithVrfCaseStatusResponse>(request);
+
+            return Ok(response.Accounts);
+        }
+                
     }
 }

@@ -9,12 +9,15 @@ using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
+using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
@@ -23,6 +26,7 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
@@ -45,15 +49,6 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
-using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
-using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -117,6 +112,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ILearnerDomainRepository, LearnerDomainRepository>();
             serviceCollection.Decorate<ILearnerDomainRepository, LearnerDomainRepositoryWithLogging>();
 
+            serviceCollection.AddScoped<IIncentiveApplicationStatusAuditDataRepository, IncentiveApplicationStatusAuditDataRepository>();
+
             return serviceCollection;
         }
 
@@ -140,7 +137,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<CalculateDaysInLearningCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator());
+                .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator());
 
             return serviceCollection;
         }

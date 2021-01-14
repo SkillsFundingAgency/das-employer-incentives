@@ -1,4 +1,6 @@
-﻿using System;
+using Microsoft.EntityFrameworkCore;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using System;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -70,6 +72,28 @@ namespace SFA.DAS.EmployerIncentives.Data
             return accounts?.Map();
         }
 
+        public async Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus)
+        {
+            var accountsWithApplications = await (from account in _dbContext.Accounts
+                                           join application in _dbContext.Applications
+                                           on account.AccountLegalEntityId equals application.AccountLegalEntityId
+                                           where account.VrfCaseStatus == vrfCaseStatus
+                                           select new Models.Account
+                                           {
+                                               AccountLegalEntityId = account.AccountLegalEntityId,
+                                               HashedLegalEntityId = account.HashedLegalEntityId,
+                                               HasSignedIncentivesTerms = account.HasSignedIncentivesTerms,
+                                               Id = account.Id,
+                                               LegalEntityId = account.LegalEntityId,
+                                               LegalEntityName = account.LegalEntityName,
+                                               VrfCaseId = account.VrfCaseId,
+                                               VrfCaseStatus = account.VrfCaseStatus,
+                                               VrfCaseStatusLastUpdatedDateTime = account.VrfCaseStatusLastUpdatedDateTime,
+                                               VrfVendorId = account.VrfVendorId
+                                           }).ToListAsync();
+
+            return accountsWithApplications?.MapDto();
+        }
         public async Task UpdatePaidDateForPaymentIds(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate)
         {
             var payments = await _dbContext.Payments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
