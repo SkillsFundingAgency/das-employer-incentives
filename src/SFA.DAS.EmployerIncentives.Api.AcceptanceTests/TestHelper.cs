@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                    Func<Task> func,
                    bool assertOnTimeout = true,
                    bool assertOnError = false,
-                   int timeoutInMs = 15000,
+                   int timeoutInMs = 60000,
                    int numberOfOnProcessedEventsExpected = 1,
                    int numberOfOnPublishedEventsExpected = 0)
         {
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             try
             {
-                await func();
+                func().Wait(timeoutInMs);
             }
             catch (Exception ex)
             {
