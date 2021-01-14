@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         protected readonly EmployerIncentiveApi EmployerIncentiveApi;
         protected readonly Fixture Fixture;
         protected readonly DataAccess DataAccess;
+        private object _lock;
 
         public StepsBase(TestContext testContext)
         {
@@ -29,11 +30,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 hook.OnProcessed = (message) =>
                 {
-                    testContext.EventsPublished.Add(message);
-                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishEvent");
-                    if (throwError)
+                    lock (_lock)
                     {
-                        throw new ApplicationException("Unexpected exception, should force a rollback");
+                        testContext.EventsPublished.Add(message);
+                        var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishEvent");
+                        if (throwError)
+                        {
+                            throw new ApplicationException("Unexpected exception, should force a rollback");
+                        }
                     }
                 };
             }
@@ -44,63 +48,79 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 commandsHook.OnReceived += (command) =>
                 {
-                    testContext.CommandsPublished.Add(
-                        new PublishedCommand(command) { 
+                    lock (_lock)
+                    {
+                        testContext.CommandsPublished.Add(
+                        new PublishedCommand(command)
+                        {
                             IsReceived = true,
                             IsDomainCommand = command is DomainCommand
                         });
+                    }
                 };
 
                 commandsHook.OnProcessed += (command) =>
                 {
-                    testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsProcessed = true);
-
-                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
-                    if (throwError)
+                    lock (_lock)
                     {
-                        throw new ApplicationException("Unexpected exception, should force a rollback");
+                        testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsProcessed = true);
+
+                        var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
+                        if (throwError)
+                        {
+                            throw new ApplicationException("Unexpected exception, should force a rollback");
+                        }
                     }
                 };
                 commandsHook.OnHandled += (command) =>
                 {
-                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
-                    if (throwError)
+                    lock (_lock)
                     {
-                        throw new ApplicationException("Unexpected exception, should force a rollback");
+                        var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
+                        if (throwError)
+                        {
+                            throw new ApplicationException("Unexpected exception, should force a rollback");
+                        }
                     }
                 };
                 commandsHook.OnPublished += (command) =>
                 {
-                    testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsPublished = true);
-
-                    var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishCommand");
-                    if (throwError)
+                    lock (_lock)
                     {
-                        throw new ApplicationException("Unexpected exception, should force a rollback");
+                        testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsPublished = true);
+
+                        var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishCommand");
+                        if (throwError)
+                        {
+                            throw new ApplicationException("Unexpected exception, should force a rollback");
+                        }
                     }
                 };
 
                 commandsHook.OnErrored += (ex, command) =>
                 {
-                    List<PublishedCommand> publishedCommands;
-                    publishedCommands = testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList();
-
-                    publishedCommands.ForEach(c =>
+                    lock (_lock)
                     {
-                        c.IsErrored = true;
-                        c.LastError = ex;
+                        List<PublishedCommand> publishedCommands;
+                        publishedCommands = testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList();
+
+                        publishedCommands.ForEach(c =>
+                        {
+                            c.IsErrored = true;
+                            c.LastError = ex;
+                            if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
+                            {
+                                c.IsPublishedWithNoListener = true;
+                            }
+                        });
+
                         if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
                         {
-                            c.IsPublishedWithNoListener = true;                            
+                            return true;
                         }
-                    });
 
-                    if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
-                    {
-                        return true;
+                        return false;
                     }
-                    
-                    return false;
                 };
             }
         }

@@ -46,8 +46,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.AccountVrfCaseStatus
                 if (submittedApplications.Any())
                 {
                     var application = submittedApplications.First();
-                    var sendRepeatReminderEmailCommand = new SendBankDetailsRepeatReminderEmailCommand(application.AccountId,
-                                                                                                       application.SubmittedByEmail);
+                    var sendRepeatReminderEmailCommand = new SendBankDetailsRepeatReminderEmailCommand(
+                        application.AccountId,
+                        application.AccountLegalEntityId,
+                        application.ApplicationId,
+                        application.SubmittedByEmail);
                     await _commandDispatcher.Send(sendRepeatReminderEmailCommand);
                 }
             }
