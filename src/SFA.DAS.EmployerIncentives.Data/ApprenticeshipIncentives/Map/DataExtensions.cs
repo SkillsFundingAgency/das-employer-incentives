@@ -218,26 +218,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 UniqueLearnerNumber = model.ULN,
                 CreatedDate = model.CreatedDate,
                 LearningPeriods = model.LearningPeriods.Map(),
-                DaysInLearnings = model.DaysInLearnings.Map()
+                DaysInLearnings = model.DaysInLearnings.Map(),
+                SubmissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData()
             };
 
-            if (model.SubmissionFound)
-            {
-                learner.SubmissionData = new Domain.ApprenticeshipIncentives.ValueTypes.SubmissionData(model.SubmissionDate.Value);
+            learner.SubmissionData.SetSubmissionDate(model.SubmissionDate);
+            learner.SubmissionData.SetLearningData(new Domain.ApprenticeshipIncentives.ValueTypes.LearningData(model.LearningFound.Value));
+            learner.SubmissionData.LearningData.SetStartDate(model.StartDate);
 
-                if (model.LearningFound.HasValue)
-                {
-                    learner.SubmissionData.SetLearningFound(new Domain.ApprenticeshipIncentives.ValueTypes.LearningFoundStatus(model.LearningFound.Value));
-                }
-                if (model.HasDataLock.HasValue)
-                {
-                    learner.SubmissionData.SetHasDataLock(model.HasDataLock.Value);
-                }               
-                learner.SubmissionData.SetIsInLearning(model.InLearning);
-                learner.SubmissionData.SetStartDate(model.StartDate);
-                learner.SubmissionData.SetRawJson(model.RawJSON);
-                learner.SubmissionData.SetStartDate(model.StartDate);
+            if (model.HasDataLock.HasValue)
+            {
+                learner.SubmissionData.LearningData.SetHasDataLock(model.HasDataLock.Value);
             }
+            learner.SubmissionData.LearningData.SetIsInLearning(model.InLearning);
+
+            learner.SubmissionData.SetRawJson(model.RawJSON);
 
             return learner;
         }
@@ -255,16 +250,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 DaysInLearnings = model.DaysInLearnings.Map(model.Id)
             };
 
-            if (model.SubmissionData != null)
-            {
-                learner.SubmissionFound = true;
-                learner.LearningFound = model.SubmissionData.LearningFoundStatus?.LearningFound;
-                learner.SubmissionDate = model.SubmissionData.SubmissionDate;
-                learner.StartDate = model.SubmissionData.StartDate;
-                learner.HasDataLock = model.SubmissionData.HasDataLock;
-                learner.InLearning = model.SubmissionData.IsInlearning;
-                learner.RawJSON = model.SubmissionData.RawJson;
-            }
+            learner.SubmissionFound = model.SubmissionData.SubmissionFound;
+            learner.LearningFound = model.SubmissionData.LearningData.LearningFound;
+            learner.SubmissionDate = model.SubmissionData.SubmissionDate;
+            learner.StartDate = model.SubmissionData.LearningData.StartDate;
+            learner.HasDataLock = model.SubmissionData.LearningData.HasDataLock;
+            learner.InLearning = model.SubmissionData.LearningData.IsInlearning;
+            learner.RawJSON = model.SubmissionData.RawJson;
 
             return learner;
         }

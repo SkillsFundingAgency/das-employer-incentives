@@ -122,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => !l.SubmissionFound)
+                It.Is<Learner>(l => !l.SubmissionData.SubmissionFound)
                 ), Times.Once);
         }
 
@@ -142,7 +142,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionFound)
+                It.Is<Learner>(l => l.SubmissionData.SubmissionFound)
                 ), Times.Once);
         }
 
@@ -162,7 +162,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => !l.SubmissionData.LearningFoundStatus.LearningFound)
+                It.Is<Learner>(l => !l.SubmissionData.LearningData.LearningFound)
                 ), Times.Once);
         }
 
@@ -205,7 +205,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.LearningFoundStatus.LearningFound)
+                It.Is<Learner>(l => l.SubmissionData.LearningData.LearningFound)
                 ), Times.Once);
         }
 
@@ -275,12 +275,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.StartDate == _testStartDate)
+                It.Is<Learner>(l => l.SubmissionData.LearningData.StartDate == _testStartDate)
                 ), Times.Once);
         }
 
         [Test]
-        public async Task Then_the_inlearning_flag_is_false_when_there_are_no_pending_payments()
+        public async Task Then_the_inlearning_flag_is_null_when_there_are_no_pending_payments()
         {
             //Arrange
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
@@ -306,7 +306,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.IsInlearning == false)
+                It.Is<Learner>(l => l.SubmissionData.LearningData.IsInlearning == null)
                 ), Times.Once);
         }
 
@@ -375,7 +375,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.SubmissionData.IsInlearning == true)
+                It.Is<Learner>(l => l.SubmissionData.LearningData.IsInlearning == true)
                 ), Times.Once);
         }
 
@@ -458,7 +458,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Start Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
             _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
-            _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Matching ILR record not found for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber} with reason: {_learner.SubmissionData.LearningFoundStatus.NotFoundReason}");
+            _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Matching ILR record not found for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber} with reason: {_learner.SubmissionData.LearningData.NotFoundReason}");
 
         }
     }

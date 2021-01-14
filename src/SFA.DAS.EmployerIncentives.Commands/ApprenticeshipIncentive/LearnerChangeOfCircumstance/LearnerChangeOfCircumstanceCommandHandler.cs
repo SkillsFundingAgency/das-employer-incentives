@@ -27,10 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
-            if (learner.SubmissionFound && learner.SubmissionData.StartDate.HasValue)
-                incentive.SetStartDate(learner.SubmissionData.StartDate.Value);
-
-            incentive.SetHasPossibleChangeOfCircumstances(false);
+            incentive.SetChangeOfCircumstances(learner);
 
             await _domainRepository.Save(incentive);
         }
