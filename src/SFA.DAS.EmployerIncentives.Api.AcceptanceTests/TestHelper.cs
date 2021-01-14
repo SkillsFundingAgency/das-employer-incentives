@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             if (assertOnError)
             {
-                waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}'");
+                waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}' and stack trace '{waitForResult.LastException?.StackTrace}'");
             }
 
             return waitForResult;
