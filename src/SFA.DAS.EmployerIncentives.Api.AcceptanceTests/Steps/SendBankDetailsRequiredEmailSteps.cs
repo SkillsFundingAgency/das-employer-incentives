@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using System;
 using System.IO;
@@ -37,7 +38,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            await _testContext.WaitFor<ICommand>(async () =>
+            {
+                _response = await EmployerIncentiveApi.Post(_url, _request);
+            });            
         }
 
         [Then(@"the employer is sent a reminder email to supply their bank details")]

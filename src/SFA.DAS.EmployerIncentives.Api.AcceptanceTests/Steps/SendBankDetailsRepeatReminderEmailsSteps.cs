@@ -2,6 +2,7 @@
 using Dapper;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
@@ -28,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private IncentiveApplication _application;
         private IncentiveApplicationApprenticeship _apprenticeship;
         private DateTime _applicationCutOffDate;
+        private HttpResponseMessage _response;
 
         public SendBankDetailsRepeatReminderEmailsSteps(TestContext testContext) : base(testContext)
         {
@@ -47,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _application.AccountId = _account.Id;
             _application.AccountLegalEntityId = _account.AccountLegalEntityId;
             _application.Status = Enums.IncentiveApplicationStatus.Submitted;
+            _application.DateCreated = _applicationCutOffDate.AddDays(-1);
             _application.DateSubmitted = _applicationCutOffDate.AddDays(-1);
             _apprenticeship = _testContext.TestData.GetOrCreate<IncentiveApplicationApprenticeship>();
             _apprenticeship.IncentiveApplicationId = _application.Id;
@@ -61,11 +64,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = "api/EmailCommand/bank-details-repeat-reminders";
             _request = new BankDetailsRepeatReminderEmailsRequest { ApplicationCutOffDate = _applicationCutOffDate };
-            var response = await EmployerIncentiveApi.Client.PostAsJsonAsync<BankDetailsRepeatReminderEmailsRequest>(url, _request);
 
-            response.IsSuccessStatusCode.Should().BeTrue();
+            await _testContext.WaitFor<ICommand>(async () =>
+            {
+                _response = await EmployerIncentiveApi.Client.PostAsJsonAsync(url, _request);
+            },
+            numberOfOnProcessedEventsExpected: 2);
+
+            _response.IsSuccessStatusCode.Should().BeTrue();
         }
-
 
         [Then(@"the employer is sent a reminder email to supply their bank details in order to receive payment")]
         public void ThenTheEmployerIsSentAReminderEmailToSupplyTheirBankDetailsInOrderToReceivePayment()

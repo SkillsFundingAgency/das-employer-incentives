@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using System.Net.Http;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -67,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.EmailAddress = null;
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request);
         }
 
         [Then(@"the email is not set and an error response returned")]
