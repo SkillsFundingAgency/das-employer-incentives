@@ -29,7 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetApplications
             var response = new GetApplicationsResponse
             {
                 ApprenticeApplications = applications,
-                BankDetailsStatus = accountLegalEntity.BankDetailsStatus
+                BankDetailsStatus = accountLegalEntity.BankDetailsStatus,
+                FirstSubmittedApplicationId = await _applicationRepository.GetFirstSubmittedApplicationId(query.AccountLegalEntityId)
             };
 
             return response;

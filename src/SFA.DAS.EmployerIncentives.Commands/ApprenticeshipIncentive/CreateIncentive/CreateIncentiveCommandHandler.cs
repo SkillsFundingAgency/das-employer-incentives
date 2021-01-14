@@ -42,7 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                     command.Uln,
                     command.ApprenticeshipEmployerTypeOnApproval
                 ),
-                command.PlannedStartDate);
+                command.PlannedStartDate,
+                command.SubmittedDate,
+                command.SubmittedByEmail);
 
             if (command.UKPRN.HasValue)
             {

@@ -104,7 +104,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy
                     ),
-                    DateTime.Today);
+                    DateTime.Today,
+                    _fixture.Create<DateTime>(),
+                    _fixture.Create<string>());
 
             return incentive;
         }

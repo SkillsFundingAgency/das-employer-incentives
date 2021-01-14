@@ -11,6 +11,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper.Contrib.Extensions;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -27,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private Account _account;
         private IncentiveApplication _application;
         private IncentiveApplicationApprenticeship _apprenticeship;
+        private ApprenticeshipIncentive _apprenticeshipIncentive;
         private DateTime _applicationCutOffDate;
 
         public SendBankDetailsRepeatReminderEmailsSteps(TestContext testContext) : base(testContext)
@@ -51,9 +54,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeship = _testContext.TestData.GetOrCreate<IncentiveApplicationApprenticeship>();
             _apprenticeship.IncentiveApplicationId = _application.Id;
 
+            _apprenticeshipIncentive = _testContext.TestData.GetOrCreate<ApprenticeshipIncentive>();
+            _apprenticeshipIncentive.AccountId = _account.Id;
+            _apprenticeshipIncentive.AccountLegalEntityId = _account.AccountLegalEntityId;
+            _apprenticeshipIncentive.SubmittedDate = _applicationCutOffDate.AddDays(-1);
+
             await SetupAccount(_account);
             await SetupApplication(_application);
             await SetupApprenticeship(_apprenticeship);
+            await SetupApprenticeshipIncentive();
         }
 
         [When(@"the check for accounts without bank details is triggered")]
@@ -77,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 var contents = File.ReadAllText(file.FullName, Encoding.UTF8);
 
-                if (contents.Contains(_application.SubmittedByEmail))
+                if (contents.Contains(_apprenticeshipIncentive.SubmittedByEmail))
                 {
                     return;
                 }
@@ -97,11 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private async Task SetupApplication(IncentiveApplication application)
         {
-            using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByEmail, submittedByName) values " +
-                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, @status, @dateSubmitted, @submittedByEmail, @submittedByName)", application);
-            }
+            await DataAccess.InsertApplication(application);
         }
 
         private async Task SetupApprenticeship(IncentiveApplicationApprenticeship apprenticeship)
@@ -112,6 +117,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                                                 "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
                                                 "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
                                                 "@uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount)", apprenticeship);
+            }
+        }
+
+        private async Task SetupApprenticeshipIncentive()
+        {
+            using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            foreach (var pendingPayment in _apprenticeshipIncentive.PendingPayments)
+            {
+                pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+                await dbConnection.InsertAsync(pendingPayment);
             }
         }
     }

@@ -220,7 +220,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange            
 
             // Act
-            var incentive = new ApprenticeshipIncentiveFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), _fixture.Create<DateTime>());
+            var incentive = new ApprenticeshipIncentiveFactory().CreateNew(
+                _fixture.Create<Guid>(), 
+                _fixture.Create<Guid>(), 
+                _fixture.Create<ApprenticeshipIncentives.ValueTypes.Account>(), 
+                _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), 
+                _fixture.Create<DateTime>(),
+                _fixture.Create<DateTime>(),
+                _fixture.Create<string>());
 
             // Assert
             incentive.PendingPayments.Count.Should().Be(0);

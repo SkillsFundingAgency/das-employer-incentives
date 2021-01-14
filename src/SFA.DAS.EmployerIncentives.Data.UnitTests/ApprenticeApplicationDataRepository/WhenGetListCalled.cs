@@ -67,7 +67,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             result.All(x => x.AccountId == accountId).Should().BeTrue();
-            result.All(x => x.ApplicationId == allApplications[0].Id).Should().BeTrue();
         }
     }
 }

@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = CreatePausedPaymentsCommandWithActionPause();
             var apprenticeshipIncentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(
                 _fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(),
-                _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), true);
+                _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), true, _fixture.Create<DateTime>(), _fixture.Create<string>());
             _mockDomainRepository
                 .Setup(x => x.FindByUlnWithinAccountLegalEntity(command.ULN, command.AccountLegalEntityId))
                 .ReturnsAsync(apprenticeshipIncentive);

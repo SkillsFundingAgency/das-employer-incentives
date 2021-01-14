@@ -55,7 +55,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         i.Apprenticeship.EmployerType == command.ApprenticeshipEmployerTypeOnApproval &&
                         i.Apprenticeship.FirstName == command.FirstName &&
                         i.Apprenticeship.LastName == command.LastName &&
-                        i.Account.Id == command.AccountId
+                        i.Account.Id == command.AccountId &&
+                        i.GetModel().SubmittedDate == command.SubmittedDate &&
+                        i.GetModel().SubmittedByEmail == command.SubmittedByEmail
                 )), Times.Once());
         }
 
@@ -63,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_apprenticeship_incentive_is_not_created_if_one_exists_for_the_apprenticeship_id()
         {
             var command = _fixture.Create<CreateIncentiveCommand>();
-            var existingAppenticeshipIncentive = (new ApprenticeshipIncentiveFactory()).CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>());
+            var existingAppenticeshipIncentive = (new ApprenticeshipIncentiveFactory()).CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(existingAppenticeshipIncentive);
 
             // Act
@@ -71,16 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _mockIncentiveDomainRepository.Verify(r =>
-                r.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(
-                    i =>
-                        i.Apprenticeship.Id == command.ApprenticeshipId &&
-                        i.Apprenticeship.UniqueLearnerNumber == command.Uln &&
-                        i.Apprenticeship.DateOfBirth == command.DateOfBirth &&
-                        i.Apprenticeship.EmployerType == command.ApprenticeshipEmployerTypeOnApproval &&
-                        i.Apprenticeship.FirstName == command.FirstName &&
-                        i.Apprenticeship.LastName == command.LastName &&
-                        i.Account.Id == command.AccountId
-                )), Times.Never());
+                r.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never());
         }
 
     }

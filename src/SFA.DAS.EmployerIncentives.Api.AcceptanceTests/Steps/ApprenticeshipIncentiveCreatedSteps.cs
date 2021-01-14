@@ -145,7 +145,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
-                    apprenticeship.UKPRN);
+                    apprenticeship.UKPRN,
+                    _applicationModel.DateSubmitted.Value,
+                    _applicationModel.SubmittedByEmail);
 
                 await _testContext.WaitFor<MessageContext>(async () =>
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
