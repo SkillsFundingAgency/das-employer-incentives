@@ -29,4 +29,4 @@ AS
 	group by Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, DaysInLearning, l.UpdatedDate, pp.DueDate,pp.PeriodNumber,pp.PaymentYear, p.PaymentPeriod,p.PaymentYear, p.PaidDate, VrfVendorId, HashedLegalEntityId
 	order by uln, pp.PaymentYear,pp.PeriodNumber
 
-Return 0
+Return @@rowcount
