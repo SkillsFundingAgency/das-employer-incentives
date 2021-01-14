@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         protected readonly EmployerIncentiveApi EmployerIncentiveApi;
         protected readonly Fixture Fixture;
         protected readonly DataAccess DataAccess;
-        private object _lock;
+        private static object _lock = new object();
 
         public StepsBase(TestContext testContext)
         {
