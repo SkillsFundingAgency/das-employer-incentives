@@ -37,10 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             try
             {
-                if (!func().Wait(timeoutInMs))
-                {
-                    waitForResult.SetHasTimedOut();
-                }
+                await func();
             }
             catch (Exception ex)
             {
