@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     this TestContext context,
                     Func<Task> func,
                     bool assertOnTimeout = true,
-                    bool assertOnError = false,
+                    bool assertOnError = true,
                     int timeoutInMs = 90000,
                     int numberOfOnProcessedEventsExpected = 1,
                     int numberOfOnPublishedEventsExpected = 0)
