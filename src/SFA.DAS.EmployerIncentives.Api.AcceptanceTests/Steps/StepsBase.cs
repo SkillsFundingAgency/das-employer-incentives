@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-[assembly: Parallelizable(ParallelScope.Fixtures)]
+//[assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     public class StepsBase
