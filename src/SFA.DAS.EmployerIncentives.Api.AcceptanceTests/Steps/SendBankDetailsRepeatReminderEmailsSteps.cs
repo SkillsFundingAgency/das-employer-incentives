@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-required";
-            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
+            _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
         }
 
         [When(@"an employer has submitted an application after the cut off date and not supplied bank details")]

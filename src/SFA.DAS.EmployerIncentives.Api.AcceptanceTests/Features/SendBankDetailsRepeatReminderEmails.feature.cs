@@ -22,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("SendBankDetailsRepeatReminderEmails")]
     [NUnit.Framework.CategoryAttribute("database")]
+    [NUnit.Framework.CategoryAttribute("messageBus")]
     [NUnit.Framework.CategoryAttribute("api")]
     public partial class SendBankDetailsRepeatReminderEmailsFeature
     {
@@ -30,6 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         private string[] _featureTags = new string[] {
                 "database",
+                "messageBus",
                 "api"};
         
 #line 1 "SendBankDetailsRepeatReminderEmails.feature"
@@ -42,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendBankDetailsRepeatReminderEmails", "\tIn order to receive incentive payments\r\n\tAs an employer\r\n\tI need to be reminded " +
                     "to supply my bank details to receive payment", ProgrammingLanguage.CSharp, new string[] {
                         "database",
+                        "messageBus",
                         "api"});
             testRunner.OnFeatureStart(featureInfo);
         }
@@ -87,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer has applied for the incentive payment but not supplied bank details", null, tagsOfScenario, argumentsOfScenario);
-#line 8
+#line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -107,14 +110,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 testRunner.When("an employer has submitted an application after the cut off date and not supplied " +
                         "bank details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 10
+#line 11
 testRunner.And("the check for accounts without bank details is triggered", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 11
+#line 12
 testRunner.Then("the employer is sent a reminder email to supply their bank details in order to re" +
                         "ceive payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-required";
-            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
+            _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
         }
 
         [When(@"a bank details required email is sent for a valid account, legal entity and email address")]

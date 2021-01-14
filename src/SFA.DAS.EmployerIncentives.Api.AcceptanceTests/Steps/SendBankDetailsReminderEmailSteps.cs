@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-reminder";
-            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
+            _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
         }
 
         [When(@"an employer selects to start the external bank details journey")]
