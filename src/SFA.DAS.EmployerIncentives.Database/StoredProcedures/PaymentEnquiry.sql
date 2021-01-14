@@ -15,7 +15,7 @@ CREATE procedure [support].[PaymentEnquiry]
 	@hashedlegalentityid varchar(8)=''
 )
 AS
-	select Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, [DaysInLearning], convert(datetime,l.UpdatedDate,101) as [ILRDataUpdated],sum(pp.amount) as [EarningAmount], pp.PeriodNumber as [EarningPeriod],pp.PaymentYear as [EarningYear], p.PaymentPeriod,p.PaymentYear, p.PaidDate,VrfVendorId, HashedLegalEntityId
+	select Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, [DaysInLearning], convert(datetime,l.UpdatedDate,101) as [ILRDataUpdated],sum(pp.amount) as [EarningAmount], convert(nvarchar(10),pp.DueDate,126) as EarningDueDate, pp.PeriodNumber as [EarningPeriod],pp.PaymentYear as [EarningYear], p.PaymentPeriod,p.PaymentYear, p.PaidDate,VrfVendorId, HashedLegalEntityId
 	from [incentives].[Learner] l
 	left join (select id, AccountLegalEntityId, case when PausePayments = 1 then 1 else 0 end as PausedPayments from [incentives].[ApprenticeshipIncentive]) ai on ai.Id = l.ApprenticeshipIncentiveId
 	left join (select AccountLegalEntityId, case when vrfvendorid is not null then 1 else 0 end as HasBank from [dbo].[Accounts] a) q on ai.AccountLegalEntityId = q.AccountLegalEntityId
@@ -26,7 +26,7 @@ AS
 	where 1=1
 	and (a.VrfVendorId=@vendorid or uln=@uln or HashedLegalEntityId=@hashedlegalentityid)
 	and a.VrfCaseStatusLastUpdatedDateTime <= pp.CalculatedDate --Used to approximate the data available when month end executed
-	group by Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, DaysInLearning, l.UpdatedDate, pp.PeriodNumber,pp.PaymentYear, p.PaymentPeriod,p.PaymentYear, p.PaidDate, VrfVendorId, HashedLegalEntityId
+	group by Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, DaysInLearning, l.UpdatedDate, pp.DueDate,pp.PeriodNumber,pp.PaymentYear, p.PaymentPeriod,p.PaymentYear, p.PaidDate, VrfVendorId, HashedLegalEntityId
 	order by uln, pp.PaymentYear,pp.PeriodNumber
 
 Return 0
