@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.DueDate, DateTime.Parse("2020-09-10"))
                     .Without(p => p.PaymentMadeDate)
                     .Create()
-            };
+            };           
         }
 
         [Given(@"an apprenticeship incentive exists")]
@@ -89,30 +89,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             foreach (var pendingPayment in _pendingPayments)
             {
                 await dbConnection.InsertAsync(pendingPayment);
-            }
+            }            
         }
 
         [Given(@"an apprenticeship incentive exists and without a corresponding learner match record")]
         public async Task GivenAnApprenticeshipIncentiveExistsWithoutACorrespondingLearnerMatchRecord()
         {
             await GivenAnApprenticeshipIncentiveExists();
-
-            _testContext.LearnerMatchApi.MockServer
-            .Given(
-                    Request
-                    .Create()
-                    .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
-                    .UsingGet()
-                    )
-                .RespondWith(Response.Create()
-                .WithStatusCode(HttpStatusCode.NotFound)
-                .WithHeader("Content-Type", "application/json"));
+            GivenTheApprenticeshipIncentiveDoesNotHaveACorrespondingLearnerMatchRecord();            
         }
 
         [Given(@"an apprenticeship incentive exists and with a corresponding learner match record")]
         public async Task GivenAnApprenticeshipIncentiveExistsWithACorrespondingLearnerMatchRecord()
         {
             await GivenAnApprenticeshipIncentiveExists();
+        }
+        
+        [Given(@"the aprenticeship incentive does not have a corresponding learner match record")]
+        public void GivenTheApprenticeshipIncentiveDoesNotHaveACorrespondingLearnerMatchRecord()
+        {
+            _testContext.LearnerMatchApi.MockServer
+           .Given(
+                   Request
+                   .Create()
+                   .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
+                   .UsingGet()
+                   )
+               .RespondWith(Response.Create()
+               .WithStatusCode(HttpStatusCode.NotFound)
+               .WithHeader("Content-Type", "application/json"));
         }
 
         [Given(@"an apprenticeship incentive exists and has previously been refreshed")]
@@ -125,9 +130,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 return _fixture.Build<Learner>()
                 .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(s => s.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                .With(l => l.CreatedDate, DateTime.Now.AddDays(-1))
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.ULN, _apprenticeshipIncentive.ULN)
-                .With(s => s.SubmissionFound, false)
+                .With(s => s.SubmissionFound, true) 
+                .With(s => s.SubmissionDate, DateTime.Now)
+                .With(s => s.StartDate, DateTime.Now.AddDays(1))
+                .With(s => s.InLearning, true)
+                .With(s => s.HasDataLock, true)
                 .Create();
             });
 
@@ -219,9 +229,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.SubmissionDate.Should().BeNull();
             createdLearner.RawJSON.Should().BeNull();
             createdLearner.InLearning.Should().BeNull();
-            createdLearner.LearningFound.Should().BeNull();
-
+            createdLearner.LearningFound.Should().BeFalse();
             createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.DaysInLearnings.Should().BeEmpty();
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application with submission data")]
@@ -324,8 +334,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
-            createdLearner.SubmissionFound.Should().Be(true);
+            createdLearner.SubmissionFound.Should().Be(true);            
             createdLearner.LearningFound.Should().BeFalse();
+            createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.StartDate.Should().BeNull();
+            createdLearner.DaysInLearnings.Should().BeEmpty();
+            createdLearner.InLearning.Should().BeNull();
+            createdLearner.RawJSON.Should().NotBeNullOrEmpty();
         }
 
         [Then(@"the apprenticeship incentive learner data is updated with days in learning counted up until the census date")]
@@ -391,6 +406,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.HasDataLock.Should().BeTrue();
             createdLearner.LearningFound.Should().BeTrue();
         }
+
+        [Then(@"the apprenticeship incentive learner data is updated for the application with default submission data")]
+        public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedForTheApplicationWithDefaultSubmissionData()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdLearners = dbConnection.GetAll<Learner>();
+
+            var createdLearner = createdLearners.Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+            dbConnection.GetAll<LearningPeriod>().Count().Should().Be(0);
+            dbConnection.GetAll<ApprenticeshipDaysInLearning>().Count().Should().Be(0);
+
+            var testLearner = _testContext.TestData.Get<Learner>("ExistingLearner");
+
+            createdLearner.Id.Should().Be(testLearner.Id);
+            createdLearner.SubmissionFound.Should().Be(false);
+            createdLearner.Id.Should().NotBeEmpty();
+            createdLearner.Ukprn.Should().Be(_apprenticeshipIncentive.UKPRN);
+            createdLearner.ULN.Should().Be(_apprenticeshipIncentive.ULN);
+            createdLearner.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            createdLearner.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
+            createdLearner.SubmissionFound.Should().BeFalse();
+            createdLearner.SubmissionDate.Should().BeNull();
+            createdLearner.RawJSON.Should().BeNull();
+            createdLearner.StartDate.Should().BeNull();
+            createdLearner.HasDataLock.Should().BeNull();
+            createdLearner.InLearning.Should().BeNull();
+            createdLearner.DaysInLearnings.Should().BeEmpty();
+            createdLearner.LearningFound.Should().BeFalse();
+        }        
 
         private void SetupLearnerMatchApiResponse(string json)
         {

@@ -6,9 +6,11 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetApplications
     {
         public long AccountId { get; }
 
-        public GetApplicationsRequest(long accountId)
+        public long AccountLegalEntityId { get; }
+        public GetApplicationsRequest(long accountId, long accountLegalEntityId)
         {
             AccountId = accountId;
+            AccountLegalEntityId = accountLegalEntityId;
         }
     }
 }

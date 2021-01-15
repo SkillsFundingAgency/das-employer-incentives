@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                    Func<Task> func,
                    bool assertOnTimeout = true,
                    bool assertOnError = false,
-                   int timeoutInMs = 15000,
+                   int timeoutInMs = 90000,
                    int numberOfOnProcessedEventsExpected = 1)
         {
             var waitForResult = new WaitForResult();
