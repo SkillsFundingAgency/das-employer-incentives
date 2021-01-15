@@ -20,5 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             _context.DomainMessageHandlers = new TestDomainMessageHandlers(_context);
             await _context.DomainMessageHandlers.Start();
         }
+
+        [AfterScenario()]
+        public void CleanUp()
+        {
+            _context.DomainMessageHandlers?.Dispose();
+        }
     }
 }

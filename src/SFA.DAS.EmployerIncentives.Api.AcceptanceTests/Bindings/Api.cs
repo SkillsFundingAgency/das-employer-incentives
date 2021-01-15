@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
@@ -35,6 +36,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             };
             _context.EmployerIncentivesWebApiFactory = webApi;
             _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
+        }
+
+        [AfterScenario()]
+        public void CleanUp()
+        {
+            _context.EmployerIncentivesWebApiFactory?.Server?.Dispose();
+            _context.EmployerIncentivesWebApiFactory?.Dispose();
+            _context.EmployerIncentiveApi?.Dispose();
         }
 
         public int GetAvailablePort(int startingPort)

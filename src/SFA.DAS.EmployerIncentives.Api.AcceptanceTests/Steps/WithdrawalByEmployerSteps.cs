@@ -19,7 +19,7 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "AWithdrawalByEmployer")]
+    [Scope(Feature = "WithdrawalByEmployer")]
     public class WithdrawalByEmployerSteps : StepsBase
     {
         private readonly TestContext _testContext;

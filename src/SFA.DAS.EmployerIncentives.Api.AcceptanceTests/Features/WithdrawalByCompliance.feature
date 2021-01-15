@@ -2,7 +2,7 @@
 @api
 @domainMessageHandlers
 @messageBus
-Feature: AWithdrawalByCompliance
+Feature: WithdrawalByCompliance
 	In order to handle Compliance withdrawing an apprenticeship from the incentive scheme
 	As the employer incentive sheme
 	I want to enable the apprenticeship to be removed from the scheme to prevent payments from being made
