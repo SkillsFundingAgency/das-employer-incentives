@@ -31,7 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 AccountLegalEntityId = model.Account.AccountLegalEntityId,
                 PausePayments = model.PausePayments,
                 SubmittedDate = model.SubmittedDate,
-                SubmittedByEmail = model.SubmittedByEmail
+                SubmittedByEmail = model.SubmittedByEmail,
+                CourseName = model.Apprenticeship.CourseName
             };
         }
 
@@ -43,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.LastName,
                      entity.DateOfBirth,
                      entity.ULN,
-                     entity.EmployerType
+                     entity.EmployerType,
+                     entity.CourseName
                      );
 
             if (entity.UKPRN.HasValue)

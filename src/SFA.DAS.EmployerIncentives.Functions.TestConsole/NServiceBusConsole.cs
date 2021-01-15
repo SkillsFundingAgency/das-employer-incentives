@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
                 //await endpointInstance.Publish(message);
 
-                var message2 = new CreateIncentiveCommand(1, 2, Guid.NewGuid(), 2, "test", "test", new DateTime(2000, 1, 1), 1, new DateTime(2020, 9, 1), 0, 10001234, DateTime.Now, "joe@bloggs.com");
+                var message2 = new CreateIncentiveCommand(1, 2, Guid.NewGuid(), 2, "test", "test", new DateTime(2000, 1, 1), 1, new DateTime(2020, 9, 1), 0, 10001234, DateTime.Now, "joe@bloggs.com", "Course Name");
                 await endpointInstance.Send(message2);
 
                 Console.WriteLine("Message sent...");

@@ -55,7 +55,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.EarningsResilienceCheck
                         x.UKPRN == apprenticeship.UKPRN &&
                         x.Uln == apprenticeship.ULN &&
                         x.SubmittedDate == @event.Model.DateSubmitted &&
-                        x.SubmittedByEmail == @event.Model.SubmittedByEmail
+                        x.SubmittedByEmail == @event.Model.SubmittedByEmail &&
+                        x.CourseName == apprenticeship.CourseName
                     ),
                     It.IsAny<CancellationToken>()), Times.Once);
             }

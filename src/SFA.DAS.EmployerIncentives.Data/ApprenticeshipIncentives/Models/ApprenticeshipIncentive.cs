@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public bool PausePayments { get; set; }
         public DateTime? SubmittedDate { get; set; }
         public string SubmittedByEmail { get; set; }
+        public string CourseName { get; set; }
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPayment> PendingPayments { get; set; }

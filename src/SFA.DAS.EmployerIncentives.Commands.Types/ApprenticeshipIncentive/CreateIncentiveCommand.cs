@@ -23,12 +23,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         public long? UKPRN { get; }
         public DateTime SubmittedDate { get; }
         public string SubmittedByEmail { get; }
+        public string CourseName { get; }
 
         public CreateIncentiveCommand(
             long accountId,
             long accountLegalEntityId, Guid incentiveApplicationApprenticeshipId, long apprenticeshipId,
             string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate,
-            ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, DateTime submittedDate, string submittedByEmail)
+            ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, DateTime submittedDate, 
+            string submittedByEmail, string courseName)
         {
             AccountId = accountId;
             AccountLegalEntityId = accountLegalEntityId;
@@ -43,6 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
             UKPRN = ukprn;
             SubmittedDate = submittedDate;
             SubmittedByEmail = submittedByEmail;
+            CourseName = courseName;
         }
 
         [Newtonsoft.Json.JsonIgnore]

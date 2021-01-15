@@ -57,7 +57,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                     i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval &&
                     i.UKPRN == apprenticeship.UKPRN &&
                     i.SubmittedDate == @event.Model.DateSubmitted &&
-                    i.SubmittedByEmail == @event.Model.SubmittedByEmail
+                    i.SubmittedByEmail == @event.Model.SubmittedByEmail &&
+                    i.CourseName == apprenticeship.CourseName
                 ), It.IsAny<CancellationToken>()), Times.Once);
             }
         }
