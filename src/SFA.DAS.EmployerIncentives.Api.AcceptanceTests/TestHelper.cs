@@ -40,25 +40,32 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             try
             {
-                await func(token);
-            }
-            catch (Exception ex)
-            {
-                waitForResult.SetHasErrored(ex);                
-                _tokenSource.Cancel();
-            }
-            await WaitForHandlerCompletion(waitForResult, timeoutInMs, token);
+                try
+                {                    
+                    await func(token);
+                }
+                catch (Exception ex)
+                {
+                    waitForResult.SetHasErrored(ex);
+                    _tokenSource.Cancel();
+                }
+                await WaitForHandlerCompletion(waitForResult, timeoutInMs, token);
 
-            if (assertOnTimeout)
-            {
-                waitForResult.HasTimedOut.Should().Be(false, "handler should not have timed out");
-            }
+                if (assertOnTimeout)
+                {
+                    waitForResult.HasTimedOut.Should().Be(false, "handler should not have timed out");
+                }
 
-            if (assertOnError)
-            {
-                waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}' and stack trace '{waitForResult.LastException?.StackTrace}'");
+                if (assertOnError)
+                {
+                    waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}' and stack trace '{waitForResult.LastException?.StackTrace}'");
+                }
             }
-            _tokenSource.Dispose();
+            finally
+            {
+                _tokenSource.Dispose();
+            }
+            
             return waitForResult;
         }
 
@@ -68,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut && !cancellationToken.IsCancellationRequested)
                 {
-                    await Task.Delay(100);
+                    await Task.Delay(1000);
                 }
             }
         }

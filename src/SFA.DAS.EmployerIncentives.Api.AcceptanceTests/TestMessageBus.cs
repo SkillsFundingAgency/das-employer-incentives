@@ -36,19 +36,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             endpointConfiguration.UseLearningTransport(s => s.AddRouting());
 
-            _endpointInstance = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
+            _endpointInstance = await Endpoint.Start(endpointConfiguration);
             
             IsRunning = true;
         }
 
         public async Task Stop()
         {
-            await _endpointInstance.Stop().ConfigureAwait(false);
+            await _endpointInstance.Stop();
             IsRunning = false;
         }
 
         public Task Publish(object message)
-        {
+        {            
             return _endpointInstance.Publish(message);
         }
 

@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             if (hook != null)
             {
-                hook.OnProcessed = (message) =>
+                hook.OnProcessed += (message) =>
                 {
                     lock (_lock)
                     {
