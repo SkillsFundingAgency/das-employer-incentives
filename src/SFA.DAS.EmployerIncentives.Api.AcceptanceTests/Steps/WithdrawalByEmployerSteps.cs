@@ -33,6 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
         private readonly Payment _payment;
         private bool waitForMessage = true;
+        private bool _isMultipleApplications;
 
         public WithdrawalByEmployerSteps(TestContext testContext) : base(testContext)
         {
@@ -107,6 +108,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeship2);
+
+            _isMultipleApplications = true;
         }
 
         [Given(@"an apprenticeship incentive with pending payments exists as a result of an incentive application")]
@@ -135,7 +138,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             if (waitForMessage)
             {
                 await _testContext.WaitFor<MessageContext>(async () =>
-                         await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest));
+                         await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest),
+                         numberOfOnProcessedEventsExpected: _isMultipleApplications ? 2 : 1);
             }
             else
             {
