@@ -54,11 +54,5 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NoContent();
         }
 
-        [HttpPatch("/legalentities/refresh")]
-        public async Task<IActionResult> RefreshLegalEntities([FromBody] RefreshLegalEntitiesRequest request)
-        {
-            await SendCommandAsync(new RefreshLegalEntitiesCommand(request.AccountLegalEntities, request.PageNumber, request.PageSize, request.TotalPages));
-            return NoContent();
-        }
     }
 }
