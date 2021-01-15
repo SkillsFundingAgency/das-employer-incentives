@@ -4,22 +4,18 @@ NOTE: VRFVendorID has a one to one relationship with Legal entity in the Apprent
 
 VendorId format: P0002196
 ULN format: 1057862088
+HashedLegalEntityId: 8MGNNW
 
 Usage: Enter either a VendorId or ULN. The procedure will recognise a VendorId or teat it as a ULN
 */
 CREATE procedure [support].[PaymentEnquiry]
 (
-	@search nvarchar(100)
+	@vendorid varchar(100)='',
+	@uln varchar(20)='', 
+	@hashedlegalentityid varchar(8)=''
 )
 AS
-	declare @vendorid nvarchar(100)='',@uln nvarchar(20)=''
-	if charindex('P',@search) > 0 
-		set @vendorid=@search
-	else
-		set @uln=@search
-	print 'VendorId:'+@vendorid +' ULN:'+@uln
-
-	select Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, [DaysInLearning], convert(datetime,l.UpdatedDate,101) as [ILRDataUpdated],sum(pp.amount) as [EarningAmount], pp.PeriodNumber as [EarningPeriod],pp.PaymentYear as [EarningYear], p.PaymentPeriod,p.PaymentYear, p.PaidDate, VrfVendorId
+	select Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, [DaysInLearning], convert(datetime,l.UpdatedDate,101) as [ILRDataUpdated],sum(pp.amount) as [EarningAmount], convert(nvarchar(10),pp.DueDate,126) as EarningDueDate, pp.PeriodNumber as [EarningPeriod],pp.PaymentYear as [EarningYear], p.PaymentPeriod,p.PaymentYear, p.PaidDate,VrfVendorId, HashedLegalEntityId
 	from [incentives].[Learner] l
 	left join (select id, AccountLegalEntityId, case when PausePayments = 1 then 1 else 0 end as PausedPayments from [incentives].[ApprenticeshipIncentive]) ai on ai.Id = l.ApprenticeshipIncentiveId
 	left join (select AccountLegalEntityId, case when vrfvendorid is not null then 1 else 0 end as HasBank from [dbo].[Accounts] a) q on ai.AccountLegalEntityId = q.AccountLegalEntityId
@@ -28,8 +24,9 @@ AS
 	left join [dbo].[Accounts] a on a.AccountLegalEntityId=pp.AccountLegalEntityId
 	left join [incentives].[Payment] p on p.PendingPaymentId=pp.id
 	where 1=1
-	and (a.VrfVendorId=@vendorid or uln=@uln)
+	and (a.VrfVendorId=@vendorid or uln=@uln or HashedLegalEntityId=@hashedlegalentityid)
 	and a.VrfCaseStatusLastUpdatedDateTime <= pp.CalculatedDate --Used to approximate the data available when month end executed
-	group by Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, DaysInLearning, l.UpdatedDate, pp.PeriodNumber,pp.PaymentYear, p.PaymentPeriod,p.PaymentYear, p.PaidDate, VrfVendorId
+	group by Uln,[SubmissionFound], [LearningFound], [HasDataLock], [InLearning], q.HasBank, PausedPayments, DaysInLearning, l.UpdatedDate, pp.DueDate,pp.PeriodNumber,pp.PaymentYear, p.PaymentPeriod,p.PaymentYear, p.PaidDate, VrfVendorId, HashedLegalEntityId
 	order by uln, pp.PaymentYear,pp.PeriodNumber
-Return 0
+
+Return @@rowcount
