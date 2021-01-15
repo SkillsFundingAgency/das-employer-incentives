@@ -37,7 +37,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                                ULN = accountApplication.application.ULN,
                                LegalEntityName = accountApplication.account.LegalEntityName,
                                SubmittedByEmail = accountApplication.application.SubmittedByEmail,
-                               TotalIncentiveAmount = accountApplication.application.PendingPayments.Sum(x => x.Amount)
+                               TotalIncentiveAmount = accountApplication.application.PendingPayments.Sum(x => x.Amount),
+                               CourseName = accountApplication.application.CourseName
                            }
                            select dto).ToListAsync();
         }
