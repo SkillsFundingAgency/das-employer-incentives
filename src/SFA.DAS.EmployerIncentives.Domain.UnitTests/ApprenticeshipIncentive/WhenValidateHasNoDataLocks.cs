@@ -50,7 +50,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _sutModel.Apprenticeship.Provider.Ukprn,
                 _sutModel.Apprenticeship.UniqueLearnerNumber);
 
-            _learner.SetSubmissionData(new SubmissionData(DateTime.Now));
+            var submisssionData = new SubmissionData();
+            submisssionData.SetSubmissionDate(DateTime.Now);
+            _learner.SetSubmissionData(submisssionData);
 
             _sut = Sut(_sutModel);
         }
@@ -62,7 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
             var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SubmissionData.SetHasDataLock(hasDataLock);
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetHasDataLock(hasDataLock);
 
             // act
             _sut.ValidateHasNoDataLocks(pendingPayment.Id, _learner, _collectionPeriod);

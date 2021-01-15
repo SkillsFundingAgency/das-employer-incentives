@@ -1,0 +1,59 @@
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
+using System;
+using System.Collections.Generic;
+
+namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
+{
+    public class LearningData : ValueObject, ILogWriter
+    {        
+        public bool LearningFound { get; private set; }
+        public string NotFoundReason { get; private set; }
+        public bool? HasDataLock { get; private set; }
+        public bool? IsInlearning { get; private set; }
+        public DateTime? StartDate { get; private set; }
+        public int? DaysinLearning { get; private set; }
+
+        public LearningData(bool isFound, string notFoundReason = "")
+        {
+            LearningFound = isFound;
+            NotFoundReason = notFoundReason;            
+        }
+
+        public void SetHasDataLock(bool hasDataLock)
+        {
+            HasDataLock = LearningFound && hasDataLock;
+        }
+
+        public void SetStartDate(DateTime? startDate)
+        {
+            StartDate = LearningFound ? startDate : null;
+        }
+
+        public void SetIsInLearning(bool? isInLearning)
+        {
+            IsInlearning = LearningFound ? isInLearning : null;            
+        }
+
+        protected override IEnumerable<object> GetAtomicValues()
+        {
+            yield return NotFoundReason;
+            yield return HasDataLock;
+            yield return IsInlearning;
+            yield return StartDate;
+            yield return DaysinLearning;
+        }
+
+        public Log Log
+        {
+            get
+            {
+
+                return new Log
+                {
+                    OnProcessed = () => $"Learning data : LearningFound : {LearningFound}, StartDate : {StartDate}, HasDataLock : {HasDataLock}, IsInlearning : {IsInlearning}, DaysinLearning : {DaysinLearning} "
+                };
+            }
+        }
+    }
+}

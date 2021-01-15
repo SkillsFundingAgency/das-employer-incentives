@@ -50,6 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _application.AccountId = _account.Id;
             _application.AccountLegalEntityId = _account.AccountLegalEntityId;
             _application.Status = Enums.IncentiveApplicationStatus.Submitted;
+            _application.DateCreated = _applicationCutOffDate.AddDays(-1);
             _application.DateSubmitted = _applicationCutOffDate.AddDays(-1);
             _apprenticeship = _testContext.TestData.GetOrCreate<IncentiveApplicationApprenticeship>();
             _apprenticeship.IncentiveApplicationId = _application.Id;

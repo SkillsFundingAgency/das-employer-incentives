@@ -56,7 +56,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRespository.Object, _mockLearnerDomainRespository.Object);
 
             _incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
-            _learner = new LearnerFactory().GetExisting(_fixture.Build<LearnerModel>().With(x => x.SubmissionData, _fixture.Create<SubmissionData>()).Create());
+            _learner = new LearnerFactory().GetExisting(
+                _fixture.Build<LearnerModel>()
+                .With(x => x.SubmissionData, _fixture.Create<SubmissionData>())
+                .With(x=> x.ApprenticeshipIncentiveId, _incentive.Id)
+                .Create());
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(incentive.Id)).ReturnsAsync(_incentive);
             _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(incentive)).ReturnsAsync(_learner);
@@ -67,13 +71,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
-            _learner.SubmissionData.SetStartDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetStartDate(_fixture.Create<DateTime>());
 
             // Act
             await _sut.Handle(command);
 
             // Assert
-            _incentive.StartDate.Should().Be(_learner.SubmissionData.StartDate.Value);
+            _incentive.StartDate.Should().Be(_learner.SubmissionData.LearningData.StartDate.Value);
         }
 
         [Test]
@@ -81,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
-            _learner.SubmissionData.SetStartDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.LearningData.SetStartDate(_fixture.Create<DateTime>());
 
             int itemsPersisted = 0;
             _mockIncentiveDomainRespository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.Id == command.ApprenticeshipIncentiveId)))
@@ -119,7 +125,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var originalStartDate = _incentive.StartDate;
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
-            _learner.SubmissionData.SetStartDate(null);
+            _learner.SubmissionData.LearningData.SetStartDate(null);
 
             // Act
             await _sut.Handle(command);
