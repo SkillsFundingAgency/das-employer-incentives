@@ -65,9 +65,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var url = "api/EmailCommand/bank-details-repeat-reminders";
             _request = new BankDetailsRepeatReminderEmailsRequest { ApplicationCutOffDate = _applicationCutOffDate };
 
-            await _testContext.WaitFor<ICommand>(async () =>
+            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
             {
-                _response = await EmployerIncentiveApi.Client.PostAsJsonAsync(url, _request);
+                _response = await EmployerIncentiveApi.Client.PostAsJsonAsync(url, _request, cancellationToken);
             },
             numberOfOnProcessedEventsExpected: 2);
 

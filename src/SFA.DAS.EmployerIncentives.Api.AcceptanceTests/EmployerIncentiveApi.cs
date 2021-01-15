@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -25,24 +26,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             return Client.PostAsJsonAsync(url, commandText);
         }
 
-        public Task<HttpResponseMessage> Post<T>(string url, T data)
+        public Task<HttpResponseMessage> Post<T>(string url, T data, CancellationToken cancellationToken = default)
         {
-            return Client.PostValueAsync(url, data);
+            return Client.PostValueAsync(url, data, cancellationToken);
         }
 
-        public Task<HttpResponseMessage> Put<T>(string url, T data)
+        public Task<HttpResponseMessage> Put<T>(string url, T data, CancellationToken cancellationToken = default)
         {
-            return Client.PutValueAsync(url, data);            
+            return Client.PutValueAsync(url, data, cancellationToken);            
         }
 
-        public Task<HttpResponseMessage> Patch<T>(string url, T data)
+        public Task<HttpResponseMessage> Patch<T>(string url, T data, CancellationToken cancellationToken = default)
         {
-            return Client.PatchValueAsync(url, data);
+            return Client.PatchValueAsync(url, data, cancellationToken);
         }
 
-        public Task<HttpResponseMessage> Delete(string url)
+        public Task<HttpResponseMessage> Delete(string url, CancellationToken cancellationToken = default)
         {
-            return Client.DeleteAsync(url);
+            return Client.DeleteAsync(url, cancellationToken);
         }
 
         public void Dispose()

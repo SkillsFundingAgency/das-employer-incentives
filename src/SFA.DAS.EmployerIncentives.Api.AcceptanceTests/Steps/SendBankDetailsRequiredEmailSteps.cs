@@ -38,9 +38,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
 
-            await _testContext.WaitFor<ICommand>(async () =>
+            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
             {
-                _response = await EmployerIncentiveApi.Post(_url, _request);
+                _response = await EmployerIncentiveApi.Post(_url, _request, cancellationToken);
             });            
         }
 

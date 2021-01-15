@@ -115,10 +115,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var url = $"withdrawals";
 
-            await _testContext.WaitFor<ICommand>(async () =>
+            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
                     {
-                        _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
-                    }
+                        _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest, cancellationToken);
+                    }               
                      ,numberOfOnProcessedEventsExpected : 2
                      ,numberOfOnPublishedEventsExpected : 1);
         }             

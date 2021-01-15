@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             _context.EmployerIncentivesWebApiFactory?.Server?.Dispose();
             _context.EmployerIncentivesWebApiFactory?.Dispose();
-            _context.EmployerIncentiveApi?.Dispose();
+            _context.EmployerIncentiveApi?.Dispose();            
         }
 
         public int GetAvailablePort(int startingPort)

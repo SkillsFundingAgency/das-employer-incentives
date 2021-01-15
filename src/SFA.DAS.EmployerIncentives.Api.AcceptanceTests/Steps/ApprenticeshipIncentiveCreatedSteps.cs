@@ -147,7 +147,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
                     apprenticeship.UKPRN);
 
-                await _testContext.WaitFor<MessageContext>(async () =>
+                await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
@@ -157,7 +157,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var calcEarningsCommand = new CalculateEarningsCommand(_apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
+            await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
               await _testContext.MessageBus.Send(calcEarningsCommand));
         }
 
@@ -170,7 +170,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 _apprenticeshipIncentive.ApprenticeshipId,
                 _apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
+            await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
                 await _testContext.MessageBus.Send(completeEarningsCalcCommand));
         }
 

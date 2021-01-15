@@ -65,9 +65,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 expectedPublishedEvents = 2;
             }
 
-            await TestContext.WaitFor<ICommand>(async () =>
+            await TestContext.WaitFor<ICommand>(async (cancellationToken) =>
                 {
-                    _response = await EmployerIncentiveApi.Patch(url, data);
+                    _response = await EmployerIncentiveApi.Patch(url, data, cancellationToken);
                 },
                numberOfOnProcessedEventsExpected: expectedProcessedEvents,
                numberOfOnPublishedEventsExpected: expectedPublishedEvents);

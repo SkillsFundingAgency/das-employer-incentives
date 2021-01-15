@@ -10,6 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     public class TestHelper
     {
         private readonly TestContext _testContext;
+        private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
         public TestHelper(TestContext testContext)
         {
@@ -17,13 +18,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         }
 
         public async Task<WaitForResult> WaitFor<T>(
-                   Func<Task> func,
+                   Func<CancellationToken, Task> func,
                    bool assertOnTimeout = true,
                    bool assertOnError = false,
                    int timeoutInMs = 60000,
                    int numberOfOnProcessedEventsExpected = 1,
                    int numberOfOnPublishedEventsExpected = 0)
         {
+            var token = _tokenSource.Token;
+
             var waitForResult = new WaitForResult();
             var messagesProcessed = 0;
             var messagesPublished = 0;
@@ -37,13 +40,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             try
             {
-                await func();
+                await func(token);
             }
             catch (Exception ex)
             {
-                waitForResult.SetHasErrored(ex);
+                waitForResult.SetHasErrored(ex);                
+                _tokenSource.Cancel();
             }
-            await WaitForHandlerCompletion(waitForResult, timeoutInMs);
+            await WaitForHandlerCompletion(waitForResult, timeoutInMs, token);
 
             if (assertOnTimeout)
             {
@@ -54,15 +58,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}' and stack trace '{waitForResult.LastException?.StackTrace}'");
             }
-
+            _tokenSource.Dispose();
             return waitForResult;
         }
 
-        private async Task WaitForHandlerCompletion(WaitForResult waitForResult, int timeoutInMs)
+        private async Task WaitForHandlerCompletion(WaitForResult waitForResult, int timeoutInMs, CancellationToken cancellationToken)
         {
             using (Timer timer = new Timer(new TimerCallback(TimedOutCallback), waitForResult, timeoutInMs, Timeout.Infinite))
             {
-                while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut)
+                while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut && !cancellationToken.IsCancellationRequested)
                 {
                     await Task.Delay(100);
                 }
@@ -72,6 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private void TimedOutCallback(object state)
         {
             ((WaitForResult)state).SetHasTimedOut();
+            _tokenSource.Cancel();
         }
     }
 }

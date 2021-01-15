@@ -13,7 +13,6 @@ Scenario: VRF case status updated with a general value for legal entity
 	Then Employer Incentives account legal entity record is updated
 	And a command to add an Employer Vendor Id Command is sent
 
-
 Scenario: VRF case status of 'Case request complete' updated for legal entity
 	Given an existing submitted incentive application
 	When VRF case status is changed to 'Case Request Completed'
