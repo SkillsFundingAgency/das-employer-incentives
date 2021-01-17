@@ -28,16 +28,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             }
             
             var endpointConfiguration = new EndpointConfiguration(_testContext.InstanceId);
-            endpointConfiguration
+            endpointConfiguration                
                 .UseNewtonsoftJsonSerializer()
                 .UseMessageConventions()
-                .UseTransport<LearningTransport>()
+                .UseTransport<LearningTransport>()                
                 .StorageDirectory(StorageDirectory.FullName);
 
             endpointConfiguration.UseLearningTransport(s => s.AddRouting());
 
-            _endpointInstance = await Endpoint.Start(endpointConfiguration);
-            
+            _endpointInstance = await Endpoint.Start(endpointConfiguration);            
+
             IsRunning = true;
         }
 

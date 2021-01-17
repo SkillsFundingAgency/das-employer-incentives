@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             if (_context.MessageBus != null && _context.MessageBus.IsRunning)
             {
-                await _context.MessageBus.Stop();
+                await _context.MessageBus.Stop();                
             }            
         }
     }

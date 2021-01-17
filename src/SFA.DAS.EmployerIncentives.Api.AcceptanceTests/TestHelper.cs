@@ -24,8 +24,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                    int timeoutInMs = 60000,
                    int numberOfOnProcessedEventsExpected = 1,
                    int numberOfOnPublishedEventsExpected = 0)
-        {
+        {            
             var token = _tokenSource.Token;
+            _tokenSource.CancelAfter(timeoutInMs);
 
             var waitForResult = new WaitForResult();
             var messagesProcessed = 0;
@@ -75,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut && !cancellationToken.IsCancellationRequested)
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(200);
                 }
             }
         }

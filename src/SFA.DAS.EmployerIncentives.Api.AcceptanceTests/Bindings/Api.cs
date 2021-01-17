@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using NServiceBus;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             var eventsHook = new Hook<object>();
             _context.Hooks.Add(eventsHook);
 
-            var commandsHook = new Hook<ICommand>();
+            var commandsHook = new Hook<Abstractions.Commands.ICommand>();
             _context.Hooks.Add(commandsHook);
 
             var webApi = new TestWebApi(_context, eventsHook, commandsHook);
@@ -39,10 +39,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         }
 
         [AfterScenario()]
-        public void CleanUp()
+        public async Task CleanUp()
         {
-            _context.EmployerIncentivesWebApiFactory?.Server?.Dispose();
-            _context.EmployerIncentivesWebApiFactory?.Dispose();
+            var endpoint = _context.EmployerIncentivesWebApiFactory.Services.GetService(typeof(IEndpointInstance)) as IEndpointInstance;
+            if(endpoint != null)
+            {
+                await endpoint.Stop();
+            }
+            _context.EmployerIncentivesWebApiFactory.Server?.Dispose();
+            _context.EmployerIncentivesWebApiFactory.Dispose();
             _context.EmployerIncentiveApi?.Dispose();            
         }
 

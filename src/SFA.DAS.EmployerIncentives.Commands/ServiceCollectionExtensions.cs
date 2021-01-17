@@ -281,7 +281,13 @@ namespace SFA.DAS.EmployerIncentives.Commands
             this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration)
         {
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
+            var endpointName = configuration["ApplicationSettings:NServiceBusEndpointName"];
+            if (string.IsNullOrEmpty(endpointName))
+            {
+                endpointName = "SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers";
+            }
+
+            var endpointConfiguration = new EndpointConfiguration(endpointName)
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
@@ -291,6 +297,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
+
                 endpointConfiguration
                     .UseTransport<LearningTransport>()
                     .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory",
