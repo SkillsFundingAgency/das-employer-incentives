@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             apprenticeship.IncentiveApplicationId = application.Id;
 
             await DataAccess.SetupAccount(_account);
-            await DataAccess.InsertApplication(application);
+            await DataAccess.InsertWithEnumAsString(application);
             await DataAccess.Insert(apprenticeship);
         }
 

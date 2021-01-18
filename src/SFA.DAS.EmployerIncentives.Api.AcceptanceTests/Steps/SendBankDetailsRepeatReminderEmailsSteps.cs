@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private async Task SetupApplication(IncentiveApplication application)
         {
-            await DataAccess.InsertApplication(application);
+            await DataAccess.InsertWithEnumAsString(application);
         }
 
         private async Task SetupApprenticeship(IncentiveApplicationApprenticeship apprenticeship)

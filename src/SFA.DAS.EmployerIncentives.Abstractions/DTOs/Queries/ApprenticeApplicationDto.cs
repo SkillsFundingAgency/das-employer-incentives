@@ -13,5 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public DateTime ApplicationDate { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
         public string SubmittedByEmail { get; set; }
+        public PaymentStatusDto FirstPaymentStatus { get; set; }
+        public PaymentStatusDto SecondPaymentStatus { get; set; }
     }
 }

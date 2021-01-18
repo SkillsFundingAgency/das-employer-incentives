@@ -1,45 +1,61 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
     public class ApprenticeApplicationDataRepository : IApprenticeApplicationDataRepository
     {
-        private Lazy<EmployerIncentivesDbContext> _lazyContext;
-        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
+        private readonly EmployerIncentivesDbContext _dbContext;
 
         public ApprenticeApplicationDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _lazyContext = dbContext;
+            _dbContext = dbContext.Value;
         }
 
         public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)
         {
-            var accountApplications = from application in _dbContext.ApprenticeshipIncentives
-                                      join account in _dbContext.Accounts on application.AccountLegalEntityId equals account.AccountLegalEntityId
-                                      where application.AccountId == accountId && application.AccountLegalEntityId == accountLegalEntityId
-                                      select new { application, account };
+            var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
+                                      join account in _dbContext.Accounts on incentive.AccountLegalEntityId equals account.AccountLegalEntityId
+                                      join firstPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals firstPayment.ApprenticeshipIncentiveId
+                                      join secondPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals secondPayment.ApprenticeshipIncentiveId
+                                      where incentive.AccountId == accountId
+                                            && incentive.AccountLegalEntityId == accountLegalEntityId
+                                            && (firstPayment == default || firstPayment.EarningType == EarningType.FirstPayment)
+                                            && (secondPayment == default || secondPayment.EarningType == EarningType.SecondPayment)
+                                      select new { incentive, account, firstPayment, secondPayment };
 
-            return await (from accountApplication in accountApplications
-                           let dto = new ApprenticeApplicationDto
-                           {
-                               AccountId = accountApplication.application.AccountId,
-                               AccountLegalEntityId = accountApplication.application.AccountLegalEntityId,
-                               ApplicationDate = accountApplication.application.SubmittedDate.HasValue ? accountApplication.application.SubmittedDate.Value : DateTime.Now,
-                               FirstName = accountApplication.application.FirstName,
-                               LastName = accountApplication.application.LastName,
-                               ULN = accountApplication.application.ULN,
-                               LegalEntityName = accountApplication.account.LegalEntityName,
-                               SubmittedByEmail = accountApplication.application.SubmittedByEmail,
-                               TotalIncentiveAmount = accountApplication.application.PendingPayments.Sum(x => x.Amount)
-                           }
-                           select dto).ToListAsync();
+            return await (from data in accountApplications
+                          let dto = new ApprenticeApplicationDto
+                          {
+                              AccountId = data.incentive.AccountId,
+                              AccountLegalEntityId = data.incentive.AccountLegalEntityId,
+                              ApplicationDate = data.incentive.SubmittedDate ?? DateTime.Now,
+                              FirstName = data.incentive.FirstName,
+                              LastName = data.incentive.LastName,
+                              ULN = data.incentive.ULN,
+                              LegalEntityName = data.account.LegalEntityName,
+                              SubmittedByEmail = data.incentive.SubmittedByEmail,
+                              TotalIncentiveAmount = data.incentive.PendingPayments.Sum(x => x.Amount),
+                              FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
+                              {
+                                  PaymentDate = data.firstPayment.DueDate.AddMonths(1),
+                                  LearnerMatchNotFound = false,
+                                  PaymentAmount = data.firstPayment.Amount
+                              },
+                              SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
+                              {
+                                  PaymentDate = data.secondPayment.DueDate.AddMonths(1),
+                                  LearnerMatchNotFound = false,
+                                  PaymentAmount = data.secondPayment.Amount
+                              }
+                          }
+                          select dto).ToListAsync();
         }
 
         public async Task<Guid?> GetFirstSubmittedApplicationId(long accountLegalEntityId)

@@ -2,8 +2,12 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -45,19 +49,32 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             allAccounts[0].Id = accountId;
             allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApplications = _fixture.CreateMany<Models.IncentiveApplication>(5).ToArray();
-            allApplications[0].AccountId = accountId;
-            allApplications[0].AccountLegalEntityId = accountLegalEntityId;
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
             var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = allApplications[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = allApplications[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = allApplications[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = allApplications[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = allApplications[0].Id;
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
 
             _context.Accounts.AddRange(allAccounts);
-            _context.Applications.AddRange(allApplications);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
 
             _context.SaveChanges();
@@ -66,7 +83,24 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Length.Should().Be(1);
             result.All(x => x.AccountId == accountId).Should().BeTrue();
+
+            var expectedFirstPaymentStatus = new PaymentStatusDto
+            {
+                LearnerMatchNotFound = false,
+                PaymentAmount = pendingPayments[0].Amount,
+                PaymentDate = DateTime.Parse("04-02-2020", new CultureInfo("en-GB"))
+            };
+            result[0].FirstPaymentStatus.Should().BeEquivalentTo(expectedFirstPaymentStatus);
+
+            var expectedSecondPaymentStatus = new PaymentStatusDto
+            {
+                LearnerMatchNotFound = false,
+                PaymentAmount = pendingPayments[1].Amount,
+                PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB"))
+            };
+            result[0].SecondPaymentStatus.Should().BeEquivalentTo(expectedSecondPaymentStatus);
         }
     }
 }

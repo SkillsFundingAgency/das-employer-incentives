@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             foreach (var application in applications)
             {
-                await DataAccess.InsertApplication(application);
+                await DataAccess.InsertWithEnumAsString(application);
 
                 var apprenticeships = _fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(a => a.IncentiveApplicationId, application.Id)
@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             foreach (var application in applications)
             {
-                await DataAccess.InsertApplication(application);
+                await DataAccess.InsertWithEnumAsString(application);
 
                 var apprenticeships = _fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(a => a.IncentiveApplicationId, application.Id)
@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             foreach (var application in applications)
             {
-                await DataAccess.InsertApplication(application);
+                await DataAccess.InsertWithEnumAsString(application);
 
                 var apprenticeships = _fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(a => a.IncentiveApplicationId, application.Id)

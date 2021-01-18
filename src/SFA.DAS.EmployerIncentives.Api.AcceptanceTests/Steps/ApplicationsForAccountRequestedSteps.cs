@@ -1,13 +1,14 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Dapper.Contrib.Extensions;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -77,12 +78,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private async Task SetupApprenticeshipIncentive()
         {
-            using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             foreach (var pendingPayment in _apprenticeshipIncentive.PendingPayments)
             {
                 pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
-                await dbConnection.InsertAsync(pendingPayment);
+                await dbConnection.InsertWithEnumAsString(pendingPayment);
             }
         }
     }
