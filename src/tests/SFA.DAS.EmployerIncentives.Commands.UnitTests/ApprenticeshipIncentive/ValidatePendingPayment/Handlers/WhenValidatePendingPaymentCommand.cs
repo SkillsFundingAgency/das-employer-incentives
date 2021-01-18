@@ -109,9 +109,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(m => m.Find(incentive.Account.Id))
                 .ReturnsAsync(domainAccount);
 
-            var submissionData = new SubmissionData(DateTime.UtcNow);
-            submissionData.SetLearningFound(new LearningFoundStatus(true));
-            submissionData.SetIsInLearning(true);
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.UtcNow);
+            submissionData.SetLearningData(new LearningData(true));
+            submissionData.LearningData.SetIsInLearning(true);
 
             _daysInLearning = new DaysInLearning(1, (short)DateTime.Now.Year, 90);
 
@@ -259,7 +260,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _learner.SetSubmissionData(null);
-            Assert.IsFalse(_learner.SubmissionFound);
+            Assert.IsFalse(_learner.SubmissionData.SubmissionFound);
 
             var pendingPayment = incentive.PendingPayments.First();
             var collectionPeriod = _collectionPeriods.First();
