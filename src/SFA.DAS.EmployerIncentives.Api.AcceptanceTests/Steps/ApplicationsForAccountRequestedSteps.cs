@@ -57,7 +57,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
 
             apprenticeshipApplication.AccountId.Should().Be(_account.Id);
-            //apprenticeshipApplication.ApplicationId.Should().Be(_application.Id); //TODO: This needs resolving as the bank details needs the original application id
             apprenticeshipApplication.FirstName.Should().Be(_apprenticeshipIncentive.FirstName);
             apprenticeshipApplication.LastName.Should().Be(_apprenticeshipIncentive.LastName);
             apprenticeshipApplication.LegalEntityName.Should().Be(_account.LegalEntityName);
