@@ -50,7 +50,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _sutModel.Apprenticeship.Provider.Ukprn,
                 _sutModel.Apprenticeship.UniqueLearnerNumber);
 
-            _learner.SetSubmissionData(new SubmissionData(DateTime.Now));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            _learner.SetSubmissionData(submissionData);
 
             _sut = Sut(_sutModel);
         }
@@ -62,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
             var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SubmissionData.SetLearningFound(new LearningFoundStatus(hasLearning));
+            _learner.SubmissionData.SetLearningData(new LearningData(hasLearning));
 
             // act
             _sut.ValidateHasLearningRecord(pendingPayment.Id, _learner, _collectionPeriod);
@@ -99,25 +101,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             _learner.SetSubmissionData(null);
-
-            // act
-            _sut.ValidateHasLearningRecord(pendingPayment.Id, _learner, _collectionPeriod);
-
-            // assert            
-            pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
-            var validationresult = pendingPayment.PendingPaymentValidationResults.First();
-            validationresult.Step.Should().Be(ValidationStep.HasLearningRecord);
-            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
-            validationresult.Result.Should().Be(false);
-        }
-
-        [Test()]
-        public void Then_a_false_validation_result_is_created_when_the_matchedLearner_LearningFoundStatus_is_null()
-        {
-            // arrange            
-            var pendingPayment = _sut.PendingPayments.First();
-
-            _learner.SubmissionData.SetLearningFound(null);
 
             // act
             _sut.ValidateHasLearningRecord(pendingPayment.Id, _learner, _collectionPeriod);
