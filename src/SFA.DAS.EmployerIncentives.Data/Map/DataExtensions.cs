@@ -199,18 +199,27 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId
             };
         }
-        
+
+        private static bool HasVendorId(Models.Account model)
+        {
+            return !string.IsNullOrEmpty(model.VrfVendorId);
+        }
+
         private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
         {
-            if (String.IsNullOrWhiteSpace(model.VrfCaseStatus))
+            if (string.IsNullOrWhiteSpace(model.VrfCaseStatus))
             {
                 return BankDetailsStatus.NotSupplied;
             }
 
             if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
-             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
-             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
+                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
             {
+                if(HasVendorId(model))
+                {
+                    return BankDetailsStatus.Completed;
+                }
                 return BankDetailsStatus.Rejected;
             }
 
