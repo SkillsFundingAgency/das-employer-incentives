@@ -1,4 +1,5 @@
 ﻿@database
+@messageBus
 @api
 Feature: SendBankDetailsRepeatReminderEmails
 	In order to receive incentive payments

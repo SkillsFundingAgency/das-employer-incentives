@@ -3,9 +3,10 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
-//[assembly: Parallelizable(ParallelScope.Fixtures)]
+[assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     public class StepsBase
@@ -27,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             if (hook != null)
             {
-                hook.OnProcessed = (message) =>
+                hook.OnProcessed += (message) =>
                 {
                     lock (_lock)
                     {
@@ -45,18 +46,49 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             if (commandsHook != null)
             {
-                commandsHook.OnReceived = (command) =>
+                commandsHook.OnReceived += (command) =>
                 {
                     lock (_lock)
                     {
-                        testContext.CommandsPublished.Add(new PublishedCommand(command) { IsReceived = true });
+                        testContext.CommandsPublished.Add(
+                        new PublishedCommand(command)
+                        {
+                            IsReceived = true,
+                            IsDomainCommand = command is DomainCommand
+                        });
                     }
                 };
-                commandsHook.OnProcessed = (command) =>
+
+                commandsHook.OnProcessed += (command) =>
                 {
                     lock (_lock)
                     {
-                        testContext.CommandsPublished.Single(c => c.Command == command).IsPublished = true;
+                        testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsProcessed = true);
+
+                        var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
+                        if (throwError)
+                        {
+                            throw new ApplicationException("Unexpected exception, should force a rollback");
+                        }
+                    }
+                };
+                commandsHook.OnHandled += (command) =>
+                {
+                    lock (_lock)
+                    {
+                        var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterProcessedCommand");
+                        if (throwError)
+                        {
+                            throw new ApplicationException("Unexpected exception, should force a rollback");
+                        }
+                    }
+                };
+                commandsHook.OnPublished += (command) =>
+                {
+                    lock (_lock)
+                    {
+                        testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsPublished = true);
+
                         var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishCommand");
                         if (throwError)
                         {
@@ -64,18 +96,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         }
                     }
                 };
-                commandsHook.OnErrored = (ex, command) =>
+
+                commandsHook.OnErrored += (ex, command) =>
                 {
                     lock (_lock)
                     {
-                        var publishedCommand = testContext.CommandsPublished.Single(c => c.Command == command);
-                        publishedCommand.IsErrored = true;
-                        publishedCommand.LastError = ex;
+                        List<PublishedCommand> publishedCommands;
+                        publishedCommands = testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList();
+
+                        publishedCommands.ForEach(c =>
+                        {
+                            c.IsErrored = true;
+                            c.LastError = ex;
+                            if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
+                            {
+                                c.IsPublishedWithNoListener = true;
+                            }
+                        });
+
                         if (ex.Message.Equals($"No destination specified for message: {command.GetType().FullName}"))
                         {
-                            publishedCommand.IsPublishedWithNoListener = true;
                             return true;
                         }
+
                         return false;
                     }
                 };

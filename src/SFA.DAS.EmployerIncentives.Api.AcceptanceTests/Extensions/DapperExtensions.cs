@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions
 {
     public static class DapperExtensions
     {
-        public static Task<int> InsertWithEnumAsString<T>(this SqlConnection sqlConnection, T obj)
+        public static Task<int> InsertWithEnumAsStringAsync<T>(this SqlConnection sqlConnection, T obj)
         {
             var propertyValuesMap = new Dictionary<string, object>();
 

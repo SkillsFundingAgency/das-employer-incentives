@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TechTalk.SpecFlow;
+using System.Net.Http;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -24,8 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly IncentiveApplication _application;
         private readonly IncentiveApplicationApprenticeship _apprenticeship;
         private PausePaymentsRequest _pausePaymentsRequest;
-
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
+        private HttpResponseMessage _response;
 
         public PausePaymentsSteps(TestContext testContext) : base(testContext)
         {
@@ -84,28 +85,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             
             var url = "pause-payments";
 
-            await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);
+            _response = await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);
         }
 
         [Then(@"the requester is informed no apprenticeship incentive is found")]
         public void ThenTheRequesterIsInformedNoApprenticeshipIncentiveIsFound()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            _response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Then(@"the requester is informed the apprenticeship incentive is paused")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsPaused()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            var content = await EmployerIncentiveApi.Response.Content.ReadAsStringAsync();
+            _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Paused");
         }
 
         [Then(@"the requester is informed the apprenticeship incentive is already paused")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsAlreadyPaused()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-            var content = await EmployerIncentiveApi.Response.Content.ReadAsStringAsync();
+            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments already paused");
         }
 

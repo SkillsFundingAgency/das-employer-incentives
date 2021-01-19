@@ -87,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 pendingPayment.DueDate = pendingPayment.DueDate.Date;
                 pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
-                await dbConnection.InsertWithEnumAsString(pendingPayment);
+                await dbConnection.InsertWithEnumAsStringAsync(pendingPayment);
             }
         }
     }

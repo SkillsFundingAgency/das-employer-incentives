@@ -60,7 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the earnings recalculation is triggered")]
         public void ThenTheEarningsRecalculationIsTriggered()
         {
-            _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command is CreateIncentiveCommand)
+            _testContext.CommandsPublished.Where(c => 
+                    c.IsPublished &&
+                    c.Command is CreateIncentiveCommand)
                 .Select(c => c.Command)
                 .Count().Should().Be(20);
         }

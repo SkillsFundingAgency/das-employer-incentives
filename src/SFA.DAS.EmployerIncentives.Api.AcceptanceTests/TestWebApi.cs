@@ -34,6 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
                     { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(_context.TestDirectory.FullName, ".learningtransport") },
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ApplicationSettings:NServiceBusEndpointName", _context.InstanceId },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
@@ -105,9 +106,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);                
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>
             {
@@ -115,6 +119,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 a.AddInMemoryCollection(_config);
             });
             builder.UseEnvironment("LOCAL");
+        }
+
+        public IServiceCollection AddDecorators(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerReceived<>));
+
+            Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
+            
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerProcessed<>));
+
+            return serviceCollection;
         }
     }
 }

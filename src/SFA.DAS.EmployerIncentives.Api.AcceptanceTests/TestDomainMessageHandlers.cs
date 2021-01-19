@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
+using NServiceBus.Raw;
 using NServiceBus.Transport;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -25,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly List<IHook> _messageHooks;
         private readonly TestContext _testContext;
         private IHost host;
+        private List<IReceivingRawEndpoint> _receivingRawEndpoints = new List<IReceivingRawEndpoint>();
         private bool isDisposed;
 
         public TestDomainMessageHandlers(
@@ -73,9 +76,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.Identifier = "";
                 });
 
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
                 s.Replace(new ServiceDescriptor(typeof(ICommandService), new CommandService(_testContext.EmployerIncentiveApi.Client)));
                 s.Decorate<ICommandService, CommandServiceWithLogging>();
-
+                
                 s.AddNServiceBus(
                     new LoggerFactory().CreateLogger<TestDomainMessageHandlers>(),
                     (o) =>
@@ -85,6 +89,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                             endpoint.UseTransport<LearningTransport>().StorageDirectory(_testMessageBus.StorageDirectory.FullName);
                             Commands.Types.RoutingSettingsExtensions.AddRouting(endpoint.UseTransport<LearningTransport>().Routing());
                             return endpoint;
+                        };
+
+                        o.OnStarted = (endpoint) =>
+                        {
+                            _receivingRawEndpoints.Add(endpoint);
                         };
 
                         var hook = _messageHooks.SingleOrDefault(h => h is Hook<MessageContext>) as Hook<MessageContext>;
@@ -115,10 +124,42 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
             });
 
-            hostBuilder.UseEnvironment("LOCAL");            
+            hostBuilder.UseEnvironment("LOCAL");
 
-            host = await hostBuilder.StartAsync();
+            host = await hostBuilder.StartAsync(_testContext.CancellationToken);
         }
+
+        public async Task Stop()
+        {
+            await host.StopAsync(_testContext.CancellationToken);
+
+            var stopEndpointTasks = new List<Task>();
+
+            foreach (var endpoint in _receivingRawEndpoints)
+            {
+                stopEndpointTasks.Add(StopEndpoint(endpoint));
+            }
+            await Task.WhenAll(stopEndpointTasks);
+        }
+
+        private async Task StopEndpoint(IReceivingRawEndpoint endpoint)
+        {
+            await endpoint.Stop().ConfigureAwait(false);
+        }
+
+        public IServiceCollection AddDecorators(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerReceived<>));
+
+            Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
+
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerProcessed<>));
+
+            return serviceCollection;
+        }
+
 
         public void Dispose()
         {
@@ -132,9 +173,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             if (disposing && host != null)
             {
-                host.StopAsync();
+                host.Dispose();
             }
-            host?.Dispose();
 
             isDisposed = true;
         }

@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public async Task<long> InsertWithEnumAsString<T>(T entity) where T : class
         {
             await using var dbConnection = new SqlConnection(_connectionString);
-            return await dbConnection.InsertWithEnumAsString(entity);
+            return await dbConnection.InsertWithEnumAsStringAsync(entity);
         }
     }
 }

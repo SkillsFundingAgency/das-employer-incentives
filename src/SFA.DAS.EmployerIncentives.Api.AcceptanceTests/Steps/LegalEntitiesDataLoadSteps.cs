@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Messages.Events;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using WireMock.Matchers;
@@ -19,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private readonly TestContext _testContext;
         private readonly HttpStatusCode _expectedResult = HttpStatusCode.NoContent;
+        private HttpResponseMessage _response;
 
         public LegalEntitiesDataLoadSteps(TestContext testContext) : base(testContext)
         {
@@ -45,11 +47,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 { "PageSize", 200 }
             };
 
-            await EmployerIncentiveApi.Put(
+            _response = await EmployerIncentiveApi.Put(
                     $"/jobs",
                    new JobRequest { Type = JobType.RefreshLegalEntities, Data = data });
 
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(_expectedResult);
+            _response.StatusCode.Should().Be(_expectedResult);
         }
 
         [Then(@"the legal entities are available in employer incentives")]
