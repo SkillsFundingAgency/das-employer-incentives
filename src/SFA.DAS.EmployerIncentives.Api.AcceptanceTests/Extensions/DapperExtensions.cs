@@ -3,25 +3,31 @@ using Dapper.Contrib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TableAttribute = Dapper.Contrib.Extensions.TableAttribute;
 
-namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions
+// ReSharper disable once CheckNamespace
+namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
     public static class DapperExtensions
     {
-        public static Task<int> InsertWithEnumAsStringAsync<T>(this SqlConnection sqlConnection, T obj)
+        public static Task<int> InsertAsync<T>(this IDbConnection connection, T entityToInsert, bool enumAsString = false, IDbTransaction transaction = null, int? commandTimeout = null, ISqlAdapter sqlAdapter = null) where T : class
+        {
+            return enumAsString ? InsertWithEnumAsStringAsync(connection, entityToInsert) : SqlMapperExtensions.InsertAsync(connection, entityToInsert, transaction, commandTimeout, sqlAdapter);
+        }
+
+        private static Task<int> InsertWithEnumAsStringAsync<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             var propertyValuesMap = new Dictionary<string, object>();
 
             var columns = new StringBuilder();
             var values = new StringBuilder();
-            var tableName = ((TableAttribute)obj.GetType().GetCustomAttribute(typeof(TableAttribute)))?.Name;
-            var relevantProperties = obj.GetType().GetProperties().Where(x =>
+            var tableName = ((TableAttribute)entityToInsert.GetType().GetCustomAttribute(typeof(TableAttribute)))?.Name;
+            var relevantProperties = entityToInsert.GetType().GetProperties().Where(x =>
                 !Attribute.IsDefined(x, typeof(ComputedAttribute)) && HasNoWriteFalseAttribute(x)).ToList();
 
             for (var i = 0; i < relevantProperties.Count; i++)
@@ -31,14 +37,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions
 
                 if (propertyInfo.PropertyType.IsEnum)
                 {
-                    var isStringEnum = propertyInfo.GetCustomAttributes(typeof(ColumnAttribute), false).FirstOrDefault() is ColumnAttribute columnAttribute
-                                       && columnAttribute.TypeName.Contains("varchar");
+                    var isStringEnum =
+                        propertyInfo.GetCustomAttributes(typeof(ColumnAttribute), false).FirstOrDefault() is ColumnAttribute
+                            columnAttribute
+                        && columnAttribute.TypeName.Contains("varchar");
 
-                    val = isStringEnum ? Enum.GetName(propertyInfo.PropertyType, propertyInfo.GetValue(obj) ?? "VALUE") : propertyInfo.GetValue(obj);
+                    val = isStringEnum
+                        ? Enum.GetName(propertyInfo.PropertyType, propertyInfo.GetValue(entityToInsert) ?? "VALUE")
+                        : propertyInfo.GetValue(entityToInsert);
                 }
                 else
                 {
-                    val = propertyInfo.GetValue(obj);
+                    val = propertyInfo.GetValue(entityToInsert);
                 }
 
                 propertyValuesMap.Add(propertyInfo.Name, val);
@@ -47,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions
                 values.Append($"@{propName}");
             }
 
-            return sqlConnection.ExecuteAsync($"Insert Into {tableName} ({columns}) values ({values})", propertyValuesMap);
+            return connection.ExecuteAsync($"Insert Into {tableName} ({columns}) values ({values})", propertyValuesMap, transaction, commandTimeout);
         }
 
         private static bool HasNoWriteFalseAttribute(ICustomAttributeProvider propertyInfo)

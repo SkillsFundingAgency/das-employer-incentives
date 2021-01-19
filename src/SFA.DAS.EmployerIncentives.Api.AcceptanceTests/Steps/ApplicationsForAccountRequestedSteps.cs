@@ -1,6 +1,4 @@
-﻿using Dapper.Contrib.Extensions;
-using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions;
+﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -60,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             apprenticeshipApplication.LegalEntityName.Should().Be(_account.LegalEntityName);
             apprenticeshipApplication.TotalIncentiveAmount.Should().Be(_apprenticeshipIncentive.PendingPayments.Sum(x => x.Amount));
             apprenticeshipApplication.SubmittedByEmail.Should().Be(_apprenticeshipIncentive.SubmittedByEmail);
+            // ReSharper disable once PossibleInvalidOperationException
             apprenticeshipApplication.ApplicationDate.Date.Should().Be(_apprenticeshipIncentive.SubmittedDate.Value.Date);
 
             apprenticeshipApplication.FirstPaymentStatus.Should().BeEquivalentTo(new
@@ -87,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 pendingPayment.DueDate = pendingPayment.DueDate.Date;
                 pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
-                await dbConnection.InsertWithEnumAsStringAsync(pendingPayment);
+                await dbConnection.InsertAsync(pendingPayment, true);
             }
         }
     }
