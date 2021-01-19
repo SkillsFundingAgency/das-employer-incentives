@@ -229,16 +229,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
 
             learner.SubmissionData.SetSubmissionDate(model.SubmissionDate);
-            learner.SubmissionData.SetLearningData(new Domain.ApprenticeshipIncentives.ValueTypes.LearningData(model.LearningFound.Value));
-            learner.SubmissionData.LearningData.SetStartDate(model.StartDate);
-
-            if (model.HasDataLock.HasValue)
+            if (learner.SubmissionData.SubmissionFound)
             {
-                learner.SubmissionData.LearningData.SetHasDataLock(model.HasDataLock.Value);
-            }
-            learner.SubmissionData.LearningData.SetIsInLearning(model.InLearning);
+                learner.SubmissionData.SetLearningData(
+                    new Domain.ApprenticeshipIncentives.ValueTypes.LearningData(model.LearningFound.Value));
+                learner.SubmissionData.LearningData.SetStartDate(model.StartDate);
 
-            learner.SubmissionData.SetRawJson(model.RawJSON);
+                if (model.HasDataLock.HasValue)
+                {
+                    learner.SubmissionData.LearningData.SetHasDataLock(model.HasDataLock.Value);
+                }
+
+                learner.SubmissionData.LearningData.SetIsInLearning(model.InLearning);
+
+                learner.SubmissionData.SetRawJson(model.RawJSON);
+            }
 
             return learner;
         }
