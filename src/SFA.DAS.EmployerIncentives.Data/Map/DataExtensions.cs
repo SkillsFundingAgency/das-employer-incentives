@@ -202,7 +202,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
 
         private static bool HasVendorId(Models.Account model)
         {
-            return !string.IsNullOrEmpty(model.VrfVendorId);
+            return !string.IsNullOrEmpty(model.VrfVendorId) && model.VrfVendorId != "000000";
         }
 
         private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
