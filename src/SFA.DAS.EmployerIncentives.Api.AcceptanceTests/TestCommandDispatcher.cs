@@ -1,23 +1,24 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
-    public class TestCommandPublisher : ICommandPublisher
+    public class TestCommandDispatcher : ICommandDispatcher
     {
-        private readonly ICommandPublisher _commandPublisher;
+        private readonly ICommandDispatcher _commandDispatcher;
         private readonly IHook<ICommand> _hook;
 
-        public TestCommandPublisher(ICommandPublisher commandPublisher, IHook<ICommand> hook)
+        public TestCommandDispatcher(ICommandDispatcher commandDispatcher, IHook<ICommand> hook)
         {
-            _commandPublisher = commandPublisher;
+            _commandDispatcher = commandDispatcher;
             _hook = hook;
         }
 
-        public async Task Publish<T>(T command, CancellationToken cancellationToken = default) where T : class, ICommand
+        public async Task Send<TCommand>(TCommand command, CancellationToken cancellationToken = default) where TCommand : ICommand
         {
             if (_hook != null)
             {
@@ -27,11 +28,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         _hook.OnReceived(command);
                     }
-                    await _commandPublisher.Publish(command);
+                    
+                    await _commandDispatcher.Send(command);
 
-                    if (_hook?.OnPublished != null)
+                    if (_hook?.OnProcessed != null)
                     {
-                        _hook.OnPublished(command);
+                        _hook.OnProcessed(command);
                     }
                 }
                 catch (Exception ex)
@@ -49,13 +51,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             }
             else
             {
-                await _commandPublisher.Publish(command);
+                await _commandDispatcher.Send(command);
             }
         }
 
-        public Task Publish(object command, CancellationToken cancellationToken = default)
+        public Task SendMany<TCommands>(TCommands commands, CancellationToken cancellationToken = default) where TCommands : IEnumerable<ICommand>
         {
-            return _commandPublisher.Publish(command);
+            return _commandDispatcher.SendMany(commands, cancellationToken);
         }
     }
 }

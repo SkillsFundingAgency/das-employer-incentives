@@ -6,18 +6,20 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
-    public class TestCommandPublisher : ICommandPublisher
+    public class TestCommandHandlerReceived<T> : ICommandHandler<T> where T : ICommand
     {
-        private readonly ICommandPublisher _commandPublisher;
+        private readonly ICommandHandler<T> _handler;
         private readonly IHook<ICommand> _hook;
 
-        public TestCommandPublisher(ICommandPublisher commandPublisher, IHook<ICommand> hook)
+        public TestCommandHandlerReceived(
+            ICommandHandler<T> handler,
+            IHook<ICommand> hook)
         {
-            _commandPublisher = commandPublisher;
+            _handler = handler;
             _hook = hook;
         }
 
-        public async Task Publish<T>(T command, CancellationToken cancellationToken = default) where T : class, ICommand
+        public async Task Handle(T command, CancellationToken cancellationToken = default)
         {
             if (_hook != null)
             {
@@ -27,11 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         _hook.OnReceived(command);
                     }
-                    await _commandPublisher.Publish(command);
+                    await _handler.Handle(command, cancellationToken);
 
-                    if (_hook?.OnPublished != null)
+                    if (_hook?.OnHandled != null)
                     {
-                        _hook.OnPublished(command);
+                        _hook.OnHandled(command);
                     }
                 }
                 catch (Exception ex)
@@ -49,13 +51,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             }
             else
             {
-                await _commandPublisher.Publish(command);
+                await _handler.Handle(command, cancellationToken);
             }
-        }
-
-        public Task Publish(object command, CancellationToken cancellationToken = default)
-        {
-            return _commandPublisher.Publish(command);
         }
     }
 }
