@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Services
@@ -14,8 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
         }
         public async Task<bool> IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            var incentive = new NewApprenticeIncentive();
-            if (!incentive.IsApprenticeshipEligible(apprenticeship))
+            if (!apprenticeship.IsApproved || IsStartDateOutsideSchemeRange(apprenticeship))
             {
                 return false;
             }
@@ -26,6 +26,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
             }
 
             return true;
+        }
+
+        private static bool IsStartDateOutsideSchemeRange(Apprenticeship apprenticeship)
+        {
+            return apprenticeship.StartDate < Incentive.EligibilityStartDate || apprenticeship.StartDate > Incentive.EligibilityEndDate;
         }
     }
 }

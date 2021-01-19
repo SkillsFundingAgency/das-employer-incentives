@@ -11,16 +11,6 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
         private const decimal TwentyFiveOrOverIncentiveAmount = 2000;
         private const decimal UnderTwentyFiveIncentiveAmount = 1500;
 
-        public bool IsApprenticeshipEligible(Apprenticeship apprenticeship)
-        {
-            if (IsStartDateOutsideSchemeRange(apprenticeship) || !apprenticeship.IsApproved)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public decimal CalculateTotalIncentiveAmount(DateTime apprenticeDateOfBirth, DateTime plannedStartDate)
         {
             var apprenticeAge = CalculateAgeAtStartOfApprenticeship(apprenticeDateOfBirth, plannedStartDate);
@@ -32,12 +22,7 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
 
             return TwentyFiveOrOverIncentiveAmount;
         }
-
-        private static bool IsStartDateOutsideSchemeRange(Apprenticeship apprenticeship)
-        {
-            return apprenticeship.StartDate < EligibilityStartDate || apprenticeship.StartDate > EligibilityEndDate;
-        }
-
+        
         private static int CalculateAgeAtStartOfApprenticeship(in DateTime apprenticeDateOfBirth, in DateTime plannedStartDate)
         {
             var age = plannedStartDate.Year - apprenticeDateOfBirth.Year;
