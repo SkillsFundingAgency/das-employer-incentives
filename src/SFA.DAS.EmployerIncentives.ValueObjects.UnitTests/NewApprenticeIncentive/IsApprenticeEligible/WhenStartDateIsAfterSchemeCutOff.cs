@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects.UnitTests.NewApprenticeIncenti
         public void Then_the_apprenticeship_is_not_eligible()
         {
             var apprenticeship = new ApprenticeshipBuilder()
-                .WithStartDate(new DateTime(2021, 2, 1))
+                .WithStartDate(new DateTime(2021, 4, 1))
                 .Build();
 
             var result = _sut.IsApprenticeshipEligible(apprenticeship);

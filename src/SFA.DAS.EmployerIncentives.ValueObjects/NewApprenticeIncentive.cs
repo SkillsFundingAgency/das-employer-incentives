@@ -7,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.ValueObjects
     public class NewApprenticeIncentive : ValueObject
     {
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 1, 31);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 3, 31);
         private const decimal TwentyFiveOrOverIncentiveAmount = 2000;
         private const decimal UnderTwentyFiveIncentiveAmount = 1500;
 
