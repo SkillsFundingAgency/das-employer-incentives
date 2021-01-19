@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
         {
             _ulnValidationService = ulnValidationService;
         }
+
         public async Task<bool> IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
             if (!apprenticeship.IsApproved || IsStartDateOutsideSchemeRange(apprenticeship))
