@@ -6,9 +6,9 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -22,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly Fixture _fixture;
         private readonly CreateIncentiveApplicationRequest _createRequest;
         private readonly SubmitIncentiveApplicationRequest _submitRequest;
+        private HttpResponseMessage _response;
 
         public IncentiveApplicationSubmittedSteps(TestContext testContext) : base(testContext)
         {
@@ -37,8 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnEmployerHasEnteredIncentiveClaimApplicationDetails()
         {
             var url = $"applications";
-            await EmployerIncentiveApi.Post(url, _createRequest);
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.Created);
+            _response = await EmployerIncentiveApi.Post(url, _createRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.Created);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
@@ -54,13 +55,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheApplicationIsSubmitted()
         {
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
         [When(@"the application is submitted and the system errors")]
         public async Task WhenTheApplicationIsSubmittedAndTheSystemErrors()
         {
-            _testContext.TestData.Set("ThrowErrorAfterPublishCommand", true);
+            _testContext.TestData.Set("ThrowErrorAfterProcessedCommand", true);
 
             await WhenTheApplicationIsSubmitted();
         }
@@ -68,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the application status is updated to reflect completion")]
         public async Task ThenTheApplicationStatusIsUpdatedToReflectCompletion()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
@@ -79,14 +80,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
             }
 
-            var publishedCommand = _testContext.CommandsPublished.Where(c => c.IsPublished)
+            var publishedCommand = _testContext.CommandsPublished
+                .Where(c => c.IsPublished && 
+                c.IsDomainCommand &&
+                c.Command is CreateIncentiveCommand)
                 .Select(c => c.Command).ToArray();
 
-            Debug.Assert(publishedCommand != null, nameof(publishedCommand) + " != null");
             publishedCommand.Count().Should().Be(_createRequest.Apprenticeships.Count());
 
             var cmd = publishedCommand.First() as CreateIncentiveCommand;
-            cmd.Should().NotBeNull();
             cmd.AccountId.Should().Be(_submitRequest.AccountId);
         }
 
@@ -96,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var invalidApplicationId = _fixture.Create<Guid>();
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
         [Then(@"the application changes are not saved")]
@@ -122,13 +124,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the service responds with an error")]
         public void ThenTheServiceRespondsWithAnError()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Then(@"the service responds with an internal error")]
         public void ThenTheServiceRespondsWithAnInternalError()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            _response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
 
         [Then(@"there are no events in the outbox")]
@@ -149,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var invalidAccountId = _fixture.Create<long>();
             _submitRequest.AccountId = invalidAccountId;
             var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _response =  await EmployerIncentiveApi.Patch(url, _submitRequest);
         }
 
     }
