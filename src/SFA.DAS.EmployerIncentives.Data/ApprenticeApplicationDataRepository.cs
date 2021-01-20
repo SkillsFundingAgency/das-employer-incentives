@@ -24,11 +24,12 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       join account in _dbContext.Accounts on incentive.AccountLegalEntityId equals account.AccountLegalEntityId
                                       join firstPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals firstPayment.ApprenticeshipIncentiveId
                                       join secondPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals secondPayment.ApprenticeshipIncentiveId
+                                      join learner in _dbContext.Learners.DefaultIfEmpty() on incentive.Id equals learner.ApprenticeshipIncentiveId
                                       where incentive.AccountId == accountId
                                             && incentive.AccountLegalEntityId == accountLegalEntityId
                                             && (firstPayment == default || firstPayment.EarningType == EarningType.FirstPayment)
                                             && (secondPayment == default || secondPayment.EarningType == EarningType.SecondPayment)
-                                      select new { incentive, account, firstPayment, secondPayment };
+                                      select new { incentive, account, firstPayment, secondPayment, learner };
 
             return await (from data in accountApplications
                           let dto = new ApprenticeApplicationDto
@@ -45,13 +46,13 @@ namespace SFA.DAS.EmployerIncentives.Data
                               FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
                               {
                                   PaymentDate = data.firstPayment.DueDate.AddMonths(1),
-                                  LearnerMatchNotFound = false,
+                                  LearnerMatchNotFound = false, //(!data.learner.LearningFound.HasValue || !data.learner.LearningFound.Value),
                                   PaymentAmount = data.firstPayment.Amount
                               },
                               SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                               {
                                   PaymentDate = data.secondPayment.DueDate.AddMonths(1),
-                                  LearnerMatchNotFound = false,
+                                  LearnerMatchNotFound = false, // (!data.learner.LearningFound.HasValue || !data.learner.LearningFound.Value),
                                   PaymentAmount = data.secondPayment.Amount
                               }
                           }
