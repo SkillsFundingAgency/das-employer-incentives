@@ -247,6 +247,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
             learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
             learners[0].LearningFound = true;
 
             _context.Accounts.AddRange(allAccounts);

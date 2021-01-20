@@ -22,16 +22,14 @@ namespace SFA.DAS.EmployerIncentives.Data
         public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)
         {
             var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
-                                      join account in _dbContext.Accounts on incentive.AccountLegalEntityId equals account.AccountLegalEntityId
-                                      join firstPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals firstPayment.ApprenticeshipIncentiveId
-                                      join secondPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals secondPayment.ApprenticeshipIncentiveId
-                                      where incentive.AccountId == accountId
-                                            && incentive.AccountLegalEntityId == accountLegalEntityId
-                                            && (firstPayment == default || firstPayment.EarningType == EarningType.FirstPayment)
-                                            && (secondPayment == default || secondPayment.EarningType == EarningType.SecondPayment)
-                                      select new { incentive, account, firstPayment, secondPayment };
+                                      from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
+                                      from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment).DefaultIfEmpty()
+                                      from secondPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment).DefaultIfEmpty()
+                                      from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
+                                      where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
+                                      select new { incentive, account, firstPayment, secondPayment, learner };
 
-            var applications = await (from data in accountApplications
+            return await (from data in accountApplications
                           let dto = new ApprenticeApplicationDto
                           {
                               AccountId = data.incentive.AccountId,
@@ -46,33 +44,18 @@ namespace SFA.DAS.EmployerIncentives.Data
                               FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
                               {
                                   PaymentDate = data.firstPayment.DueDate.AddMonths(1),
+                                  LearnerMatchNotFound = (!data.learner.LearningFound.HasValue || !data.learner.LearningFound.Value),
                                   PaymentAmount = data.firstPayment.Amount
                               },
                               SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                               {
                                   PaymentDate = data.secondPayment.DueDate.AddMonths(1),
+                                  LearnerMatchNotFound = (!data.learner.LearningFound.HasValue || !data.learner.LearningFound.Value),
                                   PaymentAmount = data.secondPayment.Amount
                               }
                           }
                           select dto).ToListAsync();
 
-            foreach(var application in applications)
-            {
-                var learnerRecord = _dbContext.Learners.Where(x => x.ULN == application.ULN).FirstOrDefault();
-                if (learnerRecord != null)
-                {
-                    var learnerMatchNotFound = !learnerRecord.LearningFound.HasValue || !learnerRecord.LearningFound.Value;
-                    application.FirstPaymentStatus.LearnerMatchNotFound = learnerMatchNotFound;
-                    application.SecondPaymentStatus.LearnerMatchNotFound = learnerMatchNotFound;
-                }
-                else
-                {
-                    application.FirstPaymentStatus.LearnerMatchNotFound = true;
-                    application.SecondPaymentStatus.LearnerMatchNotFound = true;
-                }
-            }
-
-            return applications;
         }
 
         public async Task<Guid?> GetFirstSubmittedApplicationId(long accountLegalEntityId)
