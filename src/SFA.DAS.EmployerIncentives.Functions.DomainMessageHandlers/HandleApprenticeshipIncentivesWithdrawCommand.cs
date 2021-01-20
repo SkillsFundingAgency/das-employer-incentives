@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 using SFA.DAS.NServiceBus.AzureFunction.Attributes;
@@ -8,17 +9,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 {
     public class HandleApprenticeshipIncentivesWithdrawCommand
     {
-        private readonly ICommandService _commandService;
+        private readonly ICommandDispatcher _commandDispatcher;
 
-        public HandleApprenticeshipIncentivesWithdrawCommand(ICommandService commandService)
+        public HandleApprenticeshipIncentivesWithdrawCommand(ICommandDispatcher commandDispatcher)
         {
-            _commandService = commandService;
+            _commandDispatcher = commandDispatcher;
         }
 
         [FunctionName(nameof(HandleApprenticeshipIncentivesWithdrawCommand))]
         public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.ApprenticeshipIncentivesWithdraw)] WithdrawCommand command)
         {
-            await _commandService.Dispatch(command);
+            await _commandDispatcher.Send(command);
         }
     }
 }

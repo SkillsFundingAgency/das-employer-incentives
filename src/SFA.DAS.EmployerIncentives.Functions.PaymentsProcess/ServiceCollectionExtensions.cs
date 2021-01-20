@@ -58,7 +58,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var webBuilder = serviceCollection.AddWebJobs(x => { });
             webBuilder.AddExecutionContextBinding();
 
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
+            var endpointName = configuration["ApplicationSettings:NServiceBusEndpointName"];
+            if (string.IsNullOrEmpty(endpointName))
+            {
+                endpointName = "SFA.DAS.EmployerIncentives.Functions.PaymentsProcess";
+            }
+
+            var endpointConfiguration = new EndpointConfiguration(endpointName)
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
