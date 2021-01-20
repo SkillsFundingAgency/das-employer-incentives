@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 1, 31);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 3, 31);
         
         public IEnumerable<Payment> Payments => _payments;
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;

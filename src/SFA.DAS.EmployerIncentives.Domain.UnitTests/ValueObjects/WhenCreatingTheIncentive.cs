@@ -60,9 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [Test]
-        public void And_Date_Is_After_January_Then_the_apprentice_is_not_eligible()
+        public void And_Date_Is_After_March_Then_the_apprentice_is_not_eligible()
         {
-            var date = new DateTime(2021, 02, 1);
+            var date = new DateTime(2021, 04, 1);
             var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles);
 
             result.IsEligible.Should().BeFalse();
