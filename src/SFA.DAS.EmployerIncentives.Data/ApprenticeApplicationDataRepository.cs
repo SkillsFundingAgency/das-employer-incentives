@@ -41,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                               LegalEntityName = data.account.LegalEntityName,
                               SubmittedByEmail = data.incentive.SubmittedByEmail,
                               TotalIncentiveAmount = data.incentive.PendingPayments.Sum(x => x.Amount),
+                              CourseName = data.incentive.CourseName,
                               FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
                               {
                                   PaymentDate = data.firstPayment.DueDate.AddMonths(1),
