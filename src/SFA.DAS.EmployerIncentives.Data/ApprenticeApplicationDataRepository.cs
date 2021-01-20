@@ -21,13 +21,10 @@ namespace SFA.DAS.EmployerIncentives.Data
         public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)
         {
             var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
-                                      join account in _dbContext.Accounts on incentive.AccountLegalEntityId equals account.AccountLegalEntityId
-                                      join firstPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals firstPayment.ApprenticeshipIncentiveId
-                                      join secondPayment in _dbContext.PendingPayments.DefaultIfEmpty() on incentive.Id equals secondPayment.ApprenticeshipIncentiveId
-                                      where incentive.AccountId == accountId
-                                            && incentive.AccountLegalEntityId == accountLegalEntityId
-                                            && (firstPayment == default || firstPayment.EarningType == EarningType.FirstPayment)
-                                            && (secondPayment == default || secondPayment.EarningType == EarningType.SecondPayment)
+                                      from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
+                                      from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment).DefaultIfEmpty()
+                                      from secondPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment).DefaultIfEmpty()
+                                      where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
                                       select new { incentive, account, firstPayment, secondPayment };
 
             return await (from data in accountApplications
