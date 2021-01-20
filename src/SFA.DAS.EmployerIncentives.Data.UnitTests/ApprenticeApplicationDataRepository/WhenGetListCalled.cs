@@ -88,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             var expectedFirstPaymentStatus = new PaymentStatusDto
             {
-                LearnerMatchNotFound = false,
+                LearnerMatchNotFound = true,
                 PaymentAmount = pendingPayments[0].Amount,
                 PaymentDate = DateTime.Parse("04-02-2020", new CultureInfo("en-GB"))
             };
@@ -96,11 +96,173 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             var expectedSecondPaymentStatus = new PaymentStatusDto
             {
-                LearnerMatchNotFound = false,
+                LearnerMatchNotFound = true,
                 PaymentAmount = pendingPayments[1].Amount,
                 PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB"))
             };
             result[0].SecondPaymentStatus.Should().BeEquivalentTo(expectedSecondPaymentStatus);
+        }
+
+        [Test]
+        public async Task Then_learner_match_not_found_is_true_if_no_learner_record()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;            
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            foreach(var application in result)
+            {
+                application.FirstPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
+                application.SecondPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
+            }
+        }
+
+        [Test]
+        public async Task Then_learner_match_not_found_is_true_if_learner_record_and_no_match()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].LearningFound = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
+            application.SecondPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
+        }
+        
+        [Test]
+        public async Task Then_learner_match_not_found_is_false_if_learner_record_with_match()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].LearningFound = true;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.LearnerMatchNotFound.Should().BeFalse();
+            application.SecondPaymentStatus.LearnerMatchNotFound.Should().BeFalse();
         }
     }
 }
