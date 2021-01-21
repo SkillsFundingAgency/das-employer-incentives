@@ -26,8 +26,8 @@ FROM
   [incentives].[PendingPayment] pp
   left join [incentives].[Payment] p on p.PendingPaymentId = pp.Id
   left join [dbo].accounts a on a.AccountLegalEntityId=pp.AccountLegalEntityId
-  left join (select PendingPaymentID, min(cast(result as int)) as validationResult
-			 from [incentives].PendingPaymentValidationResult
-			 group by PendingPaymentID) pv on pv.PendingPaymentId = pp.Id
+  left join (select PendingPaymentID, min(cast(result as int)) as validationResult,PeriodNumber,PaymentYear
+			 from [incentives].PendingPaymentValidationResult ppvr
+			 group by PendingPaymentID, PeriodNumber,PaymentYear) pv on pv.PendingPaymentId = pp.Id and pp.PeriodNumber=pv.PeriodNumber and pp.PaymentYear=pv.PaymentYear
 GROUP BY 
-  	pp.PeriodNumber ,pp.PaymentYear
+  pp.PeriodNumber ,pp.PaymentYear
