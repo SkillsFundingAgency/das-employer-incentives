@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var query = _fixture.Create<GetApplicationRequest>();
             var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2020, 9,1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var expected = new GetApplicationResponse(data, false);
+            var expected = new GetApplicationResponse(data);
             var legalEntity = _fixture.Create<LegalEntityDto>();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.Should().BeEquivalentTo(expected);
+            result.Should().BeEquivalentTo(expected, opts => opts.Excluding(x => x.Application.NewAgreementRequired));
         }
 
         [Test]
@@ -73,7 +73,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var query = _fixture.Create<GetApplicationRequest>();
             var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2021, 2, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var expected = new GetApplicationResponse(data, false);
             var legalEntity = _fixture.Create<LegalEntityDto>();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
@@ -83,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.NewAgreementRequired.Should().BeTrue();
+            result.Application.NewAgreementRequired.Should().BeTrue();
         }
 
         [Test]
@@ -93,7 +92,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var query = _fixture.Create<GetApplicationRequest>();
             var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2020, 9, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var expected = new GetApplicationResponse(data, false);
             var legalEntity = _fixture.Create<LegalEntityDto>();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
@@ -103,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.NewAgreementRequired.Should().BeFalse();
+            result.Application.NewAgreementRequired.Should().BeFalse();
         }
     }
 }

@@ -29,9 +29,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
 
             var paymentProfiles = await _incentivePaymentProfilesService.Get();
             var legalEntity = await _legalEntityQueryRepository.Get(x => x.AccountLegalEntityId == application.AccountLegalEntityId);
-            var isNewAgreementRequired = IsNewAgreementRequired(application.Apprenticeships, paymentProfiles, 4); //legalEntity.SignedAgreementVersion); TODO: ONCE KEVINS CHANGE IS IN USE THE CORRECT PROPERTY
+            application.NewAgreementRequired = IsNewAgreementRequired(application.Apprenticeships, paymentProfiles, 4); //legalEntity.SignedAgreementVersion); TODO: ONCE KEVINS CHANGE IS IN USE THE CORRECT PROPERTY
 
-            var response = new GetApplicationResponse(application, isNewAgreementRequired);
+            var response = new GetApplicationResponse(application);
 
             return response;
         }
