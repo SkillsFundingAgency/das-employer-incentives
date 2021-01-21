@@ -1,8 +1,6 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using NServiceBus.Transport;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
@@ -33,6 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly PendingPayment _pendingPayment;
         private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
         private HttpResponseMessage _response;
+        private bool _isMultipleApplications;
 
         public WithdrawalByComplianceSteps(TestContext testContext) : base(testContext)
         {
@@ -90,6 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeship2);
+            _isMultipleApplications = true;
         }
 
         [Given(@"an apprenticeship incentive with pending payments exists as a result of an incentive application")]
@@ -115,13 +115,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var url = $"withdrawals";
 
-            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
-                    {
-                        _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest, cancellationToken);
-                    }               
-                     ,numberOfOnProcessedEventsExpected : 2
-                     ,numberOfOnPublishedEventsExpected : 1);
-        }             
+            await _testContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest, cancellationToken);
+                },
+                (context) => HasExpectedEvents(context)
+                );
+        }
+
+        private bool HasExpectedEvents(TestContext testContext)
+        {
+            var processedEvents = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is WithdrawCommand);
+            if(_isMultipleApplications)
+            {
+                return processedEvents == 2;
+            }
+            return processedEvents == 1;
+        }
 
         [Then(@"the incentive application status is updated to indicate the Compliance withdrawal")]
         public async Task ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal()

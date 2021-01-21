@@ -2,8 +2,6 @@
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using Newtonsoft.Json;
-using NServiceBus.Transport;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
@@ -141,17 +139,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         
             if (_waitForMessage)
             {
-                await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
-                    {
-                        _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest, cancellationToken);
-                    }
-                         ,numberOfOnProcessedEventsExpected: _isMultipleApplications ? 3 : 2
-                         ,numberOfOnPublishedEventsExpected: _isMultipleApplications ? 2 : 1);
+                await _testContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest, cancellationToken);
+                },
+                (context) => HasExpectedEvents(context)
+                );
             }
             else
             {
                 _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
             }
+        }
+
+        private bool HasExpectedEvents(TestContext testContext)
+        {
+            var processedEvents = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is WithdrawCommand);
+            if (_isMultipleApplications)
+            {
+                return processedEvents == 2;
+            }
+            return processedEvents == 1;
         }
 
         [Then(@"the incentive application status is updated to indicate the employer withdrawal")]
