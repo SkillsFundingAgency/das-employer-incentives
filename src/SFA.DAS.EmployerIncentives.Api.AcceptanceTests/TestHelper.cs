@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,6 +19,56 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _testContext = testContext;
         }
 
+        public async Task<WaitForResult> WaitFor(                   
+                   Func<CancellationToken, Task> func,
+                   Expression<Func<TestContext, bool>> predicate,
+                   bool assertOnTimeout = true,
+                   bool assertOnError = false,
+                   int timeoutInMs = 60000)
+        {
+            var predicateDelegate = predicate.Compile();
+            var token = _tokenSource.Token;
+            _tokenSource.CancelAfter(timeoutInMs);
+
+            var waitForResult = new WaitForResult();
+
+            var hook = _testContext.Hooks.SingleOrDefault(h => h is Hook<ICommand>) as Hook<ICommand>;
+
+            hook.OnReceived += (message) => { waitForResult.SetHasStarted(); };
+            hook.OnProcessed += (message) => { if (predicateDelegate.Invoke(_testContext)) { waitForResult.SetHasCompleted(); } };
+            hook.OnPublished += (message) => { if( predicateDelegate.Invoke(_testContext)) { waitForResult.SetHasCompleted(); } };
+            hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
+
+            try
+            {
+                try
+                {
+                    await Task.WhenAll(func(token), WaitForHandlerCompletion(waitForResult, timeoutInMs, token));
+                }
+                catch (Exception ex)
+                {
+                    waitForResult.SetHasErrored(ex);
+                    _tokenSource.Cancel();
+                }                
+
+                if (assertOnTimeout)
+                {
+                    waitForResult.HasTimedOut.Should().Be(false, "handler should not have timed out");
+                }
+
+                if (assertOnError)
+                {
+                    waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}' and stack trace '{waitForResult.LastException?.StackTrace}'");
+                }
+            }
+            finally
+            {
+                _tokenSource.Dispose();
+            }
+
+            return waitForResult;
+        }
+        
         public async Task<WaitForResult> WaitFor<T>(
                    Func<CancellationToken, Task> func,
                    bool assertOnTimeout = true,
@@ -43,14 +95,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 try
                 {                    
-                    await func(token);
+                    await Task.WhenAll(func(token), WaitForHandlerCompletion(waitForResult, timeoutInMs, token));
                 }
                 catch (Exception ex)
                 {
                     waitForResult.SetHasErrored(ex);
                     _tokenSource.Cancel();
                 }
-                await WaitForHandlerCompletion(waitForResult, timeoutInMs, token);
 
                 if (assertOnTimeout)
                 {
