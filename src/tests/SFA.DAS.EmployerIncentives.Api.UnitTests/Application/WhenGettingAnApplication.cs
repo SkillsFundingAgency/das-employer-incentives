@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             // Arrange
             const long accountId = 7;
             var applicationId = Guid.NewGuid();
-            var expected = new GetApplicationResponse(_fixture.Create<IncentiveApplicationDto>());
+            var expected = new GetApplicationResponse(_fixture.Create<IncentiveApplicationDto>(), _fixture.Create<bool>());
 
             _queryDispatcherMock.Setup(x => x.Send<GetApplicationRequest, GetApplicationResponse>(
                     It.Is<GetApplicationRequest>(r => r.AccountId == accountId && r.ApplicationId == applicationId)))
@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             // Arrange
             const long accountId = 7;
             var applicationId = Guid.NewGuid();
-            var expected = new GetApplicationResponse(null);
+            var expected = new GetApplicationResponse(null, It.IsAny<bool>());
 
             _queryDispatcherMock.Setup(x => x.Send<GetApplicationRequest, GetApplicationResponse>(
                     It.Is<GetApplicationRequest>(r => r.AccountId == accountId && r.ApplicationId == applicationId)))

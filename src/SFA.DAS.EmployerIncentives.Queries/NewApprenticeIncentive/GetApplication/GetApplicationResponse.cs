@@ -6,9 +6,12 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
     {
         public IncentiveApplicationDto Application { get; }
 
-        public GetApplicationResponse(IncentiveApplicationDto application)
+        public bool NewAgreementRequired { get; }
+
+        public GetApplicationResponse(IncentiveApplicationDto application, bool newAgreementRequired)
         {
             Application = application;
+            NewAgreementRequired = newAgreementRequired;
         }
     }
 }
