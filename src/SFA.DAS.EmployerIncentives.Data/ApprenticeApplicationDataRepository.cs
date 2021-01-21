@@ -46,13 +46,15 @@ namespace SFA.DAS.EmployerIncentives.Data
                               {
                                   PaymentDate = data.firstPayment.DueDate.AddMonths(1),
                                   LearnerMatchNotFound = (!data.learner.LearningFound.HasValue || !data.learner.LearningFound.Value),
-                                  PaymentAmount = data.firstPayment.Amount
+                                  PaymentAmount = data.firstPayment.Amount,
+                                  HasDataLock = (data.learner.HasDataLock.HasValue && data.learner.HasDataLock.Value)
                               },
                               SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                               {
                                   PaymentDate = data.secondPayment.DueDate.AddMonths(1),
                                   LearnerMatchNotFound = (!data.learner.LearningFound.HasValue || !data.learner.LearningFound.Value),
-                                  PaymentAmount = data.secondPayment.Amount
+                                  PaymentAmount = data.secondPayment.Amount,
+                                  HasDataLock = (data.learner.HasDataLock.HasValue && data.learner.HasDataLock.Value)
                               }
                           }
                           select dto).ToListAsync();
