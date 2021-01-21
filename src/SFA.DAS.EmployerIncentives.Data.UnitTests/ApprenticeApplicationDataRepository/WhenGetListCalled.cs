@@ -88,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             var expectedFirstPaymentStatus = new PaymentStatusDto
             {
-                LearnerMatchNotFound = true,
+                LearnerMatchFound = false,
                 PaymentAmount = pendingPayments[0].Amount,
                 PaymentDate = DateTime.Parse("04-02-2020", new CultureInfo("en-GB"))
             };
@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             var expectedSecondPaymentStatus = new PaymentStatusDto
             {
-                LearnerMatchNotFound = true,
+                LearnerMatchFound = false,
                 PaymentAmount = pendingPayments[1].Amount,
                 PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB"))
             };
@@ -150,17 +150,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             // Assert
             foreach(var application in result)
             {
-                application.FirstPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
-                application.SecondPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
+                application.FirstPaymentStatus.LearnerMatchFound.Should().BeFalse();
+                application.SecondPaymentStatus.LearnerMatchFound.Should().BeFalse();
                 application.FirstPaymentStatus.HasDataLock.Should().BeFalse();
                 application.SecondPaymentStatus.HasDataLock.Should().BeFalse();
-                application.FirstPaymentStatus.ApprenticeNotInLearning.Should().BeFalse();
-                application.SecondPaymentStatus.ApprenticeNotInLearning.Should().BeFalse();
+                application.FirstPaymentStatus.InLearning.Should().BeFalse();
+                application.SecondPaymentStatus.InLearning.Should().BeFalse();
             }
         }
 
         [Test]
-        public async Task Then_learner_match_not_found_is_true_if_learner_record_and_no_match()
+        public async Task Then_learner_match_found_is_false_if_learner_record_and_no_match()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -210,12 +210,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
-            application.SecondPaymentStatus.LearnerMatchNotFound.Should().BeTrue();
+            application.FirstPaymentStatus.LearnerMatchFound.Should().BeFalse();
+            application.SecondPaymentStatus.LearnerMatchFound.Should().BeFalse();
         }
         
         [Test]
-        public async Task Then_learner_match_not_found_is_false_if_learner_record_with_match()
+        public async Task Then_learner_match_found_is_true_if_learner_record_with_match()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -266,8 +266,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.LearnerMatchNotFound.Should().BeFalse();
-            application.SecondPaymentStatus.LearnerMatchNotFound.Should().BeFalse();
+            application.FirstPaymentStatus.LearnerMatchFound.Should().BeTrue();
+            application.SecondPaymentStatus.LearnerMatchFound.Should().BeTrue();
         }
 
         [Test]
@@ -327,7 +327,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         }
 
         [Test]
-        public async Task Then_apprentice_not_in_learning_is_true_if_populated_in_learner_record()
+        public async Task Then_apprentice_in_learning_is_false_if_populated_in_learner_record()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -378,7 +378,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.ApprenticeNotInLearning.Should().BeTrue();
+            application.FirstPaymentStatus.InLearning.Should().BeFalse();
         }
     }
 }
