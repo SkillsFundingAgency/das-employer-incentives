@@ -47,7 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                                   PaymentDate = data.firstPayment.DueDate.AddMonths(1),
                                   LearnerMatchNotFound = (!data.learner.LearningFound.HasValue || !data.learner.LearningFound.Value),
                                   PaymentAmount = data.firstPayment.Amount,
-                                  HasDataLock = (data.learner.HasDataLock.HasValue && data.learner.HasDataLock.Value)
+                                  HasDataLock = (data.learner.HasDataLock.HasValue && data.learner.HasDataLock.Value),
+                                  ApprenticeNotInLearning = (data.learner.InLearning.HasValue && !data.learner.InLearning.Value)
                               },
                               SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                               {

@@ -8,5 +8,6 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public DateTime? PaymentDate { get; set; }
         public bool LearnerMatchNotFound { get; set; }
         public bool HasDataLock { get; set; }
+        public bool ApprenticeNotInLearning { get; set; }
     }
 }
