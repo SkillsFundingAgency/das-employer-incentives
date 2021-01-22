@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
 
             var paymentProfiles = await _incentivePaymentProfilesService.Get();
             var legalEntity = await _legalEntityQueryRepository.Get(x => x.AccountLegalEntityId == application.AccountLegalEntityId);
-            application.NewAgreementRequired = IsNewAgreementRequired(application.Apprenticeships, paymentProfiles, 4); //legalEntity.SignedAgreementVersion); TODO: ONCE KEVINS CHANGE IS IN USE THE CORRECT PROPERTY
+            application.NewAgreementRequired = IsNewAgreementRequired(application.Apprenticeships, paymentProfiles, legalEntity.SignedAgreementVersion ?? 0);
 
             var response = new GetApplicationResponse(application);
 
@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
             foreach (var apprenticeship in applicationApprenticeships)
             {
                 var incentive = new Incentive(apprenticeship.DateOfBirth, apprenticeship.PlannedStartDate, paymentProfiles);
-                if (!incentive.HasSignedRequiredAgreementVersion(signedAgreementVersion))
+                if (incentive.IsNewAgreementRequired(signedAgreementVersion))
                 {
                     return true;
                 }

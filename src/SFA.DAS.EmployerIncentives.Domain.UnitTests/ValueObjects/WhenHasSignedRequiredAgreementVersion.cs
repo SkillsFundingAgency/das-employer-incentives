@@ -29,36 +29,36 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
         [TestCase("2020-07-31")]
         [TestCase("2021-04-01")]
-        public void Then_returns_false_when_ineligible(DateTime startDate)
+        public void Then_returns_true_when_ineligible(DateTime startDate)
         {
             var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles);
 
-            var result = incentive.HasSignedRequiredAgreementVersion(10);
+            var result = incentive.IsNewAgreementRequired(10);
 
-            result.Should().BeFalse();
+            result.Should().BeTrue();
         }
 
         [TestCase("2020-09-01", 3)]
         [TestCase("2021-02-05", 4)]
-        public void Then_returns_false_when_incorrect_agreement_signed(DateTime startDate, int signedAgreementVersion)
+        public void Then_returns_true_when_incorrect_agreement_signed(DateTime startDate, int signedAgreementVersion)
         {
             var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles);
 
-            var result = incentive.HasSignedRequiredAgreementVersion(signedAgreementVersion);
+            var result = incentive.IsNewAgreementRequired(signedAgreementVersion);
 
-            result.Should().BeFalse();
+            result.Should().BeTrue();
         }
 
         [TestCase("2020-09-01", 4)]
         [TestCase("2021-02-05", 5)]
         [TestCase("2021-02-05", 6)]
-        public void Then_returns_true_when_correct_agreement_signed(DateTime startDate, int signedAgreementVersion)
+        public void Then_returns_false_when_correct_agreement_signed(DateTime startDate, int signedAgreementVersion)
         {
             var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles);
 
-            var result = incentive.HasSignedRequiredAgreementVersion(signedAgreementVersion);
+            var result = incentive.IsNewAgreementRequired(signedAgreementVersion);
 
-            result.Should().BeTrue();
+            result.Should().BeFalse();
         }
     }
 }

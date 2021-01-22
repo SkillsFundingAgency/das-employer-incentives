@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var query = _fixture.Create<GetApplicationRequest>();
             var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2021, 2, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var legalEntity = _fixture.Create<LegalEntityDto>();
+            var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.SignedAgreementVersion, 4).Create();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
             _legalEntityRepository.Setup(x => x.Get(y => y.AccountLegalEntityId == data.AccountLegalEntityId)).ReturnsAsync(legalEntity);
@@ -92,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var query = _fixture.Create<GetApplicationRequest>();
             var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2020, 9, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var legalEntity = _fixture.Create<LegalEntityDto>();
+            var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.SignedAgreementVersion, 5).Create();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
             _legalEntityRepository.Setup(x => x.Get(y => y.AccountLegalEntityId == data.AccountLegalEntityId)).ReturnsAsync(legalEntity);

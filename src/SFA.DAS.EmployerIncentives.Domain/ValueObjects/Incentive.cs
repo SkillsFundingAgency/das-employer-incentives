@@ -38,15 +38,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _payments = GeneratePayments();
         }
 
-        public bool HasSignedRequiredAgreementVersion(int signedagreementVersion)
+        public bool IsNewAgreementRequired(int signedagreementVersion)
         {
             if (!IsEligible)
             {
-                return false;
+                return true;
             }
 
             var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= _startDate && x.EndDate >= _startDate);
-            return signedagreementVersion >= applicablePeriod.MinimumAgreementVersion;
+            return signedagreementVersion < applicablePeriod.MinimumAgreementVersion;
         }
 
         private int AgeAtStartOfCourse()
