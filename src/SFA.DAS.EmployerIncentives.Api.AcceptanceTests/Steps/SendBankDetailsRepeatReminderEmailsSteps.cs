@@ -2,6 +2,7 @@
 using Dapper;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
@@ -28,13 +29,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private IncentiveApplication _application;
         private IncentiveApplicationApprenticeship _apprenticeship;
         private DateTime _applicationCutOffDate;
+        private HttpResponseMessage _response;
 
         public SendBankDetailsRepeatReminderEmailsSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-required";
-            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
+            _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
         }
 
         [When(@"an employer has submitted an application after the cut off date and not supplied bank details")]
@@ -62,11 +64,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = "api/EmailCommand/bank-details-repeat-reminders";
             _request = new BankDetailsRepeatReminderEmailsRequest { ApplicationCutOffDate = _applicationCutOffDate };
-            var response = await EmployerIncentiveApi.Client.PostAsJsonAsync<BankDetailsRepeatReminderEmailsRequest>(url, _request);
 
-            response.IsSuccessStatusCode.Should().BeTrue();
+            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
+            {
+                _response = await EmployerIncentiveApi.Client.PostAsJsonAsync(url, _request, cancellationToken);
+            },
+            numberOfOnProcessedEventsExpected: 2);
+
+            _response.IsSuccessStatusCode.Should().BeTrue();
         }
-
 
         [Then(@"the employer is sent a reminder email to supply their bank details in order to receive payment")]
         public void ThenTheEmployerIsSentAReminderEmailToSupplyTheirBankDetailsInOrderToReceivePayment()

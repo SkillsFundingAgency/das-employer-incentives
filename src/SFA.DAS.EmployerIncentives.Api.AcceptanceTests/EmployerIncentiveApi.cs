@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -9,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     public class EmployerIncentiveApi : IDisposable
     {
         public HttpClient Client { get; private set; }
-        public HttpResponseMessage Response { get; set; }
+        
         public Uri BaseAddress { get; private set; }
         private bool isDisposed;
 
@@ -18,33 +19,31 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             Client = client;
             BaseAddress = client.BaseAddress;
         }
-
-        public async Task PostCommand<T>(string url, T command) where T : ICommand
+      
+        public Task<HttpResponseMessage> PostCommand<T>(string url, T command) where T : ICommand
         {
             var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-            var response = await Client.PostAsJsonAsync(url, commandText);
-
-            Response = response;          
+            return Client.PostAsJsonAsync(url, commandText);
         }
 
-        public async Task Post<T>(string url, T data)
+        public Task<HttpResponseMessage> Post<T>(string url, T data, CancellationToken cancellationToken = default)
         {
-            Response = await Client.PostValueAsync(url, data);
+            return Client.PostValueAsync(url, data, cancellationToken);
         }
 
-        public async Task Put<T>(string url, T data)
+        public Task<HttpResponseMessage> Put<T>(string url, T data, CancellationToken cancellationToken = default)
         {
-            Response = await Client.PutValueAsync(url, data);
+            return Client.PutValueAsync(url, data, cancellationToken);            
         }
 
-        public async Task Patch<T>(string url, T data)
+        public Task<HttpResponseMessage> Patch<T>(string url, T data, CancellationToken cancellationToken = default)
         {
-            Response = await Client.PatchValueAsync(url, data);
+            return Client.PatchValueAsync(url, data, cancellationToken);
         }
 
-        public async Task Delete(string url)
+        public Task<HttpResponseMessage> Delete(string url, CancellationToken cancellationToken = default)
         {
-            Response = await Client.DeleteAsync(url);
+            return Client.DeleteAsync(url, cancellationToken);
         }
 
         public void Dispose()
@@ -59,7 +58,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             if (disposing)
             {
-                Response?.Dispose();
                 Client.Dispose();
             }
 

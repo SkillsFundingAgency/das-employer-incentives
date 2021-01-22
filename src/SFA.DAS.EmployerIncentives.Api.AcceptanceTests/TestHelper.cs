@@ -10,6 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     public class TestHelper
     {
         private readonly TestContext _testContext;
+        private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
         public TestHelper(TestContext testContext)
         {
@@ -17,51 +18,65 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         }
 
         public async Task<WaitForResult> WaitFor<T>(
-                   Func<Task> func,
+                   Func<CancellationToken, Task> func,
                    bool assertOnTimeout = true,
                    bool assertOnError = false,
-                   int timeoutInMs = 90000,
-                   int numberOfOnProcessedEventsExpected = 1)
-        {
+                   int timeoutInMs = 60000,
+                   int numberOfOnProcessedEventsExpected = 1,
+                   int numberOfOnPublishedEventsExpected = 0)
+        {            
+            var token = _tokenSource.Token;
+            _tokenSource.CancelAfter(timeoutInMs);
+
             var waitForResult = new WaitForResult();
             var messagesProcessed = 0;
+            var messagesPublished = 0;
 
             var hook = _testContext.Hooks.SingleOrDefault(h => h is Hook<T>) as Hook<T>;
 
-            hook.OnReceived = (message) => { waitForResult.SetHasStarted(); };
-            hook.OnProcessed = (message) => { messagesProcessed++; if (messagesProcessed >= numberOfOnProcessedEventsExpected) { waitForResult.SetHasCompleted(); } };
-            hook.OnErrored = (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
+            hook.OnReceived += (message) => { waitForResult.SetHasStarted(); };
+            hook.OnProcessed += (message) => { messagesProcessed++; if (messagesProcessed >= numberOfOnProcessedEventsExpected && messagesPublished >= numberOfOnPublishedEventsExpected) { waitForResult.SetHasCompleted(); } };
+            hook.OnPublished += (message) => { messagesPublished++; if (messagesProcessed >= numberOfOnProcessedEventsExpected && messagesPublished >= numberOfOnPublishedEventsExpected) { waitForResult.SetHasCompleted(); } };
+            hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
 
             try
             {
-                await func();
-            }
-            catch (Exception ex)
-            {
-                waitForResult.SetHasErrored(ex);
-            }
-            await WaitForHandlerCompletion(waitForResult, timeoutInMs);
+                try
+                {                    
+                    await func(token);
+                }
+                catch (Exception ex)
+                {
+                    waitForResult.SetHasErrored(ex);
+                    _tokenSource.Cancel();
+                }
+                await WaitForHandlerCompletion(waitForResult, timeoutInMs, token);
 
-            if (assertOnTimeout)
-            {
-                waitForResult.HasTimedOut.Should().Be(false, "handler should not have timed out");
-            }
+                if (assertOnTimeout)
+                {
+                    waitForResult.HasTimedOut.Should().Be(false, "handler should not have timed out");
+                }
 
-            if (assertOnError)
-            {
-                waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}'");
+                if (assertOnError)
+                {
+                    waitForResult.HasErrored.Should().Be(false, $"handler should not have errored with error '{waitForResult.LastException?.Message}' and stack trace '{waitForResult.LastException?.StackTrace}'");
+                }
             }
-
+            finally
+            {
+                _tokenSource.Dispose();
+            }
+            
             return waitForResult;
         }
 
-        private async Task WaitForHandlerCompletion(WaitForResult waitForResult, int timeoutInMs)
+        private async Task WaitForHandlerCompletion(WaitForResult waitForResult, int timeoutInMs, CancellationToken cancellationToken)
         {
             using (Timer timer = new Timer(new TimerCallback(TimedOutCallback), waitForResult, timeoutInMs, Timeout.Infinite))
             {
-                while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut)
+                while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut && !cancellationToken.IsCancellationRequested)
                 {
-                    await Task.Delay(100);
+                    await Task.Delay(200);
                 }
             }
         }
@@ -69,6 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private void TimedOutCallback(object state)
         {
             ((WaitForResult)state).SetHasTimedOut();
+            _tokenSource.Cancel();
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Dapper;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;

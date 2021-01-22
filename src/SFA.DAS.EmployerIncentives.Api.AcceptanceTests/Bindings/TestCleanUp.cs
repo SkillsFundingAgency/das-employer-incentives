@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
+using System.Threading;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
@@ -9,25 +9,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     public class TestCleanUp
     {
         private readonly TestContext _context;
+        private readonly CancellationTokenSource _tokenSource;
+
         public TestCleanUp(TestContext context)
-        {
+        {         
             _context = context;
+            _tokenSource = new CancellationTokenSource();
         }
 
-        [AfterScenario()]
-        public async Task CleanUp()
+        [BeforeScenario(Order = 1)]
+        public void StartUp()
         {
-            if (_context.MessageBus != null && _context.MessageBus.IsRunning)
-            {
-                await _context.MessageBus.Stop();
-            }
-            _context.EmployerIncentivesWebApiFactory?.Dispose();
-            _context.EmployerIncentiveApi?.Dispose();
-            _context.LearnerMatchApi?.Dispose();
-            _context.AccountApi?.Dispose();
-            _context.DomainMessageHandlers?.Dispose();
-            _context.SqlDatabase?.Dispose();
-           
+            _context.CancellationToken = _tokenSource.Token;
+        }
+
+        [AfterScenario(Order = 1)]
+        public void Cancel()
+        {
+            _tokenSource.Cancel();
+        }
+
+        [AfterScenario(Order = 100)]
+        public void CleanUp()
+        {
             try
             {
                 Directory.Delete(_context.TestDirectory.FullName, true);

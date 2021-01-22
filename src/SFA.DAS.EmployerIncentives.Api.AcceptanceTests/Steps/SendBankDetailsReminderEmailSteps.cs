@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
+using System.Net.Http;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -21,13 +23,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private SendBankDetailsEmailRequest _request;
         private readonly string _url;
         private readonly string _storageDirectory;
+        private HttpResponseMessage _response;
 
         public SendBankDetailsReminderEmailSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-reminder";
-            _storageDirectory = Path.Combine(_testContext.TestDirectory.FullName, ".learningtransport");
+            _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
         }
 
         [When(@"an employer selects to start the external bank details journey")]
@@ -35,13 +38,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
 
-            await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
         }
 
         [Then(@"the employer is sent a reminder email to supply their bank details with a link in case they do not complete the journey")]
         public void ThenTheEmployerIsSentAReminderEmailToSupplyTheirBankDetailsWithALinkInCaseTheyDoNotCompleteTheJourney()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
             var recentFiles = directoryInfo.GetFiles().OrderByDescending(x => x.CreationTimeUtc >= DateTime.Now.AddMinutes(-2));
@@ -65,13 +68,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.EmailAddress = null;
 
-            await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request);
         }
 
         [Then(@"the email is not set and an error response returned")]
         public void ThenTheEmailIsNotSetAndAnErrorResponseReturned()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [When(@"A bank details required email is sent with an invalid account id")]
@@ -80,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AccountId = 0;
 
-            await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
         }
 
         [When(@"a bank details required email is sent with an invalid account legal entity id")]
@@ -89,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AccountLegalEntityId = 0;
 
-            await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
         }
 
         [When(@"a bank details required email is sent with an invalid account bank details url")]
@@ -98,8 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AddBankDetailsUrl = null;
 
-            await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
         }
-
     }
 }
