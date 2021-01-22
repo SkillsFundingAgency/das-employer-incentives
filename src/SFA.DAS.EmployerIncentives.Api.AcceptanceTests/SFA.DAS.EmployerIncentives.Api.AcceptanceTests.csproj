@@ -4,24 +4,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="%2a%2a\**" />
-    <EmbeddedResource Remove="%2a%2a\**" />
-    <None Remove="%2a%2a\**" />
-    <SpecFlowFeatureFiles Remove="%2a%2a\**" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="%2a%2a\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Remove="%2a%2a\%2a.feature" />
-  </ItemGroup>
  
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.11" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.4.0" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="Moq" Version="4.14.2" />
@@ -30,10 +18,10 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.20" />
-    <PackageReference Include="SpecFlow" Version="3.5.5" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.5.5" />
-    <PackageReference Include="SpecFlow.NUnit" Version="3.5.5" />
+    <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.21" />
+    <PackageReference Include="SpecFlow" Version="3.5.14" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.5.14" />
+    <PackageReference Include="SpecFlow.NUnit" Version="3.5.14" />
     <PackageReference Include="WireMock.Net" Version="1.2.12" />
   </ItemGroup>
   
@@ -68,6 +56,9 @@
     </Compile>
     <Compile Update="Features\SendBankDetailsReminderEmail.feature.cs">
       <DependentUpon>SendBankDetailsReminderEmail.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\SendBankDetailsRepeatReminderEmails.feature.cs">
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Update="Features\SendBankDetailsRequiredEmail.feature.cs">
       <DependentUpon>SendBankDetailsRequiredEmail.feature</DependentUpon>
@@ -116,6 +107,10 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <LastGenOutput>SendBankDetailsRequiredEmail.feature.cs</LastGenOutput>
       <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\SendBankDetailsRepeatReminderEmails.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>SendBankDetailsRepeatReminderEmails.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendBankDetailsRequiredEmail.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

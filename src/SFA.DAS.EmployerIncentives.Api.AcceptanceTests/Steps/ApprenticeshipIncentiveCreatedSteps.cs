@@ -147,7 +147,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
                     apprenticeship.UKPRN);
 
-                await _testContext.WaitFor<MessageContext>(async () =>
+                await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
@@ -157,7 +157,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var calcEarningsCommand = new CalculateEarningsCommand(_apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
+            await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
               await _testContext.MessageBus.Send(calcEarningsCommand));
         }
 
@@ -170,7 +170,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 _apprenticeshipIncentive.ApprenticeshipId,
                 _apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
+            await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
                 await _testContext.MessageBus.Send(completeEarningsCalcCommand));
         }
 
@@ -178,10 +178,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
-            var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CreateIncentiveCommand)).Select(c => c.Command)
+            var publishedCommands = _testContext.CommandsPublished
+                .Where(c => c.IsPublished && 
+                c.IsDomainCommand &&
+                c.Command is CreateIncentiveCommand)
+                .Select(c => c.Command)
                 .ToArray();
-
-            publishedCommands.Should().NotBeEmpty();
 
             foreach (var publishedCommand in publishedCommands)
             {
@@ -197,7 +199,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the earnings are calculated for each apprenticeship incentive")]
         public void ThenTheEarningsAreCalculatedForEachApprenticeshipIncentive()
         {
-            var commandsPublished = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CalculateEarningsCommand));
+            var commandsPublished = _testContext.CommandsPublished
+                .Where(c => 
+                c.IsPublished &&
+                c.IsDomainCommand &&
+                c.Command.GetType() == typeof(CalculateEarningsCommand));
 
             commandsPublished.Count().Should().Be(NumberOfApprenticeships);
 
@@ -212,7 +218,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the pending payments are stored against the apprenticeship incentive")]
         public void ThenThePendingPaymentsAreStoredAgainstTheApprenticeshipIncentive()
         {
-            var completeCalculationCommandsPublished = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
+            var completeCalculationCommandsPublished = _testContext.CommandsPublished
+                .Where(c => c.IsPublished && 
+                c.IsDomainCommand &&
+                c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
 
             completeCalculationCommandsPublished.Count().Should().Be(1);
 

@@ -30,9 +30,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _config = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
+                    { "ApplicationSettings:EmployerIncentivesWebBaseUrl", "https://localhost:5001" },
                     { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
                     { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(_context.TestDirectory.FullName, ".learningtransport") },
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ApplicationSettings:NServiceBusEndpointName", _context.InstanceId },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
@@ -87,6 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
                 s.Configure<MatchedLearnerApi>(l =>
                 {
@@ -103,9 +106,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);                
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>
             {
@@ -113,6 +119,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 a.AddInMemoryCollection(_config);
             });
             builder.UseEnvironment("LOCAL");
+        }
+
+        public IServiceCollection AddDecorators(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerReceived<>));
+
+            Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
+            
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerProcessed<>));
+
+            return serviceCollection;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 LegalEntityId = x.Account.LegalEntityId,
                 SubmittedByEmail = x.Application.SubmittedByEmail,
                 SubmittedByName = x.Application.SubmittedByName,
-                BankDetailsRequired = MapBankDetailsRequired(x.Account.VrfCaseStatus)
+                BankDetailsRequired = MapBankDetailsRequired(x.Account.VrfCaseStatus, x.Account.VrfVendorId)
             };
         }
 
@@ -67,8 +67,13 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             };
         }
 
-        private static bool MapBankDetailsRequired(string vrfCaseStatus)
+        private static bool MapBankDetailsRequired(string vrfCaseStatus, string vrfVendorId)
         {
+            if (!string.IsNullOrWhiteSpace(vrfVendorId) && vrfVendorId != "000000")
+            {
+                return false;
+            }
+
             return (String.IsNullOrWhiteSpace(vrfCaseStatus) 
                 || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
                 || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
