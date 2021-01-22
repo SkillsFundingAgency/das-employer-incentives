@@ -10,5 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public string LastName { get; set; }
         public decimal TotalIncentiveAmount { get; set; }
         public long Uln { get; set; }
+        public DateTime PlannedStartDate { get; set; }
+        public DateTime DateOfBirth { get; set; }
     }
 }
