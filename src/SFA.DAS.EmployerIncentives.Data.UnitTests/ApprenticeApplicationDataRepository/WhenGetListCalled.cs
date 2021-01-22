@@ -52,6 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
+            incentives[0].PausePayments = false;
 
             var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
             allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
@@ -117,6 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
+            incentives[0].PausePayments = false;
 
             var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
             allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
@@ -156,6 +158,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 application.SecondPaymentStatus.HasDataLock.Should().BeFalse();
                 application.FirstPaymentStatus.InLearning.Should().BeFalse();
                 application.SecondPaymentStatus.InLearning.Should().BeFalse();
+                application.FirstPaymentStatus.PausePayments.Should().BeFalse();
+                application.SecondPaymentStatus.PausePayments.Should().BeFalse();
             }
         }
 
@@ -379,6 +383,63 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.InLearning.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_payments_paused_is_true_if_populated_in_learner_record()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+            incentives[0].PausePayments = true;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.PausePayments.Should().BeTrue();
+            application.SecondPaymentStatus.PausePayments.Should().BeTrue();
         }
     }
 }
