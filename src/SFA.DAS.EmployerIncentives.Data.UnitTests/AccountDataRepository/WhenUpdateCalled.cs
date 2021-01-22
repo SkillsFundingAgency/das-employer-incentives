@@ -58,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             storedAccount.AccountLegalEntityId.Should().Be(testLegalEntity.AccountLegalEntityId);
             storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
             storedAccount.HasSignedIncentivesTerms.Should().Be(testLegalEntity.HasSignedAgreementTerms);
+            storedAccount.SignedAgreementVersion.Should().Be(testLegalEntity.SignedAgreementVersion);
             storedAccount.HashedLegalEntityId.Should().Be(testLegalEntity.HashedLegalEntityId);
         }
 
@@ -72,6 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             _dbContext.SaveChanges();
             var newName = testAccount.LegalEntityName + "changed";
             var newHasSignedTerms = !testAccount.HasSignedIncentivesTerms;
+            var newSignedVersion = testAccount.SignedAgreementVersion + 1;
 
             var legalEntities = new List<LegalEntityModel>
             {
@@ -80,7 +82,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
                     Id = testAccount.LegalEntityId,
                     AccountLegalEntityId = testAccount.AccountLegalEntityId,
                     Name = newName,
-                    HasSignedAgreementTerms = newHasSignedTerms
+                    HasSignedAgreementTerms = newHasSignedTerms,
+                    SignedAgreementVersion = newSignedVersion
                 }
             };
 
@@ -95,6 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             addedAccount.LegalEntityId.Should().Be(testAccount.LegalEntityId);
             addedAccount.LegalEntityName.Should().Be(newName);
             addedAccount.HasSignedIncentivesTerms.Should().Be(newHasSignedTerms);
+            addedAccount.SignedAgreementVersion.Should().Be(newSignedVersion);
             addedAccount.VrfCaseId.Should().Be(testAccount.VrfCaseId);
             addedAccount.VrfCaseStatus.Should().Be(testAccount.VrfCaseStatus);
             addedAccount.VrfVendorId.Should().Be(testAccount.VrfVendorId);
@@ -136,6 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             storedAccount.LegalEntityId.Should().Be(testAccount.LegalEntityId);
             storedAccount.LegalEntityName.Should().Be(testAccount.LegalEntityName);
             storedAccount.HasSignedIncentivesTerms.Should().Be(testAccount.HasSignedIncentivesTerms);
+            storedAccount.SignedAgreementVersion.Should().Be(testAccount.SignedAgreementVersion);
         }
 
         [Test]

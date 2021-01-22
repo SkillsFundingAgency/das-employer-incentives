@@ -22,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("SendBankDetailsRequiredEmail")]
     [NUnit.Framework.CategoryAttribute("database")]
+    [NUnit.Framework.CategoryAttribute("messageBus")]
     [NUnit.Framework.CategoryAttribute("api")]
     public partial class SendBankDetailsRequiredEmailFeature
     {
@@ -30,6 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         private string[] _featureTags = new string[] {
                 "database",
+                "messageBus",
                 "api"};
         
 #line 1 "SendBankDetailsRequiredEmail.feature"
@@ -42,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendBankDetailsRequiredEmail", "\tIn order to complete the application for an incentive payment\r\n\tAs an employer\r\n" +
                     "\tI need to be reminded to supply my bank details to receive payment", ProgrammingLanguage.CSharp, new string[] {
                         "database",
+                        "messageBus",
                         "api"});
             testRunner.OnFeatureStart(featureInfo);
         }
@@ -87,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer cannot supply bank details immediately", null, tagsOfScenario, argumentsOfScenario);
-#line 8
+#line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -107,11 +110,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 testRunner.When("a bank details required email is sent for a valid account, legal entity and email" +
                         " address", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 10
+#line 11
 testRunner.Then("the employer is sent a reminder email to supply their bank details", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -125,7 +128,7 @@ testRunner.Then("the employer is sent a reminder email to supply their bank deta
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Email address invalid", null, tagsOfScenario, argumentsOfScenario);
-#line 12
+#line 13
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -145,10 +148,10 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 13
+#line 14
 testRunner.When("a bank details required email is sent with an invalid email address", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 14
+#line 15
 testRunner.Then("the email is not set and an error response returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -162,7 +165,7 @@ testRunner.Then("the email is not set and an error response returned", ((string)
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Account id invalid", null, tagsOfScenario, argumentsOfScenario);
-#line 16
+#line 17
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -182,10 +185,10 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 17
+#line 18
 testRunner.When("A bank details required email is sent with an invalid account id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 18
+#line 19
 testRunner.Then("the email is not set and an error response returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -199,7 +202,7 @@ testRunner.Then("the email is not set and an error response returned", ((string)
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Account legal entity id invalid", null, tagsOfScenario, argumentsOfScenario);
-#line 20
+#line 21
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -219,10 +222,10 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 21
+#line 22
 testRunner.When("a bank details required email is sent with an invalid account legal entity id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 23
 testRunner.Then("the email is not set and an error response returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -236,7 +239,7 @@ testRunner.Then("the email is not set and an error response returned", ((string)
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Account bank details url invalid", null, tagsOfScenario, argumentsOfScenario);
-#line 24
+#line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -256,10 +259,10 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 25
+#line 26
 testRunner.When("a bank details required email is sent with an invalid account bank details url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 27
 testRunner.Then("the email is not set and an error response returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

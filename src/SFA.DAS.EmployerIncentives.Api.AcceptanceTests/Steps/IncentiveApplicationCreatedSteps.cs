@@ -8,6 +8,7 @@ using Dapper;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
+using System.Net.Http;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -19,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly Fixture _fixture;
         private readonly HttpStatusCode _expectedResult = HttpStatusCode.Created;
         private readonly CreateIncentiveApplicationRequest _request;
+        private HttpResponseMessage _response;
 
         public IncentiveApplicationCreatedSteps(TestContext testContext) : base(testContext)
         {
@@ -37,13 +39,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheyHaveSelectedTheApprenticeshipsForTheApplication()
         {
             var url = $"applications";
-            await EmployerIncentiveApi.Post(url, _request);
+            _response = await EmployerIncentiveApi.Post(url, _request);
         }
 
         [Then(@"the application is saved")]
         public async Task ThenTheApplicationIsSaved()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(_expectedResult);
+            _response.StatusCode.Should().Be(_expectedResult);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
