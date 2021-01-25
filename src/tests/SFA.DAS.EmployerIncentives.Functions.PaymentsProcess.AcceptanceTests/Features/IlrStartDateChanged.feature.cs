@@ -343,8 +343,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("an earning has been paid for an apprenticeship incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 41
- testRunner.When("the learner data is refreshed with a new invalid start date for the apprenticeshi" +
-                        "p incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("the learner data is refreshed with a new valid start date for the apprenticeship " +
+                        "incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 42
  testRunner.Then("earnings are recalculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

@@ -38,7 +38,7 @@ Scenario: Clawbacks - Delete unpaid earnings
 Scenario: Clawbacks - eligible start date, create new first pending payment
 	Given an apprenticeship incentive exists
 	And an earning has been paid for an apprenticeship incentive application
-	When the learner data is refreshed with a new invalid start date for the apprenticeship incentive
+	When the learner data is refreshed with a new valid start date for the apprenticeship incentive
 	Then earnings are recalculated
 	And a new pending first payment record is created
 	And a new pending second payment record is created
