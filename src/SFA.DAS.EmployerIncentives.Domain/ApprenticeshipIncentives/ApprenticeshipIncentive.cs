@@ -54,8 +54,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public async Task CalculateEarnings(IIncentivePaymentProfilesService incentivePaymentProfilesService,  ICollectionCalendarService collectionCalendarService)
         {
-            RemoveUnpaidEarnings();
-
             var paymentProfiles = await incentivePaymentProfilesService.Get();
             var collectionCalendar = await collectionCalendarService.Get();
 
@@ -96,7 +94,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.SetPaymentPeriod(collectionCalendar);
 
             var existingPendingPayment = PendingPayments.SingleOrDefault(x => x.EarningType == pendingPayment.EarningType && !x.ClawedBack);
-            if (existingPendingPayment != null)
+            if (existingPendingPayment == null)
+            {
+                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+                return;
+            }
+
+            if (ExistingPendingPaymentHasBeenPaid(existingPendingPayment))
             {
                 if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
                 {
@@ -104,13 +108,46 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
 
                 existingPendingPayment.ClawBack();
+                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+                return;
             }
 
-            Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+            RemoveUnpaidPaymentIfExists(existingPendingPayment);
+            if (!existingPendingPayment.Equals(pendingPayment))
+            {
+                Model.PendingPaymentModels.Remove(existingPendingPayment.GetModel());
+                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+            }
+        }
+
+        private void RemoveUnpaidPaymentIfExists(PendingPayment existingPendingPayment)
+        {
+            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == existingPendingPayment.Id);
+            if (existingPayment != null)
+            {
+                Model.PaymentModels.Remove(existingPayment);
+            }
+        }
+
+        private bool ExistingPendingPaymentHasBeenPaid(PendingPayment existingPendingPayment)
+        {
+            if (existingPendingPayment.PaymentMadeDate == null)
+            {
+                return false;
+            }
+
+            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == existingPendingPayment.Id);
+            if (existingPayment == null || existingPayment.PaidDate == null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void ClawbackAllPayments()
         {
+            RemoveUnpaidEarnings();
             foreach (var pendingPayment in PendingPayments)
             {
                 pendingPayment.ClawBack();
