@@ -1,5 +1,5 @@
 {
-    "StartDate": "2020-10-10T00:00:00+00:00",
+    "StartDate": "2020-08-10T00:00:00+00:00",
     "EventTime": "0001-01-01T00:00:00+00:00",
     "IlrSubmissionDate": "2020-11-09T17:04:31.407+00:00",
     "IlrSubmissionWindowPeriod": 3,
@@ -36,15 +36,6 @@
                         },
                         {
                             "Period": 2,
-                            "IsPayable": true,
-                            "AccountId": 5115,
-                            "ApprenticeshipId": 511526,
-                            "ApprenticeshipEmployerType": 1,
-                            "TransferSenderAccountId": 0,
-                            "DataLockFailures": null
-                        },
-                        {
-                            "Period": 3,
                             "IsPayable": false,
                             "AccountId": 5115,
                             "ApprenticeshipId": 511526,

@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -55,26 +56,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                     .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                     .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                    .With(p => p.PeriodNumber, (byte?) 2) // previous period
-                    .With(p => p.PaymentYear, (short?) 2020)
-                    .With(p => p.PaymentMadeDate, DateTime.Now.AddDays(-1))
-                    .Create(),
-                _fixture.Build<PendingPayment>()
-                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
-                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                    .With(p => p.PeriodNumber, (byte?) 3) // current period
-                    .With(p => p.PaymentYear, (short?) 2020)
-                    .With(p => p.DueDate, DateTime.Parse("2020-08-10"))
+                    .With(p => p.PeriodNumber, (byte?) 2) // current period
+                    .With(p => p.PaymentYear, (short?) 2021)
+                    .With(p => p.DueDate, DateTime.Parse("2020-09-09"))
+                    .With(p => p.ClawedBack, false)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
                     .Without(p => p.PaymentMadeDate)
                     .Create(),
                 _fixture.Build<PendingPayment>()
                     .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                     .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                     .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                    .With(p => p.PeriodNumber, (byte?) 4) // future period
-                    .With(p => p.PaymentYear, (short?) 2020)
-                    .With(p => p.DueDate, DateTime.Parse("2020-09-10"))
+                    .With(p => p.PeriodNumber, (byte?) 2) // future period
+                    .With(p => p.PaymentYear, (short?) 2122)
+                    .With(p => p.DueDate, DateTime.Parse("2021-10-07"))
+                    .With(p => p.ClawedBack, false)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
                     .Without(p => p.PaymentMadeDate)
                     .Create()
             };           
@@ -303,7 +300,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the locked price episode period matches the next pending payment period")]
         public void TheLockedPriceEpisodePeriodMatchesTheNextPendingPaymentPeriod()
         {
-            const byte lockedPeriod = 3; // see Course-Price-Dlock-R03.json.txt
+            const byte lockedPeriod = 2; // see Course-Price-Dlock-R03.json.txt
             var nextPaymentPeriod = _pendingPayments.Where(x => x.PaymentMadeDate == null)
                 .OrderBy(x => x.DueDate).First().PeriodNumber;
             nextPaymentPeriod.Should().Be(lockedPeriod);

@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -105,6 +106,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public bool RequiresNewPayment(PendingPayment pendingPayment)
         {
             return Amount != pendingPayment.Amount || PeriodNumber != pendingPayment.PeriodNumber || PaymentYear != pendingPayment.PaymentYear;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var pendingPayment = obj as PendingPayment;
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return Amount == pendingPayment.Amount &&
+                   PeriodNumber == pendingPayment.PeriodNumber &&
+                   PaymentYear == pendingPayment.PaymentYear &&
+                   DueDate == pendingPayment.DueDate &&
+                   PaymentMadeDate == pendingPayment.PaymentMadeDate &&
+                   EarningType == pendingPayment.EarningType &&
+                   ClawedBack == pendingPayment.ClawedBack;
         }
     }
 }
