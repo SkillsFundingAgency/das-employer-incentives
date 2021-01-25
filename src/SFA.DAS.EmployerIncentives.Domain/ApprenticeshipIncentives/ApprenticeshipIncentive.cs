@@ -68,30 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             foreach (var payment in incentive.Payments)
             {
-                var pendingPayment = PendingPayment.New(
-                              Guid.NewGuid(),
-                              Model.Account,
-                              Model.Id,
-                              payment.Amount,
-                              payment.PaymentDate,
-                              DateTime.Now,
-                              payment.EarningType);
-
-                pendingPayment.SetPaymentPeriod(collectionCalendar);
-
-                var existingPendingPayment = PendingPayments.SingleOrDefault(x => x.EarningType == pendingPayment.EarningType && !x.ClawedBack);
-                if (existingPendingPayment != null)
-                {
-                    if (existingPendingPayment.RequiresNewPayment(pendingPayment))
-                    {
-                        existingPendingPayment.ClawBack();
-                        Model.PendingPaymentModels.Add(pendingPayment.GetModel());
-                    }
-                }
-                else
-                {
-                    Model.PendingPaymentModels.Add(pendingPayment.GetModel());
-                }
+                AddPendingPaymentsAndClawbackWhereRequired(payment, collectionCalendar);
             }
 
             AddEvent(new EarningsCalculated
@@ -103,6 +80,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
 
             Model.RefreshedLearnerForEarnings = false;
+        }
+
+        private void AddPendingPaymentsAndClawbackWhereRequired(ValueObjects.Payment payment, CollectionCalendar collectionCalendar)
+        {
+            var pendingPayment = PendingPayment.New(
+                Guid.NewGuid(),
+                Model.Account,
+                Model.Id,
+                payment.Amount,
+                payment.PaymentDate,
+                DateTime.Now,
+                payment.EarningType);
+
+            pendingPayment.SetPaymentPeriod(collectionCalendar);
+
+            var existingPendingPayment = PendingPayments.SingleOrDefault(x => x.EarningType == pendingPayment.EarningType && !x.ClawedBack);
+            if (existingPendingPayment != null)
+            {
+                if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
+                {
+                    return;
+                }
+
+                existingPendingPayment.ClawBack();
+            }
+
+            Model.PendingPaymentModels.Add(pendingPayment.GetModel());
         }
 
         private void ClawbackAllPayments()
