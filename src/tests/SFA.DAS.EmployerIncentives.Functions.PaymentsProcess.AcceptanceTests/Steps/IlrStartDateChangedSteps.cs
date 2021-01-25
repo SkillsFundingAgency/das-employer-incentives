@@ -44,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
+                .With(p => p.HasPossibleChangeOfCircumstances, false)
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()
