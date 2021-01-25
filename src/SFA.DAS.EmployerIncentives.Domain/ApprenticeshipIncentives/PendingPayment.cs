@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public short? PaymentYear => Model.PaymentYear;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
+        public bool ClawedBack => Model.ClawedBack;
 
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 

@@ -79,6 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentYear = x.PaymentYear,
                 PaymentMadeDate = x.PaymentMadeDate,
                 EarningType = x.EarningType,
+                ClawedBack = x.ClawedBack,
                 ValidationResults = x.PendingPaymentValidationResultModels.Map(x.Id),
             }).ToList();
         }
@@ -112,6 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 EarningType = x.EarningType,
                 PaymentYear = x.PaymentYear,
                 PaymentMadeDate = x.PaymentMadeDate,
+                ClawedBack = x.ClawedBack,
                 PendingPaymentValidationResultModels = x.ValidationResults.Map(collectionPeriods)
             }).ToList();
         }
