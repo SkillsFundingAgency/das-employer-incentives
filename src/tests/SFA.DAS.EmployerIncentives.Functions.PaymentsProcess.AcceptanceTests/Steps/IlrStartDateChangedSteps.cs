@@ -103,8 +103,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
                 .Create();
 
+            _pendingPayment.PaymentMadeDate = DateTime.Now.AddDays(-1);
+
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_payment);
+            await dbConnection.UpdateAsync(_pendingPayment);
         }
 
         [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive")]
