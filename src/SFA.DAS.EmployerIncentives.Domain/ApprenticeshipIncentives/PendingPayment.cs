@@ -73,6 +73,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.PendingPaymentValidationResultModels.Add(validationResult.GetModel());
         }
 
+        public void ClawBack()
+        {
+            Model.ClawedBack = true;
+        }
+
         internal static PendingPayment Get(PendingPaymentModel model)
         {
             return new PendingPayment(model);
@@ -95,6 +100,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     v.CollectionPeriod.AcademicYear == collectionYear &&
                     v.CollectionPeriod.PeriodNumber == collectionPeriod)
                 .All(r => r.Result);
+        }
+
+        public bool RequiresNewPayment(PendingPayment pendingPayment)
+        {
+            return Amount != pendingPayment.Amount || PeriodNumber != pendingPayment.PeriodNumber || PaymentYear != pendingPayment.PaymentYear;
         }
     }
 }

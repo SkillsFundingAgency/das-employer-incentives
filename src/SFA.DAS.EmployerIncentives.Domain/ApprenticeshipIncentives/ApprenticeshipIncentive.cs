@@ -52,14 +52,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ApprenticeshipIncentive(id, model);
         }
 
-        public async Task CalculateEarnings(
-            IIncentivePaymentProfilesService incentivePaymentProfilesService,
-            ICollectionCalendarService collectionCalendarService)
+        public async Task CalculateEarnings(IIncentivePaymentProfilesService incentivePaymentProfilesService,  ICollectionCalendarService collectionCalendarService)
         {
-            if (Model.PendingPaymentModels.Any())
-            {
-                return;
-            }
+            RemoveUnpaidEarnings();
 
             var paymentProfiles = await incentivePaymentProfilesService.Get();
             var collectionCalendar = await collectionCalendarService.Get();
@@ -67,6 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {
+                ClawbackAllPayments();
                 return;
             }
 
@@ -83,7 +79,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
                 pendingPayment.SetPaymentPeriod(collectionCalendar);
 
-                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+                var existingPendingPayment = PendingPayments.SingleOrDefault(x => x.EarningType == pendingPayment.EarningType && !x.ClawedBack);
+                if (existingPendingPayment != null)
+                {
+                    if (existingPendingPayment.RequiresNewPayment(pendingPayment))
+                    {
+                        existingPendingPayment.ClawBack();
+                        Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+                    }
+                }
+                else
+                {
+                    Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+                }
             }
 
             AddEvent(new EarningsCalculated
@@ -95,6 +103,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             });
 
             Model.RefreshedLearnerForEarnings = false;
+        }
+
+        private void ClawbackAllPayments()
+        {
+            foreach (var pendingPayment in PendingPayments)
+            {
+                pendingPayment.ClawBack();
+            }
         }
 
         public void CalculatePayments()
@@ -129,12 +145,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetStartDate(DateTime startDate)
         {
-            if (startDate != Model.StartDate)
-            {
-                Model.StartDate = startDate;
-                Model.PendingPaymentModels.Clear();
-            }
+            Model.StartDate = startDate;
         }
+
         public void SetChangeOfCircumstances(Learner learner)
         {
             if(Id != learner.ApprenticeshipIncentiveId)
@@ -148,9 +161,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
             SetHasPossibleChangeOfCircumstances(false);
         }
+
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
         {
             Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
+        }
+
+        private void RemoveUnpaidEarnings()
+        {
+            Model.PendingPaymentModels.Where(x => x.PaymentMadeDate == null).ToList().ForEach(pp => Model.PendingPaymentModels.Remove(pp));
+
+            var pendingPaymentsToDelete = new List<PendingPaymentModel>();
+            foreach (var paidPendingPayment in Model.PendingPaymentModels)
+            {
+                var payment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == paidPendingPayment.Id);
+                if(payment != null && payment.PaidDate == null)
+                {
+                    Model.PaymentModels.Remove(payment);
+                    pendingPaymentsToDelete.Add(paidPendingPayment);
+                }
+            }
+
+            foreach (var deletedPendingPayment in pendingPaymentsToDelete)
+            {
+                Model.PendingPaymentModels.Remove(deletedPendingPayment);
+            }
         }
 
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
