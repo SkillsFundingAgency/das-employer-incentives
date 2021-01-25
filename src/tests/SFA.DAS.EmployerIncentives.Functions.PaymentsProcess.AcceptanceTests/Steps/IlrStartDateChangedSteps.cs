@@ -1,20 +1,18 @@
-﻿using System;
+﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
+using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoFixture;
-using Dapper.Contrib.Extensions;
-using FluentAssertions;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Timers;
-using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
-using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -32,6 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly PendingPayment _pendingPayment;
         private readonly LearnerSubmissionDto _learnerMatchApiData;
         private readonly DateTime _plannedStartDate;
+        private Payment _payment;
+        private List<PendingPayment> _newPendingPayments;
 
         public IlrStartDateChangedSteps(TestContext testContext)
         {
@@ -90,6 +90,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
+        [Given(@"an earning has been paid for an apprenticeship incentive application")]
+        public async Task WhenTheExistingEarningHasBeenPaid()
+        {
+            _payment = _fixture.Build<Payment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.PaidDate, DateTime.Now.AddDays(-1))
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
+                .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
+                .Create();
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_payment);
+        }
+
         [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive")]
         public async Task WhenTheLearnerIsRefreshedWithAValidStartDate()
         {
@@ -136,7 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenLearnerRefreshIsCalledAgain()
         {
             _testContext.LearnerMatchApi.MockServer.LogEntries.Count(x =>
-                    x.RequestMessage.Path ==  $"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
+                    x.RequestMessage.Path == $"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
                 .Should().Be(2);
         }
 
@@ -147,6 +163,65 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
             pendingPayments.Should().BeEmpty();
+        }
+
+        [Then(@"the paid earning is marked as requiring a clawback")]
+        public void ThenThePaidEarningIsMarkedAsRequiringAClawback()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var pendingPayment = dbConnection.GetAll<PendingPayment>().Single(p => p.Id == _pendingPayment.Id);
+            pendingPayment.ClawedBack.Should().BeTrue();
+        }
+
+        [Given(@"an earning has not been paid for an apprenticeship incentive application")]
+        public async Task GivenAnEarningHasNotBeenPaidForAnApprenticeshipIncentiveApplication()
+        {
+            _payment = _fixture.Build<Payment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .Without(p => p.PaidDate)
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
+                .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
+                .Create();
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_payment);
+        }
+
+        [Then(@"the unpaid earning is deleted")]
+        public void ThenTheUnpaidEarningIsDeleted()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            dbConnection.GetAll<PendingPayment>().Any().Should().BeFalse();
+        }
+
+        [Then(@"all unpaid payment records are deleted")]
+        public void ThenAllUnpaidPaymentRecordsAreDeleted()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            dbConnection.GetAll<Payment>().Any().Should().BeFalse();
+        }
+
+        [Then(@"earnings are recalculated")]
+        public void ThenEarningsAreRecalculated()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            _newPendingPayments = dbConnection.GetAll<PendingPayment>().ToList();
+        }
+
+        [Then(@"a new pending first payment record is created")]
+        public void ThenANewPendingFirstPaymentRecordIsCreated()
+        {
+            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.FirstPayment).Should().NotBeNull();
+        }
+
+        [Then(@"a new pending second payment record is created")]
+        public void ThenANewPendingSecondPaymentRecordIsCreated()
+        {
+            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.SecondPayment).Should().NotBeNull();
+
         }
 
         private void SetupMockLearnerMatchResponse()
