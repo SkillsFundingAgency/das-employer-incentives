@@ -3,7 +3,6 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Enums;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -47,14 +46,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.AccountVrfCaseStatus
                 if (submittedApplications.Any())
                 {
                     var application = submittedApplications.First();
-                    var sendRepeatReminderEmailCommand = new SendBankDetailsRepeatReminderEmailCommand(application.AccountId,
-                                                                                                       application.AccountLegalEntityId,
-                                                                                                       application.ApplicationId,
-                                                                                                       application.SubmittedByEmail);
+                    var sendRepeatReminderEmailCommand = new SendBankDetailsRepeatReminderEmailCommand(
+                        application.AccountId,
+                        application.AccountLegalEntityId,
+                        application.ApplicationId,
+                        application.SubmittedByEmail);
                     await _commandDispatcher.Send(sendRepeatReminderEmailCommand);
                 }
             }
-
         }
     }
 }
