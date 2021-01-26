@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types
@@ -15,6 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
             routingSettings.RouteToEndpoint(typeof(CompleteEarningsCalculationCommand), QueueNames.CompleteEarningsCalculation);
             routingSettings.RouteToEndpoint(typeof(AddEmployerVendorIdCommand), QueueNames.AddEmployerVendorId);
             routingSettings.RouteToEndpoint(typeof(WithdrawCommand), QueueNames.ApprenticeshipIncentivesWithdraw);
+            routingSettings.RouteToEndpoint(typeof(UpdateVendorRegistrationCaseStatusForAccountCommand), QueueNames.UpdateVendorRegistrationCaseStatus);
         }
     }
 }

@@ -70,7 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             paymentRequestCount.Should().Be(1);
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<Payment>().Result
+            var payments = await connection.GetAllAsync<Payment>();
+            var results = payments
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.PaymentPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(2);
             results.Any(x => !x.PaidDate.HasValue).Should().BeFalse();
@@ -83,7 +84,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             paymentRequestCount.Should().Be(0);
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<Payment>().Result
+            var payments = await connection.GetAllAsync<Payment>();
+            var results = payments
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.PaymentPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(2);
             results.Any(x => x.PaidDate.HasValue).Should().BeFalse();
