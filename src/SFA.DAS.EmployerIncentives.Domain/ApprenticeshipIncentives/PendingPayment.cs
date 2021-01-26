@@ -111,7 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public override bool Equals(object obj)
         {
             var pendingPayment = obj as PendingPayment;
-            if (obj == null)
+            if (pendingPayment == null)
             {
                 return false;
             }
