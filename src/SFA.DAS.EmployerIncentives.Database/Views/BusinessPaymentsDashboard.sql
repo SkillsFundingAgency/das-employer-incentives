@@ -38,6 +38,6 @@ FROM
 			from	[incentives].[Payment]
 			group by PaymentPeriod, PaymentYear) payRun on pp.PeriodNumber = payrun.PaymentPeriod and pp.PaymentYear=payRun.PaymentYear
 WHERE 	
-  pp.CalculatedDate < runtime.LastValidation
+  pp.CalculatedDate < runtime.FirstValidation
 GROUP BY 
   pp.PeriodNumber ,pp.PaymentYear
