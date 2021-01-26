@@ -82,8 +82,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 )
                 .Should().Be(1);
 
-            var savedPayments = _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == storedIncentive.Id);
-            savedPayments.Should().BeEquivalentTo(pendingPayments, opt => opt
+            var savedPendingPayments = _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == storedIncentive.Id);
+            savedPendingPayments.Should().BeEquivalentTo(pendingPayments, opt => opt
                 .Excluding(x => x.Account)
                 .Excluding(x => x.PendingPaymentValidationResultModels));
 
@@ -104,6 +104,23 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
                 result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             }
+        }
+
+        [Test]
+        public async Task Then_the_removed_payments_are_deleted()
+        {
+            // Arrange
+            var storedIncentive = await _sut.Get(_testIncentive.Id);
+            storedIncentive.PendingPaymentModels.Clear();
+            storedIncentive.PaymentModels.Count.Should().BeGreaterThan(0);
+            storedIncentive.PaymentModels.Clear();
+
+            // Act
+            await _sut.Update(storedIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Assert 
+            _dbContext.Payments.Should().BeEmpty();
         }
     }
 }

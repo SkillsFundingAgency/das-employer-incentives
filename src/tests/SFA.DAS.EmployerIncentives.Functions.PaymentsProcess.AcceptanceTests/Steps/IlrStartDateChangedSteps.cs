@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _testContext = testContext;
             _fixture = new Fixture();
 
-            _plannedStartDate = _fixture.Create<DateTime>();
+            _plannedStartDate = new DateTime(2020, 5, 1);
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -116,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive")]
         public async Task WhenTheLearnerIsRefreshedWithAValidStartDate()
         {
-            var actualStartDate = new DateTime(2020, 9, 1);
+            var actualStartDate = _plannedStartDate.AddMonths(4);
             _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
             _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
 
@@ -128,7 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is refreshed with a new invalid start date for the apprenticeship incentive")]
         public async Task WhenTheLearnerIsRefreshedWithAnInvalidStartDate()
         {
-            var actualStartDate = new DateTime(2020, 7, 1);
+            var actualStartDate = _plannedStartDate.AddMonths(-1);
             _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
             _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
 
@@ -201,14 +201,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenTheUnpaidEarningIsDeleted()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            dbConnection.GetAll<PendingPayment>().Any().Should().BeFalse();
+            dbConnection.GetAll<PendingPayment>().Any(p => p.PeriodNumber == _pendingPayment.PeriodNumber
+                && p.PaymentYear == _pendingPayment.PaymentYear).Should()
+                .BeFalse();
         }
 
         [Then(@"all unpaid payment records are deleted")]
         public void ThenAllUnpaidPaymentRecordsAreDeleted()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            dbConnection.GetAll<Payment>().Any().Should().BeFalse();
+            dbConnection.GetAll<Payment>().Any(p => p.PaymentPeriod == _pendingPayment.PeriodNumber
+                && p.PaymentYear == _pendingPayment.PaymentYear).Should()
+                .BeFalse();
         }
 
         [Then(@"earnings are recalculated")]
@@ -227,8 +231,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"a new pending second payment record is created")]
         public void ThenANewPendingSecondPaymentRecordIsCreated()
         {
-            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.SecondPayment).Should().NotBeNull();
-
+            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.SecondPayment && !x.ClawedBack).Should().NotBeNull();
         }
 
         private void SetupMockLearnerMatchResponse()
