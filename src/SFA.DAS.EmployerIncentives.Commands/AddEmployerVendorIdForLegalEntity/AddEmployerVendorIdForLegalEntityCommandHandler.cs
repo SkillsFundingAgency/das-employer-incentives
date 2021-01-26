@@ -3,7 +3,7 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
+namespace SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity
 {
     public class AddEmployerVendorIdForLegalEntityCommandHandler : ICommandHandler<AddEmployerVendorIdForLegalEntityCommand>
     {
