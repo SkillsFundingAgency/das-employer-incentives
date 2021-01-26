@@ -121,6 +121,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             // Assert 
             _dbContext.Payments.Should().BeEmpty();
+            _dbContext.PendingPayments.Should().BeEmpty();
+            _dbContext.PendingPaymentValidationResults.Should().BeEmpty();
         }
     }
 }
