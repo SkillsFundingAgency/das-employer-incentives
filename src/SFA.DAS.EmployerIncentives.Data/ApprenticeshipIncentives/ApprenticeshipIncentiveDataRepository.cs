@@ -121,6 +121,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 }
             }
 
+            RemoveDeletedPayments(updatedIncentive, existingIncentive);
+
             foreach (var payment in updatedIncentive.Payments)
             {
                 var existingPayment = existingIncentive.Payments.SingleOrDefault(p => p.Id == payment.Id);
@@ -164,6 +166,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
                 {
                     _dbContext.PendingPayments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.Payments)
+            {
+                if (!updatedIncentive.Payments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.Payments.Remove(existingPayment);
                 }
             }
         }
