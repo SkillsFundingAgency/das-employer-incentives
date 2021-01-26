@@ -23,7 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.DescriptionAttribute("UpdateVrfCaseStatusForLegalEntity")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
-    [NUnit.Framework.CategoryAttribute("accountApi")]
+    [NUnit.Framework.CategoryAttribute("domainMessageHandlers")]
+    [NUnit.Framework.CategoryAttribute("messageBus")]
     public partial class UpdateVrfCaseStatusForLegalEntityFeature
     {
         
@@ -32,7 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         private string[] _featureTags = new string[] {
                 "database",
                 "api",
-                "accountApi"};
+                "domainMessageHandlers",
+                "messageBus"};
         
 #line 1 "UpdateVrfCaseStatusForLegalEntity.feature"
 #line hidden
@@ -45,7 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                     "r Incentives records are updated accordingly", ProgrammingLanguage.CSharp, new string[] {
                         "database",
                         "api",
-                        "accountApi"});
+                        "domainMessageHandlers",
+                        "messageBus"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -90,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("VRF case status updated with a general value for legal entity", null, tagsOfScenario, argumentsOfScenario);
-#line 9
+#line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -110,14 +113,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 10
+#line 11
  testRunner.Given("an existing submitted incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 11
+#line 12
  testRunner.When("VRF case status is changed to \'Some Update Status\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 12
+#line 13
  testRunner.Then("Employer Incentives account legal entity record is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 14
+ testRunner.And("a command to add an Employer Vendor Id Command is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -130,7 +136,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("VRF case status of \'Case request complete\' updated for legal entity", null, tagsOfScenario, argumentsOfScenario);
-#line 15
+#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -150,16 +156,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 16
+#line 17
  testRunner.Given("an existing submitted incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 17
+#line 18
  testRunner.When("VRF case status is changed to \'Case Request Completed\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 18
+#line 19
  testRunner.Then("Employer Incentives account legal entity record is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 19
+#line 20
  testRunner.And("a command to add an Employer Vendor Id Command is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

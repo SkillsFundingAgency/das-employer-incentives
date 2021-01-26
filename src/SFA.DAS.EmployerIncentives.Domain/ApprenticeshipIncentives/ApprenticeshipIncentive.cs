@@ -148,9 +148,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void ClawbackAllPayments()
         {
             RemoveUnpaidEarnings();
-            foreach (var pendingPayment in PendingPayments)
+            foreach (var paidPendingPayment in PendingPayments)
             {
-                pendingPayment.ClawBack();
+                paidPendingPayment.ClawBack();
             }
             AddEvent(new ClawBackAdded(Model));
         }
