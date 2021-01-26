@@ -5,21 +5,20 @@ using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
     public class AccountDataRepository : IAccountDataRepository
     {
-        private Lazy<EmployerIncentivesDbContext> _lazyContext;
-        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
+        private readonly EmployerIncentivesDbContext _dbContext;
 
         public AccountDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _lazyContext = dbContext;
+            _dbContext = dbContext.Value;
         }
 
         public async Task Update(AccountModel account)
@@ -107,7 +106,9 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
         }
 
-
-
+        public async Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime()
+        {
+            return await _dbContext.Accounts.MaxAsync(a => a.VrfCaseStatusLastUpdatedDateTime);
+        }
     }
 }
