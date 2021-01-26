@@ -53,6 +53,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             if (signedAgreementVersion >= minimumRequiredVersion)
             {
                 Model.HasSignedAgreementTerms = true;
+                if (Model.SignedAgreementVersion == null || signedAgreementVersion > Model.SignedAgreementVersion)
+                {
+                    Model.SignedAgreementVersion = signedAgreementVersion;
+                }
             }
         }
 

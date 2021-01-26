@@ -1,7 +1,9 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
@@ -9,6 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public class Apprenticeship : Entity<Guid, ApprenticeshipModel>
     {
+        private const decimal TwentyFiveOrOverIncentiveAmount = 2000;
+        private const decimal UnderTwentyFiveIncentiveAmount = 1500;
+
         public long ApprenticeshipId => Model.ApprenticeshipId;
         public string FirstName => Model.FirstName;
         public string LastName => Model.LastName;
@@ -40,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 ULN = uln,
                 PlannedStartDate = plannedStartDate,
                 ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval,
-                TotalIncentiveAmount = new NewApprenticeIncentive().CalculateTotalIncentiveAmount(dateOfBirth, plannedStartDate),
+                TotalIncentiveAmount = CalculateTotalIncentiveAmount(dateOfBirth, plannedStartDate),
                 UKPRN = ukprn
             };
         }
@@ -73,6 +78,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)
         {
+        }
+
+        private decimal CalculateTotalIncentiveAmount(DateTime apprenticeDateOfBirth, DateTime plannedStartDate)
+        {
+            var apprenticeAge = CalculateAgeAtStartOfApprenticeship(apprenticeDateOfBirth, plannedStartDate);
+
+            if (apprenticeAge > 24)
+            {
+                return UnderTwentyFiveIncentiveAmount;
+            }
+
+            return TwentyFiveOrOverIncentiveAmount;
+        }
+
+        private static int CalculateAgeAtStartOfApprenticeship(in DateTime apprenticeDateOfBirth, in DateTime plannedStartDate)
+        {
+            return apprenticeDateOfBirth.AgeOnThisDay(plannedStartDate);
         }
     }
 }

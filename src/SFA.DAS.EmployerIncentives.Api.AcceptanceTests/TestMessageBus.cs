@@ -28,16 +28,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             }
             
             var endpointConfiguration = new EndpointConfiguration(_testContext.InstanceId);
-            endpointConfiguration
+            endpointConfiguration                
                 .UseNewtonsoftJsonSerializer()
                 .UseMessageConventions()
-                .UseTransport<LearningTransport>()
+                .UseTransport<LearningTransport>()                
                 .StorageDirectory(StorageDirectory.FullName);
 
             endpointConfiguration.UseLearningTransport(s => s.AddRouting());
 
-            _endpointInstance = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
-            
+            _endpointInstance = await Endpoint.Start(endpointConfiguration);            
+
             IsRunning = true;
         }
 
@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         }
 
         public Task Publish(object message)
-        {
+        {            
             return _endpointInstance.Publish(message);
         }
 

@@ -215,14 +215,14 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("cannot withdraw and application that has been submitted and the incentives has ha" +
-            "d payments")]
-        public virtual void CannotWithdrawAndApplicationThatHasBeenSubmittedAndTheIncentivesHasHadPayments()
+        [NUnit.Framework.DescriptionAttribute("cannot withdraw an application that has been submitted and the incentives has had" +
+            " payments")]
+        public virtual void CannotWithdrawAnApplicationThatHasBeenSubmittedAndTheIncentivesHasHadPayments()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot withdraw and application that has been submitted and the incentives has ha" +
-                    "d payments", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot withdraw an application that has been submitted and the incentives has had" +
+                    " payments", null, tagsOfScenario, argumentsOfScenario);
 #line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
