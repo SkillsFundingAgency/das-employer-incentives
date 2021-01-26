@@ -216,6 +216,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
+
+            var clawbackevent = _sut.FlushEvents().Single(e => e is ClawBackAdded) as ClawBackAdded;
+            clawbackevent.Model.Should().Be(_sut.GetModel());
         }
 
         [Test]
@@ -239,6 +242,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
+
+            var clawbackevent = _sut.FlushEvents().Single(e => e is ClawBackAdded) as ClawBackAdded;
+            clawbackevent.Model.Should().Be(_sut.GetModel());
         }
 
         [Test]
@@ -261,7 +267,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
-        }
+
+            var clawbackevent = _sut.FlushEvents().Single(e => e is ClawBackAdded) as ClawBackAdded;
+            clawbackevent.Model.Should().Be(_sut.GetModel());
+        }        
 
         [Test]
         public async Task Then_paid_earnings_are_not_clawed_back_when_the_new_earning_is_in_the_same_collection_period()

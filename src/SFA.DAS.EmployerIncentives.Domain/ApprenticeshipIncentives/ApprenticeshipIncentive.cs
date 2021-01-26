@@ -1,21 +1,20 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Domain.Extensions;
-using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.Exceptions;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using PaymentsResumed = SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events.PaymentsResumed;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
@@ -108,6 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
 
                 existingPendingPayment.ClawBack();
+                AddEvent(new ClawBackAdded(Model));
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
                 return;
             }
@@ -152,6 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 pendingPayment.ClawBack();
             }
+            AddEvent(new ClawBackAdded(Model));
         }
 
         public void CalculatePayments()

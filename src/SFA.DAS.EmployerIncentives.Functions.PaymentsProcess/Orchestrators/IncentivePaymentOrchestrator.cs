@@ -2,6 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -53,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var sendPaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
             {
-                var sendPaymentTask = context.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+                var sendPaymentTask = context.CallActivityAsync(nameof(SendPaymentRequestsForAccountLegalEntity), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
                 sendPaymentTasks.Add(sendPaymentTask);
             }
             await Task.WhenAll(sendPaymentTasks);

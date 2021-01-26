@@ -32,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly DateTime _startDate;
         private readonly DateTime _submissionDate;
         private readonly IList<PendingPayment> _pendingPayments;
+        private readonly IList<Payment> _payments;
 
         public RefreshLearnerDataSteps(TestContext testContext)
         {
@@ -48,6 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.StartDate, _startDate)
+                .Without(p => p.PendingPayments)
+                .Without(p => p.Payments)
                 .Create();
 
             _pendingPayments = new List<PendingPayment>
@@ -74,7 +77,21 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.EarningType, EarningType.SecondPayment)
                     .Without(p => p.PaymentMadeDate)
                     .Create()
-            };           
+            };
+
+            _apprenticeshipIncentive.PendingPayments = _pendingPayments;
+
+            _payments = new List<Payment>
+            {
+                 _fixture.Build<Payment>()
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.PendingPaymentId, _pendingPayments.First().Id)
+                    .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .Create(),
+            };
+
+            _apprenticeshipIncentive.Payments = _payments;
         }
 
         [Given(@"an apprenticeship incentive exists")]
@@ -88,6 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await dbConnection.InsertAsync(pendingPayment);
             }            
         }
+
 
         [Given(@"an apprenticeship incentive exists and without a corresponding learner match record")]
         public async Task GivenAnApprenticeshipIncentiveExistsWithoutACorrespondingLearnerMatchRecord()
@@ -141,6 +159,33 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(learner);
         }
+
+        [Given(@"an apprenticeship incentive exists with a paid pending payment and has previously been refreshed")]
+        public async Task GivenAnApprenticeshipIncentiveExistsWithAPaidPendingPaymentAndHasPreviouslyBeenRefreshed()
+        {
+            _pendingPayments.First().PaymentMadeDate = DateTime.Now.AddDays(-1);
+            await GivenAnApprenticeshipIncentiveExists();            
+
+            var learner = _testContext.TestData.GetOrCreate("ExistingLearner", onCreate: () =>
+            {
+                return _fixture.Build<Learner>()
+                .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(s => s.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                .With(l => l.CreatedDate, DateTime.Now.AddDays(-1))
+                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+                .With(s => s.ULN, _apprenticeshipIncentive.ULN)
+                .With(s => s.SubmissionFound, true)
+                .With(s => s.SubmissionDate, DateTime.Now)
+                .With(s => s.StartDate, DateTime.Now.AddDays(1))
+                .With(s => s.InLearning, true)
+                .With(s => s.HasDataLock, true)
+                .Create();
+            });
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_payments);
+            await dbConnection.InsertAsync(learner);
+        }        
 
         [Given(@"the latest learner data has active in learning data")]
         public void AndTheLatestLearnerDataHasInLearningData()
@@ -205,6 +250,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void GivenTheLatestLearnerDataHasNoPayablePriceEpisodes()
         {
             SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_NoPayable_json);
+        }
+
+        [Given(@"a change of circumstances start date is made")]
+        public void GivenAChangeOfCircumstancesStartDateIsMade()
+        {
+            SetupLearnerMatchApiResponse(LearnerMatchApiResponses.StartDateChange_json);
         }
 
         [Then(@"the apprenticeship incentive learner data is created for the application without any submission data")]
@@ -431,7 +482,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdLearner.InLearning.Should().BeNull();
             createdLearner.DaysInLearnings.Should().BeEmpty();
             createdLearner.LearningFound.Should().BeFalse();
-        }        
+        }
+
+        [Then(@"the clawback creation is persisted")]
+        public void ThenTheClawbackCreationIsPersisted()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var createdClawback = dbConnection.GetAll<ClawbackPayment>().Single();
+
+            createdClawback.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            createdClawback.PendingPaymentId.Should().Be(_apprenticeshipIncentive.PendingPayments.First().Id);
+            createdClawback.AccountId.Should().Be(_apprenticeshipIncentive.AccountId);
+            createdClawback.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
+            createdClawback.Amount.Should().Be(_apprenticeshipIncentive.PendingPayments.First().Amount);
+            createdClawback.SubnominalCode.Should().Be(_apprenticeshipIncentive.Payments.Single(p => p.PendingPaymentId == _apprenticeshipIncentive.PendingPayments.First().Id).SubnominalCode);
+            createdClawback.PaymentId.Should().Be(_apprenticeshipIncentive.Payments.Single(p => p.PendingPaymentId == _apprenticeshipIncentive.PendingPayments.First().Id).Id);
+        }
 
         private void SetupLearnerMatchApiResponse(string json)
         {

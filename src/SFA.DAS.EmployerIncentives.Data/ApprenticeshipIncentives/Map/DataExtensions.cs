@@ -298,5 +298,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning(x.CollectionPeriodNumber, x.CollectionPeriodYear, x.NumberOfDaysInLearning)).ToList();
         }
+
+        internal static ClawbackPayment Map(this Domain.ApprenticeshipIncentives.ValueTypes.Clawback entity)
+        {
+            return new ClawbackPayment
+            {
+                Id = entity.Id,
+                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                PendingPaymentId = entity.PendingPaymentId,
+                AccountId = entity.Account.Id,
+                AccountLegalEntityId = entity.Account.AccountLegalEntityId,
+                Amount = entity.Amount,
+                DateClawbackCreated = entity.CreatedDate,
+                SubnominalCode = entity.SubnominalCode,
+                PaymentId = entity.PaymentId
+            };
+        }
     }
 }
