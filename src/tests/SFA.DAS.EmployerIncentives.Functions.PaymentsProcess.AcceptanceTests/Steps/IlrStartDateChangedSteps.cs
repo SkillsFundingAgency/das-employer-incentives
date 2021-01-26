@@ -51,6 +51,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.DueDate, _plannedStartDate.AddMonths(1))
+                .With(p => p.ClawedBack, false)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Without(p => p.PaymentMadeDate)
                 .Create();
 
             _pendingPayment.PaymentMadeDate = null;
@@ -218,7 +221,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"a new pending first payment record is created")]
         public void ThenANewPendingFirstPaymentRecordIsCreated()
         {
-            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.FirstPayment).Should().NotBeNull();
+            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.FirstPayment && !x.ClawedBack).Should().NotBeNull();
         }
 
         [Then(@"a new pending second payment record is created")]
