@@ -1,0 +1,13 @@
+﻿Notes for use:
+
+Run the script attached to JIRA ticket EI-776 on the target database
+
+In SQL Server Query Analyser, right click on the query results pane and select Save Results As. Save the results to CSV
+
+Obtain a copy of the EUPS template Excel spreadsheet
+
+Set the startup project to SFA.DAS.EmployerIncentives.ManualPaymentsTemplate and run.
+
+Enter the locations of the query results CSV file and the EUPS template Excel sheet.
+
+Enter the location to save the populated EUPS template, and a new Excel file will be generated.
