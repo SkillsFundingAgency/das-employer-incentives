@@ -21,6 +21,7 @@ using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
@@ -100,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
             });
-
+            
             if (addDecorators != null)
             {
                 serviceCollection = addDecorators(serviceCollection);
@@ -139,7 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
-
+          
             return serviceCollection;
         }
 
@@ -158,6 +159,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<UpdateVendorRegistrationCaseStatusForAccountCommand>), new NullValidator())
                 ;
 
             return serviceCollection;
