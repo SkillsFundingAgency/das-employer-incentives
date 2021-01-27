@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -19,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public short? PaymentYear => Model.PaymentYear;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
+        public bool ClawedBack => Model.ClawedBack;
 
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
@@ -72,6 +74,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.PendingPaymentValidationResultModels.Add(validationResult.GetModel());
         }
 
+        public void ClawBack()
+        {
+            Model.ClawedBack = true;
+        }
+
         internal static PendingPayment Get(PendingPaymentModel model)
         {
             return new PendingPayment(model);
@@ -94,6 +101,28 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     v.CollectionPeriod.AcademicYear == collectionYear &&
                     v.CollectionPeriod.PeriodNumber == collectionPeriod)
                 .All(r => r.Result);
+        }
+
+        public bool RequiresNewPayment(PendingPayment pendingPayment)
+        {
+            return Amount != pendingPayment.Amount || PeriodNumber != pendingPayment.PeriodNumber || PaymentYear != pendingPayment.PaymentYear;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var pendingPayment = obj as PendingPayment;
+            if (pendingPayment == null)
+            {
+                return false;
+            }
+
+            return Amount == pendingPayment.Amount &&
+                   PeriodNumber == pendingPayment.PeriodNumber &&
+                   PaymentYear == pendingPayment.PaymentYear &&
+                   DueDate == pendingPayment.DueDate &&
+                   PaymentMadeDate == pendingPayment.PaymentMadeDate &&
+                   EarningType == pendingPayment.EarningType &&
+                   ClawedBack == pendingPayment.ClawedBack;
         }
     }
 }

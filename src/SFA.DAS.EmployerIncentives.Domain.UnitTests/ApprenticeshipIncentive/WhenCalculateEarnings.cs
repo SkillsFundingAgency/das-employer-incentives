@@ -4,7 +4,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
@@ -40,21 +39,28 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             _fixture = new Fixture();
 
-            _collectionPeriod = new DateTime(2021, 1, 1);
+            _collectionPeriod = new DateTime(2020, 10, 1);
             _plannedStartDate = _collectionPeriod.AddDays(5);
 
             _firstPaymentDaysAfterApprenticeshipStart = 10;
             _secondPaymentDaysAfterApprenticeshipStart = 50;
 
-            var paymentProfiles = new List<PaymentProfile>
+            var under25PaymentProfiles = new List<PaymentProfile>
             {
                 new PaymentProfile(_firstPaymentDaysAfterApprenticeshipStart, 100),
                 new PaymentProfile(_secondPaymentDaysAfterApprenticeshipStart, 300)
             };
 
+            var over25PaymentProfiles = new List<PaymentProfile>
+            {
+                new PaymentProfile(_firstPaymentDaysAfterApprenticeshipStart, 200),
+                new PaymentProfile(_secondPaymentDaysAfterApprenticeshipStart, 400)
+            };
+
             _paymentProfiles = new List<IncentivePaymentProfile>()
             {
-                new IncentivePaymentProfile(Enums.IncentiveType.UnderTwentyFiveIncentive, paymentProfiles)
+                new IncentivePaymentProfile(Enums.IncentiveType.UnderTwentyFiveIncentive, under25PaymentProfiles),
+                new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, over25PaymentProfiles)
             };
 
             _collectionPeriods = new List<CollectionPeriod>()
@@ -72,10 +78,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_paymentProfiles);
 
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();            
+            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();      
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.StartDate = _plannedStartDate;
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
+            _sutModel.PaymentModels = new List<PaymentModel>();
             _sut = Sut(_sutModel);
         }
 
@@ -87,8 +94,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
             _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);
             
-            _sut = Sut(_sutModel);
-
             // act
             await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
@@ -161,24 +166,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public async Task Then_the_earnings_are_not_recalculated_if_earnings_already_exist()
-        {
-            // Arrange
-            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(_fixture.CreateMany<PendingPaymentModel>(3));
-            _sut = Sut(_sutModel);
-            _sut.PendingPayments.Count.Should().Be(3);
-            var hashCodes = new List<int>();
-            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Add(p.GetHashCode()));
-
-            // Act
-            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
-
-            // Assert
-            _sut.PendingPayments.Count.Should().Be(3);
-            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeTrue());
-        }
-
-        [Test]
         public async Task Then_an_EarningsCalculated_event_is_raised_after_the_earnings_are_calculated()
         {
             // arrange                        
@@ -208,6 +195,149 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             _sut.RefreshedLearnerForEarnings.Should().BeFalse();
         }
+
+        [Test]
+        public async Task Then_earnings_with_sent_payments_are_clawed_back_when_the_collection_period_has_changed()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+
+            // act
+            _sut.SetStartDate(_plannedStartDate.AddMonths(1));
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            pendingPayment.ClawedBack.Should().BeTrue();
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
+        }
+
+        [Test]
+        public async Task Then_earnings_with_sent_payments_are_clawed_back_when_the_earning_amount_has_changed()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+
+            // act
+            var apprenticeshipDob = DateTime.Now.AddYears(-26);
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            pendingPayment.ClawedBack.Should().BeTrue();
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
+        }
+
+        [Test]
+        public async Task Then_paid_earnings_are_clawed_back_if_the_apprenticeship_is_no_longer_eligible()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+
+            // act
+            _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            pendingPayment.ClawedBack.Should().BeTrue();
+            _sutModel.PendingPaymentModels.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_paid_earnings_are_not_clawed_back_when_the_new_earning_is_in_the_same_collection_period()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+
+            // act
+            _sut.SetStartDate(_plannedStartDate.AddDays(1));
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            pendingPayment.ClawedBack.Should().BeFalse();
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_earnings_with_unsent_payments_are_removed_when_the_earnings_change()
+        {
+            // Arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            _sutModel.PaymentModels = new List<PaymentModel>();
+            _sutModel.PendingPaymentModels.ToList().ForEach(p => _sutModel.PaymentModels.Add(_fixture.Build<PaymentModel>().With(x => x.PendingPaymentId, p.Id).With(x => x.PaidDate, (DateTime?)null).Create()));
+            var hashCodes = new List<int>();
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Add(p.GetHashCode()));
+
+            // Act
+            _sut.SetStartDate(_plannedStartDate.AddMonths(1));
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Count.Should().Be(2);
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeFalse());
+            _sut.Payments.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task Then_earnings_without_payments_are_removed_when_the_earnings_change()
+        {
+            // Arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            var hashCodes = new List<int>();
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Add(p.GetHashCode()));
+
+            // Act
+            _sut.SetStartDate(_plannedStartDate.AddMonths(1));
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Count.Should().Be(2);
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeFalse());
+        }
+
+        [Test]
+        public async Task Then_existing_earnings_are_kept_when_the_earnings_are_unchanged()
+        {
+            // Arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            var hashCodes = new List<int>();
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Add(p.GetHashCode()));
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Count.Should().Be(2);
+            _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeTrue());
+        }
+
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {

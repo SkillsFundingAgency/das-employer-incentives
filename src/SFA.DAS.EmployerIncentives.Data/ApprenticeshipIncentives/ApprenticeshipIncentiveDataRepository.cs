@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
@@ -32,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.PendingPayments.Count == 0);
             var results = new List<ApprenticeshipIncentiveModel>();
-            foreach(var incentive in queryResults)
+            foreach (var incentive in queryResults)
             {
                 results.Add(incentive.Map(collectionPeriods));
             }
@@ -90,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == deletedIncentive.Id);
 
-            foreach(var pendingPayment in existingIncentive.PendingPayments)
+            foreach (var pendingPayment in existingIncentive.PendingPayments)
             {
                 foreach (var validationResult in pendingPayment.ValidationResults)
                 {
@@ -120,6 +119,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     _dbContext.PendingPayments.Add(pendingPayment);
                 }
             }
+
+            RemoveDeletedPayments(updatedIncentive, existingIncentive);
 
             foreach (var payment in updatedIncentive.Payments)
             {
@@ -164,6 +165,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
                 {
                     _dbContext.PendingPayments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.Payments)
+            {
+                if (!updatedIncentive.Payments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.Payments.Remove(existingPayment);
                 }
             }
         }
