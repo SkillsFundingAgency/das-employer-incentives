@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger = logger;
         }
 
-        [FunctionName("ChangeOfCircumstanceOrchestrator")]
+        [FunctionName(nameof(ChangeOfCircumstanceOrchestrator))]
         public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var learnerChangeOfCircumstanceInput = context.GetInput<LearnerChangeOfCircumstanceInput>();
@@ -27,9 +27,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             if(hasPossibleChangeOfCircs)
             {
-                await context.CallActivityAsync("LearnerChangeOfCircumstanceActivity", learnerChangeOfCircumstanceInput);
-                await context.CallActivityAsync("CalculateEarningsActivity", new CalculateEarningsInput(learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln));
-                await context.CallActivityAsync("LearnerMatchAndUpdate", new LearnerMatchInput { ApprenticeshipIncentiveId = learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId });
+                await context.CallActivityAsync(nameof(LearnerChangeOfCircumstanceActivity), learnerChangeOfCircumstanceInput);
+                await context.CallActivityAsync(nameof(CalculateEarningsActivity), new CalculateEarningsInput(learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln));
+                await context.CallActivityAsync(nameof(LearnerMatchAndUpdate), new LearnerMatchInput { ApprenticeshipIncentiveId = learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId });
             }
 
             _logger.LogInformation("Learner Change of Circumstances process completed for apprenticeship Incentive {apprenticeshipIncentiveId}, ULN: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);

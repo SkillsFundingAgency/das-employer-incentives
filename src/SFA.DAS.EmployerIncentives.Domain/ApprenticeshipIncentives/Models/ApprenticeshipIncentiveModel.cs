@@ -16,12 +16,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public bool HasPossibleChangeOfCircumstances { get; set; }
         public ICollection<PendingPaymentModel> PendingPaymentModels { get; set; }
         public ICollection<PaymentModel> PaymentModels { get; set; }
+        public ICollection<ClawbackPaymentModel> ClawbackPaymentModels { get; set; }
         public bool PausePayments { get; set; }
 
         public ApprenticeshipIncentiveModel()
         {
             PendingPaymentModels = new List<PendingPaymentModel>();
             PaymentModels = new List<PaymentModel>();
+            ClawbackPaymentModels = new List<ClawbackPaymentModel>();
         }
     }
 }

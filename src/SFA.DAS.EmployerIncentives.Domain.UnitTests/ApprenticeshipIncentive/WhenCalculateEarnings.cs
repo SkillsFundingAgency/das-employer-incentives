@@ -83,6 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.StartDate = _plannedStartDate;
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sutModel.PaymentModels = new List<PaymentModel>();
+            _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
             _sut = Sut(_sutModel);
         }
 
@@ -219,6 +220,59 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
+        public async Task Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_collection_period_is_changed()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+
+            // act
+            _sut.SetStartDate(_plannedStartDate.AddMonths(1));
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            var clawback = _sutModel.ClawbackPaymentModels.Single();
+            clawback.ApprenticeshipIncentiveId.Should().Be(_sutModel.Id);
+            clawback.PendingPaymentId.Should().Be(pendingPayment.Id);
+            clawback.PaymentId.Should().Be(_sutModel.PaymentModels.First().Id);
+            clawback.Account.Should().Be(_sutModel.Account);
+            clawback.Amount.Should().Be(pendingPayment.Amount);
+            clawback.SubnominalCode.Should().Be(_sutModel.PaymentModels.First().SubnominalCode);
+        }
+
+        [Test]
+        public async Task Then_clawback_payment_is_not_created_when_one_already_exists_and_earnings_with_sent_payments_are_clawed_back_and_the_collection_period_is_changed()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+            _sutModel.ClawbackPaymentModels.Add(
+                _fixture.Build<ClawbackPaymentModel>()
+                .With(x => x.ApprenticeshipIncentiveId, _sutModel.ApplicationApprenticeshipId)
+                .With(x => x.PendingPaymentId, pendingPayment.Id)
+                .Create());
+
+            // act
+            _sut.SetStartDate(_plannedStartDate.AddMonths(1));
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
+        }
+
+        [Test]
         public async Task Then_earnings_with_sent_payments_are_clawed_back_when_the_earning_amount_has_changed()
         {
             // arrange
@@ -240,6 +294,34 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             pendingPayment.ClawedBack.Should().BeTrue();
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
         }
+
+        [Test]
+        public async Task Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_earning_amount_has_changed()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+
+            // act
+            var apprenticeshipDob = DateTime.Now.AddYears(-26);
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            var clawback = _sutModel.ClawbackPaymentModels.Single();
+            clawback.ApprenticeshipIncentiveId.Should().Be(_sutModel.Id);
+            clawback.PendingPaymentId.Should().Be(pendingPayment.Id);
+            clawback.PaymentId.Should().Be(_sutModel.PaymentModels.First().Id);
+            clawback.Account.Should().Be(_sutModel.Account);
+            clawback.Amount.Should().Be(pendingPayment.Amount);
+            clawback.SubnominalCode.Should().Be(_sutModel.PaymentModels.First().SubnominalCode);
+        }        
 
         [Test]
         public async Task Then_paid_earnings_are_clawed_back_if_the_apprenticeship_is_no_longer_eligible()
@@ -264,6 +346,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
+        public async Task Then_clawback_payment_is_created_when_paid_earnings_are_clawed_back_if_the_apprenticeship_is_no_longer_eligible()
+        {
+            // arrange
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            byte collectionPeriod = 6;
+            short collectionYear = 2020;
+            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, collectionPeriod, collectionPeriod);
+            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
+
+            // act
+            _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            var clawback = _sutModel.ClawbackPaymentModels.Single();
+            clawback.ApprenticeshipIncentiveId.Should().Be(_sutModel.Id);
+            clawback.PendingPaymentId.Should().Be(pendingPayment.Id);
+            clawback.PaymentId.Should().Be(_sutModel.PaymentModels.First().Id);
+            clawback.Account.Should().Be(_sutModel.Account);
+            clawback.Amount.Should().Be(pendingPayment.Amount);
+            clawback.SubnominalCode.Should().Be(_sutModel.PaymentModels.First().SubnominalCode);
+        }
+
+        [Test]
         public async Task Then_paid_earnings_are_not_clawed_back_when_the_new_earning_is_in_the_same_collection_period()
         {
             // arrange
@@ -283,7 +392,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             pendingPayment.ClawedBack.Should().BeFalse();
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(1);
-        }
+            _sutModel.ClawbackPaymentModels.Count.Should().Be(0);
+        }        
 
         [Test]
         public async Task Then_earnings_with_unsent_payments_are_removed_when_the_earnings_change()

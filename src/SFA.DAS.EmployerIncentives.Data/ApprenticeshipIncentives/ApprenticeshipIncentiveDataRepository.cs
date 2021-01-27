@@ -67,6 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.PendingPayments)
                 .ThenInclude(x => x.ValidationResults)
                 .Include(x => x.Payments)
+                .Include(x => x.ClawbackPayments)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
@@ -135,6 +136,22 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     _dbContext.Payments.Add(payment);
                 }
             }
+
+            RemoveDeletedClawbacks(updatedIncentive, existingIncentive);
+
+            foreach (var clawback in updatedIncentive.ClawbackPayments)
+            {
+                var existingClawback = existingIncentive.ClawbackPayments.SingleOrDefault(p => p.Id == clawback.Id);
+
+                if (existingClawback != null)
+                {
+                    _dbContext.Entry(existingClawback).CurrentValues.SetValues(clawback);
+                }
+                else
+                {
+                    _dbContext.ClawbackPayments.Add(clawback);
+                }
+            }
         }
 
         private void UpdatePendingPayment(PendingPayment updatedPendingPayment, PendingPayment existingPendingPayment)
@@ -176,6 +193,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (!updatedIncentive.Payments.Any(c => c.Id == existingPayment.Id))
                 {
                     _dbContext.Payments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedClawbacks(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.ClawbackPayments)
+            {
+                if (!updatedIncentive.ClawbackPayments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.ClawbackPayments.Remove(existingPayment);
                 }
             }
         }
