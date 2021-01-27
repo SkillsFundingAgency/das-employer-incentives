@@ -1,7 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
+namespace SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity
 {
     public class AddEmployerVendorIdForLegalEntityCommand : ICommand
     {
