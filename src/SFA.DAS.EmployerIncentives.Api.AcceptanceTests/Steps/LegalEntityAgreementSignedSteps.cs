@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
+using System.Net.Http;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -17,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private readonly TestContext _testContext;
         private readonly Account _testAccountTable;
+        private HttpResponseMessage _response;
 
         public LegalEntityAgreementSignedSteps(TestContext testContext) : base(testContext)
         {
@@ -29,13 +31,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task TheLegalAgreementIsSigned()
         {
             var url = $"/accounts/{_testAccountTable.Id}/legalEntities/{_testAccountTable.AccountLegalEntityId}";
-            await EmployerIncentiveApi.Patch(url, new SignAgreementRequest { AgreementVersion = 5 });
+            _response = await EmployerIncentiveApi.Patch(url, new SignAgreementRequest { AgreementVersion = 5 });
         }
 
         [Then(@"the employer can apply for incentives")]
         public async Task TheEmployerCanApplyForIncentives()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {

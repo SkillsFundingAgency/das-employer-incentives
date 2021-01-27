@@ -23,5 +23,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
              _context.Hooks.Add(new Hook<MessageContext>());
             return _context.MessageBus.Start();
         }
+
+        [AfterScenario()]
+        public async Task CleanUp()
+        {
+            if (_context.MessageBus != null && _context.MessageBus.IsRunning)
+            {
+                await _context.MessageBus.Stop();                
+            }            
+        }
     }
 }

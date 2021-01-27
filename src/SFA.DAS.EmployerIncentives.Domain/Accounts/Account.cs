@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 {
@@ -54,17 +54,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.LegalEntityModels.Add(legalEntityModel);
         }
 
-        public void UpdateVendorRegistrationCaseStatus(string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
+        public void SetVendorRegistrationCaseDetails(string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
         {
-            foreach (var legalEntity in LegalEntities.Where(x => x.HashedLegalEntityId == hashedLegalEntityId))
+            foreach (var legalEntity in LegalEntitiesWithIncompleteVendorRegistration(hashedLegalEntityId))
             {
                 legalEntity.UpdateVendorRegistrationCaseStatus(caseId, status, lastUpdatedDate);
             }
 
-            if (status.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
-            {
-                AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
-            }
+            AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
+        }
+
+        private IEnumerable<LegalEntity> LegalEntitiesWithIncompleteVendorRegistration(string hashedLegalEntityId)
+        {
+            return LegalEntities.Where(x => x.HashedLegalEntityId.Equals(hashedLegalEntityId) &&
+                                          !VrfStatusIsCompleted(x.VrfCaseStatus));
+        }
+
+        internal static bool VrfStatusIsCompleted(string status)
+        {
+            return status?.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase) == true;
         }
 
         public void AddEmployerVendorIdToLegalEntities(string hashedLegalEntityId, string employerVendorId)

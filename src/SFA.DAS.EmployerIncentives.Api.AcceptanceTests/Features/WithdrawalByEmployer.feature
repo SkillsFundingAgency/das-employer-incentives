@@ -22,7 +22,7 @@ Scenario: Employer withdrawal removes incentive after an apprenticeship applicat
 	When the apprenticeship application is withdrawn from the scheme
 	Then the apprenticeship incentive and it's pending payments are removed from the system
 
-Scenario: cannot withdraw and application that has been submitted and the incentives has had payments
+Scenario: cannot withdraw an application that has been submitted and the incentives has had payments
 	Given an incentive application has been made, submitted and has payments	
 	When the apprenticeship application is withdrawn from the scheme
 	Then an error is returned

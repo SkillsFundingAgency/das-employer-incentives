@@ -2,9 +2,11 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
 using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
+using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
@@ -40,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NoContent();
         }
 
-        [HttpPatch("/legalentities/{hashedLegalEntityId}/vendorregistrationform/status")]
+        [HttpPatch("/legalentities/{hashedLegalEntityId}/vendorregistrationform")]
         public async Task<IActionResult> UpdateVendorRegistrationCaseStatus([FromRoute] string hashedLegalEntityId, [FromBody] UpdateVendorRegistrationCaseStatusRequest request)
         {
             await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(hashedLegalEntityId, request.CaseId, request.Status, request.CaseStatusLastUpdatedDate));

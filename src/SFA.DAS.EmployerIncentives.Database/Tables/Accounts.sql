@@ -21,3 +21,5 @@ CREATE INDEX IX_Account_LegalEntityId ON Accounts (LegalEntityId)
 GO
 CREATE INDEX IX_Account_HashedLegalEntityId ON Accounts (HashedLegalEntityId)
 GO
+CREATE INDEX IX_Account_VrfCaseStatusLastUpdatedDateTime ON Accounts (VrfCaseStatusLastUpdatedDateTime)
+GO
