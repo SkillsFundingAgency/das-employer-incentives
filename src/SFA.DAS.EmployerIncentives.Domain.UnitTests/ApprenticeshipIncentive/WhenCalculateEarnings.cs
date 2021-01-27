@@ -216,9 +216,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
-
-            var clawbackevent = _sut.FlushEvents().Single(e => e is ClawBackAdded) as ClawBackAdded;
-            clawbackevent.Model.Should().Be(_sut.GetModel());
+            _sutModel.ClawbackPaymentModels.Count(x => x.PendingPaymentId == pendingPayment.Id).Should().Be(1);
         }
 
         [Test]
@@ -242,9 +240,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
-
-            var clawbackevent = _sut.FlushEvents().Single(e => e is ClawBackAdded) as ClawBackAdded;
-            clawbackevent.Model.Should().Be(_sut.GetModel());
+            _sutModel.ClawbackPaymentModels.Count(x => x.PendingPaymentId == pendingPayment.Id).Should().Be(1);
         }
 
         [Test]
@@ -267,9 +263,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
-
-            var clawbackevent = _sut.FlushEvents().Single(e => e is ClawBackAdded) as ClawBackAdded;
-            clawbackevent.Model.Should().Be(_sut.GetModel());
+            _sutModel.ClawbackPaymentModels.Count(x => x.PendingPaymentId == pendingPayment.Id).Should().Be(1);
         }        
 
         [Test]

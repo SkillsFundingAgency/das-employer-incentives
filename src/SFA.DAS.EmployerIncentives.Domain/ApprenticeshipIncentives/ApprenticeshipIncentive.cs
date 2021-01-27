@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public PendingPayment NextDuePayment => GetNextDuePayment();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
         public bool PausePayments => Model.PausePayments;
+        public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, bool pausePayments)
         {
@@ -106,8 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     return;
                 }
 
-                existingPendingPayment.ClawBack();
-                AddEvent(new ClawBackAdded(Model));
+                AddClawback(existingPendingPayment);
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
                 return;
             }
@@ -117,6 +117,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 Model.PendingPaymentModels.Remove(existingPendingPayment.GetModel());
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+            }
+        }
+
+        private void AddClawback(PendingPayment pendingPayment)
+        {
+            pendingPayment.ClawBack();
+            var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
+
+            var clawback = ClawbackPayment.New(
+                Guid.NewGuid(),
+                Model.Account,
+                Model.Id,
+                pendingPayment.Id,
+                pendingPayment.Amount,
+                DateTime.Now,
+                payment.SubnominalCode,
+                payment.Id);
+            
+            if(!Model.ClawbackPaymentModels.Any(c => c.PendingPaymentId == pendingPayment.Id))
+            {
+                Model.ClawbackPaymentModels.Add(clawback.GetModel());
             }
         }
 
@@ -150,9 +171,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             RemoveUnpaidEarnings();
             foreach (var paidPendingPayment in PendingPayments)
             {
-                paidPendingPayment.ClawBack();
+                AddClawback(paidPendingPayment);
             }
-            AddEvent(new ClawBackAdded(Model));
         }
 
         public void CalculatePayments()
