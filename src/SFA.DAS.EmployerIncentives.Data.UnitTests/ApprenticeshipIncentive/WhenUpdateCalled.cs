@@ -65,6 +65,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 storedIncentive.PaymentModels.Add(payment);
             }
 
+            var clawbackPayments = _fixture.Build<ClawbackPaymentModel>().With(
+                x => x.ApprenticeshipIncentiveId, storedIncentive.Id).CreateMany().ToList();
+            storedIncentive.ClawbackPaymentModels = clawbackPayments;
+
             // Act
             await _sut.Update(storedIncentive);
             await _dbContext.SaveChangesAsync();
@@ -104,6 +108,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
                 result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             }
+
+            var savedClawbackPayments = _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == storedIncentive.Id);
+            savedClawbackPayments.Should().BeEquivalentTo(clawbackPayments, opt => opt
+                .Excluding(x => x.Account).Excluding(x => x.CreatedDate));
         }
 
         [Test]
