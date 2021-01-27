@@ -1,14 +1,15 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using System;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
     public class ClawbackPayment : Entity<Guid, ClawbackPaymentModel>
     {
         public Account Account => Model.Account;
+        public bool Sent => Model.DateClawbackSent.HasValue;
 
         internal static ClawbackPayment New(
             Guid id,
@@ -23,15 +24,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             return new ClawbackPayment(new ClawbackPaymentModel
             {
-                    Id = id,
-                    Account = account,
-                    ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
-                    PendingPaymentId = pendingPaymentId,
-                    Amount = amount,
-                    CreatedDate = createdDate,
-                    SubnominalCode = subnominalCode,
-                    PaymentId = paymentId
-                },
+                Id = id,
+                Account = account,
+                ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
+                PendingPaymentId = pendingPaymentId,
+                Amount = amount,
+                CreatedDate = createdDate,
+                SubnominalCode = subnominalCode,
+                PaymentId = paymentId
+            },
                 true);
         }
 

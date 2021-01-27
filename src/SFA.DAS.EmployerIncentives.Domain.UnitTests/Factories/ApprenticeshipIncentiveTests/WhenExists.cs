@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var incentive = _sut.GetExisting(_id, _model);
 
             // Assert
-            incentive.Should().BeEquivalentTo(_model, opt => 
+            incentive.Should().BeEquivalentTo(_model, opt =>
             opt.Excluding(x => x.PendingPaymentModels)
             .Excluding(x => x.ApplicationApprenticeshipId)
             .Excluding(x => x.PaymentModels)
@@ -91,6 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var incentive = _sut.GetExisting(_id, _model);
 
             // Assert
+            incentive.Clawbacks.Should().HaveCount(3);
             incentive.Clawbacks
                 .Should()
                 .BeEquivalentTo(
@@ -101,7 +102,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                         .Excluding(x => x.CreatedDate)
                         .Excluding(x => x.SubnominalCode)
                         .Excluding(x => x.PaymentId)
+                        .Excluding(x => x.DateClawbackSent)
                         );
+        }
+
+        [Test]
+        public void Then_the_clawbacks_sent_are_mapped()
+        {
+            // Arrange
+            _model.ClawbackPaymentModels.First().DateClawbackSent = null;
+            _model.ClawbackPaymentModels.Last().DateClawbackSent = _fixture.Create<DateTime>();
+
+            // Act
+            var incentive = _sut.GetExisting(_id, _model);
+
+            // Assert
+            incentive.Clawbacks.First().Sent.Should().BeFalse();
+            incentive.Clawbacks.Last().Sent.Should().BeTrue();
         }
     }
 }

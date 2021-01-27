@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentModels = entity.Payments.Map(),
                 ClawbackPaymentModels = entity.ClawbackPayments.Map(),
                 RefreshedLearnerForEarnings = entity.RefreshedLearnerForEarnings,
-                HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,                
+                HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,
                 PausePayments = entity.PausePayments
             };
         }
@@ -169,9 +169,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             if (model != null)
             {
                 return new Domain.ValueObjects.CollectionPeriod(
-                    model.PeriodNumber, 
-                    model.CalendarMonth, 
-                    model.CalendarYear, 
+                    model.PeriodNumber,
+                    model.CalendarMonth,
+                    model.CalendarYear,
                     model.EIScheduledOpenDateUTC,
                     model.CensusDate,
                     Convert.ToInt16(model.AcademicYear),
@@ -198,8 +198,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
         {
             return models.Select(x =>
-                new CollectionPeriod                
-                { 
+                new CollectionPeriod
+                {
                     AcademicYear = x.AcademicYear.ToString(),
                     Active = x.Active,
                     CalendarMonth = x.CalendarMonth,
@@ -312,7 +312,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Amount = x.Amount,
                 DateClawbackCreated = x.CreatedDate,
                 PaymentId = x.PaymentId,
-                SubnominalCode = x.SubnominalCode
+                SubnominalCode = x.SubnominalCode,
+                DateClawbackSent = x.DateClawbackSent
             }).ToList();
         }
 
@@ -327,7 +328,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDate = x.DateClawbackCreated,
                 PaymentId = x.PaymentId,
                 SubnominalCode = x.SubnominalCode,
-                PendingPaymentId = x.PendingPaymentId
+                PendingPaymentId = x.PendingPaymentId,
+                DateClawbackSent = x.DateClawbackSent
             }).ToList();
         }
     }
