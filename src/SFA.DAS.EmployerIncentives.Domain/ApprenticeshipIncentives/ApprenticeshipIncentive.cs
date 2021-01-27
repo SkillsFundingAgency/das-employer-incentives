@@ -124,19 +124,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             pendingPayment.ClawBack();
             var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
-
-            var clawback = ClawbackPayment.New(
-                Guid.NewGuid(),
-                Model.Account,
-                Model.Id,
-                pendingPayment.Id,
-                pendingPayment.Amount,
-                DateTime.Now,
-                payment.SubnominalCode,
-                payment.Id);
             
-            if(!Model.ClawbackPaymentModels.Any(c => c.PendingPaymentId == pendingPayment.Id))
+            if (!Model.ClawbackPaymentModels.Any(c => c.PendingPaymentId == pendingPayment.Id))
             {
+                var clawback = ClawbackPayment.New(
+                    Guid.NewGuid(),
+                    Model.Account,
+                    Model.Id,
+                    pendingPayment.Id,
+                    pendingPayment.Amount,
+                    DateTime.Now,
+                    payment.SubnominalCode,
+                    payment.Id);
+                
                 Model.ClawbackPaymentModels.Add(clawback.GetModel());
             }
         }
