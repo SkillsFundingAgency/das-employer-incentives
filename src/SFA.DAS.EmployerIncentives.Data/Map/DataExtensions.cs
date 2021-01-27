@@ -209,6 +209,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
 
         private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
         {
+            if (HasVendorId(model))
+            {
+                return BankDetailsStatus.Completed;
+            }
+
             if (string.IsNullOrWhiteSpace(model.VrfCaseStatus))
             {
                 return BankDetailsStatus.NotSupplied;
@@ -218,10 +223,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                  || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
                  || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
             {
-                if(HasVendorId(model))
-                {
-                    return BankDetailsStatus.Completed;
-                }
                 return BankDetailsStatus.Rejected;
             }
 
