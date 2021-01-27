@@ -139,6 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             // Arrange
             var testAccount = _fixture.Create<Models.Account>();
             testAccount.VrfCaseStatus = vrfCaseStatus;
+            testAccount.VrfVendorId = "ABC123";
             _dbContext.Add(testAccount);
             _dbContext.SaveChanges();
 
@@ -157,6 +158,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             // Arrange
             var testAccount = _fixture.Create<Models.Account>();
             testAccount.VrfCaseStatus = vrfCaseStatus;
+            testAccount.VrfVendorId = string.Empty;
             _dbContext.Add(testAccount);
             _dbContext.SaveChanges();
 
@@ -175,6 +177,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             // Arrange
             var testAccount = _fixture.Create<Models.Account>();
             testAccount.VrfCaseStatus = vrfCaseStatus;
+            testAccount.VrfVendorId = string.Empty;
             _dbContext.Add(testAccount);
             _dbContext.SaveChanges();
 
