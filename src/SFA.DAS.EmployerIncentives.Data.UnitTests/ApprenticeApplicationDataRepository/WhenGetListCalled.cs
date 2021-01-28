@@ -101,7 +101,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             {
                 LearnerMatchFound = false,
                 PaymentAmount = pendingPayments[1].Amount,
-                PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB"))
+                PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB")),
+                PaymentSentIsEstimated = true  // update when implementing EI-827
             };
             result[0].SecondPaymentStatus.Should().BeEquivalentTo(expectedSecondPaymentStatus);
         }
