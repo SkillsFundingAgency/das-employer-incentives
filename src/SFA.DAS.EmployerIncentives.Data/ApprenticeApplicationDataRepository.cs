@@ -63,7 +63,9 @@ namespace SFA.DAS.EmployerIncentives.Data
                         LearnerMatchFound = LearnerMatchFound(data.learner),
                         PaymentAmount = data.secondPayment.Amount,
                         HasDataLock = HasDataLock(data.learner),
-                        PausePayments = data.incentive.PausePayments
+                        InLearning = InLearning(data.learner),
+                        PausePayments = data.incentive.PausePayments,
+                        PaymentSentIsEstimated = true // change to use IsPaymentEstimated when implementing ticket EI-827
                     }
                 };
 
