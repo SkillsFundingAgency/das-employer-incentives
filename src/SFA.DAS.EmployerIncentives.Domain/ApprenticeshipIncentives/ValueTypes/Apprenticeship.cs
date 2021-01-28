@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("FirstName must be set", nameof(firstName));
             if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("LastName must be set", nameof(lastName));
             if (uniqueLearnerNumber <= 0) throw new ArgumentException("UniqueLearnerNumber must be greater than 0", nameof(uniqueLearnerNumber));
-            if (string.IsNullOrWhiteSpace(courseName)) throw new ArgumentException("LastName must be set", nameof(courseName));
+            if (string.IsNullOrWhiteSpace(courseName)) throw new ArgumentException("CourseName must be set", nameof(courseName));
 
             Id = id;
             FirstName = firstName;
