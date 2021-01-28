@@ -25,7 +25,7 @@ Scenario: When there is an unsent payment clawback
 	Given there are pending payments
 	And there are payments with unsent clawbacks
 	When the payment process is run
-	Then the 'HasUnsentClawback' will have a failed validation result
+	Then the 'HasNoUnsentClawbacks' will have a failed validation result
 
 Scenario: When there is a sent payment clawback
 	Given there are pending payments
