@@ -136,21 +136,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             internal void AddClawbackPayment(bool sent)
             {
                 Payment = _fixture.Build<Payment>()
-                    .With(d => d.PendingPaymentId, PendingPaymentModel1.Id)
-                    .With(d => d.AccountLegalEntityId, AccountModel.Id)
+                    .With(d => d.PendingPaymentId, PendingPaymentModel2.Id)
+                    .With(d => d.AccountId, AccountModel.Id)
+                    .With(d => d.AccountLegalEntityId, AccountModel.AccountLegalEntityId)
                     .With(d => d.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
-                    .With(d => d.PaymentPeriod, CollectionPeriod)
-                    .With(d => d.PaymentYear, CollectionPeriodYear)
+                    .With(d => d.PaymentPeriod, PendingPaymentModel2.PeriodNumber)
+                    .With(d => d.PaymentYear, PendingPaymentModel2.PaymentYear)
+                    .Without(d => d.PaidDate)
                     .Create();
 
                 ClawbackPayment = _fixture.Build<ClawbackPayment>()
-                    .With(d => d.PendingPaymentId, PendingPaymentModel1.Id)
+                    .With(d => d.PendingPaymentId, PendingPaymentModel2.Id)
                     .With(d => d.PaymentId, Payment.Id)
                     .With(d => d.DateClawbackSent, sent ? DateTime.Now.AddDays(-1) : (DateTime?)null)
-                    .With(d => d.AccountLegalEntityId, AccountModel.Id)
+                    .With(d => d.AccountId, AccountModel.Id)
+                    .With(d => d.AccountLegalEntityId, AccountModel.AccountLegalEntityId)
                     .With(d => d.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
-                    .With(d => d.CollectionPeriod, CollectionPeriod)
-                    .With(d => d.CollectionPeriodYear, CollectionPeriodYear)
+                    .With(d => d.CollectionPeriod, PendingPaymentModel2.PeriodNumber)
+                    .With(d => d.CollectionPeriodYear, PendingPaymentModel2.PaymentYear)
                     .Create();
             }
         }
