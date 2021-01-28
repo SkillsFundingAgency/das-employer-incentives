@@ -197,11 +197,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            RemoveExistingPaymentIfExists(pendingPaymentId);
-
             var paymentDate = DateTime.Today;
 
-            AddPayment(pendingPaymentId, collectionYear, collectionPeriod, pendingPayment, paymentDate);
+            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == pendingPaymentId);
+            if (existingPayment != null)
+            {
+                existingPayment.CalculatedDate = paymentDate;
+                existingPayment.PaymentPeriod = collectionPeriod;
+                existingPayment.PaymentYear = collectionYear;
+                existingPayment.SubnominalCode = DetermineSubnominalCode();
+                existingPayment.Amount = pendingPayment.Amount;
+            }
+            else
+            {
+                AddPayment(pendingPaymentId, collectionYear, collectionPeriod, pendingPayment, paymentDate);
+            }
+            
             pendingPayment.SetPaymentMadeDate(paymentDate);
         }
 
@@ -294,15 +305,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             throw new ArgumentException("Cannot determine SubnominalCode as EmployerType has not been assigned as Levy or Non Levy");
-        }
-
-        private void RemoveExistingPaymentIfExists(Guid pendingPaymentId)
-        {
-            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == pendingPaymentId);
-            if (existingPayment != null)
-            {
-                Model.PaymentModels.Remove(existingPayment);
-            }
         }
 
         private PendingPayment GetPendingPayment(Guid pendingPaymentId)
