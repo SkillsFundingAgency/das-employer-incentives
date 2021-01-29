@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using Moq;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRepository
 {
@@ -16,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
         private Data.ApprenticeApplicationDataRepository _sut;
+        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void Arrange()
@@ -26,7 +29,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
-            _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context));
+            _mockDateTimeService = new Mock<IDateTimeService>();
+
+            _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context), _mockDateTimeService.Object);
         }
 
         [TearDown]

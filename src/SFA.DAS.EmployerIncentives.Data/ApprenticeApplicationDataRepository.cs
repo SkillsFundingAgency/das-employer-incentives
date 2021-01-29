@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,14 @@ namespace SFA.DAS.EmployerIncentives.Data
     public class ApprenticeApplicationDataRepository : IApprenticeApplicationDataRepository
     {
         private readonly EmployerIncentivesDbContext _dbContext;
+        private readonly IDateTimeService _dateTimeService;
 
-        public ApprenticeApplicationDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
+        public ApprenticeApplicationDataRepository(
+            Lazy<EmployerIncentivesDbContext> dbContext,
+            IDateTimeService dateTimeService)
         {
             _dbContext = dbContext.Value;
+            _dateTimeService = dateTimeService;
         }
 
         public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)
@@ -55,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         InLearning = InLearning(data.learner),
                         PausePayments = data.incentive.PausePayments,
                         PaymentSent = data.firstPaymentSent != null,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent)
+                        PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService)
                     },
                     SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                     {
@@ -128,14 +133,14 @@ namespace SFA.DAS.EmployerIncentives.Data
             return pendingPayment.Amount;
         }
         
-        private static bool IsPaymentEstimated(Payment payment)
+        private static bool IsPaymentEstimated(Payment payment, IDateTimeService dateTimeService)
         {
             if(payment == null)
             {
                 return true;
             }
 
-            if(payment.PaidDate != null || payment.CalculatedDate.Day >= 27)
+            if(payment.PaidDate != null && dateTimeService.Now().Day >= 27)
             {
                 return false;
             }
