@@ -1,12 +1,11 @@
-﻿using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Interfaces
 {
     public interface ICollectionCalendarService
     {
-        Task<Domain.ValueObjects.CollectionCalendar> Get();
+        Task<ValueObjects.CollectionCalendar> Get();
 
-        Task Save(Domain.ValueObjects.CollectionCalendar collectionCalendar);
+        Task Save(ValueObjects.CollectionCalendar collectionCalendar);
     }
 }
