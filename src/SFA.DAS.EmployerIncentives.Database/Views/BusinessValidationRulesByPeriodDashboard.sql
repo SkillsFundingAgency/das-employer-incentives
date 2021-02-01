@@ -1,13 +1,7 @@
 ﻿CREATE VIEW [dbo].[BusinessValidationRulesByPeriodDashboard]
 	AS
 
-with MonthEndRuntime as (
-  select min(createddateutc) FirstValidation, max(createddateutc) LastValidation, PeriodNumber, PaymentYear
-			from	[incentives].[PendingPaymentValidationResult]
-			group by PeriodNumber, PaymentYear
-
-),
-PendingPaymentValidations as (
+with PendingPaymentValidations as (
 	select	PendingPaymentId, 
 			iif(step='HasIlrSubmission',1,0) as HasIlrSubmission,
 			iif(step='HasLearningRecord',1,0) as HasLearningRecord,
@@ -20,8 +14,8 @@ PendingPaymentValidations as (
 			PeriodNumber, 
 			PaymentYear
 	from	[incentives].[PendingPaymentValidationResult] ppvr
-	where	ppvr.PeriodNumber = (select max(PeriodNumber) from MonthEndRuntime)
-	and		ppvr.PaymentYear = (select max(PaymentYear) from MonthEndRuntime)
+	where	ppvr.PeriodNumber = (select max(PeriodNumber) from [BusinessGetMonthEndRuntimes])
+	and		ppvr.PaymentYear = (select max(PaymentYear) from [BusinessGetMonthEndRuntimes])
 	group by PendingPaymentId, step, result, PeriodNumber, PaymentYear
 )
 select count(distinct pendingpaymentId) as CountOfPayments, 
