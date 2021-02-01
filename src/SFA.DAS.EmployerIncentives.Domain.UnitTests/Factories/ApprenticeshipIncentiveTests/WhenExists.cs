@@ -32,9 +32,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
 
             // Assert
             incentive.Should().BeEquivalentTo(_model, opt =>
-            opt.Excluding(x => x.PendingPaymentModels)
+            incentive.Should().BeEquivalentTo(_model, opt => opt
             .Excluding(x => x.ApplicationApprenticeshipId)
             .Excluding(x => x.PaymentModels)
+            .Excluding(x => x.SubmittedDate)
+            .Excluding(x => x.SubmittedByEmail)
+            .Excluding(x => x.PendingPaymentModels)
+            .Excluding(x => x.ApplicationApprenticeshipId)
             .Excluding(x => x.ClawbackPaymentModels));
         }
 

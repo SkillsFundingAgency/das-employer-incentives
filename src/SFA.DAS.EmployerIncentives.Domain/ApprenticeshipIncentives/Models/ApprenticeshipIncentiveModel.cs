@@ -18,6 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public ICollection<PaymentModel> PaymentModels { get; set; }
         public ICollection<ClawbackPaymentModel> ClawbackPaymentModels { get; set; }
         public bool PausePayments { get; set; }
+        public DateTime? SubmittedDate { get; set; }
+        public string SubmittedByEmail { get; set; }
 
         public ApprenticeshipIncentiveModel()
         {

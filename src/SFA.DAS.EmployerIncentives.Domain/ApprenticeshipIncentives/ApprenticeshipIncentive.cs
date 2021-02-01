@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
 
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, bool pausePayments)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, bool pausePayments, DateTime submittedDate, string submittedByEmail)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -43,7 +43,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Account = account,
                     Apprenticeship = apprenticeship,
                     StartDate = plannedStartDate,
-                    PausePayments = pausePayments
+                    PausePayments = pausePayments,
+                    SubmittedDate = submittedDate,
+                    SubmittedByEmail = submittedByEmail
                 }, true);
         }
 

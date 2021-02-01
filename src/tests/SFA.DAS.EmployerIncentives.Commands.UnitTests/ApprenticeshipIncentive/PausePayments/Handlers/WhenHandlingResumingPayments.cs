@@ -103,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             return Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(
                 _fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(),
-                _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), isPaused);
+                _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), isPaused, _fixture.Create<DateTime>(), _fixture.Create<string>());
         }
     }
 }

@@ -29,7 +29,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 RefreshedLearnerForEarnings = model.RefreshedLearnerForEarnings,
                 HasPossibleChangeOfCircumstances = model.HasPossibleChangeOfCircumstances,
                 AccountLegalEntityId = model.Account.AccountLegalEntityId,
-                PausePayments = model.PausePayments
+                PausePayments = model.PausePayments,
+                SubmittedDate = model.SubmittedDate,
+                SubmittedByEmail = model.SubmittedByEmail,
+                CourseName = model.Apprenticeship.CourseName
             };
         }
 
@@ -41,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.LastName,
                      entity.DateOfBirth,
                      entity.ULN,
-                     entity.EmployerType
+                     entity.EmployerType,
+                     entity.CourseName
                      );
 
             if (entity.UKPRN.HasValue)
@@ -52,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return new ApprenticeshipIncentiveModel
             {
                 Id = entity.Id,
-                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId),
                 Apprenticeship = apprenticeship,
                 StartDate = entity.StartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
@@ -61,7 +65,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ClawbackPaymentModels = entity.ClawbackPayments.Map(),
                 RefreshedLearnerForEarnings = entity.RefreshedLearnerForEarnings,
                 HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,
-                PausePayments = entity.PausePayments
+                PausePayments = entity.PausePayments,
+                SubmittedDate = entity.SubmittedDate,
+                SubmittedByEmail = entity.SubmittedByEmail
             };
         }
 
