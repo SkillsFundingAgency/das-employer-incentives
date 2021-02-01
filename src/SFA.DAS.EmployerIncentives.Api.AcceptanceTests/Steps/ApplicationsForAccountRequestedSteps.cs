@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -51,6 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _apiResponse.ApprenticeApplications.Should().NotBeEmpty();
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            var currentPeriodDate = new DateTime(TestContext.ActivePeriod.CalendarYear, TestContext.ActivePeriod.CalendarMonth, 1);
 
             apprenticeshipApplication.AccountId.Should().Be(_account.Id);
             apprenticeshipApplication.FirstName.Should().Be(_apprenticeshipIncentive.FirstName);
@@ -64,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             apprenticeshipApplication.FirstPaymentStatus.Should().BeEquivalentTo(new
             {
                 PaymentAmount = _apprenticeshipIncentive.PendingPayments.First().Amount,
-                PaymentDate = _apprenticeshipIncentive.PendingPayments.First().DueDate.AddMonths(1)
+                PaymentDate = currentPeriodDate <= _apprenticeshipIncentive.PendingPayments.First().DueDate ? new DateTime(currentPeriodDate.AddMonths(1).Year, currentPeriodDate.AddMonths(1).Month, _apprenticeshipIncentive.PendingPayments.First().DueDate.Day) : _apprenticeshipIncentive.PendingPayments.First().DueDate.AddMonths(1)
             });
             apprenticeshipApplication.SecondPaymentStatus.Should().BeEquivalentTo(new
             {

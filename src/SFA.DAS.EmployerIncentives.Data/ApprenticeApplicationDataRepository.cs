@@ -132,12 +132,12 @@ namespace SFA.DAS.EmployerIncentives.Data
                 return payment.CalculatedDate;
             }
 
-            var activePeriodDate = new DateTime(activePeriod.AcademicYear, activePeriod.CalendarMonth, 1);
+            var activePeriodDate = new DateTime(activePeriod.CalendarYear, activePeriod.CalendarMonth, 1);
             var paymentDueDate = new DateTime(pendingPayment.DueDate.Year, pendingPayment.DueDate.Month, 1);
 
             if (activePeriodDate <= paymentDueDate)
             {
-                return new DateTime(nextActivePeriod.AcademicYear, nextActivePeriod.CalendarMonth, pendingPayment.DueDate.Day);
+                return new DateTime(nextActivePeriod.CalendarYear, nextActivePeriod.CalendarMonth, pendingPayment.DueDate.Day);
             }
             return pendingPayment.DueDate.AddMonths(1);
         }
