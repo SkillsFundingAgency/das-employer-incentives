@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using NServiceBus.Transport;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
@@ -36,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             _fixture = new Fixture();
+            var today = new DateTime(2021, 1, 30);
 
             _accountModel = _fixture.Create<Account>();
 
@@ -47,8 +48,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             _apprenticeshipsModels = _fixture.Build<IncentiveApplicationApprenticeship>()
                 .With(p => p.IncentiveApplicationId, _applicationModel.Id)
-                .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
-                .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
+                .With(p => p.PlannedStartDate, today.AddDays(1))
+                .With(p => p.DateOfBirth, today.AddYears(-20))
                 .With(p => p.EarningsCalculated, false)
                 .With(p => p.WithdrawnByCompliance, false)
                 .With(p => p.WithdrawnByEmployer, false)
@@ -59,8 +60,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.AccountId, _applicationModel.AccountId)
                 .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
-                .With(p => p.StartDate, DateTime.Today.AddDays(1))
-                .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
+                .With(p => p.StartDate, today.AddDays(1))
+                .With(p => p.DateOfBirth, today.AddYears(-20))
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()
@@ -150,18 +151,34 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     _applicationModel.SubmittedByEmail,
                     apprenticeship.CourseName);
 
-                await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
+                await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
+        
 
         [When(@"the apprenticeship incentive earnings are calculated")]
         public async Task WhenTheApprenticeshipIncentiveEarningsAreCalculated()
         {
             var calcEarningsCommand = new CalculateEarningsCommand(_apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
-              await _testContext.MessageBus.Send(calcEarningsCommand));
+            await _testContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    await _testContext.MessageBus.Send(calcEarningsCommand);
+                },
+                (context) => HasExpectedCompleteEarningsCalculationEvents(context)
+                );
+        }
+
+        private bool HasExpectedCompleteEarningsCalculationEvents(TestContext testContext)
+        {
+            var processedEvents = testContext.CommandsPublished.Count(c =>
+            c.IsPublished &&
+            c.IsDomainCommand &&
+            c.Command is CompleteEarningsCalculationCommand);
+
+            return processedEvents == 1;
         }
 
         [When(@"the earnings calculation against the apprenticeship incentive completes")]
@@ -173,7 +190,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 _apprenticeshipIncentive.ApprenticeshipId,
                 _apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async (cancellationToken) =>
+            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
                 await _testContext.MessageBus.Send(completeEarningsCalcCommand));
         }
 

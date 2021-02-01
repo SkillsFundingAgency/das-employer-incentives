@@ -1,6 +1,7 @@
 ﻿@database
 @messageBus
 @api
+@activeCalendarPeriod
 Feature: SendBankDetailsRepeatReminderEmails
 	In order to receive incentive payments
 	As an employer

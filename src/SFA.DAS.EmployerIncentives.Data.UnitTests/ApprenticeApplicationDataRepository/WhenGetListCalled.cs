@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +24,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         private Data.ApprenticeApplicationDataRepository _sut;
         private DbContextOptions<EmployerIncentivesDbContext> _options;
         private Mock<IDateTimeService> _mockDateTimeService;
-
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        
         [SetUp]
         public void Arrange()
         {
@@ -34,8 +37,19 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _context = new EmployerIncentivesDbContext(_options);
 
             _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
-            _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context), _mockDateTimeService.Object);
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            {
+                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, (short)DateTime.Now.Year, true),
+                new Domain.ValueObjects.CollectionPeriod(2, (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), (short)DateTime.Now.AddMonths(1).Year, false)
+            };
+
+            _mockCollectionCalendarService
+                .Setup(m => m.Get())
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
+
+            _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context), _mockDateTimeService.Object, _mockCollectionCalendarService.Object);
         }
 
         [TearDown]
@@ -636,6 +650,64 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.PaymentDate.Should().Be(pendingPayments[0].DueDate.AddMonths(1));
+        }
+
+        [Test]
+        public async Task Then_first_payment_date_is_the_next_active_period_when_payment_does_not_exist_and_pending_payment_due_date_is_in_current_period()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            
+            pendingPayments[0].DueDate = new DateTime(_collectionPeriods.Single(p => p.PeriodNumber == 1).AcademicYear, _collectionPeriods.Single(p => p.PeriodNumber == 1).CalendarMonth, 4);
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.PaymentDate.Value.Year.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).AcademicYear);
+            application.FirstPaymentStatus.PaymentDate.Value.Month.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).CalendarMonth);
+            application.FirstPaymentStatus.PaymentDate.Value.Day.Should().Be(pendingPayments[0].DueDate.Day);
         }
 
         [Test]

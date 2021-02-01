@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         private Fixture _fixture;
         private Data.ApprenticeApplicationDataRepository _sut;
         private Mock<IDateTimeService> _mockDateTimeService;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
 
         [SetUp]
         public void Arrange()
@@ -30,8 +31,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _context = new EmployerIncentivesDbContext(options);
 
             _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
-            _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context), _mockDateTimeService.Object);
+            _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context), _mockDateTimeService.Object, _mockCollectionCalendarService.Object);
         }
 
         [TearDown]

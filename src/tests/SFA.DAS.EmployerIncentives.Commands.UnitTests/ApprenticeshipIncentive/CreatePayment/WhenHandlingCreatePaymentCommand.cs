@@ -33,25 +33,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         [SetUp]
         public async Task ArrangeAsync()
         {
+            var today = new DateTime(2021, 1, 30);
+
             _fixture = new Fixture();
 
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
                 new Domain.ValueObjects.CollectionPeriod(
                     1,
-                    (byte)DateTime.Now.Month,
-                    (short)DateTime.Now.Year,
-                    DateTime.Now.AddDays(-1),
-                    DateTime.Now.AddDays(-1),
-                    (short)DateTime.Now.Year,
+                    (byte)today.Month,
+                    (short)today.Year,
+                    today.AddDays(-1),
+                    today.AddDays(-1),
+                    (short)today.Year,
                     false),
                 new Domain.ValueObjects.CollectionPeriod(
                 1,
-                (byte)DateTime.Now.AddMonths(1).Month,
-                (short)DateTime.Now.AddMonths(1).Year,
-                DateTime.Now.AddMonths(1).AddDays(-1),
-                DateTime.Now.AddMonths(1).AddDays(-1),
-                (short)DateTime.Now.AddMonths(1).Year,
+                (byte)today.AddMonths(1).Month,
+                (short)today.AddMonths(1).Year,
+                today.AddMonths(1).AddDays(-1),
+                today.AddMonths(1).AddDays(-1),
+                (short)today.AddMonths(1).Year,
                 false)
             };
             _firstCollectionPeriod = _collectionPeriods.First();
@@ -105,6 +107,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
         private async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> ApprenticeshipIncentiveCreator()
         {
+            var today = new DateTime(2021, 1, 30);
+
             var incentive = new ApprenticeshipIncentiveFactory()
                 .CreateNew(_fixture.Create<Guid>(),
                     _fixture.Create<Guid>(),
@@ -113,12 +117,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         _fixture.Create<string>(),
                         _fixture.Create<string>(),
-                        DateTime.Today.AddYears(-26),
+                        today.AddYears(-26),
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
                         _fixture.Create<string>()
                     ),
-                    DateTime.Today,
+                    today,
                     _fixture.Create<DateTime>(),
                     _fixture.Create<string>());
 
@@ -138,11 +142,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             {
                 new Domain.ValueObjects.CollectionPeriod(
                     1, 
-                    (byte)DateTime.Now.Month, 
-                    (short)DateTime.Now.Year, 
-                    DateTime.Now.AddDays(-1),
-                    DateTime.Now,
-                    (short)DateTime.Now.Year,
+                    (byte)today.Month, 
+                    (short)today.Year,
+                    today.AddDays(-1),
+                    today,
+                    (short)today.Year,
                     true)
             };
 
