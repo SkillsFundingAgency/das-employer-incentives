@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         private Mock<IDateTimeService> _mockDateTimeService;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
-        
+
         [SetUp]
         public void Arrange()
         {
@@ -39,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _mockDateTimeService = new Mock<IDateTimeService>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
+            
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
                 new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, (short)DateTime.Now.Year, true),
@@ -112,9 +113,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 LearnerMatchFound = false,
                 PaymentSentIsEstimated = true,
                 PaymentAmount = pendingPayments[0].Amount,
-                PaymentDate = DateTime.Parse("04-02-2020", new CultureInfo("en-GB"))
+                PaymentDate = new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, 4)
             };
-            result[0].FirstPaymentStatus.Should().BeEquivalentTo(expectedFirstPaymentStatus);
 
             var expectedSecondPaymentStatus = new PaymentStatusDto
             {
@@ -625,7 +625,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
                 .CreateMany(2).ToList();
-            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+
+            pendingPayments[0].DueDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month,4);
             pendingPayments[0].EarningType = EarningType.FirstPayment;
             pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
