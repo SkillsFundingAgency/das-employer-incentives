@@ -153,19 +153,18 @@ namespace SFA.DAS.EmployerIncentives.Data
         
         private static bool IsPaymentEstimated(Payment payment, IDateTimeService dateTimeService)
         {
-            if(payment == null)
+            if(payment == null || !payment.PaidDate.HasValue)
             {
                 return true;
             }
 
-            if(payment.PaidDate != null &&
+            if (dateTimeService.Now().Day < 27 &&
                 payment.PaidDate.Value.Year == dateTimeService.Now().Year &&
-                payment.PaidDate.Value.Month == dateTimeService.Now().Month &&
-                dateTimeService.Now().Day >= 27)
+                payment.PaidDate.Value.Month == dateTimeService.Now().Month)
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
 
         public async Task<Guid?> GetFirstSubmittedApplicationId(long accountLegalEntityId)
