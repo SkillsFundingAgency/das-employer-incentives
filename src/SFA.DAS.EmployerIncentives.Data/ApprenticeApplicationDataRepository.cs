@@ -158,7 +158,10 @@ namespace SFA.DAS.EmployerIncentives.Data
                 return true;
             }
 
-            if(payment.PaidDate != null && dateTimeService.Now().Day >= 27)
+            if(payment.PaidDate != null &&
+                payment.PaidDate.Value.Year == dateTimeService.Now().Year &&
+                payment.PaidDate.Value.Month == dateTimeService.Now().Month &&
+                dateTimeService.Now().Day >= 27)
             {
                 return false;
             }

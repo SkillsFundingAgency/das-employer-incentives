@@ -963,6 +963,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             {
                 payments[0].PaidDate = null;
             }
+            else
+            {
+                payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payments[0].PaidDate.Value.Day);
+            }
 
             incentives[0].PendingPayments = pendingPayments;
             incentives[0].Payments = payments;
