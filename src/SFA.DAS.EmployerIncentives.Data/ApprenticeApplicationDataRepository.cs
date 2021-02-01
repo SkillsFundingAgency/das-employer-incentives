@@ -15,17 +15,24 @@ namespace SFA.DAS.EmployerIncentives.Data
     {
         private readonly EmployerIncentivesDbContext _dbContext;
         private readonly IDateTimeService _dateTimeService;
+        private readonly ICollectionCalendarService _collectionCalendarService;
 
         public ApprenticeApplicationDataRepository(
             Lazy<EmployerIncentivesDbContext> dbContext,
-            IDateTimeService dateTimeService)
+            IDateTimeService dateTimeService,
+            ICollectionCalendarService collectionCalendarService)
         {
             _dbContext = dbContext.Value;
             _dateTimeService = dateTimeService;
+            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)
         {
+            var calendar = await _collectionCalendarService.Get();
+            var activePeriod = calendar.GetActivePeriod();
+            var nextActivePeriod = calendar.GetNextPeriod(activePeriod);
+
             var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
                                       from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
                                       from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment).DefaultIfEmpty()
@@ -53,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     CourseName = data.incentive.CourseName,
                     FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = PaymentDate(data.firstPayment, data.firstPaymentSent),
+                        PaymentDate = PaymentDate(data.firstPayment, data.firstPaymentSent, activePeriod, nextActivePeriod),
                         LearnerMatchFound = LearnerMatchFound(data.learner),
                         PaymentAmount = PaymentAmount(data.firstPayment, data.firstPaymentSent),
                         HasDataLock = HasDataLock(data.learner),
@@ -110,8 +117,11 @@ namespace SFA.DAS.EmployerIncentives.Data
 
             return learner.InLearning.HasValue && learner.InLearning.Value;
         }
-
-        private static DateTime? PaymentDate(PendingPayment pendingPayment, Payment payment)
+        private static DateTime? PaymentDate(
+            PendingPayment pendingPayment, 
+            Payment payment,
+            Domain.ValueObjects.CollectionPeriod activePeriod,
+            Domain.ValueObjects.CollectionPeriod nextActivePeriod)
         {
             if (payment != null)
             {
@@ -120,6 +130,14 @@ namespace SFA.DAS.EmployerIncentives.Data
                     return payment.PaidDate.Value;
                 }
                 return payment.CalculatedDate;
+            }
+
+            var activePeriodDate = new DateTime(activePeriod.AcademicYear, activePeriod.CalendarMonth, 1);
+            var paymentDueDate = new DateTime(pendingPayment.DueDate.Year, pendingPayment.DueDate.Month, 1);
+
+            if (activePeriodDate <= paymentDueDate)
+            {
+                return new DateTime(nextActivePeriod.AcademicYear, nextActivePeriod.CalendarMonth, pendingPayment.DueDate.Day);
             }
             return pendingPayment.DueDate.AddMonths(1);
         }

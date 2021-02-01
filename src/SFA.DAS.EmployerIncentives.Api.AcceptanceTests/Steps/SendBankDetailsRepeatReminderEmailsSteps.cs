@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -83,13 +83,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             const string url = "api/EmailCommand/bank-details-repeat-reminders";
             _request = new BankDetailsRepeatReminderEmailsRequest { ApplicationCutOffDate = _applicationCutOffDate };
 
-            await TestContext.WaitFor<ICommand>(async (cancellationToken) =>
-            {
-                _response = await EmployerIncentiveApi.Client.PostAsJsonAsync(url, _request, cancellationToken);
-            },
-            numberOfOnProcessedEventsExpected: 2);
+            await TestContext.WaitFor(
+               async (cancellationToken) =>
+               {
+                   _response = await EmployerIncentiveApi.Client.PostAsJsonAsync(url, _request, cancellationToken);
+               },
+               (context) => HasExpectedSendBankDetailsRepeatReminderEmailEvents(context)
+               );
 
             _response.IsSuccessStatusCode.Should().BeTrue();
+        }
+
+        private bool HasExpectedSendBankDetailsRepeatReminderEmailEvents(TestContext testContext)
+        {
+            var processedEvents = testContext.CommandsPublished.Count(c =>
+            c.IsProcessed &&
+            c.Command is SendBankDetailsRepeatReminderEmailCommand);
+
+            return processedEvents == 1;
         }
 
         [Then(@"the employer is sent a reminder email to supply their bank details in order to receive payment")]
