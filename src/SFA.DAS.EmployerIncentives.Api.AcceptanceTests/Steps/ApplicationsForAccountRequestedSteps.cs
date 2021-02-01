@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -80,7 +81,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             _apprenticeshipIncentive.PendingPayments = _apprenticeshipIncentive.PendingPayments.Take(2).ToList();
             _apprenticeshipIncentive.PendingPayments.First().EarningType = EarningType.FirstPayment;
+            _apprenticeshipIncentive.PendingPayments.First().DueDate = new DateTime(2020, 1, 12);
             _apprenticeshipIncentive.PendingPayments.Last().EarningType = EarningType.SecondPayment;
+            _apprenticeshipIncentive.PendingPayments.Last().DueDate = new DateTime(2020, 9, 11);
 
             foreach (var pendingPayment in _apprenticeshipIncentive.PendingPayments)
             {
