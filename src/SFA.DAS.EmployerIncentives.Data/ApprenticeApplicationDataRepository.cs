@@ -132,8 +132,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                 return payment.CalculatedDate;
             }
             
-            var activePeriodDate = new DateTime(activePeriod.CalendarYear, activePeriod.CalendarMonth, 1);
-            var paymentDueDate = new DateTime(pendingPayment.DueDate.Year, pendingPayment.DueDate.Month, 1);
+            var activePeriodDate = new DateTime(activePeriod.OpenDate.Year, activePeriod.OpenDate.Month, activePeriod.OpenDate.Day);
+            var paymentDueDate = new DateTime(pendingPayment.DueDate.Year, pendingPayment.DueDate.Month, pendingPayment.DueDate.Day);
 
             if (paymentDueDate <= activePeriodDate)
             {

@@ -650,7 +650,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.PaymentDate.Should().Be(new DateTime(pendingPayments[0].DueDate.AddMonths(1).Year, pendingPayments[0].DueDate.AddMonths(1).Month, 27));
+            application.FirstPaymentStatus.PaymentDate.Should().Be(new DateTime(pendingPayments[0].DueDate.AddMonths(1).Year, pendingPayments[0].DueDate.AddMonths(1).Month, pendingPayments[0].DueDate.AddMonths(1).Day));
         }
 
         [Test]
@@ -681,8 +681,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
                 .CreateMany(2).ToList();
-            
-            pendingPayments[0].DueDate = new DateTime(_collectionPeriods.Single(p => p.PeriodNumber == 1).AcademicYear, _collectionPeriods.Single(p => p.PeriodNumber == 1).CalendarMonth, 4);
+
+            pendingPayments[0].DueDate = _collectionPeriods.Single(p => p.PeriodNumber == 1).OpenDate.AddDays(-1);
             pendingPayments[0].EarningType = EarningType.FirstPayment;
             pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
