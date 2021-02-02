@@ -650,7 +650,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.PaymentDate.Should().Be(pendingPayments[0].DueDate.AddMonths(1));
+            application.FirstPaymentStatus.PaymentDate.Should().Be(new DateTime(pendingPayments[0].DueDate.AddMonths(1).Year, pendingPayments[0].DueDate.AddMonths(1).Month, 27));
         }
 
         [Test]
@@ -708,7 +708,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.PaymentDate.Value.Year.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).AcademicYear);
             application.FirstPaymentStatus.PaymentDate.Value.Month.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).CalendarMonth);
-            application.FirstPaymentStatus.PaymentDate.Value.Day.Should().Be(pendingPayments[0].DueDate.Day);
+            application.FirstPaymentStatus.PaymentDate.Value.Day.Should().Be(27);
         }
 
         [Test]
