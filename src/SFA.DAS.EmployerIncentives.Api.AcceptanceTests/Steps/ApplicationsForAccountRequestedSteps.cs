@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             apprenticeshipApplication.FirstPaymentStatus.Should().BeEquivalentTo(new
             {
                 PaymentAmount = _apprenticeshipIncentive.PendingPayments.First().Amount,
-                PaymentDate =  _apprenticeshipIncentive.PendingPayments.First().DueDate <= currentPeriodDate ? new DateTime(currentPeriodDate.AddMonths(1).Year, currentPeriodDate.AddMonths(1).Month, _apprenticeshipIncentive.PendingPayments.First().DueDate.Day) : _apprenticeshipIncentive.PendingPayments.First().DueDate.AddMonths(1)
+                PaymentDate =  _apprenticeshipIncentive.PendingPayments.First().DueDate <= currentPeriodDate ? new DateTime(currentPeriodDate.AddMonths(1).Year, currentPeriodDate.AddMonths(1).Month, 27) : _apprenticeshipIncentive.PendingPayments.First().DueDate.AddMonths(1)
             });
             apprenticeshipApplication.SecondPaymentStatus.Should().BeEquivalentTo(new
             {
