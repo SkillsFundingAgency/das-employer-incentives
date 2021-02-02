@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _apiResponse.ApprenticeApplications.Should().NotBeEmpty();
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
-            var currentPeriodDate = new DateTime(TestContext.ActivePeriod.CalendarYear, TestContext.ActivePeriod.CalendarMonth, 1);
+            var currentPeriodDate = new DateTime(TestContext.ActivePeriod.EIScheduledOpenDateUTC.Year, TestContext.ActivePeriod.EIScheduledOpenDateUTC.Month, TestContext.ActivePeriod.EIScheduledOpenDateUTC.Day);
 
             apprenticeshipApplication.AccountId.Should().Be(_account.Id);
             apprenticeshipApplication.FirstName.Should().Be(_apprenticeshipIncentive.FirstName);
