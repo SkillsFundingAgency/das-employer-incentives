@@ -650,7 +650,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.PaymentDate.Should().Be(new DateTime(pendingPayments[0].DueDate.AddMonths(1).Year, pendingPayments[0].DueDate.AddMonths(1).Month, pendingPayments[0].DueDate.AddMonths(1).Day));
+            application.FirstPaymentStatus.PaymentDate.Should().Be(new DateTime(pendingPayments[0].DueDate.AddMonths(1).Year, pendingPayments[0].DueDate.AddMonths(1).Month, 27));
         }
 
         [Test]

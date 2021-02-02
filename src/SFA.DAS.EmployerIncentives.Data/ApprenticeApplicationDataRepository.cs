@@ -30,8 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Data
         public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)
         {
             var calendar = await _collectionCalendarService.Get();
-            var activePeriod = calendar.GetActivePeriod();
-            var nextActivePeriod = calendar.GetNextPeriod(activePeriod);
+            var nextActivePeriod = calendar.GetNextPeriod(calendar.GetActivePeriod());
 
             var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
                                       from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
@@ -60,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     CourseName = data.incentive.CourseName,
                     FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = PaymentDate(data.firstPayment, data.firstPaymentSent, activePeriod, nextActivePeriod),
+                        PaymentDate = PaymentDate(data.firstPayment, data.firstPaymentSent, nextActivePeriod),
                         LearnerMatchFound = LearnerMatchFound(data.learner),
                         PaymentAmount = PaymentAmount(data.firstPayment, data.firstPaymentSent),
                         HasDataLock = HasDataLock(data.learner),
@@ -120,7 +119,6 @@ namespace SFA.DAS.EmployerIncentives.Data
         private static DateTime? PaymentDate(
             PendingPayment pendingPayment, 
             Payment payment,
-            Domain.ValueObjects.CollectionPeriod activePeriod,
             Domain.ValueObjects.CollectionPeriod nextActivePeriod)
         {
             if (payment != null)
@@ -132,7 +130,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 return payment.CalculatedDate;
             }
             
-            var activePeriodDate = new DateTime(activePeriod.OpenDate.Year, activePeriod.OpenDate.Month, activePeriod.OpenDate.Day);
+            var activePeriodDate = new DateTime(nextActivePeriod.OpenDate.Year, nextActivePeriod.OpenDate.Month, nextActivePeriod.OpenDate.Day);
             var paymentDueDate = new DateTime(pendingPayment.DueDate.Year, pendingPayment.DueDate.Month, pendingPayment.DueDate.Day);
 
             if (paymentDueDate <= activePeriodDate)
