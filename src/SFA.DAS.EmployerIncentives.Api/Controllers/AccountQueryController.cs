@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
-using System.Linq;
-using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetLatestVendorRegistrationCaseUpdateDateTime;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
+using System.Linq;
+using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -22,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             var request = new GetLegalEntitiesRequest(accountId);
             var response = await QueryAsync<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(request);
 
-            if(response?.LegalEntities?.Count() > 0)
+            if (response?.LegalEntities?.Count() > 0)
             {
                 return Ok(response.LegalEntities);
             }
@@ -56,6 +59,26 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
 
             return NotFound();
+        }
+
+        [HttpGet("/accounts/vendorregistrationform/status")]
+        public async Task<IActionResult> GetAccountsWithVrfCaseStatus(string vrfCaseStatus)
+        {
+            var request = new GetAccountsWithVrfCaseStatusRequest(vrfCaseStatus);
+
+            var response = await QueryAsync<GetAccountsWithVrfCaseStatusRequest, GetAccountsWithVrfCaseStatusResponse>(request);
+
+            return Ok(response.Accounts);
+        }
+                
+
+        [HttpGet("/accounts/last-vrf-update-date")]
+        public async Task<IActionResult> GetLatestVendorRegistrationCaseUpdateDateTime()
+        {
+            var request = new GetLatestVendorRegistrationCaseUpdateDateTimeRequest();
+            var response = await QueryAsync<GetLatestVendorRegistrationCaseUpdateDateTimeRequest, GetLatestVendorRegistrationCaseUpdateDateTimeResponse>(request);
+
+            return Ok(response);
         }
     }
 }

@@ -29,9 +29,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     }
                     await _commandPublisher.Publish(command);
 
-                    if (_hook?.OnProcessed != null)
+                    if (_hook?.OnPublished != null)
                     {
-                        _hook.OnProcessed(command);
+                        _hook.OnPublished(command);
                     }
                 }
                 catch (Exception ex)

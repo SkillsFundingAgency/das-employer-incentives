@@ -95,7 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             result.Id.Should().NotBeEmpty("should set a new Id");
             result.ApprenticeshipIncentiveId.Should().Be(incentive.Id);
             result.ApprenticeshipId.Should().Be(incentive.Apprenticeship.Id);
-            result.SubmissionFound.Should().Be(false);
+            result.SubmissionData.SubmissionFound.Should().Be(false);
             result.Ukprn.Should().Be(incentive.Apprenticeship.Provider.Ukprn);
             result.UniqueLearnerNumber.Should().Be(incentive.Apprenticeship.UniqueLearnerNumber);
         }

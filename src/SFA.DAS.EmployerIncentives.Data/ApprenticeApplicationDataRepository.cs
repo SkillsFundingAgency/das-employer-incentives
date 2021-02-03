@@ -28,11 +28,12 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       where application.AccountId == accountId
                                       && application.AccountLegalEntityId == accountLegalEntityId
                                       select new { application, account, apprentice };
-            
+
             return await (from accountApplication in accountApplications
                            let dto = new ApprenticeApplicationDto
                            {
                                AccountId = accountApplication.application.AccountId,
+                               AccountLegalEntityId = accountApplication.application.AccountLegalEntityId,
                                ApplicationDate = accountApplication.application.DateCreated,
                                ApplicationId = accountApplication.application.Id,
                                FirstName = accountApplication.apprentice.FirstName,
@@ -40,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                ULN = accountApplication.apprentice.ULN,
                                LegalEntityName = accountApplication.account.LegalEntityName,
                                Status = accountApplication.application.Status.ToString(),
+                               SubmittedByEmail = accountApplication.application.SubmittedByEmail,
                                TotalIncentiveAmount = accountApplication.apprentice.TotalIncentiveAmount
                            }
                            select dto).ToListAsync();

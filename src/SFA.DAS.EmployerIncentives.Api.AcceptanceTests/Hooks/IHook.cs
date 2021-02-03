@@ -8,7 +8,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks
     public interface IHook<T> : IHook
     {
         Action<T> OnReceived { get; set; }
+        Action<T> OnPublished { get; set; }
         Action<T> OnProcessed { get; set; }
+        Action<T> OnHandled { get; set; }
         /// <summary>
         /// return true to suppress the raising of the exception
         /// </summary>

@@ -17,5 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public List<IncentivePaymentProfile> IncentivePaymentProfiles { get; set; }
         public string ApiBaseUrl { get; set; }
         public string Identifier { get; set; }
+        public string EmployerIncentivesWebBaseUrl { get; set; }
     }
 }

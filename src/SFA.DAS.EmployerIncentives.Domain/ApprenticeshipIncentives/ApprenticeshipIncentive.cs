@@ -135,7 +135,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Model.PendingPaymentModels.Clear();
             }
         }
-
+        public void SetChangeOfCircumstances(Learner learner)
+        {
+            if(Id != learner.ApprenticeshipIncentiveId)
+            {
+                throw new InvalidOperationException();
+            }
+                       
+            if (learner.SubmissionData.SubmissionFound && learner.SubmissionData.LearningData.StartDate.HasValue)
+            {
+                SetStartDate(learner.SubmissionData.LearningData.StartDate.Value);
+            }
+            SetHasPossibleChangeOfCircumstances(false);
+        }
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
         {
             Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
@@ -236,7 +248,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasIlrSubmission, learner.SubmissionFound));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasIlrSubmission, learner.SubmissionData.SubmissionFound));
         }
 
         public void ValidateIsInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
@@ -246,7 +258,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var isInLearning = false;
             if (matchedLearner != null)
             {
-                isInLearning = matchedLearner.SubmissionFound && matchedLearner.SubmissionData.IsInlearning == true;
+                isInLearning = matchedLearner.SubmissionData.SubmissionFound && matchedLearner.SubmissionData.LearningData.IsInlearning == true;
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.IsInLearning, isInLearning));
@@ -258,9 +270,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var hasLearningRecord = false;
 
-            if (learner != null && learner.SubmissionFound && learner.SubmissionData.LearningFoundStatus != null)
+            if (learner != null && learner.SubmissionData.SubmissionFound)
             {
-                hasLearningRecord = learner.SubmissionData.LearningFoundStatus.LearningFound;
+                hasLearningRecord = learner.SubmissionData.LearningData.LearningFound;
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasLearningRecord, hasLearningRecord));
@@ -273,7 +285,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var hasDataLock = false;
             if (matchedLearner != null)
             {
-                hasDataLock = matchedLearner.SubmissionFound && matchedLearner.SubmissionData.HasDataLock;
+                hasDataLock = matchedLearner.SubmissionData.SubmissionFound && matchedLearner.SubmissionData.LearningData.HasDataLock == true;
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
@@ -359,7 +371,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public void ValidateLearningData(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
         {
             ValidateSubmissionFound(pendingPaymentId, learner, collectionPeriod);
-            if (!learner.SubmissionFound) return;
+            if (!learner.SubmissionData.SubmissionFound) return;
 
             ValidateHasLearningRecord(pendingPaymentId, learner, collectionPeriod);
             ValidateIsInLearning(pendingPaymentId, learner, collectionPeriod);
