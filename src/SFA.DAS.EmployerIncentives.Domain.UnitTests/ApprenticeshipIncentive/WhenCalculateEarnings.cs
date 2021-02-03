@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
             var apprentiveshipDob = DateTime.Now.AddYears(-24);
             _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType);
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName);
             
             _sut = Sut(_sutModel);
 
@@ -220,7 +220,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange            
 
             // Act
-            var incentive = new ApprenticeshipIncentiveFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), _fixture.Create<DateTime>());
+            var incentive = new ApprenticeshipIncentiveFactory().CreateNew(
+                _fixture.Create<Guid>(), 
+                _fixture.Create<Guid>(), 
+                _fixture.Create<ApprenticeshipIncentives.ValueTypes.Account>(), 
+                _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), 
+                _fixture.Create<DateTime>(),
+                _fixture.Create<DateTime>(),
+                _fixture.Create<string>());
 
             // Assert
             incentive.PendingPayments.Count.Should().Be(0);

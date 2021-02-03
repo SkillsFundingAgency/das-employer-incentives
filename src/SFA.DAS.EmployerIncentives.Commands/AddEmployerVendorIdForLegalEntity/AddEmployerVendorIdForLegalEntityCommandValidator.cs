@@ -1,7 +1,6 @@
-﻿using System.Linq;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity
 {
@@ -26,6 +25,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity
             }
 
             return Task.FromResult(result);
-        }      
+        }
     }
 }

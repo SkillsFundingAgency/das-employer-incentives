@@ -1,5 +1,6 @@
 ﻿@database
 @api
+@activeCalendarPeriod
 
 Feature: ApplicationsForAccountRequested
 	In order to manage incentive applications
