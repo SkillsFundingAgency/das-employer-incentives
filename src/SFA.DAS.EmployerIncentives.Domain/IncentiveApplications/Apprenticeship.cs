@@ -26,13 +26,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public bool EarningsCalculated => Model.EarningsCalculated;
         public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
         public bool WithdrawnByCompliance => Model.WithdrawnByCompliance;
+        public string CourseName => Model.CourseName;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
             return new Apprenticeship(model.Id, model, false);
         }
 
-        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn)
+        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, string courseName)
         {
             IsNew = false;
             Model = new ApprenticeshipModel
@@ -46,7 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 PlannedStartDate = plannedStartDate,
                 ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval,
                 TotalIncentiveAmount = CalculateTotalIncentiveAmount(dateOfBirth, plannedStartDate),
-                UKPRN = ukprn
+                UKPRN = ukprn,
+                CourseName = courseName
             };
         }
 

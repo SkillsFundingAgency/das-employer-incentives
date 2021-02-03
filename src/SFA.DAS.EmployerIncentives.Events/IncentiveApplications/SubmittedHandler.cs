@@ -35,7 +35,10 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
                     apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
-                    apprenticeship.UKPRN
+                    apprenticeship.UKPRN,
+                    @event.Model.DateSubmitted.Value,
+                    @event.Model.SubmittedByEmail,
+                    apprenticeship.CourseName
                 );
 
                 var task = _commandPublisher.Publish(command);
