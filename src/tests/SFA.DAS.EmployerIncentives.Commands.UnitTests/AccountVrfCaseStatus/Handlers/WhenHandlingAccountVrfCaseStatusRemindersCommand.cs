@@ -47,8 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             var applications = _fixture.CreateMany<ApprenticeApplicationDto>(3).ToList();
             for(var i=0; i < 3; i++)
             {
+                _applicationRepository.Setup(x => x.GetFirstSubmittedApplicationId(applications[i].AccountLegalEntityId)).ReturnsAsync(Guid.NewGuid());
                 applications[i].ApplicationDate = _cutOffDate.AddDays(-1 * (i + 1));
-                applications[i].Status = "Submitted";
             }
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             for (var i = 0; i < 3; i++)
             {
                 applications[i].ApplicationDate = _cutOffDate.AddDays(i);
-                applications[i].Status = "Submitted";
+                _applicationRepository.Setup(x => x.GetFirstSubmittedApplicationId(applications[i].AccountLegalEntityId)).ReturnsAsync(Guid.NewGuid());
             }
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
@@ -119,11 +119,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             var applications2 = _fixture.CreateMany<ApprenticeApplicationDto>(1).ToList();
 
             applications1[0].AccountId = accounts[0].AccountId;
-            applications1[0].Status = "Submitted";
             applications1[0].ApplicationDate = _cutOffDate.AddDays(5);
             applications2[0].AccountId = accounts[1].AccountId;
-            applications2[0].Status = "Submitted";
             applications2[0].ApplicationDate = _cutOffDate.AddDays(-1);
+
+            _applicationRepository.Setup(x => x.GetFirstSubmittedApplicationId(applications1[0].AccountLegalEntityId)).ReturnsAsync(Guid.NewGuid());
+            _applicationRepository.Setup(x => x.GetFirstSubmittedApplicationId(applications2[0].AccountLegalEntityId)).ReturnsAsync(Guid.NewGuid());
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
             _applicationRepository.Setup(x => x.GetList(It.Is<long>(x => x == accounts[0].AccountId), It.Is<long>(x => x == accounts[0].LegalEntities[0].AccountLegalEntityId))).ReturnsAsync(applications1);

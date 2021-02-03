@@ -147,7 +147,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
-                UKPRN = x.UKPRN
+                UKPRN = x.UKPRN,
+                CourseName = x.CourseName
             }).ToList();
         }
 
@@ -183,7 +184,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 EarningsCalculated = x.EarningsCalculated,
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
-                UKPRN = x.UKPRN
+                UKPRN = x.UKPRN,
+                CourseName = x.CourseName
             }).ToList();
         }
 
@@ -199,17 +201,27 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId
             };
         }
-        
+
+        private static bool HasVendorId(Models.Account model)
+        {
+            return !string.IsNullOrEmpty(model.VrfVendorId) && model.VrfVendorId != "000000";
+        }
+
         private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
         {
-            if (String.IsNullOrWhiteSpace(model.VrfCaseStatus))
+            if (HasVendorId(model))
+            {
+                return BankDetailsStatus.Completed;
+            }
+
+            if (string.IsNullOrWhiteSpace(model.VrfCaseStatus))
             {
                 return BankDetailsStatus.NotSupplied;
             }
 
             if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
-             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
-             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
+                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
             {
                 return BankDetailsStatus.Rejected;
             }

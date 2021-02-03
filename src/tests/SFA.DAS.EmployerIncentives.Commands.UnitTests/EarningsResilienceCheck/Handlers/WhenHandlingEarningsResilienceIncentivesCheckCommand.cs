@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.Handlers
 {
@@ -24,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             _incentiveRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _sut = new EarningsResilienceIncentivesCheckCommandHandler(_incentiveRepository.Object);
             _fixture = new Fixture();
+            _fixture.Customize(new ApprenticeshipIncentiveCustomization());
         }
 
         [Test]
@@ -34,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
 
             var incentives = new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()
             {
-                Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<bool>())
+                _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()
             };
             _incentiveRepository.Setup(x => x.FindIncentivesWithoutPendingPayments()).ReturnsAsync(incentives);
 

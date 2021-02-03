@@ -33,6 +33,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 .Single(d => d.Active);
         }
 
+        public CollectionPeriod GetNextPeriod(CollectionPeriod period)
+        {
+            var nextPeriodDate = new DateTime(period.CalendarYear, period.CalendarMonth, 1).AddMonths(1);
+            return
+                _collectionPeriods
+                .Single(d => d.CalendarMonth == nextPeriodDate.Month && d.CalendarYear == nextPeriodDate.Year);
+        }
+
         public CollectionPeriod GetPeriod(short collectionYear, byte periodNumber)
         {
             return 

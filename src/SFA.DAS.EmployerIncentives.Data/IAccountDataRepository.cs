@@ -1,6 +1,6 @@
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using System;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,6 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Data
         Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId);
         Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus);
         Task UpdatePaidDateForPaymentIds(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate);
-
+        Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime();
     }
 }
