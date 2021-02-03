@@ -17,6 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public ICollection<PendingPaymentModel> PendingPaymentModels { get; set; }
         public ICollection<PaymentModel> PaymentModels { get; set; }
         public bool PausePayments { get; set; }
+        public DateTime? SubmittedDate { get; set; }
+        public string SubmittedByEmail { get; set; }
 
         public ApprenticeshipIncentiveModel()
         {

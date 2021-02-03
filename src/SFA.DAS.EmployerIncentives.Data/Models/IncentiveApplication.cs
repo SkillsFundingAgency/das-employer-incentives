@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
+    [Dapper.Contrib.Extensions.Table("IncentiveApplication")]
     [Table("IncentiveApplication")]
     public partial class IncentiveApplication
     {
