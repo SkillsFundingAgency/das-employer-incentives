@@ -34,6 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         [SetUp]
         public void Arrange()
         {
+            var today = new DateTime(2021, 1, 30);
             _fixture = new Fixture();
 
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
@@ -56,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
+                new Domain.ValueObjects.CollectionPeriod(1, (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
             };
 
             _mockCollectionCalendarService
@@ -71,11 +72,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         _fixture.Create<string>(),
                         _fixture.Create<string>(),
-                        DateTime.Today.AddYears(-26),
+                        today.AddYears(-26),
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy
                         ),
-                    DateTime.Today);
+                    today);
             
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
