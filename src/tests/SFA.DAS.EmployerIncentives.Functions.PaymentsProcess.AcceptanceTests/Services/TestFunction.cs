@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     PaymentProfiles = new List<PaymentProfile>
                     {
                         new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 354},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
                     }
                 },
                 new IncentivePaymentProfile
@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     PaymentProfiles = new List<PaymentProfile>
                     {
                         new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 354},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
                     }
                 }
             };
