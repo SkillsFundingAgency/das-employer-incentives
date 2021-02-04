@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -8,13 +6,15 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
     public class WhenCallingChangeOfCircumstancesForALearner
     {
         private Fixture _fixture;
-        private LearnerChangeOfCircumstance _sut;
+        private LearnerChangeOfCircumstanceActivity _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
 
         [SetUp]
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             
-            _sut = new LearnerChangeOfCircumstance(_mockCommandDispatcher.Object, Mock.Of<ILogger<LearnerChangeOfCircumstance>>());
+            _sut = new LearnerChangeOfCircumstanceActivity(_mockCommandDispatcher.Object, Mock.Of<ILogger<LearnerChangeOfCircumstanceActivity>>());
         }
 
         [Test]

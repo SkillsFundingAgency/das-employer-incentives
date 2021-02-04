@@ -34,10 +34,14 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<Payment> Payments { get; set; }
 
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<ClawbackPayment> ClawbackPayments { get; set; }
+
         public ApprenticeshipIncentive()
         {
             PendingPayments = new List<PendingPayment>();
             Payments = new List<Payment>();
+            ClawbackPayments = new List<ClawbackPayment>();
         }
     }
 }
