@@ -52,8 +52,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile {AmountPayable = 1250, DaysAfterApprenticeshipStart = 90},
-                        new PaymentProfile {AmountPayable = 1250, DaysAfterApprenticeshipStart = 365},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 354},
                     }
                 },
                 new IncentivePaymentProfile
@@ -61,8 +61,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 90},
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 365},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 354},
                     }
                 }
             };
