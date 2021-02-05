@@ -15,3 +15,26 @@ Scenario: Learner data contains a new start date outside of the parameters of th
 	When the learner data is refreshed with a new invalid start date for the apprenticeship incentive
 	Then the actual start date is updated
 	And the existing pending payments are removed
+
+Scenario: Clawbacks - Start Date Change Of Circumstance with eligible start date
+	Given an apprenticeship incentive exists
+	And an earning has been paid for an apprenticeship incentive application
+	When the learner data is refreshed with a new valid start date for the apprenticeship incentive
+	Then earnings are recalculated
+	And the paid earning is marked as requiring a clawback
+	And earnings are recalculated
+	And a new pending first payment record is created
+	And a new pending second payment record is created
+
+Scenario: Clawbacks - Start Date Change Of Circumstance with ineligible start date
+	Given an apprenticeship incentive exists
+	And an earning has been paid for an apprenticeship incentive application
+	When the learner data is refreshed with a new invalid start date for the apprenticeship incentive
+	Then the paid earning is marked as requiring a clawback
+
+Scenario: Clawbacks - Start Date Change Of Circumstance Delete unpaid earnings
+	Given an apprenticeship incentive exists
+	And an earning has not been paid for an apprenticeship incentive application
+	When the learner data is refreshed with a new valid start date for the apprenticeship incentive
+	Then the unpaid earning is deleted
+	And all unpaid payment records are deleted

@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _logger = logger;
         }
 
-        [FunctionName("SendPaymentRequestsForAccountLegalEntity")]
+        [FunctionName(nameof(SendPaymentRequestsForAccountLegalEntity))]
         public async Task<bool> Send([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;

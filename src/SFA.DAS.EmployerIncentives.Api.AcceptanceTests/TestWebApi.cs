@@ -42,23 +42,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
+                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile{ AmountPayable = 100, DaysAfterApprenticeshipStart = 10},
-                        new PaymentProfile{ AmountPayable = 200, DaysAfterApprenticeshipStart = 20},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
                     }
                 },
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile{ AmountPayable = 300, DaysAfterApprenticeshipStart = 30},
-                        new PaymentProfile{ AmountPayable = 400, DaysAfterApprenticeshipStart = 40},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
                     }
                 }
             };
+
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -106,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
-                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);                
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
 
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
@@ -127,7 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerReceived<>));
 
             Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
-            
+
             serviceCollection
                 .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerProcessed<>));
 

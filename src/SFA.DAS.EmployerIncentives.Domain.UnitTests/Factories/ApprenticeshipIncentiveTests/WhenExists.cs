@@ -31,7 +31,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var incentive = _sut.GetExisting(_id, _model);
 
             // Assert
-            incentive.Should().BeEquivalentTo(_model, opt => opt.Excluding(x => x.PendingPaymentModels).Excluding(x => x.ApplicationApprenticeshipId).Excluding(x => x.PaymentModels).Excluding(x => x.SubmittedDate).Excluding(x => x.SubmittedByEmail));
+            incentive.Should().BeEquivalentTo(_model, opt => opt
+                .Excluding(x => x.ApplicationApprenticeshipId)
+                .Excluding(x => x.PaymentModels)
+                .Excluding(x => x.SubmittedDate)
+                .Excluding(x => x.SubmittedByEmail)
+                .Excluding(x => x.PendingPaymentModels)
+                .Excluding(x => x.ApplicationApprenticeshipId)
+                .Excluding(x => x.ClawbackPaymentModels)
+            );
         }
 
         [Test]
@@ -47,7 +55,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                     _model.PendingPaymentModels,
                     opt => opt.Excluding(x => x.ApprenticeshipIncentiveId)
                               .Excluding(x => x.CalculatedDate)
-                              .Excluding(x => x.PaymentMadeDate)
                               .Excluding(x => x.PendingPaymentValidationResultModels));
         }
 
@@ -79,6 +86,43 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                     opt => opt.Excluding(x => x.ApprenticeshipIncentiveId)
                         .Excluding(x => x.CalculatedDate)
                         .Excluding(x => x.PendingPaymentId));
+        }
+
+        [Test]
+        public void Then_the_clawbacks_are_mapped()
+        {
+            // Act
+            var incentive = _sut.GetExisting(_id, _model);
+
+            // Assert
+            incentive.Clawbacks.Should().HaveCount(3);
+            incentive.Clawbacks
+                .Should()
+                .BeEquivalentTo(
+                    _model.ClawbackPaymentModels,
+                    opt => opt.Excluding(x => x.ApprenticeshipIncentiveId)
+                        .Excluding(x => x.PendingPaymentId)
+                        .Excluding(x => x.Amount)
+                        .Excluding(x => x.CreatedDate)
+                        .Excluding(x => x.SubnominalCode)
+                        .Excluding(x => x.PaymentId)
+                        .Excluding(x => x.DateClawbackSent)
+                        );
+        }
+
+        [Test]
+        public void Then_the_clawbacks_sent_are_mapped()
+        {
+            // Arrange
+            _model.ClawbackPaymentModels.First().DateClawbackSent = null;
+            _model.ClawbackPaymentModels.Last().DateClawbackSent = _fixture.Create<DateTime>();
+
+            // Act
+            var incentive = _sut.GetExisting(_id, _model);
+
+            // Assert
+            incentive.Clawbacks.First().Sent.Should().BeFalse();
+            incentive.Clawbacks.Last().Sent.Should().BeTrue();
         }
     }
 }

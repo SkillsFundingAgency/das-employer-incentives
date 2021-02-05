@@ -249,7 +249,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 CreatedDateTime = DateTime.Now
             };
-
         }
     }
 }
