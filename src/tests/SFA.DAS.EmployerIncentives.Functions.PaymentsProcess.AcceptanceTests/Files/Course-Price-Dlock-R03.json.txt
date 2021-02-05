@@ -35,7 +35,7 @@
                             "DataLockFailures": null
                         },
                         {
-                            "Period": 2,
+                            "Period": 4,
                             "IsPayable": false,
                             "AccountId": 5115,
                             "ApprenticeshipId": 511526,

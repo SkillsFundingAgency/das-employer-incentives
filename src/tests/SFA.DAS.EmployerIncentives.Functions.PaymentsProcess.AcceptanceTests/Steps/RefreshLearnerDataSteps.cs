@@ -1,9 +1,8 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Timers;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
@@ -14,7 +13,6 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -103,15 +101,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             foreach (var pendingPayment in _pendingPayments)
             {
                 await dbConnection.InsertAsync(pendingPayment);
-            }            
+            }
         }
-
 
         [Given(@"an apprenticeship incentive exists and without a corresponding learner match record")]
         public async Task GivenAnApprenticeshipIncentiveExistsWithoutACorrespondingLearnerMatchRecord()
         {
             await GivenAnApprenticeshipIncentiveExists();
-            GivenTheApprenticeshipIncentiveDoesNotHaveACorrespondingLearnerMatchRecord();            
+            GivenTheApprenticeshipIncentiveDoesNotHaveACorrespondingLearnerMatchRecord();
         }
 
         [Given(@"an apprenticeship incentive exists and with a corresponding learner match record")]
@@ -119,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await GivenAnApprenticeshipIncentiveExists();
         }
-        
+
         [Given(@"the aprenticeship incentive does not have a corresponding learner match record")]
         public void GivenTheApprenticeshipIncentiveDoesNotHaveACorrespondingLearnerMatchRecord()
         {
@@ -145,12 +142,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 return _fixture.Build<Learner>()
                 .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(s => s.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
-                .With(l => l.CreatedDate, DateTime.Now.AddDays(-1))
+                .With(l => l.CreatedDate, _startDate)
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.ULN, _apprenticeshipIncentive.ULN)
-                .With(s => s.SubmissionFound, true) 
-                .With(s => s.SubmissionDate, DateTime.Now)
-                .With(s => s.StartDate, DateTime.Now.AddDays(1))
+                .With(s => s.SubmissionFound, true)
+                .With(s => s.SubmissionDate, _submissionDate)
+                .With(s => s.StartDate, _startDate)
                 .With(s => s.InLearning, true)
                 .With(s => s.HasDataLock, true)
                 .Create();
@@ -163,20 +160,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"an apprenticeship incentive exists with a paid pending payment and has previously been refreshed")]
         public async Task GivenAnApprenticeshipIncentiveExistsWithAPaidPendingPaymentAndHasPreviouslyBeenRefreshed()
         {
-            _pendingPayments.First().PaymentMadeDate = DateTime.Now.AddDays(-1);
-            await GivenAnApprenticeshipIncentiveExists();            
+            _pendingPayments.First().PaymentMadeDate = _startDate.AddMonths(5);
+            await GivenAnApprenticeshipIncentiveExists();
 
             var learner = _testContext.TestData.GetOrCreate("ExistingLearner", onCreate: () =>
             {
                 return _fixture.Build<Learner>()
                 .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(s => s.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
-                .With(l => l.CreatedDate, DateTime.Now.AddDays(-1))
+                .With(l => l.CreatedDate, _startDate)
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.ULN, _apprenticeshipIncentive.ULN)
                 .With(s => s.SubmissionFound, true)
-                .With(s => s.SubmissionDate, DateTime.Now)
-                .With(s => s.StartDate, DateTime.Now.AddDays(1))
+                .With(s => s.SubmissionDate, _submissionDate)
+                .With(s => s.StartDate, _startDate)
                 .With(s => s.InLearning, true)
                 .With(s => s.HasDataLock, true)
                 .Create();
@@ -185,7 +182,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_payments);
             await dbConnection.InsertAsync(learner);
-        }        
+        }
 
         [Given(@"the latest learner data has active in learning data")]
         public void AndTheLatestLearnerDataHasInLearningData()
@@ -308,7 +305,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be((int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1);
-            
+
             createdLearner.InLearning.Should().BeTrue();
             createdLearner.HasDataLock.Should().BeFalse();
             createdLearner.LearningFound.Should().BeTrue();
@@ -318,7 +315,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenTheApprenticeshipIncentiveLearnerDataIsUpdatedForTheApplicationWithSubmissionData()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var createdLearners = dbConnection.GetAll<Learner>();            
+            var createdLearners = dbConnection.GetAll<Learner>();
 
             var createdLearner = createdLearners.Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
             var createdPeriod = dbConnection.GetAll<LearningPeriod>().Single(p => p.LearnerId == createdLearner.Id);
@@ -382,7 +379,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
-            createdLearner.SubmissionFound.Should().Be(true);            
+            createdLearner.SubmissionFound.Should().Be(true);
             createdLearner.LearningFound.Should().BeFalse();
             createdLearner.HasDataLock.Should().BeNull();
             createdLearner.StartDate.Should().BeNull();
@@ -418,7 +415,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
-            createdDaysInLearning.NumberOfDaysInLearning.Should().Be(expectedDaysInLearning);            
+            createdDaysInLearning.NumberOfDaysInLearning.Should().Be(expectedDaysInLearning);
         }
 
         [Then(@"the apprenticeship incentive learner data is updated for the application with submission data with no payable price episodes")]
@@ -451,7 +448,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);
             createdDaysInLearning.NumberOfDaysInLearning.Should().Be((int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1);
 
-            createdLearner.HasDataLock.Should().BeTrue();
+            createdLearner.HasDataLock.Should().BeFalse();
             createdLearner.LearningFound.Should().BeTrue();
         }
 
