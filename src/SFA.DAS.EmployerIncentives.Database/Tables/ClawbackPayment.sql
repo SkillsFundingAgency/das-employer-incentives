@@ -17,5 +17,4 @@
 	CONSTRAINT FK_ClawbackPayment_Payment FOREIGN KEY (PaymentId) REFERENCES [incentives].Payment(Id)
 )
 GO
-
-
+CREATE INDEX IX_ClawbackPayment_ApprenticeshipIncentiveId ON [incentives].[ClawbackPayment] (ApprenticeshipIncentiveId)
