@@ -11,3 +11,4 @@ Post-Deployment Script Template
 */
 :r .\Scripts\Data.CollectionCalendar.sql
 :r .\Scripts\Update.ApprenticeshipIncentives.sql
+:r .\Scripts\Update.AccountsSignedAgreementVersion.sql
