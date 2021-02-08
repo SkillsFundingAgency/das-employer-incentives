@@ -45,14 +45,6 @@
     </EmbeddedResource>
   </ItemGroup>
 
-
-  <ItemGroup>
-    <None Update="local.settings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
-
   <ItemGroup>
     <SpecFlowFeatureFiles Update="Features\SendPayments.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
