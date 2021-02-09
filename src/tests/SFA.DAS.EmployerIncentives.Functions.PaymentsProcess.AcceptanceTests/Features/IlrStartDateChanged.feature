@@ -38,3 +38,8 @@ Scenario: Clawbacks - Start Date Change Of Circumstance Delete unpaid earnings
 	When the learner data is refreshed with a new valid start date for the apprenticeship incentive
 	Then the unpaid earning is deleted
 	And all unpaid payment records are deleted
+
+Scenario: Learner data contains a new start date change of circumstance
+	Given an apprenticeship incentive exists
+	When the learner data is refreshed with a new valid start date for the apprenticeship incentive
+	Then the start date change of circumstance is saved

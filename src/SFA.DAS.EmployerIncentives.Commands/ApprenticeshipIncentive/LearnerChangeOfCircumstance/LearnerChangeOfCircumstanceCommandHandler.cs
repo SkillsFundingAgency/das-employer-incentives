@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,16 +10,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
+        private readonly ICollectionCalendarService _collectionCalendarService;
 
-        public LearnerChangeOfCircumstanceCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, ILearnerDomainRepository learnerDomainRepository)
+        public LearnerChangeOfCircumstanceCommandHandler(
+            IApprenticeshipIncentiveDomainRepository domainRepository, 
+            ILearnerDomainRepository learnerDomainRepository,
+            ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
             _learnerDomainRepository = learnerDomainRepository;
+            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(LearnerChangeOfCircumstanceCommand command, CancellationToken cancellationToken = default)
         {
-            var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
+            var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);            
 
             if (!incentive.HasPossibleChangeOfCircumstances)
             {
@@ -26,8 +32,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
             }
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
+            var calendar = await _collectionCalendarService.Get();
 
-            incentive.SetChangeOfCircumstances(learner);
+            incentive.SetChangeOfCircumstances(learner, calendar);
 
             await _domainRepository.Save(incentive);
         }

@@ -66,10 +66,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
                 return false;
             }
 
-            return LearningData.HasDataLock == submissionData.LearningData.HasDataLock &&
+            return !(LearningData.HasDataLock == submissionData.LearningData.HasDataLock &&
                    LearningData.StartDate == submissionData.LearningData.StartDate &&
                    LearningData.IsInlearning == submissionData.LearningData.IsInlearning &&
-                   LearningData.LearningFound == submissionData.LearningData.LearningFound;
+                   LearningData.LearningFound == submissionData.LearningData.LearningFound);
         }
     }
 }

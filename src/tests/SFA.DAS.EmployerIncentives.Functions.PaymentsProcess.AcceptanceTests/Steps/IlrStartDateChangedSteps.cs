@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly PendingPayment _pendingPayment;
         private readonly LearnerSubmissionDto _learnerMatchApiData;
         private readonly DateTime _plannedStartDate;
+        private readonly DateTime _initialStartDate;
         private Payment _payment;
         private List<PendingPayment> _newPendingPayments;
 
@@ -45,7 +46,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
+                .With(p => p.StartDate, new DateTime(2020, 11, 1))
                 .Create();
+
+            _initialStartDate = _apprenticeshipIncentive.StartDate;
 
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.AccountId, _accountModel.Id)
@@ -144,6 +148,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>();
 
             incentive.Single().StartDate.Should().Be(_learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate);
+        }
+
+        [Then(@"the start date change of circumstance is saved")]
+        public void ThenTheStartDateChangeOfCircumstanceIsSaved()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var change = dbConnection.GetAll<ChangeOfCircumstance>().Single();
+
+            change.ChangeType.Should().Be(ChangeOfCircumstanceType.StartDate);
+            change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            change.PreviousValue.Should().Be(_initialStartDate.ToString());
+            change.PreviousPeriodNumber.Should().Be(3);
+            change.PreviousPaymentYear.Should().Be(2021);
+            change.NewValue.Should().Be(_plannedStartDate.AddMonths(4).ToString());
         }
 
         [Then(@"the pending payments are recalculated for the apprenticeship incentive")]
