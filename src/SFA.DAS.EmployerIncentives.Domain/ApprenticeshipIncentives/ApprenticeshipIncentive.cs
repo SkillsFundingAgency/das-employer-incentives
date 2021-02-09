@@ -243,7 +243,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.StartDate = startDate;
         }
 
-        public void SetChangeOfCircumstances(Learner learner)
+        public void SetChangeOfCircumstances(Learner learner, CollectionCalendar collectionCalendar)
         {
             if (Id != learner.ApprenticeshipIncentiveId)
             {
@@ -252,9 +252,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (learner.SubmissionData.SubmissionFound && learner.SubmissionData.LearningData.StartDate.HasValue)
             {
-                SetStartDate(learner.SubmissionData.LearningData.StartDate.Value);
+                SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value, collectionCalendar);                
             }
+
             SetHasPossibleChangeOfCircumstances(false);
+        }
+
+        private void SetStartDateChangeOfCircumstance(DateTime startDate, CollectionCalendar collectionCalendar)
+        {
+            var previousStartDate = Model.StartDate;
+            SetStartDate(startDate);
+            if (previousStartDate != Model.StartDate)
+            {
+                var previousPeriod = collectionCalendar.GetPeriod(previousStartDate);
+                
+                AddEvent(new StartDateChanged(
+                    Model.Id,
+                    previousStartDate,
+                    previousPeriod,
+                    Model.StartDate,
+                    Model));
+            }
         }
 
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)

@@ -405,5 +405,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ArchiveDateUTC = DateTime.UtcNow
             };
         }
+
+        internal static ChangeOfCircumstance Map(this Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance model)
+        {
+            return new ChangeOfCircumstance
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                ChangeType = model.Type,
+                PreviousValue = model.PreviousValue,
+                PreviousPeriodNumber = model.PreviousCollectionPeriod?.PeriodNumber,
+                PreviousPaymentYear = model.PreviousCollectionPeriod?.AcademicYear,
+                NewValue = model.NewValue,
+                ChangedDate = model.ChangedDate
+            };
+        }
     }
 }
