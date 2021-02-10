@@ -61,6 +61,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                 result.AddError("Uln", "Is not set");
             }
 
+            if (item.SubmittedDate == default)
+            {
+                result.AddError("SubmittedDate", "Is not set");
+            }
+
+            if (item.SubmittedByEmail == default)
+            {
+                result.AddError("SubmittedByEmail", "Is not set");
+            }
+
+            if (item.CourseName == default)
+            {
+                result.AddError("CourseName", "Is not set");
+            }
+
             return Task.FromResult(result);
         }
     }

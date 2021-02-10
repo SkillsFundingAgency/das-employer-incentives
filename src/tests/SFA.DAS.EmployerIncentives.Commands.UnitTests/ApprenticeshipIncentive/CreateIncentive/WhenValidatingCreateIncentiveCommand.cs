@@ -31,7 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), 
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -47,7 +48,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(default, _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -63,7 +65,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), default,
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -79,7 +82,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), default, _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -95,7 +99,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 default, _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -111,7 +116,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), default, _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -127,7 +133,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), default,
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -143,7 +150,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 default, _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -159,7 +167,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), default,
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -175,7 +184,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), default);
+                _fixture.Create<ApprenticeshipEmployerType>(), default,
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -191,7 +201,59 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
                 Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>(), default, _fixture.Create<DateTime>(),
-                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
+
+            // Act
+            var result = await _sut.Validate(command);
+
+            // Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_submitted_date_is_not_set()
+        {
+            // Arrange
+            var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
+                Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                default, _fixture.Create<string>(), _fixture.Create<string>());
+
+            // Act
+            var result = await _sut.Validate(command);
+
+            // Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_submitted_by_name_is_not_set()
+        {
+            // Arrange
+            var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
+                Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), default, _fixture.Create<string>());
+
+            // Act
+            var result = await _sut.Validate(command);
+
+            // Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_course_name_is_not_set()
+        {
+            // Arrange
+            var command = new CreateIncentiveCommand(_fixture.Create<long>(), _fixture.Create<long>(),
+                Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(),
+                _fixture.Create<DateTime>(), _fixture.Create<string>(), default);
 
             // Act
             var result = await _sut.Validate(command);
