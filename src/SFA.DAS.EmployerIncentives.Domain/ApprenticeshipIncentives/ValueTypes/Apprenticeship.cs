@@ -14,6 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public long UniqueLearnerNumber { get; }
         public Provider Provider { get; private set; }
         public ApprenticeshipEmployerType EmployerType { get; }
+        public string CourseName { get; set; }
 
         public Apprenticeship(
             long id, 
@@ -21,12 +22,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             string lastName,
             DateTime dateOfBirth,
             long uniqueLearnerNumber,
-            ApprenticeshipEmployerType employerType)
+            ApprenticeshipEmployerType employerType,
+            string courseName)
         {
             if (id <= 0) throw new ArgumentException("Apprenticeship Id must be greater than 0", nameof(id));
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("FirstName must be set", nameof(firstName));
             if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("LastName must be set", nameof(lastName));
             if (uniqueLearnerNumber <= 0) throw new ArgumentException("UniqueLearnerNumber must be greater than 0", nameof(uniqueLearnerNumber));
+            if (string.IsNullOrWhiteSpace(courseName)) throw new ArgumentException("CourseName must be set", nameof(courseName));
 
             Id = id;
             FirstName = firstName;
@@ -34,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             DateOfBirth = dateOfBirth;
             UniqueLearnerNumber = uniqueLearnerNumber;
             EmployerType = employerType;
+            CourseName = courseName;
         }
 
         public void SetProvider(Provider provider)
@@ -50,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return UniqueLearnerNumber;
             yield return EmployerType;
             yield return Provider;
+            yield return CourseName;
         }
     }
 }

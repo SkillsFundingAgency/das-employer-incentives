@@ -4,24 +4,24 @@ SELECT
   --Volume results
 	pp.PeriodNumber as [Earning Period Number],pp.PaymentYear as [Earning Year],
   count(pp.Id) as [Num Earnings],
-  SUM(CASE WHEN pv.validationResult = 0 or pv.validationResult is null then 1 else 0 end) as [Num Earnings Validation Failed],
-  SUM(CASE WHEN pv.validationResult = 1 then 1 else 0 end) as [Num Earnings Validation Passed],
-  SUM(CASE WHEN pp.paymentmadedate is not null THEN 1 else 0 END) as [Num Earnings with made date],
-  ((SUM(CASE WHEN pv.validationResult = 0 then 1 else 0 end)+cast(SUM(CASE WHEN pp.paymentmadedate is not null THEN 1 else 0 END) as float))/nullif(count(pp.Id),0))*100 as [% Earnings Handled],
-  SUM(CASE WHEN p.PaidDate is not null THEN 1 else 0 END) as [Num BC Payments Sent], 
-  (SUM(CASE WHEN p.PaidDate is not null THEN 1 else 0 END)/nullif((cast(SUM(CASE WHEN pp.paymentmadedate is not null THEN 1 else 0 END) as float)),0))*100 as [% Valid earning to BC Payments],
-  count(distinct CASE WHEN pv.validationResult = 1 then p.AccountId end) as [Num Accounts with valid earnings],
-  count(distinct CASE WHEN p.PaidDate is null THEN p.AccountId else 0 END) as [Num Accounts with payments not sent to BC payments],
+  SUM(IIF (pv.validationResult = 0 or pv.validationResult is null,1,0)) as [Num Earnings Validation Failed],
+  SUM(IIF (pv.validationResult = 1, 1, 0)) as [Num Earnings Validation Passed],
+  SUM(IIF (pp.paymentmadedate is not null, 1, 0)) as [Num Earnings with made date],
+  ((SUM(IIF (pv.validationResult = 0, 1, 0))+cast(SUM(IIF (pp.paymentmadedate is not null, 1, 0)) as float))/nullif(count(pp.Id),0))*100 as [% Earnings Handled],
+  SUM(IIF (p.PaidDate is not null, 1, 0)) as [Num BC Payments Sent], 
+  (SUM(IIF (p.PaidDate is not null, 1, 0))/nullif((cast(SUM( IIF(pp.paymentmadedate is not null, 1, 0)) as float)),0))*100 as [% Valid earning to BC Payments],
+  count(distinct IIF( pv.validationResult = 1, p.AccountId, null )) as [Num Accounts with valid earnings],
+  count(distinct IIF( p.PaidDate is null , p.AccountId, null)) as [Num Accounts with payments not sent to BC payments],
   count(distinct a.VrfVendorId) as [Num Vendors expecting payment],
-  count(distinct CASE WHEN p.PaidDate is null THEN a.VrfVendorId else null END) as [Num Vendors with missing BC payments],
+  count(distinct IIF( p.PaidDate is null , a.VrfVendorId , null )) as [Num Vendors with missing BC payments],
 
   --Value results
   sum(pp.amount) as [Earnings Value], 
-  sum(CASE WHEN CASE WHEN pv.validationResult = 0 then 1 else 0 end = 1 then pp.Amount else 0 END) as [Validation Failed Value],
-  sum(case when pp.paymentmadedate is not null then pp.amount else 0 end) as [Payments Made Value],
-  sum(case when p.amount >= 0 then p.amount else 0 end) as [Positive Payments Value], 
-  sum(case when p.amount < 0 then p.amount else 0 end) as [Negative Payments Value], 
-  SUM(CASE WHEN p.PaidDate is not null THEN p.Amount else 0 END) as [BC Payments Sent Value]
+  sum(IIF(IIF( pv.validationResult = 0, 1, 0) = 1, pp.Amount, 0)) as [Validation Failed Value],
+  sum(IIF( pp.paymentmadedate is not null, pp.amount, 0)) as [Payments Made Value],
+  sum(IIF( p.amount >= 0 , p.amount, 0)) as [Positive Payments Value], 
+  sum(IIF( p.amount < 0 , p.amount, 0)) as [Negative Payments Value], 
+  SUM(IIF( p.PaidDate is not null, p.Amount, 0)) as [BC Payments Sent Value]
 
 
 FROM

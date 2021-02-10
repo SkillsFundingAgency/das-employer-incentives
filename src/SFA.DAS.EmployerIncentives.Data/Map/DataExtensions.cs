@@ -26,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             LegalEntityId = i.Id,
                                                             LegalEntityName = i.Name,
                                                             HasSignedIncentivesTerms = i.HasSignedAgreementTerms,
+                                                            SignedAgreementVersion = i.SignedAgreementVersion,
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
                                                             VrfVendorId = i.VrfVendorId,
@@ -61,6 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 Id = model.LegalEntityId,
                 AccountLegalEntityId = model.AccountLegalEntityId,
                 HasSignedAgreementTerms = model.HasSignedIncentivesTerms,
+                SignedAgreementVersion = model.SignedAgreementVersion,
                 Name = model.LegalEntityName,
                 HashedLegalEntityId = model.HashedLegalEntityId,
                 VrfCaseId = model.VrfCaseId,
@@ -109,6 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 AccountId = model.Id,
                 AccountLegalEntityId = model.AccountLegalEntityId,
                 HasSignedIncentivesTerms = model.HasSignedIncentivesTerms,
+                SignedAgreementVersion = model.SignedAgreementVersion,
                 LegalEntityName = model.LegalEntityName,
                 VrfVendorId = model.VrfVendorId
             };
@@ -147,7 +150,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
-                UKPRN = x.UKPRN
+                UKPRN = x.UKPRN,
+                CourseName = x.CourseName
             }).ToList();
         }
 
@@ -183,7 +187,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 EarningsCalculated = x.EarningsCalculated,
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
-                UKPRN = x.UKPRN
+                UKPRN = x.UKPRN,
+                CourseName = x.CourseName
             }).ToList();
         }
 
@@ -199,17 +204,27 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId
             };
         }
-        
+
+        private static bool HasVendorId(Models.Account model)
+        {
+            return !string.IsNullOrEmpty(model.VrfVendorId) && model.VrfVendorId != "000000";
+        }
+
         private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
         {
-            if (String.IsNullOrWhiteSpace(model.VrfCaseStatus))
+            if (HasVendorId(model))
+            {
+                return BankDetailsStatus.Completed;
+            }
+
+            if (string.IsNullOrWhiteSpace(model.VrfCaseStatus))
             {
                 return BankDetailsStatus.NotSupplied;
             }
 
             if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
-             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
-             || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
+                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
             {
                 return BankDetailsStatus.Rejected;
             }
@@ -234,7 +249,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 CreatedDateTime = DateTime.Now
             };
-
         }
     }
 }

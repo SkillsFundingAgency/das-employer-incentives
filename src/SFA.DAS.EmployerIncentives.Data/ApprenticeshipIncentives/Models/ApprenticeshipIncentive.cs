@@ -21,20 +21,27 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public ApprenticeshipEmployerType EmployerType { get; set; }
         public DateTime StartDate { get; set; }
         public Guid IncentiveApplicationApprenticeshipId { get; set; }
-        public long? AccountLegalEntityId { get; set; }
+        public long AccountLegalEntityId { get; set; }
         public bool RefreshedLearnerForEarnings { get; set; }
         public bool HasPossibleChangeOfCircumstances { get; set; }
         public bool PausePayments { get; set; }
+        public DateTime? SubmittedDate { get; set; }
+        public string SubmittedByEmail { get; set; }
+        public string CourseName { get; set; }
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPayment> PendingPayments { get; set; }
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<Payment> Payments { get; set; }
 
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<ClawbackPayment> ClawbackPayments { get; set; }
+
         public ApprenticeshipIncentive()
         {
             PendingPayments = new List<PendingPayment>();
             Payments = new List<Payment>();
+            ClawbackPayments = new List<ClawbackPayment>();
         }
     }
 }

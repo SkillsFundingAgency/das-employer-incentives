@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System;
+using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -39,7 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
             var expectedResponse = new GetApplicationsResponse
             {
                 ApprenticeApplications = applicationsList,
-                BankDetailsStatus = Enums.BankDetailsStatus.NotSupplied
+                BankDetailsStatus = Enums.BankDetailsStatus.NotSupplied,
+                FirstSubmittedApplicationId = Guid.NewGuid()
             };
 
             _applicationRepository.Setup(x => x.GetList(query.AccountId, query.AccountLegalEntityId)).ReturnsAsync(applicationsList);
@@ -51,6 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
             account.LegalEntityModels = new Collection<LegalEntityModel>(legalEntities);
 
             _accountRepository.Setup(x => x.Find(query.AccountId)).ReturnsAsync(account);
+
+            _applicationRepository.Setup(x => x.GetFirstSubmittedApplicationId(query.AccountLegalEntityId)).ReturnsAsync(expectedResponse.FirstSubmittedApplicationId);
 
             // Act
             var result = await _sut.Handle(query, CancellationToken.None);
