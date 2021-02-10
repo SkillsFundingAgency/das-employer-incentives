@@ -2,7 +2,6 @@
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -22,20 +21,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testContext = testContext;
             _fixture = new Fixture();
         }
-        
+
         [Given(@"there are apprenticeships that do not have earnings calculations")]
-        public void GivenThereAreApprenticeshipsThatDoNotHaveEarningsCalculations()
+        public async Task GivenThereAreApprenticeshipsThatDoNotHaveEarningsCalculations()
         {
-            var applications = _fixture.CreateMany<IncentiveApplication>(10);
-            foreach(var application in applications)
+            var applications = _fixture.Build<IncentiveApplication>()
+                .With(a => a.Status, Enums.IncentiveApplicationStatus.Submitted)
+                .CreateMany(10);
+
+            foreach (var application in applications)
             {
-                DataAccess.SetupApplication(application);
-                var apprenticeships = _fixture.CreateMany<IncentiveApplicationApprenticeship>(2);
-                application.Apprenticeships = new Collection<IncentiveApplicationApprenticeship>(apprenticeships.ToList());
-                foreach(var apprenticeship in apprenticeships)
+                await DataAccess.InsertWithEnumAsString(application);
+
+                var apprenticeships = _fixture.Build<IncentiveApplicationApprenticeship>()
+                    .With(a => a.IncentiveApplicationId, application.Id)
+                    .With(a => a.WithdrawnByCompliance, false)
+                    .With(a => a.WithdrawnByEmployer, false)
+                    .With(a => a.EarningsCalculated, false)
+                    .CreateMany(2).ToList();
+
+                foreach (var apprenticeship in apprenticeships)
                 {
-                    apprenticeship.IncentiveApplicationId = application.Id;
-                    DataAccess.SetupApprenticeship(apprenticeship);
+                    await DataAccess.Insert(apprenticeship);
                 }
             }
         }
@@ -53,12 +60,68 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the earnings recalculation is triggered")]
         public void ThenTheEarningsRecalculationIsTriggered()
         {
-            var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished).Select(c => c.Command)
-                .ToArray();
-            publishedCommands.Count().Should().Be(10);
-            foreach (var publishedCommand in publishedCommands)
+            _testContext.CommandsPublished.Where(c => 
+                    c.IsPublished &&
+                    c.Command is CreateIncentiveCommand)
+                .Select(c => c.Command)
+                .Count().Should().Be(20);
+        }
+
+        [Given(@"apprenticeships have been withdrawn by employer")]
+        public async Task GivenApprenticeshipsHaveBeenWithdrawnByEmployer()
+        {
+            var applications = _fixture.Build<IncentiveApplication>()
+                .With(a => a.Status, Enums.IncentiveApplicationStatus.Submitted)
+                .CreateMany(10);
+
+            foreach (var application in applications)
             {
-                publishedCommand.Should().BeOfType<CreateIncentiveCommand>();
+                await DataAccess.InsertWithEnumAsString(application);
+
+                var apprenticeships = _fixture.Build<IncentiveApplicationApprenticeship>()
+                    .With(a => a.IncentiveApplicationId, application.Id)
+                    .With(a => a.WithdrawnByCompliance, false)
+                    .With(a => a.WithdrawnByEmployer, true)
+                    .With(a => a.EarningsCalculated, false)
+                    .CreateMany(2).ToList();
+
+                foreach (var apprenticeship in apprenticeships)
+                {
+                    await DataAccess.Insert(apprenticeship);
+                }
+            }
+        }
+
+        [Then(@"the earnings recalculation is not triggered")]
+        public void ThenTheEarningsRecalculationIsNotTriggered()
+        {
+            _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command is CreateIncentiveCommand)
+                .Select(c => c.Command)
+                .Any().Should().BeFalse();
+        }
+
+        [Given(@"apprenticeships have been withdrawn by compliance")]
+        public async Task GivenApprenticeshipsHaveBeenWithdrawnByCompliance()
+        {
+            var applications = _fixture.Build<IncentiveApplication>()
+                .With(a => a.Status, Enums.IncentiveApplicationStatus.Submitted)
+                .CreateMany(10);
+
+            foreach (var application in applications)
+            {
+                await DataAccess.InsertWithEnumAsString(application);
+
+                var apprenticeships = _fixture.Build<IncentiveApplicationApprenticeship>()
+                    .With(a => a.IncentiveApplicationId, application.Id)
+                    .With(a => a.WithdrawnByCompliance, true)
+                    .With(a => a.WithdrawnByEmployer, false)
+                    .With(a => a.EarningsCalculated, false)
+                    .CreateMany(2).ToList();
+
+                foreach (var apprenticeship in apprenticeships)
+                {
+                    await DataAccess.Insert(apprenticeship);
+                }
             }
         }
 

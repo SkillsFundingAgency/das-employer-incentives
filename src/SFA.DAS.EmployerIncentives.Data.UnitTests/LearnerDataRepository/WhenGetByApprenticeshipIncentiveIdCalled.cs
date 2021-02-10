@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
@@ -38,8 +39,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         public async Task Then_the_learner_is_retrieved()
         {
             var submissionData = _fixture.Create<SubmissionData>();
-            submissionData.SetLearningFound(new LearningFoundStatus());
-            submissionData.SetHasDataLock(true);
+            submissionData.SetLearningData(new LearningData(true));
+            submissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            submissionData.LearningData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
 
             var testLearner =
@@ -62,11 +64,30 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             result.UniqueLearnerNumber.Should().Be(testLearner.UniqueLearnerNumber);
             result.SubmissionData.Should().NotBeNull();
             result.SubmissionData.SubmissionDate.Should().Be(testLearner.SubmissionData.SubmissionDate);
-            result.SubmissionData.LearningFoundStatus.Should().Be(new  LearningFoundStatus(testLearner.SubmissionData.LearningFoundStatus.LearningFound));
-            result.SubmissionData.HasDataLock.Should().BeTrue();
-            result.SubmissionData.StartDate.Should().BeNull();
-            result.SubmissionData.IsInlearning.Should().BeNull();
+            result.SubmissionData.LearningData.IsInlearning.Should().Be(testLearner.SubmissionData.LearningData.IsInlearning);
+            result.SubmissionData.LearningData.HasDataLock.Should().BeTrue();
+            result.SubmissionData.LearningData.StartDate.Should().BeNull();
+            result.SubmissionData.LearningData.IsInlearning.Should().BeNull();
             result.SubmissionData.RawJson.Should().Be(testLearner.SubmissionData.RawJson);
+        }
+
+        [Test(Description = "This test is required to validate data persisted in a format prior to changes made for EI-632/636 can be reloaded")]
+        public async Task Then_the_learner_is_retrieved_when_leaning_found_is_null()
+        {
+            var testLearner = _fixture.Create<ApprenticeshipIncentives.Models.Learner>();
+            testLearner.SubmissionFound = false;
+            testLearner.SubmissionDate = null;
+            testLearner.LearningFound = null;
+
+            // Act
+            await _dbContext.AddAsync(testLearner);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _sut.GetByApprenticeshipIncentiveId(testLearner.ApprenticeshipIncentiveId);
+
+            // Assert            
+            result.Should().NotBeNull();
         }
     }
 }

@@ -28,12 +28,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
 
             _collectionPeriod = _fixture.Create<CollectionPeriod>();
 
-            _daysInLearning = new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarYear, _fixture.Create<int>());
+            _daysInLearning = new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear, _fixture.Create<int>());
 
             _sutModel.DaysInLearnings = new List<DaysInLearning>() {
-                new DaysInLearning((byte)(_collectionPeriod.PeriodNumber - 1), (short)(_collectionPeriod.CalendarYear - 1), _fixture.Create<int>()),
+                new DaysInLearning((byte)(_collectionPeriod.PeriodNumber - 1), (short)(_collectionPeriod.AcademicYear - 1), _fixture.Create<int>()),
                 _daysInLearning,
-                new DaysInLearning((byte)(_collectionPeriod.PeriodNumber + 1), (short)(_collectionPeriod.CalendarYear + 1), _fixture.Create<int>()),
+                new DaysInLearning((byte)(_collectionPeriod.PeriodNumber + 1), (short)(_collectionPeriod.AcademicYear + 1), _fixture.Create<int>()),
             };
 
             _sut = Sut(_sutModel);

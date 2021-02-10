@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public short? PaymentYear => Model.PaymentYear;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
+        public bool ClawedBack => Model.ClawedBack;
 
         public IReadOnlyCollection<PendingPaymentValidationResult> PendingPaymentValidationResults => Model.PendingPaymentValidationResultModels.Map().ToList().AsReadOnly();
 
@@ -48,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             var period = collectionCalendar.GetPeriod(DueDate);
             Model.PeriodNumber = period.PeriodNumber;
-            Model.PaymentYear = period.CalendarYear;
+            Model.PaymentYear = period.AcademicYear;
         }
 
         public void SetPaymentMadeDate(DateTime paymentDate)
@@ -62,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 .PendingPaymentValidationResultModels
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
                                       v.CollectionPeriod.CalendarMonth == validationResult.CollectionPeriod.CalendarMonth &&
-                                      v.CollectionPeriod.CalendarYear == validationResult.CollectionPeriod.CalendarYear);
+                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear);
 
             if (existing != null)
             {
@@ -70,6 +71,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             Model.PendingPaymentValidationResultModels.Add(validationResult.GetModel());
+        }
+
+        public void ClawBack()
+        {
+            Model.ClawedBack = true;
         }
 
         internal static PendingPayment Get(PendingPaymentModel model)
@@ -91,9 +97,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             return Model.PendingPaymentValidationResultModels
                 .Where(v =>
-                    v.CollectionPeriod.CalendarYear == collectionYear &&
+                    v.CollectionPeriod.AcademicYear == collectionYear &&
                     v.CollectionPeriod.PeriodNumber == collectionPeriod)
                 .All(r => r.Result);
+        }
+
+        public bool RequiresNewPayment(PendingPayment pendingPayment)
+        {
+            return Amount != pendingPayment.Amount || PeriodNumber != pendingPayment.PeriodNumber || PaymentYear != pendingPayment.PaymentYear;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var pendingPayment = obj as PendingPayment;
+            if (pendingPayment == null)
+            {
+                return false;
+            }
+
+            return Amount == pendingPayment.Amount &&
+                   PeriodNumber == pendingPayment.PeriodNumber &&
+                   PaymentYear == pendingPayment.PaymentYear &&
+                   DueDate == pendingPayment.DueDate &&
+                   PaymentMadeDate == pendingPayment.PaymentMadeDate &&
+                   EarningType == pendingPayment.EarningType &&
+                   ClawedBack == pendingPayment.ClawedBack;
         }
     }
 }

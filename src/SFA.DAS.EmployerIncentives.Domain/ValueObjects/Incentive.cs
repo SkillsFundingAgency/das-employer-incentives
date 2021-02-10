@@ -17,7 +17,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 1, 31);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 3, 31);
+
+        private readonly List<EligibiliyPeriod> EligibilityPeriods = new List<EligibiliyPeriod>
+        {
+            new EligibiliyPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
+            new EligibiliyPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 3, 31), 5)
+        };
         
         public IEnumerable<Payment> Payments => _payments;
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
@@ -30,6 +36,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _startDate = startDate;
             _incentivePaymentProfiles = incentivePaymentProfiles;
             _payments = GeneratePayments();
+        }
+
+        public bool IsNewAgreementRequired(int signedagreementVersion)
+        {
+            if (!IsEligible)
+            {
+                return true;
+            }
+
+            var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= _startDate && x.EndDate >= _startDate);
+            return signedagreementVersion < applicablePeriod.MinimumAgreementVersion;
         }
 
         private int AgeAtStartOfCourse()
@@ -56,8 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in incentivePaymentProfile.PaymentProfiles)
             {
-                var endOfStartMonth = new DateTime(_startDate.Year, _startDate.Month, DateTime.DaysInMonth(_startDate.Year, _startDate.Month));
-                payments.Add(new Payment(paymentProfile.AmountPayable, endOfStartMonth.AddDays(paymentProfile.DaysAfterApprenticeshipStart), _earningTypes[paymentIndex]));
+                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart), _earningTypes[paymentIndex]));
                 paymentIndex++;
             }
 
@@ -74,6 +90,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 yield return payment.Amount;
                 yield return payment.PaymentDate;
                 yield return payment.EarningType;
+            }
+        }
+
+        private class EligibiliyPeriod
+        {
+            public DateTime StartDate { get; }
+            public DateTime EndDate { get; }
+            public int MinimumAgreementVersion { get; }
+
+            public EligibiliyPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
+            {
+                StartDate = startDate;
+                EndDate = endDate;
+                MinimumAgreementVersion = minimumAgreementVersion;
             }
         }
     }

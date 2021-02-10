@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
@@ -59,6 +58,17 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                         select item).ToList();
 
             return await Task.FromResult(queryResult);
+        }        
+
+        public async Task<IEnumerable<IncentiveApplicationModel>> FindApplicationsByAccountLegalEntityAndUln(long accountLegalEntity, long uln)
+        {
+            var queryResult = (from result in (_dbContext.Applications.Include(x => x.Apprenticeships)
+                                           .Where(x => x.AccountLegalEntityId == accountLegalEntity
+                                           && x.Apprenticeships.Any(y => y.ULN  == uln)))
+                               let item = ApplicationToIncentiveApplicationModel(result)
+                               select item);
+
+            return await Task.FromResult(queryResult);
         }
 
         private static IncentiveApplicationModel ApplicationToIncentiveApplicationModel(Models.IncentiveApplication application)
@@ -92,7 +102,10 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                                             PlannedStartDate = apprenticeship.PlannedStartDate,
                                             TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
                                             ULN = apprenticeship.ULN,
-                                            UKPRN = apprenticeship.UKPRN
+                                            UKPRN = apprenticeship.UKPRN,
+                                            WithdrawnByEmployer = apprenticeship.WithdrawnByEmployer,
+                                            WithdrawnByCompliance = apprenticeship.WithdrawnByCompliance,
+                                            CourseName = apprenticeship.CourseName
                                         }
                                         select apprenticeshipModel).ToList();
             return new Collection<ApprenticeshipModel>(apprenticeshipModels);

@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
@@ -35,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             _logger.LogInformation("Start Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN}",
                 learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber);
 
-            SubmissionData submissionData = null;
+            SubmissionData submissionData = new SubmissionData();
             var learnerData = await _learnerService.Get(learner);
 
             _logger.LogInformation("End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN}",
@@ -43,26 +44,49 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             if (learnerData != null)
             {
-                submissionData = new SubmissionData(learnerData.IlrSubmissionDate);
-                submissionData.SetStartDate(learnerData.LearningStartDate(incentive));
-                submissionData.SetLearningFound(learnerData.LearningFound(incentive));
-                submissionData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
-                submissionData.SetIsInLearning(learnerData.IsInLearning(incentive));
+                if (LearnerAndEarningsHaveNotChanged(learnerData, learner, incentive))
+                {
+                    return;
+                }
+
+                submissionData.SetSubmissionDate(learnerData.IlrSubmissionDate);
+
+                var learningFoundStatus = learnerData.LearningFound(incentive);
+                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound, learningFoundStatus.NotFoundReason));
+
+                if (learningFoundStatus.LearningFound)
+                {
+                    submissionData.LearningData.SetStartDate(learnerData.LearningStartDate(incentive));
+                    submissionData.LearningData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
+                    submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
+                }
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 
+            if (!submissionData.HasChangeOfCircumstances(learner.SubmissionData))
+            {
+                incentive.SetHasPossibleChangeOfCircumstances(true);
+            }
+
             learner.SetSubmissionData(submissionData);
+            incentive.LearnerRefreshCompleted();
 
             learner.SetLearningPeriods(learnerData.LearningPeriods(incentive));
 
-
-            if (learner.SubmissionData != null && !learner.SubmissionData.LearningFoundStatus.LearningFound)
+            if (!learner.SubmissionData.LearningData.LearningFound)
             {
                 _logger.LogInformation("Matching ILR record not found for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN} with reason: {NotFoundReason}",
-                    learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber, learner.SubmissionData.LearningFoundStatus.NotFoundReason);
+                    learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber, learner.SubmissionData.LearningData.NotFoundReason);
             }
 
             await _learnerDomainRepository.Save(learner);
+            await _incentiveDomainRepository.Save(incentive);
+        }
+
+        private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            return learnerData.IlrSubmissionDate == learner.SubmissionData?.SubmissionDate &&
+                   incentive.RefreshedLearnerForEarnings;
         }
     }
 }

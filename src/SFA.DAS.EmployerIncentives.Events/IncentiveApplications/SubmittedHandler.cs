@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using System.Collections.Generic;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
         {
 
             var commands = new List<Task>();
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels)
+            foreach (var apprenticeship in @event.EligibleApprenticeships())
             {
                 var command = new CreateIncentiveCommand(
                     @event.Model.AccountId,
@@ -34,7 +35,10 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
                     apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
-                    apprenticeship.UKPRN
+                    apprenticeship.UKPRN,
+                    @event.Model.DateSubmitted.Value,
+                    @event.Model.SubmittedByEmail,
+                    apprenticeship.CourseName
                 );
 
                 var task = _commandPublisher.Publish(command);

@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using NServiceBus;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using System;
+using System.Linq;
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
@@ -22,16 +26,44 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             var eventsHook = new Hook<object>();
             _context.Hooks.Add(eventsHook);
 
-            var commandsHook = new Hook<ICommand>();
+            var commandsHook = new Hook<Abstractions.Commands.ICommand>();
             _context.Hooks.Add(commandsHook);
 
             var webApi = new TestWebApi(_context, eventsHook, commandsHook);
             var options = new WebApplicationFactoryClientOptions
-            {
-                BaseAddress = new System.Uri(@"https://localhost:5001")
+            {                
+                BaseAddress = new System.Uri($"https://localhost:{GetAvailablePort(5001)}")
             };
             _context.EmployerIncentivesWebApiFactory = webApi;
             _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
+        }
+
+        [AfterScenario()]
+        public async Task CleanUp()
+        {
+            var endpoint = _context.EmployerIncentivesWebApiFactory.Services.GetService(typeof(IEndpointInstance)) as IEndpointInstance;
+            if(endpoint != null)
+            {
+                await endpoint.Stop();
+            }
+            _context.EmployerIncentivesWebApiFactory.Server?.Dispose();
+            _context.EmployerIncentivesWebApiFactory.Dispose();
+            _context.EmployerIncentiveApi?.Dispose();            
+        }
+
+        public int GetAvailablePort(int startingPort)
+        {
+            if (startingPort > ushort.MaxValue) throw new ArgumentException($"Can't be greater than {ushort.MaxValue}", nameof(startingPort));
+            var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+
+            var connectionsEndpoints = ipGlobalProperties.GetActiveTcpConnections().Select(c => c.LocalEndPoint);
+            var tcpListenersEndpoints = ipGlobalProperties.GetActiveTcpListeners();
+            var udpListenersEndpoints = ipGlobalProperties.GetActiveUdpListeners();
+            var portsInUse = connectionsEndpoints.Concat(tcpListenersEndpoints)
+                                                 .Concat(udpListenersEndpoints)
+                                                 .Select(e => e.Port);
+
+            return Enumerable.Range(startingPort, ushort.MaxValue - startingPort + 1).Except(portsInUse).FirstOrDefault();
         }
     }
 }

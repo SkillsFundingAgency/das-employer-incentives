@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _hook = hook;
         }
 
-        public async Task Publish<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
+        public async Task Publish<T>(T command, CancellationToken cancellationToken = default) where T : class, ICommand
         {
             if (_hook != null)
             {
@@ -29,9 +29,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     }
                     await _commandPublisher.Publish(command);
 
-                    if (_hook?.OnProcessed != null)
+                    if (_hook?.OnPublished != null)
                     {
-                        _hook.OnProcessed(command);
+                        _hook.OnPublished(command);
                     }
                 }
                 catch (Exception ex)

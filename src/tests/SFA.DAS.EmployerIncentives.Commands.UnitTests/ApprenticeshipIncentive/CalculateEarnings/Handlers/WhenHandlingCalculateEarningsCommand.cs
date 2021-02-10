@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -28,11 +29,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
         private List<IncentivePaymentProfile> _paymentProfiles;
-        private List<CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
 
         [SetUp]
         public void Arrange()
         {
+            var today = new DateTime(2021, 1, 30);
+
             _fixture = new Fixture();
 
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
@@ -53,14 +56,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                .Setup(m => m.Get())
                .ReturnsAsync(_paymentProfiles);
 
-            _collectionPeriods = new List<CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<string>(), false)
+                new Domain.ValueObjects.CollectionPeriod(1, (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false)
             };
 
             _mockCollectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new CollectionCalendar(_collectionPeriods));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
 
             var incentive = new ApprenticeshipIncentiveFactory()
                     .CreateNew(_fixture.Create<Guid>(),
@@ -70,11 +73,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         _fixture.Create<string>(),
                         _fixture.Create<string>(),
-                        DateTime.Today.AddYears(-26),
+                        today.AddYears(-26),
                         _fixture.Create<long>(),
-                        ApprenticeshipEmployerType.Levy
+                        ApprenticeshipEmployerType.Levy,
+                        _fixture.Create<string>()
                         ),
-                    DateTime.Today);
+                    today,
+                    _fixture.Create<DateTime>(),
+                    _fixture.Create<string>());
             
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
@@ -92,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
+            var command = new CalculateEarningsCommand(incentive.Id);
 
             _mockIncentiveDomainRespository.Setup(x => x
             .Find(command.ApprenticeshipIncentiveId))
@@ -111,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
+            var command = new CalculateEarningsCommand(incentive.Id);
 
             _mockIncentiveDomainRespository.Setup(x => x
             .Find(command.ApprenticeshipIncentiveId))
@@ -130,7 +136,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new CalculateEarningsCommand(incentive.Id, incentive.Account.Id, incentive.Apprenticeship.Id);
+            var command = new CalculateEarningsCommand(incentive.Id);
 
             _mockIncentiveDomainRespository.Setup(x => x
             .Find(command.ApprenticeshipIncentiveId))

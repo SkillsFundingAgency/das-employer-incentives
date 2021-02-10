@@ -9,20 +9,26 @@ using NServiceBus.Persistence;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
+using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
@@ -45,8 +51,6 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
-using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -60,6 +64,33 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddAccountService()
                 .AddLearnerService();
 
+            serviceCollection
+                .AddCommandHandlers(addDecorators: AddCommandHandlerDecorators)
+                .AddDomainCommandHandlerValidators()
+                .AddScoped<ICommandDispatcher, CommandDispatcher>()
+                .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()
+                .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
+
+            serviceCollection
+              .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
+
+            serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
+            serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
+            serviceCollection.AddScoped<ILearnerFactory, LearnerFactory>();
+
+            serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
+            serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
+            serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
+
+            serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
+
+            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, _obfuscateSensitiveData) => new BusinessCentralFinancePaymentsService(c, limit, version, _obfuscateSensitiveData));
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddCommandHandlers(this IServiceCollection serviceCollection, Func<IServiceCollection, IServiceCollection> addDecorators = null)
+        {
             // set up the command handlers and command validators
             serviceCollection.Scan(scan =>
             {
@@ -71,25 +102,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .AddClasses(classes => classes.AssignableTo(typeof(IValidator<>)))
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
-            })
-            .AddCommandHandlerDecorators()
-            .AddScoped<ICommandDispatcher, CommandDispatcher>()
-            .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()            
-            .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
-
-            serviceCollection
-              .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
-
-            serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
-            serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
-            serviceCollection.AddScoped<ILearnerFactory, LearnerFactory>();
-
-            serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
-            serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
-
-            serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
-
-            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, _obfuscateSensitiveData) => new BusinessCentralFinancePaymentsService(c, limit, version, _obfuscateSensitiveData));
+            });
+            
+            if (addDecorators != null)
+            {
+                serviceCollection = addDecorators(serviceCollection);
+            }
 
             return serviceCollection;
         }
@@ -111,6 +129,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ILearnerDomainRepository, LearnerDomainRepository>();
             serviceCollection.Decorate<ILearnerDomainRepository, LearnerDomainRepositoryWithLogging>();
 
+            serviceCollection.AddScoped<IIncentiveApplicationStatusAuditDataRepository, IncentiveApplicationStatusAuditDataRepository>();
+
             return serviceCollection;
         }
 
@@ -122,17 +142,26 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+          
+            return serviceCollection;
+        }
 
+        public static IServiceCollection AddDomainCommandHandlerValidators(this IServiceCollection serviceCollection)
+        {
             serviceCollection
                 .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CreatePaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshLearnerCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<LearnerChangeOfCircumstanceCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CalculateDaysInLearningCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceApplicationsCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator());
+                .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<UpdateVendorRegistrationCaseStatusForAccountCommand>), new NullValidator())
+                ;
 
             return serviceCollection;
         }
@@ -243,7 +272,13 @@ namespace SFA.DAS.EmployerIncentives.Commands
             this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration)
         {
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
+            var endpointName = configuration["ApplicationSettings:NServiceBusEndpointName"];
+            if (string.IsNullOrEmpty(endpointName))
+            {
+                endpointName = "SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers";
+            }
+
+            var endpointConfiguration = new EndpointConfiguration(endpointName)
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
@@ -253,6 +288,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
+
                 endpointConfiguration
                     .UseTransport<LearningTransport>()
                     .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory",

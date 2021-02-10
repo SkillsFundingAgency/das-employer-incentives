@@ -34,40 +34,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             return account;
         }
 
+        public async Task Insert<T>(T entity) where T : class
+        {
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(entity);
+        }
+
+        public async Task Update<T>(T entity) where T : class
+        {
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.UpdateAsync(entity);
+        }
+
         public async Task SetupAccount(Account account)
         {
-            using var dbConnection = new SqlConnection(_connectionString);
-            await dbConnection.InsertAsync(account);           
+            await using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(account);
         }
 
-        public void SetupApplication(IncentiveApplication application)
+        public async Task<long> InsertWithEnumAsString<T>(T entity) where T : class
         {
-            using var dbConnection = new SqlConnection(_connectionString);
-            dbConnection.Execute(
-                "insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByEmail, submittedByName) values " +
-                "(@id, @accountId, @accountLegalEntityId, @dateCreated, @status, @dateSubmitted, @submittedByEmail, @submittedByName)",
-                new
-                {
-                    application.Id,
-                    application.AccountId,
-                    application.AccountLegalEntityId,
-                    application.DateCreated,
-                    Status = application.Status.ToString(),
-                    application.DateSubmitted,
-                    application.SubmittedByEmail,
-                    application.SubmittedByName
-                });
-        }
-
-        public void SetupApprenticeship(IncentiveApplicationApprenticeship apprenticeship)
-        {
-            using var dbConnection = new SqlConnection(_connectionString);
-            dbConnection.Execute(
-                "insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
-                "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
-                "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
-                "@uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount)",
-                apprenticeship);
+            await using var dbConnection = new SqlConnection(_connectionString);
+            return await dbConnection.InsertAsync(entity, true);
         }
     }
 }

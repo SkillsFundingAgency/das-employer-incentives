@@ -6,6 +6,7 @@
     [HashedLegalEntityId] NVARCHAR(6) NULL, 
     [LegalEntityName] VARCHAR(MAX)  NOT NULL,
     [HasSignedIncentivesTerms] BIT NOT NULL DEFAULT(0),
+    [SignedAgreementVersion] INT NULL,
     [VrfVendorId] NVARCHAR(100) NULL, 
     [VrfCaseId] NVARCHAR(100) NULL, 
     [VrfCaseStatus] NVARCHAR(100) NULL, 
@@ -20,4 +21,6 @@ GO
 CREATE INDEX IX_Account_LegalEntityId ON Accounts (LegalEntityId)
 GO
 CREATE INDEX IX_Account_HashedLegalEntityId ON Accounts (HashedLegalEntityId)
+GO
+CREATE INDEX IX_Account_VrfCaseStatusLastUpdatedDateTime ON Accounts (VrfCaseStatusLastUpdatedDateTime)
 GO

@@ -1,23 +1,24 @@
-﻿using System;
+using Microsoft.EntityFrameworkCore;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using System;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
     public class AccountDataRepository : IAccountDataRepository
     {
-        private Lazy<EmployerIncentivesDbContext> _lazyContext;
-        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
+        private readonly EmployerIncentivesDbContext _dbContext;
 
         public AccountDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _lazyContext = dbContext;
+            _dbContext = dbContext.Value;
         }
 
         public async Task Update(AccountModel account)
@@ -43,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 {
                     legalEntity.LegalEntityName = item.LegalEntityName;
                     legalEntity.HasSignedIncentivesTerms = item.HasSignedIncentivesTerms;
+                    legalEntity.SignedAgreementVersion = item.SignedAgreementVersion;
                     legalEntity.VrfCaseId = item.VrfCaseId;
                     legalEntity.VrfCaseStatus = item.VrfCaseStatus;
                     legalEntity.VrfVendorId = item.VrfVendorId;
@@ -70,6 +72,29 @@ namespace SFA.DAS.EmployerIncentives.Data
             return accounts?.Map();
         }
 
+        public async Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus)
+        {
+            var accountsWithApplications = await (from account in _dbContext.Accounts
+                                           join application in _dbContext.Applications
+                                           on account.AccountLegalEntityId equals application.AccountLegalEntityId
+                                           where account.VrfCaseStatus == vrfCaseStatus
+                                           select new Models.Account
+                                           {
+                                               AccountLegalEntityId = account.AccountLegalEntityId,
+                                               HashedLegalEntityId = account.HashedLegalEntityId,
+                                               HasSignedIncentivesTerms = account.HasSignedIncentivesTerms,
+                                               SignedAgreementVersion = account.SignedAgreementVersion,
+                                               Id = account.Id,
+                                               LegalEntityId = account.LegalEntityId,
+                                               LegalEntityName = account.LegalEntityName,
+                                               VrfCaseId = account.VrfCaseId,
+                                               VrfCaseStatus = account.VrfCaseStatus,
+                                               VrfCaseStatusLastUpdatedDateTime = account.VrfCaseStatusLastUpdatedDateTime,
+                                               VrfVendorId = account.VrfVendorId
+                                           }).ToListAsync();
+
+            return accountsWithApplications?.MapDto();
+        }
         public async Task UpdatePaidDateForPaymentIds(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate)
         {
             var payments = await _dbContext.Payments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
@@ -83,7 +108,9 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
         }
 
-
-
+        public async Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime()
+        {
+            return await _dbContext.Accounts.MaxAsync(a => a.VrfCaseStatusLastUpdatedDateTime);
+        }
     }
 }
