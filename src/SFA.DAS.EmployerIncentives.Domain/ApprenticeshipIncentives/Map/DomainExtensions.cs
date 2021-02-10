@@ -46,5 +46,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
                 legalEntityDto.LegalEntityName,
                 legalEntityDto.VrfVendorId);
         }
+
+        public static IEnumerable<ClawbackPayment> Map(this IEnumerable<ClawbackPaymentModel> models)
+        {
+            return models.Select(q => q.Map());
+        }
+
+        public static ClawbackPayment Map(this ClawbackPaymentModel model)
+        {
+            return ClawbackPayment.Get(model);
+        }
     }
 }

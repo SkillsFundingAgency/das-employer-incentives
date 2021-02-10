@@ -1,6 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Enums;
-
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
+﻿namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
 {
     public class LegalEntityDto
     {
@@ -9,6 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
         public long LegalEntityId { get; set; }
         public string LegalEntityName { get; set; }
         public bool HasSignedIncentivesTerms { get; set; }
+        public int? SignedAgreementVersion { get; set; }
         public string VrfVendorId { get; set; }
     }
 }
