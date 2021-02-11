@@ -53,6 +53,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             if (signedAgreementVersion >= minimumRequiredVersion)
             {
                 Model.HasSignedAgreementTerms = true;
+                if (Model.SignedAgreementVersion == null || signedAgreementVersion > Model.SignedAgreementVersion)
+                {
+                    Model.SignedAgreementVersion = signedAgreementVersion;
+                }
             }
         }
 
@@ -63,21 +67,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
 
         internal void UpdateVendorRegistrationCaseStatus(string caseId, string status, DateTime caseStatusLastUpdatedDate)
         {
-            if (VrfStatusIsCompleted()) return;
-
             Model.VrfCaseId = caseId;
             Model.VrfCaseStatus = status;
             Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
         }
+
         public void AddEmployerVendorId(string employerVendorId)
         {
             Model.VrfVendorId ??= employerVendorId;
         }
-
-        private bool VrfStatusIsCompleted()
-        {
-            return Model.VrfCaseStatus != null && Model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase);
-        }
-
     }
 }

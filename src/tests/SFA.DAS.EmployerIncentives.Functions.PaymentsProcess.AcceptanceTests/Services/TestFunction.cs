@@ -1,8 +1,10 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -11,9 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
@@ -22,15 +22,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly TestContext _testContext;
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
+        private readonly OrchestrationData _orchestrationData;
         private bool isDisposed;
 
         private IJobHost Jobs => _host.Services.GetService<IJobHost>();
         public string HubName { get; }
-        public HttpResponseMessage LastResponse { get; private set; }
+        public HttpResponseMessage LastResponse => ResponseObject as HttpResponseMessage;
+        public ObjectResult HttpObjectResult => ResponseObject as ObjectResult;
+        public object ResponseObject { get; private set; }
 
         public TestFunction(TestContext testContext, string hubName)
         {
             HubName = hubName;
+            _orchestrationData = new OrchestrationData();
 
             _appConfig = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
@@ -39,7 +43,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
-            _testContext = testContext;            
+            _testContext = testContext;
+
+            var paymentProfiles = new List<IncentivePaymentProfile>
+            {
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
+                    }
+                },
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
+                    }
+                }
+            };
 
             _host = new HostBuilder()
                 .ConfigureAppConfiguration(a =>
@@ -48,8 +74,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         a.AddInMemoryCollection(_appConfig);
                     })
                 .ConfigureWebJobs(builder => builder
-                       .AddHttp(options => options.SetResponse = (request, o) => LastResponse = o as HttpResponseMessage)
-                       //.AddTimers()                         
+                       .AddHttp(options => options.SetResponse = (request, o) =>
+                       {
+                           ResponseObject = o;
+                       })
                        .AddDurableTask(options =>
                        {
                            options.HubName = HubName;
@@ -57,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            options.UseGracefulShutdown = false;
                            options.ExtendedSessionsEnabled = false;
                            options.StorageProvider["maxQueuePollingInterval"] = new TimeSpan(0, 0, 0, 0, 500);
-                           options.StorageProvider["partitionCount"] = 1;                           
+                           options.StorageProvider["partitionCount"] = 1;
                            options.NotificationUrl = new Uri("localhost:7071");
 #pragma warning disable S125 // Sections of code should not be commented out
                            //options.StorageProvider["controlQueueBatchSize"] = 5;
@@ -89,9 +117,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.DistributedLockStorage = "UseDevelopmentStorage=true";
                                a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                                a.UseLearningEndpointStorageDirectory = Path.Combine(testContext.TestDirectory.FullName, ".learningtransport");
+                               a.IncentivePaymentProfiles = paymentProfiles;
                            });
 
                            s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
+                           s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
                            s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
                        })
                        )
@@ -104,11 +134,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartHost()
         {
-            var timeout = new TimeSpan(0, 0, 5);
+            var timeout = new TimeSpan(0, 0, 10);
             var delayTask = Task.Delay(timeout);
             await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
 
-            if(delayTask.IsCompleted)
+            if (delayTask.IsCompleted)
             {
                 throw new Exception($"Failed to start test function host within {timeout.Seconds} seconds.  Check the AzureStorageEmulator is running. ");
             }
@@ -119,11 +149,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             return Jobs.Start(starter);
         }
 
+        public async Task<ObjectResult> CallEndpoint(EndpointInfo endpoint)
+        {
+            await Jobs.Start(endpoint);
+            return ResponseObject as ObjectResult;
+        }
+
         public async Task<OrchestratorStartResponse> GetOrchestratorStartResponse()
         {
             var responseString = await LastResponse.Content.ReadAsStringAsync();
             var responseValue = JsonConvert.DeserializeObject<OrchestratorStartResponse>(responseString);
             return responseValue;
+        }
+
+        public async Task<DurableOrchestrationStatus> GetStatus(string instanceId)
+        {
+            await Jobs.RefreshStatus(instanceId);
+            return _orchestrationData.Status;
         }
 
         public async Task DisposeAsync()

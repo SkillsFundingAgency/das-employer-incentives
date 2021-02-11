@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.TestHelpers\SFA.DAS.EmployerIncentives.Functions.TestHelpers.csproj" />
   </ItemGroup>
 
 </Project>

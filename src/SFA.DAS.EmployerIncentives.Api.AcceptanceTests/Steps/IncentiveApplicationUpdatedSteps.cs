@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -20,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly TestContext _testContext;
         private UpdateIncentiveApplicationRequest _updateApplicationRequest;
         private CreateIncentiveApplicationRequest _createApplicationRequest;
+        private HttpResponseMessage _response;
 
         public IncentiveApplicationUpdatedSteps(TestContext testContext) : base(testContext)
         {
@@ -31,9 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _createApplicationRequest = Fixture.Create<CreateIncentiveApplicationRequest>();
             const string url = "applications";
-            await EmployerIncentiveApi.Post(url, _createApplicationRequest);
-
-
+            _response = await EmployerIncentiveApi.Post(url, _createApplicationRequest);
         }
 
         [When(@"They have changed selected apprenticeships for the application")]
@@ -48,19 +48,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _updateApplicationRequest.Apprenticeships.AddItem(_createApplicationRequest.Apprenticeships.First());
 
             var url = $"applications/{_updateApplicationRequest.IncentiveApplicationId}";
-            await EmployerIncentiveApi.Put(url, _updateApplicationRequest);
+            _response = await EmployerIncentiveApi.Put(url, _updateApplicationRequest);
         }
 
         [Then(@"the application is updated with new selection of apprenticeships")]
         public void ThenTheApplicationIsUpdatedWithNewSelectionOfApprenticeships()
         {
-            EmployerIncentiveApi.Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var query = $"SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = '{ _updateApplicationRequest.IncentiveApplicationId}'";
             var apprenticeships = dbConnection.Query<IncentiveApplicationApprenticeship>(query).ToList();
 
-            apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships);
+            apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships, opts => opts.Excluding(x => x.PlannedStartDate));
         }
 
     }

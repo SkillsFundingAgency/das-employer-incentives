@@ -7,41 +7,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class SubmissionData : ValueObject, ILogWriter
     {
-        public SubmissionData(DateTime submissionDate)
+        public bool SubmissionFound { get; private set; }
+        public DateTime? SubmissionDate { get; private set; }
+        public LearningData LearningData { get; private set; }
+
+        public SubmissionData()
+        {
+            LearningData = new LearningData(false);
+        }
+        public void SetLearningData(LearningData learningData)
+        {
+            LearningData = learningData;
+        }
+        
+        public void SetSubmissionDate(DateTime? submissionDate)
         {
             SubmissionDate = submissionDate;
+            if (submissionDate.HasValue)
+            {
+                SubmissionFound = true;
+            }
+            else
+            {
+                SubmissionFound = false;
+            }
         }
-
-        public DateTime SubmissionDate { get; }
-
-        public bool? IsInlearning { get; private set; }
-        public int? DaysinLearning { get; private set; }
-        public LearningFoundStatus LearningFoundStatus { get; private set; }
-
-        public DateTime? StartDate { get; private set; }
-        public bool HasDataLock { get; private set; }
 
         public string RawJson { get; private set; }
-
-        public void SetStartDate(DateTime? startDate)
-        {
-            StartDate = startDate;
-        }
-
-        public void SetLearningFound(LearningFoundStatus learningFoundStatus)
-        {
-            LearningFoundStatus = learningFoundStatus;
-        }
-
-        public void SetHasDataLock(bool hasDataLock)
-        {
-            HasDataLock = hasDataLock;
-        }
-
-        public void SetIsInLearning(bool? isInLearning)
-        {
-            IsInlearning = isInLearning;
-        }
 
         public void SetRawJson(string rawJson)
         {
@@ -55,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
                 return new Log
                 {
-                    OnProcessed = () => $"Submission data : LearningFound {LearningFoundStatus?.LearningFound}, StartDate {StartDate}, IsInlearning {IsInlearning}, HasDataLock {HasDataLock} "
+                    OnProcessed = () => $"Submission data : SubmissionFound {SubmissionFound}, SubmissionDate {SubmissionDate}, {LearningData.Log.OnProcessed()} "
                 };
             }
         }
@@ -63,9 +55,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return SubmissionDate;
-            yield return LearningFoundStatus;
-            yield return IsInlearning;            
-            yield return HasDataLock;
+            yield return SubmissionFound;
+            yield return LearningData;
+        }
+
+        public bool HasChangeOfCircumstances(SubmissionData submissionData)
+        {
+            if (submissionData == null)
+            {
+                return false;
+            }
+
+            return LearningData.HasDataLock == submissionData.LearningData.HasDataLock &&
+                   LearningData.StartDate == submissionData.LearningData.StartDate &&
+                   LearningData.IsInlearning == submissionData.LearningData.IsInlearning &&
+                   LearningData.LearningFound == submissionData.LearningData.LearningFound;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -18,6 +19,42 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
         {
             _ulnValidationServiceMock = new Mock<IUlnValidationService>();
             _sut = new Domain.Services.NewApprenticeIncentiveEligibilityService(_ulnValidationServiceMock.Object);
+        }
+
+        [Test]
+        public async Task Then_an_unapproved_apprenticeship_returns_false()
+        {
+            var apprenticeship = new ApprenticeshipBuilder()
+                .WithIsApproved(false)
+                .Build();
+
+            var result = await _sut.IsApprenticeshipEligible(apprenticeship);
+
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_false_is_returned_when_the_apprenticeship_start_date_is_after_the_scheme_cut_off()
+        {
+            var apprenticeship = new ApprenticeshipBuilder()
+                .WithStartDate(new DateTime(2021, 4, 1))
+                .Build();
+
+            var result = await _sut.IsApprenticeshipEligible(apprenticeship);
+
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_false_is_returned_when_the_apprenticeship_start_date_is_before_the_scheme_start_date()
+        {
+            var apprenticeship = new ApprenticeshipBuilder()
+                .WithStartDate(new DateTime(2020, 7, 31))
+                .Build();
+
+            var result = await _sut.IsApprenticeshipEligible(apprenticeship);
+
+            result.Should().BeFalse();
         }
 
         [Test]

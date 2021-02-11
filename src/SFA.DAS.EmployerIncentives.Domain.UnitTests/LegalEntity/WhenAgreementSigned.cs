@@ -58,5 +58,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LegalEntityTests
             // Assert
             legalEntity.HasSignedAgreementTerms.Should().Be(originalValue);
         }
+
+        [TestCase(null, 2, 1, 2)]
+        [TestCase(null, 2, 3, null)]
+        [TestCase(1, 2, 1, 2)]
+        [TestCase(3, 2, 1, 3)]
+        public void Then_signed_version_is_set(int? currentVersion, int signedVersion, int minimumRequiredVersion, int? expectedVersion)
+        {
+            // Arrange
+            var model = _fixture.Build<LegalEntityModel>()
+                .With(x => x.HasSignedAgreementTerms, currentVersion != null)
+                .With(x => x.SignedAgreementVersion, currentVersion)
+                .Create();
+
+            var legalEntity = LegalEntity.Create(model);
+
+            // Act
+            legalEntity.SignedAgreement(signedVersion, minimumRequiredVersion);
+
+            // Assert
+            model.SignedAgreementVersion.Should().Be(expectedVersion);
+        }
     }
 }

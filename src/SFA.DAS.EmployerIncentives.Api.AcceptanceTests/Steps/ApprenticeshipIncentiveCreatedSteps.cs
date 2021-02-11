@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using NServiceBus.Transport;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
@@ -36,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             _fixture = new Fixture();
+            var today = new DateTime(2021, 1, 30);
 
             _accountModel = _fixture.Create<Account>();
 
@@ -47,9 +48,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             _apprenticeshipsModels = _fixture.Build<IncentiveApplicationApprenticeship>()
                 .With(p => p.IncentiveApplicationId, _applicationModel.Id)
-                .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
-                .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
+                .With(p => p.PlannedStartDate, today.AddDays(1))
+                .With(p => p.DateOfBirth, today.AddYears(-20))
                 .With(p => p.EarningsCalculated, false)
+                .With(p => p.WithdrawnByCompliance, false)
+                .With(p => p.WithdrawnByEmployer, false)
                 .CreateMany(NumberOfApprenticeships).ToList();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -57,8 +60,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.AccountId, _applicationModel.AccountId)
                 .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
-                .With(p => p.PlannedStartDate, DateTime.Today.AddDays(1))
-                .With(p => p.DateOfBirth, DateTime.Today.AddYears(-20))
+                .With(p => p.StartDate, today.AddDays(1))
+                .With(p => p.DateOfBirth, today.AddYears(-20))
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()
@@ -96,6 +99,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_accountModel);
+                await dbConnection.InsertAsync(_applicationModel);
+                await dbConnection.InsertAsync(_apprenticeshipsModels);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
             }
         }
@@ -140,23 +145,40 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     apprenticeship.DateOfBirth,
                     apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
-                    apprenticeship.ApprenticeshipEmployerTypeOnApproval);
+                    apprenticeship.ApprenticeshipEmployerTypeOnApproval,
+                    apprenticeship.UKPRN,
+                    _applicationModel.DateSubmitted.Value,
+                    _applicationModel.SubmittedByEmail,
+                    apprenticeship.CourseName);
 
-                await _testContext.WaitFor<MessageContext>(async () =>
+                await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
+        
 
         [When(@"the apprenticeship incentive earnings are calculated")]
         public async Task WhenTheApprenticeshipIncentiveEarningsAreCalculated()
         {
-            var calcEarningsCommand = new CalculateEarningsCommand(
-                _apprenticeshipIncentive.Id,
-                _apprenticeshipIncentive.AccountId,
-                _apprenticeshipIncentive.ApprenticeshipId);
+            var calcEarningsCommand = new CalculateEarningsCommand(_apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
-              await _testContext.MessageBus.Send(calcEarningsCommand));
+            await _testContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    await _testContext.MessageBus.Send(calcEarningsCommand);
+                },
+                (context) => HasExpectedCompleteEarningsCalculationEvents(context)
+                );
+        }
+
+        private bool HasExpectedCompleteEarningsCalculationEvents(TestContext testContext)
+        {
+            var processedEvents = testContext.CommandsPublished.Count(c =>
+            c.IsPublished &&
+            c.IsDomainCommand &&
+            c.Command is CompleteEarningsCalculationCommand);
+
+            return processedEvents == 1;
         }
 
         [When(@"the earnings calculation against the apprenticeship incentive completes")]
@@ -168,7 +190,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 _apprenticeshipIncentive.ApprenticeshipId,
                 _apprenticeshipIncentive.Id);
 
-            await _testContext.WaitFor<MessageContext>(async () =>
+            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
                 await _testContext.MessageBus.Send(completeEarningsCalcCommand));
         }
 
@@ -176,7 +198,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive is created for the application")]
         public void ThenTheApprenticeshipIncentiveIsCreatedForTheApplication()
         {
-            var publishedCommands = _testContext.CommandsPublished.Where(c => c.IsPublished).Select(c => c.Command)
+            var publishedCommands = _testContext.CommandsPublished
+                .Where(c => c.IsPublished && 
+                c.IsDomainCommand &&
+                c.Command is CreateIncentiveCommand)
+                .Select(c => c.Command)
                 .ToArray();
 
             foreach (var publishedCommand in publishedCommands)
@@ -193,7 +219,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the earnings are calculated for each apprenticeship incentive")]
         public void ThenTheEarningsAreCalculatedForEachApprenticeshipIncentive()
         {
-            var commandsPublished = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CalculateEarningsCommand));
+            var commandsPublished = _testContext.CommandsPublished
+                .Where(c => 
+                c.IsPublished &&
+                c.IsDomainCommand &&
+                c.Command.GetType() == typeof(CalculateEarningsCommand));
 
             commandsPublished.Count().Should().Be(NumberOfApprenticeships);
 
@@ -208,7 +238,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the pending payments are stored against the apprenticeship incentive")]
         public void ThenThePendingPaymentsAreStoredAgainstTheApprenticeshipIncentive()
         {
-            var completeCalculationCommandsPublished = _testContext.CommandsPublished.Where(c => c.IsPublished && c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
+            var completeCalculationCommandsPublished = _testContext.CommandsPublished
+                .Where(c => c.IsPublished && 
+                c.IsDomainCommand &&
+                c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
 
             completeCalculationCommandsPublished.Count().Should().Be(1);
 

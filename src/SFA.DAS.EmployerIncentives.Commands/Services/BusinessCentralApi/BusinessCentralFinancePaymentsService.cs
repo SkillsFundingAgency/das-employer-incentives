@@ -1,27 +1,29 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
+using SFA.DAS.EmployerIncentives.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
     public class BusinessCentralFinancePaymentsService : IBusinessCentralFinancePaymentsService
     {
         private readonly HttpClient _client;
-        private string _apiVersion;
+        private readonly bool _obfuscateSensitiveData;
+        private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion)
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData)
         {
             _client = client;
+            _obfuscateSensitiveData = obfuscateSensitiveData;
             _apiVersion = apiVersion ?? "2020-10-01";
             PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
@@ -36,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 return;
             }
 
-            throw new BusinessCentralApiException(response.StatusCode);
+            throw new BusinessCentralApiException(response.StatusCode, content);
         }
 
         public BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)
@@ -48,10 +50,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 FundingStream = new FundingStream
                 {
                     Code = "EIAPP",
-                    StartDate = new DateTime(2020, 9, 1),
-                    EndDate = new DateTime(2021, 8, 30),
+                    StartDate = "2020-09-01",
+                    EndDate = "2021-08-30",
                 },
-                DueDate = payment.DueDate,
+                DueDate = payment.DueDate.ToString("yyyy-MM-dd"),
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
                 CostCentreCode = "AAA40",
@@ -60,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 ExternalReference = new ExternalReference
                 {
                     Type = "ApprenticeIdentifier",
-                    Value = payment.AccountLegalEntityId.ToString()
+                    Value = payment.HashedLegalEntityId
                 },
                 PaymentLineDescription = CreatePaymentLineDescription(payment),
                 Approver = @"AD.HQ.DEPT\JPOOLE"
@@ -76,12 +78,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default);
+            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default, "application/json");
         }
 
         private string CreatePaymentLineDescription(PaymentDto payment)
         {
-            return $"Hire a new apprentice ({PaymentType(payment.EarningType)} payment). Employer: {payment.HashedLegalEntityId} ULN: {payment.ULN}";
+            var uln = payment.ULN.ToString().ToCharArray();
+            if (_obfuscateSensitiveData)
+            {
+                for (var i = 0; i < uln.Length - 4; i++)
+                {
+                    uln[i] = '*';
+                }
+            }
+
+            return $"Hire a new apprentice ({PaymentType(payment.EarningType)} payment). Employer: {payment.HashedLegalEntityId} ULN: {new string(uln)}";
         }
 
         private string PaymentType(EarningType earningType)

@@ -10,7 +10,6 @@
 	[LearningFound] BIT NULL,
 	[HasDataLock] BIT NULL,
 	[StartDate] DATETIME2 NULL,
-	[DaysInLearning] INT NULL,
 	[InLearning] BIT NULL,
 	[RawJSON] NVARCHAR(MAX) NULL,
 	[CreatedDate] DATETIME2 NOT NULL,

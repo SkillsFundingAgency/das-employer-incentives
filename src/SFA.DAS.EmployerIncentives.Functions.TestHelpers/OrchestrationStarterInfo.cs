@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
             string orchestrationName,
             Dictionary<string, object> args = null,
             TimeSpan? timeout = null,
-            string expectedCustomStatus =  null)
+            string expectedCustomStatus = null)
         {
             if (string.IsNullOrEmpty(starterName)) throw new ArgumentException("Missing starter name");
             if (string.IsNullOrEmpty(orchestrationName)) throw new ArgumentException("Missing starter name");
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
             }
             if (timeout == null)
             {
-                timeout = new TimeSpan(0, 0, 30);
+                timeout = new TimeSpan(0, 0, 60);
             }
             Timeout = timeout;
             StarterArgs = args;

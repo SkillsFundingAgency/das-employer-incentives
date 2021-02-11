@@ -7,39 +7,25 @@ using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
-    public static class MockServers
-    {
-        public static MockApi PaymentsApi { get; set; }
-        public static MockApi LearnerMatchApi { get; set; }
-    }
-
     public class TestContext : IDisposable
     {
         public string InstanceId { get; private set; }
         public DirectoryInfo TestDirectory { get; set; }
         public TestFunction TestFunction { get; set; }
 
-        public TestData TestData { get; set; }
+        public TestData TestData { get; set; }        
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
 
-        public MockApi LearnerMatchApi
-        {
-            get => MockServers.LearnerMatchApi;
-            set => MockServers.LearnerMatchApi = value;
-        }
-
-        public MockApi PaymentsApi
-        {
-            get => MockServers.PaymentsApi;
-            set => MockServers.PaymentsApi = value;
-        }
+        public MockApi LearnerMatchApi { get; set; }
+        
+        public MockApi PaymentsApi { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
 
         public TestContext()
         {
             InstanceId = Guid.NewGuid().ToString();
-            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), InstanceId));
+            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.Parent.FullName, $"TestDirectory/{InstanceId}"));
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);

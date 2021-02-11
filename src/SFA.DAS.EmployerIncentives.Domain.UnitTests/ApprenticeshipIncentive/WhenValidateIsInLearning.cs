@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionYear = _fixture.Create<short>();
             _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, DateTime.Now.Year.ToString(), true);
+            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true);
 
             _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
 
@@ -50,7 +50,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _sutModel.Apprenticeship.Provider.Ukprn,
                 _sutModel.Apprenticeship.UniqueLearnerNumber);
 
-            _learner.SetSubmissionData(new SubmissionData(DateTime.Now));
+            var submisssionData = new SubmissionData();
+            submisssionData.SetSubmissionDate(DateTime.Now);
+            _learner.SetSubmissionData(submisssionData);
 
             _sut = Sut(_sutModel);
         }
@@ -62,7 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
             var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SubmissionData.SetIsInLearning(isInLearning);
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetIsInLearning(isInLearning);
 
             // act
             _sut.ValidateIsInLearning(pendingPayment.Id, _learner, _collectionPeriod);
@@ -117,7 +120,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
             var pendingPayment = _sut.PendingPayments.First();
 
-            _learner.SubmissionData.SetIsInLearning(null);
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetIsInLearning(null);
 
             // act
             _sut.ValidateIsInLearning(pendingPayment.Id, _learner, _collectionPeriod);

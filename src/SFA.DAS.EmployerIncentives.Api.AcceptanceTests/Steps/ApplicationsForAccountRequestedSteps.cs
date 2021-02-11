@@ -1,8 +1,9 @@
-﻿using Dapper;
-using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -15,38 +16,31 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "ApplicationsForAccountRequested")]
     public class ApplicationsForAccountRequestedSteps : StepsBase
     {
-        private TestContext _testContext;
-        private IEnumerable<ApprenticeApplicationDto> _apiResponse;
+        private GetApplicationsResponse _apiResponse;
         private Account _account;
-        private IncentiveApplication _application;
-        private IncentiveApplicationApprenticeship _apprenticeship;
+        private ApprenticeshipIncentive _apprenticeshipIncentive;
 
         public ApplicationsForAccountRequestedSteps(TestContext testContext) : base(testContext)
         {
-            _testContext = testContext;
         }
 
         [Given(@"an account that is in employer incentives")]
         public async Task GivenAnAccountThatIsInEmployerIncentives()
         {
-            _account = _testContext.TestData.GetOrCreate<Account>();
-            _application = _testContext.TestData.GetOrCreate<IncentiveApplication>();
-            _application.AccountId = _account.Id;
-            _application.AccountLegalEntityId = _account.AccountLegalEntityId;
-            _apprenticeship = _testContext.TestData.GetOrCreate<IncentiveApplicationApprenticeship>();
-            _apprenticeship.IncentiveApplicationId = _application.Id;
+            _account = TestContext.TestData.GetOrCreate<Account>();
+            _apprenticeshipIncentive = TestContext.TestData.GetOrCreate<ApprenticeshipIncentive>();
+            _apprenticeshipIncentive.AccountId = _account.Id;
+            _apprenticeshipIncentive.AccountLegalEntityId = _account.AccountLegalEntityId;
 
-            await SetupAccount(_account);
-            await SetupApplication(_application);
-            await SetupApprenticeship(_apprenticeship);
+            await SetupApprenticeshipIncentive();
         }
 
         [When(@"a client requests the apprenticeships for the account")]
         public async Task WhenAClientRequestsTheApprenticeshipApplicationsForTheAccount()
         {
-            var url = $"/accounts/{_account.Id}/applications";
+            var url = $"/accounts/{_account.Id}/legalentity/{_account.AccountLegalEntityId}/applications";
             var (status, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<ApprenticeApplicationDto>>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<GetApplicationsResponse>(url);
 
             status.Should().Be(HttpStatusCode.OK);
 
@@ -56,44 +50,47 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeships are returned")]
         public void ThenTheApprenticeshipApplicationsAreReturned()
         {
-            _apiResponse.Should().NotBeEmpty();
-            var apprenticeshipApplication = _apiResponse.First();
+            _apiResponse.ApprenticeApplications.Should().NotBeEmpty();
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            var currentPeriodDate = new DateTime(TestContext.ActivePeriod.EIScheduledOpenDateUTC.Year, TestContext.ActivePeriod.EIScheduledOpenDateUTC.Month, TestContext.ActivePeriod.EIScheduledOpenDateUTC.Day);
 
             apprenticeshipApplication.AccountId.Should().Be(_account.Id);
-            apprenticeshipApplication.ApplicationId.Should().Be(_application.Id);
-            apprenticeshipApplication.FirstName.Should().Be(_apprenticeship.FirstName);
-            apprenticeshipApplication.LastName.Should().Be(_apprenticeship.LastName);
+            apprenticeshipApplication.FirstName.Should().Be(_apprenticeshipIncentive.FirstName);
+            apprenticeshipApplication.LastName.Should().Be(_apprenticeshipIncentive.LastName);
             apprenticeshipApplication.LegalEntityName.Should().Be(_account.LegalEntityName);
-            apprenticeshipApplication.Status.Should().Be(_application.Status.ToString());
-            apprenticeshipApplication.TotalIncentiveAmount.Should().Be(_apprenticeship.TotalIncentiveAmount);
+            apprenticeshipApplication.TotalIncentiveAmount.Should().Be(_apprenticeshipIncentive.PendingPayments.Sum(x => x.Amount));
+            apprenticeshipApplication.SubmittedByEmail.Should().Be(_apprenticeshipIncentive.SubmittedByEmail);
+            // ReSharper disable once PossibleInvalidOperationException
+            apprenticeshipApplication.ApplicationDate.Date.Should().Be(_apprenticeshipIncentive.SubmittedDate.Value.Date);
+
+            apprenticeshipApplication.FirstPaymentStatus.Should().BeEquivalentTo(new
+            {
+                PaymentAmount = _apprenticeshipIncentive.PendingPayments.First().Amount,
+                PaymentDate =  _apprenticeshipIncentive.PendingPayments.First().DueDate <= currentPeriodDate ? new DateTime(currentPeriodDate.AddMonths(1).Year, currentPeriodDate.AddMonths(1).Month, 27) : _apprenticeshipIncentive.PendingPayments.First().DueDate.AddMonths(1)
+            });
+            apprenticeshipApplication.SecondPaymentStatus.Should().BeEquivalentTo(new
+            {
+                PaymentAmount = _apprenticeshipIncentive.PendingPayments.Last().Amount,
+                PaymentDate = _apprenticeshipIncentive.PendingPayments.Last().DueDate.AddMonths(1)
+            });
         }
 
-        private async Task SetupAccount(Account account)
+        private async Task SetupApprenticeshipIncentive()
         {
-            using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.ExecuteAsync($"insert into Accounts(id, accountLegalEntityId, legalEntityId, legalEntityName, hasSignedIncentivesTerms) values " +
-                                                $"(@id, @accountLegalEntityId, @legalEntityId, @legalEntityName, @hasSignedIncentivesTerms)", account);
-            }
-        }
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_account);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            _apprenticeshipIncentive.PendingPayments = _apprenticeshipIncentive.PendingPayments.Take(2).ToList();
+            _apprenticeshipIncentive.PendingPayments.First().EarningType = EarningType.FirstPayment;
+            _apprenticeshipIncentive.PendingPayments.First().DueDate = new DateTime(2020, 1, 12);
+            _apprenticeshipIncentive.PendingPayments.Last().EarningType = EarningType.SecondPayment;
+            _apprenticeshipIncentive.PendingPayments.Last().DueDate = new DateTime(2020, 9, 11);
 
-        private async Task SetupApplication(IncentiveApplication application)
-        {
-            using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            foreach (var pendingPayment in _apprenticeshipIncentive.PendingPayments)
             {
-                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByEmail, submittedByName) values " +
-                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, @status, @dateSubmitted, @submittedByEmail, @submittedByName)", application);
-            }
-        }
-
-        private async Task SetupApprenticeship(IncentiveApplicationApprenticeship apprenticeship)
-        {
-            using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.ExecuteAsync($"insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
-                                                "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
-                                                "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
-                                                "@uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount)", apprenticeship);
+                pendingPayment.DueDate = pendingPayment.DueDate.Date;
+                pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+                await dbConnection.InsertAsync(pendingPayment, true);
             }
         }
     }

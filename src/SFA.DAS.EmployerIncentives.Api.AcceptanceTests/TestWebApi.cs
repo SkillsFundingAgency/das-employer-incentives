@@ -30,9 +30,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _config = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
+                    { "ApplicationSettings:EmployerIncentivesWebBaseUrl", "https://localhost:5001" },
                     { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
                     { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(_context.TestDirectory.FullName, ".learningtransport") },
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ApplicationSettings:NServiceBusEndpointName", _context.InstanceId },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
@@ -40,23 +42,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
+                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile{ AmountPayable = 100, DaysAfterApprenticeshipStart = 10},
-                        new PaymentProfile{ AmountPayable = 200, DaysAfterApprenticeshipStart = 20},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
                     }
                 },
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile{ AmountPayable = 300, DaysAfterApprenticeshipStart = 30},
-                        new PaymentProfile{ AmountPayable = 400, DaysAfterApprenticeshipStart = 40},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
                     }
                 }
             };
+
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -87,6 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
                 s.Configure<MatchedLearnerApi>(l =>
                 {
@@ -103,9 +107,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     });
                 }
 
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
+
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>
             {
@@ -113,6 +120,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 a.AddInMemoryCollection(_config);
             });
             builder.UseEnvironment("LOCAL");
+        }
+
+        public IServiceCollection AddDecorators(IServiceCollection serviceCollection)
+        {
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerReceived<>));
+
+            Commands.ServiceCollectionExtensions.AddCommandHandlerDecorators(serviceCollection);
+
+            serviceCollection
+                .Decorate(typeof(ICommandHandler<>), typeof(TestCommandHandlerProcessed<>));
+
+            return serviceCollection;
         }
     }
 }

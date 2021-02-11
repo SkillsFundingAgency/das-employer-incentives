@@ -18,10 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
 
         public Task Handle(Created @event, CancellationToken cancellationToken = default)
         {
-            var command = new CalculateEarningsCommand(
-                @event.ApprenticeshipIncentiveId,
-                @event.AccountId,
-                @event.ApprenticeshipId);
+            var command = new CalculateEarningsCommand(@event.ApprenticeshipIncentiveId);
 
             return _commandPublisher.Publish(command);
         }

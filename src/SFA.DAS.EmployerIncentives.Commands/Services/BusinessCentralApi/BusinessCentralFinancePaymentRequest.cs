@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         public string RequestorUniquePaymentIdentifier { get; set; }
         public string Requestor { get; set; }
         public FundingStream FundingStream { get; set; }
-        public DateTime DueDate { get; set; }
+        public string DueDate { get; set; }
         public string VendorNo { get; set; }
         public string AccountCode { get; set; }
         public string CostCentreCode { get; set; }

@@ -1,8 +1,7 @@
 ﻿using AutoFixture;
-using Dapper;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using System.Data.SqlClient;
+using SFA.DAS.EmployerIncentives.Enums;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -27,6 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 Fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(x => x.ULN, _uln)
                     .With(x => x.IncentiveApplicationId, _incentiveApplication.Id)
+                    .With(x => x.WithdrawnByCompliance, false)
+                    .With(x => x.WithdrawnByEmployer, false)
                     .Create();
 
             _incentiveApplication.Apprenticeships.Add(_incentiveApprenticeship);
@@ -41,15 +42,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"the ULN has been used on a previously submitted Incentive")]
         public Task GivenTheULNHasBeenUsedOnAPreviouslySubmittedIncentive()
         {
-            return SetupApplicationAndApprenticeship("Submitted");
+            return SetupApplicationAndApprenticeship(IncentiveApplicationStatus.Submitted);
         }
 
         [Given(@"the ULN has been used on a draft Incentive Application")]
         public Task GivenTheULNHasBeenUsedOnAPreviouslyInProgressIncentive()
         {
-            return SetupApplicationAndApprenticeship("InProgress");
+            return SetupApplicationAndApprenticeship(IncentiveApplicationStatus.InProgress);
         }
-
 
         [When(@"I request the eligibility of an apprenticeship")]
         public async Task WhenIRequestTheEligibilityOfAnApprenticeship()
@@ -70,17 +70,25 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apiResult.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
-        private async Task SetupApplicationAndApprenticeship(string status)
+        [Given(@"the ULN has been withdrawn by Employer")]
+        public async Task GivenTheULNHasBeenWithdrawnByEmployer()
         {
-            using (var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.ExecuteAsync($"insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByName) values " +
-                                                $"(@id, @accountId, @accountLegalEntityId, @dateCreated, '{status}', @dateSubmitted, @submittedByName)", _incentiveApplication);
-                await dbConnection.ExecuteAsync($"insert into IncentiveApplicationApprenticeship(id, incentiveApplicationId, apprenticeshipId, firstName, lastName, dateOfBirth, " +
-                                                "uln, plannedStartDate, apprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount) values " +
-                                                "(@id, @incentiveApplicationId, @apprenticeshipId, @firstName, @lastName, @dateOfBirth, " +
-                                                "@uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount)", _incentiveApprenticeship);
-            }
+            _incentiveApprenticeship.WithdrawnByEmployer = true;
+            await DataAccess.Update(_incentiveApprenticeship);
+        }
+
+        [Given(@"the ULN has been withdrawn by Compliance")]
+        public async Task GivenTheULNHasBeenWithdrawnByCompliance()
+        {
+            _incentiveApprenticeship.WithdrawnByCompliance = true;
+            await DataAccess.Update(_incentiveApprenticeship);
+        }
+
+        private async Task SetupApplicationAndApprenticeship(IncentiveApplicationStatus status)
+        {
+            _incentiveApplication.Status = status;
+            await DataAccess.InsertWithEnumAsString(_incentiveApplication);
+            await DataAccess.Insert(_incentiveApprenticeship);
         }
     }
 }

@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -32,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.PendingPayments.Count == 0);
             var results = new List<ApprenticeshipIncentiveModel>();
-            foreach(var incentive in queryResults)
+            foreach (var incentive in queryResults)
             {
                 results.Add(incentive.Map(collectionPeriods));
             }
@@ -42,14 +41,24 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId)
         {
+            var collectionPeriods = _dbContext.CollectionPeriods.AsEnumerable();
+
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
-               .Include(x => x.PendingPayments)
+               .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
                .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
             if (apprenticeshipIncentive != null)
             {
-                return apprenticeshipIncentive.Map(_dbContext.CollectionPeriods.AsEnumerable());
+                return apprenticeshipIncentive.Map(collectionPeriods);
             }
             return null;
+        }
+
+        public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
+        {
+            var apprenticeships = await _dbContext.ApprenticeshipIncentives.Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
+            var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
+
+            return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
         }
 
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
@@ -58,6 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.PendingPayments)
                 .ThenInclude(x => x.ValidationResults)
                 .Include(x => x.Payments)
+                .Include(x => x.ClawbackPayments)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
@@ -74,10 +84,29 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             }
         }
 
+        public async Task Delete(ApprenticeshipIncentiveModel apprenticeshipIncentive)
+        {
+            var deletedIncentive = apprenticeshipIncentive.Map();
+
+            var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == deletedIncentive.Id);
+
+            foreach (var pendingPayment in existingIncentive.PendingPayments)
+            {
+                foreach (var validationResult in pendingPayment.ValidationResults)
+                {
+                    _dbContext.Remove(validationResult);
+                }
+                _dbContext.Remove(pendingPayment);
+            }
+            _dbContext.Remove(existingIncentive);
+        }
+
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
         {
             _dbContext.Entry(existingIncentive).CurrentValues.SetValues(updatedIncentive);
 
+            RemoveDeletedClawbacks(updatedIncentive, existingIncentive);
+            RemoveDeletedPayments(updatedIncentive, existingIncentive);
             RemoveDeletedPendingPayments(updatedIncentive, existingIncentive);
 
             foreach (var pendingPayment in updatedIncentive.PendingPayments)
@@ -105,6 +134,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 else
                 {
                     _dbContext.Payments.Add(payment);
+                }
+            }
+
+            foreach (var clawback in updatedIncentive.ClawbackPayments)
+            {
+                var existingClawback = existingIncentive.ClawbackPayments.SingleOrDefault(p => p.Id == clawback.Id);
+
+                if (existingClawback != null)
+                {
+                    _dbContext.Entry(existingClawback).CurrentValues.SetValues(clawback);
+                }
+                else
+                {
+                    _dbContext.ClawbackPayments.Add(clawback);
                 }
             }
         }
@@ -137,6 +180,28 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
                 {
                     _dbContext.PendingPayments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.Payments)
+            {
+                if (!updatedIncentive.Payments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.Payments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedClawbacks(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.ClawbackPayments)
+            {
+                if (!updatedIncentive.ClawbackPayments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.ClawbackPayments.Remove(existingPayment);
                 }
             }
         }

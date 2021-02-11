@@ -35,8 +35,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _validatePaymentData = new ValidatePaymentData(_testContext);
         }
 
+        [Given(@"no validations steps will fail")]
+        public async Task GivenNoValidationsStepsWillFailed()
+        {
+            await _validatePaymentData.Create();
+        }
+
         [Given(@"the '(.*)' will fail")]
-        public void GivenTheValidationStepWillFail(string validationStep)
+        public async Task GivenTheValidationStepWillFail(string validationStep)
         {
             switch (validationStep)
             {
@@ -54,18 +60,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     break;
                 case ValidationStep.HasIlrSubmission:
                     _validatePaymentData.LearnerModel.SubmissionFound = false;
+                    _validatePaymentData.LearnerModel.SubmissionDate = null;
                     break;
                 case ValidationStep.HasDaysInLearning:
                     _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 89;
                     break;
+                case ValidationStep.PaymentsNotPaused:
+                    _validatePaymentData.ApprenticeshipIncentiveModel.PausePayments = true;
+                    break;
             }
+
+            await _validatePaymentData.Create();
         }
 
         [When(@"the payment process is run")]
         public async Task WhenThePaymentProcessIsRun()
         {
-            await _validatePaymentData.Create();
-
             await _testContext.TestFunction.Start(
                new OrchestrationStarterInfo(
                    "IncentivePaymentOrchestrator_HttpStart",
@@ -83,6 +93,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                    ));
 
             _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+            var response = await _testContext.TestFunction.GetOrchestratorStartResponse();
+            var status = await _testContext.TestFunction.GetStatus(response.Id);
+            status.CustomStatus.ToObject<string>().Should().Be("WaitingForPaymentApproval");
         }
 
         [Then(@"the '(.*)' will have a failed validation result")]
@@ -91,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
             results.Should().HaveCount(2);
-            results.All(r => !r.Result).Should().BeTrue();
+            results.All(r => !r.Result).Should().BeTrue($"{step} validation step should have failed");
         }
 
         [Then(@"successful validation results are recorded")]
@@ -99,6 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
+            results.Should().NotBeEmpty();
             results.All(r => r.Result).Should().BeTrue();
         }
 
@@ -155,9 +170,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Given(@"the ILR submission validation step will fail")]
-        public void GivenTheIlrSubmissionValidationStepWillFail()
+        public async Task GivenTheIlrSubmissionValidationStepWillFail()
         {
-            GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
+            await GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
         }
 
         [Then(@"the ILR Submission check will have a failed validation result")]
@@ -169,10 +184,37 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"no further ILR validation is performed")]
         public async Task ThenNoFurtherIlrValidationIsPerformed()
         {
+            var ilrValidationSteps = new[]
+            {
+                ValidationStep.IsInLearning,
+                ValidationStep.HasLearningRecord,
+                ValidationStep.HasNoDataLocks,
+                ValidationStep.HasDaysInLearning
+            };
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result
-                .Where(x => x.Step != ValidationStep.HasIlrSubmission && x.Step != ValidationStep.HasBankDetails);
+                .Where(x => ilrValidationSteps.Contains(x.Step));
             results.Any().Should().BeFalse();
+        }
+
+        [Given(@"there are payments with unsent clawbacks")]
+        public async Task GivenThereArePaymentsWithUnsentClawbacks()
+        {
+            _validatePaymentData.AddClawbackPayment(false);
+            await _validatePaymentData.Create();
+        }
+
+        [Then(@"the HasNoUnsentClawbacks step will have a failed validation result")]
+        public async Task ThenTheHasUnsentClawbackStepWillHaveAFailedValidationResult()
+        {
+            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.HasNoUnsentClawbacks);
+        }
+
+        [Given(@"there are payments with sent clawbacks")]
+        public async Task GivenThereArePaymentsWithSentClawbacks()
+        {
+            _validatePaymentData.AddClawbackPayment(true);
+            await _validatePaymentData.Create();
         }
     }
 }

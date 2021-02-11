@@ -40,9 +40,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                     command.LastName,
                     command.DateOfBirth,
                     command.Uln,
-                    command.ApprenticeshipEmployerTypeOnApproval
+                    command.ApprenticeshipEmployerTypeOnApproval,
+                    command.CourseName
                 ),
-                command.PlannedStartDate);
+                command.PlannedStartDate,
+                command.SubmittedDate,
+                command.SubmittedByEmail);
+
+            if (command.UKPRN.HasValue)
+            {
+                incentive.Apprenticeship.SetProvider(new Provider(command.UKPRN.Value));
+            }
 
             await _apprenticeshipIncentiveDomainRepository.Save(incentive);
         }

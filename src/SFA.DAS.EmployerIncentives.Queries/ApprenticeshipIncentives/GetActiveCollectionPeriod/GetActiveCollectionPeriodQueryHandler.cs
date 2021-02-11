@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetActiveC
             return new GetActiveCollectionPeriodResponse(new Abstractions.DTOs.Queries.ApprenticeshipIncentives.CollectionPeriodDto() 
             {
                 CollectionPeriodNumber = activePeriod.PeriodNumber,
-                 CollectionYear = activePeriod.CalendarYear
+                CollectionYear = activePeriod.AcademicYear
             });
         }
     }

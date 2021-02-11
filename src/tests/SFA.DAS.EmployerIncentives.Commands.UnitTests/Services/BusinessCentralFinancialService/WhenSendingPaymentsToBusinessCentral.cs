@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentralFinancialService
 {
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
 
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX");
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
         }
 
         [Test]
@@ -82,15 +82,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             paymentRequest.RequestorUniquePaymentIdentifier.Should().Be(payment.PaymentId.ToString("N"));
             paymentRequest.Requestor.Should().Be("ApprenticeServiceEI");
             paymentRequest.FundingStream.Code.Should().Be("EIAPP");
-            paymentRequest.FundingStream.StartDate.Should().Be(new DateTime(2020, 9, 1));
-            paymentRequest.FundingStream.EndDate.Should().Be(new DateTime(2021, 8, 30));
-            paymentRequest.DueDate.Should().Be(payment.DueDate);
+            paymentRequest.FundingStream.StartDate.Should().Be("2020-09-01");
+            paymentRequest.FundingStream.EndDate.Should().Be("2021-08-30");
+            paymentRequest.DueDate.Should().Be(payment.DueDate.ToString("yyyy-MM-dd"));
             paymentRequest.VendorNo.Should().Be(payment.VendorId);
             paymentRequest.CostCentreCode.Should().Be("AAA40");
             paymentRequest.Amount.Should().Be(payment.Amount);
             paymentRequest.Currency.Should().Be("GBP");
             paymentRequest.ExternalReference.Type.Should().Be("ApprenticeIdentifier");
-            paymentRequest.ExternalReference.Value.Should().Be(payment.AccountLegalEntityId.ToString());
+            paymentRequest.ExternalReference.Value.Should().Be(payment.HashedLegalEntityId);
         }
 
         [TestCase(SubnominalCode.Levy16To18, "2240147")]
@@ -119,8 +119,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
                 .Create();
 
             var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
-
+            
             paymentRequest.PaymentLineDescription.Should().Be(expected);
+        }
+
+        [TestCase(1234567890, "******7890")]
+        [TestCase(123456789, "*****6789")]
+        public void Then_the_PaymentLineDescription_is_constructed_with_uln_obfuscated(long uln, string expected)
+        {
+
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true);
+
+            var payment = _fixture.Build<PaymentDto>()
+                .With(x => x.EarningType, EarningType.FirstPayment)
+                .With(x => x.HashedLegalEntityId, "ABCD")
+
+                .With(x => x.ULN, uln)
+                .Create();
+
+            var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
+
+            paymentRequest.PaymentLineDescription.Should().Be($"Hire a new apprentice (first payment). Employer: ABCD ULN: {expected}");
         }
     }
 }

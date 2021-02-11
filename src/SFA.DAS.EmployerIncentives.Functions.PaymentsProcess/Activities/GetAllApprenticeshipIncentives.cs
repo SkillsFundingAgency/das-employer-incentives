@@ -22,12 +22,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         }
 
         [FunctionName(nameof(GetAllApprenticeshipIncentives))]
-        public async Task<List<Guid>> Get([ActivityTrigger]object input)
+        public async Task<List<ApprenticeshipIncentiveOutput>> Get([ActivityTrigger]object input)
         {
             _logger.LogInformation($"Getting all Apprenticeship Incentives");
             var response = await _queryDispatcher.Send<GetApprenticeshipIncentivesRequest, GetApprenticeshipIncentivesResponse>(new GetApprenticeshipIncentivesRequest());
             _logger.LogInformation($"{response.ApprenticeshipIncentives.Count} returned");
-            return response.ApprenticeshipIncentives.Select(x=>x.Id).ToList();
+            return response.ApprenticeshipIncentives.Select(x=> new ApprenticeshipIncentiveOutput { Id = x.Id, ULN = x.ULN }).ToList();
         }
     }
 }

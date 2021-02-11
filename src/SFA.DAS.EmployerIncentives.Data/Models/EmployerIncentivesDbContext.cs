@@ -25,7 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<Learner> Learners { get; set; }
         public virtual DbSet<LearningPeriod> LearningPeriods { get; set; }
         public virtual DbSet<ApprenticeshipDaysInLearning> DaysInLearnings { get; set; }
-
+        public virtual DbSet<IncentiveApplicationStatusAudit> IncentiveApplicationStatusAudits { get; set; }
+        public virtual DbSet<ClawbackPayment> ClawbackPayments { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>

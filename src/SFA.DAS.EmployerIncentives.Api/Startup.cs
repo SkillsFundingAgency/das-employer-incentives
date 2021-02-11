@@ -55,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddNLog();
             services.AddControllers();
             services.AddApplicationInsightsTelemetry();
             services.AddHealthChecks();
@@ -79,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<MatchedLearnerApi>(Configuration.GetSection("MatchedLearnerApi"));
             services.Configure<BusinessCentralApiClient>(Configuration.GetSection("BusinessCentralApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
-            
+
             services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
@@ -117,7 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             app.UseHttpsRedirection()
                .UseApiGlobalExceptionHandler();
 
-            app.UseRouting();            
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseEndpoints(endpoints =>
