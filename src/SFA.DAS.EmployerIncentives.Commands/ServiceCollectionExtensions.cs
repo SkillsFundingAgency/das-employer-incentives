@@ -95,7 +95,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.Scan(scan =>
             {
                 scan.FromAssembliesOf(typeof(ServiceCollectionExtensions))
-                    .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
+                    .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>))
+                    .NotInNamespaceOf(typeof(CommandHandlerWithLogging<>)))
                     .AsImplementedInterfaces()
                     .WithTransientLifetime()
 
