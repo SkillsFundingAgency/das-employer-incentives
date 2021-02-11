@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .AddNServiceBusClientUnitOfWork();
 
             services.AddPersistenceServices();
-            services.AddCommandServices(Configuration);
+            services.AddCommandServices();
             services.AddQueryServices();
             services.AddEventServices();
 
