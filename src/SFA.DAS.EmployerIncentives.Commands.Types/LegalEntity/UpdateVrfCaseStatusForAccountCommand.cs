@@ -5,7 +5,7 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity
 {
-    public class UpdateVendorRegistrationCaseStatusForAccountCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class UpdateVrfCaseStatusForAccountCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
         public long AccountId { get; }
         public string CaseId { get; }
@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity
         public string HashedLegalEntityId { get; }
         public string LockId => $"{nameof(Domain.Accounts.Account)}_{AccountId}";
 
-        public UpdateVendorRegistrationCaseStatusForAccountCommand(long accountId, string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
+        public UpdateVrfCaseStatusForAccountCommand(long accountId, string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
         {
             AccountId = accountId;
             HashedLegalEntityId = hashedLegalEntityId;
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity
         {
             get
             {
-                var message = $"Account {nameof(UpdateVendorRegistrationCaseStatusForAccountCommand)} event with AccountId {AccountId}, " +
+                var message = $"Account {nameof(UpdateVrfCaseStatusForAccountCommand)} event with AccountId {AccountId}, " +
                               $"CaseId {CaseId}, Status {Status}, LastUpdatedDate {LastUpdatedDate}";
                 return new Log
                 {

@@ -13,18 +13,18 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests
     [TestFixture]
     public class WhenHandlingUpdateVendorRegistrationCaseStatusForAccountCommand
     {
-        private HandleUpdateVendorRegistrationCaseStatusForAccountCommand _sut;
+        private HandleUpdateVrfCaseStatusForAccountCommand _sut;
         private Mock<ICommandDispatcher> _mockCommandService;
         private Fixture _fixture;
-        private UpdateVendorRegistrationCaseStatusForAccountCommand _command;
+        private UpdateVrfCaseStatusForAccountCommand _command;
 
         [SetUp]
         public void Arrange()
         {
             _mockCommandService = new Mock<ICommandDispatcher>();
             _fixture = new Fixture();
-            _command = _fixture.Create<UpdateVendorRegistrationCaseStatusForAccountCommand>();
-            _sut = new HandleUpdateVendorRegistrationCaseStatusForAccountCommand(_mockCommandService.Object);
+            _command = _fixture.Create<UpdateVrfCaseStatusForAccountCommand>();
+            _sut = new HandleUpdateVrfCaseStatusForAccountCommand(_mockCommandService.Object);
         }
 
         [Test]

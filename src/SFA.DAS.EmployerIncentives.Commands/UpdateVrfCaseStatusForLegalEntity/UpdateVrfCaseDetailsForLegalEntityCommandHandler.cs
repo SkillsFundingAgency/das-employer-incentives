@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
 
             var tasks = accounts.Select(account =>
                 _commandPublisher.Publish(
-                    new UpdateVendorRegistrationCaseStatusForAccountCommand(
+                    new UpdateVrfCaseStatusForAccountCommand(
                         account.Id,
                         command.HashedLegalEntityId,
                         command.CaseId,

@@ -7,17 +7,17 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 {
-    public class HandleUpdateVendorRegistrationCaseStatusForAccountCommand
+    public class HandleUpdateVrfCaseStatusForAccountCommand
     {
         private readonly ICommandDispatcher _commandDispatcher;
 
-        public HandleUpdateVendorRegistrationCaseStatusForAccountCommand(ICommandDispatcher commandDispatcher)
+        public HandleUpdateVrfCaseStatusForAccountCommand(ICommandDispatcher commandDispatcher)
         {
             _commandDispatcher = commandDispatcher;
         }
 
-        [FunctionName(nameof(HandleUpdateVendorRegistrationCaseStatusForAccountCommand))]
-        public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.UpdateVendorRegistrationCaseStatus)] UpdateVendorRegistrationCaseStatusForAccountCommand command)
+        [FunctionName(nameof(HandleUpdateVrfCaseStatusForAccountCommand))]
+        public async Task HandleCommand([NServiceBusTrigger(Endpoint = QueueNames.UpdateVendorRegistrationCaseStatus)] UpdateVrfCaseStatusForAccountCommand command)
         {
             await _commandDispatcher.Send(command);
         }
