@@ -1,11 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using NServiceBus.Persistence;
+using Polly;
+using Polly.Extensions.Http;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
@@ -223,7 +226,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()
                     .WithApimAuthorisationHeader(settings)
-                    .WithLogging(s.GetService<ILoggerFactory>());
+                    .WithLogging(s.GetService<ILoggerFactory>())
+                    .WithHandler(new TransientRetryHandler(p => p.RetryAsync(3)));
 
                 var httpClient = clientBuilder.Build();
 
@@ -343,5 +347,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
             });
         }
 
+        public sealed class TransientRetryHandler : PolicyHttpMessageHandler
+        {
+            public TransientRetryHandler(Func<PolicyBuilder<HttpResponseMessage>, IAsyncPolicy<HttpResponseMessage>> configurePolicy)
+                : base(configurePolicy(HttpPolicyExtensions.HandleTransientHttpError()))
+            {
+            }
+        }
     }
 }
