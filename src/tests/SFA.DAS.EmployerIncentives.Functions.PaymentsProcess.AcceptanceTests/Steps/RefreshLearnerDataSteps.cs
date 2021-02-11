@@ -41,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _accountModel = _fixture.Create<Data.Models.Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
+                .With(p => p.DateOfBirth, _startDate.AddYears(-26))
                 .With(p => p.UKPRN, 10036143)
                 .With(p => p.ULN, 9900084607)
                 .With(p => p.ApprenticeshipId, 511526)
