@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(_fixture.Create<long>(), accountLegalEntityId);
             var apprenticeship = new Apprenticeship(_fixture.Create<long>(), _fixture.Create<string>(),
                 _fixture.Create<string>(), _fixture.Create<DateTime>(), uln,
-                _fixture.Create<ApprenticeshipEmployerType>());
+                _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<string>());
 
             var incentive = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.Apprenticeship, apprenticeship)
                 .With(x => x.Account, account).Create();

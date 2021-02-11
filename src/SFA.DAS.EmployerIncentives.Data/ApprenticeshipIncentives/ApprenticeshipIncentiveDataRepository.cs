@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
@@ -32,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.PendingPayments.Count == 0);
             var results = new List<ApprenticeshipIncentiveModel>();
-            foreach(var incentive in queryResults)
+            foreach (var incentive in queryResults)
             {
                 results.Add(incentive.Map(collectionPeriods));
             }
@@ -68,6 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.PendingPayments)
                 .ThenInclude(x => x.ValidationResults)
                 .Include(x => x.Payments)
+                .Include(x => x.ClawbackPayments)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             var existingIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(x => x.Id == deletedIncentive.Id);
 
-            foreach(var pendingPayment in existingIncentive.PendingPayments)
+            foreach (var pendingPayment in existingIncentive.PendingPayments)
             {
                 foreach (var validationResult in pendingPayment.ValidationResults)
                 {
@@ -105,6 +105,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             _dbContext.Entry(existingIncentive).CurrentValues.SetValues(updatedIncentive);
 
+            RemoveDeletedClawbacks(updatedIncentive, existingIncentive);
+            RemoveDeletedPayments(updatedIncentive, existingIncentive);
             RemoveDeletedPendingPayments(updatedIncentive, existingIncentive);
 
             foreach (var pendingPayment in updatedIncentive.PendingPayments)
@@ -132,6 +134,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 else
                 {
                     _dbContext.Payments.Add(payment);
+                }
+            }
+
+            foreach (var clawback in updatedIncentive.ClawbackPayments)
+            {
+                var existingClawback = existingIncentive.ClawbackPayments.SingleOrDefault(p => p.Id == clawback.Id);
+
+                if (existingClawback != null)
+                {
+                    _dbContext.Entry(existingClawback).CurrentValues.SetValues(clawback);
+                }
+                else
+                {
+                    _dbContext.ClawbackPayments.Add(clawback);
                 }
             }
         }
@@ -164,6 +180,28 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
                 {
                     _dbContext.PendingPayments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.Payments)
+            {
+                if (!updatedIncentive.Payments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.Payments.Remove(existingPayment);
+                }
+            }
+        }
+
+        private void RemoveDeletedClawbacks(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingPayment in existingIncentive.ClawbackPayments)
+            {
+                if (!updatedIncentive.ClawbackPayments.Any(c => c.Id == existingPayment.Id))
+                {
+                    _dbContext.ClawbackPayments.Remove(existingPayment);
                 }
             }
         }

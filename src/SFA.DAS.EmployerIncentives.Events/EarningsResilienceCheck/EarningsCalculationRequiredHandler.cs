@@ -33,7 +33,10 @@ namespace SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck
                     apprenticeship.ULN,
                     apprenticeship.PlannedStartDate,
                     apprenticeship.ApprenticeshipEmployerTypeOnApproval,
-                    apprenticeship.UKPRN
+                    apprenticeship.UKPRN,
+                    @event.Model.DateSubmitted.Value,
+                    @event.Model.SubmittedByEmail,
+                    apprenticeship.CourseName
                 );
 
                 var task = _commandPublisher.Publish(command);

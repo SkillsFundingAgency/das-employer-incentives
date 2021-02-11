@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 
         [Column(TypeName = "nvarchar(20)")]
         public EarningType EarningType { get; set; }
+        public bool ClawedBack { get; set; }
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<PendingPaymentValidationResult> ValidationResults { get; set; }

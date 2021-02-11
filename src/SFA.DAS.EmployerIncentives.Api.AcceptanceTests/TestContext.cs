@@ -26,11 +26,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public List<object> EventsPublished { get; set; }
         public List<PublishedCommand> CommandsPublished { get; set; }
         public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
+        public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
 
         public TestContext()
         {
             InstanceId = Guid.NewGuid().ToString();
-            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), InstanceId));
+            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName, $"TestDirectory/{InstanceId}"));
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);

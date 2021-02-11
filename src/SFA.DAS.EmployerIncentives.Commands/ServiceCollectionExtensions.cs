@@ -28,6 +28,7 @@ using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
@@ -79,6 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
+            serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 

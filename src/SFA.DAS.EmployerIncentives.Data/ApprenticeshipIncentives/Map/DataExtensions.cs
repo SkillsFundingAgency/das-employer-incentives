@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+﻿using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
@@ -25,11 +24,15 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 StartDate = model.StartDate,
                 IncentiveApplicationApprenticeshipId = model.ApplicationApprenticeshipId,
                 PendingPayments = model.PendingPaymentModels.Map(),
-                Payments = model.PaymentModels.Map(),                
+                Payments = model.PaymentModels.Map(),
+                ClawbackPayments = model.ClawbackPaymentModels.Map(),
                 RefreshedLearnerForEarnings = model.RefreshedLearnerForEarnings,
                 HasPossibleChangeOfCircumstances = model.HasPossibleChangeOfCircumstances,
                 AccountLegalEntityId = model.Account.AccountLegalEntityId,
-                PausePayments = model.PausePayments
+                PausePayments = model.PausePayments,
+                SubmittedDate = model.SubmittedDate,
+                SubmittedByEmail = model.SubmittedByEmail,
+                CourseName = model.Apprenticeship.CourseName
             };
         }
 
@@ -41,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.LastName,
                      entity.DateOfBirth,
                      entity.ULN,
-                     entity.EmployerType
+                     entity.EmployerType,
+                     entity.CourseName
                      );
 
             if (entity.UKPRN.HasValue)
@@ -52,15 +56,18 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return new ApprenticeshipIncentiveModel
             {
                 Id = entity.Id,
-                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId.HasValue ? entity.AccountLegalEntityId.Value : 0),
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId),
                 Apprenticeship = apprenticeship,
                 StartDate = entity.StartDate,
                 ApplicationApprenticeshipId = entity.IncentiveApplicationApprenticeshipId,
                 PendingPaymentModels = entity.PendingPayments.Map(collectionPeriods),
                 PaymentModels = entity.Payments.Map(),
+                ClawbackPaymentModels = entity.ClawbackPayments.Map(),
                 RefreshedLearnerForEarnings = entity.RefreshedLearnerForEarnings,
-                HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,                
-                PausePayments = entity.PausePayments
+                HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,
+                PausePayments = entity.PausePayments,
+                SubmittedDate = entity.SubmittedDate,
+                SubmittedByEmail = entity.SubmittedByEmail
             };
         }
 
@@ -79,6 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentYear = x.PaymentYear,
                 PaymentMadeDate = x.PaymentMadeDate,
                 EarningType = x.EarningType,
+                ClawedBack = x.ClawedBack,
                 ValidationResults = x.PendingPaymentValidationResultModels.Map(x.Id),
             }).ToList();
         }
@@ -112,6 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 EarningType = x.EarningType,
                 PaymentYear = x.PaymentYear,
                 PaymentMadeDate = x.PaymentMadeDate,
+                ClawedBack = x.ClawedBack,
                 PendingPaymentValidationResultModels = x.ValidationResults.Map(collectionPeriods)
             }).ToList();
         }
@@ -166,9 +175,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             if (model != null)
             {
                 return new Domain.ValueObjects.CollectionPeriod(
-                    model.PeriodNumber, 
-                    model.CalendarMonth, 
-                    model.CalendarYear, 
+                    model.PeriodNumber,
+                    model.CalendarMonth,
+                    model.CalendarYear,
                     model.EIScheduledOpenDateUTC,
                     model.CensusDate,
                     Convert.ToInt16(model.AcademicYear),
@@ -195,8 +204,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
         {
             return models.Select(x =>
-                new CollectionPeriod                
-                { 
+                new CollectionPeriod
+                {
                     AcademicYear = x.AcademicYear.ToString(),
                     Active = x.Active,
                     CalendarMonth = x.CalendarMonth,
@@ -295,6 +304,39 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> Map(this ICollection<ApprenticeshipDaysInLearning> models)
         {
             return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning(x.CollectionPeriodNumber, x.CollectionPeriodYear, x.NumberOfDaysInLearning)).ToList();
+        }
+
+        private static ICollection<ClawbackPayment> Map(this ICollection<ClawbackPaymentModel> models)
+        {
+            return models.Select(x => new ClawbackPayment
+            {
+                Id = x.Id,
+                AccountId = x.Account.Id,
+                AccountLegalEntityId = x.Account.AccountLegalEntityId,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                PendingPaymentId = x.PendingPaymentId,
+                Amount = x.Amount,
+                DateClawbackCreated = x.CreatedDate,
+                PaymentId = x.PaymentId,
+                SubnominalCode = x.SubnominalCode,
+                DateClawbackSent = x.DateClawbackSent
+            }).ToList();
+        }
+
+        private static ICollection<ClawbackPaymentModel> Map(this ICollection<ClawbackPayment> models)
+        {
+            return models.Select(x => new ClawbackPaymentModel
+            {
+                Id = x.Id,
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(x.AccountId, x.AccountLegalEntityId),
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                Amount = x.Amount,
+                CreatedDate = x.DateClawbackCreated,
+                PaymentId = x.PaymentId,
+                SubnominalCode = x.SubnominalCode,
+                PendingPaymentId = x.PendingPaymentId,
+                DateClawbackSent = x.DateClawbackSent
+            }).ToList();
         }
     }
 }

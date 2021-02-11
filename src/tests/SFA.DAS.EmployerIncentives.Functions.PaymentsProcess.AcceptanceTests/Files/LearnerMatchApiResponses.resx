@@ -160,4 +160,7 @@
   <data name="PC_R04_Pricechange_DLock7_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>pc-r04-pricechange-dlock7.json.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="StartDateChange_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>StartDateChange.json.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
 </root>

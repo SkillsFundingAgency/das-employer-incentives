@@ -7,18 +7,18 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
 {
-    public class CalculateEarnings
+    public class CalculateEarningsActivity
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private ILogger<CalculateEarnings> _logger;
+        private ILogger<CalculateEarningsActivity> _logger;
 
-        public CalculateEarnings(ICommandDispatcher commandDispatcher, ILogger<CalculateEarnings> logger)
+        public CalculateEarningsActivity(ICommandDispatcher commandDispatcher, ILogger<CalculateEarningsActivity> logger)
         {
             _commandDispatcher = commandDispatcher;
             _logger = logger;
         }
 
-        [FunctionName("CalculateEarningsActivity")]
+        [FunctionName(nameof(CalculateEarningsActivity))]
         public async Task Update([ActivityTrigger] CalculateEarningsInput input)
         {
             _logger.LogInformation("Calculating Earnings for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);

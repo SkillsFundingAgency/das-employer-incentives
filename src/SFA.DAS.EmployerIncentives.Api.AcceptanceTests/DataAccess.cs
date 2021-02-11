@@ -52,25 +52,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             await dbConnection.InsertAsync(account);
         }
 
-        // Use this method to add `Status` column data as string as dapper would insert numeric enum value
-        public async Task InsertApplication(IncentiveApplication application)
+        public async Task<long> InsertWithEnumAsString<T>(T entity) where T : class
         {
             await using var dbConnection = new SqlConnection(_connectionString);
-            await dbConnection.ExecuteAsync(
-                "insert into IncentiveApplication(id, accountId, accountLegalEntityId, dateCreated, status, dateSubmitted, submittedByEmail, submittedByName) values " +
-                "(@id, @accountId, @accountLegalEntityId, @dateCreated, @status, @dateSubmitted, @submittedByEmail, @submittedByName)",
-                new
-                {
-                    application.Id,
-                    application.AccountId,
-                    application.AccountLegalEntityId,
-                    application.DateCreated,
-                    Status = application.Status.ToString(),
-                    application.DateSubmitted,
-                    application.SubmittedByEmail,
-                    application.SubmittedByName
-                });
+            return await dbConnection.InsertAsync(entity, true);
         }
-
     }
 }

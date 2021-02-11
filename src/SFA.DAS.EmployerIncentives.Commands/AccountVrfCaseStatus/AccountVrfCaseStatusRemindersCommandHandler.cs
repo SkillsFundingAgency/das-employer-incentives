@@ -39,18 +39,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.AccountVrfCaseStatus
                     applications.AddRange(applicationsForLegalEntity);
                 }
 
-                var submittedApplications = applications.Where(x => x.Status == IncentiveApplicationStatus.Submitted.ToString()
-                                                               && x.ApplicationDate < command.ApplicationCutOffDate)
+                var submittedApplications = applications.Where(x => x.ApplicationDate < command.ApplicationCutOffDate)
                                                               .OrderBy(x => x.ApplicationDate);
 
                 if (submittedApplications.Any())
                 {
                     var application = submittedApplications.First();
-                    var sendRepeatReminderEmailCommand = new SendBankDetailsRepeatReminderEmailCommand(
-                        application.AccountId,
-                        application.AccountLegalEntityId,
-                        application.ApplicationId,
-                        application.SubmittedByEmail);
+
+                    var firstSubmittedApplicationId = await _applicationDataRepository.GetFirstSubmittedApplicationId(application.AccountLegalEntityId);
+                    var sendRepeatReminderEmailCommand = new SendBankDetailsRepeatReminderEmailCommand(application.AccountId,
+                                                                                                       application.AccountLegalEntityId,
+                                                                                                       firstSubmittedApplicationId.Value,
+                                                                                                       application.SubmittedByEmail);
+
                     await _commandDispatcher.Send(sendRepeatReminderEmailCommand);
                 }
             }

@@ -6,10 +6,12 @@ using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.LearnerChangeOfCircumstance
@@ -41,9 +43,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<string>(),
                         DateTime.Today.AddYears(-26),
                         _fixture.Create<long>(),
-                        ApprenticeshipEmployerType.Levy
+                        ApprenticeshipEmployerType.Levy,
+                        _fixture.Create<string>()
                         ),
-                    DateTime.Today);
+                    DateTime.Today,
+                    _fixture.Create<DateTime>(),
+                    _fixture.Create<string>());
             incentive.SetHasPossibleChangeOfCircumstances(true);
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
@@ -77,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _incentive.StartDate.Should().Be(_learner.SubmissionData.LearningData.StartDate.Value);
-        }
+        }       
 
         [Test]
         public async Task Then_the_changes_are_persisted()
