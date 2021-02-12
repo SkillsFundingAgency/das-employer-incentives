@@ -149,7 +149,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
         public static IServiceCollection AddDomainCommandHandlerValidators(this IServiceCollection serviceCollection)
         {
             serviceCollection
-                .AddSingleton(typeof(IValidator<CreateIncentiveCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CalculateEarningsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<ValidatePendingPaymentCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteEarningsCalculationCommand>), new NullValidator())
