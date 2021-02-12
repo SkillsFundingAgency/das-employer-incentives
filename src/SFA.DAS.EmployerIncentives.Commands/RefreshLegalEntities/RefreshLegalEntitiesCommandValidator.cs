@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System.Linq;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
@@ -17,6 +18,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
             if (item.PageSize <= 0)
             {
                 result.AddError("PageSize", "Is negative or zero");
+            }
+
+            if (item.AccountLegalEntities == null || !item.AccountLegalEntities.Any())
+            {
+                result.AddError("AccountLegalEntities", "Not set");
             }
 
             return Task.FromResult(result);

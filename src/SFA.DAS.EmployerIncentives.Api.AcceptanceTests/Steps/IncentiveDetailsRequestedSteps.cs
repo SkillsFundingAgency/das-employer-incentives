@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetIncentiveDetails;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 using TechTalk.SpecFlow;
@@ -38,8 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenTheIncentiveDetailsAreReturned()
         {
             _incentiveResponse.Should().NotBeNull();
-            _incentiveResponse.EligibilityStartDate.Should().Be(NewApprenticeIncentive.EligibilityStartDate);
-            _incentiveResponse.EligibilityEndDate.Should().Be(NewApprenticeIncentive.EligibilityEndDate);
+            _incentiveResponse.EligibilityStartDate.Should().Be(Incentive.EligibilityStartDate);
+            _incentiveResponse.EligibilityEndDate.Should().Be(Incentive.EligibilityEndDate);
         }
     }
 }

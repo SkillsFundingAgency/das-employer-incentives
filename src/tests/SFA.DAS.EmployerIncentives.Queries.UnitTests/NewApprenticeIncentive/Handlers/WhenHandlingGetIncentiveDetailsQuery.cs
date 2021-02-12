@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetIncentiveDetails;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Handlers
@@ -26,8 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.EligibilityStartDate.Should().Be(ValueObjects.NewApprenticeIncentive.EligibilityStartDate);
-            result.EligibilityEndDate.Should().Be(ValueObjects.NewApprenticeIncentive.EligibilityEndDate);
+            result.EligibilityStartDate.Should().Be(Incentive.EligibilityStartDate);
+            result.EligibilityEndDate.Should().Be(Incentive.EligibilityEndDate);
         }
     }
 }

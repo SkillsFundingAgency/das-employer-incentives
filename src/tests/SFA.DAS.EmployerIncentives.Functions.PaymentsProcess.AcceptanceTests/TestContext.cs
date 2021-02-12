@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public TestContext()
         {
             InstanceId = Guid.NewGuid().ToString();
-            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), InstanceId));
+            TestDirectory = new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.Parent.FullName, $"TestDirectory/{InstanceId}"));
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);
