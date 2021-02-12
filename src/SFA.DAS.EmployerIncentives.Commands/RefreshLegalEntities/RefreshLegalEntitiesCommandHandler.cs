@@ -11,25 +11,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
 {
     public class RefreshLegalEntitiesCommandHandler : ICommandHandler<RefreshLegalEntitiesCommand>
     {
-        private readonly IAccountService _accountService;
         private readonly IEventPublisher _eventPublisher;
 
         public RefreshLegalEntitiesCommandHandler(
-            IAccountService accountService,
             IEventPublisher eventPublisher)
         {
-            _accountService = accountService;
             _eventPublisher = eventPublisher;
         }
         public async Task Handle(RefreshLegalEntitiesCommand command, CancellationToken cancellationToken = default)
         {
-            var response = await _accountService.GetAccountLegalEntitiesByPage(command.PageNumber, command.PageSize);
+            await ProcessLegalEntities(command.AccountLegalEntities);
 
-            await ProcessLegalEntities(response.Data);
-
-            if (response.Page == 1)
+            if (command.PageNumber == 1)
             {
-                await ProcessOtherPages(response.TotalPages, command.PageSize);
+                await ProcessOtherPages(command.TotalPages, command.PageSize);
             }
         }
 
@@ -41,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities
             }
         }
 
-        private async Task ProcessLegalEntities(List<AccountLegalEntity> accountLegalEntities)
+        private async Task ProcessLegalEntities(IEnumerable<AccountLegalEntity> accountLegalEntities)
         {
             var tasks = accountLegalEntities.Select(ale=> _eventPublisher.Publish(new RefreshLegalEntityEvent
                 {
