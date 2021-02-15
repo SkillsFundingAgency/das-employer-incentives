@@ -226,8 +226,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()
                     .WithApimAuthorisationHeader(settings)
-                    .WithLogging(s.GetService<ILoggerFactory>())
-                    .WithHandler(new TransientRetryHandler(p => p.RetryAsync(3)));
+                    .WithLogging(s.GetService<ILoggerFactory>());
+                    //.WithHandler(new TransientRetryHandler(p => p.RetryAsync(3)));
 
                 var httpClient = clientBuilder.Build();
 
