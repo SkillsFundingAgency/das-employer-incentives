@@ -32,16 +32,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly DateTime _plannedStartDate;
         private Payment _payment;
         private List<PendingPayment> _newPendingPayments;
+        private DateTime _actualStartDate;
 
         public IlrStartDateChangedSteps(TestContext testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
 
-            _plannedStartDate = new DateTime(2020, 5, 1);
+            _plannedStartDate = new DateTime(2020, 8, 1);
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
+                .With(p => p.DateOfBirth, _plannedStartDate.AddYears(-24).AddMonths(-10)) // under 25
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
@@ -55,8 +57,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
-
-            _pendingPayment.PaymentMadeDate = null;
 
             _learnerMatchApiData = _fixture
                 .Build<LearnerSubmissionDto>()
@@ -113,28 +113,33 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await dbConnection.UpdateAsync(_pendingPayment);
         }
 
-        [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive")]
-        public async Task WhenTheLearnerIsRefreshedWithAValidStartDate()
+
+        [When(@"the learner data is updated with new valid start date for the apprenticeship incentive")]
+        public void WhenTheLearnerDataIsUpdatedWithNewValidStartDateForTheApprenticeshipIncentive()
         {
-            var actualStartDate = _plannedStartDate.AddMonths(4);
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
+            _actualStartDate = _plannedStartDate.AddMonths(1);
+        }
 
+        [When(@"the learner data is updated with new invalid start date for the apprenticeship incentive")]
+        public void WhenTheLearnerDataIsUpdatedWithNewInvalidStartDateForTheApprenticeshipIncentive()
+        {
+            _actualStartDate = _plannedStartDate.AddMonths(-1);
+        }
+
+
+        [When(@"the incentive learner data is refreshed")]
+        public async Task WhenTheIncentiveLearnerDataIsRefreshed()
+        {
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = _actualStartDate;
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = _actualStartDate.AddYears(1);
             SetupMockLearnerMatchResponse();
-
             await StartLearnerMatching();
         }
 
-        [When(@"the learner data is refreshed with a new invalid start date for the apprenticeship incentive")]
-        public async Task WhenTheLearnerIsRefreshedWithAnInvalidStartDate()
+        [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive making the learner over twenty five at start")]
+        public void WhenTheLearnerDataIsRefreshedWithANewValidStartDateForTheApprenticeshipIncentiveMakingTheLearnerOverTwentyFiveAtStart()
         {
-            var actualStartDate = _plannedStartDate.AddMonths(-1);
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
-
-            SetupMockLearnerMatchResponse();
-
-            await StartLearnerMatching();
+            _actualStartDate = _plannedStartDate.AddMonths(2);
         }
 
         [Then(@"the actual start date is updated")]
@@ -225,13 +230,65 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"a new pending first payment record is created")]
         public void ThenANewPendingFirstPaymentRecordIsCreated()
         {
-            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.FirstPayment && !x.ClawedBack).Should().NotBeNull();
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.FirstPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(1000);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(4);
+            pp.PaymentYear.Should().Be(2021);
         }
 
         [Then(@"a new pending second payment record is created")]
         public void ThenANewPendingSecondPaymentRecordIsCreated()
         {
-            _newPendingPayments.SingleOrDefault(x => x.EarningType == EarningType.SecondPayment && !x.ClawedBack).Should().NotBeNull();
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.SecondPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(1000);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(1);
+            pp.PaymentYear.Should().Be(2122);
+        }
+
+        [Then(@"a new pending first payment record is created with a new amount and payment period")]
+        public void ThenANewPendingFirstPaymentRecordIsCreatedWithANewAmount()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.FirstPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(750);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(5);
+            pp.PaymentYear.Should().Be(2021);
+        }
+
+        [Then(@"a new pending second payment record is created with a new amount and payment period")]
+        public void ThenANewPendingSecondPaymentRecordIsCreatedWithANewAmount()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.SecondPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(750);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(2);
+            pp.PaymentYear.Should().Be(2122);
         }
 
         private void SetupMockLearnerMatchResponse()
