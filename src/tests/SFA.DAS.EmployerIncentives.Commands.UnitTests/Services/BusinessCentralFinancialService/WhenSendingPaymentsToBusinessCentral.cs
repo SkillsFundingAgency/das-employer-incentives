@@ -1,5 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
@@ -26,7 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
 
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false,
+                Mock.Of<ILogger<BusinessCentralFinancePaymentsService>>());
         }
 
         [Test]
@@ -133,7 +136,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
                 .Create();
 
             var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
-            
+
             paymentRequest.PaymentLineDescription.Should().Be(expected);
         }
 
@@ -142,7 +145,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         public void Then_the_PaymentLineDescription_is_constructed_with_uln_obfuscated(long uln, string expected)
         {
 
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true);
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true,
+                Mock.Of<ILogger<BusinessCentralFinancePaymentsService>>());
 
             var payment = _fixture.Build<PaymentDto>()
                 .With(x => x.EarningType, EarningType.FirstPayment)

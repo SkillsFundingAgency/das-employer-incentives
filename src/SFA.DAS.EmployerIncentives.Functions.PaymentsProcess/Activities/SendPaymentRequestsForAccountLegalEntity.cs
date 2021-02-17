@@ -1,17 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
+using System;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
 {
     public class SendPaymentRequestsForAccountLegalEntity
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private ILogger<SendPaymentRequestsForAccountLegalEntity> _logger;
+        private readonly ILogger<SendPaymentRequestsForAccountLegalEntity> _logger;
 
         public SendPaymentRequestsForAccountLegalEntity(ICommandDispatcher commandDispatcher, ILogger<SendPaymentRequestsForAccountLegalEntity> logger)
         {
@@ -20,13 +20,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         }
 
         [FunctionName(nameof(SendPaymentRequestsForAccountLegalEntity))]
-        public async Task<bool> Send([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
+        public async Task<bool> Send([ActivityTrigger] AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
-            _logger.LogInformation("Publish SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
+            _logger.LogInformation("[SendPaymentRequestsForAccountLegalEntity] Publish SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
             await _commandDispatcher.Send(new SendPaymentRequestsCommand(accountLegalEntityId, DateTime.UtcNow));
-            _logger.LogInformation("Published SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
+            _logger.LogInformation("[SendPaymentRequestsForAccountLegalEntity] Published SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
             return true;
         }
     }

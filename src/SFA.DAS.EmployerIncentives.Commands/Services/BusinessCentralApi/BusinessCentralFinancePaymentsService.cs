@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Net.Http.Headers;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -18,23 +18,28 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     {
         private readonly HttpClient _client;
         private readonly bool _obfuscateSensitiveData;
+        private readonly ILogger<BusinessCentralFinancePaymentsService> _logger;
         private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData)
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData,
+            ILogger<BusinessCentralFinancePaymentsService> logger)
         {
             _client = client;
             _obfuscateSensitiveData = obfuscateSensitiveData;
+            _logger = logger;
             _apiVersion = apiVersion ?? "2020-10-01";
             PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
 
-        public async Task SendPaymentRequests(List<PaymentDto> payments)
+        public async Task SendPaymentRequests(IList<PaymentDto> payments)
         {
+            _logger.LogInformation("[BusinessCentralFinancePaymentsService] Sending {Payments} payment requests to BC", payments.Count);
             var content = CreateJsonContent(payments);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/payments-data");
             var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
+            _logger.LogInformation("[BusinessCentralFinancePaymentsService] Response received from BC {response}", response);
             if (response.StatusCode == HttpStatusCode.Accepted)
             {
                 return;
@@ -71,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             };
         }
 
-        private HttpContent CreateJsonContent(List<PaymentDto> paymentsToSend)
+        private HttpContent CreateJsonContent(IEnumerable<PaymentDto> paymentsToSend)
         {
             var paymentRequests = paymentsToSend.Select(MapToBusinessCentralPaymentRequest);
 

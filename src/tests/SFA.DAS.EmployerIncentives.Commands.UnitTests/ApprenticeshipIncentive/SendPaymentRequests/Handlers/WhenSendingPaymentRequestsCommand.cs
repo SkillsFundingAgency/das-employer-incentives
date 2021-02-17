@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
@@ -10,6 +7,10 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentReq
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.SendPaymentRequests.Handlers
 {
@@ -21,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IBusinessCentralFinancePaymentsService> _mockBusinessCentralFinancePaymentsService;
         private List<PaymentDto> _paymentsToSend;
         private List<PaymentDto> _unsentPayments;
-        private int _paymentRequestsLimit; 
+        private int _paymentRequestsLimit;
 
         private SendPaymentRequestsCommand _command;
 
@@ -39,11 +40,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockBusinessCentralFinancePaymentsService.Setup(x => x.PaymentRequestsLimit)
                 .Returns(_paymentRequestsLimit);
             _paymentsToSend = _fixture.CreateMany<PaymentDto>(5).ToList();
-            _unsentPayments = _paymentsToSend.TakeLast(5-_paymentRequestsLimit).ToList();
+            _unsentPayments = _paymentsToSend.TakeLast(5 - _paymentRequestsLimit).ToList();
 
             _command = new SendPaymentRequestsCommand(_fixture.Create<long>(), _fixture.Create<DateTime>());
 
-            _sut = new SendPaymentRequestsCommandHandler(_mockAccountDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
+            _sut = new SendPaymentRequestsCommandHandler(_mockAccountDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object,
+                Mock.Of<ILogger<SendPaymentRequestsCommandHandler>>());
         }
 
         [Test]
