@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task ThenThePaymentsAreSent()
         {
             var paymentRequestCount = _testContext.PaymentsApi.MockServer.LogEntries.Count(l => l.RequestMessage.AbsolutePath == "/payments/requests");
-            paymentRequestCount.Should().Be(1);
+            paymentRequestCount.Should().Be(2);
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var payments = await connection.GetAllAsync<Payment>();
