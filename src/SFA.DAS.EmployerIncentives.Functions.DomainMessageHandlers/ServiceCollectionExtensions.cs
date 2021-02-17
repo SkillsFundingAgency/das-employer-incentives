@@ -11,6 +11,7 @@ using SFA.DAS.NServiceBus.AzureFunction.Hosting;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
+using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
@@ -105,7 +106,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             Task.WhenAll(endpoint);
 
             serviceCollection.AddSingleton(p => endpoint.Result)
-                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>());
+                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
+                .AddHostedService<NServiceBusHostedService>();
             return serviceCollection;
         }
     }
