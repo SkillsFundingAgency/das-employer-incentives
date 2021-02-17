@@ -22,24 +22,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData,
-            ILogger<BusinessCentralFinancePaymentsService> logger)
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData)
         {
             _client = client;
             _obfuscateSensitiveData = obfuscateSensitiveData;
-            _logger = logger;
             _apiVersion = apiVersion ?? "2020-10-01";
             PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
 
         public async Task SendPaymentRequests(IList<PaymentDto> payments)
         {
-            _logger.LogInformation("[BusinessCentralFinancePaymentsService] Sending {Payments} payment requests to BC", payments.Count);
             var content = CreateJsonContent(payments);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/payments-data");
             var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
-            _logger.LogInformation("[BusinessCentralFinancePaymentsService] Response received from BC {response}", response);
             if (response.StatusCode == HttpStatusCode.Accepted)
             {
                 return;

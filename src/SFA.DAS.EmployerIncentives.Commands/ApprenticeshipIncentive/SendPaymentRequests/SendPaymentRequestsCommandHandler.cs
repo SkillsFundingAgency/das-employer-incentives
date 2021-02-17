@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,40 +16,44 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
         private readonly IAccountDataRepository _accountRepository;
         private readonly IPayableLegalEntityQueryRepository _queryRepository;
         private readonly IBusinessCentralFinancePaymentsService _businessCentralFinancePaymentsService;
-        private readonly ILogger<SendPaymentRequestsCommandHandler> _logger;
 
         public SendPaymentRequestsCommandHandler(
             IAccountDataRepository accountRepository,
             IPayableLegalEntityQueryRepository queryRepository,
-            IBusinessCentralFinancePaymentsService businessCentralFinancePaymentsService,
-            ILogger<SendPaymentRequestsCommandHandler> logger)
+            IBusinessCentralFinancePaymentsService businessCentralFinancePaymentsService)
         {
             _accountRepository = accountRepository;
             _queryRepository = queryRepository;
             _businessCentralFinancePaymentsService = businessCentralFinancePaymentsService;
-            _logger = logger;
         }
 
         public async Task Handle(SendPaymentRequestsCommand command, CancellationToken cancellationToken = default)
         {
-            IList<PaymentDto> payments;
-            IList<PaymentDto> paymentsToSend;
-            do
+            var payments = await _queryRepository.GetPaymentsToSendForAccountLegalEntity(command.AccountLegalEntityId);
+            if (!payments.Any())
             {
-                payments = await _queryRepository.GetPaymentsToSendForAccountLegalEntity(command.AccountLegalEntityId);
-                _logger.LogInformation("[SendPaymentRequestsCommandHandler] Number of outstanding payments for {AccountLegalEntityId} found is: {Payments}",
-                    command.AccountLegalEntityId, payments.Count);
+                return;
+            }
 
-                if (!payments.Any()) return;
+            await Send(payments, command.AccountLegalEntityId, command.PaidDate);
+        }
 
-                paymentsToSend = payments.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
+        private async Task Send(List<PaymentDto> payments, long accountLegalEntityId, DateTime paidDate, CancellationToken cancellationToken = default)
+        {
+            var paymentsToSend = payments.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
+            if (!paymentsToSend.Any())
+            {
+                return;
+            }
 
-                await _businessCentralFinancePaymentsService.SendPaymentRequests(paymentsToSend);
+            await _businessCentralFinancePaymentsService.SendPaymentRequests(paymentsToSend);
 
-                await _accountRepository.UpdatePaidDateForPaymentIds(paymentsToSend.Select(s => s.PaymentId).ToList(),
-                    command.AccountLegalEntityId, command.PaidDate);
+            await _accountRepository.UpdatePaidDateForPaymentIds(paymentsToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, paidDate);
 
-            } while (payments.Count > paymentsToSend.Count);
+            if (payments.Count > paymentsToSend.Count)
+            {
+                await Send(payments.Skip(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList(), accountLegalEntityId, paidDate, cancellationToken);
+            }
         }
     }
 }

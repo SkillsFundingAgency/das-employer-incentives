@@ -28,8 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
 
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false,
-                Mock.Of<ILogger<BusinessCentralFinancePaymentsService>>());
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
         }
 
         [Test]
@@ -145,8 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         public void Then_the_PaymentLineDescription_is_constructed_with_uln_obfuscated(long uln, string expected)
         {
 
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true,
-                Mock.Of<ILogger<BusinessCentralFinancePaymentsService>>());
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true);
 
             var payment = _fixture.Build<PaymentDto>()
                 .With(x => x.EarningType, EarningType.FirstPayment)

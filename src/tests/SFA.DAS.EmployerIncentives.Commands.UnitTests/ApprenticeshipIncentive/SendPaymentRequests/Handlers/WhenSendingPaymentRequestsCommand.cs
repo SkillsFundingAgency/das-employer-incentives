@@ -44,8 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _command = new SendPaymentRequestsCommand(_fixture.Create<long>(), _fixture.Create<DateTime>());
 
-            _sut = new SendPaymentRequestsCommandHandler(_mockAccountDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object,
-                Mock.Of<ILogger<SendPaymentRequestsCommandHandler>>());
+            _sut = new SendPaymentRequestsCommandHandler(_mockAccountDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
         }
 
         [Test]
