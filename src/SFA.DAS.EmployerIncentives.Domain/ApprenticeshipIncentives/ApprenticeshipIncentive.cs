@@ -134,7 +134,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.Account,
                     Model.Id,
                     pendingPayment.Id,
-                    pendingPayment.Amount,
+                    -pendingPayment.Amount,
                     DateTime.Now,
                     payment.SubnominalCode,
                     payment.Id);
