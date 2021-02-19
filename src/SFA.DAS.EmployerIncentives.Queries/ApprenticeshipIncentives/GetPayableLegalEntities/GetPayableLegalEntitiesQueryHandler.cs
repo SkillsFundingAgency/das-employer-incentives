@@ -7,16 +7,16 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayable
 {
     public class GetPayableLegalEntitiesQueryHandler : IQueryHandler<GetPayableLegalEntitiesRequest, GetPayableLegalEntitiesResponse>
     {
-        private IPayableLegalEntityQueryRepository _queryRepository;
+        private IPaymentsQueryRepository _queryRepository;
 
-        public GetPayableLegalEntitiesQueryHandler(IPayableLegalEntityQueryRepository queryRepository)
+        public GetPayableLegalEntitiesQueryHandler(IPaymentsQueryRepository queryRepository)
         {
             _queryRepository = queryRepository;
         }
 
         public async Task<GetPayableLegalEntitiesResponse> Handle(GetPayableLegalEntitiesRequest query, CancellationToken cancellationToken = default)
         {
-            var payableLegalEntities = await _queryRepository.GetList(query.CollectionPeriodYear, query.CollectionPeriodMonth);
+            var payableLegalEntities = await _queryRepository.GetPayableLegalEntities(query.CollectionPeriodYear, query.CollectionPeriodMonth);
 
             var response = new GetPayableLegalEntitiesResponse(payableLegalEntities);
 

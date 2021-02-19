@@ -9,17 +9,17 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
-    public class PayableLegalEntityQueryRepository : IPayableLegalEntityQueryRepository
+    public class PaymentsQueryRepository : IPaymentsQueryRepository
     {
-        private Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private readonly Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
 
-        public PayableLegalEntityQueryRepository(Lazy<EmployerIncentivesDbContext> context)
+        public PaymentsQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
             _lazyContext = context;
         }
 
-        public Task<List<PayableLegalEntityDto>> GetList(short collectionPeriodYear, byte collectionPeriodNumber)
+        public Task<List<PayableLegalEntityDto>> GetPayableLegalEntities(short collectionPeriodYear, byte collectionPeriodNumber)
         {
             var accountLegalEntities = _context.Set<PendingPayment>().Where(x => !x.PaymentMadeDate.HasValue && (x.PaymentYear < collectionPeriodYear || (x.PaymentYear == collectionPeriodYear && x.PeriodNumber <= collectionPeriodNumber)))
                 .Select(x => new { x.AccountLegalEntityId, x.AccountId })
@@ -29,10 +29,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             return accountLegalEntities.Select(x=> new PayableLegalEntityDto {AccountLegalEntityId = x.AccountLegalEntityId, AccountId = x.AccountId }).ToListAsync();
         }
 
-        public Task<List<PaymentDto>> GetPaymentsToSendForAccountLegalEntity(long accountLegalEntity)
+        public Task<List<PaymentDto>> GetUnpaidPayments(long accountLegalEntity)
         {
             var payments = _context.Set<Payment>().Where(p => !p.PaidDate.HasValue && p.AccountLegalEntityId == accountLegalEntity)
-                .Join(_context.Set<Models.ApprenticeshipIncentive>(), p => p.ApprenticeshipIncentiveId, ai => ai.Id,
+                .Join(_context.Set<ApprenticeshipIncentive>(), p => p.ApprenticeshipIncentiveId, ai => ai.Id,
                     (p, ai) => new {ApprenticeshipIncentive = ai, Payment = p})
                 .Join(_context.Set<Data.Models.Account>(), ap => ap.Payment.AccountLegalEntityId, a => a.AccountLegalEntityId, (ap, a) =>
                     new { ap.ApprenticeshipIncentive, ap.Payment, Account = a})
@@ -60,6 +60,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     });
 
             return payments.ToListAsync();
+        }
+
+        public Task<List<ClawbackLegalEntityDto>> GetClawbackLegalEntities(short collectionPeriodYear, byte collectionPeriodNumber, bool isSent = false)
+        {
+            var accountLegalEntities = _context.Set<ClawbackPayment>()
+                .Where(x => (isSent ? x.DateClawbackSent.HasValue : !x.DateClawbackSent.HasValue) 
+                    && (x.CollectionPeriodYear < collectionPeriodYear || (x.CollectionPeriodYear == collectionPeriodYear && x.CollectionPeriod <= collectionPeriodNumber)))
+                .Select(x => new { x.AccountLegalEntityId, x.AccountId })
+                .Distinct();
+
+            return accountLegalEntities.Select(x => new ClawbackLegalEntityDto { AccountLegalEntityId = x.AccountLegalEntityId, AccountId = x.AccountId, IsSent = isSent }).ToListAsync();
         }
     }
 }

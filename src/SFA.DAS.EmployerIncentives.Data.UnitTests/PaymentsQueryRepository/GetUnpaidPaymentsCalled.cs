@@ -9,13 +9,13 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepository
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentsQueryRepository
 {
-    public class WhenGettingPaymentsToSendForAccountLegalEntity
+    public class GetUnpaidPaymentsCalled
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IPayableLegalEntityQueryRepository _sut;
+        private IPaymentsQueryRepository _sut;
         short _collectionPeriodYear = 2020;
         byte _collectionPeriodMonth = 5;
         private Payment _payment1;
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.PayableLegalEntityQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
+            _sut = new ApprenticeshipIncentives.PaymentsQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
 
             SetupAccount();
             SetupApprenticeshipIncentives();
@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         [TestCase(2, false)]
         public async Task Then_should_return_only_records_for_account_legal_entity(long accountLegalEntityId, bool expected)
         {
-            var payments = await _sut.GetPaymentsToSendForAccountLegalEntity(accountLegalEntityId);
+            var payments = await _sut.GetUnpaidPayments(accountLegalEntityId);
 
             (payments.Count > 0).Should().Be(expected);
         }
@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         [Test]
         public async Task Then_should_return_only_records_for_payments_which_havent_been_sent()
         {
-            var payments = await _sut.GetPaymentsToSendForAccountLegalEntity(1);
+            var payments = await _sut.GetUnpaidPayments(1);
 
             payments.Count.Should().Be(1);
         }
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         [Test]
         public async Task Then_should_return_records_with_values_mapped()
         {
-            var payments = await _sut.GetPaymentsToSendForAccountLegalEntity(1);
+            var payments = await _sut.GetUnpaidPayments(1);
 
             payments.Count.Should().Be(1);
             payments[0].PaymentId.Should().Be(_payment1.Id);

@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 _logger.LogInformation("Incentive Payment process started for collection period {collectionPeriod}", collectionPeriod);
 
             context.SetCustomStatus("GettingPayableLegalEntities");
-            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);
+            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);            
 
             context.SetCustomStatus("CalculatingPayments");
             var calculatePaymentTasks = new List<Task>();
@@ -37,6 +37,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
 
             await Task.WhenAll(calculatePaymentTasks);
+
+            context.SetCustomStatus("GettingUnsentClawbackLegalEntities");
+            var clawbackLegalEntities = await context.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), collectionPeriod);
+
+            if (!context.IsReplaying)
+            {
+                context.SetCustomStatus("LoggingUnsentClawbacks");
+                foreach (var legalEntity in clawbackLegalEntities)
+                {
+                    _logger.LogInformation($"Unsent clawback for AccountId : {legalEntity.AccountId}, AccountLegalEntityId : {legalEntity.AccountLegalEntityId}, Collection Year : {collectionPeriod.Year}, Period : {collectionPeriod.Period}");
+                }
+            }
 
             context.SetCustomStatus("WaitingForPaymentApproval");
 

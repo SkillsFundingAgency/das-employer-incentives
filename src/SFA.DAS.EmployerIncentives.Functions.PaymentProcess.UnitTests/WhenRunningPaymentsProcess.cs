@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Application.UnitTests;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private IncentivePaymentOrchestrator _orchestrator;
         private List<PayableLegalEntityDto> _legalEntities;
+        private Mock<ILogger<IncentivePaymentOrchestrator>> _mockLogger;
 
         [SetUp]
         public void Setup()
@@ -29,8 +31,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             _legalEntities = _fixture.CreateMany<PayableLegalEntityDto>(3).ToList();
             _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", _collectionPeriod)).ReturnsAsync(_legalEntities);
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<ClawbackLegalEntityDto>>("GetUnsentClawbacks", _collectionPeriod)).ReturnsAsync(new List<ClawbackLegalEntityDto>());
+            
+            _mockLogger = new Mock<ILogger<IncentivePaymentOrchestrator>>();
 
-            _orchestrator = new IncentivePaymentOrchestrator(Mock.Of<ILogger<IncentivePaymentOrchestrator>>());
+            _orchestrator = new IncentivePaymentOrchestrator(_mockLogger.Object);
         }
 
         [Test]
@@ -109,6 +114,31 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
                 ), Times.Once);
             }
+        }
+
+        [Test]
+        public async Task Then_call_is_made_to_get_unsent_clawback_legal_entities()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), _collectionPeriod), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_unsent_clawback_legal_entities_are_logged()
+        {
+            var clawbackLegalEntities = _fixture.Create<List<ClawbackLegalEntityDto>>();
+
+            _mockOrchestrationContext
+                .Setup(m => m.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), _collectionPeriod))
+                .ReturnsAsync(clawbackLegalEntities);
+
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            foreach(var clawbackLegalEntity in clawbackLegalEntities)
+            {
+                _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"Unsent clawback for AccountId : {clawbackLegalEntity.AccountId}, AccountLegalEntityId : {clawbackLegalEntity.AccountLegalEntityId}, Collection Year : {_collectionPeriod.Year}, Period : {_collectionPeriod.Period}");
+            }            
         }
     }
 }
