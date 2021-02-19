@@ -31,12 +31,22 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared
             BaseAddress = baseAddress;
         }
 
+        public void VerifyContentType(string contentType)
+        {
+            _mockHttpMessageHandler
+             .Protected()
+             .Verify("SendAsync", Times.AtLeastOnce(),
+             ItExpr.Is<HttpRequestMessage>(r =>
+             r.Content.Headers.ContentType.MediaType == contentType
+             ), ItExpr.IsAny<CancellationToken>());
+        }
+
         public void VerifyPostAsAsync<T>(string relativePath, T value, Times times)
         {
             _mockHttpMessageHandler
              .Protected()
              .Verify("SendAsync", times,
-             ItExpr.Is<HttpRequestMessage>(r =>
+             ItExpr.Is<HttpRequestMessage>(r =>             
              r.Method == HttpMethod.Post &&
              r.RequestUri.AbsoluteUri == $"{BaseAddress.AbsoluteUri}{relativePath}" &&
              r.Content.ReadAsStringAsync().Result == JsonConvert.SerializeObject(value)

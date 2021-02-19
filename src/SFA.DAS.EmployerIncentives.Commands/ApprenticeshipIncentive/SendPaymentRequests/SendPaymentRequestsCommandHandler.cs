@@ -1,11 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests
 {
@@ -28,20 +30,29 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
         public async Task Handle(SendPaymentRequestsCommand command, CancellationToken cancellationToken = default)
         {
             var payments = await _queryRepository.GetPaymentsToSendForAccountLegalEntity(command.AccountLegalEntityId);
-            if (payments.Any() == false)
+            if (!payments.Any())
             {
                 return;
             }
 
+            await Send(payments, command.AccountLegalEntityId, command.PaidDate);
+        }
+
+        private async Task Send(List<PaymentDto> payments, long accountLegalEntityId, DateTime paidDate, CancellationToken cancellationToken = default)
+        {
             var paymentsToSend = payments.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
+            if (!paymentsToSend.Any())
+            {
+                return;
+            }
 
             await _businessCentralFinancePaymentsService.SendPaymentRequests(paymentsToSend);
 
-            await _accountRepository.UpdatePaidDateForPaymentIds(paymentsToSend.Select(s => s.PaymentId).ToList(), command.AccountLegalEntityId, command.PaidDate);
+            await _accountRepository.UpdatePaidDateForPaymentIds(paymentsToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, paidDate);
 
             if (payments.Count > paymentsToSend.Count)
             {
-                await Handle(command, cancellationToken);
+                await Send(payments.Skip(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList(), accountLegalEntityId, paidDate, cancellationToken);
             }
         }
     }
