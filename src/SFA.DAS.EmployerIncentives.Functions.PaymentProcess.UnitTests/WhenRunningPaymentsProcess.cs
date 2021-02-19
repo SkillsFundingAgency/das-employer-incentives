@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {

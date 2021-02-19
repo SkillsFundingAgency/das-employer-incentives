@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,95 +14,83 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
     public class WhenUpdateCalled
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
-        private Fixture _fixture;
+        private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
-        private ApprenticeshipIncentiveModel _testIncentive;
+        private ApprenticeshipIncentives.Models.CollectionPeriod _collectionPeriod;
 
         [SetUp]
-        public async Task Arrange()
+        public async Task Setup()
         {
-            _fixture = new Fixture();
-
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
+            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
-
-            _testIncentive = _fixture
-                .Build<ApprenticeshipIncentiveModel>()
-                .Create();
-
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
-            await _sut.Add(_testIncentive);
-            await _dbContext.SaveChangesAsync();
+            await AddCollectionPeriod();
         }
 
         [TearDown]
-        public void CleanUp()
-        {
-            _dbContext.Dispose();
-        }
+        public void CleanUp() => _dbContext.Dispose();
 
         [Test]
         public async Task Then_the_apprenticeship_incentive_is_updated_with_new_values()
         {
             // Arrange
-            var storedIncentive = await _sut.Get(_testIncentive.Id);
+            var expected = await SaveAndGetApprenticeshipIncentive();
 
-            storedIncentive.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
-            storedIncentive.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
+            expected.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
+            expected.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
 
             var pendingPayments = _fixture.Build<PendingPaymentModel>().With(
-                x => x.ApprenticeshipIncentiveId, storedIncentive.Id).CreateMany().ToList();
-            storedIncentive.PendingPaymentModels = pendingPayments;
+                x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
+            expected.PendingPaymentModels = pendingPayments;
 
             var validationResults = _fixture.CreateMany<PendingPaymentValidationResultModel>().ToList();
-            storedIncentive.PendingPaymentModels.First().PendingPaymentValidationResultModels = validationResults;
+            expected.PendingPaymentModels.First().PendingPaymentValidationResultModels = validationResults;
 
-            foreach (var pendingPaymentModel in storedIncentive.PendingPaymentModels)
+            foreach (var pendingPaymentModel in expected.PendingPaymentModels)
             {
                 var payment = _fixture.Build<PaymentModel>()
-                    .With(x => x.ApprenticeshipIncentiveId, storedIncentive.Id)
+                    .With(x => x.ApprenticeshipIncentiveId, expected.Id)
                     .With(x => x.PendingPaymentId, pendingPaymentModel.Id).Create();
-                storedIncentive.PaymentModels.Add(payment);
+                expected.PaymentModels.Add(payment);
             }
 
             var clawbackPayments = _fixture.Build<ClawbackPaymentModel>().With(
-                x => x.ApprenticeshipIncentiveId, storedIncentive.Id).CreateMany().ToList();
-            storedIncentive.ClawbackPaymentModels = clawbackPayments;
+                x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
+            expected.ClawbackPaymentModels = clawbackPayments;
 
             // Act
-            await _sut.Update(storedIncentive);
+            await _sut.Update(expected);
             await _dbContext.SaveChangesAsync();
 
             // Assert
             _dbContext.ApprenticeshipIncentives.Count().Should().Be(1);
             _dbContext.ApprenticeshipIncentives.Count(
-                x => x.AccountId == storedIncentive.Account.Id &&
-                     x.ApprenticeshipId == storedIncentive.Apprenticeship.Id &&
-                     x.FirstName == storedIncentive.Apprenticeship.FirstName &&
-                     x.LastName == storedIncentive.Apprenticeship.LastName &&
-                     x.DateOfBirth == storedIncentive.Apprenticeship.DateOfBirth &&
-                     x.ULN == storedIncentive.Apprenticeship.UniqueLearnerNumber &&
-                     x.EmployerType == storedIncentive.Apprenticeship.EmployerType &&
-                     x.SubmittedByEmail == storedIncentive.SubmittedByEmail &&
-                     x.SubmittedDate == storedIncentive.SubmittedDate &&
-                     x.CourseName == storedIncentive.Apprenticeship.CourseName
+                x => x.AccountId == expected.Account.Id &&
+                     x.ApprenticeshipId == expected.Apprenticeship.Id &&
+                     x.FirstName == expected.Apprenticeship.FirstName &&
+                     x.LastName == expected.Apprenticeship.LastName &&
+                     x.DateOfBirth == expected.Apprenticeship.DateOfBirth &&
+                     x.ULN == expected.Apprenticeship.UniqueLearnerNumber &&
+                     x.EmployerType == expected.Apprenticeship.EmployerType &&
+                     x.SubmittedByEmail == expected.SubmittedByEmail &&
+                     x.SubmittedDate == expected.SubmittedDate &&
+                     x.CourseName == expected.Apprenticeship.CourseName
                 )
                 .Should().Be(1);
 
-            var savedPendingPayments = _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == storedIncentive.Id);
+            var savedPendingPayments = _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
             savedPendingPayments.Should().BeEquivalentTo(pendingPayments, opt => opt
                 .Excluding(x => x.Account)
                 .Excluding(x => x.PendingPaymentValidationResultModels));
 
             var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
-                x.PendingPaymentId == storedIncentive.PendingPaymentModels.First().Id);
+                x.PendingPaymentId == expected.PendingPaymentModels.First().Id);
             savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
                 .Excluding(x => x.CollectionPeriod)
             );
 
-            _dbContext.PendingPayments.Count().Should().Be(storedIncentive.PendingPaymentModels.Count);
-            _dbContext.Payments.Count().Should().Be(storedIncentive.PaymentModels.Count);
+            _dbContext.PendingPayments.Count().Should().Be(expected.PendingPaymentModels.Count);
+            _dbContext.Payments.Count().Should().Be(expected.PaymentModels.Count);
 
             foreach (var result in savedValidationResults)
             {
@@ -112,16 +101,36 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             }
 
-            var savedClawbackPayments = _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == storedIncentive.Id);
+            var savedClawbackPayments = _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
             savedClawbackPayments.Should().BeEquivalentTo(clawbackPayments, opt => opt
                 .Excluding(x => x.Account).Excluding(x => x.CreatedDate));
+        }
+
+        [Test]
+        public async Task Then_existing_pending_payments_are_updated()
+        {
+            // Arrange
+            var expected = await SaveAndGetApprenticeshipIncentive();
+            AddUpdateAndRemovePendingPaymentsAndValidationResults(expected);
+
+            // Act
+            await _sut.Update(expected);
+            await _dbContext.SaveChangesAsync();
+
+            // Assert 
+            var result = await _sut.Get(expected.Id);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Test]
         public async Task Then_the_removed_payments_are_deleted()
         {
             // Arrange
-            var storedIncentive = await _sut.Get(_testIncentive.Id);
+            var incentive = _fixture.Create<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
+            await _dbContext.AddAsync(incentive);
+            await _dbContext.SaveChangesAsync();
+
+            var storedIncentive = await _sut.Get(incentive.Id);
             storedIncentive.PendingPaymentModels.Clear();
             storedIncentive.PaymentModels.Count.Should().BeGreaterThan(0);
             storedIncentive.PaymentModels.Clear();
@@ -134,6 +143,74 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             _dbContext.Payments.Should().BeEmpty();
             _dbContext.PendingPayments.Should().BeEmpty();
             _dbContext.PendingPaymentValidationResults.Should().BeEmpty();
+        }
+
+        private async Task<ApprenticeshipIncentiveModel> SaveAndGetApprenticeshipIncentive()
+        {
+            var incentive = _fixture.Create<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
+            foreach (var pendingPayment in incentive.PendingPayments)
+            {
+                pendingPayment.PaymentYear = Convert.ToInt16(_collectionPeriod.AcademicYear);
+                pendingPayment.PeriodNumber = _collectionPeriod.PeriodNumber;
+                foreach (var validationResult in pendingPayment.ValidationResults)
+                {
+                    validationResult.PaymentYear = Convert.ToInt16(_collectionPeriod.AcademicYear);
+                    validationResult.PeriodNumber = _collectionPeriod.PeriodNumber;
+                }
+            }
+
+            await _dbContext.AddAsync(incentive);
+            await _dbContext.SaveChangesAsync();
+            return await _sut.Get(incentive.Id);
+        }
+
+        private async Task AddCollectionPeriod()
+        {
+            _collectionPeriod = _fixture.Build<ApprenticeshipIncentives.Models.CollectionPeriod>()
+                .With(x => x.Active, true)
+                .With(x => x.PeriodNumber, 2)
+                .With(x => x.CalendarMonth, 9)
+                .With(x => x.CalendarYear, 2020)
+                .With(x => x.EIScheduledOpenDateUTC, new DateTime(2020, 9, 6))
+                .With(x => x.CensusDate, new DateTime(2020, 9, 30))
+                .With(x => x.AcademicYear, "2021")
+                .Create();
+            await _dbContext.AddAsync(_collectionPeriod);
+        }
+
+        private void AddUpdateAndRemovePendingPaymentsAndValidationResults(ApprenticeshipIncentiveModel expected)
+        {
+            expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().Result
+                = !expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().Result;
+            expected.PendingPaymentModels.First().Amount -= 250;
+            expected.PaymentModels.First().Amount -= 250;
+            var newPendingPayment = _fixture.Build<PendingPaymentModel>()
+                .With(x => x.ApprenticeshipIncentiveId, expected.Id)
+                .With(x => x.PaymentYear, _collectionPeriod.PeriodNumber)
+                .With(x => x.PeriodNumber, _collectionPeriod.PeriodNumber)
+                .Without(x => x.PendingPaymentValidationResultModels)
+                .Create();
+
+            var cp = new CollectionPeriod(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarMonth,
+                _collectionPeriod.CalendarYear,
+                _collectionPeriod.EIScheduledOpenDateUTC, _collectionPeriod.CensusDate,
+                Convert.ToInt16(_collectionPeriod.AcademicYear), true);
+
+            expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels
+                .Remove(expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels.First());
+            expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels.Add(
+                _fixture.Build<PendingPaymentValidationResultModel>()
+                    .With(x => x.CollectionPeriod, cp)
+                    .Create()
+            );
+
+            newPendingPayment.PendingPaymentValidationResultModels.Add(
+                _fixture.Build<PendingPaymentValidationResultModel>()
+                    .With(x => x.CollectionPeriod, cp)
+                    .Create()
+            );
+
+            expected.PendingPaymentModels.Add(newPendingPayment);
         }
     }
 }

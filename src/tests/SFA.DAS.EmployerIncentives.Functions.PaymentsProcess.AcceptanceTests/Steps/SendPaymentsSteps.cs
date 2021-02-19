@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Dapper.Contrib.Extensions;
+using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
-using FluentAssertions;
 using System.Threading.Tasks;
-using Dapper.Contrib.Extensions;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     Request
                         .Create()
                         .WithPath($"/payments/requests")
+                        .WithHeader("Content-Type", "application/payments-data")
                         .WithParam("api-version", "2020-10-01")
                         .UsingPost()
                 )
@@ -67,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task ThenThePaymentsAreSent()
         {
             var paymentRequestCount = _testContext.PaymentsApi.MockServer.LogEntries.Count(l => l.RequestMessage.AbsolutePath == "/payments/requests");
-            paymentRequestCount.Should().Be(1);
+            paymentRequestCount.Should().Be(2);
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var payments = await connection.GetAllAsync<Payment>();
