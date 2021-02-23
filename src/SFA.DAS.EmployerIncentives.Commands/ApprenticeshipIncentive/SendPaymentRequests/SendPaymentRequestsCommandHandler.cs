@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
         public async Task Handle(SendPaymentRequestsCommand command, CancellationToken cancellationToken = default)
         {
             var payments = await _queryRepository.GetUnpaidPayments(command.AccountLegalEntityId);
-            if (payments.Any() == false)
+            if (!payments.Any())
             {
                 return;
             }

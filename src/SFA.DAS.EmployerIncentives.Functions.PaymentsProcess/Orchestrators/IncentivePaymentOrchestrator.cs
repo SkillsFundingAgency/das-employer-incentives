@@ -72,6 +72,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             await Task.WhenAll(sendPaymentTasks);
             context.SetCustomStatus("PaymentsSent");
 
+            context.SetCustomStatus("SendingClawbacks");
+            var sendClawbackTasks = new List<Task>();
+            foreach (var legalEntity in clawbackLegalEntities)
+            {
+                var sendClawbackTask = context.CallActivityAsync(nameof(SendClawbacksForAccountLegalEntity), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+                sendClawbackTasks.Add(sendClawbackTask);
+            }
+            await Task.WhenAll(sendClawbackTasks);
+            context.SetCustomStatus("ClawbacksSent");
+
             _logger.LogInformation("[IncentivePaymentOrchestrator] Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);
         }
     }

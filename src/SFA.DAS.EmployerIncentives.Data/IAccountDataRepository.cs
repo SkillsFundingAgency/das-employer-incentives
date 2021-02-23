@@ -14,6 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Data
         Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId);
         Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus);
         Task UpdatePaidDateForPaymentIds(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate);
+        Task UpdateClawbackDateForClawbackIds(List<Guid> clawbackIds, long accountLegalEntityId, DateTime clawbackDate);
         Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime();
     }
 }

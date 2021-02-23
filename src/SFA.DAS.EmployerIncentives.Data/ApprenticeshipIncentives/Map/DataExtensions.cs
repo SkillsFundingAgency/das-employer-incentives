@@ -319,7 +319,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 DateClawbackCreated = x.CreatedDate,
                 PaymentId = x.PaymentId,
                 SubnominalCode = x.SubnominalCode,
-                DateClawbackSent = x.DateClawbackSent
+                DateClawbackSent = x.DateClawbackSent,
+                CollectionPeriod = x.CollectionPeriod,
+                CollectionPeriodYear = x.CollectionPeriodYear
             }).ToList();
         }
 
@@ -335,7 +337,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentId = x.PaymentId,
                 SubnominalCode = x.SubnominalCode,
                 PendingPaymentId = x.PendingPaymentId,
-                DateClawbackSent = x.DateClawbackSent
+                DateClawbackSent = x.DateClawbackSent,
+                CollectionPeriod = x.CollectionPeriod,
+                CollectionPeriodYear = x.CollectionPeriodYear               
             }).ToList();
         }
     }

@@ -14,12 +14,12 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysI
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawbacks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
 using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators;
 using SFA.DAS.EmployerIncentives.Commands.Services;
-using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
@@ -164,6 +164,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateVendorRegistrationCaseStatusForAccountCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<SendClawbacksCommand>), new NullValidator())
                 ;
 
             return serviceCollection;

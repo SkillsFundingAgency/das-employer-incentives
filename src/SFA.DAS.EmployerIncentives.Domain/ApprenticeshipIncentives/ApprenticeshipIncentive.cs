@@ -139,6 +139,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     payment.SubnominalCode,
                     payment.Id);
 
+                clawback.SetPaymentPeriod(pendingPayment.CollectionPeriod);
+
                 Model.ClawbackPaymentModels.Add(clawback.GetModel());
             }
         }

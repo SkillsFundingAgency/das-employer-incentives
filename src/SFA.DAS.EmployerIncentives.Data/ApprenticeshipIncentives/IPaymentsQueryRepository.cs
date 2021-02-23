@@ -9,5 +9,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         Task<List<PayableLegalEntityDto>> GetPayableLegalEntities(short collectionPeriodYear, byte collectionPeriodNumber);
         Task<List<ClawbackLegalEntityDto>> GetClawbackLegalEntities(short collectionPeriodYear, byte collectionPeriodNumber, bool isSent = false);
         Task<List<PaymentDto>> GetUnpaidPayments(long accountLegalEntity);
+        Task<List<PaymentDto>> GetUnpaidClawbacks(long accountLegalEntity);
     }
 }

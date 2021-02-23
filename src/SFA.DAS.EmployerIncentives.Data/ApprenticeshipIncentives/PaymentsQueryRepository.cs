@@ -62,6 +62,39 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             return payments.ToListAsync();
         }
 
+        public Task<List<PaymentDto>> GetUnpaidClawbacks(long accountLegalEntity)
+        {
+            var clawbacks = _context.Set<ClawbackPayment>().Where(p => !p.DateClawbackSent.HasValue && p.AccountLegalEntityId == accountLegalEntity)
+               .Join(_context.Set<ApprenticeshipIncentive>(), p => p.ApprenticeshipIncentiveId, ai => ai.Id,
+                   (p, ai) => new { ApprenticeshipIncentive = ai, Clawback = p })
+               .Join(_context.Set<Data.Models.Account>(), ap => ap.Clawback.AccountLegalEntityId, a => a.AccountLegalEntityId, (ap, a) =>
+                   new { ap.ApprenticeshipIncentive, ap.Clawback, Account = a })
+               .Join(_context.Set<PendingPayment>(), ap => ap.Clawback.PendingPaymentId, pp => pp.Id, (ap, pp) =>
+                   new
+                   {
+                       ap.ApprenticeshipIncentive,
+                       ap.Clawback,
+                       ap.Account,
+                       PendingPayment = pp
+                   })
+               .Select(x =>
+                   new PaymentDto
+                   {
+                       PaymentId = x.Clawback.Id,
+                       ApprenticeshipIncentiveId = x.ApprenticeshipIncentive.Id,
+                       AccountLegalEntityId = x.Account.AccountLegalEntityId,
+                       VendorId = x.Account.VrfVendorId,
+                       DueDate = x.PendingPayment.DueDate,
+                       SubnominalCode = x.Clawback.SubnominalCode,
+                       Amount = x.Clawback.Amount,
+                       EarningType = x.PendingPayment.EarningType,
+                       ULN = x.ApprenticeshipIncentive.ULN,
+                       HashedLegalEntityId = x.Account.HashedLegalEntityId
+                   });
+
+            return clawbacks.ToListAsync();
+        }
+
         public Task<List<ClawbackLegalEntityDto>> GetClawbackLegalEntities(short collectionPeriodYear, byte collectionPeriodNumber, bool isSent = false)
         {
             var accountLegalEntities = _context.Set<ClawbackPayment>()
