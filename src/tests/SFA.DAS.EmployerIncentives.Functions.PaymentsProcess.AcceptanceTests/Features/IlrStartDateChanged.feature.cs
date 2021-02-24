@@ -322,10 +322,13 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 43
- testRunner.Then("the unpaid earning is deleted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the unpaid earning is archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 44
- testRunner.And("all unpaid payment records are deleted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("all unpaid payment records are archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 45
+ testRunner.And("all pending payment validation results are archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -340,7 +343,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Clawbacks - Start Date Change Of Circumstance with eligible start date changing l" +
                     "earner\'s age from under to over 25", null, tagsOfScenario, argumentsOfScenario);
-#line 46
+#line 47
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -360,30 +363,30 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 47
+#line 48
  testRunner.Given("an apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 48
+#line 49
  testRunner.And("an earning has been paid for an apprenticeship incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 49
+#line 50
  testRunner.When("the learner data is refreshed with a new valid start date for the apprenticeship " +
                         "incentive making the learner over twenty five at start", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 50
+#line 51
  testRunner.And("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 51
+#line 52
  testRunner.Then("earnings are recalculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 52
+#line 53
  testRunner.And("the paid earning is marked as requiring a clawback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 53
+#line 54
  testRunner.And("a new pending first payment record is created with a new amount and payment perio" +
                         "d", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 54
+#line 55
  testRunner.And("a new pending second payment record is created with a new amount and payment peri" +
                         "od", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden

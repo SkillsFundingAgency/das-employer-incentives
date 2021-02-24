@@ -175,11 +175,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         private void RemoveDeletedPendingPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
         {
-            foreach (var existingPayment in existingIncentive.PendingPayments)
+            foreach (var existingPendingPayment in existingIncentive.PendingPayments)
             {
-                if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
+                if (updatedIncentive.PendingPayments.All(c => c.Id != existingPendingPayment.Id))
                 {
-                    _dbContext.PendingPayments.Remove(existingPayment);
+                    ArchiveValidationResults(existingPendingPayment);
+                    _dbContext.ArchivedPendingPayments.Add(existingPendingPayment.Archive());
+                    _dbContext.PendingPayments.Remove(existingPendingPayment);
                 }
             }
         }
@@ -190,6 +192,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 if (!updatedIncentive.Payments.Any(c => c.Id == existingPayment.Id))
                 {
+                    _dbContext.ArchivedPayments.Add(existingPayment.Archive());
                     _dbContext.Payments.Remove(existingPayment);
                 }
             }
@@ -212,8 +215,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 if (!updatedPendingPayment.ValidationResults.Any(c => c.Id == existingValidationResult.Id))
                 {
+                    _dbContext.ArchivedPendingPaymentValidationResults.Add(existingValidationResult.Archive());
                     _dbContext.PendingPaymentValidationResults.Remove(existingValidationResult);
                 }
+            }
+        }
+
+        private void ArchiveValidationResults(PendingPayment pendingPayment)
+        {
+            foreach (var validationResult in _dbContext.PendingPaymentValidationResults.Where(vr => vr.PendingPaymentId == pendingPayment.Id))
+            {
+                _dbContext.ArchivedPendingPaymentValidationResults.Add(validationResult.Archive());
             }
         }
     }

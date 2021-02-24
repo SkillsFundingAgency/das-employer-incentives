@@ -2,12 +2,15 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CollectionPeriod = SFA.DAS.EmployerIncentives.Domain.ValueObjects.CollectionPeriod;
+using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -123,10 +126,44 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         }
 
         [Test]
-        public async Task Then_the_removed_payments_are_deleted()
+        public async Task Then_the_removed_pending_payments_are_archived()
         {
             // Arrange
-            var incentive = _fixture.Create<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .Without(i => i.PendingPayments)
+                .Create();
+            var pendingPayments = _fixture.CreateMany<PendingPayment>(1).ToList();
+            incentive.PendingPayments = new List<PendingPayment>(pendingPayments);
+
+            await _dbContext.AddAsync(incentive);
+            await _dbContext.SaveChangesAsync();
+
+            var storedIncentive = await _sut.Get(incentive.Id);
+            storedIncentive.PendingPaymentModels.Clear();
+
+            // Act
+            await _sut.Update(storedIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Assert 
+            _dbContext.PendingPayments.Should().BeEmpty();
+            pendingPayments.Should().NotBeEmpty();
+            _dbContext.ArchivedPendingPayments.Should().BeEquivalentTo(pendingPayments, opt =>
+                opt.Excluding(x => x.Id).Excluding(x => x.ValidationResults));
+            _dbContext.ArchivedPendingPayments.Select(x => x.PendingPaymentId).Should().BeEquivalentTo(pendingPayments.Select(x => x.Id));
+        }
+
+        [Test]
+        public async Task Then_the_removed_payments_are_archived()
+        {
+            // Arrange
+            var payments = _fixture.CreateMany<Payment>().ToList();
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .Without(i => i.Payments)
+                .Create();
+            incentive.Payments = new List<Payment>(payments);
+            payments.Should().NotBeEmpty();
+
             await _dbContext.AddAsync(incentive);
             await _dbContext.SaveChangesAsync();
 
@@ -143,7 +180,47 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             _dbContext.Payments.Should().BeEmpty();
             _dbContext.PendingPayments.Should().BeEmpty();
             _dbContext.PendingPaymentValidationResults.Should().BeEmpty();
+
+            payments.Should().NotBeEmpty();
+            _dbContext.ArchivedPayments.Should().BeEquivalentTo(payments, opt => opt
+                .Excluding(x => x.Id)
+            );
+            _dbContext.ArchivedPayments.Select(x => x.PaymentId).Should().BeEquivalentTo(payments.Select(x => x.Id));
         }
+
+        [Test]
+        public async Task Then_the_removed_validation_results_are_archived()
+        {
+            // Arrange
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .Without(i => i.PendingPayments)
+                .Create();
+            var pendingPayments = _fixture.CreateMany<PendingPayment>(1).ToList();
+            var validationResults = _fixture.CreateMany<PendingPaymentValidationResult>().ToList();
+            pendingPayments[0].ValidationResults = new List<PendingPaymentValidationResult>(validationResults);
+            incentive.PendingPayments = new List<PendingPayment>(pendingPayments);
+            validationResults.Should().NotBeEmpty();
+
+            await _dbContext.AddAsync(incentive);
+            await _dbContext.SaveChangesAsync();
+
+            var storedIncentive = await _sut.Get(incentive.Id);
+            storedIncentive.PendingPaymentModels.Clear();
+
+            // Act
+            await _sut.Update(storedIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Assert 
+            _dbContext.PendingPaymentValidationResults.Should().BeEmpty();
+
+            validationResults.Should().NotBeEmpty();
+            _dbContext.ArchivedPendingPaymentValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
+                .Excluding(x => x.Id)
+            );
+            _dbContext.ArchivedPendingPaymentValidationResults.Select(x => x.PendingPaymentValidationResultId).Should().BeEquivalentTo(validationResults.Select(x => x.Id));
+        }
+
 
         private async Task<ApprenticeshipIncentiveModel> SaveAndGetApprenticeshipIncentive()
         {

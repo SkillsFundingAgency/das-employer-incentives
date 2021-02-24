@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly PendingPayment _pendingPayment;
         private readonly LearnerSubmissionDto _learnerMatchApiData;
         private readonly DateTime _plannedStartDate;
+        private PendingPaymentValidationResult _pendingPaymentValidationResult;
         private Payment _payment;
         private List<PendingPayment> _newPendingPayments;
         private DateTime _actualStartDate;
@@ -53,9 +54,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.DueDate, _plannedStartDate.AddMonths(1))
+                .With(p => p.PeriodNumber, (byte?)1)
+                .With(p => p.PaymentYear, (short?)2021)
                 .With(p => p.ClawedBack, false)
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Without(p => p.PaymentMadeDate)
+                .Create();
+
+            _pendingPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.PeriodNumber, _pendingPayment.PeriodNumber)
+                .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
+                .With(p => p.Step, "HasBankDetails")
+                .With(p => p.Result, true)
                 .Create();
 
             _learnerMatchApiData = _fixture
@@ -86,12 +97,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"an apprenticeship incentive exists")]
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.InsertAsync(_accountModel);
-                await dbConnection.InsertAsync(_apprenticeshipIncentive);
-                await dbConnection.InsertAsync(_pendingPayment);
-            }
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_accountModel);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertAsync(_pendingPayment);
+            await dbConnection.InsertAsync(_pendingPaymentValidationResult);
         }
 
         [Given(@"an earning has been paid for an apprenticeship incentive application")]
@@ -113,7 +123,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await dbConnection.UpdateAsync(_pendingPayment);
         }
 
-
         [When(@"the learner data is updated with new valid start date for the apprenticeship incentive")]
         public void WhenTheLearnerDataIsUpdatedWithNewValidStartDateForTheApprenticeshipIncentive()
         {
@@ -125,7 +134,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _actualStartDate = _plannedStartDate.AddMonths(-1);
         }
-
 
         [When(@"the incentive learner data is refreshed")]
         public async Task WhenTheIncentiveLearnerDataIsRefreshed()
@@ -189,6 +197,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"an earning has not been paid for an apprenticeship incentive application")]
         public async Task GivenAnEarningHasNotBeenPaidForAnApprenticeshipIncentiveApplication()
         {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
             _payment = _fixture.Build<Payment>()
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
@@ -197,27 +207,50 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
                 .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
                 .Create();
-
-            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_payment);
         }
 
-        [Then(@"the unpaid earning is deleted")]
-        public void ThenTheUnpaidEarningIsDeleted()
+        [Then(@"the unpaid earning is archived")]
+        public void ThenTheUnpaidEarningIsArchived()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             dbConnection.GetAll<PendingPayment>().Any(p => p.PeriodNumber == _pendingPayment.PeriodNumber
                 && p.PaymentYear == _pendingPayment.PaymentYear).Should()
                 .BeFalse();
+            var archivedPendingPayment = dbConnection.GetAll<ArchivedPendingPayment>().Single(p =>
+                p.PendingPaymentId == _pendingPayment.Id);
+            archivedPendingPayment.ArchivedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedPendingPayment.Should().BeEquivalentTo(_pendingPayment, opt => opt.ExcludingMissingMembers()
+                    .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
+            );
+            archivedPendingPayment.CalculatedDate.Should().BeCloseTo(_pendingPayment.CalculatedDate, TimeSpan.FromSeconds(1));
         }
 
-        [Then(@"all unpaid payment records are deleted")]
-        public void ThenAllUnpaidPaymentRecordsAreDeleted()
+        [Then(@"all unpaid payment records are archived")]
+        public void ThenAllUnpaidPaymentRecordsAreArchived()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            dbConnection.GetAll<Payment>().Any(p => p.PaymentPeriod == _pendingPayment.PeriodNumber
-                && p.PaymentYear == _pendingPayment.PaymentYear).Should()
-                .BeFalse();
+            dbConnection.GetAll<Payment>().Any(p =>
+                    p.PaymentPeriod == _pendingPayment.PeriodNumber && p.PaymentYear == _pendingPayment.PaymentYear)
+                .Should().BeFalse();
+            var archivedPayment = dbConnection.GetAll<ArchivedPayment>().Single(p => p.PaymentId == _payment.Id);
+            archivedPayment.ArchivedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedPayment.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
+                    .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
+                );
+            archivedPayment.CalculatedDate.Should().BeCloseTo(archivedPayment.CalculatedDate, TimeSpan.FromSeconds(1));
+        }
+
+        [Then(@"all pending payment validation results are archived")]
+        public void ThenAllPendingPaymentValidationResultsAreArchived()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var archivedValidationResult = dbConnection.GetAll<ArchivedPendingPaymentValidationResult>().Single(p =>
+                p.PendingPaymentId == _pendingPayment.Id);
+            archivedValidationResult.ArchivedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedValidationResult.Should().BeEquivalentTo(_pendingPaymentValidationResult, opt => opt.ExcludingMissingMembers()
+                .Excluding(x => x.CreatedDateUtc));
+            archivedValidationResult.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         }
 
         [Then(@"earnings are recalculated")]

@@ -40,8 +40,9 @@ Scenario: Clawbacks - Start Date Change Of Circumstance Delete unpaid earnings
 	And an earning has not been paid for an apprenticeship incentive application
 	When the learner data is updated with new valid start date for the apprenticeship incentive
 	And the incentive learner data is refreshed
-	Then the unpaid earning is deleted
-	And all unpaid payment records are deleted
+	Then the unpaid earning is archived
+	And all unpaid payment records are archived
+	And all pending payment validation results are archived
 
 Scenario: Clawbacks - Start Date Change Of Circumstance with eligible start date changing learner's age from under to over 25
 	Given an apprenticeship incentive exists
