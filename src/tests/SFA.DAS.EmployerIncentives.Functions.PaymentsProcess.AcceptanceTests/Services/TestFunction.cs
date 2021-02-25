@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 {
     public class TestFunction : IDisposable
     {
+        public const int BusinessCentralPaymentRequestsLimit = 1;
         private readonly TestContext _testContext;
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
@@ -41,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                     { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
-                };
+            };
 
             _testContext = testContext;
 
@@ -109,6 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            s.Configure<BusinessCentralApiClient>(c =>
                            {
                                c.ApiBaseUrl = _testContext.PaymentsApi.BaseAddress;
+                               c.PaymentRequestsLimit = BusinessCentralPaymentRequestsLimit;
                            });
 
                            s.Configure<ApplicationSettings>(a =>

@@ -480,10 +480,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
         }
 
-        public void ValidateClawbacks(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
-        {
-            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoUnsentClawbacks, Clawbacks.All(c => c.Sent)));
-        }
     }
 }
