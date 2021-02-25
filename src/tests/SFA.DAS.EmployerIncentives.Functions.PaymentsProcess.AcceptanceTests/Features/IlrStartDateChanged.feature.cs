@@ -336,13 +336,13 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Clawbacks - Start Date Change Of Circumstance with eligible start date changing l" +
-            "earner\'s age from under to over 25")]
-        public virtual void Clawbacks_StartDateChangeOfCircumstanceWithEligibleStartDateChangingLearnersAgeFromUnderToOver25()
+            "earner\'s age from under to over 25 - paid earning")]
+        public virtual void Clawbacks_StartDateChangeOfCircumstanceWithEligibleStartDateChangingLearnersAgeFromUnderToOver25_PaidEarning()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Clawbacks - Start Date Change Of Circumstance with eligible start date changing l" +
-                    "earner\'s age from under to over 25", null, tagsOfScenario, argumentsOfScenario);
+                    "earner\'s age from under to over 25 - paid earning", null, tagsOfScenario, argumentsOfScenario);
 #line 47
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -370,8 +370,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("an earning has been paid for an apprenticeship incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 50
- testRunner.When("the learner data is refreshed with a new valid start date for the apprenticeship " +
-                        "incentive making the learner over twenty five at start", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("the learner data is updated with a new valid start date for the apprenticeship in" +
+                        "centive making the learner over twenty five at start", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 51
  testRunner.And("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -389,6 +389,12 @@ this.ScenarioInitialize(scenarioInfo);
 #line 55
  testRunner.And("a new pending second payment record is created with a new amount and payment peri" +
                         "od", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 56
+ testRunner.And("existing payment record is retained", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 57
+ testRunner.And("existing pending payment validation record is retained", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
