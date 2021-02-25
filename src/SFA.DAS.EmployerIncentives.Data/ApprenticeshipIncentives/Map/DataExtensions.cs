@@ -32,7 +32,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PausePayments = model.PausePayments,
                 SubmittedDate = model.SubmittedDate,
                 SubmittedByEmail = model.SubmittedByEmail,
-                CourseName = model.Apprenticeship.CourseName
+                CourseName = model.Apprenticeship.CourseName,
+                Status = model.Status
             };
         }
 
@@ -67,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,
                 PausePayments = entity.PausePayments,
                 SubmittedDate = entity.SubmittedDate,
-                SubmittedByEmail = entity.SubmittedByEmail
+                SubmittedByEmail = entity.SubmittedByEmail,
+                Status = entity.Status
             };
         }
 
@@ -319,7 +321,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 DateClawbackCreated = x.CreatedDate,
                 PaymentId = x.PaymentId,
                 SubnominalCode = x.SubnominalCode,
-                DateClawbackSent = x.DateClawbackSent
+                DateClawbackSent = x.DateClawbackSent,
+                CollectionPeriod = x.CollectionPeriod,
+                CollectionPeriodYear = x.CollectionPeriodYear
             }).ToList();
         }
 
@@ -335,8 +339,51 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentId = x.PaymentId,
                 SubnominalCode = x.SubnominalCode,
                 PendingPaymentId = x.PendingPaymentId,
-                DateClawbackSent = x.DateClawbackSent
+                DateClawbackSent = x.DateClawbackSent,
+                CollectionPeriod = x.CollectionPeriod,
+                CollectionPeriodYear = x.CollectionPeriodYear
             }).ToList();
+        }
+
+        internal static PendingPaymentArchive Map(this PendingPaymentModel model)
+        {
+            return new PendingPaymentArchive
+            {
+                Id = model.Id,
+                AccountId = model.Account.Id,
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                Amount = model.Amount,
+                DueDate = model.DueDate,
+                CalculatedDate = model.CalculatedDate,
+                PeriodNumber = model.PeriodNumber,
+                PaymentYear = model.PaymentYear,
+                PaymentMadeDate = model.PaymentMadeDate,
+                EarningType = model.EarningType,
+                ClawedBack = model.ClawedBack,
+                ArchiveDateUTC = DateTime.UtcNow,
+                //ValidationResults = model.PendingPaymentValidationResultModels.ArchiveMap(model.Id)
+            };
+        }
+
+        internal static ICollection<PendingPaymentValidationResultArchive> ArchiveMap(this ICollection<PendingPaymentValidationResultModel> models, Guid pendingPaymentId)
+        {
+            return models.Select(x => x.ArchiveMap(pendingPaymentId)).ToList();
+        }
+
+        internal static PendingPaymentValidationResultArchive ArchiveMap(this PendingPaymentValidationResultModel model, Guid pendingPaymentId)
+        {
+            return new PendingPaymentValidationResultArchive
+            {
+                Id = model.Id,
+                PendingPaymentId = pendingPaymentId,
+                Step = model.Step,
+                Result = model.Result,
+                PeriodNumber = model.CollectionPeriod.PeriodNumber,
+                PaymentYear = model.CollectionPeriod.AcademicYear,
+                CreatedDateUtc = model.CreatedDateUtc,
+                ArchiveDateUTC = DateTime.UtcNow
+            };
         }
     }
 }

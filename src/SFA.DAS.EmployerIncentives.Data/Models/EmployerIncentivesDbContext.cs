@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<IncentiveApplication> Applications { get; set; }
         public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
         public virtual DbSet<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }
-        public virtual DbSet<PendingPayment> PendingPayments { get; set; }
+        public virtual DbSet<PendingPayment> PendingPayments { get; set; }        
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<CollectionPeriod> CollectionPeriods { get; set; }
         public virtual DbSet<PendingPaymentValidationResult> PendingPaymentValidationResults { get; set; }
@@ -27,7 +27,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<ApprenticeshipDaysInLearning> DaysInLearnings { get; set; }
         public virtual DbSet<IncentiveApplicationStatusAudit> IncentiveApplicationStatusAudits { get; set; }
         public virtual DbSet<ClawbackPayment> ClawbackPayments { get; set; }
-        
+        public virtual DbSet<PendingPaymentArchive> ArchivedPendingPayments { get; set; }
+        public virtual DbSet<PendingPaymentValidationResultArchive> ArchivedPendingPaymentValidationResults { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>

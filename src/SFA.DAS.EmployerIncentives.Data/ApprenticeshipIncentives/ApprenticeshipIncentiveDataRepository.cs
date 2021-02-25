@@ -45,6 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
+               .Include(x => x.Payments)
                .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
             if (apprenticeshipIncentive != null)
             {

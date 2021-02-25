@@ -23,9 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Withdraw
             {
                 return;
             }
-
-            incentive.Delete();
             
+            incentive.Withdraw();
+
             await _domainRepository.Save(incentive);
         }
     }

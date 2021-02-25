@@ -215,14 +215,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("cannot withdraw an application that has been submitted and the incentives has had" +
-            " payments")]
-        public virtual void CannotWithdrawAnApplicationThatHasBeenSubmittedAndTheIncentivesHasHadPayments()
+        [NUnit.Framework.DescriptionAttribute("Employer withdrawal for an apprenticeship that has paid payments (earnings)")]
+        public virtual void EmployerWithdrawalForAnApprenticeshipThatHasPaidPaymentsEarnings()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot withdraw an application that has been submitted and the incentives has had" +
-                    " payments", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawal for an apprenticeship that has paid payments (earnings)", null, tagsOfScenario, argumentsOfScenario);
 #line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -244,13 +242,15 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 26
- testRunner.Given("an incentive application has been made, submitted and has payments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("an apprenticeship incentive with paid payments exists as a result of an incentive" +
+                        " application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 27
  testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 28
- testRunner.Then("an error is returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("clawbacks are created for the apprenticeship incentive payments and it\'s pending " +
+                        "payments are archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
