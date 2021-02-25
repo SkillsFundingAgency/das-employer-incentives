@@ -98,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
                 result.PaymentYear.Should()
                     .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
-                result.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+                result.CreatedDateUtc.Should().BeCloseTo(validationResults.Single(x => x.Id == result.Id).CreatedDateUtc, TimeSpan.FromMinutes(1));
             }
 
             var savedClawbackPayments = _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == expected.Id);

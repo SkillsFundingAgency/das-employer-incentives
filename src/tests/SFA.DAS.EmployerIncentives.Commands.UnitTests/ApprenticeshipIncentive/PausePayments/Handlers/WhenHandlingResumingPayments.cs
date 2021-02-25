@@ -8,6 +8,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
@@ -101,9 +102,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive CreateApprenticeshipIncentive(bool isPaused)
         {
-            return Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(
-                _fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(),
-                _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), isPaused, _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(p => p.PausePayments, isPaused)
+                .Create();
+
+            return Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
         }
     }
 }
