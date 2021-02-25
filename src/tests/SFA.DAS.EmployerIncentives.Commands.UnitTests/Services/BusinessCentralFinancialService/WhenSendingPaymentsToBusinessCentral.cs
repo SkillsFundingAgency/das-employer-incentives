@@ -1,5 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
@@ -38,6 +40,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
 
             //Act
             await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+        }
+
+        [Test]
+        public async Task Then_the_payment_is_posted_with_the_correct_content_type()
+        {
+            //Arrange
+            _httpClient.SetUpPostAsAsync(System.Net.HttpStatusCode.Accepted);
+            var payment = _fixture.Create<PaymentDto>();
+
+            //Act
+            await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+
+            // Assert
+            _httpClient.VerifyContentType("application/payments-data");
         }
 
         [TestCase(HttpStatusCode.InternalServerError)]
@@ -119,7 +135,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
                 .Create();
 
             var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
-            
+
             paymentRequest.PaymentLineDescription.Should().Be(expected);
         }
 

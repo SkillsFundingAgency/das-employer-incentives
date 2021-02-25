@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
+    [TestFixture]
     public class WhenCalculateEarnings
     {
         private ApprenticeshipIncentive _sut;
@@ -242,7 +243,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             clawback.PendingPaymentId.Should().Be(pendingPayment.Id);
             clawback.PaymentId.Should().Be(_sutModel.PaymentModels.First().Id);
             clawback.Account.Should().Be(_sutModel.Account);
-            clawback.Amount.Should().Be(pendingPayment.Amount);
+            clawback.Amount.Should().Be(-1 * pendingPayment.Amount);
             clawback.SubnominalCode.Should().Be(_sutModel.PaymentModels.First().SubnominalCode);
         }
 
@@ -319,7 +320,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             clawback.PendingPaymentId.Should().Be(pendingPayment.Id);
             clawback.PaymentId.Should().Be(_sutModel.PaymentModels.First().Id);
             clawback.Account.Should().Be(_sutModel.Account);
-            clawback.Amount.Should().Be(pendingPayment.Amount);
+            clawback.Amount.Should().Be(-1 * pendingPayment.Amount);
             clawback.SubnominalCode.Should().Be(_sutModel.PaymentModels.First().SubnominalCode);
         }
 
@@ -368,7 +369,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             clawback.PendingPaymentId.Should().Be(pendingPayment.Id);
             clawback.PaymentId.Should().Be(_sutModel.PaymentModels.First().Id);
             clawback.Account.Should().Be(_sutModel.Account);
-            clawback.Amount.Should().Be(pendingPayment.Amount);
+            clawback.Amount.Should().Be(-1 * pendingPayment.Amount);
             clawback.SubnominalCode.Should().Be(_sutModel.PaymentModels.First().SubnominalCode);
         }
 
