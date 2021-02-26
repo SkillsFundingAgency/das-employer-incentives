@@ -1,16 +1,15 @@
 ﻿using SFA.DAS.EmployerIncentives.Enums;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
+namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Archive
 {
-    [Dapper.Contrib.Extensions.Table("incentives.PendingPaymentArchive")]
-    [Table("PendingPaymentArchive", Schema = "incentives")]
-    public partial class PendingPaymentArchive
+    [Dapper.Contrib.Extensions.Table("archive.PendingPayment")]
+    [Table("PendingPayment", Schema = "archive")]
+    public partial class PendingPayment
     {
         [Dapper.Contrib.Extensions.ExplicitKey]
-        public Guid Id { get; set; }
+        public Guid PendingPaymentId { get; set; }
         public long AccountId { get; set; }
         public Guid ApprenticeshipIncentiveId { get; set; }
         public decimal Amount { get; set; }
@@ -27,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 
         public DateTime ArchiveDateUTC { get; set; }
 
-        public PendingPaymentArchive()
+        public PendingPayment()
         {
         }
     }

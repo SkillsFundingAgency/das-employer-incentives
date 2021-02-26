@@ -268,8 +268,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
             var payments = await dbConnection.GetAllAsync<Payment>();
             var clawbackPayments = await dbConnection.GetAllAsync<ClawbackPayment>();
-            var archivedPendingPayments = await dbConnection.GetAllAsync<PendingPaymentArchive>();
-            var archivedPendingPaymentValidationResults = await dbConnection.GetAllAsync<PendingPaymentValidationResultArchive>();
+            var archivedPendingPayments = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>();
+            var archivedPendingPaymentValidationResults = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>();
 
             pendingPaymentValidationResults.Should().HaveCount(0);
             incentives.Should().HaveCount(1);
@@ -310,7 +310,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             archivedPendingPayment.PeriodNumber.Should().Be(_pendingPayment.PeriodNumber);
 
             var archivedValidationResult = archivedPendingPaymentValidationResults.Single();
-            archivedValidationResult.Id.Should().Be(_pendingPaymentValidationResult.Id);
+            archivedValidationResult.PendingPaymentValidationResultId.Should().Be(_pendingPaymentValidationResult.Id);
             archivedValidationResult.PendingPaymentId.Should().Be(_pendingPaymentValidationResult.PendingPaymentId);
             archivedValidationResult.PaymentYear.Should().Be(_pendingPaymentValidationResult.PaymentYear);
             archivedValidationResult.PeriodNumber.Should().Be(_pendingPaymentValidationResult.PeriodNumber);

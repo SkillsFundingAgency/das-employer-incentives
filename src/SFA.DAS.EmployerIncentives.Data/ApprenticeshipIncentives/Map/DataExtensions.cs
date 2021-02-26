@@ -346,11 +346,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             }).ToList();
         }
 
-        internal static PendingPaymentArchive Map(this PendingPaymentModel model)
+        internal static Models.Archive.PendingPayment Map(this PendingPaymentModel model)
         {
-            return new PendingPaymentArchive
+            return new Models.Archive.PendingPayment
             {
-                Id = model.Id,
+                PendingPaymentId = model.Id,
                 AccountId = model.Account.Id,
                 AccountLegalEntityId = model.Account.AccountLegalEntityId,
                 ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
@@ -367,16 +367,16 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
         }
 
-        internal static ICollection<PendingPaymentValidationResultArchive> ArchiveMap(this ICollection<PendingPaymentValidationResultModel> models, Guid pendingPaymentId)
+        internal static ICollection<Models.Archive.PendingPaymentValidationResult> ArchiveMap(this ICollection<PendingPaymentValidationResultModel> models, Guid pendingPaymentId)
         {
             return models.Select(x => x.ArchiveMap(pendingPaymentId)).ToList();
         }
 
-        internal static PendingPaymentValidationResultArchive ArchiveMap(this PendingPaymentValidationResultModel model, Guid pendingPaymentId)
+        internal static Models.Archive.PendingPaymentValidationResult ArchiveMap(this PendingPaymentValidationResultModel model, Guid pendingPaymentId)
         {
-            return new PendingPaymentValidationResultArchive
+            return new Models.Archive.PendingPaymentValidationResult
             {
-                Id = model.Id,
+                PendingPaymentValidationResultId = model.Id,
                 PendingPaymentId = pendingPaymentId,
                 Step = model.Step,
                 Result = model.Result,

@@ -99,9 +99,10 @@
     <Build Include="Views\BusinessValidationRulesByPeriodDashboard.sql" />
     <Build Include="Views\BusinessGetMonthEndRuntimes.sql" />
     <Build Include="Tables\ClawbackPayment.sql" />
-    <Build Include="Tables\PendingPaymentArchive.sql" />
-    <Build Include="Tables\PendingPaymentValidationResultArchive.sql" />
     <Build Include="Schemas\Archive.sql" />
+    <Build Include="Tables\Archive.Payment.sql" />
+    <Build Include="Tables\Archive.PendingPayment.sql" />
+    <Build Include="Tables\Archive.PendingPaymentValidationResult.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />

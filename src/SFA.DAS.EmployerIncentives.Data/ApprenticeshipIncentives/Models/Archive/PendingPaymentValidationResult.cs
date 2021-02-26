@@ -2,14 +2,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
+namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Archive
 {
-    [Dapper.Contrib.Extensions.Table("incentives.PendingPaymentValidationResultArchive")]
-    [Table("PendingPaymentValidationResultArchive", Schema = "incentives")]
-    public partial class PendingPaymentValidationResultArchive
+    [Dapper.Contrib.Extensions.Table("archive.PendingPaymentValidationResult")]
+    [Table("PendingPaymentValidationResult", Schema = "archive")]
+    public partial class PendingPaymentValidationResult
     {
         [Dapper.Contrib.Extensions.ExplicitKey]
-        public Guid Id { get; set; }
+        public Guid PendingPaymentValidationResultId { get; set; }
         public Guid PendingPaymentId { get; set; }
         public string Step { get; set; }
         public bool Result { get; set; }

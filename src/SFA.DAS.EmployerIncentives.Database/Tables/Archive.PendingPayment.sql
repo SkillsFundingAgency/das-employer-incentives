@@ -1,6 +1,6 @@
-﻿CREATE TABLE [incentives].[PendingPaymentArchive]
+﻿CREATE TABLE [archive].[PendingPayment]
 (
-    [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,	
+    [PendingPaymentId] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,	
     [AccountId] BIGINT NOT NULL, 
     [ApprenticeshipIncentiveId] UNIQUEIDENTIFIER NOT NULL,
     [DueDate] DATETIME2 NOT NULL, 
@@ -16,7 +16,7 @@
 	[ArchiveDateUTC] DATETIME2 NOT NULL,
 )
 GO
-CREATE CLUSTERED INDEX IX_PendingPaymentArchive ON [incentives].[PendingPaymentArchive] (AccountId)
+CREATE CLUSTERED INDEX IX_ArchivePendingPayment ON [archive].[PendingPayment] (AccountId)
 GO
-CREATE INDEX IX_PendingPaymentArchive_ApprenticeshipIncentiveId ON [incentives].[PendingPaymentArchive] (ApprenticeshipIncentiveId)
+CREATE INDEX IX_ArchivePendingPayment_ApprenticeshipIncentiveId ON [archive].[PendingPayment] (ApprenticeshipIncentiveId)
 GO
