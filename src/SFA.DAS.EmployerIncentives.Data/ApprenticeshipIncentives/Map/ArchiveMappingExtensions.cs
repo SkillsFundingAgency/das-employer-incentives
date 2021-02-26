@@ -1,57 +1,68 @@
-﻿using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 {
     public static class ArchiveMappingExtensions
     {
-        public static ArchivedPayment Archive(this Payment payment)
+        internal static Models.Archive.PendingPayment Map(this PendingPaymentModel model)
         {
-            return new ArchivedPayment
+            return new Models.Archive.PendingPayment
             {
-                PaymentId = payment.Id,
-                PendingPaymentId = payment.PendingPaymentId,
-                PaymentYear = payment.PaymentYear,
-                PaymentPeriod = payment.PaymentPeriod,
-                CalculatedDate = payment.CalculatedDate,
-                Amount = payment.Amount,
-                ApprenticeshipIncentiveId = payment.ApprenticeshipIncentiveId,
-                AccountLegalEntityId = payment.AccountLegalEntityId,
-                AccountId = payment.AccountId,
-                PaidDate = payment.PaidDate,
-                SubnominalCode = payment.SubnominalCode
+                PendingPaymentId = model.Id,
+                AccountId = model.Account.Id,
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                Amount = model.Amount,
+                DueDate = model.DueDate,
+                CalculatedDate = model.CalculatedDate,
+                PeriodNumber = model.PeriodNumber,
+                PaymentYear = model.PaymentYear,
+                PaymentMadeDate = model.PaymentMadeDate,
+                EarningType = model.EarningType,
+                ClawedBack = model.ClawedBack,
+                ArchiveDateUTC = DateTime.UtcNow
             };
         }
 
-        public static ArchivedPendingPayment Archive(this PendingPayment pendingPayment)
+        internal static Models.Archive.Payment Map(this PaymentModel model)
         {
-            return new ArchivedPendingPayment
+            return new Models.Archive.Payment
             {
-                PendingPaymentId = pendingPayment.Id,
-                PaymentYear = pendingPayment.PaymentYear,
-                PeriodNumber = pendingPayment.PeriodNumber,
-                CalculatedDate = pendingPayment.CalculatedDate,
-                Amount = pendingPayment.Amount,
-                ApprenticeshipIncentiveId = pendingPayment.ApprenticeshipIncentiveId,
-                AccountLegalEntityId = pendingPayment.AccountLegalEntityId,
-                AccountId = pendingPayment.AccountId,
-                ClawedBack = pendingPayment.ClawedBack,
-                DueDate = pendingPayment.DueDate,
-                EarningType = pendingPayment.EarningType,
-                PaymentMadeDate = pendingPayment.PaymentMadeDate
+                PaymentId = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                PendingPaymentId = model.PendingPaymentId,
+                AccountId = model.Account.Id,
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                Amount = model.Amount,
+                CalculatedDate = model.CalculatedDate,
+                PaidDate = model.PaidDate,
+                SubnominalCode = model.SubnominalCode,
+                PaymentPeriod = model.PaymentPeriod,
+                PaymentYear = model.PaymentYear,
+                ArchiveDateUTC = DateTime.UtcNow
             };
         }
 
-        public static ArchivedPendingPaymentValidationResult Archive(this PendingPaymentValidationResult validationResult)
+        internal static ICollection<Models.Archive.PendingPaymentValidationResult> ArchiveMap(this ICollection<PendingPaymentValidationResultModel> models, Guid pendingPaymentId)
         {
-            return new ArchivedPendingPaymentValidationResult
+            return models.Select(x => x.ArchiveMap(pendingPaymentId)).ToList();
+        }
+
+        internal static Models.Archive.PendingPaymentValidationResult ArchiveMap(this PendingPaymentValidationResultModel model, Guid pendingPaymentId)
+        {
+            return new Models.Archive.PendingPaymentValidationResult
             {
-                PendingPaymentValidationResultId = validationResult.Id,
-                PendingPaymentId = validationResult.PendingPaymentId,
-                PaymentYear = validationResult.PaymentYear,
-                PeriodNumber = validationResult.PeriodNumber,
-                CreatedDateUtc = validationResult.CreatedDateUtc,
-                Step = validationResult.Step,
-                Result = validationResult.Result,
+                PendingPaymentValidationResultId = model.Id,
+                PendingPaymentId = pendingPaymentId,
+                Step = model.Step,
+                Result = model.Result,
+                PeriodNumber = model.CollectionPeriod.PeriodNumber,
+                PaymentYear = model.CollectionPeriod.AcademicYear,
+                CreatedDateUtc = model.CreatedDateUtc,
+                ArchiveDateUTC = DateTime.UtcNow
             };
         }
     }

@@ -67,8 +67,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             // Assert
             pendingPayments.ToList().ForEach(p =>
                 p.PendingPaymentValidationResults.Should()
-                .BeEquivalentTo(
-                    _model.PendingPaymentModels.Single(m => m.Id == p.Id).PendingPaymentValidationResultModels)
+                 .BeEquivalentTo(
+                  _model.PendingPaymentModels.Single(m => m.Id == p.Id).PendingPaymentValidationResultModels,
+                    opt => opt.Excluding(x => x.CreatedDateUtc))
                 );
         }
 

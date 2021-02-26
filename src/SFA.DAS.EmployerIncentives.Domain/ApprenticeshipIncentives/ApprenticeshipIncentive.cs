@@ -117,7 +117,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             RemoveUnpaidPaymentIfExists(existingPendingPayment);
             if (!existingPendingPayment.Equals(pendingPayment))
             {
-                Model.PendingPaymentModels.Remove(existingPendingPayment.GetModel());
+                var existingPendingPaymentModel = existingPendingPayment.GetModel();
+                if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
+                {
+                    AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
+                }
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
             }
         }
@@ -148,7 +152,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == existingPendingPayment.Id);
             if (existingPayment != null)
             {
-                Model.PaymentModels.Remove(existingPayment);
+                if (Model.PaymentModels.Remove(existingPayment))
+                {
+                    AddEvent(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPayment));
+                }
             }
         }
 
@@ -244,7 +251,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private void RemoveUnpaidEarnings()
         {
-            Model.PendingPaymentModels.Where(x => x.PaymentMadeDate == null).ToList().ForEach(pp => Model.PendingPaymentModels.Remove(pp));
+            Model.PendingPaymentModels.Where(x => x.PaymentMadeDate == null).ToList()
+               .ForEach(pp => {
+                   if (Model.PendingPaymentModels.Remove(pp))
+                   {
+                       AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, pp));
+                   }
+               });
 
             var pendingPaymentsToDelete = new List<PendingPaymentModel>();
             foreach (var paidPendingPayment in Model.PendingPaymentModels)
@@ -252,14 +265,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 var payment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == paidPendingPayment.Id);
                 if (payment != null && payment.PaidDate == null)
                 {
-                    Model.PaymentModels.Remove(payment);
+                    if (Model.PaymentModels.Remove(payment))
+                    {
+                        AddEvent(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, payment));
+                    }
                     pendingPaymentsToDelete.Add(paidPendingPayment);
                 }
             }
 
             foreach (var deletedPendingPayment in pendingPaymentsToDelete)
             {
-                Model.PendingPaymentModels.Remove(deletedPendingPayment);
+                if (Model.PendingPaymentModels.Remove(deletedPendingPayment))
+                {
+                    AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, deletedPendingPayment));
+                }
             }
         }
 

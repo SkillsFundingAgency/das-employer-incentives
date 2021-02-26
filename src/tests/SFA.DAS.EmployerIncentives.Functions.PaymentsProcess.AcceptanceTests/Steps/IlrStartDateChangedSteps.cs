@@ -145,12 +145,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             dbConnection.GetAll<PendingPayment>().Any(p => p.PeriodNumber == _pendingPayment.PeriodNumber
                 && p.PaymentYear == _pendingPayment.PaymentYear).Should()
                 .BeFalse();
-            dbConnection.GetAll<ArchivedPendingPayment>().Count(p =>
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>().Count(p =>
                 p.ApprenticeshipIncentiveId == _pendingPayment.ApprenticeshipIncentiveId)
                 .Should().Be(1);
-            var archivedPendingPayment = dbConnection.GetAll<ArchivedPendingPayment>().Single(p =>
+            var archivedPendingPayment = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>().Single(p =>
                 p.PendingPaymentId == _pendingPayment.Id);
-            archivedPendingPayment.ArchivedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             archivedPendingPayment.Should().BeEquivalentTo(_pendingPayment, opt => opt.ExcludingMissingMembers()
                     .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
             );
@@ -164,11 +164,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             dbConnection.GetAll<Payment>().Any(p =>
                     p.PaymentPeriod == _pendingPayment.PeriodNumber && p.PaymentYear == _pendingPayment.PaymentYear)
                 .Should().BeFalse();
-            dbConnection.GetAll<ArchivedPayment>()
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>()
                 .Count(p => p.ApprenticeshipIncentiveId == _payment.ApprenticeshipIncentiveId)
                 .Should().Be(1);
-            var archivedPayment = dbConnection.GetAll<ArchivedPayment>().Single(p => p.PaymentId == _payment.Id);
-            archivedPayment.ArchivedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            var archivedPayment = dbConnection.GetAll< Data.ApprenticeshipIncentives.Models.Archive.Payment> ().Single(p => p.PaymentId == _payment.Id);
+            archivedPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             archivedPayment.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
                     .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
                 );
@@ -179,12 +179,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenAllPendingPaymentValidationResultsAreArchived()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var archivedValidationResult = dbConnection.GetAll<ArchivedPendingPaymentValidationResult>().Single(p =>
+            var archivedValidationResult = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult> ().Single(p =>
                 p.PendingPaymentId == _pendingPayment.Id);
-            archivedValidationResult.ArchivedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             archivedValidationResult.Should().BeEquivalentTo(_pendingPaymentValidationResult, opt => opt.ExcludingMissingMembers()
                 .Excluding(x => x.CreatedDateUtc));
-            archivedValidationResult.CreatedDateUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedValidationResult.CreatedDateUtc.Should().BeCloseTo(_pendingPaymentValidationResult.CreatedDateUtc, TimeSpan.FromMinutes(1));
         }
 
         [Then(@"earnings are recalculated")]
@@ -262,7 +262,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenExistingPaymentRecordIsRetained()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            dbConnection.GetAll<ArchivedPayment>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
                 .Should().BeNull("Should not have archived existing payment");
 
             dbConnection.GetAll<Payment>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
@@ -273,7 +273,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenExistingPendingPaymentValidationRecordIsRetained()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            dbConnection.GetAll<ArchivedPendingPaymentValidationResult>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
                 .Should().BeNull("Should not have archived existing pending payment validation result");
 
             dbConnection.GetAll<PendingPaymentValidationResult>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
