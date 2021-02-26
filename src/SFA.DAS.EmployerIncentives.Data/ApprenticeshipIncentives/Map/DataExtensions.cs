@@ -367,6 +367,25 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
         }
 
+        internal static Models.Archive.Payment Map(this PaymentModel model)
+        {
+            return new Models.Archive.Payment
+            {
+                PaymentId = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                PendingPaymentId = model.PendingPaymentId,
+                AccountId = model.Account.Id,
+                AccountLegalEntityId = model.Account.AccountLegalEntityId,
+                Amount = model.Amount,
+                CalculatedDate = model.CalculatedDate,
+                PaidDate = model.PaidDate,
+                SubnominalCode = model.SubnominalCode,
+                PaymentPeriod = model.PaymentPeriod,
+                PaymentYear = model.PaymentYear,
+                ArchiveDateUTC = DateTime.UtcNow
+            };
+        }
+
         internal static ICollection<Models.Archive.PendingPaymentValidationResult> ArchiveMap(this ICollection<PendingPaymentValidationResultModel> models, Guid pendingPaymentId)
         {
             return models.Select(x => x.ArchiveMap(pendingPaymentId)).ToList();
