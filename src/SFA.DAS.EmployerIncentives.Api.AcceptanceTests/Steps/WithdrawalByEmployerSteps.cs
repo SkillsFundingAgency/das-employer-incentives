@@ -289,7 +289,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var clawbackPayment = clawbackPayments.Single();
             clawbackPayment.AccountId.Should().Be(_apprenticeshipIncentive.AccountId);
             clawbackPayment.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
-            clawbackPayment.Amount.Should().Be(_paidPendingPayment.Amount);
+            clawbackPayment.Amount.Should().Be(_paidPendingPayment.Amount * -1);
             clawbackPayment.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             clawbackPayment.CollectionPeriod.Should().Be(_paidPendingPayment.PeriodNumber);
             clawbackPayment.CollectionPeriodYear.Should().Be(_paidPendingPayment.PaymentYear);

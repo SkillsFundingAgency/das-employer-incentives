@@ -101,6 +101,7 @@
     <Build Include="Tables\ClawbackPayment.sql" />
     <Build Include="Tables\PendingPaymentArchive.sql" />
     <Build Include="Tables\PendingPaymentValidationResultArchive.sql" />
+    <Build Include="Schemas\Archive.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
