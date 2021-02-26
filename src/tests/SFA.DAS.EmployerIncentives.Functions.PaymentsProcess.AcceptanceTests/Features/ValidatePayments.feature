@@ -21,12 +21,6 @@ Scenario: When no ILR submission found
 	And no payment records are created
 	And pending payments are not marked as paid
 
-Scenario: When there is an unsent payment clawback
-	Given there are pending payments
-	And there are payments with unsent clawbacks
-	When the payment process is run
-	Then the 'HasNoUnsentClawbacks' will have a failed validation result
-
 Scenario: When there is a sent payment clawback
 	Given there are pending payments
 	Given there are payments with sent clawbacks

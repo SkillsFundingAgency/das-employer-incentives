@@ -198,19 +198,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             results.Any().Should().BeFalse();
         }
 
-        [Given(@"there are payments with unsent clawbacks")]
-        public async Task GivenThereArePaymentsWithUnsentClawbacks()
-        {
-            _validatePaymentData.AddClawbackPayment(false);
-            await _validatePaymentData.Create();
-        }
-
-        [Then(@"the HasNoUnsentClawbacks step will have a failed validation result")]
-        public async Task ThenTheHasUnsentClawbackStepWillHaveAFailedValidationResult()
-        {
-            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.HasNoUnsentClawbacks);
-        }
-
         [Given(@"there are payments with sent clawbacks")]
         public async Task GivenThereArePaymentsWithSentClawbacks()
         {

@@ -492,7 +492,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdClawback.PendingPaymentId.Should().Be(_apprenticeshipIncentive.PendingPayments.First().Id);
             createdClawback.AccountId.Should().Be(_apprenticeshipIncentive.AccountId);
             createdClawback.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
-            createdClawback.Amount.Should().Be(_apprenticeshipIncentive.PendingPayments.First().Amount);
+            createdClawback.Amount.Should().Be(-1 * _apprenticeshipIncentive.PendingPayments.First().Amount);
             createdClawback.SubnominalCode.Should().Be(_apprenticeshipIncentive.Payments.Single(p => p.PendingPaymentId == _apprenticeshipIncentive.PendingPayments.First().Id).SubnominalCode);
             createdClawback.PaymentId.Should().Be(_apprenticeshipIncentive.Payments.Single(p => p.PendingPaymentId == _apprenticeshipIncentive.PendingPayments.First().Id).Id);
         }
