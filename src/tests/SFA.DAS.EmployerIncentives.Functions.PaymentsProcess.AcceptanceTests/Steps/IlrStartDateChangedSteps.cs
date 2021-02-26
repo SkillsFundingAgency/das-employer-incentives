@@ -166,7 +166,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             change.PreviousValue.Should().Be(_initialStartDate.ToString());
             change.PreviousPeriodNumber.Should().Be(3);
             change.PreviousPaymentYear.Should().Be(2021);
-            change.NewValue.Should().Be(_plannedStartDate.AddMonths(4).ToString());
+            change.NewValue.Should().Be(_actualStartDate.ToString());
         }
 
         [Then(@"the pending payments are recalculated for the apprenticeship incentive")]
