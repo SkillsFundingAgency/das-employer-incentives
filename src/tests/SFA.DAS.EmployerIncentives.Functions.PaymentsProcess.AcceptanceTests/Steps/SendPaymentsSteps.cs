@@ -92,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task ThenTheClawbacksAreSent()
         {
             var paymentRequestCount = _testContext.PaymentsApi.MockServer.LogEntries.Count(l => l.RequestMessage.AbsolutePath == "/payments/requests");
-            paymentRequestCount.Should().Be(2);
+            paymentRequestCount.Should().Be(3);
 
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var clawbacks = await connection.GetAllAsync<ClawbackPayment>();
