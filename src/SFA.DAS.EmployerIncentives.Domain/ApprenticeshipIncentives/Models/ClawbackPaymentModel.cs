@@ -16,5 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public SubnominalCode SubnominalCode { get; set; }
         public Guid PaymentId { get; set; }
         public DateTime? DateClawbackSent { get; set; }
+        public byte? CollectionPeriod { get; set; }
+        public short? CollectionPeriodYear { get; set; }
     }
 }

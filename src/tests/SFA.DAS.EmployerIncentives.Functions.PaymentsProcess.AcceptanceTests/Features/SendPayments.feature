@@ -12,3 +12,13 @@ Scenario: When payments are rejected they are not sent to Business Central
 	Given payments exist for a legal entity
 	When the payments have been rejected
 	Then the payments are not sent to Business Central
+
+Scenario: When clawbacks are approved they are sent to Business Central
+	Given clawbacks exist for a legal entity
+	When the payments have been approved
+	Then the clawbacks are sent to Business Central
+
+Scenario: When clawback payments are rejected they are not sent to Business Central
+	Given clawbacks exist for a legal entity
+	When the payments have been rejected
+	Then the clawbacks are not sent to Business Central
