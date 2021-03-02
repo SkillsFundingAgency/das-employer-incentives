@@ -17,8 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
 
         public Task Handle(PaymentDeleted @event, CancellationToken cancellationToken = default)
         {
-            //return _archiveRepository.Archive(@event.Model); // TODO: implement and test
-            return Task.CompletedTask;
+            return _archiveRepository.Archive(@event.Model);            
         }
     }
 }
