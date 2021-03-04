@@ -10,6 +10,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     {
         private WithdrawCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Domain.ValueObjects.CollectionPeriod _activePeriod;
+
         private Fixture _fixture;
      
         [SetUp]
@@ -30,10 +34,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _fixture = new Fixture();
 
             _mockIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
+
+            _activePeriod = new Domain.ValueObjects.CollectionPeriod(2, 2020);
+            _activePeriod.SetActive(true);
+
+            var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            {
+                new Domain.ValueObjects.CollectionPeriod(1, 2020),
+                _activePeriod,
+                new Domain.ValueObjects.CollectionPeriod(3, 2020)
+            };
+            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
 
             _fixture.Register(ApprenticeshipIncentiveCreator);
 
-            _sut = new WithdrawCommandHandler(_mockIncentiveDomainRepository.Object);
+            _sut = new WithdrawCommandHandler(_mockIncentiveDomainRepository.Object, _mockCollectionCalendarService.Object);
         }
 
         [Test]
@@ -287,6 +303,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             clawback.SubnominalCode.Should().Be(paymentModel.SubnominalCode);
             clawback.PaymentId.Should().Be(paymentModel.Id);
             clawback.CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            clawback.CollectionPeriod.Should().Be(_activePeriod.PeriodNumber);
+            clawback.CollectionPeriodYear.Should().Be(_activePeriod.AcademicYear);
         }
 
         [Test]

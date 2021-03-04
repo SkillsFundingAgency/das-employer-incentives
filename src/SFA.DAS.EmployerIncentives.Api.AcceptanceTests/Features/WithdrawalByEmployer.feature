@@ -2,6 +2,7 @@
 @api
 @domainMessageHandlers
 @messageBus
+@activeCalendarPeriod
 Feature: WithdrawalByEmployer
 	In order to handle an Employer withdrawing an apprenticeship from the incentive scheme
 	As the employer incentive sheme

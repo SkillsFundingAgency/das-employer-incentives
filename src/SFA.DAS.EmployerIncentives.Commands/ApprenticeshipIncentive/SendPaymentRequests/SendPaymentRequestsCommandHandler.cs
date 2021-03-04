@@ -14,12 +14,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
     public class SendPaymentRequestsCommandHandler : ICommandHandler<SendPaymentRequestsCommand>
     {
         private readonly IAccountDataRepository _accountRepository;
-        private readonly IPayableLegalEntityQueryRepository _queryRepository;
+        private readonly IPaymentsQueryRepository _queryRepository;
         private readonly IBusinessCentralFinancePaymentsService _businessCentralFinancePaymentsService;
 
         public SendPaymentRequestsCommandHandler(
             IAccountDataRepository accountRepository,
-            IPayableLegalEntityQueryRepository queryRepository,
+            IPaymentsQueryRepository queryRepository,
             IBusinessCentralFinancePaymentsService businessCentralFinancePaymentsService)
         {
             _accountRepository = accountRepository;
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
 
         public async Task Handle(SendPaymentRequestsCommand command, CancellationToken cancellationToken = default)
         {
-            var payments = await _queryRepository.GetPaymentsToSendForAccountLegalEntity(command.AccountLegalEntityId);
+            var payments = await _queryRepository.GetUnpaidPayments(command.AccountLegalEntityId);
             if (!payments.Any())
             {
                 return;

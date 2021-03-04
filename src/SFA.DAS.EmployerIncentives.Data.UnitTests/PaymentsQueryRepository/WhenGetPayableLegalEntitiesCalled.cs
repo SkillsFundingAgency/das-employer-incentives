@@ -9,13 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepository
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentsQueryRepository
 {
     public class WhenGetPayableLegalEntitiesCalled
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IPayableLegalEntityQueryRepository _sut;
+        private IPaymentsQueryRepository _sut;
 
         [SetUp]
         public void Arrange()
@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
-            _sut = new ApprenticeshipIncentives.PayableLegalEntityQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
+            _sut = new ApprenticeshipIncentives.PaymentsQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
         [TearDown]
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.PendingPayments.AddRange(pendingPayments);
             _context.SaveChanges();
 
-            var actual = await _sut.GetList(collectionPeriodYear, collectionPeriod);
+            var actual = await _sut.GetPayableLegalEntities(collectionPeriodYear, collectionPeriod);
 
             actual.Count.Should().Be(2);
             actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.PendingPayments.AddRange(pendingPayments);
             _context.SaveChanges();
 
-            var actual = await _sut.GetList(collectionPeriodYear, collectionPeriod);
+            var actual = await _sut.GetPayableLegalEntities(collectionPeriodYear, collectionPeriod);
 
             actual.Count.Should().Be(2);
             actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.PendingPayments.AddRange(pendingPayments);
             _context.SaveChanges();
 
-            var actual = await _sut.GetList(collectionPeriodYear, collectionPeriod);
+            var actual = await _sut.GetPayableLegalEntities(collectionPeriodYear, collectionPeriod);
 
             actual.Count.Should().Be(2);
             actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
@@ -115,7 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.PendingPayments.AddRange(pendingPayments);
             _context.SaveChanges();
 
-            var actual = await _sut.GetList(collectionPeriodYear, collectionPeriod);
+            var actual = await _sut.GetPayableLegalEntities(collectionPeriodYear, collectionPeriod);
 
             actual.Count.Should().Be(1);
             actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
@@ -136,7 +136,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.PendingPayments.AddRange(pendingPayments);
             _context.SaveChanges();
 
-            var actual = await _sut.GetList(collectionPeriodYear, collectionPeriod);
+            var actual = await _sut.GetPayableLegalEntities(collectionPeriodYear, collectionPeriod);
 
             actual.Count.Should().Be(2);
             actual.Should().Contain(x => x.AccountLegalEntityId == pendingPayments[0].AccountLegalEntityId);
@@ -156,7 +156,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.Payments.AddRange(payments);
             _context.SaveChanges();
 
-            var actual = await _sut.GetList(2020, 1);
+            var actual = await _sut.GetPayableLegalEntities(2020, 1);
 
             actual.Count.Should().Be(2);
             actual.Should().Contain(x => x.AccountLegalEntityId == payments[0].AccountLegalEntityId);
@@ -189,7 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.PendingPayments.Add(pendingPayment);
             _context.SaveChanges();
 
-            var actual = await _sut.GetList(collectionPeriodYear, collectionPeriod);
+            var actual = await _sut.GetPayableLegalEntities(collectionPeriodYear, collectionPeriod);
 
             actual.Count.Should().Be(1);
         }

@@ -1,10 +1,10 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using System;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
 
         [SetUp]
@@ -30,7 +31,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     })
                 .With(a => a.PaymentModels, new List<PaymentModel>())
                 .Create();
-                        
+
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
+
             _sut = Sut(_sutModel);
         }
 
@@ -40,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
 
             // act
-            _sut.Withdraw();
+            _sut.Withdraw(_mockCollectionCalendarService.Object);
 
             // assert            
             _sut.IsDeleted.Should().BeTrue();

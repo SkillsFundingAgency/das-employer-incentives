@@ -2,6 +2,7 @@
 @api
 @domainMessageHandlers
 @messageBus
+@activeCalendarPeriod
 Feature: WithdrawalByCompliance
 	In order to handle Compliance withdrawing an apprenticeship from the incentive scheme
 	As the employer incentive sheme

@@ -269,8 +269,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             clawbackPayment.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
             clawbackPayment.Amount.Should().Be(_paidPendingPayment.Amount * -1);
             clawbackPayment.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            clawbackPayment.CollectionPeriod.Should().Be(_paidPendingPayment.PeriodNumber);
-            clawbackPayment.CollectionPeriodYear.Should().Be(_paidPendingPayment.PaymentYear);
+            clawbackPayment.CollectionPeriod.Should().Be(_testContext.ActivePeriod.PeriodNumber);
+            clawbackPayment.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             clawbackPayment.PaymentId.Should().Be(_payment.Id);
             clawbackPayment.PendingPaymentId.Should().Be(_paidPendingPayment.Id);
             clawbackPayment.SubnominalCode.Should().Be(_payment.SubnominalCode);
@@ -290,7 +290,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var archivedValidationResult = archivedPendingPaymentValidationResults.Single();
             archivedValidationResult.PendingPaymentValidationResultId.Should().Be(_pendingPaymentValidationResult.Id);
             archivedValidationResult.PendingPaymentId.Should().Be(_pendingPaymentValidationResult.PendingPaymentId);
-            archivedValidationResult.PaymentYear.Should().Be(_pendingPaymentValidationResult.PaymentYear);
+            archivedValidationResult.PaymentYear.Should().Be(Convert.ToInt16(_pendingPaymentValidationResult.PaymentYear));
             archivedValidationResult.PeriodNumber.Should().Be(_pendingPaymentValidationResult.PeriodNumber);
             archivedValidationResult.Step.Should().Be(_pendingPaymentValidationResult.Step);
             archivedValidationResult.Result.Should().Be(_pendingPaymentValidationResult.Result);
