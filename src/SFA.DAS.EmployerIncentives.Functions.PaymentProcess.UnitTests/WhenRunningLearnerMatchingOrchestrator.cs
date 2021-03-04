@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             foreach (var apprenticeshipIncentive in _apprenticeshipIncentives)
             {
-                _mockOrchestrationContext.Verify(x => x.CallActivityAsync("LearnerMatchAndUpdate", It.Is<LearnerMatchInput>(input => input.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id)), Times.Once);
+                _mockOrchestrationContext.Verify(x => x.CallActivityWithRetryAsync("LearnerMatchAndUpdate", It.IsAny<RetryOptions>(), It.Is<LearnerMatchInput>(input => input.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id)), Times.Once);
             }
         }
 
