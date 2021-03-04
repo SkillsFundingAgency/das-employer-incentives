@@ -59,6 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetStartDate(learnerData.LearningStartDate(incentive));
                     submissionData.LearningData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
                     submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
+                    submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive));
                 }
                 submissionData.SetRawJson(learnerData.RawJson);
             }

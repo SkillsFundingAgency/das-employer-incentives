@@ -126,7 +126,39 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
             return isInLearning;
         }
-                
+
+        public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            // If the end date of the apprenticeship’s most recent price episode is before the current date
+            if (incentive == null) return new LearningStoppedStatus(false);
+
+            var matchedRecords =
+               (from tr in learnerData.Training
+                where tr.Reference == PROGRAM_REFERENCE
+                from pe in tr.PriceEpisodes
+                from p in pe.Periods
+                where p.ApprenticeshipId == incentive.Apprenticeship.Id
+                select new
+                {
+                    p.ApprenticeshipId,
+                    pe.StartDate,
+                    pe.EndDate,
+                }).ToArray();
+
+            var learningStoppedStatus = new LearningStoppedStatus(false);
+            if (matchedRecords.Any())
+            {
+                var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
+
+                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date)
+                {
+                    learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
+                }
+            }
+
+            return learningStoppedStatus;
+        }
+
         public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             if(learnerData == null)

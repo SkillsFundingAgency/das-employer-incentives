@@ -250,9 +250,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 throw new InvalidOperationException();
             }
 
-            if (learner.SubmissionData.SubmissionFound && learner.SubmissionData.LearningData.StartDate.HasValue)
+            if (learner.SubmissionData.SubmissionFound)
             {
-                SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value, collectionCalendar);                
+                if (learner.SubmissionData.LearningData.StartDate.HasValue)
+                {
+                    SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value, collectionCalendar);
+                }
+
+                SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus);
             }
 
             SetHasPossibleChangeOfCircumstances(false);
@@ -272,6 +277,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     previousPeriod,
                     Model.StartDate,
                     Model));
+            }
+        }
+
+        private void SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus)
+        {
+            if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
+            {
+                Model.Status = IncentiveStatus.Stopped;
+                AddEvent(new LearningStopped(
+                    Model.Id,
+                    learningStoppedStatus.DateStopped.Value));
             }
         }
 
