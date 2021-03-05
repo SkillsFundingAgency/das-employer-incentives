@@ -10,9 +10,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,11 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private LearnerChangeOfCircumstanceCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Fixture _fixture;
-        private Mock<ILearnerDomainRepository> _mockLearnerDomainRespository;
-        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Mock<ILearnerDomainRepository> _mockLearnerDomainRespository;        
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
-        private Learner _learner;
-        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private Learner _learner;        
 
         [SetUp]
         public void Arrange()
@@ -36,7 +32,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRespository = new Mock<ILearnerDomainRepository>();
-            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
             var incentive = new ApprenticeshipIncentiveFactory()
                     .CreateNew(_fixture.Create<Guid>(),
@@ -60,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _fixture.Register(() => incentive);
 
-            _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRespository.Object, _mockLearnerDomainRespository.Object, _mockCollectionCalendarService.Object);
+            _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRespository.Object, _mockLearnerDomainRespository.Object);
 
             _incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _learner = new LearnerFactory().GetExisting(
@@ -72,12 +67,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository.Setup(x => x.Find(incentive.Id)).ReturnsAsync(_incentive);
             _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(incentive)).ReturnsAsync(_learner);
 
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>
-            {
-                new Domain.ValueObjects.CollectionPeriod(2, (byte)DateTime.Today.Month, (short)DateTime.Today.Year, DateTime.Today, DateTime.Today, (short)DateTime.Today.Year, false),
-                new Domain.ValueObjects.CollectionPeriod(3, (byte)DateTime.Today.AddMonths(1).Month, (short)DateTime.Today.AddMonths(1).Year, DateTime.Today.AddMonths(1), DateTime.Today.AddMonths(1), (short)DateTime.Today.AddMonths(1).Year, false)
-            };
-            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
         }
 
         [Test]
@@ -115,7 +104,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             @event.ApprenticeshipIncentiveId.Should().Be(_incentive.Id);
             @event.NewStartDate.Should().Be(newStartDate);
             @event.PreviousStartDate.Should().Be(previousStartDate);
-            @event.PreviousPeriod.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2));
         }
 
         [Test]

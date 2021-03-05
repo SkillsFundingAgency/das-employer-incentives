@@ -362,8 +362,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentMadeDate = model.PaymentMadeDate,
                 EarningType = model.EarningType,
                 ClawedBack = model.ClawedBack,
-                ArchiveDateUTC = DateTime.UtcNow,
-                //ValidationResults = model.PendingPaymentValidationResultModels.ArchiveMap(model.Id)
+                ArchiveDateUTC = DateTime.UtcNow
             };
         }
 
@@ -414,8 +413,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
                 ChangeType = model.Type,
                 PreviousValue = model.PreviousValue,
-                PreviousPeriodNumber = model.PreviousCollectionPeriod?.PeriodNumber,
-                PreviousPaymentYear = model.PreviousCollectionPeriod?.AcademicYear,
                 NewValue = model.NewValue,
                 ChangedDate = model.ChangedDate
             };

@@ -22,11 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
                 Guid.NewGuid(),
                 @event.ApprenticeshipIncentiveId,
                 Enums.ChangeOfCircumstanceType.StartDate,
-                @event.PreviousStartDate.ToString(),
-                @event.NewStartDate.ToString(),
+                @event.PreviousStartDate.ToString("yyyy-MM-dd"),
+                @event.NewStartDate.ToString("yyyy-MM-dd"),
                 DateTime.Now);
-
-            change.SetPreviousCollectionPeriod(@event.PreviousPeriod);
 
             return _repository.Save(change);
         }

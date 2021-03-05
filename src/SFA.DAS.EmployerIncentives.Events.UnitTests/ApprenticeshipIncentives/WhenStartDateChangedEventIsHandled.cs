@@ -40,9 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.ApprenticeshipIncentives
             m.Save(It.Is<ChangeOfCircumstance>(i =>
                    i.ApprenticeshipIncentiveId == @event.ApprenticeshipIncentiveId &&
                    i.Type == Enums.ChangeOfCircumstanceType.StartDate &&
-                   i.NewValue == @event.NewStartDate.ToString() &&
-                   i.PreviousValue == @event.PreviousStartDate.ToString() &&
-                   i.PreviousCollectionPeriod == @event.PreviousPeriod
+                   i.NewValue == @event.NewStartDate.ToString("yyyy-MM-dd") &&
+                   i.PreviousValue == @event.PreviousStartDate.ToString("yyyy-MM-dd")
                    )),
                    Times.Once);
         }

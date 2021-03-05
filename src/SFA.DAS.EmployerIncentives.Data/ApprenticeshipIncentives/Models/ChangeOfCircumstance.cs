@@ -14,8 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Column(TypeName = "nvarchar(20)")]
         public ChangeOfCircumstanceType ChangeType { get; set; }
         public string PreviousValue { get; set; }
-        public byte? PreviousPeriodNumber { get; set; }
-        public short? PreviousPaymentYear { get; set; }
         public string NewValue { get; set; }
         public DateTime ChangedDate { get; set; }
     }
