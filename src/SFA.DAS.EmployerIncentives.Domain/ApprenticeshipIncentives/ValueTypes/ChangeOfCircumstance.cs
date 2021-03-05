@@ -14,7 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public string PreviousValue { get; set; }
         public string NewValue { get; set; }
         public DateTime ChangedDate { get; set; }
-        public CollectionPeriod PreviousCollectionPeriod { get; set; }
 
         public ChangeOfCircumstance(
             Guid id,
@@ -32,18 +31,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             ChangedDate = changedDate;
         }
 
-        public void SetPreviousCollectionPeriod(CollectionPeriod previousCollectionPeriod)
-        {
-            PreviousCollectionPeriod = previousCollectionPeriod;
-        }
-
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return Id;
             yield return ApprenticeshipIncentiveId;
             yield return Type;
             yield return PreviousValue;
-            yield return PreviousCollectionPeriod;
             yield return NewValue;
         }
     }

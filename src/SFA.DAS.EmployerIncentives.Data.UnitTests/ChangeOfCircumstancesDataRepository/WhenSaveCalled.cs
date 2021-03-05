@@ -52,8 +52,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ChangeOfCircumstancesDataRep
             storedChange.ApprenticeshipIncentiveId.Should().Be(testChange.ApprenticeshipIncentiveId);
             storedChange.NewValue.Should().Be(testChange.NewValue);
             storedChange.PreviousValue.Should().Be(testChange.PreviousValue);
-            storedChange.PreviousPeriodNumber.Should().Be(testChange.PreviousCollectionPeriod.PeriodNumber);
-            storedChange.PreviousPaymentYear.Should().Be(testChange.PreviousCollectionPeriod.AcademicYear);
             storedChange.ChangedDate.Should().Be(testChange.ChangedDate);
         }
     }

@@ -10,20 +10,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
     {
         public Guid ApprenticeshipIncentiveId { get; set; }
         public DateTime PreviousStartDate { get; set; }
-        public CollectionPeriod PreviousPeriod { get; set; }
         public DateTime NewStartDate { get; set; }
         public ApprenticeshipIncentiveModel Model { get; }
 
         public StartDateChanged(
             Guid apprenticeshipIncentiveId,
             DateTime previousStartDate,
-            CollectionPeriod previousPeriod,
             DateTime newStartDate,
             ApprenticeshipIncentiveModel model)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
             PreviousStartDate = previousStartDate;
-            PreviousPeriod = previousPeriod;
             NewStartDate = newStartDate;
             Model = model;
         }
