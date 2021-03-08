@@ -9,13 +9,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public long LegalEntityId { get; }
         public string LegalEntityName { get; set; }
         public string VrfVendorId { get; set; }
+        public string VrfCaseStatus { get; set; }
+        public string HashedLegalEntityId { get; set; }
 
-        public LegalEntity(Account account, long legalEntityId, string legalEntityName, string vrfVendorId)
+        public LegalEntity(Account account, long legalEntityId, string legalEntityName, string vrfVendorId, 
+                           string vrfCaseStatus, string hashedLegalEntityId)
         {
             Account = account;
             LegalEntityId = legalEntityId;
             LegalEntityName = legalEntityName;
             VrfVendorId = vrfVendorId;
+            VrfCaseStatus = vrfCaseStatus;
+            HashedLegalEntityId = hashedLegalEntityId;
         }
       
         protected override IEnumerable<object> GetAtomicValues()
@@ -24,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return LegalEntityId;
             yield return LegalEntityName;
             yield return VrfVendorId;
+            yield return HashedLegalEntityId;
         }
     }
 }
