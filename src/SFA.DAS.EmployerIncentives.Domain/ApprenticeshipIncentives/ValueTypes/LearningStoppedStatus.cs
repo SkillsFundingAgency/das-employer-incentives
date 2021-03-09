@@ -9,21 +9,32 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public bool LearningStopped { get; }
 
         public DateTime? DateStopped { get; }
+        public DateTime? DateResumed { get; }
 
-        public LearningStoppedStatus(bool isStopped, DateTime? dateStopped = null)
+        public LearningStoppedStatus(bool isStopped, DateTime? dateChanged = null)
         {
-            if(isStopped && !dateStopped.HasValue)
+            if(isStopped && !dateChanged.HasValue)
             {
-                throw new ArgumentException("Date stopped mus be provided when leanring stopped");
+                throw new ArgumentException("Date changed must be provided when learning stopped");
             }
             LearningStopped = isStopped;
-            DateStopped = dateStopped;
+            if (isStopped)
+            {
+                DateStopped = dateChanged;
+                DateResumed = null;
+            }
+            else 
+            {
+                DateResumed = dateChanged;
+                DateStopped = null;
+            }
         }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return LearningStopped;
             yield return DateStopped;
+            yield return DateResumed;
         }
     }
 }

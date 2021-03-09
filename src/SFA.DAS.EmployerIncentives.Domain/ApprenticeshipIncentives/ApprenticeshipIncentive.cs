@@ -287,6 +287,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.Id,
                     learningStoppedStatus.DateStopped.Value));
             }
+            else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped)
+            {
+                Model.Status = IncentiveStatus.Active;
+                AddEvent(new LearningResumed(
+                   Model.Id,
+                   learningStoppedStatus.DateResumed.Value));
+            }            
         }
 
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)

@@ -21,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public DateTime? StartDate { get; set; }
         public bool? InLearning { get; set; }
         public DateTime? LearningStoppedDate { get; set; }
+        public DateTime? LearningResumedDate { get; set; }
         public string RawJSON { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }

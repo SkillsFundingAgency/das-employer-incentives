@@ -128,8 +128,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
-            // If the end date of the apprenticeship’s most recent price episode is before the current date
-            if (incentive == null) return new LearningStoppedStatus(false);
+            var learningStoppedStatus = new LearningStoppedStatus(false);
+
+            if (incentive == null) return learningStoppedStatus;
 
             var matchedRecords =
                (from tr in learnerData.Training
@@ -144,7 +145,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                     pe.EndDate,
                 }).ToArray();
 
-            var learningStoppedStatus = new LearningStoppedStatus(false);
             if (matchedRecords.Any())
             {
                 var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
@@ -152,6 +152,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date)
                 {
                     learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
+                }
+                else
+                {
+                    learningStoppedStatus = new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
                 }
             }
 

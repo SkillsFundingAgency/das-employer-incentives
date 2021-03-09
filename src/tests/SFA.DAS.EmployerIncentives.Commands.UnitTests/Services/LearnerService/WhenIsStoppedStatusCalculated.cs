@@ -2,12 +2,10 @@
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
@@ -77,6 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
             isStoppedStatus.DateStopped.HasValue.Should().BeFalse();
+            isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
         }
 
         [Test]
@@ -91,6 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
             isStoppedStatus.DateStopped.HasValue.Should().BeFalse();
+            isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
         }
 
         [Test]
@@ -105,6 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
             isStoppedStatus.DateStopped.HasValue.Should().BeFalse();
+            isStoppedStatus.DateResumed.Value.Should().Be(_testPriceEpisodeDto.StartDate);
         }
 
         [Test]
@@ -118,7 +119,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
-            isStoppedStatus.DateStopped.HasValue.Should().BeFalse();
+            isStoppedStatus.DateStopped.HasValue.Should().BeFalse();            
+            isStoppedStatus.DateResumed.Value.Should().Be(_testPriceEpisodeDto.StartDate);
         }
 
         [Test]
@@ -133,6 +135,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             isStoppedStatus.LearningStopped.Should().BeTrue();
             isStoppedStatus.DateStopped.HasValue.Should().BeTrue();
+            isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
         }
 
         [Test]
@@ -147,6 +150,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             isStoppedStatus.LearningStopped.Should().BeTrue();
             isStoppedStatus.DateStopped.Should().Be(_testPriceEpisodeDto.EndDate.Value.AddDays(1));
+            isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
         }
     }
 }

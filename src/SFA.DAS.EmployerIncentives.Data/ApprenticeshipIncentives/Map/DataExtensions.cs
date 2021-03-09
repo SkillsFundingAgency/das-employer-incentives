@@ -253,6 +253,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     learner.SubmissionData.LearningData.SetIsStopped(new Domain.ApprenticeshipIncentives.ValueTypes.LearningStoppedStatus(true, model.LearningStoppedDate.Value));
                 }
 
+                if (model.LearningResumedDate.HasValue)
+                {
+                    learner.SubmissionData.LearningData.SetIsStopped(new Domain.ApprenticeshipIncentives.ValueTypes.LearningStoppedStatus(false, model.LearningResumedDate.Value));
+                }
+
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
@@ -280,7 +285,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             learner.InLearning = model.SubmissionData.LearningData.IsInlearning;
             learner.RawJSON = model.SubmissionData.RawJson;
             learner.LearningStoppedDate = model.SubmissionData.LearningData.StoppedStatus.DateStopped;
-
+            learner.LearningResumedDate = model.SubmissionData.LearningData.StoppedStatus.DateResumed;
             return learner;
         }
 
