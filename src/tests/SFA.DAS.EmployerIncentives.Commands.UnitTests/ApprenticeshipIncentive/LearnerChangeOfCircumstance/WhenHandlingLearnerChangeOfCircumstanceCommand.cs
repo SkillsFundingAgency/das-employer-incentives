@@ -12,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
@@ -36,7 +37,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRespository = new Mock<ILearnerDomainRepository>();
+
+            var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            {
+                new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<short>(), true),
+            };
+            var collectionCalendar = new Domain.ValueObjects.CollectionCalendar(collectionPeriods);
+
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
+            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(collectionCalendar);
 
             _incentiveModel = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
@@ -53,6 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(p => p.StartDate, DateTime.Today)
                 .With(p => p.Status, Enums.IncentiveStatus.Active)
                 .With(p => p.HasPossibleChangeOfCircumstances, true)
+                .With(p => p.PendingPaymentModels, new List<PendingPaymentModel>())
                 .Create();
             _incentiveModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
