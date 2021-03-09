@@ -185,10 +185,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void ClawbackAllPayments(CollectionPeriod collectionPeriod)
         {
             RemoveUnpaidEarnings();
-            foreach (var paidPendingPayment in PendingPayments)
-            {
-                AddClawback(paidPendingPayment, collectionPeriod);
-            }
+            ClawbackPayments(PendingPayments, collectionPeriod);
         }
 
         public void CalculatePayments()
@@ -300,9 +297,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var collectionCalendar = await collectionCalendarService.Get();
 
             RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate > dateStopped));
-            foreach (var paidPendingPayment in PendingPayments.Where(x => x.DueDate > dateStopped))
+            ClawbackPayments(PendingPayments.Where(x => x.DueDate > dateStopped), collectionCalendar.GetActivePeriod());
+        }
+
+        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionPeriod collectionPeriod)
+        {
+            foreach (var paidPendingPayment in pendingPayments)
             {
-                AddClawback(paidPendingPayment, collectionCalendar.GetActivePeriod());
+                AddClawback(paidPendingPayment, collectionPeriod);
             }
         }
 
