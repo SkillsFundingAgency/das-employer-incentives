@@ -95,10 +95,52 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
-        [Given(@"the learner data identifies the learner as not in leaning anymore")]
+        [Given(@"the learner data identifies the learner as not in learning anymore")]
         public void GivenTheIncentiveLearnerDataIdentifiesTheLearnerAsNotInLearningAnymore()
         {
             SetupMockLearnerMatchResponse();            
+        }
+
+        [Given(@"the apprenticeship incentive has unpaid earnings after the stopped date")]
+        public async Task GivenTheApprenticeshipIncentiveHasUnpaidEarningsAfterTheStoppedDate()
+        {
+            var futurePendingPayment = _fixture.Build<PendingPayment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.DueDate, _periodEndDate.AddMonths(1))
+                .With(p => p.ClawedBack, false)
+                .With(p => p.EarningType, EarningType.SecondPayment)
+                .Without(p => p.PaymentMadeDate)
+                .Create();
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(futurePendingPayment);
+        }
+
+        [Given(@"the apprenticeship incentive has paid earnings after the stopped date")]
+        public async Task GivenTheApprenticeshipIncentiveHasPaidEarningsAfterTheStoppedDate()
+        {
+            var paidPendingPayment = _fixture.Build<PendingPayment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.DueDate, _periodEndDate.AddMonths(1))
+                .With(p => p.ClawedBack, false)
+                .With(p => p.EarningType, EarningType.SecondPayment)
+                .With(p => p.PaymentMadeDate, DateTime.Now.AddDays(-1))
+                .Create();
+
+            var payment = _fixture.Build<Payment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.PaidDate, DateTime.Now.AddDays(-1))
+                .With(p => p.PendingPaymentId, paidPendingPayment.Id)
+                .With(p => p.PaymentYear, paidPendingPayment.PaymentYear)
+                .With(p => p.PaymentPeriod, paidPendingPayment.PeriodNumber)
+                .Create();
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(paidPendingPayment);
+            await dbConnection.InsertAsync(payment);
         }
 
         [When(@"the incentive learner data is refreshed")]
@@ -127,6 +169,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             change.PreviousValue.Should().Be(false.ToString());
             change.NewValue.Should().Be(true.ToString());
             change.ChangedDate.Should().Be(_periodEndDate.AddDays(1));
+        }
+
+        [Then(@"the existing pending payments are removed")]
+        public void ThenTheExistingPendingPaymentsAreRemoved()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var pendingPayments = dbConnection.GetAll<PendingPayment>();
+
+            pendingPayments.Count().Should().Be(1);
+            pendingPayments.Single().EarningType.Should().Be(EarningType.FirstPayment);
+        }
+
+        [Then(@"the existing paid pending payments are clawed back")]
+        public void ThenTheExistingPaidPendingPaymentsAreClawedBack()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var pendingPayment = dbConnection.GetAll<PendingPayment>().Single(p => p.EarningType == EarningType.SecondPayment);
+            pendingPayment.ClawedBack.Should().BeTrue();
         }
 
         private void SetupMockLearnerMatchResponse()
