@@ -14,6 +14,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.LearnerChangeOfCircumstance
 {
@@ -25,7 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRespository;        
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
         private ApprenticeshipIncentiveModel _incentiveModel;
-        private Learner _learner;        
+        private Learner _learner;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
 
         [SetUp]
         public void Arrange()
@@ -34,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRespository = new Mock<ILearnerDomainRepository>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
             _incentiveModel = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
@@ -56,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(_incentiveModel.Id, _incentiveModel);
             _fixture.Register(() => incentive);
 
-            _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRespository.Object, _mockLearnerDomainRespository.Object);
+            _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRespository.Object, _mockLearnerDomainRespository.Object, _mockCollectionCalendarService.Object);
 
             _incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _learner = new LearnerFactory().GetExisting(

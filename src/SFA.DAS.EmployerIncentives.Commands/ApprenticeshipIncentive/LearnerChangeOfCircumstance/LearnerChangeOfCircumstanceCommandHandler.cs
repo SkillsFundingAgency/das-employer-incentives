@@ -10,13 +10,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
+        private readonly ICollectionCalendarService _collectionCalendarService;
 
         public LearnerChangeOfCircumstanceCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository, 
-            ILearnerDomainRepository learnerDomainRepository)
+            ILearnerDomainRepository learnerDomainRepository,
+            ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
             _learnerDomainRepository = learnerDomainRepository;
+            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(LearnerChangeOfCircumstanceCommand command, CancellationToken cancellationToken = default)
@@ -30,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
-            incentive.SetChangeOfCircumstances(learner);
+            await incentive.SetChangeOfCircumstances(learner, _collectionCalendarService);
 
             await _domainRepository.Save(incentive);
         }
