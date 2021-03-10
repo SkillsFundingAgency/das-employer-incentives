@@ -12,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -83,6 +84,35 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _incentive.StartDate.Should().Be(_learner.SubmissionData.LearningData.StartDate.Value);
+        }
+
+        [Test]
+        public async Task Then_the_break_in_learning_day_count_is_calculated()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+
+            var learningPeriod1 = new LearningPeriod(new DateTime(2020, 11, 12), new DateTime(2020, 12, 4));
+            var learningPeriod2 = new LearningPeriod(new DateTime(2021, 1, 18), null);
+
+            var learnerModel =
+                _fixture.Build<LearnerModel>()
+                .With(x => x.SubmissionData, _fixture.Create<SubmissionData>())
+                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
+                .With(x => x.LearningPeriods, new List<LearningPeriod>() { learningPeriod2, learningPeriod1 })
+                .Create();
+
+            _learner = new LearnerFactory().GetExisting(learnerModel);
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+
+            _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _incentive.GetModel().BreakInLearningDayCount.Should().Be(44);
         }
 
         [Test]

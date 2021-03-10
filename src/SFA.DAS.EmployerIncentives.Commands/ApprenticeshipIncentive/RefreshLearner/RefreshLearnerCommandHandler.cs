@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             incentive.LearnerRefreshCompleted();
 
             learner.SetLearningPeriods(learnerData.LearningPeriods(incentive));
-
+            
             if (!learner.SubmissionData.LearningData.LearningFound)
             {
                 _logger.LogInformation("Matching ILR record not found for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN} with reason: {NotFoundReason}",

@@ -108,7 +108,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 8
- testRunner.And("the learner data identifies the learner as not in leaning anymore", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the learner data identifies the learner as not in learning anymore", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 9
  testRunner.When("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
@@ -157,7 +157,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an apprenticeship incentive exists that has stopped learning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 16
- testRunner.And("the learner data identifies the learner as in leaning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the learner data identifies the learner as in learning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 17
  testRunner.When("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
@@ -170,6 +170,51 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 20
  testRunner.And("the learner data resumed date is stored", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("A learning resumed change updated the pending payment due dates with the break in" +
+            " learning")]
+        public virtual void ALearningResumedChangeUpdatedThePendingPaymentDueDatesWithTheBreakInLearning()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A learning resumed change updated the pending payment due dates with the break in" +
+                    " learning", null, tagsOfScenario, argumentsOfScenario);
+#line 22
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 23
+ testRunner.Given("an apprenticeship incentive exists that has stopped learning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 24
+ testRunner.And("the learner data identifies the learner as in leaning with a break in learning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 25
+ testRunner.When("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 26
+ testRunner.Then("the pending payment due dates include the break in learning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

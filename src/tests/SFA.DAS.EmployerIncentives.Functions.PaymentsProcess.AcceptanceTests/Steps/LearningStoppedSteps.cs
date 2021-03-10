@@ -28,10 +28,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
+        private readonly Learner _learner;
+        private readonly LearningPeriod _learningPeriod1;
         private readonly LearnerSubmissionDto _stoppedLearnerMatchApiData;
         private readonly LearnerSubmissionDto _resumedLearnerMatchApiData;
+        private readonly LearnerSubmissionDto _resumedLearnerWithBreakInLearningMatchApiData;
         private readonly DateTime _plannedStartDate;
         private readonly DateTime _periodEndDate;
+        private readonly int _breakInLearning;
 
         public LearningStoppedSteps(TestContext testContext)
         {
@@ -39,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _fixture = new Fixture();
 
             _plannedStartDate = new DateTime(2020, 8, 1);
+            _breakInLearning = 15;
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -59,6 +64,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
 
             _periodEndDate = DateTime.Today.AddDays(-10);
+
+            _learner = _fixture
+                .Build<Learner>()
+                .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.ULN, _apprenticeshipIncentive.ULN)
+                .With(p => p.Ukprn, _apprenticeshipIncentive.UKPRN)
+                .With(p => p.LearningFound, true)
+                .With(p => p.StartDate, _plannedStartDate.AddDays(-10))
+                .Create();
+
+            _learningPeriod1 = _fixture
+                .Build<LearningPeriod>()
+                .With(p => p.LearnerId, _learner.Id)
+                .With(p => p.StartDate, _plannedStartDate.AddDays(-20).AddDays(_breakInLearning * -1))
+                .With(p => p.EndDate, _plannedStartDate.AddDays(-10).AddDays(_breakInLearning * -1))
+                .Create();
 
             _stoppedLearnerMatchApiData = _fixture
                 .Build<LearnerSubmissionDto>()
@@ -107,6 +129,42 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         .Create()}
                 )
                 .Create();
+
+            _resumedLearnerWithBreakInLearningMatchApiData = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){
+                            _fixture.Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                                    .With(period => period.IsPayable, true)
+                                    .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                    .Create()
+                            })
+                            .With(pe => pe.StartDate, _plannedStartDate)
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(_breakInLearning * -1))
+                            .Create(),
+                            _fixture.Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                                    .With(period => period.IsPayable, true)
+                                    .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                    .Create()
+                            })
+                            .With(pe => pe.StartDate, DateTime.Today)
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(10))
+                            .Create() }
+                        )
+                        .Create()}
+                )
+                .Create();
         }
 
         [Given(@"an apprenticeship incentive exists")]
@@ -130,20 +188,28 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
                 await dbConnection.InsertAsync(_pendingPayment);
+                await dbConnection.InsertAsync(_learner);
+                await dbConnection.InsertAsync(_learningPeriod1);
             }
         }
 
-        [Given(@"the learner data identifies the learner as not in leaning anymore")]
+        [Given(@"the learner data identifies the learner as not in learning anymore")]
         public void GivenTheIncentiveLearnerDataIdentifiesTheLearnerAsNotInLearningAnymore()
         {
             SetupMockLearnerMatchResponse(_stoppedLearnerMatchApiData);            
         }
 
-        [Given(@"the learner data identifies the learner as in leaning")]
+        [Given(@"the learner data identifies the learner as in learning")]
         public void GivenTheIncentiveLearnerDataIdentifiesTheLearnerAsInLearning()
         {
             SetupMockLearnerMatchResponse(_resumedLearnerMatchApiData);
-        }        
+        }
+
+        [Given(@"the learner data identifies the learner as in leaning with a break in learning")]
+        public void GivenTheIncentiveLearnerDataIdentifiesTheLearnerAsInLearningWithABreakInLearning()
+        {
+            SetupMockLearnerMatchResponse(_resumedLearnerWithBreakInLearningMatchApiData);
+        }
 
         [When(@"the incentive learner data is refreshed")]
         public async Task WhenTheIncentiveLearnerDataIsRefreshed()
@@ -214,6 +280,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             change.NewValue.Should().Be(false.ToString());
             change.ChangedDate.Should().Be(_plannedStartDate);
         }
+
+        [Then(@"the pending payment due dates include the break in learning")]
+        public void ThenThePendingPaymentDuedatesIncludeTheBreakInLearning()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var pendingPayments = dbConnection.GetAll<PendingPayment>();
+
+            pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment).DueDate.Should().Be(_plannedStartDate.AddDays(89).AddDays(_breakInLearning - 1));
+            pendingPayments.Single(p => p.EarningType == EarningType.SecondPayment).DueDate.Should().Be(_plannedStartDate.AddDays(364).AddDays(_breakInLearning - 1));
+        }
+        
 
         private void SetupMockLearnerMatchResponse(LearnerSubmissionDto learnerMatchApiData)
         {

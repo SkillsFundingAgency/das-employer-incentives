@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public async Task CalculateEarnings(IIncentivePaymentProfilesService incentivePaymentProfilesService, ICollectionCalendarService collectionCalendarService)
         {
-            if(Model.Status == IncentiveStatus.Withdrawn)
+            if(Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
             {
                 return;
             }
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var paymentProfiles = await incentivePaymentProfilesService.Get();
             var collectionCalendar = await collectionCalendarService.Get();
 
-            var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles);
+            var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles, Model.BreakInLearningDayCount);
             if (!incentive.IsEligible)
             {
                 ClawbackAllPayments(collectionCalendar.GetActivePeriod());
@@ -258,6 +258,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
 
                 SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus);
+                SetBreakInLearningDayCount(learner.GetBreakInLearningDayCount());
             }
 
             SetHasPossibleChangeOfCircumstances(false);
@@ -289,11 +290,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
             else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped)
             {
-                Model.Status = IncentiveStatus.Active;
+                Model.Status = IncentiveStatus.Active;                
                 AddEvent(new LearningResumed(
                    Model.Id,
                    learningStoppedStatus.DateResumed.Value));
             }            
+        }
+
+        private void SetBreakInLearningDayCount(int breakInLearningDayCount)
+        {
+            Model.BreakInLearningDayCount = breakInLearningDayCount;
         }
 
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
