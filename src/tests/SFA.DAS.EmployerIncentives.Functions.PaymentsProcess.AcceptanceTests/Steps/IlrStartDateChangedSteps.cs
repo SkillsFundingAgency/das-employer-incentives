@@ -15,7 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     [Scope(Feature = "IlrStartDateChanged")]
     public partial class IlrStartDateChangedSteps
     {
-
         [Given(@"an apprenticeship incentive exists")]
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
@@ -83,6 +82,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             incentive.Single().StartDate.Should().Be(_learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate);
         }
 
+        [Then(@"the start date change of circumstance is saved")]
+        public void ThenTheStartDateChangeOfCircumstanceIsSaved()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var change = dbConnection.GetAll<ChangeOfCircumstance>().Single();
+
+            change.ChangeType.Should().Be(ChangeOfCircumstanceType.StartDate);
+            change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            change.PreviousValue.Should().Be(_initialStartDate.ToString("yyy-MM-dd"));
+            change.NewValue.Should().Be(_actualStartDate.ToString("yyy-MM-dd"));
+        }
+
         [Then(@"the pending payments are recalculated for the apprenticeship incentive")]
         public void ThenPendingPaymentsAreRecalculated()
         {
@@ -119,7 +130,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             var clawback = dbConnection.GetAll<ClawbackPayment>().Single(p => p.PendingPaymentId == _pendingPayment.Id);
             clawback.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
+                .Excluding(x => x.Amount)
                 .Excluding(x => x.Id));
+            clawback.Amount.Should().Be(-750);
         }
 
         [Given(@"an earning has not been paid for an apprenticeship incentive application")]
@@ -167,7 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>()
                 .Count(p => p.ApprenticeshipIncentiveId == _payment.ApprenticeshipIncentiveId)
                 .Should().Be(1);
-            var archivedPayment = dbConnection.GetAll< Data.ApprenticeshipIncentives.Models.Archive.Payment> ().Single(p => p.PaymentId == _payment.Id);
+            var archivedPayment = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>().Single(p => p.PaymentId == _payment.Id);
             archivedPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             archivedPayment.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
                     .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
@@ -179,8 +192,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenAllPendingPaymentValidationResultsAreArchived()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var archivedValidationResult = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult> ().Single(p =>
-                p.PendingPaymentId == _pendingPayment.Id);
+            var archivedValidationResult = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>().Single(p =>
+               p.PendingPaymentId == _pendingPayment.Id);
             archivedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             archivedValidationResult.Should().BeEquivalentTo(_pendingPaymentValidationResult, opt => opt.ExcludingMissingMembers()
                 .Excluding(x => x.CreatedDateUtc));

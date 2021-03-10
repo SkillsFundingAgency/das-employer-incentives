@@ -100,6 +100,7 @@
     <Build Include="Views\BusinessGetMonthEndRuntimes.sql" />
     <Build Include="Tables\ClawbackPayment.sql" />
     <Build Include="Schemas\archive.sql" />
+    <Build Include="Tables\ChangeOfCircumstances.sql" />
     <Build Include="Tables\Archive.PendingPaymentValidationResult.sql" />
     <Build Include="Tables\Archive.Payment.sql" />
     <Build Include="Tables\Archive.PendingPayment.sql" />

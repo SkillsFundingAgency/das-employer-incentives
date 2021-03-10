@@ -9,16 +9,14 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepository
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentsQueryRepository
 {
-    public class WhenGettingPaymentsToSendForAccountLegalEntity
+    public class GetUnpaidClawbacksCalled
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IPayableLegalEntityQueryRepository _sut;
-        short _collectionPeriodYear = 2020;
-        byte _collectionPeriodMonth = 5;
-        private Payment _payment1;
+        private IPaymentsQueryRepository _sut;
+        private ClawbackPayment _clawback1;
         private PendingPayment _pendingPayment1;
         private Models.Account _account1;
         private ApprenticeshipIncentives.Models.ApprenticeshipIncentive _apprenticeshipIncentive1;
@@ -32,12 +30,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.PayableLegalEntityQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
+            _sut = new ApprenticeshipIncentives.PaymentsQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
 
             SetupAccount();
             SetupApprenticeshipIncentives();
             SetupPendingPayments();
-            SetupPayments();
+            SetupClawbacks();
         }
 
         [TearDown]
@@ -50,33 +48,33 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
         [TestCase(2, false)]
         public async Task Then_should_return_only_records_for_account_legal_entity(long accountLegalEntityId, bool expected)
         {
-            var payments = await _sut.GetPaymentsToSendForAccountLegalEntity(accountLegalEntityId);
+            var clawbacks = await _sut.GetUnpaidClawbacks(accountLegalEntityId);
 
-            (payments.Count > 0).Should().Be(expected);
+            (clawbacks.Count > 0).Should().Be(expected);
         }
 
         [Test]
-        public async Task Then_should_return_only_records_for_payments_which_havent_been_sent()
+        public async Task Then_should_return_only_records_for_clawbacks_which_havent_been_sent()
         {
-            var payments = await _sut.GetPaymentsToSendForAccountLegalEntity(1);
+            var clawbacks = await _sut.GetUnpaidClawbacks(1);
 
-            payments.Count.Should().Be(1);
+            clawbacks.Count.Should().Be(1);
         }
 
         [Test]
         public async Task Then_should_return_records_with_values_mapped()
         {
-            var payments = await _sut.GetPaymentsToSendForAccountLegalEntity(1);
+            var clawbacks = await _sut.GetUnpaidClawbacks(1);
 
-            payments.Count.Should().Be(1);
-            payments[0].PaymentId.Should().Be(_payment1.Id);
-            payments[0].ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive1.Id);
-            payments[0].AccountLegalEntityId.Should().Be(_account1.AccountLegalEntityId);
-            payments[0].VendorId.Should().Be(_account1.VrfVendorId);
-            payments[0].DueDate.Should().Be(_pendingPayment1.DueDate);
-            payments[0].EarningType.Should().Be(_pendingPayment1.EarningType);
-            payments[0].ULN.Should().Be(_apprenticeshipIncentive1.ULN);
-            payments[0].HashedLegalEntityId.Should().Be(_account1.HashedLegalEntityId);
+            clawbacks.Count.Should().Be(1);
+            clawbacks[0].PaymentId.Should().Be(_clawback1.Id);
+            clawbacks[0].ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive1.Id);
+            clawbacks[0].AccountLegalEntityId.Should().Be(_account1.AccountLegalEntityId);
+            clawbacks[0].VendorId.Should().Be(_account1.VrfVendorId);
+            clawbacks[0].DueDate.Should().Be(_pendingPayment1.DueDate);
+            clawbacks[0].EarningType.Should().Be(_pendingPayment1.EarningType);
+            clawbacks[0].ULN.Should().Be(_apprenticeshipIncentive1.ULN);
+            clawbacks[0].HashedLegalEntityId.Should().Be(_account1.HashedLegalEntityId);
         }
 
         private void SetupPendingPayments()
@@ -123,30 +121,30 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PayableLegalEntityQueryRepos
             _context.SaveChanges();
         }
 
-        private void SetupPayments()
+        private void SetupClawbacks()
         {
-            _payment1 = _fixture.Build<Payment>()
+            _clawback1 = _fixture.Build<ClawbackPayment>()
                 .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive1.Id)
                 .With(x => x.PendingPaymentId, _pendingPayment1.Id)
                 .With(x => x.AccountId, _account1.Id)
                 .With(x => x.AccountLegalEntityId, _account1.AccountLegalEntityId)
-                .Without(x=>x.PaidDate)
+                .Without(x=>x.DateClawbackSent)
                 .Create();
 
-            var sentPayment = _fixture.Build<Payment>()
+            var sentClawback = _fixture.Build<ClawbackPayment>()
                 .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive1.Id)
                 .With(x => x.PendingPaymentId, _pendingPayment1.Id)
                 .With(x => x.AccountId, _account1.Id)
                 .With(x => x.AccountLegalEntityId, _account1.AccountLegalEntityId)
                 .Create();
 
-            var payments = new List<Payment>()
+            var clawbacks = new List<ClawbackPayment>()
             {
-                _payment1,
-                sentPayment
+                _clawback1,
+                sentClawback
             };
 
-            _context.Payments.AddRange(payments);
+            _context.ClawbackPayments.AddRange(clawbacks);
             _context.SaveChanges();
         }
     }

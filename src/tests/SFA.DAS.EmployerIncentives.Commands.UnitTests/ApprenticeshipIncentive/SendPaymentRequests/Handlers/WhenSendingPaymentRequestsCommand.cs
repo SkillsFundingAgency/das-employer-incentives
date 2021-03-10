@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     public class WhenSendingPaymentRequestsCommand
     {
         private SendPaymentRequestsCommandHandler _sut;
-        private Mock<IPayableLegalEntityQueryRepository> _mockPayableLegalEntityQueryRepository;
+        private Mock<IPaymentsQueryRepository> _mockPayableLegalEntityQueryRepository;
         private Mock<IAccountDataRepository> _mockAccountDataRepository;
         private Mock<IBusinessCentralFinancePaymentsService> _mockBusinessCentralFinancePaymentsService;
         private List<PaymentDto> _paymentsToSend;
@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _fixture = new Fixture();
             _paymentRequestsLimit = 3;
 
-            _mockPayableLegalEntityQueryRepository = new Mock<IPayableLegalEntityQueryRepository>();
+            _mockPayableLegalEntityQueryRepository = new Mock<IPaymentsQueryRepository>();
             _mockAccountDataRepository = new Mock<IAccountDataRepository>();
             _mockBusinessCentralFinancePaymentsService = new Mock<IBusinessCentralFinancePaymentsService>();
             _mockBusinessCentralFinancePaymentsService.Setup(x => x.PaymentRequestsLimit)
@@ -115,13 +115,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public void SetupSingleCallScenario()
         {
             _mockPayableLegalEntityQueryRepository
-                .Setup(x => x.GetPaymentsToSendForAccountLegalEntity(It.Is<long>(id => id == _command.AccountLegalEntityId)))
+                .Setup(x => x.GetUnpaidPayments(It.Is<long>(id => id == _command.AccountLegalEntityId)))
                 .ReturnsAsync(_paymentsToSend.Take(_paymentRequestsLimit).ToList());
         }
         public void SetupMultipleCallScenario()
         {
             _mockPayableLegalEntityQueryRepository
-                .SetupSequence(x => x.GetPaymentsToSendForAccountLegalEntity(It.Is<long>(id => id == _command.AccountLegalEntityId)))
+                .SetupSequence(x => x.GetUnpaidPayments(It.Is<long>(id => id == _command.AccountLegalEntityId)))
                 .ReturnsAsync(_paymentsToSend)
                 .ReturnsAsync(_unsentPayments);
         }

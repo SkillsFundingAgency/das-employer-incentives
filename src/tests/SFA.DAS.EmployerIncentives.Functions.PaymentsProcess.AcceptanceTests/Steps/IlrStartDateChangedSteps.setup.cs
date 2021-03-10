@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private Payment _payment;
         private List<PendingPayment> _newPendingPayments;
         private DateTime _actualStartDate;
+        private readonly DateTime _initialStartDate;
         private readonly (byte Number, short Year) _paymentPeriod = (1, 2021);
 
         public IlrStartDateChangedSteps(TestContext testContext)
@@ -43,6 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
                 .Create();
+
+            _initialStartDate = _apprenticeshipIncentive.StartDate;
 
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.AccountId, _accountModel.Id)
