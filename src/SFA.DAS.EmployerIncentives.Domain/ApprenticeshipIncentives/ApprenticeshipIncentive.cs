@@ -252,9 +252,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (learner.SubmissionData.SubmissionFound && learner.SubmissionData.LearningData.StartDate.HasValue)
             {
-                SetStartDate(learner.SubmissionData.LearningData.StartDate.Value);
+                SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);                
             }
+
             SetHasPossibleChangeOfCircumstances(false);
+        }
+
+        private void SetStartDateChangeOfCircumstance(DateTime startDate)
+        {
+            var previousStartDate = Model.StartDate;
+            SetStartDate(startDate);
+            if (previousStartDate != Model.StartDate)
+            {
+                AddEvent(new StartDateChanged(
+                    Model.Id,
+                    previousStartDate,
+                    Model.StartDate,
+                    Model));
+            }
         }
 
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)

@@ -31,6 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<ApprenticeshipIncentives.Models.Archive.PendingPayment> ArchivedPendingPayments { get; set; }
         public virtual DbSet<ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult> ArchivedPendingPaymentValidationResults { get; set; }
 
+        public virtual DbSet<ChangeOfCircumstance> ChangeOfCircumstances { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
