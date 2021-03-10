@@ -99,6 +99,7 @@
     <Build Include="Views\BusinessValidationRulesByPeriodDashboard.sql" />
     <Build Include="Views\BusinessGetMonthEndRuntimes.sql" />
     <Build Include="Tables\ClawbackPayment.sql" />
+    <Build Include="Tables\ChangeOfCircumstances.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
