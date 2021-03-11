@@ -185,10 +185,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void ClawbackAllPayments(CollectionPeriod collectionPeriod)
         {
             RemoveUnpaidEarnings();
-            foreach (var paidPendingPayment in PendingPayments)
-            {
-                AddClawback(paidPendingPayment, collectionPeriod);
-            }
+            ClawbackPayments(PendingPayments, collectionPeriod);
         }
 
         public void CalculatePayments()
@@ -243,7 +240,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.StartDate = startDate;
         }
 
-        public void SetChangeOfCircumstances(Learner learner)
+        public async Task SetChangeOfCircumstances(Learner learner, ICollectionCalendarService collectionCalendarService)
         {
             if (Id != learner.ApprenticeshipIncentiveId)
             {
@@ -257,11 +254,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);
                 }
 
-                SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus);
+                
+                
+                await SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus, collectionCalendarService);
                 SetBreakInLearningDayCount(learner.GetBreakInLearningDayCount());
             }
 
             SetHasPossibleChangeOfCircumstances(false);
+        }
+
+        public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
+        {
+            Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
         }
 
         private void SetStartDateChangeOfCircumstance(DateTime startDate)
@@ -279,11 +283,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        private void SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus)
+        private async Task SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus, ICollectionCalendarService collectionCalendarService)
         {
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {
                 Model.Status = IncentiveStatus.Stopped;
+                await RemoveEarningsAfterStopDate(learningStoppedStatus.DateStopped.Value, collectionCalendarService);
                 AddEvent(new LearningStopped(
                     Model.Id,
                     learningStoppedStatus.DateStopped.Value));
@@ -302,14 +307,30 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.BreakInLearningDayCount = breakInLearningDayCount;
         }
 
-        public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
+        private async Task RemoveEarningsAfterStopDate(DateTime dateStopped, ICollectionCalendarService collectionCalendarService)
         {
-            Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
+            var collectionCalendar = await collectionCalendarService.Get();
+
+            RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate > dateStopped));
+            ClawbackPayments(PendingPayments.Where(x => x.DueDate > dateStopped), collectionCalendar.GetActivePeriod());
+        }
+
+        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionPeriod collectionPeriod)
+        {
+            foreach (var paidPendingPayment in pendingPayments)
+            {
+                AddClawback(paidPendingPayment, collectionPeriod);
+            }
         }
 
         private void RemoveUnpaidEarnings()
         {
-            Model.PendingPaymentModels.Where(x => x.PaymentMadeDate == null).ToList()
+            RemoveUnpaidEarnings(Model.PendingPaymentModels);
+        }
+
+        private void RemoveUnpaidEarnings(IEnumerable<PendingPaymentModel> pendingPayments)
+        {
+            pendingPayments.Where(x => x.PaymentMadeDate == null).ToList()
                 .ForEach(pp => {
                     if (Model.PendingPaymentModels.Remove(pp))
                     {
@@ -318,7 +339,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 });
 
             var pendingPaymentsToDelete = new List<PendingPaymentModel>();
-            foreach (var paidPendingPayment in Model.PendingPaymentModels)
+            foreach (var paidPendingPayment in pendingPayments.Where(x => x.PaymentMadeDate != null))
             {
                 var payment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == paidPendingPayment.Id);
                 if (payment != null && payment.PaidDate == null)
