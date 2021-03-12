@@ -46,6 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
                .Include(x => x.Payments)
+               .Include(x => x.ClawbackPayments)
                .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
             if (apprenticeshipIncentive != null)
             {
@@ -176,11 +177,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         private void RemoveDeletedPendingPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
         {
-            foreach (var existingPayment in existingIncentive.PendingPayments)
+            foreach (var existingPendingPayment in existingIncentive.PendingPayments)
             {
-                if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
+                if (updatedIncentive.PendingPayments.All(c => c.Id != existingPendingPayment.Id))
                 {
-                    _dbContext.PendingPayments.Remove(existingPayment);
+                    _dbContext.PendingPayments.Remove(existingPendingPayment);
                 }
             }
         }
