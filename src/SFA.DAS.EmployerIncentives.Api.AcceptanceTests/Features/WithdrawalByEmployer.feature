@@ -27,3 +27,8 @@ Scenario: Employer withdrawal for an apprenticeship that has paid payments (earn
 	Given an apprenticeship incentive with paid payments exists as a result of an incentive application
 	When the apprenticeship application is withdrawn from the scheme
 	Then clawbacks are created for the apprenticeship incentive payments and it's pending payments are archived
+
+Scenario: Employer withdrawal for an apprenticeship that has a clawed back paid payment (earnings)
+	Given an apprenticeship incentive with a clawedback paid payment exists as a result of an incentive application
+	When the apprenticeship application is withdrawn from the scheme
+	Then the pending payments are archived
