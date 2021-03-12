@@ -2,12 +2,15 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CollectionPeriod = SFA.DAS.EmployerIncentives.Domain.ValueObjects.CollectionPeriod;
+using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -120,29 +123,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             // Assert 
             var result = await _sut.Get(expected.Id);
             result.Should().BeEquivalentTo(expected);
-        }
-
-        [Test]
-        public async Task Then_the_removed_payments_are_deleted()
-        {
-            // Arrange
-            var incentive = _fixture.Create<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
-            await _dbContext.AddAsync(incentive);
-            await _dbContext.SaveChangesAsync();
-
-            var storedIncentive = await _sut.Get(incentive.Id);
-            storedIncentive.PendingPaymentModels.Clear();
-            storedIncentive.PaymentModels.Count.Should().BeGreaterThan(0);
-            storedIncentive.PaymentModels.Clear();
-
-            // Act
-            await _sut.Update(storedIncentive);
-            await _dbContext.SaveChangesAsync();
-
-            // Assert 
-            _dbContext.Payments.Should().BeEmpty();
-            _dbContext.PendingPayments.Should().BeEmpty();
-            _dbContext.PendingPaymentValidationResults.Should().BeEmpty();
         }
 
         private async Task<ApprenticeshipIncentiveModel> SaveAndGetApprenticeshipIncentive()

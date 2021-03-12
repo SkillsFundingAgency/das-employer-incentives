@@ -177,11 +177,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         private void RemoveDeletedPendingPayments(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
         {
-            foreach (var existingPayment in existingIncentive.PendingPayments)
+            foreach (var existingPendingPayment in existingIncentive.PendingPayments)
             {
-                if (!updatedIncentive.PendingPayments.Any(c => c.Id == existingPayment.Id))
+                if (updatedIncentive.PendingPayments.All(c => c.Id != existingPendingPayment.Id))
                 {
-                    _dbContext.PendingPayments.Remove(existingPayment);
+                    _dbContext.PendingPayments.Remove(existingPendingPayment);
                 }
             }
         }
