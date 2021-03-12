@@ -174,7 +174,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private bool HasExpectedCompleteEarningsCalculationEvents(TestContext testContext)
         {
             var processedEvents = testContext.CommandsPublished.Count(c =>
-            c.IsPublished &&
+            c.IsProcessed &&
             c.IsDomainCommand &&
             c.Command is CompleteEarningsCalculationCommand);
 
