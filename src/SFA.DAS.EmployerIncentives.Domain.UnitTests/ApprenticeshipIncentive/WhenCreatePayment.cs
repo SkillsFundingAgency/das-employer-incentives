@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange
             var apprenticeship = new Apprenticeship(_fixture.Create<long>(), _fixture.Create<string>(),
-                _fixture.Create<string>(), dob, _fixture.Create<long>(), employerType);
+                _fixture.Create<string>(), dob, _fixture.Create<long>(), employerType, _fixture.Create<string>());
 
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x=>x.StartDate, plannedStartDate)
@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_the_payment_is_created_and_the_existing_payment_is_replaced()
+        public void Then_the_payment_is_created_and_the_existing_payment_is_updated()
         {
             // arrange
             var pendingPayment = _sut.PendingPayments.First();
@@ -119,7 +119,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // assert
             _sut.Payments.Count.Should().Be(1);
-            _sut.Payments.First().Id.Should().NotBe(existingPayment.Id);
+            var payment = _sut.Payments.First();
+            payment.Id.Should().Be(existingPayment.Id);
+            payment.PaymentPeriod.Should().Be(_collectionPeriod.PeriodNumber);
+            payment.PaymentYear.Should().Be(_collectionPeriod.AcademicYear);
         }
 
         [Test]

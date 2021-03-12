@@ -11,7 +11,8 @@
 	[PaymentYear] SMALLINT NULL,
     [AccountLegalEntityId] BIGINT NULL,
     [EarningType] VARCHAR(20) NULL
-    CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id)
+    CONSTRAINT FK_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id), 
+    [ClawedBack] BIT NOT NULL DEFAULT 0
 )
 GO
 CREATE CLUSTERED INDEX IX_PendingPayment ON [incentives].[PendingPayment] (AccountId)

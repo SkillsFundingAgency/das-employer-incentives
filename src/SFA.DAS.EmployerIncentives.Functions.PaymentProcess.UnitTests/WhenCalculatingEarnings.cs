@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
     public class WhenCalculatingEarnings
     {
         private Fixture _fixture;
-        private CalculateEarnings _sut;
+        private CalculateEarningsActivity _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
 
         [SetUp]
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             
-            _sut = new CalculateEarnings(_mockCommandDispatcher.Object, Mock.Of<ILogger<CalculateEarnings>>());
+            _sut = new CalculateEarningsActivity(_mockCommandDispatcher.Object, Mock.Of<ILogger<CalculateEarningsActivity>>());
         }
 
         [Test]

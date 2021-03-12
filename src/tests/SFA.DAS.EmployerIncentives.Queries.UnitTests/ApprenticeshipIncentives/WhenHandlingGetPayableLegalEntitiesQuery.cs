@@ -14,14 +14,14 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
     public class WhenHandlingGetPayableLegalEntitiesQuery
     {
         private GetPayableLegalEntitiesQueryHandler _sut;
-        private Mock<IPayableLegalEntityQueryRepository> _repositoryMock;
+        private Mock<IPaymentsQueryRepository> _repositoryMock;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _repositoryMock = new Mock<IPayableLegalEntityQueryRepository>();
+            _repositoryMock = new Mock<IPaymentsQueryRepository>();
             _sut = new GetPayableLegalEntitiesQueryHandler(_repositoryMock.Object);
         }
 
@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
             var data = _fixture.CreateMany<PayableLegalEntityDto>().ToList();
             var expected = new GetPayableLegalEntitiesResponse(data);
 
-            _repositoryMock.Setup(x => x.GetList(query.CollectionPeriodYear, query.CollectionPeriodMonth)).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.GetPayableLegalEntities(query.CollectionPeriodYear, query.CollectionPeriodMonth)).ReturnsAsync(data);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);

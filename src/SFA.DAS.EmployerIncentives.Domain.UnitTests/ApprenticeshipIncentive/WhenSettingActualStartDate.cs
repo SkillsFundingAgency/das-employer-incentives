@@ -36,26 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.StartDate.Should().Be(newStartDate);
         }
 
-        [Test]
-        public void Then_the_earnings_are_removed_when_the_start_date_has_changed()
-        {
-            var newStartDate = _fixture.Create<DateTime>();
-
-            _sut.SetStartDate(newStartDate);
-
-            _sutModel.PendingPaymentModels.Should().BeEmpty();
-        }
-
-        [Test]
-        public void Then_earnings_are_not_removed_when_the_start_date_has_not_changed()
-        {
-            var newStartDate = _sutModel.StartDate;
-
-            _sut.SetStartDate(newStartDate);
-
-            _sutModel.PendingPaymentModels.Count.Should().Be(3);
-        }
-
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);

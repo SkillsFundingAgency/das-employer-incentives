@@ -6,10 +6,14 @@ using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.LearnerChangeOfCircumstance
@@ -41,9 +45,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<string>(),
                         DateTime.Today.AddYears(-26),
                         _fixture.Create<long>(),
-                        ApprenticeshipEmployerType.Levy
+                        ApprenticeshipEmployerType.Levy,
+                        _fixture.Create<string>()
                         ),
-                    DateTime.Today);
+                    DateTime.Today,
+                    _fixture.Create<DateTime>(),
+                    _fixture.Create<string>());
             incentive.SetHasPossibleChangeOfCircumstances(true);
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
@@ -61,6 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(incentive.Id)).ReturnsAsync(_incentive);
             _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(incentive)).ReturnsAsync(_learner);
+
         }
 
         [Test]
@@ -77,6 +85,43 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _incentive.StartDate.Should().Be(_learner.SubmissionData.LearningData.StartDate.Value);
+        }
+
+        [Test]
+        public async Task Then_the_StartdateChanged_event_is_raised()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            var newStartDate = _incentive.StartDate.AddMonths(2);
+            var previousStartDate = _incentive.StartDate;
+            _learner.SubmissionData.LearningData.SetStartDate(newStartDate);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var @event = _incentive.FlushEvents().Single(e => e is StartDateChanged) as StartDateChanged;
+            @event.ApprenticeshipIncentiveId.Should().Be(_incentive.Id);
+            @event.NewStartDate.Should().Be(newStartDate);
+            @event.PreviousStartDate.Should().Be(previousStartDate);
+        }
+
+        [Test]
+        public async Task Then_the_StartdateChanged_event_is_not_raised_if_the_start_date_is_the_same_as_the_previous_start_date()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetStartDate(_incentive.StartDate);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _incentive.FlushEvents().Count(e => e is StartDateChanged).Should().Be(0);
         }
 
         [Test]

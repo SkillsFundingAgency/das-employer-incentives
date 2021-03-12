@@ -69,3 +69,8 @@ Scenario: Request to refresh learner data for an Apprenticeship Incentive where 
 	When the learner data is refreshed for the apprenticeship incentive
 	Then the apprenticeship incentive learner data is updated for the application with default submission data
 	
+Scenario: Request to refresh learner data for an Apprenticeship Incentive where change of circumstances start date is set
+	Given an apprenticeship incentive exists with a paid pending payment and has previously been refreshed
+	And a change of circumstances start date is made
+	When the learner data is refreshed for the apprenticeship incentive
+	Then the clawback creation is persisted

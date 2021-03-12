@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
@@ -14,26 +13,19 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
     public class WhenGetByApprenticeshipIncentiveIdCalled
     {
         private ApprenticeshipIncentives.LearnerDataRepository _sut;
-        private Fixture _fixture;
+        private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
 
         [SetUp]
         public void Arrange()
         {
-            _fixture = new Fixture();
-
-            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
+            var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
-
             _sut = new ApprenticeshipIncentives.LearnerDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 
         [TearDown]
-        public void CleanUp()
-        {
-            _dbContext.Dispose();
-        }
+        public void CleanUp() => _dbContext.Dispose();
 
         [Test]
         public async Task Then_the_learner_is_retrieved()
@@ -72,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         }
 
         [Test(Description = "This test is required to validate data persisted in a format prior to changes made for EI-632/636 can be reloaded")]
-        public async Task Then_the_learner_is_retrieved_when_leaning_found_is_null()
+        public async Task Then_the_learner_is_retrieved_when_learning_found_is_null()
         {
             var testLearner = _fixture.Create<ApprenticeshipIncentives.Models.Learner>();
             testLearner.SubmissionFound = false;
@@ -88,6 +80,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
 
             // Assert            
             result.Should().NotBeNull();
+        }
+
+
+        [Test]
+        public async Task Then_null_is_returned_when_no_data_found()
+        {
+            // Act
+            var result = await _sut.GetByApprenticeshipIncentiveId(Guid.Empty);
+
+            // Assert
+            result.Should().BeNull();
         }
     }
 }

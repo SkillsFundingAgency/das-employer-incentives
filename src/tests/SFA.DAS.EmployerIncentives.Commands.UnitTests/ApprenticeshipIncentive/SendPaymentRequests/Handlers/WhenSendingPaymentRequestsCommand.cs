@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
@@ -10,18 +7,22 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentReq
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.SendPaymentRequests.Handlers
 {
     public class WhenSendingPaymentRequestsCommand
     {
         private SendPaymentRequestsCommandHandler _sut;
-        private Mock<IPayableLegalEntityQueryRepository> _mockPayableLegalEntityQueryRepository;
+        private Mock<IPaymentsQueryRepository> _mockPayableLegalEntityQueryRepository;
         private Mock<IAccountDataRepository> _mockAccountDataRepository;
         private Mock<IBusinessCentralFinancePaymentsService> _mockBusinessCentralFinancePaymentsService;
         private List<PaymentDto> _paymentsToSend;
         private List<PaymentDto> _unsentPayments;
-        private int _paymentRequestsLimit; 
+        private int _paymentRequestsLimit;
 
         private SendPaymentRequestsCommand _command;
 
@@ -33,13 +34,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _fixture = new Fixture();
             _paymentRequestsLimit = 3;
 
-            _mockPayableLegalEntityQueryRepository = new Mock<IPayableLegalEntityQueryRepository>();
+            _mockPayableLegalEntityQueryRepository = new Mock<IPaymentsQueryRepository>();
             _mockAccountDataRepository = new Mock<IAccountDataRepository>();
             _mockBusinessCentralFinancePaymentsService = new Mock<IBusinessCentralFinancePaymentsService>();
             _mockBusinessCentralFinancePaymentsService.Setup(x => x.PaymentRequestsLimit)
                 .Returns(_paymentRequestsLimit);
             _paymentsToSend = _fixture.CreateMany<PaymentDto>(5).ToList();
-            _unsentPayments = _paymentsToSend.TakeLast(5-_paymentRequestsLimit).ToList();
+            _unsentPayments = _paymentsToSend.TakeLast(5 - _paymentRequestsLimit).ToList();
 
             _command = new SendPaymentRequestsCommand(_fixture.Create<long>(), _fixture.Create<DateTime>());
 
@@ -114,13 +115,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public void SetupSingleCallScenario()
         {
             _mockPayableLegalEntityQueryRepository
-                .Setup(x => x.GetPaymentsToSendForAccountLegalEntity(It.Is<long>(id => id == _command.AccountLegalEntityId)))
+                .Setup(x => x.GetUnpaidPayments(It.Is<long>(id => id == _command.AccountLegalEntityId)))
                 .ReturnsAsync(_paymentsToSend.Take(_paymentRequestsLimit).ToList());
         }
         public void SetupMultipleCallScenario()
         {
             _mockPayableLegalEntityQueryRepository
-                .SetupSequence(x => x.GetPaymentsToSendForAccountLegalEntity(It.Is<long>(id => id == _command.AccountLegalEntityId)))
+                .SetupSequence(x => x.GetUnpaidPayments(It.Is<long>(id => id == _command.AccountLegalEntityId)))
                 .ReturnsAsync(_paymentsToSend)
                 .ReturnsAsync(_unsentPayments);
         }

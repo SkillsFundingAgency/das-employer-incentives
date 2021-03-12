@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,14 +14,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
     public class TestFunction : IDisposable
     {
+        public const int BusinessCentralPaymentRequestsLimit = 1;
         private readonly TestContext _testContext;
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
@@ -43,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                     { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
-                };
+            };
 
             _testContext = testContext;
 
@@ -51,20 +50,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
+                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile{ AmountPayable = 100, DaysAfterApprenticeshipStart = 10},
-                        new PaymentProfile{ AmountPayable = 200, DaysAfterApprenticeshipStart = 20},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
                     }
                 },
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile{ AmountPayable = 300, DaysAfterApprenticeshipStart = 30},
-                        new PaymentProfile{ AmountPayable = 400, DaysAfterApprenticeshipStart = 40},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
                     }
                 }
             };
@@ -87,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            options.UseGracefulShutdown = false;
                            options.ExtendedSessionsEnabled = false;
                            options.StorageProvider["maxQueuePollingInterval"] = new TimeSpan(0, 0, 0, 0, 500);
-                           options.StorageProvider["partitionCount"] = 1;                           
+                           options.StorageProvider["partitionCount"] = 1;
                            options.NotificationUrl = new Uri("localhost:7071");
 #pragma warning disable S125 // Sections of code should not be commented out
                            //options.StorageProvider["controlQueueBatchSize"] = 5;
@@ -111,6 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            s.Configure<BusinessCentralApiClient>(c =>
                            {
                                c.ApiBaseUrl = _testContext.PaymentsApi.BaseAddress;
+                               c.PaymentRequestsLimit = BusinessCentralPaymentRequestsLimit;
                            });
 
                            s.Configure<ApplicationSettings>(a =>
@@ -123,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            });
 
                            s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
-                           s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);                           
+                           s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
                            s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
                        })
                        )

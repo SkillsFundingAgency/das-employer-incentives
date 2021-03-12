@@ -14,6 +14,7 @@
 	[EarningsCalculated] [bit] NOT NULL  DEFAULT 0,
 	[WithdrawnByEmployer] BIT NOT NULL DEFAULT 0,
 	[WithdrawnByCompliance] BIT NOT NULL DEFAULT 0,
+	[CourseName] NVARCHAR(126) NULL,
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
 GO

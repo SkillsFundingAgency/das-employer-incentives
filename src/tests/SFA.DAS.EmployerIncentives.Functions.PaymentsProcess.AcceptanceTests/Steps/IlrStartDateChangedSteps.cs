@@ -1,20 +1,18 @@
-﻿using System;
+﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
+using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoFixture;
-using Dapper.Contrib.Extensions;
-using FluentAssertions;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Timers;
-using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
-using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -32,28 +30,37 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly PendingPayment _pendingPayment;
         private readonly LearnerSubmissionDto _learnerMatchApiData;
         private readonly DateTime _plannedStartDate;
+        private readonly DateTime _initialStartDate;
+        private Payment _payment;
+        private List<PendingPayment> _newPendingPayments;
+        private DateTime _actualStartDate;
 
         public IlrStartDateChangedSteps(TestContext testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
 
-            _plannedStartDate = _fixture.Create<DateTime>();
+            _plannedStartDate = new DateTime(2020, 8, 1);
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
+                .With(p => p.DateOfBirth, _plannedStartDate.AddYears(-24).AddMonths(-10)) // under 25
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
+                .With(p => p.StartDate, new DateTime(2020, 11, 1))
                 .Create();
+
+            _initialStartDate = _apprenticeshipIncentive.StartDate;
 
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(p => p.DueDate, _plannedStartDate.AddMonths(1))
+                .With(p => p.ClawedBack, false)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Without(p => p.PaymentMadeDate)
                 .Create();
-
-            _pendingPayment.PaymentMadeDate = null;
 
             _learnerMatchApiData = _fixture
                 .Build<LearnerSubmissionDto>()
@@ -91,28 +98,52 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
-        [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive")]
-        public async Task WhenTheLearnerIsRefreshedWithAValidStartDate()
+        [Given(@"an earning has been paid for an apprenticeship incentive application")]
+        public async Task WhenTheExistingEarningHasBeenPaid()
         {
-            var actualStartDate = new DateTime(2020, 9, 1);
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
+            _payment = _fixture.Build<Payment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.PaidDate, DateTime.Now.AddDays(-1))
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
+                .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
+                .Create();
 
+            _pendingPayment.PaymentMadeDate = DateTime.Now.AddDays(-1);
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_payment);
+            await dbConnection.UpdateAsync(_pendingPayment);
+        }
+
+
+        [When(@"the learner data is updated with new valid start date for the apprenticeship incentive")]
+        public void WhenTheLearnerDataIsUpdatedWithNewValidStartDateForTheApprenticeshipIncentive()
+        {
+            _actualStartDate = _plannedStartDate.AddMonths(1);
+        }
+
+        [When(@"the learner data is updated with new invalid start date for the apprenticeship incentive")]
+        public void WhenTheLearnerDataIsUpdatedWithNewInvalidStartDateForTheApprenticeshipIncentive()
+        {
+            _actualStartDate = _plannedStartDate.AddMonths(-1);
+        }
+
+
+        [When(@"the incentive learner data is refreshed")]
+        public async Task WhenTheIncentiveLearnerDataIsRefreshed()
+        {
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = _actualStartDate;
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = _actualStartDate.AddYears(1);
             SetupMockLearnerMatchResponse();
-
             await StartLearnerMatching();
         }
 
-        [When(@"the learner data is refreshed with a new invalid start date for the apprenticeship incentive")]
-        public async Task WhenTheLearnerIsRefreshedWithAnInvalidStartDate()
+        [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive making the learner over twenty five at start")]
+        public void WhenTheLearnerDataIsRefreshedWithANewValidStartDateForTheApprenticeshipIncentiveMakingTheLearnerOverTwentyFiveAtStart()
         {
-            var actualStartDate = new DateTime(2020, 7, 1);
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = actualStartDate;
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = actualStartDate.AddYears(1);
-
-            SetupMockLearnerMatchResponse();
-
-            await StartLearnerMatching();
+            _actualStartDate = _plannedStartDate.AddMonths(2);
         }
 
         [Then(@"the actual start date is updated")]
@@ -122,6 +153,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>();
 
             incentive.Single().StartDate.Should().Be(_learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate);
+        }
+
+        [Then(@"the start date change of circumstance is saved")]
+        public void ThenTheStartDateChangeOfCircumstanceIsSaved()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var change = dbConnection.GetAll<ChangeOfCircumstance>().Single();
+
+            change.ChangeType.Should().Be(ChangeOfCircumstanceType.StartDate);
+            change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            change.PreviousValue.Should().Be(_initialStartDate.ToString("yyy-MM-dd"));
+            change.NewValue.Should().Be(_actualStartDate.ToString("yyy-MM-dd"));
         }
 
         [Then(@"the pending payments are recalculated for the apprenticeship incentive")]
@@ -137,7 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenLearnerRefreshIsCalledAgain()
         {
             _testContext.LearnerMatchApi.MockServer.LogEntries.Count(x =>
-                    x.RequestMessage.Path ==  $"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
+                    x.RequestMessage.Path == $"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
                 .Should().Be(2);
         }
 
@@ -148,6 +191,120 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
             pendingPayments.Should().BeEmpty();
+        }
+
+        [Then(@"the paid earning is marked as requiring a clawback")]
+        public void ThenThePaidEarningIsMarkedAsRequiringAClawback()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var pendingPayment = dbConnection.GetAll<PendingPayment>().Single(p => p.Id == _pendingPayment.Id);
+            pendingPayment.ClawedBack.Should().BeTrue();
+        }
+
+        [Given(@"an earning has not been paid for an apprenticeship incentive application")]
+        public async Task GivenAnEarningHasNotBeenPaidForAnApprenticeshipIncentiveApplication()
+        {
+            _payment = _fixture.Build<Payment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .Without(p => p.PaidDate)
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
+                .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
+                .Create();
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_payment);
+        }
+
+        [Then(@"the unpaid earning is deleted")]
+        public void ThenTheUnpaidEarningIsDeleted()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            dbConnection.GetAll<PendingPayment>().Any(p => p.PeriodNumber == _pendingPayment.PeriodNumber
+                && p.PaymentYear == _pendingPayment.PaymentYear).Should()
+                .BeFalse();
+        }
+
+        [Then(@"all unpaid payment records are deleted")]
+        public void ThenAllUnpaidPaymentRecordsAreDeleted()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            dbConnection.GetAll<Payment>().Any(p => p.PaymentPeriod == _pendingPayment.PeriodNumber
+                && p.PaymentYear == _pendingPayment.PaymentYear).Should()
+                .BeFalse();
+        }
+
+        [Then(@"earnings are recalculated")]
+        public void ThenEarningsAreRecalculated()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            _newPendingPayments = dbConnection.GetAll<PendingPayment>().ToList();
+        }
+
+        [Then(@"a new pending first payment record is created")]
+        public void ThenANewPendingFirstPaymentRecordIsCreated()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.FirstPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(1000);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(4);
+            pp.PaymentYear.Should().Be(2021);
+        }
+
+        [Then(@"a new pending second payment record is created")]
+        public void ThenANewPendingSecondPaymentRecordIsCreated()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.SecondPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(1000);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(1);
+            pp.PaymentYear.Should().Be(2122);
+        }
+
+        [Then(@"a new pending first payment record is created with a new amount and payment period")]
+        public void ThenANewPendingFirstPaymentRecordIsCreatedWithANewAmount()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.FirstPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(750);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(5);
+            pp.PaymentYear.Should().Be(2021);
+        }
+
+        [Then(@"a new pending second payment record is created with a new amount and payment period")]
+        public void ThenANewPendingSecondPaymentRecordIsCreatedWithANewAmount()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.SecondPayment
+                && !x.ClawedBack);
+
+            pp.Amount.Should().Be(750);
+            pp.PaymentMadeDate.Should().BeNull();
+            pp.PeriodNumber.Should().Be(2);
+            pp.PaymentYear.Should().Be(2122);
         }
 
         private void SetupMockLearnerMatchResponse()

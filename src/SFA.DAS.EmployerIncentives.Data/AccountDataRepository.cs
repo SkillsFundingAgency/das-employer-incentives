@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using System;
-using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
@@ -44,6 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 {
                     legalEntity.LegalEntityName = item.LegalEntityName;
                     legalEntity.HasSignedIncentivesTerms = item.HasSignedIncentivesTerms;
+                    legalEntity.SignedAgreementVersion = item.SignedAgreementVersion;
                     legalEntity.VrfCaseId = item.VrfCaseId;
                     legalEntity.VrfCaseStatus = item.VrfCaseStatus;
                     legalEntity.VrfVendorId = item.VrfVendorId;
@@ -82,6 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                                AccountLegalEntityId = account.AccountLegalEntityId,
                                                HashedLegalEntityId = account.HashedLegalEntityId,
                                                HasSignedIncentivesTerms = account.HasSignedIncentivesTerms,
+                                               SignedAgreementVersion = account.SignedAgreementVersion,
                                                Id = account.Id,
                                                LegalEntityId = account.LegalEntityId,
                                                LegalEntityName = account.LegalEntityName,
@@ -102,6 +102,20 @@ namespace SFA.DAS.EmployerIncentives.Data
                 if (payment != null)
                 {
                     payment.PaidDate ??= paidDate;
+                }
+            }
+        }
+
+        public async Task UpdateClawbackDateForClawbackIds(List<Guid> clawbackIds, long accountLegalEntityId, DateTime clawbackDate)
+        {
+            var clawbacks = await _dbContext.ClawbackPayments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
+
+            foreach (var clawbackId in clawbackIds)
+            {
+                var clawback = clawbacks.SingleOrDefault(p => p.Id == clawbackId);
+                if (clawback != null)
+                {
+                    clawback.DateClawbackSent ??= clawbackDate;
                 }
             }
         }
