@@ -29,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return LegalEntityId;
             yield return LegalEntityName;
             yield return VrfVendorId;
+            yield return VrfCaseStatus;
             yield return HashedLegalEntityId;
         }
     }
