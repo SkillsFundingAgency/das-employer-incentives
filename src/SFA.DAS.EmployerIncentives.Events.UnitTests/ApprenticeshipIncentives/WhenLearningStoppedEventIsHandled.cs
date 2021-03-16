@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives;
+using System;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.ApprenticeshipIncentives
@@ -40,9 +41,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.ApprenticeshipIncentives
             m.Save(It.Is<ChangeOfCircumstance>(i =>
                    i.ApprenticeshipIncentiveId == @event.ApprenticeshipIncentiveId &&
                    i.Type == Enums.ChangeOfCircumstanceType.LearningStopped &&
-                   i.NewValue == "True" &&
-                   i.PreviousValue == "False" &&
-                   i.ChangedDate == @event.StoppedDate
+                   i.NewValue == @event.StoppedDate.ToString("yyyy-MM-dd") &&
+                   i.PreviousValue == string.Empty
                    )),
                    Times.Once);
         }

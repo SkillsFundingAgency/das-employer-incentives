@@ -305,9 +305,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             change.ChangeType.Should().Be(ChangeOfCircumstanceType.LearningStopped);
             change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            change.PreviousValue.Should().Be(false.ToString());
-            change.NewValue.Should().Be(true.ToString());
-            change.ChangedDate.Should().Be(_periodEndDate.AddDays(1));
+            change.PreviousValue.Should().Be(string.Empty);
+            change.NewValue.Should().Be(_periodEndDate.AddDays(1).ToString("yyyy-MM-dd"));
+            change.ChangedDate.Should().BeCloseTo(DateTime.Now, new TimeSpan(0,1,0));
         }
 
         [Then(@"the resumed change of circumstance is saved")]

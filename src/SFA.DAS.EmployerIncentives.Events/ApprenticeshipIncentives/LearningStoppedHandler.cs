@@ -22,9 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
                 Guid.NewGuid(),
                 @event.ApprenticeshipIncentiveId,
                 Enums.ChangeOfCircumstanceType.LearningStopped,
-                false.ToString(),
-                true.ToString(),
-                @event.StoppedDate);
+                string.Empty,
+                @event.StoppedDate.ToString("yyyy-MM-dd"),
+                DateTime.Now);
 
             return _repository.Save(change);
         }
