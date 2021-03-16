@@ -20,24 +20,18 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
     {
         private WithdrawalCommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
-        private Mock<IQueryDispatcher> _mockQueryDispatcher;
         private Fixture _fixture;
 
         [SetUp]
         public void Setup()
         {
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
-            _mockQueryDispatcher = new Mock<IQueryDispatcher>();
             _fixture = new Fixture();
-            _sut = new WithdrawalCommandController(_mockCommandDispatcher.Object, _mockQueryDispatcher.Object);
+            _sut = new WithdrawalCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
                 .Setup(m => m.Send(It.IsAny<UpsertLegalEntityCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-
-            _mockQueryDispatcher
-                .Setup(m => m.Send<UlnHasPaymentsRequest, UlnHasPaymentsResponse>(It.IsAny<UlnHasPaymentsRequest>()))
-                .ReturnsAsync(new UlnHasPaymentsResponse(false));                
         }
 
         [Test]
@@ -115,26 +109,6 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
 
             // Act
             var actual = await _sut.WithdrawalIncentiveApplication(request) as AcceptedResult;
-
-            // Assert
-            actual.Should().NotBeNull();
-        }
-
-        [Test]
-        public async Task Then_a_BadRequest_response_is_returned_when_there_are_payments_against_the_uln()
-        {
-            // Arrange
-            var request = _fixture
-                .Build<WithdrawApplicationRequest>()
-                .With(r => r.WithdrawalType, WithdrawalType.Compliance)
-                .Create();
-
-            _mockQueryDispatcher
-                .Setup(m => m.Send<UlnHasPaymentsRequest, UlnHasPaymentsResponse>(It.IsAny<UlnHasPaymentsRequest>()))
-                .ReturnsAsync(new UlnHasPaymentsResponse(true));
-
-            // Act
-            var actual = await _sut.WithdrawalIncentiveApplication(request) as BadRequestObjectResult;
 
             // Assert
             actual.Should().NotBeNull();

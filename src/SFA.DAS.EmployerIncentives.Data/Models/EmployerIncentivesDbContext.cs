@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<IncentiveApplication> Applications { get; set; }
         public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
-        public virtual DbSet<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }
+        public virtual DbSet<ApprenticeshipIncentive> ApprenticeshipIncentives { get; set; }        
         public virtual DbSet<PendingPayment> PendingPayments { get; set; }
         public virtual DbSet<ApprenticeshipIncentives.Models.Archive.PendingPayment> ArchivedPendingPayments { get; set; }
         public virtual DbSet<Payment> Payments { get; set; }

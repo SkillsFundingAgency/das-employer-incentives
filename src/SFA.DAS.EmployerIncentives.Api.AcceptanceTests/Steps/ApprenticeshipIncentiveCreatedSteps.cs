@@ -239,7 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenThePendingPaymentsAreStoredAgainstTheApprenticeshipIncentive()
         {
             var completeCalculationCommandsPublished = _testContext.CommandsPublished
-                .Where(c => c.IsPublished && 
+                .Where(c => c.IsProcessed && 
                 c.IsDomainCommand &&
                 c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
 

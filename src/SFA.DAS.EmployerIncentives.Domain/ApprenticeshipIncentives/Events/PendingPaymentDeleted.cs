@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
             {
                 var message =
                     $"Pending payment has been deleted for  Apprenticeship Incentive with ApprenticeshipIncentiveId {Model.ApprenticeshipIncentiveId} and " +
-                    $"AccountLegalEntityId {AccountLegalEntityId} and ULN {UniqueLearnerNumber}";
+                    $"AccountLegalEntityId {AccountLegalEntityId} and ULN {UniqueLearnerNumber}" ;
                 return new Log
                 {
                     OnProcessing = () => message,

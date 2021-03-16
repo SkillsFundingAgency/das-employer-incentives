@@ -32,7 +32,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PausePayments = model.PausePayments,
                 SubmittedDate = model.SubmittedDate,
                 SubmittedByEmail = model.SubmittedByEmail,
-                CourseName = model.Apprenticeship.CourseName
+                CourseName = model.Apprenticeship.CourseName,
+                Status = model.Status
             };
         }
 
@@ -67,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,
                 PausePayments = entity.PausePayments,
                 SubmittedDate = entity.SubmittedDate,
-                SubmittedByEmail = entity.SubmittedByEmail
+                SubmittedByEmail = entity.SubmittedByEmail,
+                Status = entity.Status
             };
         }
 
@@ -340,7 +342,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PendingPaymentId = x.PendingPaymentId,
                 DateClawbackSent = x.DateClawbackSent,
                 CollectionPeriod = x.CollectionPeriod,
-                CollectionPeriodYear = x.CollectionPeriodYear               
+                CollectionPeriodYear = x.CollectionPeriodYear
             }).ToList();
         }
 

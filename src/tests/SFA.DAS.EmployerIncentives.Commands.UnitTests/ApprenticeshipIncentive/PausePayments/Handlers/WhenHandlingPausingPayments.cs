@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
@@ -91,9 +92,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             // Arrange
             var command = CreatePausedPaymentsCommandWithActionPause();
-            var apprenticeshipIncentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.New(
-                _fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(),
-                _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), true, _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(p => p.PausePayments, true)
+                .Create();
+
+            var apprenticeshipIncentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+
             _mockDomainRepository
                 .Setup(x => x.FindByUlnWithinAccountLegalEntity(command.ULN, command.AccountLegalEntityId))
                 .ReturnsAsync(apprenticeshipIncentive);
