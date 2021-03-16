@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
                 Enums.ChangeOfCircumstanceType.LearningStopped,
                 string.Empty,
                 @event.StoppedDate.ToString("yyyy-MM-dd"),
-                DateTime.Now);
+                DateTime.Today);
 
             return _repository.Save(change);
         }
