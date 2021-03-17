@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -20,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public bool PausePayments { get; set; }
         public DateTime? SubmittedDate { get; set; }
         public string SubmittedByEmail { get; set; }
+        public IncentiveStatus Status { get; set; }
 
         public ApprenticeshipIncentiveModel()
         {

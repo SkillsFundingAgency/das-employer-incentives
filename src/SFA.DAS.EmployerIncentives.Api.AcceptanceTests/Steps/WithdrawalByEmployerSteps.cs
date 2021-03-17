@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -30,8 +31,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
+        private readonly PendingPayment _paidPendingPayment;
+        private readonly PendingPayment _clawedbackPaidPendingPayment;
         private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
         private readonly Payment _payment;
+        private readonly Payment _payment2;
+        private readonly ClawbackPayment _clawedBackPayment;
         private bool _waitForMessage = true;
         private HttpResponseMessage _response;
         private bool _isMultipleApplications;
@@ -60,18 +65,61 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Build<ApprenticeshipIncentive>()
                 .With(i => i.IncentiveApplicationApprenticeshipId, _apprenticeship.Id)
                 .With(i => i.AccountLegalEntityId, _application.AccountLegalEntityId)
+                .With(i => i.AccountId, _application.AccountId)
                 .With(i => i.ULN, _apprenticeship.ULN)
+                .With(i => i.Status, IncentiveStatus.Active)
                 .Create();
 
             _pendingPayment = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(i => i.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(i => i.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.PaymentMadeDate, (DateTime?)null)
+                .With(p => p.ClawedBack, false)
                 .Create();
+
+            _paidPendingPayment = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(i => i.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(i => i.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.ClawedBack, false)
+                .Create();
+
+            _clawedbackPaidPendingPayment = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(i => i.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(i => i.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.ClawedBack, true)
+                .Create();          
 
             _payment = _fixture
                 .Build<Payment>()
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(i => i.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(i => i.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.PendingPaymentId, _paidPendingPayment.Id)
                 .Create();
+
+            _payment2 = _fixture
+                .Build<Payment>()
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(i => i.AccountId, _apprenticeshipIncentive.AccountId)
+                .With(i => i.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                .With(p => p.PendingPaymentId, _clawedbackPaidPendingPayment.Id)
+                .Create();
+
+            _clawedBackPayment = _fixture
+              .Build<ClawbackPayment>()
+              .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+              .With(i => i.AccountId, _apprenticeshipIncentive.AccountId)
+              .With(i => i.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+              .With(i => i.PendingPaymentId, _clawedbackPaidPendingPayment.Id)
+              .With(i => i.PaymentId, _payment2.Id)
+              .With(i => i.Amount, _clawedbackPaidPendingPayment.Amount * -1)
+              .Create();
 
             _pendingPaymentValidationResult = _fixture
                 .Build<PendingPaymentValidationResult>()
@@ -122,6 +170,33 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             await dbConnection.InsertAsync(_pendingPayment);
             await dbConnection.InsertAsync(_pendingPaymentValidationResult);
+        }
+
+        [Given(@"an apprenticeship incentive with a clawedback paid payment exists as a result of an incentive application")]
+        public async Task GivenAnApprenticeshipIncentiveWithAClawedBackPaymentExistsForAnApplication()
+        {
+            using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_application);
+            await dbConnection.InsertAsync(_apprenticeship);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertAsync(_pendingPayment);
+            await dbConnection.InsertAsync(_clawedbackPaidPendingPayment);
+            await dbConnection.InsertAsync(_pendingPaymentValidationResult);
+            await dbConnection.InsertAsync(_payment2);
+            await dbConnection.InsertAsync(_clawedBackPayment);
+        }
+
+        [Given(@"an apprenticeship incentive with paid payments exists as a result of an incentive application")]
+        public async Task GivenAnApprenticeshipIncentiveWithPaidPaymentsExistsForAnApplication()
+        {
+            using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_application);
+            await dbConnection.InsertAsync(_apprenticeship);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertAsync(_pendingPayment);
+            await dbConnection.InsertAsync(_pendingPaymentValidationResult);
+            await dbConnection.InsertAsync(_paidPendingPayment);
+            await dbConnection.InsertAsync(_payment);
         }
 
         [When(@"the apprenticeship application is withdrawn from the scheme")]
@@ -225,6 +300,117 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             incentives.Should().HaveCount(0);
             pendingPayments.Should().HaveCount(0);
+        }
+
+        [Then(@"clawbacks are created for the apprenticeship incentive payments and it's pending payments are archived")]
+        public async Task ThenClawbacksAreCreatedForTheIncentiveAndItsPendingPaymentsAreArchived()
+        {
+            await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal();
+
+            await using var dbConnection = new SqlConnection(_connectionString);
+            var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
+            var pendingPaymentValidationResults = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
+            var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
+            var payments = await dbConnection.GetAllAsync<Payment>();
+            var clawbackPayments = await dbConnection.GetAllAsync<ClawbackPayment>();
+            var archivedPendingPayments = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>();
+            var archivedPendingPaymentValidationResults = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>();
+
+            pendingPaymentValidationResults.Should().HaveCount(0);
+            incentives.Should().HaveCount(1);
+            payments.Should().HaveCount(1); // the paid payment
+            pendingPayments.Should().HaveCount(1); // for the paid payment
+            clawbackPayments.Should().HaveCount(1); // the paid amount
+            archivedPendingPayments.Should().HaveCount(1); // the unpaid payment
+            archivedPendingPaymentValidationResults.Should().HaveCount(1); // the unpaid payment
+
+            var incentive = incentives.Single();
+            incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.PausePayments.Should().BeFalse();
+
+            payments.Single().Id.Should().Be(_payment.Id);
+            pendingPayments.Single().Id.Should().Be(_paidPendingPayment.Id);
+
+            var clawbackPayment = clawbackPayments.Single();
+            clawbackPayment.AccountId.Should().Be(_apprenticeshipIncentive.AccountId);
+            clawbackPayment.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
+            clawbackPayment.Amount.Should().Be(_paidPendingPayment.Amount * -1);
+            clawbackPayment.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            clawbackPayment.CollectionPeriod.Should().Be(_testContext.ActivePeriod.PeriodNumber);
+            clawbackPayment.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
+            clawbackPayment.PaymentId.Should().Be(_payment.Id);
+            clawbackPayment.PendingPaymentId.Should().Be(_paidPendingPayment.Id);
+            clawbackPayment.SubnominalCode.Should().Be(_payment.SubnominalCode);
+
+            var archivedPendingPayment = archivedPendingPayments.Single();
+            archivedPendingPayment.AccountId.Should().Be(_apprenticeshipIncentive.AccountId);
+            archivedPendingPayment.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
+            archivedPendingPayment.Amount.Should().Be(_pendingPayment.Amount);
+            archivedPendingPayment.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            archivedPendingPayment.CalculatedDate.ToLongTimeString().Should().Be(_pendingPayment.CalculatedDate.ToLongTimeString());
+            archivedPendingPayment.ClawedBack.Should().Be(_pendingPayment.ClawedBack);
+            archivedPendingPayment.DueDate.ToLongTimeString().Should().Be(_pendingPayment.DueDate.ToLongTimeString());
+            archivedPendingPayment.EarningType.Should().Be(_pendingPayment.EarningType);
+            archivedPendingPayment.PaymentYear.Should().Be(_pendingPayment.PaymentYear);
+            archivedPendingPayment.PeriodNumber.Should().Be(_pendingPayment.PeriodNumber);
+
+            var archivedValidationResult = archivedPendingPaymentValidationResults.Single();
+            archivedValidationResult.PendingPaymentValidationResultId.Should().Be(_pendingPaymentValidationResult.Id);
+            archivedValidationResult.PendingPaymentId.Should().Be(_pendingPaymentValidationResult.PendingPaymentId);
+            archivedValidationResult.PaymentYear.Should().Be(_pendingPaymentValidationResult.PaymentYear);
+            archivedValidationResult.PeriodNumber.Should().Be(_pendingPaymentValidationResult.PeriodNumber);
+            archivedValidationResult.Step.Should().Be(_pendingPaymentValidationResult.Step);
+            archivedValidationResult.Result.Should().Be(_pendingPaymentValidationResult.Result);
+        }
+
+        [Then(@"the pending payments are archived")]
+        public async Task ThenThePendingPaymentsAreArchived()
+        {
+            await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal();
+
+            await using var dbConnection = new SqlConnection(_connectionString);
+            var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
+            var pendingPaymentValidationResults = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
+            var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
+            var payments = await dbConnection.GetAllAsync<Payment>();
+            var clawbackPayments = await dbConnection.GetAllAsync<ClawbackPayment>();
+            var archivedPendingPayments = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>();
+            var archivedPendingPaymentValidationResults = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>();
+
+            pendingPaymentValidationResults.Should().HaveCount(0);
+            incentives.Should().HaveCount(1);
+            payments.Should().HaveCount(1); // the paid payment
+            pendingPayments.Should().HaveCount(1); // for the paid payment
+            clawbackPayments.Should().HaveCount(1); // the paid amount
+            archivedPendingPayments.Should().HaveCount(1); // the unpaid payment
+            archivedPendingPaymentValidationResults.Should().HaveCount(1); // the unpaid payment
+
+            var incentive = incentives.Single();
+            incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.PausePayments.Should().BeFalse();
+
+            payments.Single().Id.Should().Be(_payment2.Id);
+            pendingPayments.Single().Id.Should().Be(_clawedbackPaidPendingPayment.Id);
+
+            var archivedPendingPayment = archivedPendingPayments.Single();
+            archivedPendingPayment.AccountId.Should().Be(_apprenticeshipIncentive.AccountId);
+            archivedPendingPayment.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
+            archivedPendingPayment.Amount.Should().Be(_pendingPayment.Amount);
+            archivedPendingPayment.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            archivedPendingPayment.CalculatedDate.ToLongTimeString().Should().Be(_pendingPayment.CalculatedDate.ToLongTimeString());
+            archivedPendingPayment.ClawedBack.Should().Be(_pendingPayment.ClawedBack);
+            archivedPendingPayment.DueDate.ToLongTimeString().Should().Be(_pendingPayment.DueDate.ToLongTimeString());
+            archivedPendingPayment.EarningType.Should().Be(_pendingPayment.EarningType);
+            archivedPendingPayment.PaymentYear.Should().Be(_pendingPayment.PaymentYear);
+            archivedPendingPayment.PeriodNumber.Should().Be(_pendingPayment.PeriodNumber);
+
+            var archivedValidationResult = archivedPendingPaymentValidationResults.Single();
+            archivedValidationResult.PendingPaymentValidationResultId.Should().Be(_pendingPaymentValidationResult.Id);
+            archivedValidationResult.PendingPaymentId.Should().Be(_pendingPaymentValidationResult.PendingPaymentId);
+            archivedValidationResult.PaymentYear.Should().Be(_pendingPaymentValidationResult.PaymentYear);
+            archivedValidationResult.PeriodNumber.Should().Be(_pendingPaymentValidationResult.PeriodNumber);
+            archivedValidationResult.Step.Should().Be(_pendingPaymentValidationResult.Step);
+            archivedValidationResult.Result.Should().Be(_pendingPaymentValidationResult.Result);
         }
 
         [Then(@"an error is returned")]
