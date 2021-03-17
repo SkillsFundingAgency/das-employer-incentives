@@ -303,7 +303,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var change = dbConnection.GetAll<ChangeOfCircumstance>().Single(coc=> coc.ChangeType == ChangeOfCircumstanceType.LearningStopped);
 
-            change.ChangeType.Should().Be(ChangeOfCircumstanceType.LearningStopped);
             change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             change.PreviousValue.Should().Be(string.Empty);
             change.NewValue.Should().Be(_periodEndDate.AddDays(1).ToString("yyyy-MM-dd"));
@@ -314,13 +313,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenTheResumedChangeOfCircumstancesIsSaved()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var change = dbConnection.GetAll<ChangeOfCircumstance>().Single(coc => coc.ChangeType == ChangeOfCircumstanceType.LearningStopped);
+            var change = dbConnection.GetAll<ChangeOfCircumstance>().Single(coc => coc.ChangeType == ChangeOfCircumstanceType.LearningResumed);
 
-            change.ChangeType.Should().Be(ChangeOfCircumstanceType.LearningStopped);
             change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            change.PreviousValue.Should().Be(true.ToString());
-            change.NewValue.Should().Be(false.ToString());
-            change.ChangedDate.Should().Be(_plannedStartDate);
+            change.PreviousValue.Should().Be(string.Empty);
+            change.NewValue.Should().Be(_plannedStartDate.ToString("yyyy-MM-dd"));
+            change.ChangedDate.Should().Be(DateTime.Today);
         }
 
         [Then(@"the pending payment due dates include the break in learning")]

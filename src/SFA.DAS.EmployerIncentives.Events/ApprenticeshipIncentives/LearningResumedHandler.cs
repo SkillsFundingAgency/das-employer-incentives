@@ -21,10 +21,10 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
             var change = new Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance(
                 Guid.NewGuid(),
                 @event.ApprenticeshipIncentiveId,
-                Enums.ChangeOfCircumstanceType.LearningStopped,
-                true.ToString(),
-                false.ToString(),
-                @event.ResumedDate);
+                Enums.ChangeOfCircumstanceType.LearningResumed,
+                string.Empty,
+                @event.ResumedDate.ToString("yyyy-MM-dd"),
+                DateTime.Today);
 
             return _repository.Save(change);
         }

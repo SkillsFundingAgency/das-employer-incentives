@@ -3,6 +3,7 @@
     public enum ChangeOfCircumstanceType : byte
     {
         StartDate = 1,
-        LearningStopped = 2
+        LearningStopped = 2,
+        LearningResumed = 3
     }
 }
