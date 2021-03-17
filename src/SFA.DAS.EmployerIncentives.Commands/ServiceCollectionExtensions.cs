@@ -311,14 +311,14 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 {
                     var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
                     var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
-                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection, options => options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(20), null));
+                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
                     dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
                     dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
                 }
                 catch (KeyNotFoundException)
                 {
                     var settings = p.GetService<IOptions<ApplicationSettings>>();
-                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(settings.Value.DbConnectionString, options => options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(20), null));
+                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(settings.Value.DbConnectionString);
                     dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
                 }
 
