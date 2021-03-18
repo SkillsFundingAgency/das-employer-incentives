@@ -184,7 +184,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     model.EIScheduledOpenDateUTC,
                     model.CensusDate,
                     Convert.ToInt16(model.AcademicYear),
-                    model.Active);
+                    model.Active,
+                    model.PeriodEndInProgress);
             }
 
             return null;
@@ -200,7 +201,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     x.EIScheduledOpenDateUTC,
                     x.CensusDate,
                     Convert.ToInt16(x.AcademicYear),
-                    x.Active)
+                    x.Active,
+                    x.PeriodEndInProgress)
             ).ToList();
         }
 
@@ -215,7 +217,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     CalendarYear = x.CalendarYear,
                     CensusDate = x.CensusDate,
                     EIScheduledOpenDateUTC = x.OpenDate,
-                    PeriodNumber = x.PeriodNumber
+                    PeriodNumber = x.PeriodNumber,
+                    PeriodEndInProgress = x.PeriodEndInProgress
                 }).ToList();
         }
 
