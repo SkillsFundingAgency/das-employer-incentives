@@ -16,11 +16,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             ILogger log)
         {
 
-            log.LogInformation("Triggering LearnerMatchingOrchestrator");
+            log.LogInformation("Manually Triggering LearnerMatchingOrchestrator");
 
             string instanceId = await starter.StartNewAsync(nameof(LearnerMatchingOrchestrator));
 
-            log.LogInformation($"Started LearnerMatchingOrchestrator with ID = '{instanceId}'.");
+            log.LogInformation($"Manually Started LearnerMatchingOrchestrator with ID = '{instanceId}'.");
 
             return starter.CreateCheckStatusResponse(req, instanceId);
         }
