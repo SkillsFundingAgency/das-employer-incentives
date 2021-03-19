@@ -16,3 +16,55 @@ FROM incentives.ApprenticeshipIncentive i
 WHERE i.Status IS NULL
 AND  i.PausePayments = 1
 GO
+-- EI-914 reinstate [ApprenticeshipIncentive] records for prevous withdrawals
+INSERT INTO [incentives].[ApprenticeshipIncentive]
+(
+	[Id]
+    ,[AccountId]
+    ,[ApprenticeshipId]
+    ,[FirstName]
+    ,[LastName]
+    ,[DateOfBirth]
+    ,[ULN]
+    ,[EmployerType]
+    ,[StartDate]
+    ,[IncentiveApplicationApprenticeshipId]
+    ,[AccountLegalEntityId]
+    ,[UKPRN]
+    ,[RefreshedLearnerForEarnings]
+    ,[HasPossibleChangeOfCircumstances]
+    ,[PausePayments]
+    ,[SubmittedDate]
+    ,[SubmittedByEmail]
+    ,[CourseName]
+    ,[Status]
+)
+SELECT
+	  NewID() AS "Id",
+      a.AccountId,
+	  aa.ApprenticeshipId,
+	  aa.FirstName,
+	  aa.LastName,
+	  aa.DateOfBirth,
+	  aa.ULN,
+	  aa.ApprenticeshipEmployerTypeOnApproval AS "EmployerType",
+	  aa.PlannedStartDate,
+	  aa.Id AS "IncentiveApplicationApprenticeshipId",
+	  a.AccountLegalEntityId,
+	  aa.UKPRN,
+	  0 as "RefreshedLearnerForEarnings",
+	  0 as "HasPossibleChangeOfCircumstances",
+	  0 as "PausePayments",
+	  a.DateSubmitted,
+	  a.SubmittedByEmail,
+	  aa.CourseName,
+	  'Withdrawn' as "Status"
+FROM
+	[dbo].[IncentiveApplication] a INNER JOIN [dbo].[IncentiveApplicationApprenticeship] aa
+		ON a.Id = aa.IncentiveApplicationId
+	LEFT OUTER JOIN [incentives].[ApprenticeshipIncentive] i
+		ON i.IncentiveApplicationApprenticeshipId = aa.Id
+WHERE
+	(aa.WithdrawnByCompliance = 1 OR aa.WithdrawnByEmployer = 1)
+	AND i.Id IS NULL
+GO
