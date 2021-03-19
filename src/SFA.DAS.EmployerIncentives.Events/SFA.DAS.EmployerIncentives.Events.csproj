@@ -20,7 +20,7 @@
     <PackageReference Include="SFA.DAS.HashingService" Version="1.0.183" />
     <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.21" />
     <PackageReference Include="SFA.DAS.NServiceBus.SqlServer" Version="16.0.20" />
-    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.24" />
+    <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.28" />
     
   </ItemGroup>
 

@@ -73,6 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Step.Should().Be(ValidationStep.HasDaysInLearning);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(false);
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
 
         [TestCase(89, false)]
@@ -98,6 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Step.Should().Be(ValidationStep.HasDaysInLearning);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(validationResult);
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
         
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
