@@ -9,3 +9,9 @@ Scenario: The month end payment process is started
 	Given the active collection period is not currently in progress
 	When the payment process is run
 	Then the active collection period is set to in progress
+
+Scenario: Learner match does not run when payment process in progress.
+	Given an apprenticeship incentive exists
+	And the active collection period is currently in progress
+	When the learner match process is run
+	Then the learner match data is not updated
