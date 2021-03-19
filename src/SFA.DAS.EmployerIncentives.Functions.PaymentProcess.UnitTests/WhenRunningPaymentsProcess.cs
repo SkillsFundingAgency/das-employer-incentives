@@ -42,6 +42,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         }
 
         [Test]
+        public async Task Then_the_active_period_is_set_to_in_progress()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SetActivePeriodToInProgress", null), Times.Once);
+        }
+
+        [Test]
         public async Task Then_query_is_called_to_get_payable_legal_entities()
         {
             // act
