@@ -200,15 +200,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         
         public async Task Withdraw(ICollectionCalendarService collectionCalendarService)
         {
+            Model.Status = IncentiveStatus.Withdrawn;
             if (HasPaidEarnings)
             {
                 var calendarService = await collectionCalendarService.Get();
                 ClawbackAllPayments(calendarService.GetActivePeriod());
                 Model.PausePayments = false;
-                Model.Status = IncentiveStatus.Withdrawn;
             }
             else
             {
+                RemoveUnpaidEarnings();
                 IsDeleted = true;
             }
         }

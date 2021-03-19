@@ -100,7 +100,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 }
                 _dbContext.Remove(pendingPayment);
             }
-            _dbContext.Remove(existingIncentive);
         }
 
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
