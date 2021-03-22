@@ -7,7 +7,8 @@
 	[EIScheduledOpenDateUTC] DATETIME2 NOT NULL, 
     [CensusDate] DATETIME NULL, 
     [AcademicYear] VARCHAR(10) NULL, 
-    [Active] BIT NULL
+    [Active] BIT NULL,
+	[MonthEndProcessingCompleteUTC] DATETIME2 NULL
 )
 GO
 CREATE CLUSTERED INDEX IX_CollectionCalendar_PeriodNumber ON [incentives].CollectionCalendar (PeriodNumber)

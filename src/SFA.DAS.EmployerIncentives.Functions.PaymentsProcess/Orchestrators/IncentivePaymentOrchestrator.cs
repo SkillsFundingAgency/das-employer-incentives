@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -81,6 +82,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             }
             await Task.WhenAll(sendClawbackTasks);
             context.SetCustomStatus("ClawbacksSent");
+
+            context.SetCustomStatus("CompletingPaymentProcessing");
+            await context.CallActivityAsync(nameof(CompletePaymentProcess), new CompletePaymentProcessInput { CompletionDateTime = DateTime.UtcNow, CollectionPeriod = collectionPeriod });
+            context.SetCustomStatus("PaymentProcessingCompleted");
 
             _logger.LogInformation("[IncentivePaymentOrchestrator] Incentive Payment process completed for collection period {collectionPeriod}", collectionPeriod);
         }
