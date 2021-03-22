@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Queries
                 .AddQueryHandlerDecorators()
                 .AddScoped<IQueryDispatcher, QueryDispatcher>()
                 .AddScoped<INewApprenticeIncentiveEligibilityService, NewApprenticeIncentiveEligibilityService>()
-                .AddScoped<IPayableLegalEntityQueryRepository, PayableLegalEntityQueryRepository>()
+                .AddScoped<IPaymentsQueryRepository, PaymentsQueryRepository>()
                 .AddScoped<IApprenticeshipIncentiveQueryRepository, ApprenticeshipIncentiveQueryRepository>()
                 .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
 

@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,11 +10,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Withdraw
     public class WithdrawCommandHandler : ICommandHandler<WithdrawCommand>
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
-     
+        private readonly ICollectionCalendarService _collectionCalendarService;
+
         public WithdrawCommandHandler(
-            IApprenticeshipIncentiveDomainRepository domainRepository)
+            IApprenticeshipIncentiveDomainRepository domainRepository,
+            ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
+            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(WithdrawCommand command, CancellationToken cancellationToken = default)
@@ -23,9 +27,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Withdraw
             {
                 return;
             }
-
-            incentive.Delete();
             
+            await incentive.Withdraw(_collectionCalendarService);
+
             await _domainRepository.Save(incentive);
         }
     }

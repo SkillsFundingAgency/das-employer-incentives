@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public decimal Amount => Model.Amount;
         public byte? PeriodNumber => Model.PeriodNumber;
         public short? PaymentYear => Model.PaymentYear;
+        public CollectionPeriod CollectionPeriod => Model.PeriodNumber.HasValue ? new CollectionPeriod(Model.PeriodNumber.Value, Model.PaymentYear.Value) : null;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
         public bool ClawedBack => Model.ClawedBack;

@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var matchingTasks = new List<Task>();
             foreach (var apprenticeshipIncentive in apprenticeshipIncentives)
             {
-                var task = context.CallActivityAsync(nameof(LearnerMatchAndUpdate),
+                var task = context.CallActivityWithRetryAsync(nameof(LearnerMatchAndUpdate), new RetryOptions(TimeSpan.FromSeconds(1), 3), 
                     new LearnerMatchInput {ApprenticeshipIncentiveId = apprenticeshipIncentive.Id});
                 matchingTasks.Add(task);
             }

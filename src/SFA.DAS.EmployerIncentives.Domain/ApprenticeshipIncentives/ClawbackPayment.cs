@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 
@@ -39,6 +40,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         internal static ClawbackPayment Get(ClawbackPaymentModel model)
         {
             return new ClawbackPayment(model);
+        }
+
+        public void SetPaymentPeriod(CollectionPeriod period)
+        {
+            Model.CollectionPeriod = period.PeriodNumber;
+            Model.CollectionPeriodYear = period.AcademicYear;
         }
 
         private ClawbackPayment(ClawbackPaymentModel model, bool isNew = false) : base(model.Id, model, isNew)

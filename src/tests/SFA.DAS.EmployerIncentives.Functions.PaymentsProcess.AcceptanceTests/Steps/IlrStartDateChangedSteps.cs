@@ -1,97 +1,28 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
-using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
-using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
     [Binding]
     [Scope(Feature = "IlrStartDateChanged")]
-    public class IlrStartDateChangedSteps
+    public partial class IlrStartDateChangedSteps
     {
-        private readonly TestContext _testContext;
-        private readonly Account _accountModel;
-        private readonly Fixture _fixture;
-        private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
-        private readonly PendingPayment _pendingPayment;
-        private readonly LearnerSubmissionDto _learnerMatchApiData;
-        private readonly DateTime _plannedStartDate;
-        private Payment _payment;
-        private List<PendingPayment> _newPendingPayments;
-        private DateTime _actualStartDate;
-
-        public IlrStartDateChangedSteps(TestContext testContext)
-        {
-            _testContext = testContext;
-            _fixture = new Fixture();
-
-            _plannedStartDate = new DateTime(2020, 8, 1);
-            _accountModel = _fixture.Create<Account>();
-
-            _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
-                .With(p => p.DateOfBirth, _plannedStartDate.AddYears(-24).AddMonths(-10)) // under 25
-                .With(p => p.AccountId, _accountModel.Id)
-                .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
-                .With(p => p.HasPossibleChangeOfCircumstances, false)
-                .Create();
-
-            _pendingPayment = _fixture.Build<PendingPayment>()
-                .With(p => p.AccountId, _accountModel.Id)
-                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                .With(p => p.DueDate, _plannedStartDate.AddMonths(1))
-                .With(p => p.ClawedBack, false)
-                .With(p => p.EarningType, EarningType.FirstPayment)
-                .Without(p => p.PaymentMadeDate)
-                .Create();
-
-            _learnerMatchApiData = _fixture
-                .Build<LearnerSubmissionDto>()
-                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
-                .With(l => l.Training, new List<TrainingDto> {
-                    _fixture
-                        .Build<TrainingDto>()
-                        .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
-                            .With(pe => pe.Periods, new List<PeriodDto>(){
-                                _fixture.Build<PeriodDto>()
-                                    .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
-                                    .With(period => period.IsPayable, true)
-                                    .With(period => period.Period, _pendingPayment.PeriodNumber)
-                                    .Create()
-                            })
-                            .With(pe => pe.StartDate, _plannedStartDate)
-                            .With(pe => pe.EndDate, _plannedStartDate.AddYears(1))
-                            .Create() }
-                        )
-                        .Create()}
-                )
-                .Create();
-        }
-
         [Given(@"an apprenticeship incentive exists")]
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.InsertAsync(_accountModel);
-                await dbConnection.InsertAsync(_apprenticeshipIncentive);
-                await dbConnection.InsertAsync(_pendingPayment);
-            }
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_accountModel);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertAsync(_pendingPayment);
+            await dbConnection.InsertAsync(_pendingPaymentValidationResult);
         }
 
         [Given(@"an earning has been paid for an apprenticeship incentive application")]
@@ -100,8 +31,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _payment = _fixture.Build<Payment>()
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                 .With(p => p.PaidDate, DateTime.Now.AddDays(-1))
                 .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.Amount, _pendingPayment.Amount)
                 .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
                 .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
                 .Create();
@@ -112,7 +45,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await dbConnection.InsertAsync(_payment);
             await dbConnection.UpdateAsync(_pendingPayment);
         }
-
 
         [When(@"the learner data is updated with new valid start date for the apprenticeship incentive")]
         public void WhenTheLearnerDataIsUpdatedWithNewValidStartDateForTheApprenticeshipIncentive()
@@ -126,7 +58,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _actualStartDate = _plannedStartDate.AddMonths(-1);
         }
 
-
         [When(@"the incentive learner data is refreshed")]
         public async Task WhenTheIncentiveLearnerDataIsRefreshed()
         {
@@ -136,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await StartLearnerMatching();
         }
 
-        [When(@"the learner data is refreshed with a new valid start date for the apprenticeship incentive making the learner over twenty five at start")]
+        [When(@"the learner data is updated with a new valid start date for the apprenticeship incentive making the learner over twenty five at start")]
         public void WhenTheLearnerDataIsRefreshedWithANewValidStartDateForTheApprenticeshipIncentiveMakingTheLearnerOverTwentyFiveAtStart()
         {
             _actualStartDate = _plannedStartDate.AddMonths(2);
@@ -149,6 +80,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>();
 
             incentive.Single().StartDate.Should().Be(_learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate);
+        }
+
+        [Then(@"the start date change of circumstance is saved")]
+        public void ThenTheStartDateChangeOfCircumstanceIsSaved()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var change = dbConnection.GetAll<ChangeOfCircumstance>().Single();
+
+            change.ChangeType.Should().Be(ChangeOfCircumstanceType.StartDate);
+            change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            change.PreviousValue.Should().Be(_initialStartDate.ToString("yyy-MM-dd"));
+            change.NewValue.Should().Be(_actualStartDate.ToString("yyy-MM-dd"));
         }
 
         [Then(@"the pending payments are recalculated for the apprenticeship incentive")]
@@ -184,11 +127,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             var pendingPayment = dbConnection.GetAll<PendingPayment>().Single(p => p.Id == _pendingPayment.Id);
             pendingPayment.ClawedBack.Should().BeTrue();
+
+            var clawback = dbConnection.GetAll<ClawbackPayment>().Single(p => p.PendingPaymentId == _pendingPayment.Id);
+            clawback.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
+                .Excluding(x => x.Amount)
+                .Excluding(x => x.Id));
+            clawback.Amount.Should().Be(-750);
         }
 
         [Given(@"an earning has not been paid for an apprenticeship incentive application")]
         public async Task GivenAnEarningHasNotBeenPaidForAnApprenticeshipIncentiveApplication()
         {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
             _payment = _fixture.Build<Payment>()
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
@@ -197,27 +148,56 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
                 .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
                 .Create();
-
-            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_payment);
         }
 
-        [Then(@"the unpaid earning is deleted")]
-        public void ThenTheUnpaidEarningIsDeleted()
+        [Then(@"the unpaid earning is archived")]
+        public void ThenTheUnpaidEarningIsArchived()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             dbConnection.GetAll<PendingPayment>().Any(p => p.PeriodNumber == _pendingPayment.PeriodNumber
                 && p.PaymentYear == _pendingPayment.PaymentYear).Should()
                 .BeFalse();
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>().Count(p =>
+                p.ApprenticeshipIncentiveId == _pendingPayment.ApprenticeshipIncentiveId)
+                .Should().Be(1);
+            var archivedPendingPayment = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>().Single(p =>
+                p.PendingPaymentId == _pendingPayment.Id);
+            archivedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedPendingPayment.Should().BeEquivalentTo(_pendingPayment, opt => opt.ExcludingMissingMembers()
+                    .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
+            );
+            archivedPendingPayment.CalculatedDate.Should().BeCloseTo(_pendingPayment.CalculatedDate, TimeSpan.FromSeconds(1));
         }
 
-        [Then(@"all unpaid payment records are deleted")]
-        public void ThenAllUnpaidPaymentRecordsAreDeleted()
+        [Then(@"all unpaid payment records are archived")]
+        public void ThenAllUnpaidPaymentRecordsAreArchived()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            dbConnection.GetAll<Payment>().Any(p => p.PaymentPeriod == _pendingPayment.PeriodNumber
-                && p.PaymentYear == _pendingPayment.PaymentYear).Should()
-                .BeFalse();
+            dbConnection.GetAll<Payment>().Any(p =>
+                    p.PaymentPeriod == _pendingPayment.PeriodNumber && p.PaymentYear == _pendingPayment.PaymentYear)
+                .Should().BeFalse();
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>()
+                .Count(p => p.ApprenticeshipIncentiveId == _payment.ApprenticeshipIncentiveId)
+                .Should().Be(1);
+            var archivedPayment = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>().Single(p => p.PaymentId == _payment.Id);
+            archivedPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedPayment.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
+                    .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
+                );
+            archivedPayment.CalculatedDate.Should().BeCloseTo(archivedPayment.CalculatedDate, TimeSpan.FromSeconds(1));
+        }
+
+        [Then(@"all pending payment validation results are archived")]
+        public void ThenAllPendingPaymentValidationResultsAreArchived()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var archivedValidationResult = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>().Single(p =>
+               p.PendingPaymentId == _pendingPayment.Id);
+            archivedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedValidationResult.Should().BeEquivalentTo(_pendingPaymentValidationResult, opt => opt.ExcludingMissingMembers()
+                .Excluding(x => x.CreatedDateUtc));
+            archivedValidationResult.CreatedDateUtc.Should().BeCloseTo(_pendingPaymentValidationResult.CreatedDateUtc, TimeSpan.FromMinutes(1));
         }
 
         [Then(@"earnings are recalculated")]
@@ -291,35 +271,26 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             pp.PaymentYear.Should().Be(2122);
         }
 
-        private void SetupMockLearnerMatchResponse()
+        [Then(@"existing payment record is retained")]
+        public void ThenExistingPaymentRecordIsRetained()
         {
-            _testContext.LearnerMatchApi.MockServer
-                .Given(
-                    Request
-                        .Create()
-                        .WithPath($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}")
-                        .UsingGet()
-                )
-                .RespondWith(Response.Create()
-                    .WithStatusCode(HttpStatusCode.OK)
-                    .WithHeader("Content-Type", "application/json")
-                    .WithBodyAsJson(_learnerMatchApiData));
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
+                .Should().BeNull("Should not have archived existing payment");
+
+            dbConnection.GetAll<Payment>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
+                .Should().NotBeNull("Should not have deleted existing payment");
         }
 
-        private async Task StartLearnerMatching()
+        [Then(@"existing pending payment validation record is retained")]
+        public void ThenExistingPendingPaymentValidationRecordIsRetained()
         {
-            await _testContext.TestFunction.Start(
-                new OrchestrationStarterInfo(
-                    "LearnerMatchingOrchestrator_Start",
-                    nameof(LearnerMatchingOrchestrator),
-                    new Dictionary<string, object>
-                    {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/LearnerMatchingOrchestrator"
-                        }
-                    }
-                ));
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
+                .Should().BeNull("Should not have archived existing pending payment validation result");
+
+            dbConnection.GetAll<PendingPaymentValidationResult>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
+                .Should().NotBeNull("Should not have deleted existing pending payment validation result");
         }
     }
 }

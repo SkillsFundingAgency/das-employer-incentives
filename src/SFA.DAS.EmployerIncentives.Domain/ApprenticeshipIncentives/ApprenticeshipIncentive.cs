@@ -31,8 +31,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
+        private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
 
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, bool pausePayments, DateTime submittedDate, string submittedByEmail)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -43,9 +44,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Account = account,
                     Apprenticeship = apprenticeship,
                     StartDate = plannedStartDate,
-                    PausePayments = pausePayments,
+                    PausePayments = false,
                     SubmittedDate = submittedDate,
-                    SubmittedByEmail = submittedByEmail
+                    SubmittedByEmail = submittedByEmail,
+                    Status = IncentiveStatus.Active
                 }, true);
         }
 
@@ -56,13 +58,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public async Task CalculateEarnings(IIncentivePaymentProfilesService incentivePaymentProfilesService, ICollectionCalendarService collectionCalendarService)
         {
+            if(Model.Status == IncentiveStatus.Withdrawn)
+            {
+                return;
+            }
+
             var paymentProfiles = await incentivePaymentProfilesService.Get();
             var collectionCalendar = await collectionCalendarService.Get();
 
             var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles);
             if (!incentive.IsEligible)
             {
-                ClawbackAllPayments();
+                ClawbackAllPayments(collectionCalendar.GetActivePeriod());
                 return;
             }
 
@@ -109,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     return;
                 }
 
-                AddClawback(existingPendingPayment);
+                AddClawback(existingPendingPayment, collectionCalendar.GetActivePeriod());
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
                 return;
             }
@@ -117,12 +124,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             RemoveUnpaidPaymentIfExists(existingPendingPayment);
             if (!existingPendingPayment.Equals(pendingPayment))
             {
-                Model.PendingPaymentModels.Remove(existingPendingPayment.GetModel());
+                var existingPendingPaymentModel = existingPendingPayment.GetModel();
+                if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
+                {
+                    AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
+                }
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
             }
         }
 
-        private void AddClawback(PendingPayment pendingPayment)
+        private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
         {
             pendingPayment.ClawBack();
             var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
@@ -134,10 +145,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.Account,
                     Model.Id,
                     pendingPayment.Id,
-                    pendingPayment.Amount,
+                    -pendingPayment.Amount,
                     DateTime.Now,
                     payment.SubnominalCode,
                     payment.Id);
+
+                clawback.SetPaymentPeriod(collectionPeriod);
 
                 Model.ClawbackPaymentModels.Add(clawback.GetModel());
             }
@@ -148,7 +161,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == existingPendingPayment.Id);
             if (existingPayment != null)
             {
-                Model.PaymentModels.Remove(existingPayment);
+                if (Model.PaymentModels.Remove(existingPayment))
+                {
+                    AddEvent(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPayment));
+                }
             }
         }
 
@@ -168,12 +184,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return true;
         }
 
-        private void ClawbackAllPayments()
+        private void ClawbackAllPayments(CollectionPeriod collectionPeriod)
         {
             RemoveUnpaidEarnings();
             foreach (var paidPendingPayment in PendingPayments)
             {
-                AddClawback(paidPendingPayment);
+                AddClawback(paidPendingPayment, collectionPeriod);
             }
         }
 
@@ -181,14 +197,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             AddEvent(new PaymentsCalculationRequired(Model));
         }
-
-        public void Delete()
+        
+        public async Task Withdraw(ICollectionCalendarService collectionCalendarService)
         {
-            if (Model.PaymentModels.Count > 0)
+            if (HasPaidEarnings)
             {
-                throw new DeleteIncentiveException("Cannot delete an incentive that has made a Payment");
+                var calendarService = await collectionCalendarService.Get();
+                ClawbackAllPayments(calendarService.GetActivePeriod());
+                Model.PausePayments = false;
+                Model.Status = IncentiveStatus.Withdrawn;
             }
-            IsDeleted = true;
+            else
+            {
+                IsDeleted = true;
+            }
         }
 
         public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
@@ -232,9 +254,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (learner.SubmissionData.SubmissionFound && learner.SubmissionData.LearningData.StartDate.HasValue)
             {
-                SetStartDate(learner.SubmissionData.LearningData.StartDate.Value);
+                SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);                
             }
+
             SetHasPossibleChangeOfCircumstances(false);
+        }
+
+        private void SetStartDateChangeOfCircumstance(DateTime startDate)
+        {
+            var previousStartDate = Model.StartDate;
+            SetStartDate(startDate);
+            if (previousStartDate != Model.StartDate)
+            {
+                AddEvent(new StartDateChanged(
+                    Model.Id,
+                    previousStartDate,
+                    Model.StartDate,
+                    Model));
+            }
         }
 
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
@@ -244,7 +281,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private void RemoveUnpaidEarnings()
         {
-            Model.PendingPaymentModels.Where(x => x.PaymentMadeDate == null).ToList().ForEach(pp => Model.PendingPaymentModels.Remove(pp));
+            Model.PendingPaymentModels.Where(x => x.PaymentMadeDate == null).ToList()
+                .ForEach(pp => {
+                    if (Model.PendingPaymentModels.Remove(pp))
+                    {
+                        AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, pp));
+                    }
+                });
 
             var pendingPaymentsToDelete = new List<PendingPaymentModel>();
             foreach (var paidPendingPayment in Model.PendingPaymentModels)
@@ -252,14 +295,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 var payment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == paidPendingPayment.Id);
                 if (payment != null && payment.PaidDate == null)
                 {
-                    Model.PaymentModels.Remove(payment);
+                    if(Model.PaymentModels.Remove(payment))
+                    {
+                        AddEvent(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, payment));
+                    }
                     pendingPaymentsToDelete.Add(paidPendingPayment);
                 }
             }
 
             foreach (var deletedPendingPayment in pendingPaymentsToDelete)
             {
-                Model.PendingPaymentModels.Remove(deletedPendingPayment);
+                if (Model.PendingPaymentModels.Remove(deletedPendingPayment))
+                {
+                    AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, deletedPendingPayment));
+                }
             }
         }
 
@@ -412,9 +461,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void PauseSubsequentPayments(ServiceRequest serviceRequest)
         {
-            if (Model.PausePayments == false)
+            if (!Model.PausePayments)
             {
                 Model.PausePayments = true;
+                Model.Status = IncentiveStatus.Paused;
                 AddEvent(new PaymentsPaused(Model.Account.Id, Model.Account.AccountLegalEntityId, Model, serviceRequest));
             }
             else
@@ -428,6 +478,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (Model.PausePayments)
             {
                 Model.PausePayments = false;
+                Model.Status = IncentiveStatus.Active;
                 AddEvent(new PaymentsResumed(Model.Account.Id, Model.Account.AccountLegalEntityId, Model, serviceRequest));
             }
             else
@@ -451,6 +502,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             if (isNew)
             {
+                model.Status = IncentiveStatus.Active;
                 AddEvent(new Created
                 {
                     ApprenticeshipIncentiveId = id,
@@ -480,10 +532,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
         }
 
-        public void ValidateClawbacks(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
-        {
-            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoUnsentClawbacks, Clawbacks.All(c => c.Sent)));
-        }
     }
 }
