@@ -39,13 +39,13 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.CollectionCalendar
 
         [TestCase(true)]
         [TestCase(false)]
-        public async Task ThenActiveCollectionPeriodInProgressStatusIsReturned(bool isActive)
+        public async Task ThenActiveCollectionPeriodInProgressStatusIsReturned(bool isInProgress)
         {
-            _activeCollectionPeriod.SetPeriodEndInProgress(isActive);
+            _activeCollectionPeriod.SetPeriodEndInProgress(isInProgress);
 
             var response = await _sut.Handle(new CollectionPeriodInProgressRequest(), CancellationToken.None);
 
-            response.IsInProgress.Should().Be(isActive);
+            response.IsInProgress.Should().Be(isInProgress);
         }
     }
 }
