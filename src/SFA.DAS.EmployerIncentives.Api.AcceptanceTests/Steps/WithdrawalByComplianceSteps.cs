@@ -221,7 +221,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Should().Be(2);
         }
         [Then(@"the apprenticeship incentive is marked as withdrawn and it's pending payments are removed from the system")]
-        public async Task ThenTheIncentiveAndPendingPaymentsAreRemovedFromTheSystem()
+        public async Task ThenTheIncentiveIsWithdrawnAndPendingPaymentsAreRemovedFromTheSystem()
         {
             await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal();
 
