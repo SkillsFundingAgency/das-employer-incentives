@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_incentive_is_deleted_when_the_incentive_has_no_paid_earnings()
+        public async Task Then_the_incentive_is_marked_as_withdrawn_when_the_incentive_has_no_paid_earnings()
         {
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
@@ -66,7 +66,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            incentive.IsDeleted.Should().BeTrue();
+            incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.IsDeleted.Should().BeFalse();
         }
 
         [Test]
