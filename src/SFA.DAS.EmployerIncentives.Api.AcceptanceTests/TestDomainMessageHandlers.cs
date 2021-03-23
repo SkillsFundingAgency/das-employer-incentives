@@ -11,11 +11,14 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -26,9 +29,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly TestMessageBus _testMessageBus;
         private readonly List<IHook> _messageHooks;
         private readonly TestContext _testContext;
+        private readonly List<IncentivePaymentProfile> _paymentProfiles;
         private IHost host;
         private List<IReceivingRawEndpoint> _receivingRawEndpoints = new List<IReceivingRawEndpoint>();
         private bool isDisposed;
+        private readonly IHook<ICommand> _commandMessageHook;
+        private readonly IHook<object> _eventMessageHook;
+
 
         public TestDomainMessageHandlers(
             TestContext testContext)
@@ -36,6 +43,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _testContext = testContext;
             _testMessageBus = testContext.MessageBus;
             _messageHooks = testContext.Hooks;
+
+            _eventMessageHook = testContext.Hooks.SingleOrDefault(h => h is Hook<object>) as IHook<object>;
+            if (_eventMessageHook == null)
+            {
+                testContext.Hooks.Add(_eventMessageHook);
+            }
+
+            _commandMessageHook = testContext.Hooks.SingleOrDefault(h => h is Hook<ICommand>) as IHook<ICommand>;
+            if (_commandMessageHook == null)
+            {
+                _commandMessageHook = new Hook<ICommand>();
+                testContext.Hooks.Add(_commandMessageHook);
+            }
 
             _hostConfig = new Dictionary<string, string>();
             _appConfig = new Dictionary<string, string>
@@ -47,6 +67,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 { "ApplicationSettings:DbConnectionString", testContext.SqlDatabase.DatabaseInfo.ConnectionString },
                 { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
                 { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(testContext.TestDirectory.FullName, ".learningtransport") }
+            };
+
+            _paymentProfiles = new List<IncentivePaymentProfile>
+            {
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile{ AmountPayable = 100, DaysAfterApprenticeshipStart = 10},
+                        new PaymentProfile{ AmountPayable = 200, DaysAfterApprenticeshipStart = 20},
+                    }
+                },
+                new IncentivePaymentProfile
+                {
+                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    PaymentProfiles = new List<PaymentProfile>
+                    {
+                        new PaymentProfile{ AmountPayable = 300, DaysAfterApprenticeshipStart = 30},
+                        new PaymentProfile{ AmountPayable = 400, DaysAfterApprenticeshipStart = 40},
+                    }
+                }
             };
         }
 
@@ -74,12 +116,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     a.ApiBaseUrl = _testContext.EmployerIncentiveApi.BaseAddress.AbsoluteUri;
                     a.Identifier = "";
-                });
+                    a.DbConnectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
+                    a.DistributedLockStorage = "UseDevelopmentStorage=true";
+                    a.AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY";
+                    a.Hashstring = "Test Hashstring";
+                    a.NServiceBusConnectionString = "UseLearningEndpoint=true";
+                    a.IncentivePaymentProfiles = _paymentProfiles;
+                });                
 
-                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
-                s.Replace(new ServiceDescriptor(typeof(ICommandService), new CommandService(_testContext.EmployerIncentiveApi.Client)));
-                s.Decorate<ICommandService, CommandServiceWithLogging>();
-                
                 s.AddNServiceBus(
                     new LoggerFactory().CreateLogger<TestDomainMessageHandlers>(),
                     (o) =>
@@ -122,6 +166,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                             };
                         }
                     });
+
+                Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
+
+                s.AddTransient<IDistributedLockProvider, NullLockProvider>();
+                s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
+                s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.AddSingleton(_commandMessageHook);
             });
 
             hostBuilder.UseEnvironment("LOCAL");
@@ -159,7 +210,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
             return serviceCollection;
         }
-
 
         public void Dispose()
         {

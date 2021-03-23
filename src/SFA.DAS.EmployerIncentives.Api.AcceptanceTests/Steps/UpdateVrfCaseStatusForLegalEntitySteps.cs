@@ -82,12 +82,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Where(c =>
                     c.IsPublished &&
                     c.IsDomainCommand &&
-                    c.Command is UpdateVendorRegistrationCaseStatusForAccountCommand                    
+                    c.Command is UpdateVrfCaseStatusForAccountCommand                    
                 ).ToList();
 
             foreach (var publishedCommand in publishedCommands)
             {
-                var command = publishedCommand.Command as UpdateVendorRegistrationCaseStatusForAccountCommand;
+                var command = publishedCommand.Command as UpdateVrfCaseStatusForAccountCommand;
                 command.AccountId.Should().Be(_account.Id);
                 command.HashedLegalEntityId.Should().Be(_account.HashedLegalEntityId);
                 command.Status.Should().Be(_newVrfStatus);

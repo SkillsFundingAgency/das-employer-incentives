@@ -176,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var processedEvents = testContext.CommandsPublished.Count(c =>
             c.IsProcessed &&
             c.IsDomainCommand &&
-            c.Command is CompleteEarningsCalculationCommand);
+            c.Command is CalculateEarningsCommand);
 
             return processedEvents == 1;
         }
@@ -239,7 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenThePendingPaymentsAreStoredAgainstTheApprenticeshipIncentive()
         {
             var completeCalculationCommandsPublished = _testContext.CommandsPublished
-                .Where(c => c.IsProcessed && 
+                .Where(c => c.IsPublished && 
                 c.IsDomainCommand &&
                 c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
 

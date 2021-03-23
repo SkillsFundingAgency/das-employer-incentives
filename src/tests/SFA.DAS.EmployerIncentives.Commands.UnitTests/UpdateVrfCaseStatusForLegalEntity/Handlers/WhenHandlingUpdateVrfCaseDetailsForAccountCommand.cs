@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForLe
             // Assert
             foreach (var account in accounts)
             {
-                _mockCommandPublisher.Verify(x => x.Publish(It.Is<UpdateVendorRegistrationCaseStatusForAccountCommand>(
+                _mockCommandPublisher.Verify(x => x.Publish(It.Is<UpdateVrfCaseStatusForAccountCommand>(
                     c =>
                         c.AccountId == account.Id &&
                         c.CaseId == command.CaseId &&

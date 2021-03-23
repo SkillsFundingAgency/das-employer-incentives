@@ -98,7 +98,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.Scan(scan =>
             {
                 scan.FromAssembliesOf(typeof(ServiceCollectionExtensions))
-                    .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
+                    .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>))
+                    .NotInNamespaceOf(typeof(CommandHandlerWithLogging<>)))
                     .AsImplementedInterfaces()
                     .WithTransientLifetime()
 
@@ -167,7 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<UpdateVendorRegistrationCaseStatusForAccountCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<UpdateVrfCaseStatusForAccountCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendClawbacksCommand>), new NullValidator())
                 ;
 

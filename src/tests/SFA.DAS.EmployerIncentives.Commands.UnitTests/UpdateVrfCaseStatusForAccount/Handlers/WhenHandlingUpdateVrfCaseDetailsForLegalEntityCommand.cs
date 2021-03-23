@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForAc
 {
     public class WhenHandlingUpdateVrfCaseDetailsForAccountCommand
     {
-        private UpdateVendorRegistrationCaseStatusForAccountCommandHandler _sut;
+        private UpdateVrfCaseStatusForAccountCommandHandler _sut;
         private Mock<IAccountDomainRepository> _mockDomainRepository;
         private Fixture _fixture;
         private const string LegalEntityToBeUpdatedId = "XYZ123";
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForAc
             _fixture = new Fixture();
             _fixture.Customize(new IncentiveApplicationCustomization());
             _mockDomainRepository = new Mock<IAccountDomainRepository>();
-            _sut = new UpdateVendorRegistrationCaseStatusForAccountCommandHandler(_mockDomainRepository.Object);
+            _sut = new UpdateVrfCaseStatusForAccountCommandHandler(_mockDomainRepository.Object);
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForAc
         {
             // Arrange
             var account = _fixture.Create<Account>();
-            var command = new UpdateVendorRegistrationCaseStatusForAccountCommand(
+            var command = new UpdateVrfCaseStatusForAccountCommand(
                 account.Id,
                 LegalEntityToBeUpdatedId, _fixture.Create<string>(), _fixture.Create<string>(),
                 _fixture.Create<DateTime>());
@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForAc
         {
             // Arrange
             var account = _fixture.Create<Account>();
-            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusForAccountCommand(account.Id,
+            var caseCompletedCommand = new UpdateVrfCaseStatusForAccountCommand(account.Id,
                 LegalEntityToBeUpdatedId, _fixture.Create<string>(), "case request completed",
                 _fixture.Create<DateTime>());
 
@@ -88,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForAc
             _mockDomainRepository.Setup(x => x.Find(caseCompletedCommand.AccountId)).ReturnsAsync(account);
             await _sut.Handle(caseCompletedCommand);
 
-            var command2 = new UpdateVendorRegistrationCaseStatusForAccountCommand(account.Id, LegalEntityToBeUpdatedId, caseCompletedCommand.CaseId, "New Status",
+            var command2 = new UpdateVrfCaseStatusForAccountCommand(account.Id, LegalEntityToBeUpdatedId, caseCompletedCommand.CaseId, "New Status",
                 _fixture.Create<DateTime>());
 
             // Act
@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateVrfCaseStatusForAc
         {
             // Arrange
             var account = _fixture.Create<Account>();
-            var caseCompletedCommand = new UpdateVendorRegistrationCaseStatusForAccountCommand(account.Id,
+            var caseCompletedCommand = new UpdateVrfCaseStatusForAccountCommand(account.Id,
                 LegalEntityToBeUpdatedId, _fixture.Create<string>(), LegalEntityVrfCaseStatus.Completed, _fixture.Create<DateTime>());
 
             var legalEntityToBeUpdated = LegalEntity.New(123, _fixture.Create<string>(), LegalEntityToBeUpdatedId);

@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
 {
-    public class UpdateVendorRegistrationCaseStatusForAccountCommandHandler : ICommandHandler<UpdateVendorRegistrationCaseStatusForAccountCommand>
+    public class UpdateVrfCaseStatusForAccountCommandHandler : ICommandHandler<UpdateVrfCaseStatusForAccountCommand>
     {
         private readonly IAccountDomainRepository _domainRepository;
 
-        public UpdateVendorRegistrationCaseStatusForAccountCommandHandler(IAccountDomainRepository domainRepository)
+        public UpdateVrfCaseStatusForAccountCommandHandler(IAccountDomainRepository domainRepository)
         {
             _domainRepository = domainRepository;
         }
 
-        public async Task Handle(UpdateVendorRegistrationCaseStatusForAccountCommand command, CancellationToken cancellationToken = default)
+        public async Task Handle(UpdateVrfCaseStatusForAccountCommand command, CancellationToken cancellationToken = default)
         {
             var account = await _domainRepository.Find(command.AccountId);
             account.SetVendorRegistrationCaseDetails(command.HashedLegalEntityId, command.CaseId, command.Status, command.LastUpdatedDate);
