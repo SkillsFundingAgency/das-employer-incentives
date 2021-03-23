@@ -9,21 +9,12 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NServiceBus;
 using NServiceBus.Container;
-using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
-using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
-using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
-using SFA.DAS.NServiceBus.AzureFunction.Configuration;
-using SFA.DAS.NServiceBus.AzureFunction.Hosting;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {

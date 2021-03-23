@@ -17,12 +17,34 @@ using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using NLog.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 {
     public static class ServiceCollectionExtensions
-    {   
-        
+    {
+        public static IServiceCollection AddNLog(this IServiceCollection serviceCollection)
+        {
+            var nLogConfiguration = new NLogConfiguration();
+
+            serviceCollection.AddLogging((options) =>
+            {
+                options.AddFilter("SFA.DAS", LogLevel.Information); // this is because all logging is filtered out by defualt
+                options.SetMinimumLevel(LogLevel.Trace);
+                options.SetMinimumLevel(LogLevel.Trace);
+                options.AddNLog(new NLogProviderOptions
+                {
+                    CaptureMessageTemplates = true,
+                    CaptureMessageProperties = true
+                });
+                options.AddConsole();
+
+                nLogConfiguration.ConfigureNLog();
+            });
+
+            return serviceCollection;
+        }
+
         public static IServiceCollection AddNServiceBus(
             this IServiceCollection serviceCollection,
             ILogger logger,
@@ -68,6 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
         {
             var webBuilder = serviceCollection.AddWebJobs(x => { });
             webBuilder.AddExecutionContextBinding();
+            webBuilder.AddExtension<NServiceBusExtensionConfigProvider>();
 
             var endpointName = configuration["ApplicationSettings:NServiceBusEndpointName"];
             if (string.IsNullOrEmpty(endpointName))
@@ -106,8 +129,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             Task.WhenAll(endpoint);
 
             serviceCollection.AddSingleton(p => endpoint.Result)
-                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
-                .AddHostedService<NServiceBusHostedService>();
+                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>());
+
             return serviceCollection;
         }
     }
