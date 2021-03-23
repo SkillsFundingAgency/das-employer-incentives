@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using NServiceBus.Transport;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
@@ -153,7 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     apprenticeship.CourseName);
 
                 await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
-                   await _testContext.MessageBus.Send(createCommand));
+                   await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
         
@@ -177,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var processedEvents = testContext.CommandsPublished.Count(c =>
             c.IsProcessed &&
             c.IsDomainCommand &&
-            c.Command is CompleteEarningsCalculationCommand);
+            c.Command is CalculateEarningsCommand);
 
             return processedEvents == 1;
         }
@@ -240,7 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenThePendingPaymentsAreStoredAgainstTheApprenticeshipIncentive()
         {
             var completeCalculationCommandsPublished = _testContext.CommandsPublished
-                .Where(c => c.IsProcessed && 
+                .Where(c => c.IsPublished && 
                 c.IsDomainCommand &&
                 c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
 
