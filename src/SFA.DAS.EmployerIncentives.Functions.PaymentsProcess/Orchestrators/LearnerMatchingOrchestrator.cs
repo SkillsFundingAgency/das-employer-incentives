@@ -23,9 +23,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             if(!context.IsReplaying)
                 _logger.LogInformation("LearnerMatchOrchestrator Started");
 
-            var paymentRunInProcess = await context.CallActivityAsync<bool>(nameof(CollectionPeriodInProgress), null);
-            if (paymentRunInProcess)
+            var collectionPeriod = await context.CallActivityAsync<CollectionPeriodDto>(nameof(GetActiveCollectionPeriod), null);
+            if (collectionPeriod.IsInProgress)
+            {
+                _logger.LogInformation("Learner match not performed as payment run is in process.");
                 return;
+            }
 
             var apprenticeshipIncentives = await context.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>(nameof(GetAllApprenticeshipIncentives), null);
 

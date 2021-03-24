@@ -17,8 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriod
         public async Task Handle(SetActivePeriodToInProgressCommand command, CancellationToken cancellationToken = default)
         {
             var collectionCalendar = await _collectionCalendarService.Get();
-            var activePeriod = collectionCalendar.GetActivePeriod();
-            activePeriod.SetPeriodEndInProgress(true);
+            collectionCalendar.SetActivePeriodToInProgress();
             await _collectionCalendarService.Save(collectionCalendar);
         }
     }
