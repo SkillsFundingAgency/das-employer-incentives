@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
@@ -17,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private LearnerMatchingOrchestrator _orchestrator;
         private List<ApprenticeshipIncentiveOutput> _apprenticeshipIncentives;
+        private CollectionPeriodDto _activeCollectionPeriod;
 
         [SetUp]
         public void Setup()
@@ -24,8 +26,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
 
+            _activeCollectionPeriod = new CollectionPeriodDto { IsInProgress = false };
+
             _apprenticeshipIncentives = _fixture.CreateMany<ApprenticeshipIncentiveOutput>(3).ToList();
             _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>("GetAllApprenticeshipIncentives", null)).ReturnsAsync(_apprenticeshipIncentives);
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<CollectionPeriodDto>("GetActiveCollectionPeriod", null)).ReturnsAsync(_activeCollectionPeriod);
 
             _orchestrator = new LearnerMatchingOrchestrator(Mock.Of<ILogger<LearnerMatchingOrchestrator>>());
         }
@@ -33,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         [Test]
         public async Task Then_learner_match_is_not_performed_if_payment_run_is_in_progress()
         {
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<bool>("CollectionPeriodInProgress", null)).ReturnsAsync(true);
+            _activeCollectionPeriod.IsInProgress = true;
 
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
