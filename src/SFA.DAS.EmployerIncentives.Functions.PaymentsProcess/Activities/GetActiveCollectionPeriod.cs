@@ -3,8 +3,8 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
-using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetActiveCollectionPeriod;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollectionPeriod;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {

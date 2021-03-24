@@ -8,6 +8,7 @@
     [CensusDate] DATETIME NULL, 
     [AcademicYear] VARCHAR(10) NULL, 
     [Active] BIT NULL,
+	[PeriodEndInProgress] BIT NOT NULL DEFAULT(0),
 	[MonthEndProcessingCompleteUTC] DATETIME2 NULL
 )
 GO

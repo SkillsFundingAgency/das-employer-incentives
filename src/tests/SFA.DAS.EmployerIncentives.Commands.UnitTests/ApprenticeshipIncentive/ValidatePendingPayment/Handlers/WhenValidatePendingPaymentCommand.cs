@@ -58,7 +58,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     DateTime.Now.AddDays(-1),
                     DateTime.Now,
                     (short)DateTime.Now.Year,
-                    true)
+                    true,
+                    false)
             };
 
             _mockCollectionCalendarService

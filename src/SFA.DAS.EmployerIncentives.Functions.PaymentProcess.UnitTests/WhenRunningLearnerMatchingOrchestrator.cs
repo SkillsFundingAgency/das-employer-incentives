@@ -31,6 +31,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         }
 
         [Test]
+        public async Task Then_learner_match_is_not_performed_if_payment_run_is_in_progress()
+        {
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<bool>("CollectionPeriodInProgress", null)).ReturnsAsync(true);
+
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>("GetAllApprenticeshipIncentives", null), Times.Never);
+        }
+
+        [Test]
         public async Task Then_query_is_called_to_get_apprenticeship_Incentives()
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
