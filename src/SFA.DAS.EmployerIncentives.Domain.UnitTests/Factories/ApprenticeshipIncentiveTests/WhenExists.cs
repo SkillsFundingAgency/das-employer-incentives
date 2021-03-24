@@ -39,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                 .Excluding(x => x.PendingPaymentModels)
                 .Excluding(x => x.ApplicationApprenticeshipId)
                 .Excluding(x => x.ClawbackPaymentModels)
+                .Excluding(x => x.Status)
             );
         }
 
@@ -68,7 +69,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             pendingPayments.ToList().ForEach(p =>
                 p.PendingPaymentValidationResults.Should()
                 .BeEquivalentTo(
-                    _model.PendingPaymentModels.Single(m => m.Id == p.Id).PendingPaymentValidationResultModels)
+                    _model.PendingPaymentModels.Single(m => m.Id == p.Id).PendingPaymentValidationResultModels,
+                    opt => opt.Excluding(x => x.CreatedDateUtc))
                 );
         }
 
