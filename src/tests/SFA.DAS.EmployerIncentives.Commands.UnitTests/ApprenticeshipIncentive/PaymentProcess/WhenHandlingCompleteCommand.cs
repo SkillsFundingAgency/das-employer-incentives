@@ -33,6 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     today.AddDays(-1),
                     today.AddDays(-1),
                     (short)today.Year,
+                    false,
                     false),
                 new Domain.ValueObjects.CollectionPeriod(
                 2,
@@ -41,6 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 today.AddMonths(1).AddDays(-1),
                 today.AddMonths(1).AddDays(-1),
                 (short)today.AddMonths(1).Year,
+                false,
                 false)
             };
             _firstCollectionPeriod = _collectionPeriods.First();

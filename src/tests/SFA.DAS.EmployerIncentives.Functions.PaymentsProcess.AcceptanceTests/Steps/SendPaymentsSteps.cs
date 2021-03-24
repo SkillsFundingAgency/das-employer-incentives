@@ -143,6 +143,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             exitingPeriod.PeriodNumber.Should().Be(CollectionPeriod);
             exitingPeriod.AcademicYear.Should().Be(CollectionPeriodYear.ToString());
             exitingPeriod.MonthEndProcessingCompleteUTC.Value.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 1, 0));
+            exitingPeriod.PeriodEndInProgress.Should().BeFalse(); ;
 
             var nextPeriod = collectionPeriods.Single(p => p.Active);
             nextPeriod.PeriodNumber.Should().Be(CollectionPeriod + 1);

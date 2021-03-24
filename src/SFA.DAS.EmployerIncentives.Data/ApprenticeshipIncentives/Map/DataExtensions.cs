@@ -185,8 +185,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     Convert.ToInt16(model.AcademicYear),
                     model.Active,
                     model.PeriodEndInProgress);
-            }
-            
+           
                 if (model.MonthEndProcessingCompleteUTC.HasValue)
                 {
                     period.SetMonthEndProcessingCompletedDate(model.MonthEndProcessingCompleteUTC.Value);
@@ -215,7 +214,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     CensusDate = x.CensusDate,
                     EIScheduledOpenDateUTC = x.OpenDate,
                     PeriodNumber = x.PeriodNumber,
-                    PeriodEndInProgress = x.PeriodEndInProgress
+                    PeriodEndInProgress = x.PeriodEndInProgress,
                     MonthEndProcessingCompleteUTC = x.MonthEndProcessingCompletedDate
                 }).ToList();
         }
