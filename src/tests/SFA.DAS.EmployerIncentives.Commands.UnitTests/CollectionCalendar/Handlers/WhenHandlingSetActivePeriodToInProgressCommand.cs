@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
 
             var calendarPeriods = new List<Domain.ValueObjects.CollectionPeriod>
             {
-                new Domain.ValueObjects.CollectionPeriod(1, 2021),
+                _previousCollectionPeriod,
                 _activeCollectionPeriod,
                 new Domain.ValueObjects.CollectionPeriod(3, 2021)
             };
