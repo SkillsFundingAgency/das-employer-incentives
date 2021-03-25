@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -18,7 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     {
         private readonly HttpClient _client;
         private readonly bool _obfuscateSensitiveData;
-        private readonly ILogger<BusinessCentralFinancePaymentsService> _logger;
         private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
@@ -59,7 +57,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 DueDate = payment.DueDate.ToString("yyyy-MM-dd"),
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
-                CostCentreCode = "AAA40",
+                ActivityCode = MapToActivityCode(payment.SubnominalCode),
+                CostCentreCode = "10233",
                 Amount = payment.Amount,
                 Currency = "GBP",
                 ExternalReference = new ExternalReference
@@ -69,6 +68,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 },
                 PaymentLineDescription = CreatePaymentLineDescription(payment),
                 Approver = @"AD.HQ.DEPT\JPOOLE"
+            };
+        }
+
+        private static string MapToActivityCode(SubnominalCode subnominalCode)
+        {
+            return subnominalCode switch
+            {
+                SubnominalCode.Levy16To18 => "100339",
+                SubnominalCode.Levy19Plus => "100388",
+                SubnominalCode.NonLevy16To18 => "100349",
+                SubnominalCode.NonLevy19Plus => "100397",
+                _ => throw new InvalidIncentiveException($"No mapping found for SubnominalCode {subnominalCode}")
             };
         }
 
@@ -98,34 +109,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             return $"Hire a new apprentice ({PaymentType(payment.EarningType)} payment). Employer: {payment.HashedLegalEntityId} ULN: {new string(uln)}";
         }
 
-        private string PaymentType(EarningType earningType)
+        private static string PaymentType(EarningType earningType)
         {
-            switch (earningType)
+            return earningType switch
             {
-                case EarningType.FirstPayment:
-                    return "first";
-                case EarningType.SecondPayment:
-                    return "second";
-                default:
-                    throw new InvalidIncentiveException($"No mapping found for EarningType {earningType}");
-            }
+                EarningType.FirstPayment => "first",
+                EarningType.SecondPayment => "second",
+                _ => throw new InvalidIncentiveException($"No mapping found for EarningType {earningType}")
+            };
         }
 
-        private string MapToAccountCode(SubnominalCode subnominalCode)
+        private static string MapToAccountCode(SubnominalCode subnominalCode)
         {
-            switch (subnominalCode)
+            return subnominalCode switch
             {
-                case SubnominalCode.Levy16To18:
-                    return "2240147";
-                case SubnominalCode.Levy19Plus:
-                    return "2340147";
-                case SubnominalCode.NonLevy16To18:
-                    return "2240250";
-                case SubnominalCode.NonLevy19Plus:
-                    return "2340292";
-                default:
-                    throw new InvalidIncentiveException($"No mapping found for subnominalCode {subnominalCode}");
-            }
+                SubnominalCode.Levy16To18 => "54156003",
+                SubnominalCode.Levy19Plus => "54156002",
+                SubnominalCode.NonLevy16To18 => "54156003",
+                SubnominalCode.NonLevy19Plus => "54156002",
+                _ => throw new InvalidIncentiveException($"No mapping found for SubnominalCode {subnominalCode}")
+            };
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
@@ -102,25 +101,37 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             paymentRequest.FundingStream.EndDate.Should().Be("2021-08-30");
             paymentRequest.DueDate.Should().Be(payment.DueDate.ToString("yyyy-MM-dd"));
             paymentRequest.VendorNo.Should().Be(payment.VendorId);
-            paymentRequest.CostCentreCode.Should().Be("AAA40");
+            paymentRequest.CostCentreCode.Should().Be("10233");
             paymentRequest.Amount.Should().Be(payment.Amount);
             paymentRequest.Currency.Should().Be("GBP");
             paymentRequest.ExternalReference.Type.Should().Be("ApprenticeIdentifier");
             paymentRequest.ExternalReference.Value.Should().Be(payment.HashedLegalEntityId);
         }
 
-        [TestCase(SubnominalCode.Levy16To18, "2240147")]
-        [TestCase(SubnominalCode.Levy19Plus, "2340147")]
-        [TestCase(SubnominalCode.NonLevy16To18, "2240250")]
-        [TestCase(SubnominalCode.NonLevy19Plus, "2340292")]
-        public void Then_the_SubnominalCodes_are_mapped_to_accountcode(SubnominalCode subnominalCode, string expectedAccountCode)
+        [TestCase(SubnominalCode.Levy16To18, "54156003")]
+        [TestCase(SubnominalCode.Levy19Plus, "54156002")]
+        [TestCase(SubnominalCode.NonLevy16To18, "54156003")]
+        [TestCase(SubnominalCode.NonLevy19Plus, "54156002")]
+        public void Then_the_SubnominalCodes_are_mapped_to_AccountCode(SubnominalCode subnominalCode, string expectedAccountCode)
         {
-
             var payment = _fixture.Build<PaymentDto>().With(x => x.SubnominalCode, subnominalCode).Create();
 
             var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
 
             paymentRequest.AccountCode.Should().Be(expectedAccountCode);
+        }
+
+        [TestCase(SubnominalCode.Levy16To18, "100339")]
+        [TestCase(SubnominalCode.Levy19Plus, "100388")]
+        [TestCase(SubnominalCode.NonLevy16To18, "100349")]
+        [TestCase(SubnominalCode.NonLevy19Plus, "100397")]
+        public void Then_the_SubnominalCodes_are_mapped_to_ActivityCode(SubnominalCode subnominalCode, string expectedActivityCode)
+        {
+            var payment = _fixture.Build<PaymentDto>().With(x => x.SubnominalCode, subnominalCode).Create();
+
+            var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
+
+            paymentRequest.ActivityCode.Should().Be(expectedActivityCode);
         }
 
         [TestCase(EarningType.FirstPayment, "XXX", 12345, "Hire a new apprentice (first payment). Employer: XXX ULN: 12345")]
