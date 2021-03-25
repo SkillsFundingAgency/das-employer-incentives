@@ -5,8 +5,6 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
-using NServiceBus;
-using SFA.DAS.NServiceBus.Services;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateEarnings
 {
@@ -15,18 +13,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly IIncentivePaymentProfilesService _incentivePaymentProfilesService;
         private readonly ICollectionCalendarService _collectionCalendarService;
-        private readonly IMessageSession _messageSession;
+        private readonly IScheduledCommandPublisher _commandPublisher;
 
         public CalculateEarningsCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository, 
             IIncentivePaymentProfilesService incentivePaymentProfilesService,
             ICollectionCalendarService collectionCalendarService,
-            IMessageSession messageSession)
+            IScheduledCommandPublisher commandPublisher)
         {
             _domainRepository = domainRepository;
             _incentivePaymentProfilesService = incentivePaymentProfilesService;
             _collectionCalendarService = collectionCalendarService;
-            _messageSession = messageSession;
+            _commandPublisher = commandPublisher;
         }
 
         public async Task Handle(CalculateEarningsCommand command, CancellationToken cancellationToken = default)
@@ -46,9 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
 
         private async Task ScheduleCalculateEarnings(CalculateEarningsCommand command)
         {
-            var sendOptions = new SendOptions();
-            sendOptions.DelayDeliveryWith(TimeSpan.FromHours(1));
-            await _messageSession.Send(new CalculateEarningsCommand(command.ApprenticeshipIncentiveId), sendOptions);
+            await _commandPublisher.Send(new CalculateEarningsCommand(command.ApprenticeshipIncentiveId), TimeSpan.FromHours(1));
         }
 
         private async Task<bool> ActivePeriodInProgress()

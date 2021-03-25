@@ -86,6 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
+            serviceCollection.AddScoped<IScheduledCommandPublisher, ScheduledCommandPublisher>();
 
             serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, obfuscateSensitiveData) =>
                 new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData));
