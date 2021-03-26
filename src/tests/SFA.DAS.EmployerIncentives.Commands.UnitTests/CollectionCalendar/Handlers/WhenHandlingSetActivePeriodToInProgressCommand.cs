@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
         private Mock<ICollectionCalendarService> _service;
         private Domain.ValueObjects.CollectionPeriod _activeCollectionPeriod;
         private Domain.ValueObjects.CollectionCalendar _collectionCalendar;
+        private Domain.ValueObjects.CollectionPeriod _previousCollectionPeriod;
 
         [SetUp]
         public void Arrange()
@@ -22,12 +23,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
             _service = new Mock<ICollectionCalendarService>();
             _sut = new SetActivePeriodToInProgressCommandHandler(_service.Object);
 
+            _previousCollectionPeriod = new Domain.ValueObjects.CollectionPeriod(1, 2021);
+            _previousCollectionPeriod.SetPeriodEndInProgress(true);
+
             _activeCollectionPeriod = new Domain.ValueObjects.CollectionPeriod(2, 2021);
             _activeCollectionPeriod.SetActive(true);
 
             var calendarPeriods = new List<Domain.ValueObjects.CollectionPeriod>
             {
-                new Domain.ValueObjects.CollectionPeriod(1, 2021),
+                _previousCollectionPeriod,
                 _activeCollectionPeriod,
                 new Domain.ValueObjects.CollectionPeriod(3, 2021)
             };
@@ -47,6 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
 
             // Assert
             _activeCollectionPeriod.PeriodEndInProgress.Should().BeTrue();
+            _previousCollectionPeriod.PeriodEndInProgress.Should().BeFalse();
             _service.Verify(x => x.Save(_collectionCalendar), Times.Once);
         }
     }
