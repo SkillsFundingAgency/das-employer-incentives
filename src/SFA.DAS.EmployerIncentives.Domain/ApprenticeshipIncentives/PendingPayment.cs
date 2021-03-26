@@ -103,8 +103,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 .All(r => r.Result);
         }
 
-        public bool RequiresNewPayment(PendingPayment pendingPayment)
+        public bool RequiresNewPayment(PendingPayment pendingPayment, IEnumerable<BreakInLearning> breakInLearnings)
         {
+            if (breakInLearnings.Any(b => b.EndDate.HasValue && b.IsBreakInLearning(DueDate)))
+            {
+                return true;
+            }
+
+            if (breakInLearnings.Any(b => b.EndDate.HasValue && DueDate.Date < b.StartDate))
+            {
+                return false;
+            }
+
             return Amount != pendingPayment.Amount || PeriodNumber != pendingPayment.PeriodNumber || PaymentYear != pendingPayment.PaymentYear;
         }
 

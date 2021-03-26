@@ -11,6 +11,7 @@ Scenario: Learner data contains a learning stopped change
 	Then the incentive is updated to stopped
 	And the stopped change of circumstance is saved
 	And the learner data stopped date is stored
+	And the learner start break in learning is stored
 
 Scenario: Apprenticeship has unpaid earnings after the stopped date
 	Given an apprenticeship incentive exists
@@ -35,6 +36,7 @@ Scenario: Learner data contains a learning resumed change
 	Then the incentive is updated to active
 	And the resumed change of circumstance is saved
 	And the learner data resumed date is stored
+	And the learner resume break in learning is stored
 
 Scenario: A learning resumed change updated the pending payment due dates with the break in learning
 	Given an apprenticeship incentive exists that has stopped learning

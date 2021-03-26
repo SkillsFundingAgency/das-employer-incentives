@@ -111,7 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (ExistingPendingPaymentHasBeenPaid(existingPendingPayment))
             {
-                if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
+                if (!existingPendingPayment.RequiresNewPayment(pendingPayment, Model.BreakInLearnings.ToList().AsReadOnly()))
                 {
                     return;
                 }
@@ -131,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
             }
-        }
+        }     
 
         private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
         {
@@ -276,7 +276,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             SetStartDate(startDate);
             if (previousStartDate != Model.StartDate)
             {
-               
                 AddEvent(new StartDateChanged(
                     Model.Id,
                     previousStartDate,
@@ -284,12 +283,32 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model));
             }
         }
+        private void StartBreakInLearning(DateTime startDate)
+        {
+            if(Model.BreakInLearnings.Any(b => b.StartDate == startDate.Date))
+            {
+                return;
+            }
+
+            Model.BreakInLearnings.Add(new BreakInLearning(startDate));
+        }
+
+        private void StopBreakInLearning(DateTime stopDate)
+        {
+            if (Model.BreakInLearnings.Any(b => b.EndDate == stopDate.Date) || Model.BreakInLearnings.Count == 0)
+            {
+                return;
+            }
+
+            Model.BreakInLearnings.Single(b => !b.EndDate.HasValue).SetEndDate(stopDate);            
+        }
 
         private async Task SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus, ICollectionCalendarService collectionCalendarService)
         {
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {
                 Model.Status = IncentiveStatus.Stopped;
+                StartBreakInLearning(learningStoppedStatus.DateStopped.Value);
                 await RemoveEarningsAfterStopDate(learningStoppedStatus.DateStopped.Value, collectionCalendarService);
                 AddEvent(new LearningStopped(
                     Model.Id,
@@ -297,7 +316,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
             else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped)
             {
-                Model.Status = IncentiveStatus.Active;                
+                Model.Status = IncentiveStatus.Active;
+                StopBreakInLearning(learningStoppedStatus.DateResumed.Value.AddDays(-1));
                 AddEvent(new LearningResumed(
                    Model.Id,
                    learningStoppedStatus.DateResumed.Value));

@@ -34,7 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedByEmail = model.SubmittedByEmail,
                 CourseName = model.Apprenticeship.CourseName,
                 Status = model.Status,
-                BreakInLearningDayCount = model.BreakInLearningDayCount
+                BreakInLearningDayCount = model.BreakInLearningDayCount,
+                BreakInLearnings = model.BreakInLearnings.Map(model.Id)
             };
         }
 
@@ -71,7 +72,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
-                BreakInLearningDayCount = entity.BreakInLearningDayCount
+                BreakInLearningDayCount = entity.BreakInLearningDayCount,
+                BreakInLearnings = entity.BreakInLearnings.Map()
             };
         }
 
@@ -320,6 +322,32 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> Map(this ICollection<ApprenticeshipDaysInLearning> models)
         {
             return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning(x.CollectionPeriodNumber, x.CollectionPeriodYear, x.NumberOfDaysInLearning)).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning> Map(this ICollection<ApprenticeshipBreakInLearning> models)
+        {
+            return models.Select(x => x.Map()).ToList();
+        }
+
+        private static Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning Map(this ApprenticeshipBreakInLearning model)
+        {
+            var newBreakInLearning = new Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning(model.StartDate);
+            if (model.EndDate.HasValue)
+            {
+                newBreakInLearning.SetEndDate(model.EndDate.Value);
+            }
+
+            return newBreakInLearning;
+        }
+
+        private static ICollection<ApprenticeshipBreakInLearning> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning> models, Guid ApprenticeshipIncentiveId)
+        {
+            return models.Select(x => new ApprenticeshipBreakInLearning
+            {
+                ApprenticeshipIncentiveId = ApprenticeshipIncentiveId,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate                
+            }).ToList();
         }
 
         private static ICollection<ClawbackPayment> Map(this ICollection<ClawbackPaymentModel> models)

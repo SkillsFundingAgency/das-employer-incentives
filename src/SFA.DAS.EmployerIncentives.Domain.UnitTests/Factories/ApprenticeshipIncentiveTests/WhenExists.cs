@@ -41,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                 .Excluding(x => x.ClawbackPaymentModels)
                 .Excluding(x => x.Status)
                 .Excluding(x => x.BreakInLearningDayCount)
+                .Excluding(x => x.BreakInLearnings)
             );
         }
 

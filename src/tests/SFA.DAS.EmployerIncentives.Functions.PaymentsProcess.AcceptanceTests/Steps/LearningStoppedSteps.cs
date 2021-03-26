@@ -33,6 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly LearnerSubmissionDto _stoppedLearnerMatchApiData;
         private readonly LearnerSubmissionDto _resumedLearnerMatchApiData;
         private readonly LearnerSubmissionDto _resumedLearnerWithBreakInLearningMatchApiData;
+        private readonly ApprenticeshipBreakInLearning _apprenticeshipBreakinLearning;
         private readonly DateTime _plannedStartDate;
         private readonly DateTime _periodEndDate;
         private readonly int _breakInLearning;
@@ -165,6 +166,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         .Create()}
                 )
                 .Create();
+
+            _apprenticeshipBreakinLearning = _fixture
+                .Build<ApprenticeshipBreakInLearning>()
+                .With(b => b.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(b => b.StartDate, _plannedStartDate.AddDays(_breakInLearning * -1))
+                .With(b => b.EndDate, (DateTime?)null)
+                .Create();
         }
 
         [Given(@"an apprenticeship incentive exists")]
@@ -187,6 +195,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
+                await dbConnection.InsertAsync(_apprenticeshipBreakinLearning);
                 await dbConnection.InsertAsync(_pendingPayment);
                 await dbConnection.InsertAsync(_learner);
                 await dbConnection.InsertAsync(_learningPeriod1);
@@ -276,6 +285,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             learner.Single().LearningStoppedDate.Should().Be(_periodEndDate.AddDays(1));
             learner.Single().LearningResumedDate.Should().Be(null);
+        }
+
+        [Then(@"the learner start break in learning is stored")]
+        public void ThenTheLearnerStartBreakInLearningIsStored()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var breakInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>();
+
+            breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            breakInLearning.Single().StartDate.Should().Be(_periodEndDate.AddDays(1));
+            breakInLearning.Single().EndDate.Should().Be(null);
+        }
+
+        [Then(@"the learner resume break in learning is stored")]
+        public void ThenTheLearnerResumeBreakInLearningIsStored()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var breakInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>();
+
+            var temp = breakInLearning.Single();
+            breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            breakInLearning.Single().StartDate.Should().Be(_plannedStartDate.AddDays(_breakInLearning * -1));
+            breakInLearning.Single().EndDate.Should().Be(_plannedStartDate.AddDays(-1));
         }
 
         [Then(@"the learner data resumed date is stored")]

@@ -43,11 +43,15 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 
         public int BreakInLearningDayCount { get; set; }
 
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
+
         public ApprenticeshipIncentive()
         {
             PendingPayments = new List<PendingPayment>();
             Payments = new List<Payment>();
             ClawbackPayments = new List<ClawbackPayment>();
+            BreakInLearnings = new List<ApprenticeshipBreakInLearning>();
         }
     }
 }
