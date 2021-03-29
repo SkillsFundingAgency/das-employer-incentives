@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedPendingPayment.PaymentYear.Should().Be(testPendingPayment.PaymentYear);
             storedPendingPayment.EarningType.Should().Be(testPendingPayment.EarningType);
             storedPendingPayment.ClawedBack.Should().Be(testPendingPayment.ClawedBack);
-            storedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            storedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
 
             var storedValidationResult = _dbContext.ArchivedPendingPaymentValidationResults.Single();
             storedValidationResult.PendingPaymentId.Should().Be(testPendingPayment.Id);
@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedValidationResult.Result.Should().Be(testPendingPaymentValidationResult.Result);
             storedValidationResult.Step.Should().Be(testPendingPaymentValidationResult.Step);
             storedValidationResult.CreatedDateUtc.Should().Be(testPendingPaymentValidationResult.CreatedDateUtc);
-            storedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            storedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         }
     }
 }
