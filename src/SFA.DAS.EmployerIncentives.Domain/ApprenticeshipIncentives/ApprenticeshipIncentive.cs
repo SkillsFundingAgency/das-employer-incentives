@@ -31,10 +31,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
+        public int MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
-
+        
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail)
         {
+            var minimumAgreementVersion = CalculateMinimumAgreementVersion(plannedStartDate);
+
             return new ApprenticeshipIncentive(
                 id,
                 new ApprenticeshipIncentiveModel
@@ -47,10 +50,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     PausePayments = false,
                     SubmittedDate = submittedDate,
                     SubmittedByEmail = submittedByEmail,
-                    Status = IncentiveStatus.Active
+                    Status = IncentiveStatus.Active,
+                    MinimumAgreementVersion = minimumAgreementVersion
                 }, true);
         }
-
+        
         internal static ApprenticeshipIncentive Get(Guid id, ApprenticeshipIncentiveModel model)
         {
             return new ApprenticeshipIncentive(id, model);
@@ -531,6 +535,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
         }
+        
+        private static int CalculateMinimumAgreementVersion(DateTime plannedStartDate)
+        {
+            const int minimumEmployerIncentivesAgreementVersion = 4;
+            const int schemeEligibilityExtensionAgreementVersion = 5;
+            var schemeEligibilityExtensionStartDate = new DateTime(2021, 02, 01);
 
+            if (plannedStartDate < schemeEligibilityExtensionStartDate)
+            {
+                return minimumEmployerIncentivesAgreementVersion;
+            }
+
+            return schemeEligibilityExtensionAgreementVersion;
+        }
     }
 }

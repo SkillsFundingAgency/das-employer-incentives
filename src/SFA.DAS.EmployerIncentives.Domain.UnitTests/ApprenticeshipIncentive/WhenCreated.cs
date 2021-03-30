@@ -109,5 +109,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             incentive.PendingPayments.Count.Should().Be(0);
             incentive.GetModel().PendingPaymentModels.Count.Should().Be(0);
         }
+
+        [TestCase(2020, 8, 1, 4)]
+        [TestCase(2021, 1, 31, 4)]
+        [TestCase(2021, 2, 1, 5)]
+        [TestCase(2021, 3, 31, 5)]
+        public void Then_the_minimum_agreement_version_is_set(int year, int month, int day, int minimumAgreementVersion)
+        {
+            // Arrange
+            var plannedStartDate = new DateTime(year, month, day);
+            // Act
+            var incentive = new ApprenticeshipIncentiveFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), plannedStartDate, _fixture.Create<DateTime>(), _fixture.Create<string>());
+
+            // Assert
+            incentive.MinimumAgreementVersion.Should().Be(minimumAgreementVersion);
+        }
     }
 }

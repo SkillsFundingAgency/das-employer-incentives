@@ -33,7 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = model.SubmittedDate,
                 SubmittedByEmail = model.SubmittedByEmail,
                 CourseName = model.Apprenticeship.CourseName,
-                Status = model.Status
+                Status = model.Status,
+                MinimumAgreementVersion = model.MinimumAgreementVersion
             };
         }
 
@@ -69,7 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PausePayments = entity.PausePayments,
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
-                Status = entity.Status
+                Status = entity.Status,
+                MinimumAgreementVersion = entity.MinimumAgreementVersion
             };
         }
 
