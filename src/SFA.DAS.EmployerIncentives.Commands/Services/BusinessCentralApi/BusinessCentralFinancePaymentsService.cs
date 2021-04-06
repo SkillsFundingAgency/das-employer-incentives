@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -10,6 +11,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -17,20 +19,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
     {
         private readonly HttpClient _client;
         private readonly bool _obfuscateSensitiveData;
+        private readonly ILogger<BusinessCentralFinancePaymentsService> _logger;
         private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData)
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData, ILogger<BusinessCentralFinancePaymentsService> logger)
         {
             _client = client;
             _obfuscateSensitiveData = obfuscateSensitiveData;
+            _logger = logger;
             _apiVersion = apiVersion ?? "2020-10-01";
             PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
 
         public async Task SendPaymentRequests(IList<PaymentDto> payments)
         {
-            var content = CreateJsonContent(payments);
+            var paymentRequests = payments.Select(MapToBusinessCentralPaymentRequest).ToList();
+            var nonSensitiveData = BusinessCentralPaymentsRequestLogEntry.Create(paymentRequests);
+            _logger.Log(LogLevel.Information,"[BusinessCentralFinancePaymentsService] Sending {count} payment requests to BC {@data}", nonSensitiveData.Count, nonSensitiveData);
+
+            var content = CreateJsonContent(paymentRequests);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/payments-data");
             var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
@@ -54,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                     StartDate = "2020-09-01",
                     EndDate = "2021-08-30",
                 },
-                DueDate = payment.DueDate.ToString("yyyy-MM-dd"),
+                DueDate = DateTime.Now.ToString("yyyy-MM-dd"),
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
                 ActivityCode = MapToActivityCode(payment.SubnominalCode),
@@ -83,11 +91,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             };
         }
 
-        private HttpContent CreateJsonContent(IEnumerable<PaymentDto> paymentsToSend)
+        private static HttpContent CreateJsonContent(IEnumerable<BusinessCentralFinancePaymentRequest> payments)
         {
-            var paymentRequests = paymentsToSend.Select(MapToBusinessCentralPaymentRequest);
-
-            var body = new PaymentRequestContainer { PaymentRequests = paymentRequests.ToArray() };
+            var body = new PaymentRequestContainer { PaymentRequests = payments.ToArray() };
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
