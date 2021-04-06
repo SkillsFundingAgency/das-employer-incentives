@@ -122,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var incentive = new ApprenticeshipIncentiveFactory().CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Account>(), _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(), plannedStartDate, _fixture.Create<DateTime>(), _fixture.Create<string>());
 
             // Assert
-            incentive.MinimumAgreementVersion.Should().Be(minimumAgreementVersion);
+            incentive.MinimumAgreementVersion.MinimumRequiredVersion.Should().Be(minimumAgreementVersion);
         }
     }
 }
