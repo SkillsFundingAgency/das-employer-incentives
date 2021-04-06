@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                     StartDate = "2020-09-01",
                     EndDate = "2021-08-30",
                 },
-                DueDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                DueDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
                 ActivityCode = MapToActivityCode(payment.SubnominalCode),

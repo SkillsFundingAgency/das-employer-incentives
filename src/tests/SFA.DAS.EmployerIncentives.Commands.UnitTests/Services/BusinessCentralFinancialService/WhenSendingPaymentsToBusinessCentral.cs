@@ -99,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             paymentRequest.FundingStream.Code.Should().Be("EIAPP");
             paymentRequest.FundingStream.StartDate.Should().Be("2020-09-01");
             paymentRequest.FundingStream.EndDate.Should().Be("2021-08-30");
-            paymentRequest.DueDate.Should().Be(DateTime.Now.ToString("yyyy-MM-dd"));
+            paymentRequest.DueDate.Should().Be(DateTime.UtcNow.ToString("yyyy-MM-dd"));
             paymentRequest.VendorNo.Should().Be(payment.VendorId);
             paymentRequest.CostCentreCode.Should().Be("10233");
             paymentRequest.Amount.Should().Be(payment.Amount);
