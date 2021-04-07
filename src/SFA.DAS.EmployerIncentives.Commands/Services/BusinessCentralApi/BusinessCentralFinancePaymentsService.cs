@@ -35,8 +35,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         public async Task SendPaymentRequests(IList<PaymentDto> payments)
         {
             var paymentRequests = payments.Select(MapToBusinessCentralPaymentRequest).ToList();
-            var nonSensitiveData = BusinessCentralPaymentsRequestLogEntry.Create(paymentRequests);
-            _logger.Log(LogLevel.Information,"[BusinessCentralFinancePaymentsService] Sending {count} payment requests to BC {@data}", nonSensitiveData.Count, nonSensitiveData);
+            
+            LogNonSensitiveRequestData(paymentRequests);
 
             var content = CreateJsonContent(paymentRequests);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/payments-data");
@@ -48,6 +48,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             }
 
             throw new BusinessCentralApiException(response.StatusCode, content);
+        }
+
+        private void LogNonSensitiveRequestData(IEnumerable<BusinessCentralFinancePaymentRequest> paymentRequests)
+        {
+            var nonSensitiveData = BusinessCentralPaymentsRequestLogEntry.Create(paymentRequests);
+            _logger.Log(LogLevel.Information,
+                "[BusinessCentralFinancePaymentsService] Sending {count} payment requests to BC {@data}",
+                nonSensitiveData.Count,
+                JsonConvert.SerializeObject(nonSensitiveData));
         }
 
         public BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)

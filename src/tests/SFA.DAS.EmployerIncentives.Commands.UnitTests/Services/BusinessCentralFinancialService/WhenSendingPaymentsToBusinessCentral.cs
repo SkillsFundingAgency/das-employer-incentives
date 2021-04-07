@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.EmployerIncentives.Application.UnitTests;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentralFinancialService
 {
@@ -39,6 +40,34 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
 
             //Act
             await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+        }
+
+        [Test]
+        public async Task Then_the_nonsensitive_payment_data_is_logged()
+        {
+            //Arrange
+            var loggerMock = new Mock<ILogger<BusinessCentralFinancePaymentsService>>();
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false, loggerMock.Object);
+            _httpClient.SetUpPostAsAsync(HttpStatusCode.Accepted);
+            var payment1 = _fixture.Create<PaymentDto>();
+            var payment2 = _fixture.Create<PaymentDto>();
+            var req1 = _sut.MapToBusinessCentralPaymentRequest(payment1);
+            var req2 = _sut.MapToBusinessCentralPaymentRequest(payment2);
+
+            //Act
+            await _sut.SendPaymentRequests(new List<PaymentDto> { payment1, payment2 });
+
+            //Assert
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.ActivityCode);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.AccountCode);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.CostCentreCode);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.RequestorUniquePaymentIdentifier);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.DueDate);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req2.ActivityCode);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req2.AccountCode);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req2.CostCentreCode);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req2.RequestorUniquePaymentIdentifier);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req2.DueDate);
         }
 
         [Test]
