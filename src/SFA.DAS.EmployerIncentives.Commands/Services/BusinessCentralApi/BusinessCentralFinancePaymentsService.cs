@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -22,17 +23,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData)
+        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData, ILogger<BusinessCentralFinancePaymentsService> logger)
         {
             _client = client;
             _obfuscateSensitiveData = obfuscateSensitiveData;
+            _logger = logger;
             _apiVersion = apiVersion ?? "2020-10-01";
             PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
         }
 
         public async Task SendPaymentRequests(IList<PaymentDto> payments)
         {
-            var content = CreateJsonContent(payments);
+            var paymentRequests = payments.Select(MapToBusinessCentralPaymentRequest).ToList();
+            
+            LogNonSensitiveRequestData(paymentRequests);
+
+            var content = CreateJsonContent(paymentRequests);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/payments-data");
             var response = await _client.PostAsync($"payments/requests?api-version={_apiVersion}", content);
 
@@ -42,6 +48,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             }
 
             throw new BusinessCentralApiException(response.StatusCode, content);
+        }
+
+        private void LogNonSensitiveRequestData(IEnumerable<BusinessCentralFinancePaymentRequest> paymentRequests)
+        {
+            var nonSensitiveData = BusinessCentralPaymentsRequestLogEntry.Create(paymentRequests);
+            _logger.Log(LogLevel.Information,
+                "[BusinessCentralFinancePaymentsService] Sending {count} payment requests to BC {@data}",
+                nonSensitiveData.Count,
+                JsonConvert.SerializeObject(nonSensitiveData));
         }
 
         public BusinessCentralFinancePaymentRequest MapToBusinessCentralPaymentRequest(PaymentDto payment)
@@ -56,10 +71,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                     StartDate = "2020-09-01",
                     EndDate = "2021-08-30",
                 },
-                DueDate = payment.DueDate.ToString("yyyy-MM-dd"),
+                DueDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
-                CostCentreCode = "AAA40",
+                ActivityCode = MapToActivityCode(payment.SubnominalCode),
+                CostCentreCode = "10233",
                 Amount = payment.Amount,
                 Currency = "GBP",
                 ExternalReference = new ExternalReference
@@ -72,11 +88,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             };
         }
 
-        private HttpContent CreateJsonContent(IEnumerable<PaymentDto> paymentsToSend)
+        private static string MapToActivityCode(SubnominalCode subnominalCode)
         {
-            var paymentRequests = paymentsToSend.Select(MapToBusinessCentralPaymentRequest);
+            return subnominalCode switch
+            {
+                SubnominalCode.Levy16To18 => "100339",
+                SubnominalCode.Levy19Plus => "100388",
+                SubnominalCode.NonLevy16To18 => "100349",
+                SubnominalCode.NonLevy19Plus => "100397",
+                _ => throw new InvalidIncentiveException($"No mapping found for SubnominalCode {subnominalCode}")
+            };
+        }
 
-            var body = new PaymentRequestContainer { PaymentRequests = paymentRequests.ToArray() };
+        private static HttpContent CreateJsonContent(IEnumerable<BusinessCentralFinancePaymentRequest> payments)
+        {
+            var body = new PaymentRequestContainer { PaymentRequests = payments.ToArray() };
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -98,34 +124,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             return $"Hire a new apprentice ({PaymentType(payment.EarningType)} payment). Employer: {payment.HashedLegalEntityId} ULN: {new string(uln)}";
         }
 
-        private string PaymentType(EarningType earningType)
+        private static string PaymentType(EarningType earningType)
         {
-            switch (earningType)
+            return earningType switch
             {
-                case EarningType.FirstPayment:
-                    return "first";
-                case EarningType.SecondPayment:
-                    return "second";
-                default:
-                    throw new InvalidIncentiveException($"No mapping found for EarningType {earningType}");
-            }
+                EarningType.FirstPayment => "first",
+                EarningType.SecondPayment => "second",
+                _ => throw new InvalidIncentiveException($"No mapping found for EarningType {earningType}")
+            };
         }
 
-        private string MapToAccountCode(SubnominalCode subnominalCode)
+        private static string MapToAccountCode(SubnominalCode subnominalCode)
         {
-            switch (subnominalCode)
+            return subnominalCode switch
             {
-                case SubnominalCode.Levy16To18:
-                    return "2240147";
-                case SubnominalCode.Levy19Plus:
-                    return "2340147";
-                case SubnominalCode.NonLevy16To18:
-                    return "2240250";
-                case SubnominalCode.NonLevy19Plus:
-                    return "2340292";
-                default:
-                    throw new InvalidIncentiveException($"No mapping found for subnominalCode {subnominalCode}");
-            }
+                SubnominalCode.Levy16To18 => "54156003",
+                SubnominalCode.Levy19Plus => "54156002",
+                SubnominalCode.NonLevy16To18 => "54156003",
+                SubnominalCode.NonLevy19Plus => "54156002",
+                _ => throw new InvalidIncentiveException($"No mapping found for SubnominalCode {subnominalCode}")
+            };
         }
     }
 }
