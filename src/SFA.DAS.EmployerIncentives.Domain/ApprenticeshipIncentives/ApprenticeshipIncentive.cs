@@ -532,19 +532,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
         }
-        
-        private static int CalculateMinimumAgreementVersion(DateTime plannedStartDate)
-        {
-            const int minimumEmployerIncentivesAgreementVersion = 4;
-            const int schemeEligibilityExtensionAgreementVersion = 5;
-            var schemeEligibilityExtensionStartDate = new DateTime(2021, 02, 01);
 
-            if (plannedStartDate < schemeEligibilityExtensionStartDate)
-            {
-                return minimumEmployerIncentivesAgreementVersion;
-            }
-
-            return schemeEligibilityExtensionAgreementVersion;
-        }
     }
 }
