@@ -8,31 +8,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
     {
         private const int MinimumEmployerIncentivesAgreementVersion = 4;
         private const int SchemeEligibilityExtensionAgreementVersion = 5;
-        public int? MinimumRequiredVersion { get; private set; }
-
-        public AgreementVersion() 
-        {
-        }
+        public int? MinimumRequiredVersion { get; }
 
         public AgreementVersion(int? minimumRequiredVersion)
         {
             MinimumRequiredVersion = minimumRequiredVersion;
         }
         
-        public AgreementVersion Create(DateTime startDate)
+        public static AgreementVersion Create(DateTime startDate)
         {
             var schemeEligibilityExtensionStartDate = new DateTime(2021, 02, 01);
-
+            int minimumAgreementVersion = SchemeEligibilityExtensionAgreementVersion;
             if (startDate < schemeEligibilityExtensionStartDate)
             {
-                MinimumRequiredVersion = MinimumEmployerIncentivesAgreementVersion;
-            }
-            else
-            {
-                MinimumRequiredVersion = SchemeEligibilityExtensionAgreementVersion;
+                minimumAgreementVersion = MinimumEmployerIncentivesAgreementVersion;
             }
 
-            return new AgreementVersion(MinimumRequiredVersion);
+            return new AgreementVersion(minimumAgreementVersion);
         }
 
         protected override IEnumerable<object> GetAtomicValues()
