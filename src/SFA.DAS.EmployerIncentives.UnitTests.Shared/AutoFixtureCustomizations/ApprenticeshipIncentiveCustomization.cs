@@ -16,7 +16,8 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations
                 fixture.Create<Apprenticeship>(), 
                 fixture.Create<DateTime>(), 
                 fixture.Create<DateTime>(), 
-                fixture.Create<string>()));
+                fixture.Create<string>(),
+                fixture.Create<int>()));
         }
     }
 }

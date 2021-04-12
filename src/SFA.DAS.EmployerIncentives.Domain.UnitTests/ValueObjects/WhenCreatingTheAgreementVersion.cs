@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             // Arrange
             var plannedStartDate = new DateTime(year, month, day);
             // Act
-            var agreementVersion = new AgreementVersion(plannedStartDate);
+            var agreementVersion = new AgreementVersion().Create(plannedStartDate);
 
             // Assert
             agreementVersion.MinimumRequiredVersion.Should().Be(minimumAgreementVersion);

@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
-                MinimumAgreementVersion = new AgreementVersion(entity.StartDate)
+                MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : new AgreementVersion().Create(entity.StartDate)
             };
         }
 
@@ -364,5 +364,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ChangedDate = model.ChangedDate
             };
         }        
+
     }
 }

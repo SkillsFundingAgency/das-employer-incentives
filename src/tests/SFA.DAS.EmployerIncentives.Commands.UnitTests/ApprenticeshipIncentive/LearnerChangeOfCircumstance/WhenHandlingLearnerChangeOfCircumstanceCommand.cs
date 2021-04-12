@@ -50,7 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         ),
                     DateTime.Today,
                     _fixture.Create<DateTime>(),
-                    _fixture.Create<string>());
+                    _fixture.Create<string>(),
+                    _fixture.Create<int>());
             incentive.SetHasPossibleChangeOfCircumstances(true);
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
