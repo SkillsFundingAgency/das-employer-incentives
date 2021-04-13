@@ -272,6 +272,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     previousStartDate,
                     Model.StartDate,
                     Model));
+
+                Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(startDate);
             }
         }
 

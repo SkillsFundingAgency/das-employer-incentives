@@ -27,6 +27,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             return new AgreementVersion(minimumAgreementVersion);
         }
 
+        public AgreementVersion ChangedStartDate(DateTime startDate)
+        {
+            var schemeEligibilityExtensionEndDate = new DateTime(2021, 05, 31);
+
+            if (startDate > schemeEligibilityExtensionEndDate)
+            {
+                return this; // no need to change the version outside the eligibility window 
+            }
+
+            return Create(startDate);          
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return MinimumRequiredVersion;
