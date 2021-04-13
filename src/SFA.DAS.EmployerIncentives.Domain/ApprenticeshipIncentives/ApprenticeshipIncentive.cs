@@ -273,7 +273,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.StartDate,
                     Model));
 
-                Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(startDate);
+                SetMinimumAgreementVersion(startDate);
+            }
+        }
+
+        private void SetMinimumAgreementVersion(DateTime startDate)
+        {
+            var existingMinimumAgreementVersion = Model.MinimumAgreementVersion;
+            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(startDate);
+            if (existingMinimumAgreementVersion != Model.MinimumAgreementVersion)
+            {
+                AddEvent(new MinimumAgreementVersionChanged(
+                Model.Id,
+                existingMinimumAgreementVersion.MinimumRequiredVersion,
+                Model.MinimumAgreementVersion.MinimumRequiredVersion.Value,
+                Model));
             }
         }
 

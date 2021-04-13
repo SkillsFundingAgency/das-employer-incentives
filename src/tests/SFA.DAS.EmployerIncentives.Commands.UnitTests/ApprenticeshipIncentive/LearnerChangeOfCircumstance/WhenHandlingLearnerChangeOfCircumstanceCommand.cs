@@ -26,6 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRespository;
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
         private Learner _learner;
+        private int? _miniumAgreementVersion;
+        private DateTime _plannedStartDate;
 
         [SetUp]
         public void Arrange()
@@ -34,6 +36,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRespository = new Mock<ILearnerDomainRepository>();
+            
+            _miniumAgreementVersion = 1;
+            _plannedStartDate = new DateTime(2021, 03, 31);
 
             var incentive = new ApprenticeshipIncentiveFactory()
                     .CreateNew(_fixture.Create<Guid>(),
@@ -48,10 +53,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         ApprenticeshipEmployerType.Levy,
                         _fixture.Create<string>()
                         ),
-                    DateTime.Today,
+                    _plannedStartDate,
                     _fixture.Create<DateTime>(),
                     _fixture.Create<string>(),
-                    _fixture.Create<int>());
+                    _miniumAgreementVersion);
             incentive.SetHasPossibleChangeOfCircumstances(true);
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
@@ -203,6 +208,44 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             _mockLearnerDomainRespository.Verify(x => x.GetOrCreate(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
             _mockIncentiveDomainRespository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
+        }
+
+        [Test]
+        public async Task Then_the_MinimumAgreementVersionChanged_event_is_raised_when_the_version_changes()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            var newStartDate = _incentive.StartDate.AddMonths(2);
+            _learner.SubmissionData.LearningData.SetStartDate(newStartDate);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var @event = _incentive.FlushEvents().Single(e => e is MinimumAgreementVersionChanged) as MinimumAgreementVersionChanged;
+            @event.ApprenticeshipIncentiveId.Should().Be(_incentive.Id);
+            @event.PreviousAgreementVersion.Should().Be(_miniumAgreementVersion);
+            @event.NewAgreementVersion.Should().Be(5);
+        }
+
+        [Test]
+        public async Task Then_the_MinimumAgreementVersionChanged_event_is_not_raised_when_the_version_does_not_change()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            var newStartDate = new DateTime(2021, 06, 01);
+
+            _learner.SubmissionData.LearningData.SetStartDate(newStartDate);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _incentive.FlushEvents().Count(e => e is MinimumAgreementVersionChanged).Should().Be(0);
         }
     }
 }
