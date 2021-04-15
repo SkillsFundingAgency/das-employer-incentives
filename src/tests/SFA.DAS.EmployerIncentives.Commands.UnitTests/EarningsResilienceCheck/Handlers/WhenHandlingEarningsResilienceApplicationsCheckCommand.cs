@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
+using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

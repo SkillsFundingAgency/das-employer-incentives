@@ -1,12 +1,10 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateEarnings;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
@@ -17,7 +15,9 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CalculateEarnings.Handlers
 {
@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IIncentivePaymentProfilesService> _mockPaymentProfilesService;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Mock<IScheduledCommandPublisher> _mockCommandPublisher;
         private Fixture _fixture;
         private List<IncentivePaymentProfile> _paymentProfiles;
         private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
@@ -58,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(), false, false)
+                new Domain.ValueObjects.CollectionPeriod(1, (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(), true, false)
             };
 
             _mockCollectionCalendarService
@@ -86,10 +87,30 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _fixture.Register(() => incentive);
 
+            _mockCommandPublisher = new Mock<IScheduledCommandPublisher>();
+
             _sut = new CalculateEarningsCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockPaymentProfilesService.Object,
-                _mockCollectionCalendarService.Object);
+                _mockCollectionCalendarService.Object,
+                _mockCommandPublisher.Object);
+        }
+
+        [Test]
+        public async Task Then_the_calculation_is_delayed_if_the_active_period_is_in_progress()
+        {
+            // Arrange
+            _collectionPeriods.First().SetPeriodEndInProgress(true);
+
+            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
+            var command = new CalculateEarningsCommand(incentive.Id);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _mockCommandPublisher.Verify(x => x.Send(It.Is<CalculateEarningsCommand>(y => y.ApprenticeshipIncentiveId == incentive.Id), It.Is<TimeSpan>(y => y.TotalHours == 1), It.IsAny<CancellationToken>()));
+            _mockIncentiveDomainRespository.Verify(x => x.Find(It.IsAny<Guid>()), Times.Never);
         }
 
         [Test]

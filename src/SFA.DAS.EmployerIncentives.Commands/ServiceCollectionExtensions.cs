@@ -34,7 +34,7 @@ using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
+using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using SFA.DAS.HashingService;
 using SFA.DAS.Http;
 using SFA.DAS.Http.TokenGenerators;
@@ -86,6 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
+            serviceCollection.AddScoped<IScheduledCommandPublisher, ScheduledCommandPublisher>();
 
             serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, obfuscateSensitiveData) =>
                 new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData, s.GetRequiredService<ILogger<BusinessCentralFinancePaymentsService>>()));
