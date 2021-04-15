@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
             _startDate = DateTime.Now.Date;
             _censusDate = _startDate.AddDays(17);
 
-            _collectionPeriod = new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddMonths(-2), _censusDate, (short)DateTime.Now.Year, true);
+            _collectionPeriod = new CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddMonths(-2), _censusDate, (short)DateTime.Now.Year, true, false);
 
             _learningPeriod3 = new LearningPeriod(_startDate, null);
             _learningPeriods = new List<LearningPeriod>()

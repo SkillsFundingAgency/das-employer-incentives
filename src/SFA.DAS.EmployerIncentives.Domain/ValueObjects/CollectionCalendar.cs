@@ -65,6 +65,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             collectionPeriodToActivate.SetActive(true);
         }
 
+        public void SetActivePeriodToInProgress()
+        {
+            foreach (var collectionCalendarPeriod in _collectionPeriods)
+            {
+                collectionCalendarPeriod.SetPeriodEndInProgress(false);
+            }
+
+            var activePeriod = GetActivePeriod();
+            activePeriod.SetPeriodEndInProgress(true);
+        }
+
         public ReadOnlyCollection<CollectionPeriod> GetAllPeriods()
         {
             return new ReadOnlyCollection<CollectionPeriod>(_collectionPeriods.ToList());

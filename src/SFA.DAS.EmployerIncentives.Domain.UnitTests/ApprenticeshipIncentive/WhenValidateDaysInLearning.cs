@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionYear = _fixture.Create<short>();
             _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true);
+            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true, false);
 
             var startDate = DateTime.Now.Date;
             var dueDate = startDate.AddDays(90).Date;

@@ -25,6 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             if (!context.IsReplaying)
                 _logger.LogInformation("[IncentivePaymentOrchestrator] Incentive Payment process started for collection period {collectionPeriod}", collectionPeriod);
 
+            context.SetCustomStatus("SettingActivePeriodToInProgress");
+            await context.CallActivityAsync(nameof(SetActivePeriodToInProgress), null);
+
             context.SetCustomStatus("GettingPayableLegalEntities");
             var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);            
 

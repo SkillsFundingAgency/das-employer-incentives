@@ -16,5 +16,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public DateTime CensusDate { get; set; }
         public string AcademicYear { get; set; }
         public bool Active { get; set; }
+        public bool PeriodEndInProgress { get; set; }
     }
 }

@@ -67,6 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
             {
                 _fixture.Build<CollectionPeriod>()
                     .With(x => x.Active, false)
+                    .With(x => x.PeriodEndInProgress, false)
                     .With(x => x.PeriodNumber, 1)
                     .With(x => x.CalendarMonth, 8)
                     .With(x => x.CalendarYear, 2020)
@@ -76,6 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
                     .Create(),
                 _fixture.Build<CollectionPeriod>()
                     .With(x => x.Active, true)
+                    .With(x => x.PeriodEndInProgress, true)
                     .With(x => x.PeriodNumber, 2)
                     .With(x => x.CalendarMonth, 9)
                     .With(x => x.CalendarYear, 2020)
@@ -85,6 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
                     .Create(),
                 _fixture.Build<CollectionPeriod>()
                     .With(x => x.Active, false)
+                    .With(x => x.PeriodEndInProgress, false)
                     .With(x => x.PeriodNumber, 3)
                     .With(x => x.CalendarMonth, 10)
                     .With(x => x.CalendarYear, 2020)

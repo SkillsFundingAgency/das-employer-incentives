@@ -21,12 +21,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("ValidatePayments")]
+    [NUnit.Framework.CategoryAttribute("activeCalendarPeriod")]
     public partial class ValidatePaymentsFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = ((string[])(null));
+        private string[] _featureTags = new string[] {
+                "activeCalendarPeriod"};
         
 #line 1 "ValidatePayments.feature"
 #line hidden
@@ -36,7 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ValidatePayments", "\tIn order to make employer incentives payments\r\n\tAs a employer incentives service" +
-                    "\r\n\tI want to be validate and submit payment requests", ProgrammingLanguage.CSharp, ((string[])(null)));
+                    "\r\n\tI want to be validate and submit payment requests", ProgrammingLanguage.CSharp, new string[] {
+                        "activeCalendarPeriod"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -81,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When all validation checks are successful", null, tagsOfScenario, argumentsOfScenario);
-#line 6
+#line 7
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -101,25 +104,25 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 7
+#line 8
  testRunner.Given("there are pending payments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 8
+#line 9
  testRunner.And("no validations steps will fail", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 9
+#line 10
  testRunner.When("the payment process is run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 10
+#line 11
  testRunner.Then("successful validation results are recorded", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 11
+#line 12
  testRunner.And("payment records are created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 12
+#line 13
  testRunner.And("pending payments are marked as paid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
+#line 14
  testRunner.And("future payments are not marked as paid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -133,7 +136,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When no ILR submission found", null, tagsOfScenario, argumentsOfScenario);
-#line 15
+#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -153,25 +156,25 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 16
+#line 17
  testRunner.Given("there are pending payments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 17
+#line 18
  testRunner.And("the ILR submission validation step will fail", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 18
+#line 19
  testRunner.When("the payment process is run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 19
+#line 20
  testRunner.Then("the ILR Submission check will have a failed validation result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 20
+#line 21
  testRunner.And("no further ILR validation is performed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 21
+#line 22
  testRunner.And("no payment records are created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
+#line 23
  testRunner.And("pending payments are not marked as paid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -185,7 +188,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When there is a sent payment clawback", null, tagsOfScenario, argumentsOfScenario);
-#line 24
+#line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -205,16 +208,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 25
+#line 26
  testRunner.Given("there are pending payments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 26
+#line 27
  testRunner.Given("there are payments with sent clawbacks", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 27
+#line 28
  testRunner.When("the payment process is run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 28
+#line 29
  testRunner.Then("successful validation results are recorded", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -236,7 +239,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("ValidationStep", validationStep);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When at least one validation check fails", null, tagsOfScenario, argumentsOfScenario);
-#line 30
+#line 31
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -256,22 +259,22 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 31
+#line 32
  testRunner.Given("there are pending payments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 32
+#line 33
  testRunner.And(string.Format("the \'{0}\' will fail", validationStep), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 33
+#line 34
  testRunner.When("the payment process is run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 34
+#line 35
  testRunner.Then(string.Format("the \'{0}\' will have a failed validation result", validationStep), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 35
+#line 36
  testRunner.And("no payment records are created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 36
+#line 37
  testRunner.And("pending payments are not marked as paid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
