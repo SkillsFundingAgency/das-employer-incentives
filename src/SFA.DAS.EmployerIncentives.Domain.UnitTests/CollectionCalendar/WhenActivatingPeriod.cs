@@ -54,7 +54,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeFalse();
             periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeTrue();
             periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
-            periods.Count(x => x.Active == true).Should().Be(1);
+            periods.Count(x => x.Active).Should().Be(1);
+        }
+
+        [Test]
+        public void Then_the_period_in_progress_is_false_when_the_active_period_is_changed()
+        {
+            // Arrange / Act
+            _collectionPeriods.Add(new CollectionPeriod(4, (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), 2021, false, true));
+            var period = new CollectionPeriod(2, 2021);
+            _sut.SetActive(period);            
+
+            var periods = _sut.GetAllPeriods().ToList();
+
+            periods.FirstOrDefault(x => x.PeriodNumber == 1).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.PeriodNumber == 2).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.PeriodNumber == 3).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.PeriodNumber == 4).PeriodEndInProgress.Should().BeFalse();
+            periods.Count(x => x.Active).Should().Be(1);
         }
 
         [Test]
@@ -69,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeTrue();
             periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeFalse();
             periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
-            periods.Count(x => x.Active == true).Should().Be(1);
+            periods.Count(x => x.Active).Should().Be(1);
         }      
     }
 }

@@ -172,12 +172,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PendingPaymentId = x.PendingPaymentId
             }).ToList();
         }
-
         private static Domain.ValueObjects.CollectionPeriod Map(this CollectionPeriod model)
         {
             if (model != null)
             {
-                return new Domain.ValueObjects.CollectionPeriod(
+                var period = new Domain.ValueObjects.CollectionPeriod(
                     model.PeriodNumber,
                     model.CalendarMonth,
                     model.CalendarYear,
@@ -186,6 +185,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     Convert.ToInt16(model.AcademicYear),
                     model.Active,
                     model.PeriodEndInProgress);
+           
+                if (model.MonthEndProcessingCompleteUTC.HasValue)
+                {
+                    period.SetMonthEndProcessingCompletedDate(model.MonthEndProcessingCompleteUTC.Value);
+                }
+
+                return period;
             }
 
             return null;
@@ -193,20 +199,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
         internal static ICollection<Domain.ValueObjects.CollectionPeriod> Map(this ICollection<CollectionPeriod> models)
         {
-            return models.Select(x =>
-                new Domain.ValueObjects.CollectionPeriod(
-                    x.PeriodNumber,
-                    x.CalendarMonth,
-                    x.CalendarYear,
-                    x.EIScheduledOpenDateUTC,
-                    x.CensusDate,
-                    Convert.ToInt16(x.AcademicYear),
-                    x.Active,
-                    x.PeriodEndInProgress)
-            ).ToList();
+            return models.Select(x => x.Map()).ToList();
         }
 
-        internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
+       internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
         {
             return models.Select(x =>
                 new CollectionPeriod
@@ -218,7 +214,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     CensusDate = x.CensusDate,
                     EIScheduledOpenDateUTC = x.OpenDate,
                     PeriodNumber = x.PeriodNumber,
-                    PeriodEndInProgress = x.PeriodEndInProgress
+                    PeriodEndInProgress = x.PeriodEndInProgress,
+                    MonthEndProcessingCompleteUTC = x.MonthEndProcessingCompletedDate
                 }).ToList();
         }
 

@@ -32,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public short AcademicYear { get; }
         public bool Active { get; private set; }
         public bool PeriodEndInProgress { get; private set; }
+        public DateTime? MonthEndProcessingCompletedDate { get; private set; }
 
         public void SetActive(bool active)
         {
@@ -43,6 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             PeriodEndInProgress = periodEndInProgress;
         }
 
+        public void SetMonthEndProcessingCompletedDate(DateTime processingCompletedDate)
+        {
+            MonthEndProcessingCompletedDate = processingCompletedDate;
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return PeriodNumber;
@@ -52,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             yield return CensusDate;
             yield return AcademicYear;
             yield return Active;
+            yield return MonthEndProcessingCompletedDate;
         }
     }
 }

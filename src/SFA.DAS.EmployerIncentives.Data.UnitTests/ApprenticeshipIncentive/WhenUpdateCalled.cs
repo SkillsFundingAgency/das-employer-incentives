@@ -154,6 +154,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .With(x => x.EIScheduledOpenDateUTC, new DateTime(2020, 9, 6))
                 .With(x => x.CensusDate, new DateTime(2020, 9, 30))
                 .With(x => x.AcademicYear, "2021")
+                .Without(x => x.MonthEndProcessingCompleteUTC)
                 .Create();
             await _dbContext.AddAsync(_collectionPeriod);
         }
