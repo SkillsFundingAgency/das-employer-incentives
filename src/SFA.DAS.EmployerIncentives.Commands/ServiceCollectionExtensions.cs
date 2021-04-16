@@ -87,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
 
             serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, obfuscateSensitiveData) =>
-                new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData));
+                new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData, s.GetRequiredService<ILogger<BusinessCentralFinancePaymentsService>>()));
 
             return serviceCollection;
         }
@@ -133,8 +133,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.Decorate<ILearnerDomainRepository, LearnerDomainRepositoryWithLogging>();
 
             serviceCollection.AddScoped<IIncentiveApplicationStatusAuditDataRepository, IncentiveApplicationStatusAuditDataRepository>();
+            serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
             serviceCollection.AddScoped<IChangeOfCircumstancesDataRepository, ChangeOfCircumstancesDataRepository>();            
 
+            serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
+            
             return serviceCollection;
         }
 

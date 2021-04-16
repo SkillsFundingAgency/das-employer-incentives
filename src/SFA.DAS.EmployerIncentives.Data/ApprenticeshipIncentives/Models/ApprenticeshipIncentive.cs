@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 {
@@ -36,6 +37,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<ClawbackPayment> ClawbackPayments { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public IncentiveStatus Status { get; set; }
 
         public ApprenticeshipIncentive()
         {

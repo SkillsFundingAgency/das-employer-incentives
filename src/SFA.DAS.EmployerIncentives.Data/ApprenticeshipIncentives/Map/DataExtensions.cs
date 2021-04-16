@@ -32,7 +32,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PausePayments = model.PausePayments,
                 SubmittedDate = model.SubmittedDate,
                 SubmittedByEmail = model.SubmittedByEmail,
-                CourseName = model.Apprenticeship.CourseName
+                CourseName = model.Apprenticeship.CourseName,
+                Status = model.Status
             };
         }
 
@@ -67,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 HasPossibleChangeOfCircumstances = entity.HasPossibleChangeOfCircumstances,
                 PausePayments = entity.PausePayments,
                 SubmittedDate = entity.SubmittedDate,
-                SubmittedByEmail = entity.SubmittedByEmail
+                SubmittedByEmail = entity.SubmittedByEmail,
+                Status = entity.Status
             };
         }
 
@@ -97,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return models.Select(x => new PendingPaymentValidationResult
             {
                 Id = x.Id,
-                CreatedDateUtc = DateTime.UtcNow,
+                CreatedDateUtc = x.CreatedDateUtc,
                 PeriodNumber = x.CollectionPeriod.PeriodNumber,
                 PaymentYear = x.CollectionPeriod.AcademicYear,
                 Result = x.Result,
@@ -132,7 +134,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Id = x.Id,
                 CollectionPeriod = collectionPeriods.SingleOrDefault(p => Convert.ToInt16(p.AcademicYear) == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
                 Result = x.Result,
-                Step = x.Step
+                Step = x.Step,
+                CreatedDateUtc = x.CreatedDateUtc
             }).ToList();
         }
         private static ICollection<Payment> Map(this ICollection<PaymentModel> models)
@@ -339,7 +342,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PendingPaymentId = x.PendingPaymentId,
                 DateClawbackSent = x.DateClawbackSent,
                 CollectionPeriod = x.CollectionPeriod,
-                CollectionPeriodYear = x.CollectionPeriodYear               
+                CollectionPeriodYear = x.CollectionPeriodYear
             }).ToList();
         }
 
@@ -354,6 +357,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 NewValue = model.NewValue,
                 ChangedDate = model.ChangedDate
             };
-        }
+        }        
     }
 }

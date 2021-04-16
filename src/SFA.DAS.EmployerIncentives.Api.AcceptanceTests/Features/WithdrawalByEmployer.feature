@@ -2,6 +2,7 @@
 @api
 @domainMessageHandlers
 @messageBus
+@activeCalendarPeriod
 Feature: WithdrawalByEmployer
 	In order to handle an Employer withdrawing an apprenticeship from the incentive scheme
 	As the employer incentive sheme
@@ -22,7 +23,12 @@ Scenario: Employer withdrawal removes incentive after an apprenticeship applicat
 	When the apprenticeship application is withdrawn from the scheme
 	Then the apprenticeship incentive and it's pending payments are removed from the system
 
-Scenario: cannot withdraw an application that has been submitted and the incentives has had payments
-	Given an incentive application has been made, submitted and has payments	
+Scenario: Employer withdrawal for an apprenticeship that has paid payments (earnings)
+	Given an apprenticeship incentive with paid payments exists as a result of an incentive application
 	When the apprenticeship application is withdrawn from the scheme
-	Then an error is returned
+	Then clawbacks are created for the apprenticeship incentive payments and it's pending payments are archived
+
+Scenario: Employer withdrawal for an apprenticeship that has a clawed back paid payment (earnings)
+	Given an apprenticeship incentive with a clawedback paid payment exists as a result of an incentive application
+	When the apprenticeship application is withdrawn from the scheme
+	Then the pending payments are archived

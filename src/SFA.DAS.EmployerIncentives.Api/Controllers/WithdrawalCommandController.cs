@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
-using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.UlnHasPayments;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,14 +11,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
     [ApiController]
     public class WithdrawalCommandController : ApiCommandControllerBase
-    {
-        private readonly IQueryDispatcher _queryDispatcher;
+    {   
 
         public WithdrawalCommandController(
-            ICommandDispatcher commandDispatcher,
-            IQueryDispatcher queryDispatcher) : base(commandDispatcher)
+            ICommandDispatcher commandDispatcher) : base(commandDispatcher)
         {
-            _queryDispatcher = queryDispatcher;
         }
 
         [HttpPost("/withdrawals")]
@@ -28,11 +23,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> WithdrawalIncentiveApplication([FromBody] WithdrawApplicationRequest request)
         {            
-            if (await HasPayments(request.AccountLegalEntityId, request.ULN))
-            {
-                return BadRequest(new { Error = "Cannot withdraw an application that has been submitted and has received payments" });
-            }
-
             if (request.WithdrawalType == WithdrawalType.Employer)
             {
                 await SendCommandAsync(
@@ -60,20 +50,5 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 return BadRequest(new { Error = "Invalid WithdrawalType of {request.WithdrawalType} passed in" });
             }
         }       
-
-        private async Task<bool> HasPayments(long accountLegalEntityId, long uln)
-        {
-            var hasPaymentResponse = await _queryDispatcher
-                .Send<UlnHasPaymentsRequest, UlnHasPaymentsResponse>(
-                 new UlnHasPaymentsRequest(accountLegalEntityId, uln)
-                 );
-            
-            if (hasPaymentResponse.HasPayments)
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 }

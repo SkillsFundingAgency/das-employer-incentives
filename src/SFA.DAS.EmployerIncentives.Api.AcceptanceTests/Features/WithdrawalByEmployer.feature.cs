@@ -25,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.CategoryAttribute("api")]
     [NUnit.Framework.CategoryAttribute("domainMessageHandlers")]
     [NUnit.Framework.CategoryAttribute("messageBus")]
+    [NUnit.Framework.CategoryAttribute("activeCalendarPeriod")]
     public partial class WithdrawalByEmployerFeature
     {
         
@@ -34,7 +35,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "database",
                 "api",
                 "domainMessageHandlers",
-                "messageBus"};
+                "messageBus",
+                "activeCalendarPeriod"};
         
 #line 1 "WithdrawalByEmployer.feature"
 #line hidden
@@ -49,7 +51,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                         "database",
                         "api",
                         "domainMessageHandlers",
-                        "messageBus"});
+                        "messageBus",
+                        "activeCalendarPeriod"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -94,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawal status set against an apprenticeship in an application", null, tagsOfScenario, argumentsOfScenario);
-#line 10
+#line 11
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -114,13 +117,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 11
+#line 12
  testRunner.Given("an incentive application has been made without being submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 12
+#line 13
  testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 13
+#line 14
  testRunner.Then("the incentive application status is updated to indicate the employer withdrawal", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -136,7 +139,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Withdrawal status set against a ULN with multiple apprenticeships in applications" +
                     "", null, tagsOfScenario, argumentsOfScenario);
-#line 15
+#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -156,14 +159,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 16
+#line 17
  testRunner.Given("multiple incentive applications have been made for the same ULN without being sub" +
                         "mitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 17
+#line 18
  testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 18
+#line 19
  testRunner.Then("each incentive application status is updated to indicate the employer withdrawal", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -179,7 +182,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawal removes incentive after an apprenticeship application has bee" +
                     "n submitted", null, tagsOfScenario, argumentsOfScenario);
-#line 20
+#line 21
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -199,14 +202,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 21
+#line 22
  testRunner.Given("an apprenticeship incentive with pending payments exists as a result of an incent" +
                         "ive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 22
+#line 23
  testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 23
+#line 24
  testRunner.Then("the apprenticeship incentive and it\'s pending payments are removed from the syste" +
                         "m", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -215,15 +218,13 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("cannot withdraw an application that has been submitted and the incentives has had" +
-            " payments")]
-        public virtual void CannotWithdrawAnApplicationThatHasBeenSubmittedAndTheIncentivesHasHadPayments()
+        [NUnit.Framework.DescriptionAttribute("Employer withdrawal for an apprenticeship that has paid payments (earnings)")]
+        public virtual void EmployerWithdrawalForAnApprenticeshipThatHasPaidPaymentsEarnings()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot withdraw an application that has been submitted and the incentives has had" +
-                    " payments", null, tagsOfScenario, argumentsOfScenario);
-#line 25
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawal for an apprenticeship that has paid payments (earnings)", null, tagsOfScenario, argumentsOfScenario);
+#line 26
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -243,14 +244,59 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 26
- testRunner.Given("an incentive application has been made, submitted and has payments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
 #line 27
- testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Given("an apprenticeship incentive with paid payments exists as a result of an incentive" +
+                        " application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 28
- testRunner.Then("an error is returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 29
+ testRunner.Then("clawbacks are created for the apprenticeship incentive payments and it\'s pending " +
+                        "payments are archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employer withdrawal for an apprenticeship that has a clawed back paid payment (ea" +
+            "rnings)")]
+        public virtual void EmployerWithdrawalForAnApprenticeshipThatHasAClawedBackPaidPaymentEarnings()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawal for an apprenticeship that has a clawed back paid payment (ea" +
+                    "rnings)", null, tagsOfScenario, argumentsOfScenario);
+#line 31
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 32
+ testRunner.Given("an apprenticeship incentive with a clawedback paid payment exists as a result of " +
+                        "an incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 33
+ testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 34
+ testRunner.Then("the pending payments are archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

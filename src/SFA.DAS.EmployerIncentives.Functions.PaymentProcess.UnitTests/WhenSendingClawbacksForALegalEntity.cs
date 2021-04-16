@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                     It.Is<SendClawbacksCommand>(p =>
                         p.AccountLegalEntityId == input.AccountLegalEntityId), CancellationToken.None), Times.Once);
 
-            datePaid.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            datePaid.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         }
     }
 }

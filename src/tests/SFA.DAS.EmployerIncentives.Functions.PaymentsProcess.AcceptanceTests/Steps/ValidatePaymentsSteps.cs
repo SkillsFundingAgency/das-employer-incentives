@@ -12,6 +12,7 @@ using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -107,6 +108,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
             results.Should().HaveCount(2);
             results.All(r => !r.Result).Should().BeTrue($"{step} validation step should have failed");
+            results.All(r => r.CreatedDateUtc == DateTime.Today).Should().BeTrue();
         }
 
         [Then(@"successful validation results are recorded")]
