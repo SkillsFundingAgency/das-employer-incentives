@@ -32,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
+        public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail)
         {
@@ -111,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (ExistingPendingPaymentHasBeenPaid(existingPendingPayment))
             {
-                if (!existingPendingPayment.RequiresNewPayment(pendingPayment, Model.BreakInLearnings.ToList().AsReadOnly()))
+                if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
                 {
                     return;
                 }
@@ -124,6 +125,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             RemoveUnpaidPaymentIfExists(existingPendingPayment);
             if (!existingPendingPayment.Equals(pendingPayment))
             {
+                if(!existingPendingPayment.RequiresNewPaymentAfterBreakInLearning(Model.BreakInLearnings))
+                {
+                    return;
+                }
+
                 var existingPendingPaymentModel = existingPendingPayment.GetModel();
                 if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
                 {
@@ -256,10 +262,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);
                 }
 
-                
-                
-                await SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus, collectionCalendarService);
                 SetBreakInLearningDayCount(learner.GetBreakInLearningDayCount());
+                await SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus, collectionCalendarService);                
             }
 
             SetHasPossibleChangeOfCircumstances(false);

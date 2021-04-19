@@ -3,13 +3,15 @@ using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
     [TestFixture]
-    public class WhenRequiresNewPayment
+    public class WhenRequiresNewPaymentAfterBreakInLearning
     {
         private PendingPayment _sut;
         private PendingPaymentModel _sutModel;
@@ -47,58 +49,65 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_is_false_when_there_are_no_changes()
+        public void Then_is_false_when_due_date_is_on_start_date_of_a_resumed_break_from_learning()
         {
             // arrange            
+            var breakInLearning = new BreakInLearning(_sutModel.DueDate);
+            breakInLearning.SetEndDate(_sutModel.DueDate.AddDays(10));
+            var breakInLearnings = new List<BreakInLearning>()
+            {
+                breakInLearning
+            };
 
             // act
-            var result = _sut.RequiresNewPayment(_newPendingPayment);
+            var result = _sut.RequiresNewPaymentAfterBreakInLearning(breakInLearnings);
 
             // assert
             result.Should().BeFalse();
         }
 
         [Test]
-        public void Then_is_true_when_the_amount_change()
+        public void Then_is_false_when_due_date_is_before_start_date_of_a_resumed_break_from_learning()
         {
             // arrange            
-
-            _newPendingPaymentModel.Amount = _sut.Amount + 1;
-            _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
+            var breakInLearning = new BreakInLearning(_sutModel.DueDate.AddDays(1));
+            breakInLearning.SetEndDate(_sutModel.DueDate.AddDays(10));
+            var breakInLearnings = new List<BreakInLearning>()
+            {
+                breakInLearning
+            };
 
             // act
-            var result = _sut.RequiresNewPayment(_newPendingPayment);
+            var result = _sut.RequiresNewPaymentAfterBreakInLearning(breakInLearnings);
+
+            // assert
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_is_true_when_due_date_is_before_start_date_of_a_stopped_break_from_learning_and_no_other_change()
+        {
+            // arrange
+            var breakInLearnings = new List<BreakInLearning>()
+            {
+                new BreakInLearning(_sutModel.DueDate.AddDays(1))
+            };
+
+            // act
+            var result = _sut.RequiresNewPaymentAfterBreakInLearning(breakInLearnings);
 
             // assert
             result.Should().BeTrue();
         }
 
         [Test]
-        public void Then_is_true_when_the_period_changes()
+        public void Then_is_true_when_there_are_no_stopped_break_from_learnings_and_no_other_change()
         {
             // arrange            
-
-            _newPendingPaymentModel.PeriodNumber = (byte?)(_sut.PeriodNumber.Value + 1);
-            _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
+            var breakInLearnings = new List<BreakInLearning>();
 
             // act
-            var result = _sut.RequiresNewPayment(_newPendingPayment);
-
-            // assert
-            result.Should().BeTrue();
-        }
-        
-
-        [Test]
-        public void Then_is_true_when_the_payment_year_changes()
-        {
-            // arrange            
-
-            _newPendingPaymentModel.PaymentYear = (short?)(_sut.PaymentYear.Value + 1);
-            _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
-
-            // act
-            var result = _sut.RequiresNewPayment(_newPendingPayment);
+            var result = _sut.RequiresNewPaymentAfterBreakInLearning(breakInLearnings);
 
             // assert
             result.Should().BeTrue();

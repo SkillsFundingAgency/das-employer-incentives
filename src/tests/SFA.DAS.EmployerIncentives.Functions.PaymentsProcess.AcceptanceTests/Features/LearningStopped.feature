@@ -1,5 +1,4 @@
 ﻿@activeCalendarPeriod
-@activeCalendarPeriod
 Feature: LearningStopped
 	When the refreshed learner data contains a learning stopped change of circumstance
 	Then the apprenticeship incentive is updated to a stopped state
@@ -37,9 +36,3 @@ Scenario: Learner data contains a learning resumed change
 	And the resumed change of circumstance is saved
 	And the learner data resumed date is stored
 	And the learner resume break in learning is stored
-
-Scenario: A learning resumed change updated the pending payment due dates with the break in learning
-	Given an apprenticeship incentive exists that has stopped learning
-	And the learner data identifies the learner as in leaning with a break in learning
-	When the incentive learner data is refreshed
-	Then the pending payment due dates include the break in learning

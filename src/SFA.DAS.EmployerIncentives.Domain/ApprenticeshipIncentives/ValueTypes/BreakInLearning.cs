@@ -23,10 +23,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             EndDate = dateTime.Date;
         }
 
-        public bool IsBreakInLearning(DateTime dateTime)
-        {
-            return StartDate <= dateTime.Date && dateTime.Date <= (EndDate ?? dateTime.Date);
-        }
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return StartDate;
