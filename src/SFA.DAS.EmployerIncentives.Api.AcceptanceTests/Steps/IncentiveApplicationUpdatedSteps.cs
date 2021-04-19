@@ -10,6 +10,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions.Equivalency;
+using Microsoft.CodeAnalysis.Options;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -32,6 +34,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive()
         {
             _createApplicationRequest = Fixture.Create<CreateIncentiveApplicationRequest>();
+            var uln = 10000;
+            foreach (var apprentice in _createApplicationRequest.Apprenticeships)
+            {
+                apprentice.Selected = true;
+                apprentice.ULN = uln;
+                uln++;
+            }
             const string url = "applications";
             _response = await EmployerIncentiveApi.Post(url, _createApplicationRequest);
         }
@@ -45,6 +54,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 Apprenticeships = Fixture.CreateMany<IncentiveApplicationApprenticeshipDto>(4),
                 AccountId = _createApplicationRequest.AccountId,
             };
+            var uln = 10000;
+            foreach (var apprentice in _updateApplicationRequest.Apprenticeships)
+            {
+                apprentice.Selected = true;
+                apprentice.ULN = uln;
+                uln++;
+            }
             _updateApplicationRequest.Apprenticeships.AddItem(_createApplicationRequest.Apprenticeships.First());
 
             var url = $"applications/{_updateApplicationRequest.IncentiveApplicationId}";
@@ -60,8 +76,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var query = $"SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = '{ _updateApplicationRequest.IncentiveApplicationId}'";
             var apprenticeships = dbConnection.Query<IncentiveApplicationApprenticeship>(query).ToList();
 
-            apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships, opts => opts.Excluding(x => x.PlannedStartDate));
+            apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships, ExcludeProperties);
         }
 
+        private EquivalencyAssertionOptions<IncentiveApplicationApprenticeshipDto> ExcludeProperties(EquivalencyAssertionOptions<IncentiveApplicationApprenticeshipDto> options)
+        {
+            options.Excluding(x => x.PlannedStartDate);
+            options.Excluding(x => x.Selected);
+
+            return options;
+        }
     }
 }

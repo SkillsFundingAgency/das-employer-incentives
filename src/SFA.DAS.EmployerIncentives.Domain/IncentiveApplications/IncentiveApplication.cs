@@ -73,6 +73,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
+        public void AddApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
+        {
+            foreach (var a in apprenticeships)
+            {
+                AddApprenticeship(a);
+            }
+        }
+
+        public void RemoveApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
+        {
+            foreach (var a in apprenticeships)
+            {
+                RemoveApprenticeship(a);
+            }
+        }
+
         public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
         {
             var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
@@ -107,8 +123,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
             apprenticeship.SetPlannedStartDate(endOfStartMonth);
+            var existingApprenticeship = _apprenticeships.FirstOrDefault(x => x.ULN == apprenticeship.ULN);
+            if (existingApprenticeship != null)
+            {
+                RemoveApprenticeship(apprenticeship);
+            }
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
+
+        }
+
+        private void RemoveApprenticeship(Apprenticeship apprenticeship)
+        {
+            var apprenticeshipToRemove = _apprenticeships.FirstOrDefault(x => x.ULN == apprenticeship.ULN);
+            _apprenticeships.Remove(apprenticeshipToRemove);
+            var modelToRemove = Model.ApprenticeshipModels.FirstOrDefault(x => x.ULN == apprenticeship.ULN);
+            Model.ApprenticeshipModels.Remove(modelToRemove);
         }
     }
 }

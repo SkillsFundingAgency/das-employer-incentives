@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System.Linq;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Extensions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
@@ -21,8 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
         public async Task Handle(UpdateIncentiveApplicationCommand command, CancellationToken cancellationToken = default)
         {
             var application = await _domainRepository.Find(command.IncentiveApplicationId);
-            application.SetApprenticeships(command.Apprenticeships.ToEntities(_domainFactory));
-
+            application.AddApprenticeships(command.Apprenticeships.Where(x => x.Selected).ToEntities(_domainFactory));
+            application.RemoveApprenticeships(command.Apprenticeships.Where(x => !x.Selected).ToEntities(_domainFactory));
             await _domainRepository.Save(application);
         }
     }
