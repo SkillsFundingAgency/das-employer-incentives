@@ -23,11 +23,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
                 return Task.FromResult(Enumerable.Empty<Domain.ValueObjects.IncentivePaymentProfile>());
             }
             return Task.FromResult(_applicationSettings.IncentivePaymentProfiles.Select(x =>
-                new Domain.ValueObjects.IncentivePaymentProfile(x.IncentiveType,
+                new Domain.ValueObjects.IncentivePaymentProfile(
+                    x.IncentiveType,
+                    x.IncentivePhase,
+                    x.MinRequiredAgreementVersion,
+                    x.EligibleApplicationDates.Start,
+                    x.EligibleApplicationDates.End,
+                    x.EligibleEmploymentDates.Start,
+                    x.EligibleEmploymentDates.End,
+                    x.EligibleTrainingDates.Start,
+                    x.EligibleTrainingDates.End,
                     MapToDomainPaymentProfiles(x.PaymentProfiles).ToList())));
         }
 
-        private IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(List<Infrastructure.Configuration.PaymentProfile> paymentProfiles)
+        private static IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(IReadOnlyCollection<PaymentProfile> paymentProfiles)
         {
             if (paymentProfiles == null)
             {

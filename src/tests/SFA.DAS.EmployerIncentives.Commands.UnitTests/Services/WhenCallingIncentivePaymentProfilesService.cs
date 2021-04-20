@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -27,14 +28,24 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
                 {
                     IncentiveType = IncentiveType.TwentyFiveOrOverIncentive,
                     PaymentProfiles = new List<PaymentProfile>
-                        {new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 90}}
+                        {new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 90}},
+                    IncentivePhase = IncentivePhase.Phase1_0,
+                    EligibleApplicationDates= (new DateTime(2020,8,1), new DateTime(2021,5,31)),
+                    EligibleTrainingDates= (new DateTime(2020,7,1), new DateTime(2021,6,31)),
+                    EligibleEmploymentDates= (new DateTime(2020,6,1), new DateTime(2021,7,31)),
+                    MinRequiredAgreementVersion = 4
                 },
                 new IncentivePaymentProfile
                 {
                     IncentiveType = IncentiveType.UnderTwentyFiveIncentive,
                     PaymentProfiles = new List<PaymentProfile>
-                        {new PaymentProfile {AmountPayable = 1500, DaysAfterApprenticeshipStart = 90}}
-                },
+                        {new PaymentProfile {AmountPayable = 1500, DaysAfterApprenticeshipStart = 90}},
+                    IncentivePhase = IncentivePhase.Phase2_0,
+                    EligibleApplicationDates= (new DateTime(2020,9,1), new DateTime(2021,6,31)),
+                    EligibleTrainingDates= (new DateTime(2020,10,1), new DateTime(2021,7,31)),
+                    EligibleEmploymentDates= (new DateTime(2020,11,1), new DateTime(2021,8,31)),
+                    MinRequiredAgreementVersion = 5
+                }
             };
 
             _mockApplicationSettings = new Mock<IOptions<ApplicationSettings>>();
@@ -46,16 +57,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
         [Test]
         public async Task then_config_settings_should_map_to_domain_values()
         {
-            var result = (await _sut.Get()).ToList();
+            List<Domain.ValueObjects.IncentivePaymentProfile> result = (await _sut.Get()).ToList();
 
-            result.Count.Should().Be(2);
-            result[0].IncentiveType.Should().Be(_incentivePaymentProfiles[0].IncentiveType);
-            result[0].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].AmountPayable);
-            result[0].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].DaysAfterApprenticeshipStart);
 
-            result[1].IncentiveType.Should().Be(_incentivePaymentProfiles[1].IncentiveType);
-            result[1].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].AmountPayable);
-            result[1].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].DaysAfterApprenticeshipStart);
+            result.Should().BeEquivalentTo(_incentivePaymentProfiles);
+
+        //    result.Count.Should().Be(2);
+        //    result[0].IncentiveType.Should().Be(_incentivePaymentProfiles[0].IncentiveType);
+        //    result[0].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].AmountPayable);
+        //    result[0].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].DaysAfterApprenticeshipStart);
+        //    result[0].IncentivePhase.Should().Be(_incentivePaymentProfiles[0].IncentivePhase);
+        //    result[0].MinRequiredAgreementVersion.Should().Be(_incentivePaymentProfiles[0].MinRequiredAgreementVersion);
+
+        //    result[1].IncentiveType.Should().Be(_incentivePaymentProfiles[1].IncentiveType);
+        //    result[1].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].AmountPayable);
+        //    result[1].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].DaysAfterApprenticeshipStart);
         }
     }
 }

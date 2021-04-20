@@ -60,8 +60,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _paymentProfiles = new List<IncentivePaymentProfile>()
             {
-                new IncentivePaymentProfile(Enums.IncentiveType.UnderTwentyFiveIncentive, under25PaymentProfiles),
-                new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, over25PaymentProfiles)
+                new IncentivePaymentProfile(IncentiveType.UnderTwentyFiveIncentive,
+                    IncentivePhase.Phase1_0,
+                    4,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    under25PaymentProfiles),
+                new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
+                    IncentivePhase.Phase1_1,
+                    5,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    over25PaymentProfiles)
             };
 
             _collectionPeriods = new List<CollectionPeriod>()

@@ -35,10 +35,27 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             _paymentProfileService.Setup(x => x.Get()).ReturnsAsync(new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
+                    IncentivePhase.Phase1_0,
+                    4,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
                     new List<PaymentProfile>
-                        {new PaymentProfile(90, 1000), new PaymentProfile(365, 1000)}),
+                        {new PaymentProfile(90, 1000), new PaymentProfile(365, 1000)}
+                ),
 
                 new IncentivePaymentProfile(IncentiveType.UnderTwentyFiveIncentive,
+                    IncentivePhase.Phase1_1,
+                    5,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
                     new List<PaymentProfile>
                         {new PaymentProfile(90, 1200), new PaymentProfile(365, 1200)})
             });

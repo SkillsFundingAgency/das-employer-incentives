@@ -131,7 +131,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentiveType.TwentyFiveOrOverIncentive, new List<PaymentProfile>
+                    IncentiveType.TwentyFiveOrOverIncentive,
+                    IncentivePhase.Phase1_0,
+                    4,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    new List<PaymentProfile>
                     {
                         new PaymentProfile(10, 100),
                         new PaymentProfile(100, 1000)
