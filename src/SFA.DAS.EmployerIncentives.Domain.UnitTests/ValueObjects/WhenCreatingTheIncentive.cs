@@ -11,37 +11,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     [TestFixture]
     public class WhenCreatingTheIncentive
     {
-        private List<IncentivePaymentProfile> _incentivePaymentProfiles;
+        private IncentivesConfiguration _incentivePaymentProfiles;
 
         [SetUp]
         public void SetUp()
         {
-            _incentivePaymentProfiles = new List<IncentivePaymentProfile>
+            var profiles = new List<IncentivePaymentProfile>
             {
-                new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
+                new IncentivePaymentProfile(
                     IncentivePhase.Phase1_0,
                     4,
                     DateTime.MinValue,
                     DateTime.MaxValue,
                     DateTime.MinValue,
                     DateTime.MaxValue,
-                    DateTime.MinValue,
-                    DateTime.MaxValue,
-                    new List<PaymentProfile>
-                        {new PaymentProfile(90, 1000), new PaymentProfile(365, 1000)}),
 
-                new IncentivePaymentProfile(IncentiveType.UnderTwentyFiveIncentive,
-                    IncentivePhase.Phase1_1,
-                    5,
-                    DateTime.MinValue,
-                    DateTime.MaxValue,
-                    DateTime.MinValue,
-                    DateTime.MaxValue,
-                    DateTime.MinValue,
-                    DateTime.MaxValue,
                     new List<PaymentProfile>
-                        {new PaymentProfile(90, 1200), new PaymentProfile(365, 1200)})
-            };
+                        {
+                            new PaymentProfile(90, 1000, IncentiveType.UnderTwentyFiveIncentive), 
+                            new PaymentProfile(365, 1000, IncentiveType.UnderTwentyFiveIncentive),
+                            new PaymentProfile(90, 750, IncentiveType.TwentyFiveOrOverIncentive),
+                            new PaymentProfile(365, 750, IncentiveType.TwentyFiveOrOverIncentive)
+                        }),
+                   };
+
+            _incentivePaymentProfiles = new IncentivesConfiguration(profiles);
         }
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]

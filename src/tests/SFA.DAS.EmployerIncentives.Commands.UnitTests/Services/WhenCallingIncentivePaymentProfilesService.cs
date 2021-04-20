@@ -32,7 +32,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
                     IncentivePhase = IncentivePhase.Phase1_0,
                     EligibleApplicationDates= (new DateTime(2020,8,1), new DateTime(2021,5,31)),
                     EligibleTrainingDates= (new DateTime(2020,7,1), new DateTime(2021,6,31)),
-                    EligibleEmploymentDates= (new DateTime(2020,6,1), new DateTime(2021,7,31)),
                     MinRequiredAgreementVersion = 4
                 },
                 new IncentivePaymentProfile
@@ -43,7 +42,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
                     IncentivePhase = IncentivePhase.Phase2_0,
                     EligibleApplicationDates= (new DateTime(2020,9,1), new DateTime(2021,6,31)),
                     EligibleTrainingDates= (new DateTime(2020,10,1), new DateTime(2021,7,31)),
-                    EligibleEmploymentDates= (new DateTime(2020,11,1), new DateTime(2021,8,31)),
                     MinRequiredAgreementVersion = 5
                 }
             };
@@ -57,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
         [Test]
         public async Task then_config_settings_should_map_to_domain_values()
         {
-            List<Domain.ValueObjects.IncentivePaymentProfile> result = (await _sut.Get()).ToList();
+            var result = await _sut.Get();
 
 
             result.Should().BeEquivalentTo(_incentivePaymentProfiles);

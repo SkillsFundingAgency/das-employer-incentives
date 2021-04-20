@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using PaymentProfile = SFA.DAS.EmployerIncentives.Infrastructure.Configuration.PaymentProfile;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services
 {
@@ -16,33 +18,25 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
             _applicationSettings = applicationSettings.Value;
         }
 
-        public Task<IEnumerable<Domain.ValueObjects.IncentivePaymentProfile>> Get()
+        public Task<IncentivesConfiguration> Get()
         {
-            if (_applicationSettings?.IncentivePaymentProfiles == null)
-            {
-                return Task.FromResult(Enumerable.Empty<Domain.ValueObjects.IncentivePaymentProfile>());
-            }
-            return Task.FromResult(_applicationSettings.IncentivePaymentProfiles.Select(x =>
+            var profiles = _applicationSettings.IncentivePaymentProfiles.Select(x =>
                 new Domain.ValueObjects.IncentivePaymentProfile(
-                    x.IncentiveType,
                     x.IncentivePhase,
                     x.MinRequiredAgreementVersion,
                     x.EligibleApplicationDates.Start,
                     x.EligibleApplicationDates.End,
-                    x.EligibleEmploymentDates.Start,
-                    x.EligibleEmploymentDates.End,
                     x.EligibleTrainingDates.Start,
                     x.EligibleTrainingDates.End,
-                    MapToDomainPaymentProfiles(x.PaymentProfiles).ToList())));
+                    MapToDomainPaymentProfiles(x.PaymentProfiles).ToList()
+                    )).ToList();
+
+            return Task.FromResult(new IncentivesConfiguration(profiles));
         }
 
         private static IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(IReadOnlyCollection<PaymentProfile> paymentProfiles)
         {
-            if (paymentProfiles == null)
-            {
-                return Enumerable.Empty<Domain.ValueObjects.PaymentProfile>();
-            }
-            return paymentProfiles.Select(x => new Domain.ValueObjects.PaymentProfile(x.DaysAfterApprenticeshipStart, x.AmountPayable));
+            return paymentProfiles == null ? Enumerable.Empty<Domain.ValueObjects.PaymentProfile>() : paymentProfiles.Select(x => new Domain.ValueObjects.PaymentProfile(x.DaysAfterApprenticeshipStart, x.AmountPayable, x.IncentiveType));
         }
     }
 }

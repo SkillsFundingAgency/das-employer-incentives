@@ -45,25 +45,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentiveType.TwentyFiveOrOverIncentive,
                     IncentivePhase.Phase1_0,
                     4,
                     DateTime.MinValue,
                     DateTime.MaxValue,
                     DateTime.MinValue,
                     DateTime.MaxValue,
-                    DateTime.MinValue,
-                    DateTime.MaxValue,
                     new List<PaymentProfile>
                     {
-                        new PaymentProfile(10, 100),
-                        new PaymentProfile(100, 1000)
+                        new PaymentProfile(10, 100,IncentiveType.TwentyFiveOrOverIncentive),
+                        new PaymentProfile(100, 1000,IncentiveType.TwentyFiveOrOverIncentive)
                     })
             };
 
             _mockPaymentProfilesService
                .Setup(m => m.Get())
-               .ReturnsAsync(_paymentProfiles);
+               .ReturnsAsync(new IncentivesConfiguration(_paymentProfiles));
 
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
