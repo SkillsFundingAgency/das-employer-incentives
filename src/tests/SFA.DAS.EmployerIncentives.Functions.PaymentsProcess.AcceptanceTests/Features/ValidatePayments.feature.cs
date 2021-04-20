@@ -230,6 +230,7 @@ this.ScenarioInitialize(scenarioInfo);
         [NUnit.Framework.TestCaseAttribute("HasIlrSubmission", null)]
         [NUnit.Framework.TestCaseAttribute("HasDaysInLearning", null)]
         [NUnit.Framework.TestCaseAttribute("PaymentsNotPaused", null)]
+        [NUnit.Framework.TestCaseAttribute("HasSignedMinVersion", null)]
         public virtual void WhenAtLeastOneValidationCheckFails(string validationStep, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;

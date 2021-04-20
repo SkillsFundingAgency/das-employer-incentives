@@ -69,6 +69,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 case ValidationStep.PaymentsNotPaused:
                     _validatePaymentData.ApprenticeshipIncentiveModel.PausePayments = true;
                     break;
+                case ValidationStep.HasSignedMinVersion:
+                    _validatePaymentData.ApprenticeshipIncentiveModel.MinimumAgreementVersion = _validatePaymentData.AccountModel.SignedAgreementVersion + 1;
+                    break;
             }
 
             await _validatePaymentData.Create();
