@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using PaymentProfile = SFA.DAS.EmployerIncentives.Infrastructure.Configuration.PaymentProfile;
 
@@ -12,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
     public class IncentivePaymentProfilesService : IIncentivePaymentProfilesService
     {
         private readonly ApplicationSettings _applicationSettings;
+        private static readonly EarningType[] EarningTypes = { EarningType.FirstPayment, EarningType.SecondPayment };
 
         public IncentivePaymentProfilesService(IOptions<ApplicationSettings> applicationSettings)
         {
@@ -34,9 +36,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
             return Task.FromResult(new IncentivesConfiguration(profiles));
         }
 
-        private static IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(IReadOnlyCollection<PaymentProfile> paymentProfiles)
+        private static IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(IList<PaymentProfile> profiles)
         {
-            return paymentProfiles == null ? Enumerable.Empty<Domain.ValueObjects.PaymentProfile>() : paymentProfiles.Select(x => new Domain.ValueObjects.PaymentProfile(x.DaysAfterApprenticeshipStart, x.AmountPayable, x.IncentiveType));
+            var result = new List<Domain.ValueObjects.PaymentProfile>();
+            if (profiles == null) return result;
+
+            var incentives = profiles.OrderBy(x => x.DaysAfterApprenticeshipStart).GroupBy(x => x.IncentiveType);
+
+            foreach (var incentive in incentives)
+            {
+                result.AddRange(
+                    incentive.Select((profile, index) =>
+                        new Domain.ValueObjects.PaymentProfile(
+                            profile.DaysAfterApprenticeshipStart,
+                            profile.AmountPayable,
+                            profile.IncentiveType,
+                            EarningTypes[index])
+                    ));
+            }
+
+            return result;
         }
     }
 }

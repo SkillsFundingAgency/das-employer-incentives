@@ -17,18 +17,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         {
             var paymentProfilesPhase1 = new List<PaymentProfile>
             {
-                new PaymentProfile(90, 100, IncentiveType.UnderTwentyFiveIncentive),
-                new PaymentProfile(365, 300, IncentiveType.UnderTwentyFiveIncentive),
-                new PaymentProfile(90, 200, IncentiveType.TwentyFiveOrOverIncentive),
-                new PaymentProfile(365, 400, IncentiveType.TwentyFiveOrOverIncentive),
+                new PaymentProfile(90, 100, IncentiveType.UnderTwentyFiveIncentive, EarningType.FirstPayment),
+                new PaymentProfile(365, 300, IncentiveType.UnderTwentyFiveIncentive, EarningType.SecondPayment),
+                new PaymentProfile(90, 200, IncentiveType.TwentyFiveOrOverIncentive, EarningType.FirstPayment),
+                new PaymentProfile(365, 400, IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment),
             };
 
             var paymentProfilesPhase2 = new List<PaymentProfile>
             {
-                new PaymentProfile(90, 100, IncentiveType.UnderTwentyFiveIncentive),
-                new PaymentProfile(365, 300, IncentiveType.UnderTwentyFiveIncentive),
-                new PaymentProfile(90, 200, IncentiveType.TwentyFiveOrOverIncentive),
-                new PaymentProfile(365, 400, IncentiveType.TwentyFiveOrOverIncentive),
+                new PaymentProfile(90, 100, IncentiveType.UnderTwentyFiveIncentive, EarningType.FirstPayment),
+                new PaymentProfile(365, 300, IncentiveType.UnderTwentyFiveIncentive, EarningType.SecondPayment),
+                new PaymentProfile(90, 200, IncentiveType.TwentyFiveOrOverIncentive, EarningType.FirstPayment),
+                new PaymentProfile(365, 400, IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment),
             };
 
             var paymentProfiles = new List<IncentivePaymentProfile>
@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                     5,
                     new DateTime(2020,8,1),
                     new DateTime(2021,5,31),
-                    new DateTime(2020,2,1),
+                    new DateTime(2021,2,1),
                     new DateTime(2021,5,31),
                     paymentProfilesPhase1),
                 new IncentivePaymentProfile(
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [TestCase("2020-07-31")]
-        [TestCase("2021-04-01")]
+        [TestCase("2023-04-01")]
         public void Then_returns_true_when_ineligible(DateTime startDate)
         {
             var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _config);

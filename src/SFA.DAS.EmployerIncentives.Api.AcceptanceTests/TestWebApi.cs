@@ -10,6 +10,7 @@ using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -42,20 +43,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
+                    IncentivePhase = IncentivePhase.Phase1_0,
+                    EligibleApplicationDates = (new DateTime(2020,8,1), new DateTime(2021,5,31)),
+                    EligibleTrainingDates = (new DateTime(2020,8,1), new DateTime(2021,5,31)),
+                    MinRequiredAgreementVersion = 4,
                     PaymentProfiles = new List<PaymentProfile>
                     {
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
-                    }
-                },
-                new IncentivePaymentProfile
-                {
-                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
-                    PaymentProfiles = new List<PaymentProfile>
-                    {
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89, IncentiveType = IncentiveType.UnderTwentyFiveIncentive},
+                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364, IncentiveType = IncentiveType.UnderTwentyFiveIncentive},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89,IncentiveType = IncentiveType.TwentyFiveOrOverIncentive},
+                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364,IncentiveType = IncentiveType.TwentyFiveOrOverIncentive},
                     }
                 }
             };

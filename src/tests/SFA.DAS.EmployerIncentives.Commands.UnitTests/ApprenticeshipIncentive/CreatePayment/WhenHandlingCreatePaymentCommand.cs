@@ -140,8 +140,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     DateTime.MaxValue,
                     new List<PaymentProfile>
                     {
-                        new PaymentProfile(10, 100,IncentiveType.TwentyFiveOrOverIncentive),
-                        new PaymentProfile(100, 1000,IncentiveType.TwentyFiveOrOverIncentive)
+                        new PaymentProfile(10, 100,IncentiveType.TwentyFiveOrOverIncentive, EarningType.FirstPayment),
+                        new PaymentProfile(100, 1000,IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment)
                     })
             };
 

@@ -6,7 +6,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
     public class IncentivePaymentProfile
     {
-        public IncentiveType IncentiveType { get; set; }
         public IncentivePhase IncentivePhase { get; set; }
         public (DateTime Start, DateTime End) EligibleApplicationDates { get; set; }
         public (DateTime Start, DateTime End) EligibleTrainingDates { get; set; }

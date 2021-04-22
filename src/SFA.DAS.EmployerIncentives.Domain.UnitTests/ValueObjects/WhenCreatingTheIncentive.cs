@@ -21,25 +21,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                 new IncentivePaymentProfile(
                     IncentivePhase.Phase1_0,
                     4,
-                    DateTime.MinValue,
-                    DateTime.MaxValue,
-                    DateTime.MinValue,
-                    DateTime.MaxValue,
+                    new DateTime(2020,8,1),
+                    new DateTime(2021,5,31),
+                    new DateTime(2020,8,1),
+                    new DateTime(2021,1,31),
 
                     new List<PaymentProfile>
                         {
-                            new PaymentProfile(90, 1000, IncentiveType.UnderTwentyFiveIncentive), 
-                            new PaymentProfile(365, 1000, IncentiveType.UnderTwentyFiveIncentive),
-                            new PaymentProfile(90, 750, IncentiveType.TwentyFiveOrOverIncentive),
-                            new PaymentProfile(365, 750, IncentiveType.TwentyFiveOrOverIncentive)
+                            new PaymentProfile(89, 1222, IncentiveType.UnderTwentyFiveIncentive, EarningType.FirstPayment), 
+                            new PaymentProfile(354, 1333, IncentiveType.UnderTwentyFiveIncentive, EarningType.SecondPayment),
+                            new PaymentProfile(90, 1000, IncentiveType.TwentyFiveOrOverIncentive, EarningType.FirstPayment),
+                            new PaymentProfile(365, 1100, IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment)
                         }),
                    };
 
             _incentivePaymentProfiles = new IncentivesConfiguration(profiles);
         }
 
-        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
-        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
+        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1100, 365)]
+        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1222, 89, 1333, 354)]
         public void Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);

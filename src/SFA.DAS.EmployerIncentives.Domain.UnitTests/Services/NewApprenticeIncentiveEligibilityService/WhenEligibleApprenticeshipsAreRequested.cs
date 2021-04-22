@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Builders.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeIncentiveEligibilityService
@@ -18,7 +22,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
         public void SetUp()
         {
             _ulnValidationServiceMock = new Mock<IUlnValidationService>();
-            _sut = new Domain.Services.NewApprenticeIncentiveEligibilityService(_ulnValidationServiceMock.Object);
+            var paymentProfilesPhase1 = new List<PaymentProfile>
+            {
+                new PaymentProfile(90, 100, IncentiveType.UnderTwentyFiveIncentive, EarningType.FirstPayment),
+                new PaymentProfile(365, 300, IncentiveType.UnderTwentyFiveIncentive, EarningType.SecondPayment),
+                new PaymentProfile(90, 200, IncentiveType.TwentyFiveOrOverIncentive, EarningType.FirstPayment),
+                new PaymentProfile(365, 400, IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment),
+            };
+
+            var paymentProfiles = new List<IncentivePaymentProfile>
+            {
+                new IncentivePaymentProfile(
+                    IncentivePhase.Phase1_0,
+                    4,
+                    new DateTime(2020, 8, 1),
+                    new DateTime(2021, 5, 31),
+                    new DateTime(2020, 8, 1),
+                    new DateTime(2021, 1, 31),
+                    paymentProfilesPhase1)
+            };
+
+            var config = new IncentivesConfiguration(paymentProfiles);
+
+            var mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
+            mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(config);
+
+            _sut = new Domain.Services.NewApprenticeIncentiveEligibilityService(_ulnValidationServiceMock.Object,
+                mockPaymentProfilesService.Object);
         }
 
         [Test]
@@ -37,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
         public async Task Then_false_is_returned_when_the_apprenticeship_start_date_is_after_the_scheme_cut_off()
         {
             var apprenticeship = new ApprenticeshipBuilder()
-                .WithStartDate(new DateTime(2021, 4, 1))
+                .WithStartDate(new DateTime(2021, 7, 1))
                 .Build();
 
             var result = await _sut.IsApprenticeshipEligible(apprenticeship);

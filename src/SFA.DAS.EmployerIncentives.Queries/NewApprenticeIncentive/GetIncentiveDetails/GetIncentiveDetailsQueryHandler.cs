@@ -10,8 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetIncentive
     {
         public Task<GetIncentiveDetailsResponse> Handle(GetIncentiveDetailsRequest query, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException("TODO Get Min/Max from config??");
-           //  return Task.FromResult(new GetIncentiveDetailsResponse(Incentive.EligibilityStartDate, Incentive.EligibilityEndDate));
+            return Task.FromResult(new GetIncentiveDetailsResponse(IncentivesConfiguration.EligibilityStartDate, IncentivesConfiguration.EligibilityEndDate));
         }
     }
 }

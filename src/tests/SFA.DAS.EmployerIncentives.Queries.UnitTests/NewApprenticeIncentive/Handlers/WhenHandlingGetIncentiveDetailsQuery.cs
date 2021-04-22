@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -27,8 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.EligibilityStartDate.Should().Be(Incentive.EligibilityStartDate);
-            result.EligibilityEndDate.Should().Be(Incentive.EligibilityEndDate);
+            result.EligibilityStartDate.Should().Be(new DateTime(2020, 8, 1));
+            result.EligibilityEndDate.Should().Be(new DateTime(2021, 5, 31));
         }
     }
 }

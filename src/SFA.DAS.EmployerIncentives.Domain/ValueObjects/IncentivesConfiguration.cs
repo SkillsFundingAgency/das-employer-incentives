@@ -16,6 +16,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _profiles = profiles;
         }
 
+        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
+
         public byte GetMinimumAgreementVersion(DateTime trainingStartDate)
         {
             return GetIncentivePhaseConfiguration(trainingStartDate).MinRequiredAgreementVersion;
@@ -38,20 +41,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public bool IsEligible(DateTime trainingStartDate)
         {
-            return GetIncentivePhaseConfiguration(trainingStartDate) != null;
+            return GetIncentivePhaseConfigurationOrNull(trainingStartDate) != null;
         }
 
         private IncentivePaymentProfile GetIncentivePhaseConfiguration(DateTime trainingStartDate)
         {
+            var phaseConfig = GetIncentivePhaseConfigurationOrNull(trainingStartDate);
+
+            if (phaseConfig == null) throw new MissingPaymentProfileException($"Payment profiles not found for Training Start Date {trainingStartDate}");
+
+            return phaseConfig;
+        }
+
+        private IncentivePaymentProfile GetIncentivePhaseConfigurationOrNull(DateTime trainingStartDate)
+        {
             var phaseConfig = _profiles.SingleOrDefault(x =>
-                x.EligibleTrainingDates.Start <= trainingStartDate && x.EligibleTrainingDates.End >= trainingStartDate
+                x.EligibleTrainingDates.Start <= trainingStartDate && x.EligibleTrainingDates.End >= trainingStartDate &&
+                x.EligibleApplicationDates.Start <= trainingStartDate && x.EligibleApplicationDates.End >= trainingStartDate
             );
-
-            if (phaseConfig == null)
-            {
-                throw new MissingPaymentProfileException($"Payment profiles not found for Training Start Date {trainingStartDate}");
-            }
-
             return phaseConfig;
         }
     }
