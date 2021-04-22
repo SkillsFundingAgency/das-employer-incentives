@@ -6,6 +6,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Interfaces
 {
     public interface IIncentivePaymentProfilesService
     {
-        Task<IEnumerable<IncentivePaymentProfile>> Get();
+        Task<IncentivesConfiguration> Get();
     }
 }

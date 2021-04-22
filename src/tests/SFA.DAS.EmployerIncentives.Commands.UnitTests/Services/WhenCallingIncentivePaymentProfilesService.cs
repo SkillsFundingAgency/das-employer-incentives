@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
 {
@@ -25,16 +26,28 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
             {
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = IncentiveType.TwentyFiveOrOverIncentive,
                     PaymentProfiles = new List<PaymentProfile>
-                        {new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 90}}
+                        {
+                         new PaymentProfile {AmountPayable = 1002, DaysAfterApprenticeshipStart = 365, IncentiveType = IncentiveType.TwentyFiveOrOverIncentive},
+                         new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 91, IncentiveType = IncentiveType.UnderTwentyFiveIncentive},
+                         new PaymentProfile {AmountPayable = 1001, DaysAfterApprenticeshipStart = 366, IncentiveType = IncentiveType.UnderTwentyFiveIncentive},
+                         new PaymentProfile {AmountPayable = 1003, DaysAfterApprenticeshipStart = 90, IncentiveType = IncentiveType.TwentyFiveOrOverIncentive},
+                        },
+                    IncentivePhase = IncentivePhase.Phase1_0,
+                    EligibleApplicationDates= (new DateTime(2020,8,1), new DateTime(2021,5,31)),
+                    EligibleTrainingDates= (new DateTime(2020,7,1), new DateTime(2021,6,30)),
+                    MinRequiredAgreementVersion = 4
                 },
                 new IncentivePaymentProfile
                 {
-                    IncentiveType = IncentiveType.UnderTwentyFiveIncentive,
                     PaymentProfiles = new List<PaymentProfile>
-                        {new PaymentProfile {AmountPayable = 1500, DaysAfterApprenticeshipStart = 90}}
-                },
+                    {new PaymentProfile {AmountPayable = 1200, DaysAfterApprenticeshipStart = 190, IncentiveType = IncentiveType.TwentyFiveOrOverIncentive},
+                    new PaymentProfile {AmountPayable = 1201, DaysAfterApprenticeshipStart = 191, IncentiveType = IncentiveType.UnderTwentyFiveIncentive}},
+                    IncentivePhase = IncentivePhase.Phase2_0,
+                    EligibleApplicationDates= (new DateTime(2020,9,1), new DateTime(2021,6,30)),
+                    EligibleTrainingDates= (new DateTime(2021,6,1), new DateTime(2021,7,29)),
+                    MinRequiredAgreementVersion = 5
+                }
             };
 
             _mockApplicationSettings = new Mock<IOptions<ApplicationSettings>>();
@@ -46,16 +59,33 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
         [Test]
         public async Task then_config_settings_should_map_to_domain_values()
         {
-            var result = (await _sut.Get()).ToList();
+            // Act
+            var config = await _sut.Get();
+           
+            // Assert
+            config.GetPaymentProfiles(IncentiveType.TwentyFiveOrOverIncentive, new DateTime(2020, 8, 1))
+                .Single(x => x.EarningType == EarningType.FirstPayment).Should().BeEquivalentTo(_incentivePaymentProfiles[0].PaymentProfiles[3]);
+       
+            config.GetPaymentProfiles(IncentiveType.TwentyFiveOrOverIncentive, new DateTime(2020, 8, 1))
+                .Single(x => x.EarningType == EarningType.SecondPayment).Should().BeEquivalentTo(_incentivePaymentProfiles[0].PaymentProfiles[0]);
 
-            result.Count.Should().Be(2);
-            result[0].IncentiveType.Should().Be(_incentivePaymentProfiles[0].IncentiveType);
-            result[0].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].AmountPayable);
-            result[0].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].DaysAfterApprenticeshipStart);
+            config.GetPaymentProfiles(IncentiveType.UnderTwentyFiveIncentive, new DateTime(2020, 8, 1))
+                .Single(x => x.EarningType == EarningType.FirstPayment).Should().BeEquivalentTo(_incentivePaymentProfiles[0].PaymentProfiles[1]);
+           
+            config.GetPaymentProfiles(IncentiveType.UnderTwentyFiveIncentive, new DateTime(2020, 8, 1))
+                .Single(x => x.EarningType == EarningType.SecondPayment).Should().BeEquivalentTo(_incentivePaymentProfiles[0].PaymentProfiles[2]);
+           
+            config.GetPaymentProfiles(IncentiveType.TwentyFiveOrOverIncentive, new DateTime(2021, 6, 5))
+                .Single(x => x.EarningType == EarningType.FirstPayment).Should().BeEquivalentTo(_incentivePaymentProfiles[1].PaymentProfiles[0]);
 
-            result[1].IncentiveType.Should().Be(_incentivePaymentProfiles[1].IncentiveType);
-            result[1].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].AmountPayable);
-            result[1].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].DaysAfterApprenticeshipStart);
+            config.GetPaymentProfiles(IncentiveType.UnderTwentyFiveIncentive, new DateTime(2021, 6, 5)).
+                Single(x => x.EarningType == EarningType.FirstPayment).Should().BeEquivalentTo(_incentivePaymentProfiles[1].PaymentProfiles[1]);
+
+            config.GetPaymentProfiles(IncentiveType.TwentyFiveOrOverIncentive, new DateTime(2021, 6, 5))
+                .SingleOrDefault(x => x.EarningType == EarningType.SecondPayment).Should().BeNull();
+            
+            config.GetPaymentProfiles(IncentiveType.UnderTwentyFiveIncentive, new DateTime(2021, 6, 5))
+                .SingleOrDefault(x => x.EarningType == EarningType.SecondPayment).Should().BeNull();
         }
     }
 }

@@ -1,22 +1,26 @@
-﻿using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+﻿using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.ValueObjects;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Services
 {
     public class NewApprenticeIncentiveEligibilityService : INewApprenticeIncentiveEligibilityService
     {
         private readonly IUlnValidationService _ulnValidationService;
+        private static IIncentivePaymentProfilesService _incentivePaymentProfilesService;
 
-        public NewApprenticeIncentiveEligibilityService(IUlnValidationService ulnValidationService)
+        public NewApprenticeIncentiveEligibilityService(
+            IUlnValidationService ulnValidationService,
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
             _ulnValidationService = ulnValidationService;
+            _incentivePaymentProfilesService = incentivePaymentProfilesService;
         }
 
         public async Task<bool> IsApprenticeshipEligible(Apprenticeship apprenticeship)
         {
-            if (!apprenticeship.IsApproved || IsStartDateOutsideSchemeRange(apprenticeship))
+            if (!apprenticeship.IsApproved || await IsStartDateOutsideSchemeRange(apprenticeship))
             {
                 return false;
             }
@@ -29,9 +33,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
             return true;
         }
 
-        private static bool IsStartDateOutsideSchemeRange(Apprenticeship apprenticeship)
+        private static async Task<bool> IsStartDateOutsideSchemeRange(Apprenticeship apprenticeship)
         {
-            return apprenticeship.StartDate < Incentive.EligibilityStartDate || apprenticeship.StartDate > Incentive.EligibilityEndDate;
+            var config = await _incentivePaymentProfilesService.Get();
+           
+            return !config.IsEligible(apprenticeship.StartDate);
         }
     }
 }

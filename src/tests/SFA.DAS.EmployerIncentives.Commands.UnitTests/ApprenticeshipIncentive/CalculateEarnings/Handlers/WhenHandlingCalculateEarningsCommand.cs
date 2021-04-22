@@ -1,12 +1,10 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateEarnings;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
@@ -45,16 +43,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentiveType.TwentyFiveOrOverIncentive, new List<PaymentProfile>
+                    IncentivePhase.Phase1_0,
+                    4,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    new List<PaymentProfile>
                     {
-                        new PaymentProfile(10, 100),
-                        new PaymentProfile(100, 1000)
+                        new PaymentProfile(10, 100,IncentiveType.TwentyFiveOrOverIncentive, EarningType.FirstPayment),
+                        new PaymentProfile(100, 1000,IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment)
                     })
             };
 
             _mockPaymentProfilesService
                .Setup(m => m.Get())
-               .ReturnsAsync(_paymentProfiles);
+               .ReturnsAsync(new IncentivesConfiguration(_paymentProfiles));
 
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {

@@ -3,37 +3,59 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using PaymentProfile = SFA.DAS.EmployerIncentives.Infrastructure.Configuration.PaymentProfile;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services
 {
     public class IncentivePaymentProfilesService : IIncentivePaymentProfilesService
     {
         private readonly ApplicationSettings _applicationSettings;
+        private static readonly EarningType[] EarningTypes = { EarningType.FirstPayment, EarningType.SecondPayment };
 
         public IncentivePaymentProfilesService(IOptions<ApplicationSettings> applicationSettings)
         {
             _applicationSettings = applicationSettings.Value;
         }
 
-        public Task<IEnumerable<Domain.ValueObjects.IncentivePaymentProfile>> Get()
+        public Task<IncentivesConfiguration> Get()
         {
-            if (_applicationSettings?.IncentivePaymentProfiles == null)
-            {
-                return Task.FromResult(Enumerable.Empty<Domain.ValueObjects.IncentivePaymentProfile>());
-            }
-            return Task.FromResult(_applicationSettings.IncentivePaymentProfiles.Select(x =>
-                new Domain.ValueObjects.IncentivePaymentProfile(x.IncentiveType,
-                    MapToDomainPaymentProfiles(x.PaymentProfiles).ToList())));
+            var profiles = _applicationSettings.IncentivePaymentProfiles.Select(x =>
+                new Domain.ValueObjects.IncentivePaymentProfile(
+                    x.IncentivePhase,
+                    x.MinRequiredAgreementVersion,
+                    x.EligibleApplicationDates.Start,
+                    x.EligibleApplicationDates.End,
+                    x.EligibleTrainingDates.Start,
+                    x.EligibleTrainingDates.End,
+                    MapToDomainPaymentProfiles(x.PaymentProfiles).ToList()
+                    )).ToList();
+
+            return Task.FromResult(new IncentivesConfiguration(profiles));
         }
 
-        private IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(List<Infrastructure.Configuration.PaymentProfile> paymentProfiles)
+        private static IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(IList<PaymentProfile> profiles)
         {
-            if (paymentProfiles == null)
+            var result = new List<Domain.ValueObjects.PaymentProfile>();
+            if (profiles == null) return result;
+
+            var incentives = profiles.OrderBy(x => x.DaysAfterApprenticeshipStart).GroupBy(x => x.IncentiveType);
+
+            foreach (var incentive in incentives)
             {
-                return Enumerable.Empty<Domain.ValueObjects.PaymentProfile>();
+                result.AddRange(
+                    incentive.Select((profile, index) =>
+                        new Domain.ValueObjects.PaymentProfile(
+                            profile.DaysAfterApprenticeshipStart,
+                            profile.AmountPayable,
+                            profile.IncentiveType,
+                            EarningTypes[index])
+                    ));
             }
-            return paymentProfiles.Select(x => new Domain.ValueObjects.PaymentProfile(x.DaysAfterApprenticeshipStart, x.AmountPayable));
+
+            return result;
         }
     }
 }

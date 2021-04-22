@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
@@ -9,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetIncentive
     {
         public Task<GetIncentiveDetailsResponse> Handle(GetIncentiveDetailsRequest query, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new GetIncentiveDetailsResponse(Incentive.EligibilityStartDate, Incentive.EligibilityEndDate));
+            return Task.FromResult(new GetIncentiveDetailsResponse(IncentivesConfiguration.EligibilityStartDate, IncentivesConfiguration.EligibilityEndDate));
         }
     }
 }

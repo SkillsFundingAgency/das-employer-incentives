@@ -132,10 +132,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentiveType.TwentyFiveOrOverIncentive, new List<PaymentProfile>
+                    IncentivePhase.Phase1_0,
+                    4,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    new List<PaymentProfile>
                     {
-                        new PaymentProfile(10, 100),
-                        new PaymentProfile(100, 1000)
+                        new PaymentProfile(10, 100,IncentiveType.TwentyFiveOrOverIncentive, EarningType.FirstPayment),
+                        new PaymentProfile(100, 1000,IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment)
                     })
             };
 
@@ -152,7 +158,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             };
 
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
-            _mockIncentivePaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
+            _mockIncentivePaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(new IncentivesConfiguration(paymentProfiles));
 
             await incentive.CalculateEarnings(_mockIncentivePaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
