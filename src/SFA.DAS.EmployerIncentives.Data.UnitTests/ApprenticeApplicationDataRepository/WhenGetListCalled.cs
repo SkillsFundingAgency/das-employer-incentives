@@ -74,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
             incentives[0].PausePayments = false;
+            incentives[0].MinimumAgreementVersion = allAccounts[0].SignedAgreementVersion;
 
             var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
             allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
@@ -113,7 +114,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 LearnerMatchFound = false,
                 PaymentSentIsEstimated = true,
                 PaymentAmount = pendingPayments[0].Amount,
-                PaymentDate = new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, 4)
+                PaymentDate = new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, 4),
+                RequiresNewEmployerAgreement = false
             };
 
             var expectedSecondPaymentStatus = new PaymentStatusDto
@@ -121,7 +123,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 LearnerMatchFound = false,
                 PaymentAmount = pendingPayments[1].Amount,
                 PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB")),
-                PaymentSentIsEstimated = true  // update when implementing EI-827
+                PaymentSentIsEstimated = true,  // update when implementing EI-827
+                RequiresNewEmployerAgreement = false
             };
             result[0].SecondPaymentStatus.Should().BeEquivalentTo(expectedSecondPaymentStatus);
         }
