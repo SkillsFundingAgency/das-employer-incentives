@@ -31,9 +31,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
+        public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
-
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, int? minimumAgreementVersion)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -47,10 +47,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     PausePayments = false,
                     SubmittedDate = submittedDate,
                     SubmittedByEmail = submittedByEmail,
-                    Status = IncentiveStatus.Active
+                    Status = IncentiveStatus.Active,
+                    MinimumAgreementVersion = new AgreementVersion(minimumAgreementVersion)
                 }, true);
         }
-
+        
         internal static ApprenticeshipIncentive Get(Guid id, ApprenticeshipIncentiveModel model)
         {
             return new ApprenticeshipIncentive(id, model);
