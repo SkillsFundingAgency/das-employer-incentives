@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 {
     public class IncentivesConfigurationTests
     {
-        private IncentivesConfiguration _sut;
+        private IncentiveProfiles _sut;
 
         [SetUp]
         public void Arrange()
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     paymentProfilesPhase2),
             };
 
-            _sut = new IncentivesConfiguration(paymentProfiles);
+            _sut = new IncentiveProfiles(paymentProfiles);
         }
 
         [Test]

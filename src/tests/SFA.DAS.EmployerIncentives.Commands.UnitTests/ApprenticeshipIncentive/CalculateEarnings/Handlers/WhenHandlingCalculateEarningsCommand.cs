@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockPaymentProfilesService
                .Setup(m => m.Get())
-               .ReturnsAsync(new IncentivesConfiguration(_paymentProfiles));
+               .ReturnsAsync(new IncentiveProfiles(_paymentProfiles));
 
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {

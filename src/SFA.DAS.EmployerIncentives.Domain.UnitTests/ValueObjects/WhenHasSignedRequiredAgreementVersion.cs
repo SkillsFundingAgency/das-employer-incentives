@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     [TestFixture]
     public class WhenHasSignedRequiredAgreementVersion
     {
-        private IncentivesConfiguration _config;
+        private IncentiveProfiles _config;
 
         [SetUp]
         public void SetUp()
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                     paymentProfilesPhase2),
             };
 
-            _config = new IncentivesConfiguration(paymentProfiles);
+            _config = new IncentiveProfiles(paymentProfiles);
         }
 
         [TestCase("2020-07-31")]

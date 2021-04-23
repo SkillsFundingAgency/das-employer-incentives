@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     [TestFixture]
     public class WhenCreatingTheIncentive
     {
-        private IncentivesConfiguration _incentivePaymentProfiles;
+        private IncentiveProfiles _incentivePaymentProfiles;
 
         [SetUp]
         public void SetUp()
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         }),
                    };
 
-            _incentivePaymentProfiles = new IncentivesConfiguration(profiles);
+            _incentivePaymentProfiles = new IncentiveProfiles(profiles);
         }
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1100, 365)]

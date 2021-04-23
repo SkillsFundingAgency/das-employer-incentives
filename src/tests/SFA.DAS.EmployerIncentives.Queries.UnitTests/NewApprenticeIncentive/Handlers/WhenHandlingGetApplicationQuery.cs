@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
                     paymentProfilesPhase2),
             };
 
-            var config = new IncentivesConfiguration(paymentProfiles);
+            var config = new IncentiveProfiles(paymentProfiles);
 
             _paymentProfileService.Setup(x => x.Get()).ReturnsAsync(config);
 

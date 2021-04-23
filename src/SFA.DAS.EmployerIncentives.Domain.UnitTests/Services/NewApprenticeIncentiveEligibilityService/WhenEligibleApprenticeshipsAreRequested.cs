@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
                     paymentProfilesPhase1)
             };
 
-            var config = new IncentivesConfiguration(paymentProfiles);
+            var config = new IncentiveProfiles(paymentProfiles);
 
             var mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(config);

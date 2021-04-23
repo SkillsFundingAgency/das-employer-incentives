@@ -7,11 +7,11 @@ using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
-    public class IncentivesConfiguration
+    public class IncentiveProfiles
     {
         private readonly IList<IncentivePaymentProfile> _profiles;
 
-        public IncentivesConfiguration(IList<IncentivePaymentProfile> profiles)
+        public IncentiveProfiles(IList<IncentivePaymentProfile> profiles)
         {
             _profiles = profiles;
         }

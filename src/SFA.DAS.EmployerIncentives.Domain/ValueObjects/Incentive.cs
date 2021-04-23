@@ -11,16 +11,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         private readonly DateTime _startDate;
-        private readonly IncentivesConfiguration _configuration;
+        private readonly IncentiveProfiles _profiles;
         public IEnumerable<Payment> Payments { get; }
-        public bool IsEligible => _configuration.IsEligible(_startDate);
+        public bool IsEligible => _profiles.IsEligible(_startDate);
         public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
-        public Incentive(DateTime dateOfBirth, DateTime startDate, IncentivesConfiguration configuration)
+        public Incentive(DateTime dateOfBirth, DateTime startDate, IncentiveProfiles profiles)
         {
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
-            _configuration = configuration;
+            _profiles = profiles;
             Payments = GeneratePayments();
         }
 
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             if (!IsEligible) return true;
 
-            var minimumRequiredAgreementVersion = _configuration.GetMinimumAgreementVersion(_startDate);
+            var minimumRequiredAgreementVersion = _profiles.GetMinimumAgreementVersion(_startDate);
             return signedAgreementVersion < minimumRequiredAgreementVersion;
         }
 
@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             if (!IsEligible) return new List<Payment>();
 
-            var paymentProfiles = _configuration.GetPaymentProfiles(IncentiveType, _startDate);
+            var paymentProfiles = _profiles.GetPaymentProfiles(IncentiveType, _startDate);
 
             return paymentProfiles.Select(profile =>
                 new Payment(

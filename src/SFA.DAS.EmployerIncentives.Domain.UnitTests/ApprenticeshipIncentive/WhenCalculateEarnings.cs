@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private int _secondPaymentDaysAfterApprenticeshipStartPhase2;
         private DateTime _collectionPeriod;
         private DateTime _plannedStartDate;
-        private IncentivesConfiguration _config;
+        private IncentiveProfiles _config;
 
         [SetUp]
         public void Arrange()
@@ -94,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     paymentProfilesPhase2),
             };
 
-            _config = new IncentivesConfiguration(_paymentProfiles);
+            _config = new IncentiveProfiles(_paymentProfiles);
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
