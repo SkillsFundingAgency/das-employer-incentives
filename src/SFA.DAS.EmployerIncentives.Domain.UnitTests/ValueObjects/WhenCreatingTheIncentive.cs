@@ -11,12 +11,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     [TestFixture]
     public class WhenCreatingTheIncentive
     {
-        private List<IncentivePaymentProfile> _profiles;
+        private List<IncentivePaymentProfile> _incentivePaymentProfiles;
 
         [SetUp]
         public void SetUp()
         {
-            _profiles = new List<IncentivePaymentProfile>
+            _incentivePaymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
                     4,
@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         {
             var date = new DateTime(2020, 10, 1);
             
-            var result = new Incentive(date.AddYears(-1*age), date, _profiles);
+            var result = new Incentive(date.AddYears(-1*age), date, _incentivePaymentProfiles);
 
             result.IncentiveType.Should().Be(expectedIncentiveType);
             result.IsEligible.Should().BeTrue();
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         public void And_Date_Is_Before_August_Then_the_apprentice_is_not_eligible()
         {
             var date = new DateTime(2020, 07, 31);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _profiles);
+            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         public void And_Date_Is_After_March_Then_the_apprentice_is_not_eligible()
         {
             var date = new DateTime(2021, 04, 1);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _profiles);
+            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();

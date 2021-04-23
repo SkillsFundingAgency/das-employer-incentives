@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
     public class WhenHandlingGetIncentiveDetailsQuery
     {
         private GetIncentiveDetailsQueryHandler _sut;
-
+        
         [SetUp]
         public void Arrange()
         {
@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = new GetIncentiveDetailsRequest();
-
+            
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
 
