@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is updated with new valid start date for the apprenticeship incentive")]
         public void WhenTheLearnerDataIsUpdatedWithNewValidStartDateForTheApprenticeshipIncentive()
         {
-            _actualStartDate = _plannedStartDate.AddMonths(1);
+            _actualStartDate = new DateTime(2021, 5, 31);
         }
 
         [When(@"the learner data is updated with new invalid start date for the apprenticeship incentive")]
@@ -217,10 +217,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.FirstPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(1000);
+            pp.Amount.Should().Be(750);
             pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(4);
-            pp.PaymentYear.Should().Be(2021);
+            pp.PeriodNumber.Should().Be(1);
+            pp.PaymentYear.Should().Be(2122);
         }
 
         [Then(@"a new pending second payment record is created")]
@@ -233,9 +233,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.SecondPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(1000);
+            pp.Amount.Should().Be(750);
             pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(1);
+            pp.PeriodNumber.Should().Be(10);
             pp.PaymentYear.Should().Be(2122);
         }
 
@@ -300,7 +300,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>()
                 .Single(x => x.Id == _apprenticeshipIncentive.Id);
 
-            incentive.MinimumAgreementVersion.Should().Be(4);
+            incentive.MinimumAgreementVersion.Should().Be(5);
         }
         
     }

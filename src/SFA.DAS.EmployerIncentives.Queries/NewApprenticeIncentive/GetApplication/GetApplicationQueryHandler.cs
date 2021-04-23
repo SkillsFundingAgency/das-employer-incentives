@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
             return response;
         }
 
-        private bool IsNewAgreementRequired(IEnumerable<IncentiveApplicationApprenticeshipDto> applicationApprenticeships,  IncentiveProfiles paymentProfiles, int signedAgreementVersion)
+        private bool IsNewAgreementRequired(IEnumerable<IncentiveApplicationApprenticeshipDto> applicationApprenticeships, IEnumerable<IncentivePaymentProfile> paymentProfiles, int signedAgreementVersion)
         {
             foreach (var apprenticeship in applicationApprenticeships)
             {

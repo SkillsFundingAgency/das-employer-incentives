@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     public class WhenHandlingCreatePaymentCommand
     {
         private CreatePaymentCommandHandler _sut;
-        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
+        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfilesService;
         private Fixture _fixture;
@@ -58,13 +58,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             };
             _firstCollectionPeriod = _collectionPeriods.First();
 
-            _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
+            _mockIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockIncentivePaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
 
             _incentive = await ApprenticeshipIncentiveCreator();
 
-            _sut = new CreatePaymentCommandHandler(_mockIncentiveDomainRespository.Object);
+            _sut = new CreatePaymentCommandHandler(_mockIncentiveDomainRepository.Object);
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new CreatePaymentCommand(_incentive.Id, _incentive.PendingPayments.First().Id,
                 _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
 
-            _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(_incentive);
+            _mockIncentiveDomainRepository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(_incentive);
 
             // Act
             await _sut.Handle(command);
@@ -89,10 +89,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var command = new CreatePaymentCommand(_incentive.Id, _incentive.PendingPayments.First().Id, _firstCollectionPeriod.CalendarYear, _firstCollectionPeriod.PeriodNumber);
 
-            _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(_incentive);
+            _mockIncentiveDomainRepository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(_incentive);
 
             int itemsPersisted = 0;
-            _mockIncentiveDomainRespository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>( a => a.Id == command.ApprenticeshipIncentiveId)))
+            _mockIncentiveDomainRepository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>( a => a.Id == command.ApprenticeshipIncentiveId)))
                                             .Callback(() =>
                                             {
                                                 itemsPersisted++;
@@ -132,7 +132,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase1_0,
                     4,
                     DateTime.MinValue,
                     DateTime.MaxValue,
@@ -158,7 +157,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             };
 
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
-            _mockIncentivePaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(new IncentiveProfiles(paymentProfiles));
+            _mockIncentivePaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
 
             await incentive.CalculateEarnings(_mockIncentivePaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 

@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using IncentivePaymentProfile = SFA.DAS.EmployerIncentives.Domain.ValueObjects.IncentivePaymentProfile;
 using PaymentProfile = SFA.DAS.EmployerIncentives.Infrastructure.Configuration.PaymentProfile;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services
@@ -20,38 +20,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
             _applicationSettings = applicationSettings.Value;
         }
 
-        public Task<IncentiveProfiles> Get()
+        public Task<IEnumerable<IncentivePaymentProfile>> Get()
         {
             var profiles = _applicationSettings.IncentivePaymentProfiles.Select(x =>
-                new Domain.ValueObjects.IncentivePaymentProfile(
-                    x.IncentivePhase,
+                new IncentivePaymentProfile(
                     x.MinRequiredAgreementVersion,
                     x.EligibleApplicationDates.Start,
                     x.EligibleApplicationDates.End,
                     x.EligibleTrainingDates.Start,
                     x.EligibleTrainingDates.End,
                     MapToDomainPaymentProfiles(x.PaymentProfiles).ToList()
-                    )).ToList();
+                    ));
 
-            return Task.FromResult(new IncentiveProfiles(profiles));
-        }
-
-        public Task<IncentiveProfiles> Get(IncentivePhase phase)
-        {
-            var profiles = _applicationSettings.IncentivePaymentProfiles
-                .Where(x => x.IncentivePhase == phase)
-                .Select(x =>
-                new Domain.ValueObjects.IncentivePaymentProfile(
-                    x.IncentivePhase,
-                    x.MinRequiredAgreementVersion,
-                    x.EligibleApplicationDates.Start,
-                    x.EligibleApplicationDates.End,
-                    x.EligibleTrainingDates.Start,
-                    x.EligibleTrainingDates.End,
-                    MapToDomainPaymentProfiles(x.PaymentProfiles).ToList()
-                )).ToList();
-
-            return Task.FromResult(new IncentiveProfiles(profiles));
+            return Task.FromResult(profiles);
         }
 
         private static IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(IList<PaymentProfile> profiles)

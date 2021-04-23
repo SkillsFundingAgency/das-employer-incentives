@@ -51,7 +51,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 new IncentivePaymentProfile
                 {
-                    IncentivePhase = IncentivePhase.Phase1_0,
                     EligibleApplicationDates = (new DateTime(2020,8,1), new DateTime(2021,5,31)),
                     EligibleTrainingDates = (new DateTime(2020,8,1), new DateTime(2021,5,31)),
                     MinRequiredAgreementVersion = 4,

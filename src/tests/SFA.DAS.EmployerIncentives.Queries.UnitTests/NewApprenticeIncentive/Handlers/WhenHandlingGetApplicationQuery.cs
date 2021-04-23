@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         private Fixture _fixture;
         private Mock<IIncentivePaymentProfilesService> _paymentProfileService;
         private Mock<IQueryRepository<LegalEntityDto>> _legalEntityRepository;
+        private List<IncentivePaymentProfile> _paymentProfiles;
 
         [SetUp]
         public void Arrange()
@@ -48,10 +49,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
                 new PaymentProfile(365, 400, IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment),
             };
 
-            var paymentProfiles = new List<IncentivePaymentProfile>
+            _paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase1_0,
                     4,
                     new DateTime(2020,8,1),
                     new DateTime(2021,5,31),
@@ -59,7 +59,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
                     new DateTime(2021,1,31),
                     paymentProfilesPhase1),
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase1_1,
                     5,
                     new DateTime(2020,8,1),
                     new DateTime(2021,5,31),
@@ -67,7 +66,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
                     new DateTime(2021,5,31),
                     paymentProfilesPhase1),
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase2_0,
                     6,
                     new DateTime(2021,6,1),
                     new DateTime(2021,11,30),
@@ -76,9 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
                     paymentProfilesPhase2),
             };
 
-            var config = new IncentiveProfiles(paymentProfiles);
-
-            _paymentProfileService.Setup(x => x.Get()).ReturnsAsync(config);
+            _paymentProfileService.Setup(x => x.Get()).ReturnsAsync(_paymentProfiles);
 
             _sut = new GetApplicationQueryHandler(_applicationRepository.Object, _legalEntityRepository.Object, _paymentProfileService.Object);
         }

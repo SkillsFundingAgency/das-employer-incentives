@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
@@ -11,26 +12,28 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         private readonly DateTime _startDate;
-        private readonly IncentiveProfiles _profiles;
+        private readonly IEnumerable<IncentivePaymentProfile> _incentivePaymentProfiles;
         public IEnumerable<Payment> Payments { get; }
-        public bool IsEligible => _profiles.IsEligible(_startDate);
+        public bool IsEligible => IncentivePaymentProfile != null;
         public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
+      
+        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
 
-        public Incentive(DateTime dateOfBirth, DateTime startDate, IncentiveProfiles profiles)
+        public Incentive(DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
         {
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
-            _profiles = profiles;
+            _incentivePaymentProfiles = incentivePaymentProfiles;
             Payments = GeneratePayments();
         }
 
-        public bool IsNewAgreementRequired(int signedAgreementVersion)
-        {
-            if (!IsEligible) return true;
+        public bool IsNewAgreementRequired(int signedAgreementVersion) => !IsEligible || signedAgreementVersion < IncentivePaymentProfile.MinRequiredAgreementVersion;
+    
+        private IncentivePaymentProfile IncentivePaymentProfile => _incentivePaymentProfiles.SingleOrDefault(x =>
+            x.EligibleTrainingDates.Start <= _startDate && x.EligibleTrainingDates.End >= _startDate &&
+            x.EligibleApplicationDates.Start <= _startDate && x.EligibleApplicationDates.End >= _startDate);
 
-            var minimumRequiredAgreementVersion = _profiles.GetMinimumAgreementVersion(_startDate);
-            return signedAgreementVersion < minimumRequiredAgreementVersion;
-        }
 
         private int AgeAtStartOfCourse()
         {
@@ -39,9 +42,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         private IEnumerable<Payment> GeneratePayments()
         {
-            if (!IsEligible) return new List<Payment>();
+            if (!IsEligible) return Enumerable.Empty<Payment>();
 
-            var paymentProfiles = _profiles.GetPaymentProfiles(IncentiveType, _startDate);
+            var paymentProfiles = IncentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == IncentiveType).ToList();
+
+            if (!paymentProfiles.Any())
+            {
+                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {IncentiveType} with Start Date {_startDate}");
+            }
 
             return paymentProfiles.Select(profile =>
                 new Payment(

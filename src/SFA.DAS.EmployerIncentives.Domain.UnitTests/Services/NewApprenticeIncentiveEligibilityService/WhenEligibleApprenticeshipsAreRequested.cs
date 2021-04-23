@@ -33,7 +33,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
             var paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase1_0,
                     4,
                     new DateTime(2020, 8, 1),
                     new DateTime(2021, 5, 31),
@@ -42,13 +41,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
                     paymentProfilesPhase1)
             };
 
-            var config = new IncentiveProfiles(paymentProfiles);
-
             var mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
-            mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(config);
+            mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
 
-            _sut = new Domain.Services.NewApprenticeIncentiveEligibilityService(_ulnValidationServiceMock.Object,
-                mockPaymentProfilesService.Object);
+            _sut = new Domain.Services.NewApprenticeIncentiveEligibilityService(_ulnValidationServiceMock.Object);
         }
 
         [Test]

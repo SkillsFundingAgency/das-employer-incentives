@@ -36,7 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private int _secondPaymentDaysAfterApprenticeshipStartPhase2;
         private DateTime _collectionPeriod;
         private DateTime _plannedStartDate;
-        private IncentiveProfiles _config;
 
         [SetUp]
         public void Arrange()
@@ -69,7 +68,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _paymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase1_0,
                     4,
                     new DateTime(2020,8,1),
                     new DateTime(2021,5,31),
@@ -77,7 +75,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     new DateTime(2021,1,31),
                     paymentProfilesPhase1),
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase1_1,
                     5,
                     new DateTime(2020,8,1),
                     new DateTime(2021,5,31),
@@ -85,7 +82,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     new DateTime(2021,5,31),
                     paymentProfilesPhase1),
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase2_0,
                     6,
                     new DateTime(2021,6,1),
                     new DateTime(2021,11,30),
@@ -93,8 +89,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     new DateTime(2021,5,31),
                     paymentProfilesPhase2),
             };
-
-            _config = new IncentiveProfiles(_paymentProfiles);
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
@@ -109,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(_collectionCalendar);
 
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
-            _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_config);
+            _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_paymentProfiles);
 
             _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
             _apprenticeship = _sutModel.Apprenticeship;

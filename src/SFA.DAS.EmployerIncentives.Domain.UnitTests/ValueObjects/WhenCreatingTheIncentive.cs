@@ -11,15 +11,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     [TestFixture]
     public class WhenCreatingTheIncentive
     {
-        private IncentiveProfiles _incentivePaymentProfiles;
+        private List<IncentivePaymentProfile> _profiles;
 
         [SetUp]
         public void SetUp()
         {
-            var profiles = new List<IncentivePaymentProfile>
+            _profiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(
-                    IncentivePhase.Phase1_0,
                     4,
                     new DateTime(2020,8,1),
                     new DateTime(2021,5,31),
@@ -34,8 +33,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                             new PaymentProfile(365, 1100, IncentiveType.TwentyFiveOrOverIncentive, EarningType.SecondPayment)
                         }),
                    };
-
-            _incentivePaymentProfiles = new IncentiveProfiles(profiles);
         }
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1100, 365)]
@@ -44,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         {
             var date = new DateTime(2020, 10, 1);
             
-            var result = new Incentive(date.AddYears(-1*age), date, _incentivePaymentProfiles);
+            var result = new Incentive(date.AddYears(-1*age), date, _profiles);
 
             result.IncentiveType.Should().Be(expectedIncentiveType);
             result.IsEligible.Should().BeTrue();
@@ -62,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         public void And_Date_Is_Before_August_Then_the_apprentice_is_not_eligible()
         {
             var date = new DateTime(2020, 07, 31);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles);
+            var result = new Incentive(date.AddYears(-1 * 25), date, _profiles);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
@@ -73,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         public void And_Date_Is_After_March_Then_the_apprentice_is_not_eligible()
         {
             var date = new DateTime(2021, 04, 1);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles);
+            var result = new Incentive(date.AddYears(-1 * 25), date, _profiles);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
