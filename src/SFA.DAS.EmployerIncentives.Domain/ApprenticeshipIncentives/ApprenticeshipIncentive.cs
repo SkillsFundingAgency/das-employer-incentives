@@ -337,8 +337,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             var collectionCalendar = await collectionCalendarService.Get();
 
-            RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate > dateStopped));
-            ClawbackPayments(PendingPayments.Where(x => x.DueDate > dateStopped), collectionCalendar.GetActivePeriod());
+            RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate >= dateStopped));
+            ClawbackPayments(PendingPayments.Where(x => x.DueDate >= dateStopped), collectionCalendar.GetActivePeriod());
         }
 
         private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionPeriod collectionPeriod)
