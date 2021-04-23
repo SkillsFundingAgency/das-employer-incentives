@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -11,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
     public class WhenHandlingGetIncentiveDetailsQuery
     {
         private GetIncentiveDetailsQueryHandler _sut;
-        
+
         [SetUp]
         public void Arrange()
         {
@@ -23,13 +22,13 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = new GetIncentiveDetailsRequest();
-            
+
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.EligibilityStartDate.Should().Be(new DateTime(2020, 8, 1));
-            result.EligibilityEndDate.Should().Be(new DateTime(2021, 5, 31));
+            result.EligibilityStartDate.Should().Be(Incentive.EligibilityStartDate);
+            result.EligibilityEndDate.Should().Be(Incentive.EligibilityEndDate);
         }
     }
 }

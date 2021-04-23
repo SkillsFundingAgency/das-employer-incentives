@@ -12,8 +12,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         private readonly DateTime _startDate;
+        private readonly List<Payment> _payments;
         private readonly IEnumerable<IncentivePaymentProfile> _incentivePaymentProfiles;
-        public IEnumerable<Payment> Payments { get; }
+        public IEnumerable<Payment> Payments => _payments;
         public bool IsEligible => IncentivePaymentProfile != null;
         public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
       
@@ -25,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
             _incentivePaymentProfiles = incentivePaymentProfiles;
-            Payments = GeneratePayments();
+            _payments = GeneratePayments();
         }
 
         public bool IsNewAgreementRequired(int signedAgreementVersion) => !IsEligible || signedAgreementVersion < IncentivePaymentProfile.MinRequiredAgreementVersion;
@@ -34,15 +35,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             x.EligibleTrainingDates.Start <= _startDate && x.EligibleTrainingDates.End >= _startDate &&
             x.EligibleApplicationDates.Start <= _startDate && x.EligibleApplicationDates.End >= _startDate);
 
-
         private int AgeAtStartOfCourse()
         {
             return _dateOfBirth.AgeOnThisDay(_startDate);
         }
 
-        private IEnumerable<Payment> GeneratePayments()
+        private List<Payment> GeneratePayments()
         {
-            if (!IsEligible) return Enumerable.Empty<Payment>();
+            if (!IsEligible) return new List<Payment>();
 
             var paymentProfiles = IncentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == IncentiveType).ToList();
 
@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                     profile.AmountPayable, 
                     _startDate.AddDays(profile.DaysAfterApprenticeshipStart),
                     profile.EarningType)
-            );
+            ).ToList();
         }
 
         protected override IEnumerable<object> GetAtomicValues()
