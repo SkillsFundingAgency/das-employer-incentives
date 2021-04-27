@@ -7,8 +7,6 @@ using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApplicationApprenticeships;
-using System;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -50,34 +48,5 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
         }
 
-        [HttpPatch("/applications/{applicationId}/apprenticeships")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> AddApprenticeshipsToApplication([FromBody] AddApplicationApprenticeshipsRequest request)
-        {
-            try
-            {
-                await SendCommandAsync(new AddApplicationApprenticeshipsCommand(request.IncentiveApplicationId, request.AccountId, request.Apprenticeships));
-                return Ok();
-            }
-            catch (InvalidRequestException)
-            {
-                return BadRequest();
-            }
-        }
-
-        [HttpDelete("/applications/{applicationId}/apprenticeships/{apprenticeshipId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> RemoveApprenticeshipsFromApplication(Guid applicationId, long apprenticeshipId)
-        {
-            try
-            {
-                await SendCommandAsync(new RemoveApplicationApprenticeshipCommand(applicationId, apprenticeshipId));
-                return Ok();
-            }
-            catch (InvalidRequestException)
-            {
-                return BadRequest();
-            }
-        }
     }
 }

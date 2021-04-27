@@ -74,23 +74,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             _apprenticeships.Clear();
             Model.ApprenticeshipModels.Clear();
-            AddApprenticeships(apprenticeships);
-        }
-
-        public void AddApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
-        {
             foreach (var a in apprenticeships)
             {
                 AddApprenticeship(a);
             }
-        }
-        public void RemoveApprenticeship(long apprenticeshipId)
-        {
-            var apprenticeship = _apprenticeships.FirstOrDefault(x => x.ApprenticeshipId == apprenticeshipId);
-            _apprenticeships.Remove(apprenticeship);
-            var apprenticeshipModel =
-                Model.ApprenticeshipModels.FirstOrDefault(x => x.ApprenticeshipId == apprenticeshipId);
-            Model.ApprenticeshipModels.Remove(apprenticeshipModel);
         }
 
         public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
