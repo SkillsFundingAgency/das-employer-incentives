@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("SFA.DAS.EmployerIncentives.Commands.UnitTests")]
+
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public sealed class IncentiveApplication : AggregateRoot<Guid, IncentiveApplicationModel>
@@ -27,7 +28,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         internal static IncentiveApplication New(Guid id, long accountId, long accountLegalEntityId)
         {
-            return new IncentiveApplication(id, new IncentiveApplicationModel { Id = id, AccountId = accountId, AccountLegalEntityId = accountLegalEntityId, DateCreated = DateTime.Now, Status = IncentiveApplicationStatus.InProgress }, true);
+            return new IncentiveApplication(id,
+                new IncentiveApplicationModel
+                {
+                    Id = id, AccountId = accountId, AccountLegalEntityId = accountLegalEntityId,
+                    DateCreated = DateTime.Now, Status = IncentiveApplicationStatus.InProgress
+                }, true);
         }
 
         internal static IncentiveApplication Get(Guid id, IncentiveApplicationModel model)
@@ -35,7 +41,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             return new IncentiveApplication(id, model);
         }
 
-        private IncentiveApplication(Guid id, IncentiveApplicationModel model, bool isNew = false) : base(id, model, isNew)
+        private IncentiveApplication(Guid id, IncentiveApplicationModel model, bool isNew = false) : base(id, model,
+            isNew)
         {
             foreach (var apprenticeshipModel in model.ApprenticeshipModels.ToList())
             {
@@ -67,20 +74,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             _apprenticeships.Clear();
             Model.ApprenticeshipModels.Clear();
+            AddApprenticeships(apprenticeships);
+        }
+
+        public void AddApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
+        {
             foreach (var a in apprenticeships)
             {
                 AddApprenticeship(a);
             }
+        }
+        public void RemoveApprenticeship(long apprenticeshipId)
+        {
+            var apprenticeship = _apprenticeships.FirstOrDefault(x => x.ApprenticeshipId == apprenticeshipId);
+            _apprenticeships.Remove(apprenticeship);
+            var apprenticeshipModel =
+                Model.ApprenticeshipModels.FirstOrDefault(x => x.ApprenticeshipId == apprenticeshipId);
+            Model.ApprenticeshipModels.Remove(apprenticeshipModel);
         }
 
         public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
         {
             var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
             apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.EmployerWithdrawn);
-            
+
             AddEvent(new EmployerWithdrawn(
                 Model.AccountId,
-                Model.AccountLegalEntityId, 
+                Model.AccountLegalEntityId,
                 apprenticeToWithdraw.GetModel(),
                 serviceRequest));
         }
@@ -105,10 +125,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
-            var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
+            var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year,
+                apprenticeship.PlannedStartDate.Month,
+                DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
             apprenticeship.SetPlannedStartDate(endOfStartMonth);
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
+
     }
 }
