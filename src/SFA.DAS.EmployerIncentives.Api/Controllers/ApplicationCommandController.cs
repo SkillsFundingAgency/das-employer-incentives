@@ -47,6 +47,5 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 return BadRequest();
             }
         }
-
     }
 }

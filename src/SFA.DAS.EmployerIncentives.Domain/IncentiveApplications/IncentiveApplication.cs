@@ -10,7 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("SFA.DAS.EmployerIncentives.Commands.UnitTests")]
-
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public sealed class IncentiveApplication : AggregateRoot<Guid, IncentiveApplicationModel>
