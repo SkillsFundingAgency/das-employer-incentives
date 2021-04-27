@@ -18,7 +18,8 @@
     [SubmittedDate] DATETIME2 NULL, 
     [SubmittedByEmail] NVARCHAR(255) NULL,
 	[CourseName] NVARCHAR(126) NULL,
-	[Status] NVARCHAR(50) NULL
+	[Status] NVARCHAR(50) NULL,
+	[MinimumAgreementVersion] INT NULL
 )
 GO
 CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, ApprenticeshipId)

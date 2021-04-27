@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var id = _fixture.Create<Guid>();
 
             // Act
-            var incentive = _sut.CreateNew(id, _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var incentive = _sut.CreateNew(id, _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<int>());
 
             // Assert
             incentive.Id.Should().Be(id);
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var account = _fixture.Create<Account>();
 
             // Act
-            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), account, _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), account, _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<int>());
 
             // Assert
             incentive.Account.Id.Should().Be(account.Id);
@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var apprenticeshipApplicationId = _fixture.Create<Guid>();
 
             // Act
-            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), apprenticeshipApplicationId, _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), apprenticeshipApplicationId, _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<int>());
 
             // Assert
             incentive.GetModel().ApplicationApprenticeshipId.Should().Be(apprenticeshipApplicationId);
@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var apprenticeship = _fixture.Create<Apprenticeship>();
 
             // Act
-            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), apprenticeship, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), apprenticeship, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<int>());
 
             // Assert
             incentive.Apprenticeship.Id.Should().Be(apprenticeship.Id);
@@ -83,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var plannedStartDate = _fixture.Create<DateTime>();
 
             // Act
-            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), plannedStartDate, _fixture.Create<DateTime>(), _fixture.Create<string>());
+            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), plannedStartDate, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<int>());
 
             // Assert
             incentive.StartDate.Should().Be(plannedStartDate);
@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var submittedDate = _fixture.Create<DateTime>();
 
             // Act
-            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), submittedDate, _fixture.Create<string>());
+            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), submittedDate, _fixture.Create<string>(), _fixture.Create<int>());
 
             // Assert
             incentive.GetModel().SubmittedDate.Should().Be(submittedDate);
@@ -109,7 +109,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
             var submittedByEmail = _fixture.Create<string>();
 
             // Act
-            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), submittedByEmail);
+            var incentive = _sut.CreateNew(_fixture.Create<Guid>(), _fixture.Create<Guid>(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), submittedByEmail, _fixture.Create<int>());
 
             // Assert
             incentive.GetModel().SubmittedByEmail.Should().Be(submittedByEmail);
