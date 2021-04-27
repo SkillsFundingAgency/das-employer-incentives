@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     {
         public AccountCommandController(ICommandDispatcher commandDispatcher) : base(commandDispatcher) { }
 
-        [HttpPost("/accounts/{accountId}/legalEntities")]
+        [HttpPut("/accounts/{accountId}/legalEntities")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public async Task<IActionResult> UpsertLegalEntity([FromRoute] long accountId, [FromBody] AddLegalEntityRequest request)
         {
