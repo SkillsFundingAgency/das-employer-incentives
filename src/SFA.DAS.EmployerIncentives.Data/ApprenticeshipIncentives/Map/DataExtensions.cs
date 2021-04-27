@@ -3,6 +3,10 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using ChangeOfCircumstance = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ChangeOfCircumstance;
+using LearningPeriod = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.LearningPeriod;
+using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 {
@@ -35,7 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CourseName = model.Apprenticeship.CourseName,
                 Status = model.Status,
                 BreakInLearningDayCount = model.BreakInLearningDayCount,
-                BreakInLearnings = model.BreakInLearnings.Map(model.Id)
+                BreakInLearnings = model.BreakInLearnings.Map(model.Id),                
+                MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion
             };
         }
 
@@ -73,7 +78,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
                 BreakInLearningDayCount = entity.BreakInLearningDayCount,
-                BreakInLearnings = entity.BreakInLearnings.Map()
+                BreakInLearnings = entity.BreakInLearnings.Map(),
+                MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.StartDate)
             };
         }
 
@@ -399,5 +405,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ChangedDate = model.ChangedDate
             };
         }        
+
     }
 }

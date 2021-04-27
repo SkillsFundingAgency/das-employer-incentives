@@ -24,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public IncentiveStatus Status { get; set; }
         public int BreakInLearningDayCount { get; set; }
         public ICollection<BreakInLearning> BreakInLearnings { get; set; }
+        public AgreementVersion MinimumAgreementVersion { get; set; }
 
         public ApprenticeshipIncentiveModel()
         {

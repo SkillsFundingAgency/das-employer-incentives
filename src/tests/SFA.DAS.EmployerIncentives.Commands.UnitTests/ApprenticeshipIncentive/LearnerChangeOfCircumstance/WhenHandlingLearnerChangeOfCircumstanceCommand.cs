@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(p => p.PendingPaymentModels, new List<PendingPaymentModel>())
                 .Create();
             _incentiveModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            _incentiveModel.HasPossibleChangeOfCircumstances = true;
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(_incentiveModel.Id, _incentiveModel);
             _fixture.Register(() => incentive);
 

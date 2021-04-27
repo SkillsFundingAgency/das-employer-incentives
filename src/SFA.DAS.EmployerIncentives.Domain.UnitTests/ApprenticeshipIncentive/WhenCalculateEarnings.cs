@@ -541,7 +541,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(),
                 _fixture.Create<DateTime>(),
                 _fixture.Create<DateTime>(),
-                _fixture.Create<string>());
+                _fixture.Create<string>(),
+                _fixture.Create<int>());
 
             // Assert
             incentive.PendingPayments.Count.Should().Be(0);
