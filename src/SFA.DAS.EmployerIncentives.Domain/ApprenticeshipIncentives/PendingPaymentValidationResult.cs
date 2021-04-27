@@ -22,7 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Id = id,
                 CollectionPeriod = collectionPeriod,
                 Step = step,
-                Result = result
+                Result = result,
+                CreatedDateUtc = DateTime.Today
             },
                 true);
         }

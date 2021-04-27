@@ -1,9 +1,13 @@
-﻿using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
+﻿using Dapper.Contrib.Extensions;
+using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
@@ -40,6 +44,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public async Task SetActiveCollectionCalendarPeriod(CollectionPeriod collectionPeriod)
+        {
+            await using var dbConnection = new SqlConnection(SqlDatabase.DatabaseInfo.ConnectionString);
+            var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionPeriod>();
+            var currentActivePeriod = calendar.SingleOrDefault(x => x.Active);
+            if (currentActivePeriod != null)
+            {
+                currentActivePeriod.Active = false;
+                await dbConnection.UpdateAsync(currentActivePeriod);
+            }
+            var period = calendar.Single(x => x.CalendarYear == collectionPeriod.Year && x.PeriodNumber == collectionPeriod.Period);
+            period.Active = true;
+
+            await dbConnection.UpdateAsync(period);
+            ActivePeriod = period;
         }
 
         protected virtual void Dispose(bool disposing)
