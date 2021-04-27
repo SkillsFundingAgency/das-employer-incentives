@@ -36,13 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
         {
             if (apprenticeships == null)
             {
-                result.AddError("Apprenticeships", "Is not set");
-                return;
-            }
-
-            if (!apprenticeships.Any())
-            {
-                result.AddError("Apprenticeships", "Have not been provided");
                 return;
             }
 
