@@ -14,5 +14,7 @@
         public const string ApprenticeshipIncentivesWithdraw = "SFA.DAS.EmployerIncentives.Withdraw";
 
         public const string UpdateVendorRegistrationCaseStatus = "SFA.DAS.EmployerIncentives.UpdateVrfStatus";
+
+        public const string NotifyNewAgreementRequired = "SFA.DAS.EmployerIncentives.NewAgreementRequired";
     }
 }

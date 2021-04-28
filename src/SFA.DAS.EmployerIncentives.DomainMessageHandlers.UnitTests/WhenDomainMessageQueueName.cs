@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests
                 .Where(fi => fi.IsLiteral && !fi.IsInitOnly).Select(x => x.GetRawConstantValue()).ToList();
 
             Assert.IsTrue(queues.Any());
-            queues.ForEach(q => Assert.IsTrue(((string)q).Length <= 50, $"'{q}' is {((string)q).Length} long and therefore exceeds 50 character limit"));
+            queues.ForEach(q => Assert.IsTrue(((string)q).Length <= 50, $"'{q}' is {((string)q).Length} characters long and therefore exceeds 50 character limit"));
         }
     }
 }
