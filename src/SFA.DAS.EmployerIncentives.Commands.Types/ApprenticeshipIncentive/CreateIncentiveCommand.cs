@@ -64,6 +64,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
                 };
             }
         }
-
     }
 }

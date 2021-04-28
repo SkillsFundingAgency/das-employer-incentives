@@ -79,12 +79,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_paymentProfiles);
 
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.Status, IncentiveStatus.Active).Create();
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.StartDate = _plannedStartDate;
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sutModel.PaymentModels = new List<PaymentModel>();
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
+            _sutModel.BreakInLearningDayCount = 0;
             _sut = Sut(_sutModel);
         }
 
@@ -167,6 +168,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
             secondPayment.Account.Id.Should().Be(_sutModel.Account.Id);
             secondPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
+        }
+
+        [Test]
+        public async Task Then_the_earnings_are_calculated_and_the_pending_payments_due_date_includes_any_break_in_learning()
+        {
+            // arrange                        
+            _sutModel.BreakInLearningDayCount = 44;
+            _sut = Sut(_sutModel);
+
+            // act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            _sut.PendingPayments.Count.Should().Be(2);
+
+            var firstPayment = _sut.PendingPayments.First();
+            var secondPayment = _sut.PendingPayments.Last();
+
+            firstPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart + 44));
+            secondPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart + 44));
         }
 
         [Test]
@@ -474,6 +495,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeTrue());
         }
 
+        [Test]
+        public async Task Then_earnings_are_not_calculated_when_the_apprenticeship_is_stopped()
+        {
+            // Arrange
+            _sutModel.Status = IncentiveStatus.Stopped;
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task Then_earnings_are_not_calculated_when_the_apprenticeship_is_withdrawn()
+        {
+            // Arrange
+            _sutModel.Status = IncentiveStatus.Withdrawn;
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Should().BeEmpty();
+        }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
@@ -493,7 +541,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(),
                 _fixture.Create<DateTime>(),
                 _fixture.Create<DateTime>(),
-                _fixture.Create<string>());
+                _fixture.Create<string>(),
+                _fixture.Create<int>());
 
             // Assert
             incentive.PendingPayments.Count.Should().Be(0);

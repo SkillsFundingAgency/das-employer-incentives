@@ -132,6 +132,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private async Task RunPaymentsProcess()
         {
+            await _testContext.SetActiveCollectionCalendarPeriod(new CollectionPeriod() { Period = CollectionPeriod, Year = CollectionPeriodYear });
+
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "IncentivePaymentOrchestrator_HttpStart",
@@ -140,10 +142,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     {
                         ["req"] = new DummyHttpRequest
                         {
-                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
-                        },
-                        ["collectionPeriodYear"] = CollectionPeriodYear,
-                        ["collectionPeriodNumber"] = CollectionPeriod
+                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
+                        }
                     },
                     expectedCustomStatus: "WaitingForPaymentApproval"
                 ));
@@ -151,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
             var orchestratorStartResponse = await _testContext.TestFunction.GetOrchestratorStartResponse();
             _orchestratorInstanceId = orchestratorStartResponse.Id;
-        }
+        }      
 
         private async Task ApprovePayments()
         {

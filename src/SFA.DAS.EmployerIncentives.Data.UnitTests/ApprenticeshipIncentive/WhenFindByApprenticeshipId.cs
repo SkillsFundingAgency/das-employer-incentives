@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         public async Task Then_apprenticeship_incentive_is_returned_if_exists()
         {
             // Arrange
-            var expected = _fixture.Create<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
+            var expected = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>().Without(x => x.BreakInLearnings).Create();
             await _dbContext.AddAsync(expected);
             await _dbContext.SaveChangesAsync();
 

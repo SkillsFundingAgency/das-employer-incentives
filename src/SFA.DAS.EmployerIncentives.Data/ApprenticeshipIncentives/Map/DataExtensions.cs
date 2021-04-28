@@ -3,6 +3,10 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using ChangeOfCircumstance = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ChangeOfCircumstance;
+using LearningPeriod = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.LearningPeriod;
+using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 {
@@ -34,7 +38,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedByEmail = model.SubmittedByEmail,
                 CourseName = model.Apprenticeship.CourseName,
                 Status = model.Status,
-                MinimumAgreementVersion = model.MinimumAgreementVersion
+                BreakInLearningDayCount = model.BreakInLearningDayCount,
+                BreakInLearnings = model.BreakInLearnings.Map(model.Id),                
+                MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion
             };
         }
 
@@ -71,7 +77,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
-                MinimumAgreementVersion = entity.MinimumAgreementVersion
+                BreakInLearningDayCount = entity.BreakInLearningDayCount,
+                BreakInLearnings = entity.BreakInLearnings.Map(),
+                MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.StartDate)
             };
         }
 
@@ -250,6 +258,16 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
                 learner.SubmissionData.LearningData.SetIsInLearning(model.InLearning);
 
+                if(model.LearningStoppedDate.HasValue)
+                {
+                    learner.SubmissionData.LearningData.SetIsStopped(new Domain.ApprenticeshipIncentives.ValueTypes.LearningStoppedStatus(true, model.LearningStoppedDate.Value));
+                }
+
+                if (model.LearningResumedDate.HasValue)
+                {
+                    learner.SubmissionData.LearningData.SetIsStopped(new Domain.ApprenticeshipIncentives.ValueTypes.LearningStoppedStatus(false, model.LearningResumedDate.Value));
+                }
+
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
@@ -276,7 +294,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             learner.HasDataLock = model.SubmissionData.LearningData.HasDataLock;
             learner.InLearning = model.SubmissionData.LearningData.IsInlearning;
             learner.RawJSON = model.SubmissionData.RawJson;
-
+            learner.LearningStoppedDate = model.SubmissionData.LearningData.StoppedStatus.DateStopped;
+            learner.LearningResumedDate = model.SubmissionData.LearningData.StoppedStatus.DateResumed;
             return learner;
         }
 
@@ -309,6 +328,32 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning> Map(this ICollection<ApprenticeshipDaysInLearning> models)
         {
             return models.Select(x => new Domain.ApprenticeshipIncentives.ValueTypes.DaysInLearning(x.CollectionPeriodNumber, x.CollectionPeriodYear, x.NumberOfDaysInLearning)).ToList();
+        }
+
+        private static ICollection<Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning> Map(this ICollection<ApprenticeshipBreakInLearning> models)
+        {
+            return models.Select(x => x.Map()).ToList();
+        }
+
+        private static Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning Map(this ApprenticeshipBreakInLearning model)
+        {
+            var newBreakInLearning = new Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning(model.StartDate);
+            if (model.EndDate.HasValue)
+            {
+                newBreakInLearning.SetEndDate(model.EndDate.Value);
+            }
+
+            return newBreakInLearning;
+        }
+
+        private static ICollection<ApprenticeshipBreakInLearning> Map(this ICollection<Domain.ApprenticeshipIncentives.ValueTypes.BreakInLearning> models, Guid ApprenticeshipIncentiveId)
+        {
+            return models.Select(x => new ApprenticeshipBreakInLearning
+            {
+                ApprenticeshipIncentiveId = ApprenticeshipIncentiveId,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate                
+            }).ToList();
         }
 
         private static ICollection<ClawbackPayment> Map(this ICollection<ClawbackPaymentModel> models)
@@ -360,5 +405,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ChangedDate = model.ChangedDate
             };
         }        
+
     }
 }

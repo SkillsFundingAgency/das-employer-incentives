@@ -1,4 +1,5 @@
-﻿Feature: SendPayments
+﻿@activeCalendarPeriod
+Feature: SendPayments
 	In order to make employer incentives payments
 	As a employer incentives service
 	I want to be send payments to business central once they are validated
