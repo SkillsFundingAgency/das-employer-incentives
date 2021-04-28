@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
       
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 3, 31);
 
         public Incentive(DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
         {
