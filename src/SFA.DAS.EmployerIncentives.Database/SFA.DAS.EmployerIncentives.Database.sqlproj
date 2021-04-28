@@ -117,5 +117,6 @@
     <None Include="SFA.DAS.EmployerIncentives.Database.publish.xml" />
     <None Include="update-model.publish.xml" />
     <Build Include="Views\BusinessApplicationsDashboard.sql" />
+    <None Include="Scripts\Update.MinimumAgreementVersion.sql" />
   </ItemGroup>
 </Project>
