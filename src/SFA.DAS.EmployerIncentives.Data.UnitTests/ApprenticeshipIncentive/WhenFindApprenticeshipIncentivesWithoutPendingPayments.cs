@@ -33,6 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             // Arrange
             var incentives = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
                 .Without(x => x.PendingPayments)
+                .Without(x => x.BreakInLearnings)
                 .CreateMany(3).ToList();
 
             var expected = (IncentiveWithPendingPayments: incentives[0].Id,

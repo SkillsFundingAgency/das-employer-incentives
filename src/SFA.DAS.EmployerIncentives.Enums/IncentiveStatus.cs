@@ -4,6 +4,7 @@
     {
         Active,
         Paused,
-        Withdrawn
+        Withdrawn,
+        Stopped
     }
 }
