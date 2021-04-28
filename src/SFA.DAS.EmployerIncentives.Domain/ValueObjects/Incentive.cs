@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return paymentProfiles.Select(profile =>
                 new Payment(
                     profile.AmountPayable, 
-                    _startDate.AddDays(profile.DaysAfterApprenticeshipStart),
+                    _startDate.AddDays(profile.DaysAfterApprenticeshipStart).AddDays(_breakInLearningDayCount),
                     profile.EarningType)
             ).ToList();
         }

@@ -55,8 +55,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             payments[1].EarningType.Should().Be(EarningType.SecondPayment);
         }
 
-        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
-        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
+        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1100, 365)]
+        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1222, 89, 1333, 354)]
         public void Then_the_due_date_includes_the_break_in_learning(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);
