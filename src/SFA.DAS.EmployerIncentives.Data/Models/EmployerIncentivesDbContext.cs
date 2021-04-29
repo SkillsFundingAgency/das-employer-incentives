@@ -31,7 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<IncentiveApplicationStatusAudit> IncentiveApplicationStatusAudits { get; set; }
         public virtual DbSet<ClawbackPayment> ClawbackPayments { get; set; }
         public virtual DbSet<ChangeOfCircumstance> ChangeOfCircumstances { get; set; }
-
+        public virtual DbSet<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -42,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
                 entity.Property(e => e.LegalEntityName)
                     .IsRequired()
                     .IsUnicode(false);
-            });
+            });            
 
             modelBuilder.Entity<IncentiveApplicationApprenticeship>().Property(x => x.ApprenticeshipEmployerTypeOnApproval).HasConversion<int>();
             modelBuilder.Entity<ApprenticeshipIncentive>().Property(x => x.EmployerType).HasConversion<int>();
@@ -56,6 +57,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
             modelBuilder.Entity<ApprenticeshipDaysInLearning>(entity =>
             {
                 entity.HasKey(e => new { e.LearnerId, e.CollectionPeriodYear, e.CollectionPeriodNumber });
+            });
+
+            modelBuilder.Entity<ApprenticeshipBreakInLearning>(entity =>
+            {
+                entity.HasKey(e => new { e.ApprenticeshipIncentiveId, e.StartDate });
             });
 
             OnModelCreatingPartial(modelBuilder);

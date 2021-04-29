@@ -59,6 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetStartDate(learnerData.LearningStartDate(incentive));
                     submissionData.LearningData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
                     submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
+                    submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive));
                 }
                 submissionData.SetRawJson(learnerData.RawJson);
             }
@@ -72,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             incentive.LearnerRefreshCompleted();
 
             learner.SetLearningPeriods(learnerData.LearningPeriods(incentive));
-
+            
             if (!learner.SubmissionData.LearningData.LearningFound)
             {
                 _logger.LogInformation("Matching ILR record not found for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN} with reason: {NotFoundReason}",
