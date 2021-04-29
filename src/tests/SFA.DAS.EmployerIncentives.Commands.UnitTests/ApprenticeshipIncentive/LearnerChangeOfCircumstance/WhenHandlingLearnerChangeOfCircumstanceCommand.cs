@@ -11,6 +11,8 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     DateTime.Today,
                     _fixture.Create<DateTime>(),
                     _fixture.Create<string>(),
-                    _fixture.Create<int>());
+                    new AgreementVersion(_fixture.Create<int>()),
+                    new IncentivePhase(Phase.Phase1_0));
             incentive.SetHasPossibleChangeOfCircumstances(true);
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());

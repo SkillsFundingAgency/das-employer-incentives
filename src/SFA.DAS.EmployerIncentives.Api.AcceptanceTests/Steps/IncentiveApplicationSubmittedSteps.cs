@@ -1,10 +1,12 @@
 ﻿using AutoFixture;
 using Dapper;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -23,13 +25,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly CreateIncentiveApplicationRequest _createRequest;
         private readonly SubmitIncentiveApplicationRequest _submitRequest;
         private HttpResponseMessage _response;
+        private long _firstApprenticeshipId;
+        private long _secondApprenticeshipId;
 
         public IncentiveApplicationSubmittedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
-            _createRequest = _fixture.Create<CreateIncentiveApplicationRequest>();
-            _submitRequest = _fixture.Create<SubmitIncentiveApplicationRequest>();
+            _firstApprenticeshipId = _fixture.Create<long>();
+            _secondApprenticeshipId = _firstApprenticeshipId + 1;
+            var apprenticeships = new List<IncentiveApplicationApprenticeshipDto>
+            {
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2020, 8, 1)).Create(),
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 2, 1)).Create()
+            };
+
+            _createRequest = _fixture
+                .Build<CreateIncentiveApplicationRequest>()
+                .With(r => r.Apprenticeships, apprenticeships)
+                .Create();
+            _submitRequest = _fixture.Build<SubmitIncentiveApplicationRequest>().With(r => r.DateSubmitted, new DateTime(2021, 5, 31)).Create();
             _submitRequest.IncentiveApplicationId = _createRequest.IncentiveApplicationId;
             _submitRequest.AccountId = _createRequest.AccountId;
         }
@@ -78,6 +93,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
                 application.Should().HaveCount(1);
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
+
+                var apprenticeships = await dbConnection.QueryAsync<IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
+                    new { _submitRequest.IncentiveApplicationId });
+
+                apprenticeships.Count().Should().Be(2);
+                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1_0);
+                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1_1);
             }
 
             var publishedCommand = _testContext.CommandsPublished

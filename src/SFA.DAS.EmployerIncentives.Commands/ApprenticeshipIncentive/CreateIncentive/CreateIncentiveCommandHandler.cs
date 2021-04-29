@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,7 +47,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                 command.PlannedStartDate,
                 command.SubmittedDate,
                 command.SubmittedByEmail,
-                AgreementVersion.Create(command.PlannedStartDate).MinimumRequiredVersion);
+                AgreementVersion.Create(command.PlannedStartDate),
+                IncentivePhase.Create(command.PlannedStartDate, command.SubmittedDate)
+                );
 
             if (command.UKPRN.HasValue)
             {

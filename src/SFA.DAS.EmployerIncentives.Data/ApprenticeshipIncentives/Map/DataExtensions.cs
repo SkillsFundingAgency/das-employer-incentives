@@ -38,7 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedByEmail = model.SubmittedByEmail,
                 CourseName = model.Apprenticeship.CourseName,
                 Status = model.Status,
-                MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion
+                MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
+                Phase = model.Phase.Identifier
             };
         }
 
@@ -75,7 +76,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
-                MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.StartDate)
+                MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.StartDate),
+                Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase)
             };
         }
 

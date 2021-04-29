@@ -42,6 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public IncentiveStatus Status { get; set; }
 
         public int? MinimumAgreementVersion { get; set; }
+        
+        [Column(TypeName = "nvarchar(50)")]
+        public Phase Phase { get; set; }
 
         public ApprenticeshipIncentive()
         {
