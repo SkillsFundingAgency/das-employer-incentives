@@ -19,15 +19,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 3, 31);
+        public static DateTime ApplicationEndDate = new DateTime(2021, 5, 31);
 
         private readonly List<EligibiliyPeriod> EligibilityPeriods = new List<EligibiliyPeriod>
         {
             new EligibiliyPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
-            new EligibiliyPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 3, 31), 5)
+            new EligibiliyPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
         };
-        
+
         public IEnumerable<Payment> Payments => _payments;
-        public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
+        public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= ApplicationEndDate;
         public decimal Total => Payments.Sum(x => x.Amount);
         public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
