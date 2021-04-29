@@ -11,6 +11,8 @@
 	[HasDataLock] BIT NULL,
 	[StartDate] DATETIME2 NULL,
 	[InLearning] BIT NULL,
+	[LearningStoppedDate] DATETIME2 NULL,
+	[LearningResumedDate] DATETIME2 NULL,
 	[RawJSON] NVARCHAR(MAX) NULL,
 	[CreatedDate] DATETIME2 NOT NULL,
 	[UpdatedDate] DATETIME2 NULL

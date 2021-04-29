@@ -41,6 +41,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Column(TypeName = "nvarchar(50)")]
         public IncentiveStatus Status { get; set; }
 
+        public int BreakInLearningDayCount { get; set; }
+
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
+
         public int? MinimumAgreementVersion { get; set; }
         
         [Column(TypeName = "nvarchar(50)")]
@@ -51,6 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
             PendingPayments = new List<PendingPayment>();
             Payments = new List<Payment>();
             ClawbackPayments = new List<ClawbackPayment>();
+            BreakInLearnings = new List<ApprenticeshipBreakInLearning>();
         }
     }
 }
