@@ -36,7 +36,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
                 return this; // no need to change the version outside the eligibility window 
             }
 
-            return Create(startDate);          
+            var newVersion = Create(startDate);
+
+            if(newVersion.MinimumRequiredVersion > MinimumRequiredVersion)
+            {
+                return newVersion; // only increase the version on start date change
+            }
+
+            return this;
         }
 
         protected override IEnumerable<object> GetAtomicValues()
