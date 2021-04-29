@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
 
             //Assert
             result.EligibilityStartDate.Should().Be(Incentive.EligibilityStartDate);
-            result.EligibilityEndDate.Should().Be(Incentive.EligibilityEndDate);
+            result.EligibilityEndDate.Should().Be(Incentive.LatestCommitmentStartDate);
         }
     }
 }
