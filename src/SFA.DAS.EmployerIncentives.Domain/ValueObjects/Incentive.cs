@@ -19,7 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
-        public static DateTime LatestCommitmentStartDate = new DateTime(2021, 3, 31);
 
         private readonly List<EligibiliyPeriod> EligibilityPeriods = new List<EligibiliyPeriod>
         {
