@@ -127,7 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
         private async Task<ApprenticeshipIncentiveModel> SaveAndGetApprenticeshipIncentive()
         {
-            var incentive = _fixture.Create<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>().Without(m => m.BreakInLearnings).Create();
             foreach (var pendingPayment in incentive.PendingPayments)
             {
                 pendingPayment.PaymentYear = Convert.ToInt16(_collectionPeriod.AcademicYear);

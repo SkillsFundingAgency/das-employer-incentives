@@ -459,7 +459,272 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Start Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
             _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
             _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Matching ILR record not found for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber} with reason: {_learner.SubmissionData.LearningData.NotFoundReason}");
+        }
 
+        [Test]
+        public async Task Then_the_learning_stopped_status_has_false_stopped_flag_when_there_are_no_matching_learner_records()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            var learnerSubmissionDto = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .Create(),
+                    _fixture.Create<TrainingDto>()
+                   })
+               .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLearnerDomainRepository.Verify(m => m.Save(
+                It.Is<Learner>(l => !l.SubmissionData.LearningData.StoppedStatus.LearningStopped)
+                ), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_learning_stopped_status_has_true_stopped_flag_when_there_are_matching_learner_records_and_the_learning_has_stopped()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            var apprenticeship = _fixture.Create<Apprenticeship>();
+            apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+               .With(p => p.Apprenticeship, apprenticeship)
+               .Create();
+
+            _mockApprenticeshipIncentiveDomainRepository
+                .Setup(m => m.Find(_apprenticeshipIncentiveId))
+                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.ApplicationApprenticeshipId, apprenticeshipIncentiveModel));
+
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(apprenticeshipIncentive))
+                .ReturnsAsync(learner);
+
+            var learnerSubmissionDto = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(t => t.PriceEpisodes,
+                        new List<PriceEpisodeDto>{
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(-10))
+                            .Create(),
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-10))
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(-2))
+                            .Create()
+                            }).Create(),
+                        _fixture.Create<TrainingDto>()
+                   })
+               .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLearnerDomainRepository.Verify(m => m.Save(
+                It.Is<Learner>(l => l.SubmissionData.LearningData.StoppedStatus.LearningStopped &&
+                l.SubmissionData.LearningData.StoppedStatus.DateStopped == DateTime.Today.AddDays(-1) &&
+                !l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue)
+                ), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_learning_stopped_status_has_false_stopped_flag_when_there_are_matching_learner_records_and_the_learning_has_not_stopped()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            var apprenticeship = _fixture.Create<Apprenticeship>();
+            apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+               .With(p => p.Apprenticeship, apprenticeship)
+               .Create();
+
+            _mockApprenticeshipIncentiveDomainRepository
+                .Setup(m => m.Find(_apprenticeshipIncentiveId))
+                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.ApplicationApprenticeshipId, apprenticeshipIncentiveModel));
+
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(apprenticeshipIncentive))
+                .ReturnsAsync(learner);
+
+            var learnerSubmissionDto = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(t => t.PriceEpisodes,
+                        new List<PriceEpisodeDto>{
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(-10))
+                            .Create(),
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-10))
+                            .With(pe => pe.EndDate, DateTime.Today)
+                            .Create()
+                            }).Create(),
+                        _fixture.Create<TrainingDto>()
+                   })
+               .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLearnerDomainRepository.Verify(m => m.Save(
+                It.Is<Learner>(l => !l.SubmissionData.LearningData.StoppedStatus.LearningStopped &&
+                !l.SubmissionData.LearningData.StoppedStatus.DateStopped.HasValue &&
+                l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue)
+                ), Times.Once);
+        }
+       
+        [Test]
+        public async Task Then_the_learning_stopped_status_has_false_stopped_flag_when_there_are_matching_learner_records_and_the_learning_has_resumed_from_stopped()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            var apprenticeship = _fixture.Create<Apprenticeship>();
+            apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+               .With(p => p.Apprenticeship, apprenticeship)
+               .With(p => p.Status, Enums.IncentiveStatus.Stopped)
+               .Create();
+
+            _mockApprenticeshipIncentiveDomainRepository
+                .Setup(m => m.Find(_apprenticeshipIncentiveId))
+                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.ApplicationApprenticeshipId, apprenticeshipIncentiveModel));
+
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(apprenticeshipIncentive))
+                .ReturnsAsync(learner);
+
+            var learnerSubmissionDto = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(t => t.PriceEpisodes,
+                        new List<PriceEpisodeDto>{
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(10))
+                            .Create(),
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-10))
+                            .With(pe => pe.EndDate, DateTime.Today)
+                            .Create()
+                            }).Create(),
+                        _fixture.Create<TrainingDto>()
+                   })
+               .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLearnerDomainRepository.Verify(m => m.Save(
+                It.Is<Learner>(l => !l.SubmissionData.LearningData.StoppedStatus.LearningStopped &&
+                l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue &&
+                !l.SubmissionData.LearningData.StoppedStatus.DateStopped.HasValue)
+                ), Times.Once);
         }
     }
 }
