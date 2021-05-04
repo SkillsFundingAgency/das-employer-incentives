@@ -120,7 +120,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         today.AddYears(-26),
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
-                        _fixture.Create<string>()
+                        _fixture.Create<string>(),
+                        _fixture.Create<DateTime>()
                     ),
                     today,
                     _fixture.Create<DateTime>(),

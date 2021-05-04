@@ -37,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = model.SubmittedDate,
                 SubmittedByEmail = model.SubmittedByEmail,
                 CourseName = model.Apprenticeship.CourseName,
+                EmploymentStartDate = model.Apprenticeship.EmploymentStartDate,
                 Status = model.Status,
                 BreakInLearningDayCount = model.BreakInLearningDayCount,
                 BreakInLearnings = model.BreakInLearnings.Map(model.Id),                
@@ -53,7 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.DateOfBirth,
                      entity.ULN,
                      entity.EmployerType,
-                     entity.CourseName
+                     entity.CourseName,
+                     entity.EmploymentStartDate
                      );
 
             if (entity.UKPRN.HasValue)

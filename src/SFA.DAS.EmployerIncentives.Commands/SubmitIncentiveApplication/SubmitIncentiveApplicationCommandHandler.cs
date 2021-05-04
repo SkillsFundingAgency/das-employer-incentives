@@ -1,4 +1,6 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System;
+using System.Linq;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
@@ -21,6 +23,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             var application = await _domainRepository.Find(command.IncentiveApplicationId);
 
             if (application == null || application.AccountId != command.AccountId)
+            {
+                throw new InvalidRequestException();
+            }
+            if (application.Apprenticeships.Any(apprenticeship => !apprenticeship.EmploymentStartDate.HasValue || apprenticeship.EmploymentStartDate.Value == DateTime.MinValue))
             {
                 throw new InvalidRequestException();
             }

@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public ICollection<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
 
         public int? MinimumAgreementVersion { get; set; }
+        public DateTime EmploymentStartDate { get; set; }
 
         public ApprenticeshipIncentive()
         {

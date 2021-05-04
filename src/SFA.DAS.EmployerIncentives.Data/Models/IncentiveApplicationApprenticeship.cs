@@ -24,5 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public bool WithdrawnByEmployer { get; set; }
         public bool WithdrawnByCompliance { get; set; }
         public string CourseName { get; set; }
+        public DateTime? EmploymentStartDate { get; set; }
     }
 }

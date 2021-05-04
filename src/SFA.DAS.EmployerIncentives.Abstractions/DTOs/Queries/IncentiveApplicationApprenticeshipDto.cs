@@ -12,5 +12,6 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public long Uln { get; set; }
         public DateTime PlannedStartDate { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public DateTime? EmploymentStartDate { get; set; }
     }
 }

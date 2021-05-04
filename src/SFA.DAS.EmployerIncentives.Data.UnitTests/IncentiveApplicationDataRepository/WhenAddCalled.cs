@@ -50,15 +50,15 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             // Assert
             _dbContext.Applications.Count().Should().Be(1);
 
-            var storedAccount = _dbContext.Applications.Single();
-            storedAccount.Id.Should().Be(testApplication.Id);
-            storedAccount.AccountId.Should().Be(testApplication.AccountId);
-            storedAccount.AccountLegalEntityId.Should().Be(testApplication.AccountLegalEntityId);
-            storedAccount.DateCreated.Should().Be(testApplication.DateCreated);
-            storedAccount.DateSubmitted.Should().Be(testApplication.DateSubmitted);
-            storedAccount.Status.Should().Be(testApplication.Status);
-            storedAccount.SubmittedByEmail.Should().Be(testApplication.SubmittedByEmail);
-            storedAccount.SubmittedByName.Should().Be(testApplication.SubmittedByName);
+            var storedApplication = _dbContext.Applications.Single();
+            storedApplication.Id.Should().Be(testApplication.Id);
+            storedApplication.AccountId.Should().Be(testApplication.AccountId);
+            storedApplication.AccountLegalEntityId.Should().Be(testApplication.AccountLegalEntityId);
+            storedApplication.DateCreated.Should().Be(testApplication.DateCreated);
+            storedApplication.DateSubmitted.Should().Be(testApplication.DateSubmitted);
+            storedApplication.Status.Should().Be(testApplication.Status);
+            storedApplication.SubmittedByEmail.Should().Be(testApplication.SubmittedByEmail);
+            storedApplication.SubmittedByName.Should().Be(testApplication.SubmittedByName);
         }
 
         [Test]
@@ -94,6 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedApprenticeship.TotalIncentiveAmount.Should().Be(testApprenticeship.TotalIncentiveAmount);
             storedApprenticeship.UKPRN.Should().Be(testApprenticeship.UKPRN);
             storedApprenticeship.CourseName.Should().Be(testApprenticeship.CourseName);
+            storedApprenticeship.EmploymentStartDate.Should().Be(testApprenticeship.EmploymentStartDate);
         }
     }
 }

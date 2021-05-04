@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public Provider Provider { get; private set; }
         public ApprenticeshipEmployerType EmployerType { get; }
         public string CourseName { get; set; }
+        public DateTime EmploymentStartDate { get; set; }
 
         public Apprenticeship(
             long id, 
@@ -23,14 +24,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             DateTime dateOfBirth,
             long uniqueLearnerNumber,
             ApprenticeshipEmployerType employerType,
-            string courseName)
+            string courseName,
+            DateTime employmentStartDate)
         {
             if (id <= 0) throw new ArgumentException("Apprenticeship Id must be greater than 0", nameof(id));
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("FirstName must be set", nameof(firstName));
             if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("LastName must be set", nameof(lastName));
             if (uniqueLearnerNumber <= 0) throw new ArgumentException("UniqueLearnerNumber must be greater than 0", nameof(uniqueLearnerNumber));
             if (string.IsNullOrWhiteSpace(courseName)) throw new ArgumentException("CourseName must be set", nameof(courseName));
-
+            if (employmentStartDate == DateTime.MinValue) throw new ArgumentException("EmploymentStartDate must be set", nameof(employmentStartDate));
             Id = id;
             FirstName = firstName;
             LastName = lastName;
@@ -38,6 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             UniqueLearnerNumber = uniqueLearnerNumber;
             EmployerType = employerType;
             CourseName = courseName;
+            EmploymentStartDate = employmentStartDate;
         }
 
         public void SetProvider(Provider provider)
@@ -55,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return EmployerType;
             yield return Provider;
             yield return CourseName;
+            yield return EmploymentStartDate;
         }
     }
 }

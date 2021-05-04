@@ -41,7 +41,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                     command.DateOfBirth,
                     command.Uln,
                     command.ApprenticeshipEmployerTypeOnApproval,
-                    command.CourseName
+                    command.CourseName,
+                    command.EmploymentStartDate
                 ),
                 command.PlannedStartDate,
                 command.SubmittedDate,

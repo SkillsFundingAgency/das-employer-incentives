@@ -10,7 +10,11 @@ using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplication.Handlers
 {
@@ -79,6 +83,30 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
+
+            _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
+                .ReturnsAsync(incentiveApplication);
+
+            // Act
+            Func<Task> action = async () => await _sut.Handle(command);
+
+            // Assert
+            action.Should().Throw<InvalidRequestException>();
+            _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
+        }
+
+        [Test]
+        public void Then_application_with_invalid_employment_start_date_is_rejected()
+        {
+            //Arrange
+            var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
+                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), DateTime.MinValue);
+
+            var incentiveApplication = _fixture.Create<IncentiveApplication>();
+            incentiveApplication.SetApprenticeships(new List<Apprenticeship> {apprentice});
+
+            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
