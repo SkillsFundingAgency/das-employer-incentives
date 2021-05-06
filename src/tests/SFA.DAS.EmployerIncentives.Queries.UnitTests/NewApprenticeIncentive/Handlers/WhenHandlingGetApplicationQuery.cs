@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -10,9 +6,12 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Handlers
 {
@@ -21,7 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         private GetApplicationQueryHandler _sut;
         private Mock<IQueryRepository<IncentiveApplicationDto>> _applicationRepository;
         private Fixture _fixture;
-        private Mock<IIncentivePaymentProfilesService> _paymentProfileService;
         private Mock<IQueryRepository<LegalEntityDto>> _legalEntityRepository;
 
         [SetUp]
@@ -30,20 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             _fixture = new Fixture();
             _applicationRepository = new Mock<IQueryRepository<IncentiveApplicationDto>>();
             _legalEntityRepository = new Mock<IQueryRepository<LegalEntityDto>>();
-            _paymentProfileService = new Mock<IIncentivePaymentProfilesService>();
 
-            _paymentProfileService.Setup(x => x.Get()).ReturnsAsync(new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
-                    new List<PaymentProfile>
-                        {new PaymentProfile(90, 1000), new PaymentProfile(365, 1000)}),
-
-                new IncentivePaymentProfile(IncentiveType.UnderTwentyFiveIncentive,
-                    new List<PaymentProfile>
-                        {new PaymentProfile(90, 1200), new PaymentProfile(365, 1200)})
-            });
-
-            _sut = new GetApplicationQueryHandler(_applicationRepository.Object, _legalEntityRepository.Object, _paymentProfileService.Object);
+            _sut = new GetApplicationQueryHandler(_applicationRepository.Object, _legalEntityRepository.Object);
         }
 
         [Test]
@@ -51,10 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = _fixture.Create<GetApplicationRequest>();
-            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2020, 9,1)).Create();
+            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1_0).With(x => x.PlannedStartDate, new DateTime(2020, 9,1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
             var expected = new GetApplicationResponse(data);
-            var legalEntity = _fixture.Create<LegalEntityDto>();
+            var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.AccountLegalEntityId, data.AccountLegalEntityId).Create();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
             _legalEntityRepository.Setup(x => x.Get(y => y.AccountLegalEntityId == data.AccountLegalEntityId)).ReturnsAsync(legalEntity);
@@ -71,9 +57,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = _fixture.Create<GetApplicationRequest>();
-            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2021, 2, 1)).Create();
+            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1_0).With(x => x.PlannedStartDate, new DateTime(2021, 2, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.SignedAgreementVersion, 4).Create();
+            var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.AccountLegalEntityId, data.AccountLegalEntityId).With(x => x.SignedAgreementVersion, 4).Create();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
             _legalEntityRepository.Setup(x => x.Get(y => y.AccountLegalEntityId == data.AccountLegalEntityId)).ReturnsAsync(legalEntity);
@@ -90,9 +76,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = _fixture.Create<GetApplicationRequest>();
-            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.PlannedStartDate, new DateTime(2020, 9, 1)).Create();
+            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1_0).With(x => x.PlannedStartDate, new DateTime(2020, 9, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.SignedAgreementVersion, 5).Create();
+            var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.AccountLegalEntityId, data.AccountLegalEntityId).With(x => x.SignedAgreementVersion, 5).Create();
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);
             _legalEntityRepository.Setup(x => x.Get(y => y.AccountLegalEntityId == data.AccountLegalEntityId)).ReturnsAsync(legalEntity);

@@ -1,9 +1,11 @@
 ﻿using AutoFixture;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive.Builders
+namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
 {
     internal class ApprenticeshipIncentiveBuilder
     {
@@ -29,15 +31,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive.Bu
             return this;
         }
 
+        public ApprenticeshipIncentiveBuilder WithIncentivePhase(IncentivePhase incentivePhase)
+        {
+            _apprenticeshipIncentiveModel.Phase = incentivePhase;
+            return this;
+        }
+
         public ApprenticeshipIncentiveBuilder WithStartDate(DateTime startDate)
         {
             _apprenticeshipIncentiveModel.StartDate = startDate;
             return this;
         }
 
-        public ApprenticeshipIncentives.ApprenticeshipIncentive Build()
+        public ApprenticeshipIncentive Build()
         {
-            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
+            return ApprenticeshipIncentive.Get(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
         }
     }
 }

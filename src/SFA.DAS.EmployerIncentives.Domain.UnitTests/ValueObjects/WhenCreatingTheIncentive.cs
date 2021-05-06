@@ -2,9 +2,9 @@
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
-using SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive.Builders;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,16 +22,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         public void SetUp()
         {
             _mockIncentivePaymentProfileService = new Mock<IIncentivePaymentProfilesService>();
-            _incentivePaymentProfiles = new List<IncentivePaymentProfile>
+            _incentivePaymentProfiles = new IncentivePaymentProfileListBuilder()
+                .WithIncentivePaymentProfiles(new List<IncentivePaymentProfile>
             {
-                new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
-                    new List<PaymentProfile>
-                        {new PaymentProfile(90, 1000), new PaymentProfile(365, 1000)}),
-
-                new IncentivePaymentProfile(IncentiveType.UnderTwentyFiveIncentive,
-                    new List<PaymentProfile>
-                        {new PaymentProfile(90, 1200), new PaymentProfile(365, 1200)})
-            };
+                 new IncentivePaymentProfile(
+                     new IncentivePhase(Phase.Phase1_0),
+                        new List<PaymentProfile>
+                            {
+                                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 90, 1200),
+                                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 365, 1200),
+                                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, 90, 1000),
+                                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, 365, 1000)
+                            })
+                })
+                .Build();
 
             _mockIncentivePaymentProfileService.Setup(m => m.Get()).ReturnsAsync(_incentivePaymentProfiles);
         }        
@@ -45,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(0)
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * age))
@@ -53,7 +58,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
 
-            result.IncentiveType.Should().Be(expectedIncentiveType);
             result.IsEligible.Should().BeTrue();            
             var payments = result.Payments.ToList();
             payments.Count().Should().Be(2);
@@ -75,6 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(breakInLearning)
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * age))
@@ -83,10 +88,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
 
-            result.IncentiveType.Should().Be(expectedIncentiveType);
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();
-            payments.Count().Should().Be(2);
+            payments.Count.Should().Be(2);
             payments[0].Amount.Should().Be(expectedAmount1);
             payments[0].PaymentDate.Should().Be(date.AddDays(expectedDays1).AddDays(breakInLearning));
             payments[0].EarningType.Should().Be(EarningType.FirstPayment);
@@ -103,6 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(0)
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * 25))
@@ -113,7 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
-            payments.Count().Should().Be(0);
+            payments.Count.Should().Be(0);
         }
 
         [Test]
@@ -124,6 +129,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(0)
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * 25))
@@ -134,7 +140,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
-            payments.Count().Should().Be(0);
+            payments.Count.Should().Be(0);
         }           
     }
 }

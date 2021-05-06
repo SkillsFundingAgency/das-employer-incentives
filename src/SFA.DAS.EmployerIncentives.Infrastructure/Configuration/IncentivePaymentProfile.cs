@@ -5,7 +5,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
     public class IncentivePaymentProfile
     {
-        public IncentiveType IncentiveType { get; set; }
+        public Phase Phase { get; set; }
         public List<PaymentProfile> PaymentProfiles { get; set; }
     }
 }

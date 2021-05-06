@@ -15,6 +15,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using LegalEntity = SFA.DAS.EmployerIncentives.Domain.Accounts.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CreatePayment
@@ -130,15 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
-            var paymentProfiles = new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile(
-                    IncentiveType.TwentyFiveOrOverIncentive, new List<PaymentProfile>
-                    {
-                        new PaymentProfile(10, 100),
-                        new PaymentProfile(100, 1000)
-                    })
-            };
+            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
             var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {

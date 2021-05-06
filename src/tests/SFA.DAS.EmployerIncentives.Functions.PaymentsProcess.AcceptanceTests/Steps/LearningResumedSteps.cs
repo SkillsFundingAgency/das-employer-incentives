@@ -61,6 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.Status, IncentiveStatus.Stopped)
                 .With(p => p.BreakInLearningDayCount, 0)
                 .With(p => p.BreakInLearnings, new List<ApprenticeshipBreakInLearning>())
+                .With(p => p.Phase, Phase.Phase1_0)
                 .Create();
 
             _apprenticeshipBreakinLearning = _fixture

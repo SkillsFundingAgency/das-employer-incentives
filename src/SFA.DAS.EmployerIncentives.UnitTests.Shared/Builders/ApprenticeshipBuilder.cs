@@ -3,7 +3,7 @@ using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive.Builders
+namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
 {
     internal class ApprenticeshipBuilder
     {

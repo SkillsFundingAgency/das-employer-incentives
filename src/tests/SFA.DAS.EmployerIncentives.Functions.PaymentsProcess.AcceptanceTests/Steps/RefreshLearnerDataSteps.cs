@@ -50,6 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.StartDate, _startDate)
                 .Without(p => p.PendingPayments)
                 .Without(p => p.Payments)
+                .With(p => p.Phase, Phase.Phase1_0)
                 .Create();
 
             _pendingPayments = new List<PendingPayment>
