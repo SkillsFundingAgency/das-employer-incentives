@@ -21,16 +21,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly int _breakInLearningDayCount;
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
-        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
-
-        private static List<EligibiliyPeriod> EligibilityPeriods = new List<EligibiliyPeriod>
+        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
-            new EligibiliyPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
-            new EligibiliyPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
+            new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
+            new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
         };
 
-        public IEnumerable<Payment> Payments => _payments;
+        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
+        public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
 
         private Incentive(
@@ -151,13 +150,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
         }
 
-        private class EligibiliyPeriod
+        private class EligibilityPeriod
         {
             public DateTime StartDate { get; }
             public DateTime EndDate { get; }
             public int MinimumAgreementVersion { get; }
 
-            public EligibiliyPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
+            public EligibilityPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
             {
                 StartDate = startDate;
                 EndDate = endDate;
