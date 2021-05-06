@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
         {
             foreach (var apprenticeship in applicationApprenticeships)
             {
-                var incentive = await Incentive.Create(apprenticeship.DateOfBirth, apprenticeship.PlannedStartDate, incentivePaymentProfilesService, 0);
+                var incentive = await Incentive.Create(apprenticeship, incentivePaymentProfilesService);
                 if (incentive.IsNewAgreementRequired(signedAgreementVersion))
                 {
                     return true;

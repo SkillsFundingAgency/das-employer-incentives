@@ -5,6 +5,7 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive.Builders;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -38,7 +39,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         [TestCase("2021-06-01")]
         public async Task Then_returns_true_when_ineligible(DateTime startDate)
         {
-            var incentive = await Incentive.Create(DateTime.Now.AddYears(-20), startDate, _mockIncentivePaymentProfileService.Object, 0);
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
+                .WithStartDate(startDate)
+                .WithBreakInLearningDayCount(0)
+                .WithApprenticeship(
+                        new ApprenticeshipBuilder()
+                        .WithDateOfBirth(DateTime.Now.AddYears(-20))
+                        .Build())
+                .Build();
+
+            var incentive = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
 
             var result = incentive.IsNewAgreementRequired(10);
 
@@ -49,7 +59,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         [TestCase("2021-02-05", 4)]
         public async Task Then_returns_true_when_incorrect_agreement_signed(DateTime startDate, int signedAgreementVersion)
         {
-            var incentive = await Incentive.Create(DateTime.Now.AddYears(-20), startDate, _mockIncentivePaymentProfileService.Object, 0);
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
+                .WithStartDate(startDate)
+                .WithBreakInLearningDayCount(0)
+                .WithApprenticeship(
+                        new ApprenticeshipBuilder()
+                        .WithDateOfBirth(DateTime.Now.AddYears(-20))
+                        .Build())
+                .Build();
+
+            var incentive = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
 
             var result = incentive.IsNewAgreementRequired(signedAgreementVersion);
 
@@ -61,7 +80,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         [TestCase("2021-02-05", 6)]
         public async Task Then_returns_false_when_correct_agreement_signed(DateTime startDate, int signedAgreementVersion)
         {
-            var incentive = await Incentive.Create(DateTime.Now.AddYears(-20), startDate, _mockIncentivePaymentProfileService.Object, 0);
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
+                .WithStartDate(startDate)
+                .WithBreakInLearningDayCount(0)
+                .WithApprenticeship(
+                        new ApprenticeshipBuilder()
+                        .WithDateOfBirth(DateTime.Now.AddYears(-20))
+                        .Build())
+                .Build();
+
+            var incentive = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
 
             var result = incentive.IsNewAgreementRequired(signedAgreementVersion);
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
@@ -45,15 +47,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _breakInLearningDayCount = breakInLearningDayCount;
             _payments = GeneratePayments(_breakInLearningDayCount);
         }
-       
-        public static async Task<Incentive> Create(DateTime dateOfBirth,
-            DateTime startDate,
-            IIncentivePaymentProfilesService incentivePaymentProfilesService,
-            int breakInLearningDayCount)
+        
+        public static async Task<Incentive> Create(
+            ApprenticeshipIncentive incentive,            
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
             var paymentProfiles = await incentivePaymentProfilesService.Get();
-            return new Incentive(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount);
-        }        
+            return new Incentive(incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearningDayCount);
+        }
+
+        public static async Task<Incentive> Create(
+            IncentiveApplicationApprenticeshipDto incentiveApplication,
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
+        {
+            var paymentProfiles = await incentivePaymentProfilesService.Get();
+            return new Incentive(incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, 0);
+        }
 
         public bool IsNewAgreementRequired(int signedagreementVersion)
         {

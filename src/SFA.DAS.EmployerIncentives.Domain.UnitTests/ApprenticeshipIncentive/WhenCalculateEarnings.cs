@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     [TestFixture]
     public class WhenCalculateEarnings
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Mock<IIncentivePaymentProfilesService> _mockPaymentProfilesService;
@@ -523,9 +523,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.PendingPayments.Should().BeEmpty();
         }
 
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
 
         [Test]
