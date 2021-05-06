@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
@@ -9,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -41,8 +40,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             try
             {
-                await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedByEmail, request.SubmittedByName));
+                await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId,
+                    request.AccountId, request.DateSubmitted, request.SubmittedByEmail, request.SubmittedByName));
                 return Ok();
+            }
+            catch (UlnAlreadySubmittedException)
+            {
+                return Conflict("Application contains a ULN which has already been submitted");
             }
             catch (InvalidRequestException)
             {

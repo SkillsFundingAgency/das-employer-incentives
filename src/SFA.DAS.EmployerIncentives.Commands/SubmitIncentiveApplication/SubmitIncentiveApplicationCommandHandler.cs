@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 {
@@ -32,8 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             {
                 if (await _ulnValidationService.UlnAlreadyOnSubmittedIncentiveApplication(apprenticeship.ULN))
                 {
-                    //TODO: New exception type?
-                    throw new InvalidRequestException();
+                    throw new UlnAlreadySubmittedException();
                 }
             }
 

@@ -9,10 +9,9 @@ using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using IncentiveApplication = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication;
 
@@ -103,7 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         {
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             incentiveApplication.SetApprenticeships(_fixture.CreateMany<Apprenticeship>(3));
-            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
+            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
 
             _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
@@ -114,7 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            action.Should().Throw<InvalidRequestException>();
+            action.Should().Throw<UlnAlreadySubmittedException>();
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
     }
