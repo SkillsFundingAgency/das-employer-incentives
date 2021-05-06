@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -11,11 +14,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     [TestFixture]
     public class WhenCreatingTheIncentive
     {
+        private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfileService;
         private List<IncentivePaymentProfile> _incentivePaymentProfiles;
 
         [SetUp]
         public void SetUp()
         {
+            _mockIncentivePaymentProfileService = new Mock<IIncentivePaymentProfilesService>();
             _incentivePaymentProfiles = new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive,
@@ -26,15 +31,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                     new List<PaymentProfile>
                         {new PaymentProfile(90, 1200), new PaymentProfile(365, 1200)})
             };
+
+            _mockIncentivePaymentProfileService.Setup(m => m.Get()).ReturnsAsync(_incentivePaymentProfiles);
         }
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
         [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
-        public void Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
+        public async Task Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);
             
-            var result = new Incentive(date.AddYears(-1*age), date, _incentivePaymentProfiles, 0);
+            var result = await Incentive.Create(date.AddYears(-1*age), date, _mockIncentivePaymentProfileService.Object, 0);
 
             result.IncentiveType.Should().Be(expectedIncentiveType);
             result.IsEligible.Should().BeTrue();            
@@ -50,12 +57,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
         [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
-        public void Then_the_due_date_includes_the_break_in_learning(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
+        public async Task Then_the_due_date_includes_the_break_in_learning(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);
             int breakInLearning = 10;
 
-            var result = new Incentive(date.AddYears(-1 * age), date, _incentivePaymentProfiles, breakInLearning);
+            var result = await Incentive.Create(date.AddYears(-1 * age), date, _mockIncentivePaymentProfileService.Object, breakInLearning);
 
             result.IncentiveType.Should().Be(expectedIncentiveType);
             result.IsEligible.Should().BeTrue();
@@ -70,10 +77,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [Test]
-        public void And_Date_Is_Before_August_Then_the_application_is_not_eligible()
+        public async Task And_Date_Is_Before_August_Then_the_application_is_not_eligible()
         {
-            var date = new DateTime(2020, 07, 31);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles, 0);
+            var date = new DateTime(2020, 07, 31);            
+            var result = await Incentive.Create(date.AddYears(-1 * 25), date, _mockIncentivePaymentProfileService.Object, 0);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
@@ -81,10 +88,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [Test]
-        public void And_Date_Is_After_May_Then_the_application_is_not_eligible()
+        public async Task And_Date_Is_After_May_Then_the_application_is_not_eligible()
         {
             var date = new DateTime(2021, 06, 1);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles, 0);
+            var result = await Incentive.Create(date.AddYears(-1 * 25), date, _mockIncentivePaymentProfileService.Object, 0);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();

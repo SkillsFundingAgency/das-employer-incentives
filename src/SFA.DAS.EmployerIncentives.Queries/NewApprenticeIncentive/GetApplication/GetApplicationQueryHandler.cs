@@ -27,20 +27,19 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
         {
             var application = await _applicationQueryRepository.Get(app => app.Id == query.ApplicationId && app.AccountId == query.AccountId);
 
-            var paymentProfiles = await _incentivePaymentProfilesService.Get();
             var legalEntity = await _legalEntityQueryRepository.Get(x => x.AccountLegalEntityId == application.AccountLegalEntityId);
-            application.NewAgreementRequired = IsNewAgreementRequired(application.Apprenticeships, paymentProfiles, legalEntity.SignedAgreementVersion ?? 0);
+            application.NewAgreementRequired = await IsNewAgreementRequired(application.Apprenticeships, _incentivePaymentProfilesService, legalEntity.SignedAgreementVersion ?? 0);
 
             var response = new GetApplicationResponse(application);
 
             return response;
         }
 
-        private bool IsNewAgreementRequired(IEnumerable<IncentiveApplicationApprenticeshipDto> applicationApprenticeships,  IEnumerable<IncentivePaymentProfile> paymentProfiles, int signedAgreementVersion)
+        private static async Task<bool> IsNewAgreementRequired(IEnumerable<IncentiveApplicationApprenticeshipDto> applicationApprenticeships, IIncentivePaymentProfilesService incentivePaymentProfilesService, int signedAgreementVersion)
         {
             foreach (var apprenticeship in applicationApprenticeships)
             {
-                var incentive = new Incentive(apprenticeship.DateOfBirth, apprenticeship.PlannedStartDate, paymentProfiles, 0);
+                var incentive = await Incentive.Create(apprenticeship.DateOfBirth, apprenticeship.PlannedStartDate, incentivePaymentProfilesService, 0);
                 if (incentive.IsNewAgreementRequired(signedAgreementVersion))
                 {
                     return true;
