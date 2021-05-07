@@ -98,8 +98,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     new { _submitRequest.IncentiveApplicationId });
 
                 apprenticeships.Count().Should().Be(2);
-                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1_0);
-                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1_1);
+                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1);
+                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1);
             }
 
             var publishedCommand = _testContext.CommandsPublished

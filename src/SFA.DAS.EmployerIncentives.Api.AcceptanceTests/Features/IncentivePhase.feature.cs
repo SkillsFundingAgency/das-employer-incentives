@@ -92,13 +92,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Incentive Application is submitted")]
         [NUnit.Framework.TestCaseAttribute("2020-08-01", "2021-06-01", "NotSet", null)]
-        [NUnit.Framework.TestCaseAttribute("2020-08-01", "2021-05-31", "Phase1_0", null)]
-        [NUnit.Framework.TestCaseAttribute("2020-08-02", "2021-05-31", "Phase1_0", null)]
-        [NUnit.Framework.TestCaseAttribute("2021-01-31", "2021-05-31", "Phase1_0", null)]
-        [NUnit.Framework.TestCaseAttribute("2021-02-01", "2021-05-31", "Phase1_1", null)]
-        [NUnit.Framework.TestCaseAttribute("2021-02-02", "2021-05-31", "Phase1_1", null)]
-        [NUnit.Framework.TestCaseAttribute("2021-03-31", "2021-05-31", "Phase1_1", null)]
-        [NUnit.Framework.TestCaseAttribute("2021-04-01", "2021-05-31", "NotSet", null)]
+        [NUnit.Framework.TestCaseAttribute("2020-08-01", "2021-05-31", "Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("2020-08-02", "2021-05-31", "Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("2021-01-31", "2021-05-31", "Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("2021-02-01", "2021-05-31", "Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("2021-02-02", "2021-05-31", "Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("2021-03-31", "2021-05-31", "Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("2021-04-01", "2021-05-31", "Phase1", null)]
         public virtual void IncentiveApplicationIsSubmitted(string startDate, string submissionDate, string phase, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;

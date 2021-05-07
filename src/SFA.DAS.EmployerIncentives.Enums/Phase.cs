@@ -3,8 +3,7 @@
     public enum Phase
     {
         NotSet,
-        Phase1_0,
-        Phase1_1,
-        Phase2_0
+        Phase1,
+        Phase2
     }
 }
