@@ -66,7 +66,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         InLearning = InLearning(data.learner),
                         PausePayments = data.incentive.PausePayments,
                         PaymentSent = data.firstPaymentSent != null,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService)
+                        PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
+                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
                     },
                     SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                     {
@@ -76,8 +77,9 @@ namespace SFA.DAS.EmployerIncentives.Data
                         HasDataLock = HasDataLock(data.learner),
                         InLearning = InLearning(data.learner),
                         PausePayments = data.incentive.PausePayments,
-                        PaymentSentIsEstimated = true // change to use IsPaymentEstimated when implementing ticket EI-827
-                    }
+                        PaymentSentIsEstimated = true, // change to use IsPaymentEstimated when implementing ticket EI-827,
+                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
+                    }                    
                 };
 
                 result.Add(apprenticeApplicationDto);
