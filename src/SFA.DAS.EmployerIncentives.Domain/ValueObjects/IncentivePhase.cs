@@ -14,26 +14,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             Identifier = identifier;
         }
 
-        public static IncentivePhase Create(DateTime startDate, DateTime applicationSubmissionDate)
+        public static IncentivePhase Create(DateTime applicationSubmissionDate)
         {
             if (applicationSubmissionDate < new DateTime(2021, 6, 1))
             {
-                if (startDate >= new DateTime(2020, 8, 1) && startDate < new DateTime(2021, 2, 1))
-                {
-                    return new IncentivePhase(Phase.Phase1_0);
-                }
-
-                if (startDate >= new DateTime(2021, 2, 1) && startDate < new DateTime(2021, 4, 1))
-                {
-                    return new IncentivePhase(Phase.Phase1_1);
-                }
+                return new IncentivePhase(Phase.Phase1);
             }
             else if(applicationSubmissionDate < new DateTime(2021, 12, 1))
             {
-                if (startDate >= new DateTime(2021, 4, 1) && startDate < new DateTime(2021, 12, 1))
-                {
-                    return new IncentivePhase(Phase.Phase2_0);
-                }                
+                return new IncentivePhase(Phase.Phase2);
             }
 
             return new IncentivePhase(Phase.NotSet);
