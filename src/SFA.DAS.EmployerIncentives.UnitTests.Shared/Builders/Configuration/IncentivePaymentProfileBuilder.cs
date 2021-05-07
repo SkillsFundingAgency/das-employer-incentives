@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration
             {
                  new IncentivePaymentProfile
                 {
-                    Phase = Phase.Phase1_0,
+                    Phase = Phase.Phase1,
                     PaymentProfiles = new List<PaymentProfile>
                         {
                             new PaymentProfile {IncentiveType = IncentiveType.UnderTwentyFiveIncentive, AmountPayable = 1000, DaysAfterApprenticeshipStart = 89 },
@@ -24,21 +24,10 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration
                             new PaymentProfile {IncentiveType = IncentiveType.TwentyFiveOrOverIncentive, AmountPayable = 750, DaysAfterApprenticeshipStart = 89 },
                             new PaymentProfile {IncentiveType = IncentiveType.TwentyFiveOrOverIncentive, AmountPayable = 750, DaysAfterApprenticeshipStart = 364 }
                         },
-                },
+                },                
                 new IncentivePaymentProfile
                 {
-                    Phase = Phase.Phase1_1,
-                    PaymentProfiles = new List<PaymentProfile>
-                        {
-                            new PaymentProfile {IncentiveType = IncentiveType.UnderTwentyFiveIncentive, AmountPayable = 1000, DaysAfterApprenticeshipStart = 89 },
-                            new PaymentProfile {IncentiveType = IncentiveType.UnderTwentyFiveIncentive, AmountPayable = 1000, DaysAfterApprenticeshipStart = 363645 },
-                            new PaymentProfile {IncentiveType = IncentiveType.TwentyFiveOrOverIncentive, AmountPayable = 750, DaysAfterApprenticeshipStart = 89 },
-                            new PaymentProfile {IncentiveType = IncentiveType.TwentyFiveOrOverIncentive, AmountPayable = 750, DaysAfterApprenticeshipStart = 364 }
-                        },
-                },
-                new IncentivePaymentProfile
-                {
-                    Phase = Phase.Phase2_0,
+                    Phase = Phase.Phase2,
                     PaymentProfiles = new List<PaymentProfile>
                         {
                             new PaymentProfile {IncentiveType = IncentiveType.UnderTwentyFiveIncentive, AmountPayable = 1500, DaysAfterApprenticeshipStart = 89 },

@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     new List<IncentivePaymentProfile>()
                     {
                         new IncentivePaymentProfile(
-                            new IncentivePhase(Phase.Phase1_0),
+                            new IncentivePhase(Phase.Phase1),
                             new List<PaymentProfile>
                                 {
                                     new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, _firstPaymentDaysAfterApprenticeshipStart, 100),
@@ -80,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Status, IncentiveStatus.Active)
-                .With(x => x.Phase, new IncentivePhase(Phase.Phase1_0))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
                 .Create();
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.StartDate = _plannedStartDate;

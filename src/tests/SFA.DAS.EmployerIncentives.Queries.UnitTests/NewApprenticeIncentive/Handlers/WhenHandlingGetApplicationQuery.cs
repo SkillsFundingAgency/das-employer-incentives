@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = _fixture.Create<GetApplicationRequest>();
-            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1_0).With(x => x.PlannedStartDate, new DateTime(2020, 9,1)).Create();
+            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1).With(x => x.PlannedStartDate, new DateTime(2020, 9,1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
             var expected = new GetApplicationResponse(data);
             var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.AccountLegalEntityId, data.AccountLegalEntityId).Create();
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = _fixture.Create<GetApplicationRequest>();
-            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1_0).With(x => x.PlannedStartDate, new DateTime(2021, 2, 1)).Create();
+            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1).With(x => x.PlannedStartDate, new DateTime(2021, 2, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
             var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.AccountLegalEntityId, data.AccountLegalEntityId).With(x => x.SignedAgreementVersion, 4).Create();
 
@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = _fixture.Create<GetApplicationRequest>();
-            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1_0).With(x => x.PlannedStartDate, new DateTime(2020, 9, 1)).Create();
+            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1).With(x => x.PlannedStartDate, new DateTime(2020, 9, 1)).Create();
             var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
             var legalEntity = _fixture.Build<LegalEntityDto>().With(x => x.AccountLegalEntityId, data.AccountLegalEntityId).With(x => x.SignedAgreementVersion, 5).Create();
 

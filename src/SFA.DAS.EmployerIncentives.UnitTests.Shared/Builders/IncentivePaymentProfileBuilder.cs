@@ -13,17 +13,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
             _incentivePaymentProfiles = new List<IncentivePaymentProfile>
             {
                  new IncentivePaymentProfile(
-                     new IncentivePhase(Phase.Phase1_0),
-                        new List<PaymentProfile>
-                            {
-                                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 89, 1000),
-                                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 364, 1000),
-                                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, 89, 750),
-                                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, 364, 750)
-                            }),
-
-                  new IncentivePaymentProfile(
-                     new IncentivePhase(Phase.Phase1_1),
+                     new IncentivePhase(Phase.Phase1),
                         new List<PaymentProfile>
                             {
                                 new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 89, 1000),
@@ -33,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
                             }),
 
                    new IncentivePaymentProfile(
-                     new IncentivePhase(Phase.Phase2_0),
+                     new IncentivePhase(Phase.Phase2),
                         new List<PaymentProfile>
                             {
                                 new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 89, 1500),

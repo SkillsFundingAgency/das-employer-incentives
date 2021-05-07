@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                 .WithIncentivePaymentProfiles(new List<IncentivePaymentProfile>
             {
                  new IncentivePaymentProfile(
-                     new IncentivePhase(Phase.Phase1_0),
+                     new IncentivePhase(Phase.Phase1),
                         new List<PaymentProfile>
                             {
                                 new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 90, 1200),
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(0)
-                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * age))
@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(breakInLearning)
-                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * age))
@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(0)
-                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * 25))
@@ -129,7 +129,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
                 .WithBreakInLearningDayCount(0)
-                .WithIncentivePhase(new IncentivePhase(Phase.Phase1_0))
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
                         .WithDateOfBirth(date.AddYears(-1 * 25))

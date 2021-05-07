@@ -186,14 +186,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
             }
 
-            if (phase == Phase.Phase1_0 || phase == Phase.Phase1_1)
+            if (phase == Phase.Phase1)
             {
                 return new Phase1Incentive(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount);
             }
-            else
+            else if (phase == Phase.Phase2)
             {
                 return new Phase2Incentive(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount);
             }
+
+            return null; // wouldn't get here
         }
     }
 }

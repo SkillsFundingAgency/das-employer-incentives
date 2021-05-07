@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
-                .With(p => p.Phase, Phase.Phase1_0)
+                .With(p => p.Phase, Phase.Phase1)
                 .Create();
 
             _initialStartDate = _apprenticeshipIncentive.StartDate;
