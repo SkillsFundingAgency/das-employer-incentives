@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
             var result = (await _sut.Get()).ToList();
 
             result.Count.Should().Be(2);
-            result[0].IncentivePhase.Identifier.Should().Be(_incentivePaymentProfiles[0].Phase);
+            result[0].IncentivePhase.Identifier.Should().Be(_incentivePaymentProfiles[0].IncentivePhase);
             result[0].PaymentProfiles[0].IncentiveType.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].IncentiveType);
             result[0].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].AmountPayable);
             result[0].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].DaysAfterApprenticeshipStart);
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
             result[0].PaymentProfiles[1].AmountPayable.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[1].AmountPayable);
             result[0].PaymentProfiles[1].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[1].DaysAfterApprenticeshipStart);
 
-            result[1].IncentivePhase.Identifier.Should().Be(_incentivePaymentProfiles[1].Phase);
+            result[1].IncentivePhase.Identifier.Should().Be(_incentivePaymentProfiles[1].IncentivePhase);
             result[1].PaymentProfiles[0].IncentiveType.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].IncentiveType);
             result[1].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].AmountPayable);
             result[1].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].DaysAfterApprenticeshipStart);

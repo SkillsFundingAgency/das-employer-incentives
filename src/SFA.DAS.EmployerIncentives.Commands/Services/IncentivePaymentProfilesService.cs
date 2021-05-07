@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
                 return Task.FromResult(Enumerable.Empty<Domain.ValueObjects.IncentivePaymentProfile>());
             }
             return Task.FromResult(_applicationSettings.IncentivePaymentProfiles.Select(x =>
-                new Domain.ValueObjects.IncentivePaymentProfile(new Domain.ValueObjects.IncentivePhase(x.Phase),
+                new Domain.ValueObjects.IncentivePaymentProfile(new Domain.ValueObjects.IncentivePhase(x.IncentivePhase),
                     MapToDomainPaymentProfiles(x.PaymentProfiles).ToList())));
         }
 

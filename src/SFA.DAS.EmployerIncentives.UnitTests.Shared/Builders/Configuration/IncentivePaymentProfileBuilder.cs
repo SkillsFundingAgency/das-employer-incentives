@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration
             {
                  new IncentivePaymentProfile
                 {
-                    Phase = Phase.Phase1,
+                    IncentivePhase = Phase.Phase1,
                     PaymentProfiles = new List<PaymentProfile>
                         {
                             new PaymentProfile {IncentiveType = IncentiveType.UnderTwentyFiveIncentive, AmountPayable = 1000, DaysAfterApprenticeshipStart = 89 },
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration
                 },                
                 new IncentivePaymentProfile
                 {
-                    Phase = Phase.Phase2,
+                    IncentivePhase = Phase.Phase2,
                     PaymentProfiles = new List<PaymentProfile>
                         {
                             new PaymentProfile {IncentiveType = IncentiveType.UnderTwentyFiveIncentive, AmountPayable = 1500, DaysAfterApprenticeshipStart = 89 },
