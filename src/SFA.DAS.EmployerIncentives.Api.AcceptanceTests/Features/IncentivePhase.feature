@@ -13,12 +13,12 @@ Scenario: Incentive Application is submitted
 	And the apprenticeship incentive is created with an incentive phase of '<Phase>'
 
 Examples:
-	| StartDate  | SubmissionDate | Phase    |
-	| 2020-08-01 | 2021-06-01     | NotSet   |
-	| 2020-08-01 | 2021-05-31     | Phase1_0 |
-	| 2020-08-02 | 2021-05-31     | Phase1_0 |
-	| 2021-01-31 | 2021-05-31     | Phase1_0 |
-	| 2021-02-01 | 2021-05-31     | Phase1_1 |
-	| 2021-02-02 | 2021-05-31     | Phase1_1 |
-	| 2021-03-31 | 2021-05-31     | Phase1_1 |
-	| 2021-04-01 | 2021-05-31     | NotSet   |
+	| StartDate  | SubmissionDate | Phase  |
+	| 2020-08-01 | 2021-06-01     | NotSet |
+	| 2020-08-01 | 2021-05-31     | Phase1 |
+	| 2020-08-02 | 2021-05-31     | Phase1 |
+	| 2021-01-31 | 2021-05-31     | Phase1 |
+	| 2021-02-01 | 2021-05-31     | Phase1 |
+	| 2021-02-02 | 2021-05-31     | Phase1 |
+	| 2021-03-31 | 2021-05-31     | Phase1 |
+	| 2021-04-01 | 2021-05-31     | Phase1 |

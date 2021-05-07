@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [TestCase("2020-07-31")]
-        [TestCase("2021-04-01")]
+        [TestCase("2021-06-01")]
         public void Then_returns_true_when_ineligible(DateTime startDate)
         {
             var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles, 0);

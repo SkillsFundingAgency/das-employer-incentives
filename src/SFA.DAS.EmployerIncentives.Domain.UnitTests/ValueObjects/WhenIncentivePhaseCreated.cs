@@ -13,9 +13,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     {  
 
         [TestCase(Phase.NotSet)]
-        [TestCase(Phase.Phase1_0)]
-        [TestCase(Phase.Phase1_1)]
-        [TestCase(Phase.Phase2_0)]
+        [TestCase(Phase.Phase1)]
+        [TestCase(Phase.Phase2)]
         public void Then_the_incentive_phase_is_initialised_when_created(Phase phase)
         {
             // Act
@@ -25,21 +24,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             newIncentivePhase.Identifier.Should().Be(phase);
         }
 
-        [TestCase("2020-8-1", "2021-6-1", Phase.NotSet)]
-        [TestCase("2020-8-1", "2021-5-31", Phase.Phase1_0)]
-        [TestCase("2020-8-2", "2021-5-31", Phase.Phase1_0)]
-        [TestCase("2021-1-31", "2021-5-31", Phase.Phase1_0)]
-        [TestCase("2021-2-1", "2021-5-31", Phase.Phase1_1)]
-        [TestCase("2021-2-2", "2021-5-31", Phase.Phase1_1)]
-        [TestCase("2021-3-31", "2021-5-31", Phase.Phase1_1)]
-        [TestCase("2021-4-1", "2021-5-31", Phase.NotSet)]
-        public void Then_the_incentive_phase_is_created_by_the_factory_method(DateTime startDate, DateTime applicationSubmissionDate, Phase expectedPhaseId)
+        [TestCase("2021-6-1", Phase.NotSet)]
+        [TestCase("2021-5-31", Phase.Phase1)]
+        public void Then_the_incentive_phase_is_created_by_the_factory_method(DateTime applicationSubmissionDate, Phase expectedPhaseId)
         {
             // Arrange
             var expectedPhase = new IncentivePhase(expectedPhaseId);
 
             // Act
-            var result = IncentivePhase.Create(startDate, applicationSubmissionDate);
+            var result = IncentivePhase.Create(applicationSubmissionDate);
 
             // Assert
             result.Should().BeEquivalentTo(expectedPhase);

@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             expected.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
             expected.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
-            expected.Phase = new Domain.ValueObjects.IncentivePhase(Enums.Phase.Phase1_1);
+            expected.Phase = new Domain.ValueObjects.IncentivePhase(Enums.Phase.Phase1);
 
             var pendingPayments = _fixture.Build<PendingPaymentModel>().With(
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();

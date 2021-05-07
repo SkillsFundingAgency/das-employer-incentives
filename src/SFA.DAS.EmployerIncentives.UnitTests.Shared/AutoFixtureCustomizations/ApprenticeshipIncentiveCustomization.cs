@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations
                 fixture.Create<DateTime>(), 
                 fixture.Create<string>(),
                 new  AgreementVersion(fixture.Create<int>()),
-                new Domain.ValueObjects.IncentivePhase(Enums.Phase.Phase1_0)));
+                new Domain.ValueObjects.IncentivePhase(Enums.Phase.Phase1)));
         }
     }
 }
