@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.DateSubmitted = submittedAt;
             Model.SubmittedByEmail = submittedByEmail;
             Model.SubmittedByName = submittedByName;
-            Model.ApprenticeshipModels.ToList().ForEach(m => m.Phase = IncentivePhase.Create(m.PlannedStartDate, Model.DateSubmitted.Value).Identifier);
+            Model.ApprenticeshipModels.ToList().ForEach(m => m.Phase = IncentivePhase.Create(Model.DateSubmitted.Value).Identifier);
 
             AddEvent(new Submitted(Model));
         }

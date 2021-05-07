@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_apprenticeship_incentive_is_not_created_if_one_exists_for_the_apprenticeship_id()
         {
             var command = _fixture.Create<CreateIncentiveCommand>();
-            var existingAppenticeshipIncentive = (new ApprenticeshipIncentiveFactory()).CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), new AgreementVersion(_fixture.Create<int>()), new IncentivePhase(Phase.Phase1_0));
+            var existingAppenticeshipIncentive = (new ApprenticeshipIncentiveFactory()).CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), new AgreementVersion(_fixture.Create<int>()), new IncentivePhase(Phase.Phase1));
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(existingAppenticeshipIncentive);
 
             // Act
