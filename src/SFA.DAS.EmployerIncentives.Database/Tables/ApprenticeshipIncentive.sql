@@ -26,3 +26,5 @@
 GO
 CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, ApprenticeshipId)
 GO
+CREATE INDEX IX_ApprenticeshipIncentive_IncentiveAppAppId ON [incentives].[ApprenticeshipIncentive] ([IncentiveApplicationApprenticeshipId])
+GO

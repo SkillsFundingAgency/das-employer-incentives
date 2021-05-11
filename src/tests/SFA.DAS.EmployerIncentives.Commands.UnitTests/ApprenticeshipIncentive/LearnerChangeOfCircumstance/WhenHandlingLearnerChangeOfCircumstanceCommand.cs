@@ -31,6 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
         private ApprenticeshipIncentiveModel _incentiveModel;
         private Learner _learner;
+        private int? _miniumAgreementVersion;
+        private DateTime _plannedStartDate;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
 
         [SetUp]
