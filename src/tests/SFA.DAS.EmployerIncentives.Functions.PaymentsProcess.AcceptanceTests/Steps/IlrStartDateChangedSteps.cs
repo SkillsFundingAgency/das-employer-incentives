@@ -300,7 +300,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>()
                 .Single(x => x.Id == _apprenticeshipIncentive.Id);
 
-            incentive.MinimumAgreementVersion.Should().Be(4);
+            incentive.MinimumAgreementVersion.Should().Be(5);
         }
         
     }
