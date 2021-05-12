@@ -5,8 +5,6 @@ using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using System;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
@@ -70,6 +68,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count().Should().Be(2);
             learningPeriods.Single(e => e.StartDate == _testPriceEpisode1Dto.StartDate && e.EndDate == _testPriceEpisode1Dto.EndDate);
+            learningPeriods.Single(e => e.StartDate == _testPriceEpisode2Dto.StartDate && e.EndDate == null);
+        }
+
+        [Test]
+        public void Then_expected_periods_are_returned_when_there_are_multiple_price_episodes_with_the_same_start_date_but_different_end_date_for_the_apprenticeship()
+        {
+            //Arrange              
+            _testPriceEpisode1Dto.StartDate = _testPriceEpisode1Dto.StartDate;
+            _testPriceEpisode3Dto.EndDate = _testPriceEpisode1Dto.EndDate.Value.AddDays(1);
+
+            //Act
+            var learningPeriods = _sut.LearningPeriods(_incentive);
+
+            //Assert
+            learningPeriods.Count().Should().Be(2);
+            learningPeriods.Single(e => e.StartDate == _testPriceEpisode3Dto.StartDate && e.EndDate == _testPriceEpisode3Dto.EndDate);
             learningPeriods.Single(e => e.StartDate == _testPriceEpisode2Dto.StartDate && e.EndDate == null);
         }
 
