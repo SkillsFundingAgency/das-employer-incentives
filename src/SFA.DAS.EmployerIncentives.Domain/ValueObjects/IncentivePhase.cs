@@ -14,14 +14,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             Identifier = identifier;
         }
 
-        public static IncentivePhase Create(DateTime applicationSubmissionDate)
+        public static IncentivePhase Create()
         {
-            if (applicationSubmissionDate < new DateTime(2021, 6, 1))
-            {
-                return new IncentivePhase(Phase.Phase1);
-            }
-
-            return new IncentivePhase(Phase.NotSet);
+            return new IncentivePhase(Phase.Phase2);
         }
 
         protected override IEnumerable<object> GetAtomicValues()
