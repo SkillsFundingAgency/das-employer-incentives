@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Enums;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
 {
@@ -12,5 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public long Uln { get; set; }
         public DateTime PlannedStartDate { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public Phase Phase { get; set; }
+        
     }
 }

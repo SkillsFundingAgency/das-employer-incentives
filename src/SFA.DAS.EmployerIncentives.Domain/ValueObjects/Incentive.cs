@@ -1,85 +1,113 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
-    public class Incentive : ValueObject
+    public abstract class Incentive : ValueObject
     {
         private readonly DateTime _dateOfBirth;
         private readonly DateTime _startDate;
-        private readonly int _breakInLearningDayCount;
         private readonly List<Payment> _payments;
-        private readonly IEnumerable<IncentivePaymentProfile> _incentivePaymentProfiles;
+        private readonly int _breakInLearningDayCount;
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
+
+        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
+        {
+            new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
+            new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
+        };
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
-
-        private readonly List<EligibiliyPeriod> EligibilityPeriods = new List<EligibiliyPeriod>
-        {
-            new EligibiliyPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
-            new EligibiliyPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
-        };
-
-        public IEnumerable<Payment> Payments => _payments;
+        public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
-        public decimal Total => Payments.Sum(x => x.Amount);
-        public IncentiveType IncentiveType => AgeAtStartOfCourse() >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
-        public Incentive(
+        private Incentive(
             DateTime dateOfBirth, 
-            DateTime startDate, 
-            IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles,
+            DateTime startDate,
+            IEnumerable<PaymentProfile> paymentProfiles,
             int breakInLearningDayCount)
         {
             _dateOfBirth = dateOfBirth;
             _startDate = startDate;
-            _incentivePaymentProfiles = incentivePaymentProfiles;
             _breakInLearningDayCount = breakInLearningDayCount;
-            _payments = GeneratePayments();
+            _payments = Generate(paymentProfiles, _breakInLearningDayCount);
+        }
+        
+        public static async Task<Incentive> Create(
+            ApprenticeshipIncentive incentive,            
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
+        {
+            var paymentProfiles = await incentivePaymentProfilesService.Get();
+
+            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearningDayCount);            
+        }        
+
+        public static async Task<Incentive> Create(
+            IncentiveApplicationApprenticeshipDto incentiveApplication,
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
+        {
+            var paymentProfiles = await incentivePaymentProfilesService.Get();
+            return Create(incentiveApplication.Phase, incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, 0);
         }
 
-        public bool IsNewAgreementRequired(int signedagreementVersion)
+        public static bool IsNewAgreementRequired(IncentiveApplicationDto application, LegalEntityDto legalEntityDto)
         {
-            if (!IsEligible)
+            if(application.AccountLegalEntityId != legalEntityDto.AccountLegalEntityId)
+            {
+                throw new ArgumentException($"Legal entity {legalEntityDto.AccountLegalEntityId} is not related to the application {application.AccountLegalEntityId} when checking IsNewAgreementRequired");
+            }
+
+            foreach (var apprenticeship in application.Apprenticeships)
+            {
+                if (IsNewAgreementRequired(apprenticeship, legalEntityDto.SignedAgreementVersion ?? 0))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsNewAgreementRequired(IncentiveApplicationApprenticeshipDto application, int signedAgreementVersion)
+        {
+            var isEligible = application.PlannedStartDate >= EligibilityStartDate && application.PlannedStartDate <= EligibilityEndDate;
+            if (!isEligible)
             {
                 return true;
             }
-
-            var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= _startDate && x.EndDate >= _startDate);
-            return signedagreementVersion < applicablePeriod.MinimumAgreementVersion;
+            var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= application.PlannedStartDate && x.EndDate >= application.PlannedStartDate);
+            return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
         }
 
-        private int AgeAtStartOfCourse()
+        private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
         {
-            return _dateOfBirth.AgeOnThisDay(_startDate);
+            return dateOfBirth.AgeOnThisDay(startDate);
         }
 
-        private List<Payment> GeneratePayments()
+        protected List<Payment> Generate(IEnumerable<PaymentProfile> paymentProfiles, int breakInLearningDayCount)
         {
             var payments = new List<Payment>();
 
             if (!IsEligible)
             {
                 return payments;
-            }
-
-            var incentivePaymentProfile = _incentivePaymentProfiles.FirstOrDefault(x => x.IncentiveType == IncentiveType);
-
-            if (incentivePaymentProfile?.PaymentProfiles == null)
-            {
-                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {IncentiveType}");
-            }
+            }          
 
             var paymentIndex = 0;
-            foreach (var paymentProfile in incentivePaymentProfile.PaymentProfiles)
+            foreach (var paymentProfile in paymentProfiles)
             {
-                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart).AddDays(_breakInLearningDayCount), _earningTypes[paymentIndex]));
+                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart).AddDays(breakInLearningDayCount), _earningTypes[paymentIndex]));
                 paymentIndex++;
             }
 
@@ -100,18 +128,74 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
         }
 
-        private class EligibiliyPeriod
+        private class Phase1Incentive : Incentive
+        {
+            public Phase1Incentive(
+                DateTime dateOfBirth,
+                DateTime startDate,
+                IEnumerable<PaymentProfile> paymentProfiles,
+                int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
+            {
+            }
+        }
+
+        private class Phase2Incentive : Incentive
+        {
+            public Phase2Incentive(
+                DateTime dateOfBirth,
+                DateTime startDate,
+                IEnumerable<PaymentProfile> paymentProfiles,
+                int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
+            {
+            }
+        }
+
+        private class EligibilityPeriod
         {
             public DateTime StartDate { get; }
             public DateTime EndDate { get; }
             public int MinimumAgreementVersion { get; }
 
-            public EligibiliyPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
+            public EligibilityPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
             {
                 StartDate = startDate;
                 EndDate = endDate;
                 MinimumAgreementVersion = minimumAgreementVersion;
             }
+        }
+        private static Incentive Create(
+            Phase phase,
+            DateTime dateOfBirth,
+            DateTime startDate,
+            IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles,
+            int breakInLearningDayCount)
+        {
+            var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
+
+            if (incentivePaymentProfile?.PaymentProfiles == null)
+            {
+                throw new MissingPaymentProfileException($"Incentive Payment profile not found for IncentivePhase {phase}");
+            }
+
+            var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
+
+            var paymentProfiles = incentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == incentiveType);
+
+            if (!paymentProfiles.Any())
+            {
+                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
+            }
+
+            if (phase == Phase.Phase1)
+            {
+                return new Phase1Incentive(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount);
+            }
+            else if (phase == Phase.Phase2)
+            {
+                return new Phase2Incentive(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount);
+            }
+
+            return null; // wouldn't get here
         }
     }
 }

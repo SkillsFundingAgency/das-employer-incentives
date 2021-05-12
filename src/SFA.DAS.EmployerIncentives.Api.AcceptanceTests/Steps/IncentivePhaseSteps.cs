@@ -93,7 +93,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 {
                     _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
                 },
-                (context) => HasExpectedEvents(context)
+                (context) => HasExpectedEvents(context),
+                assertOnError: false
                 );
 
             _response.StatusCode.Should().Be(HttpStatusCode.OK);

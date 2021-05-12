@@ -66,7 +66,8 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
                 Uln = apprenticeship.ULN,
                 PlannedStartDate = apprenticeship.PlannedStartDate,
-                DateOfBirth = apprenticeship.DateOfBirth
+                DateOfBirth = apprenticeship.DateOfBirth,
+                Phase = apprenticeship.Phase
             };
         }
 
