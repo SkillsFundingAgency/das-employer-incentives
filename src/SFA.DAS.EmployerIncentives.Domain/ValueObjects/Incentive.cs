@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -20,12 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly List<Payment> _payments;
         private readonly int _breakInLearningDayCount;
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
-
-        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
-        {
-            new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
-            new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
-        };
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
@@ -59,35 +52,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             var paymentProfiles = await incentivePaymentProfilesService.Get();
             return Create(incentiveApplication.Phase, incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, 0);
-        }
-
-        public static bool IsNewAgreementRequired(IncentiveApplicationDto application, LegalEntityDto legalEntityDto)
-        {
-            if(application.AccountLegalEntityId != legalEntityDto.AccountLegalEntityId)
-            {
-                throw new ArgumentException($"Legal entity {legalEntityDto.AccountLegalEntityId} is not related to the application {application.AccountLegalEntityId} when checking IsNewAgreementRequired");
-            }
-
-            foreach (var apprenticeship in application.Apprenticeships)
-            {
-                if (IsNewAgreementRequired(apprenticeship, legalEntityDto.SignedAgreementVersion ?? 0))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsNewAgreementRequired(IncentiveApplicationApprenticeshipDto application, int signedAgreementVersion)
-        {
-            var isEligible = application.PlannedStartDate >= EligibilityStartDate && application.PlannedStartDate <= EligibilityEndDate;
-            if (!isEligible)
-            {
-                return true;
-            }
-            var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= application.PlannedStartDate && x.EndDate >= application.PlannedStartDate);
-            return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
         }
 
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
@@ -150,19 +114,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
         }
 
-        private class EligibilityPeriod
-        {
-            public DateTime StartDate { get; }
-            public DateTime EndDate { get; }
-            public int MinimumAgreementVersion { get; }
-
-            public EligibilityPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
-            {
-                StartDate = startDate;
-                EndDate = endDate;
-                MinimumAgreementVersion = minimumAgreementVersion;
-            }
-        }
         private static Incentive Create(
             Phase phase,
             DateTime dateOfBirth,
