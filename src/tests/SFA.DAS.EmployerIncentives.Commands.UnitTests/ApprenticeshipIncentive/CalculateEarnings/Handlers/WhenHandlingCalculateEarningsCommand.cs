@@ -1,12 +1,10 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateEarnings;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
@@ -14,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,15 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
-            _paymentProfiles = new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile(
-                    IncentiveType.TwentyFiveOrOverIncentive, new List<PaymentProfile>
-                    {
-                        new PaymentProfile(10, 100),
-                        new PaymentProfile(100, 1000)
-                    })
-            };
+            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
             _mockPaymentProfilesService
                .Setup(m => m.Get())
@@ -82,7 +73,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     today,
                     _fixture.Create<DateTime>(),
                     _fixture.Create<string>(),
-                    _fixture.Create<int>());
+                    new AgreementVersion(_fixture.Create<int>()),
+                    new IncentivePhase(Phase.Phase1));
             
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 

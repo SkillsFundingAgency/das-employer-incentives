@@ -16,6 +16,7 @@
 	[WithdrawnByCompliance] BIT NOT NULL DEFAULT 0,
 	[CourseName] NVARCHAR(126) NULL,
 	[EmploymentStartDate] DATETIME2 NULL,
+	[Phase] NVARCHAR(50) NULL,
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
 GO

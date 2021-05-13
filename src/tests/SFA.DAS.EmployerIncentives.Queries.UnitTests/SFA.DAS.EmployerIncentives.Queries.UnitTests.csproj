@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />
+    <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
 </Project>

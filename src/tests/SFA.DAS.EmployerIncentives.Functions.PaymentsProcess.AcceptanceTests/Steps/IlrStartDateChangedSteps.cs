@@ -292,5 +292,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             dbConnection.GetAll<PendingPaymentValidationResult>().SingleOrDefault(x => x.PendingPaymentId == _pendingPayment.Id)
                 .Should().NotBeNull("Should not have deleted existing pending payment validation result");
         }
+
+        [Then(@"the minimum agreement version is changed")]
+        public void ThenTheMinimumAgreementVersionIsChanged()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var incentive = dbConnection.GetAll<ApprenticeshipIncentive>()
+                .Single(x => x.Id == _apprenticeshipIncentive.Id);
+
+            incentive.MinimumAgreementVersion.Should().Be(5);
+        }
+        
     }
 }

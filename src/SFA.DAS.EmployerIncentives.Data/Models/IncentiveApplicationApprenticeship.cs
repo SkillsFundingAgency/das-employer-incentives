@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,5 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public bool WithdrawnByCompliance { get; set; }
         public string CourseName { get; set; }
         public DateTime? EmploymentStartDate { get; set; }
+        [Column(TypeName = "nvarchar(50)")]
+        public Phase Phase { get; set; }
     }
 }

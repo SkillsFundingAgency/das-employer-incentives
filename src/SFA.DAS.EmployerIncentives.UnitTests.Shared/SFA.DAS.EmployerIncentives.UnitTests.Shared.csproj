@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -14,6 +14,25 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Domain\SFA.DAS.EmployerIncentives.Domain.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Infrastructure\SFA.DAS.EmployerIncentives.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SFA.DAS.EmployerIncentives.Domain.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SFA.DAS.EmployerIncentives.Commands.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SFA.DAS.EmployerIncentives.Api.AcceptanceTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SFA.DAS.EmployerIncentives.Queries.UnitTests</_Parameter1>
+    </AssemblyAttribute>    
   </ItemGroup>
 
 </Project>

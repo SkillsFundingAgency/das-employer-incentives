@@ -53,6 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.EarningsCalculated, false)
                 .With(p => p.WithdrawnByCompliance, false)
                 .With(p => p.WithdrawnByEmployer, false)
+                .With(p => p.Phase, Phase.Phase1)
                 .CreateMany(NumberOfApprenticeships).ToList();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -62,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
                 .With(p => p.StartDate, today.AddDays(1))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
+                .With(p => p.Phase, Phase.Phase1)
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()

@@ -1,6 +1,7 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models
 {
@@ -21,5 +22,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models
         public bool WithdrawnByCompliance { get; set; }
         public string CourseName { get; set; }
         public DateTime? EmploymentStartDate { get; set; }
+        public Phase Phase { get; set; }
     }
 }
