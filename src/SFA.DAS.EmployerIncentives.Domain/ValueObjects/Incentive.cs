@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly int _breakInLearningDayCount;
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
-        protected static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
+        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
             new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
             new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
@@ -173,6 +173,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
         {
         }
+
+        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
+        {
+            new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
+            new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
+        };
 
         public static int MinimumAgreementVersion(DateTime startDate)
         {
