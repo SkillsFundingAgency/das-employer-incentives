@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                      x.SubmittedByEmail == expected.SubmittedByEmail &&
                      x.SubmittedDate == expected.SubmittedDate &&
                      x.CourseName == expected.Apprenticeship.CourseName &&
-                     x.EmploymentStartDate == expected.Apprenticeship.EmploymentStartDate,
+                     x.EmploymentStartDate == expected.Apprenticeship.EmploymentStartDate &&
                      x.Phase == expected.Phase.Identifier
                 )
                 .Should().Be(1);
