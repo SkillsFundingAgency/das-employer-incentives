@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly int _breakInLearningDayCount;
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
-        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
+        protected static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
             new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
             new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
 
-        private Incentive(
+        protected Incentive(
             DateTime dateOfBirth, 
             DateTime startDate,
             IEnumerable<PaymentProfile> paymentProfiles,
@@ -128,41 +128,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
         }
 
-        private class Phase1Incentive : Incentive
-        {
-            public Phase1Incentive(
-                DateTime dateOfBirth,
-                DateTime startDate,
-                IEnumerable<PaymentProfile> paymentProfiles,
-                int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
-            {
-            }
-        }
-
-        private class Phase2Incentive : Incentive
-        {
-            public Phase2Incentive(
-                DateTime dateOfBirth,
-                DateTime startDate,
-                IEnumerable<PaymentProfile> paymentProfiles,
-                int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
-            {
-            }
-        }
-
-        private class EligibilityPeriod
-        {
-            public DateTime StartDate { get; }
-            public DateTime EndDate { get; }
-            public int MinimumAgreementVersion { get; }
-
-            public EligibilityPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
-            {
-                StartDate = startDate;
-                EndDate = endDate;
-                MinimumAgreementVersion = minimumAgreementVersion;
-            }
-        }
         private static Incentive Create(
             Phase phase,
             DateTime dateOfBirth,
@@ -196,6 +161,50 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
 
             return null; // wouldn't get here
+        }
+    }
+
+    public class Phase1Incentive : Incentive
+    {
+        public Phase1Incentive(
+            DateTime dateOfBirth,
+            DateTime startDate,
+            IEnumerable<PaymentProfile> paymentProfiles,
+            int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
+        {
+        }
+
+        public static int MinimumAgreementVersion(DateTime startDate)
+        {
+            var applicablePeriod = EligibilityPeriods.SingleOrDefault(x => x.StartDate <= startDate && x.EndDate >= startDate);
+            return applicablePeriod?.MinimumAgreementVersion ?? EligibilityPeriods.First().MinimumAgreementVersion;
+        }
+    }
+
+    public class Phase2Incentive : Incentive
+    {
+        public Phase2Incentive(
+            DateTime dateOfBirth,
+            DateTime startDate,
+            IEnumerable<PaymentProfile> paymentProfiles,
+            int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
+        {
+        }
+
+        public static int MinimumAgreementVersion(DateTime startDate) => 6;
+    }
+
+    public class EligibilityPeriod
+    {
+        public DateTime StartDate { get; }
+        public DateTime EndDate { get; }
+        public int MinimumAgreementVersion { get; }
+
+        public EligibilityPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
+            MinimumAgreementVersion = minimumAgreementVersion;
         }
     }
 }
