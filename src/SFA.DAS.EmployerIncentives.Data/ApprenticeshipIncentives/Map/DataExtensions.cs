@@ -39,8 +39,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CourseName = model.Apprenticeship.CourseName,
                 Status = model.Status,
                 BreakInLearningDayCount = model.BreakInLearningDayCount,
-                BreakInLearnings = model.BreakInLearnings.Map(model.Id),                
-                MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion
+                BreakInLearnings = model.BreakInLearnings.Map(model.Id),
+                
+                MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
+                Phase = model.Phase.Identifier
             };
         }
 
@@ -78,8 +80,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
                 BreakInLearningDayCount = entity.BreakInLearningDayCount,
-                BreakInLearnings = entity.BreakInLearnings.Map(),
-                MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.StartDate)
+                BreakInLearnings = entity.BreakInLearnings.Map(),                
+                MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.StartDate),
+                Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase)
             };
         }
 
