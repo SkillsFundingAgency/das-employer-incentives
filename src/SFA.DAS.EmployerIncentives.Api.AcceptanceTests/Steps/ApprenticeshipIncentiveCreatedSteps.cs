@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             _fixture = new Fixture();
-            var today = new DateTime(2021, 1, 30);
+            var today = new DateTime(2021, 6, 30);
 
             _accountModel = _fixture.Create<Account>();
 
