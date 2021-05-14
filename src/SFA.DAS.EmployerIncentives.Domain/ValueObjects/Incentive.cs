@@ -29,11 +29,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
+
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
-
-        public static DateTime MinimumCommitmentStartDate = new DateTime(2021, 4, 1);
-        public static DateTime MaximumCommitmentStartDate = new DateTime(2021, 11, 30);
 
         protected Incentive(
             DateTime dateOfBirth, 
@@ -199,6 +197,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
         {
         }
+
+        public new static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
+        public new static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
 
         public static int MinimumAgreementVersion(DateTime startDate) => 6;
     }

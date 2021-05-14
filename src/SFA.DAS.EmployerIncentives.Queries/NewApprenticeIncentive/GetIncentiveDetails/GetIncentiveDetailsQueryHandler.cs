@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetIncentive
     {
         public Task<GetIncentiveDetailsResponse> Handle(GetIncentiveDetailsRequest query, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new GetIncentiveDetailsResponse(Incentive.MinimumCommitmentStartDate, Incentive.MaximumCommitmentStartDate));
+            return Task.FromResult(new GetIncentiveDetailsResponse(Phase2Incentive.EligibilityStartDate, Phase2Incentive.EligibilityEndDate));
         }
     }
 }
