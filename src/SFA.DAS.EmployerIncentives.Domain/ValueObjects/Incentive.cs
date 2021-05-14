@@ -32,6 +32,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
 
+        public static DateTime MinimumCommitmentStartDate = new DateTime(2021, 4, 1);
+        public static DateTime MaximumCommitmentStartDate = new DateTime(2021, 11, 30);
+
         protected Incentive(
             DateTime dateOfBirth, 
             DateTime startDate,
