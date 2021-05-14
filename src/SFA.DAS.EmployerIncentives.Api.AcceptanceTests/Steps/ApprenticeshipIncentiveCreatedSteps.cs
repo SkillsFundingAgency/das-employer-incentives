@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             _fixture = new Fixture();
-            var today = new DateTime(2021, 1, 30);
+            var today = new DateTime(2021, 6, 30);
 
             _accountModel = _fixture.Create<Account>();
 
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
                 .With(p => p.StartDate, today.AddDays(1))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
-                .With(p => p.Phase, Phase.Phase1)
+                .With(p => p.Phase, Phase.Phase2)
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()

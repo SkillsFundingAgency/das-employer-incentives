@@ -15,15 +15,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     public abstract class Incentive : ValueObject
     {
         private readonly DateTime _dateOfBirth;
-        private readonly DateTime _startDate;
+        protected readonly DateTime StartDate;
         private readonly List<Payment> _payments;
         private readonly int _breakInLearningDayCount;
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
-        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
-        public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
+        public abstract bool IsEligible { get; }
 
         protected Incentive(
             DateTime dateOfBirth, 
@@ -32,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             int breakInLearningDayCount)
         {
             _dateOfBirth = dateOfBirth;
-            _startDate = startDate;
+            StartDate = startDate;
             _breakInLearningDayCount = breakInLearningDayCount;
             _payments = Generate(paymentProfiles, _breakInLearningDayCount);
         }
@@ -71,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart).AddDays(breakInLearningDayCount), _earningTypes[paymentIndex]));
+                payments.Add(new Payment(paymentProfile.AmountPayable, StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart).AddDays(breakInLearningDayCount), _earningTypes[paymentIndex]));
                 paymentIndex++;
             }
 
@@ -81,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return _dateOfBirth;
-            yield return _startDate;
+            yield return StartDate;
             yield return _breakInLearningDayCount;
 
             foreach (var payment in Payments)
@@ -138,6 +136,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
         }
 
+        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
+        public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
+
         private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
             new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
@@ -160,6 +162,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             int breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
         {
         }
+
+        public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
+        public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
 
         public static int MinimumAgreementVersion(DateTime startDate) => 6;
     }
