@@ -297,7 +297,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void SetMinimumAgreementVersion(DateTime startDate)
         {
             var existingMinimumAgreementVersion = Model.MinimumAgreementVersion;
-            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(startDate);
+            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(Phase.Identifier, startDate);
             if (existingMinimumAgreementVersion != Model.MinimumAgreementVersion)
             {
                 AddEvent(new MinimumAgreementVersionChanged(
