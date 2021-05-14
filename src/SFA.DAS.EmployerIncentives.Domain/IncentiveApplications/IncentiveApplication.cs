@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public string SubmittedByName => Model.SubmittedByName;
 
         private readonly List<Apprenticeship> _apprenticeships = new List<Apprenticeship>();
-        public ReadOnlyCollection<Apprenticeship> Apprenticeships => _apprenticeships.AsReadOnly();
+        public ReadOnlyCollection<Apprenticeship> Apprenticeships => _apprenticeships.AsReadOnly();        
 
         internal static IncentiveApplication New(Guid id, long accountId, long accountLegalEntityId)
         {
@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
             var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
-            apprenticeship.SetPlannedStartDate(endOfStartMonth);           
+            apprenticeship.SetPlannedStartDate(endOfStartMonth);
 
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());

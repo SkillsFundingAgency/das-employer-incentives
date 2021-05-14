@@ -67,8 +67,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 Uln = apprenticeship.ULN,
                 PlannedStartDate = apprenticeship.PlannedStartDate,
                 DateOfBirth = apprenticeship.DateOfBirth,
-                EmploymentStartDate = apprenticeship.EmploymentStartDate,
-                Phase = apprenticeship.Phase
+                EmploymentStartDate = apprenticeship.EmploymentStartDate,                
+                Phase = apprenticeship.Phase,
+                HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
             };
         }
 

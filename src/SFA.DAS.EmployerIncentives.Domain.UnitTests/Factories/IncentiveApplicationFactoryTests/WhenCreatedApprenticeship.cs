@@ -153,7 +153,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
                 _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), _fixture.Create<string>(), startDate);
 
             // Assert
-            apprenticeship.EmploymentStartDate.Should().Be(startDate);
+            apprenticeship.GetModel().EmploymentStartDate.Should().Be(startDate);
+        }
+
+        [TestCase(null, false)]
+        [TestCase("2021-03-31", false)]
+        [TestCase("2021-04-01", true)]
+        [TestCase("2021-09-30", true)]
+        [TestCase("2021-10-01", false)]
+        public void Then_the_employment_eligibililty_is_set_based_on_the_employement_start_date(DateTime? startDate, bool eligibility)
+        {
+            // Arrange
+
+            // Act
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), _fixture.Create<string>(), startDate);
+
+            // Assert
+            apprenticeship.HasEligibleEmploymentStartDate.Should().Be(eligibility);
         }
     }
 }

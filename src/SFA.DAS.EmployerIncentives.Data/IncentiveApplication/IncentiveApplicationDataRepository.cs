@@ -106,7 +106,8 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                                             WithdrawnByEmployer = apprenticeship.WithdrawnByEmployer,
                                             WithdrawnByCompliance = apprenticeship.WithdrawnByCompliance,
                                             CourseName = apprenticeship.CourseName,
-                                            EmploymentStartDate = apprenticeship.EmploymentStartDate
+                                            EmploymentStartDate = apprenticeship.EmploymentStartDate,
+                                            HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
                                         }
                                         select apprenticeshipModel).ToList();
             return new Collection<ApprenticeshipModel>(apprenticeshipModels);

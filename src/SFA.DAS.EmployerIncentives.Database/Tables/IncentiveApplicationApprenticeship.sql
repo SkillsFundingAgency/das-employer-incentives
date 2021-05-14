@@ -17,6 +17,7 @@
 	[CourseName] NVARCHAR(126) NULL,
 	[EmploymentStartDate] DATETIME2 NULL,
 	[Phase] NVARCHAR(50) NULL,
+	[HasEligibleEmploymentStartDate] [bit] NOT NULL DEFAULT 0,
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
 GO
