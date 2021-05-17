@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement
     public class SignLegalEntityAgreementCommandHandler : ICommandHandler<SignLegalEntityAgreementCommand>
     {
         private readonly IAccountDomainRepository _domainRepository;
-        private int _minimumAgreementVersion;
+        private readonly int _minimumAgreementVersion;
 
         public SignLegalEntityAgreementCommandHandler(IAccountDomainRepository domainRepository, IOptions<ApplicationSettings> options)
         {

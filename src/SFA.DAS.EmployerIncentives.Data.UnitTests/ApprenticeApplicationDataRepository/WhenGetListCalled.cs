@@ -74,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
             incentives[0].PausePayments = false;
+            incentives[0].MinimumAgreementVersion = allAccounts[0].SignedAgreementVersion;
 
             var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
             allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
@@ -113,7 +114,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 LearnerMatchFound = false,
                 PaymentSentIsEstimated = true,
                 PaymentAmount = pendingPayments[0].Amount,
-                PaymentDate = new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, 4)
+                PaymentDate = new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, 4),
+                RequiresNewEmployerAgreement = false
             };
 
             var expectedSecondPaymentStatus = new PaymentStatusDto
@@ -121,7 +123,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 LearnerMatchFound = false,
                 PaymentAmount = pendingPayments[1].Amount,
                 PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB")),
-                PaymentSentIsEstimated = true  // update when implementing EI-827
+                PaymentSentIsEstimated = true,  // update when implementing EI-827
+                RequiresNewEmployerAgreement = false
             };
             result[0].SecondPaymentStatus.Should().BeEquivalentTo(expectedSecondPaymentStatus);
         }
@@ -990,6 +993,56 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.PaymentSentIsEstimated.Should().Be(expected);
+        }
+
+        [TestCase(null, null, true)]
+        [TestCase(null, 1, true)]
+        [TestCase(1, null, false)]
+        [TestCase(1, 1, false)]
+        [TestCase(1, 2, true)]
+        [TestCase(2, 1, false)]
+        public async Task Then_requires_new_employer_agreement_is_set(int? accountVersion, int? incentiveVersion, bool requiresNewVersion)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+            allAccounts[0].SignedAgreementVersion = accountVersion;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(1).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+            incentives[0].MinimumAgreementVersion = incentiveVersion;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(1).ToArray();
+            allApprenticeships[0].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result[0].FirstPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
+            result[0].SecondPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
         }
     }
 }
