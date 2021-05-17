@@ -10,8 +10,7 @@
     [PeriodNumber] TINYINT NULL,
 	[PaymentYear] SMALLINT NULL,
     [AccountLegalEntityId] BIGINT NULL,
-    [EarningType] VARCHAR(20) NULL
-    CONSTRAINT FK_PendingPaymentArchive_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id), 
+    [EarningType] VARCHAR(20) NULL, 
     [ClawedBack] BIT NOT NULL DEFAULT 0,
 	[ArchiveDateUTC] DATETIME2 NOT NULL,
 )

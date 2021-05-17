@@ -16,3 +16,5 @@ FROM incentives.ApprenticeshipIncentive i
 WHERE i.Status IS NULL
 AND  i.PausePayments = 1
 GO
+ALTER TABLE [archive].[PendingPayment] DROP CONSTRAINT IF EXISTS [FK_PendingPaymentArchive_ApprenticeshipIncentive]
+GO

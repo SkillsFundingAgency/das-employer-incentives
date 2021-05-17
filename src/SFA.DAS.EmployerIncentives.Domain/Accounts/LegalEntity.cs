@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         public string VrfCaseId => Model.VrfCaseId;
         public string VrfCaseStatus => Model.VrfCaseStatus;
         public DateTime? VrfCaseStatusLastUpdatedDateTime => Model.VrfCaseStatusLastUpdatedDateTime;
+        public int? SignedAgreementVersion => Model.SignedAgreementVersion;
 
         public static LegalEntity New(long id, string name)
         {

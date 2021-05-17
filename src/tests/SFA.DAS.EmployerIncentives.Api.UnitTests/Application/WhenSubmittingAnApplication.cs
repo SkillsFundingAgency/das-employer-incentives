@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -10,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
 {
@@ -55,6 +55,27 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
 
             // Act
             var result = await _sut.SubmitIncentiveApplication(request) as OkResult;
+
+            // Assert
+            result.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task Then_a_conflict_response_is_returned_when_a_uln_has_already_been_submitted()
+        {
+            // Arrange
+            var request = _fixture.Create<SubmitIncentiveApplicationRequest>();
+            _mockCommandDispatcher
+                .Setup(m => m.Send(It.Is<SubmitIncentiveApplicationCommand>(c =>
+                            c.IncentiveApplicationId == request.IncentiveApplicationId &&
+                            c.AccountId == request.AccountId &&
+                            c.DateSubmitted == request.DateSubmitted &&
+                            c.SubmittedByEmail == request.SubmittedByEmail),
+                        It.IsAny<CancellationToken>())
+                ).ThrowsAsync(new UlnAlreadySubmittedException());
+
+            // Act
+            var result = await _sut.SubmitIncentiveApplication(request) as ConflictObjectResult;
 
             // Assert
             result.Should().NotBeNull();

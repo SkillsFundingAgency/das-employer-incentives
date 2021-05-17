@@ -24,6 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public string SubmittedByEmail { get; set; }
         public string SubmittedByName { get; set; }
         [Dapper.Contrib.Extensions.Write(false)]
-        public ICollection<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }
+        public ICollection<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }        
     }
 }

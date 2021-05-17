@@ -34,8 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
-
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, int? minimumAgreementVersion)
+                
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -50,7 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     SubmittedDate = submittedDate,
                     SubmittedByEmail = submittedByEmail,
                     Status = IncentiveStatus.Active,
-                    MinimumAgreementVersion = new AgreementVersion(minimumAgreementVersion)
+                    MinimumAgreementVersion = agreementVersion,
+                    Phase = phase
                 }, true);
         }
         
@@ -287,6 +288,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     previousStartDate,
                     Model.StartDate,
                     Model));
+
+                SetMinimumAgreementVersion(startDate);
+            }
+        }
+
+        private void SetMinimumAgreementVersion(DateTime startDate)
+        {
+            var existingMinimumAgreementVersion = Model.MinimumAgreementVersion;
+            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(startDate);
+            if (existingMinimumAgreementVersion != Model.MinimumAgreementVersion)
+            {
+                AddEvent(new MinimumAgreementVersionChanged(
+                Model.Id,
+                existingMinimumAgreementVersion.MinimumRequiredVersion,
+                Model.MinimumAgreementVersion.MinimumRequiredVersion.Value,
+                Model));
             }
         }
         private void StartBreakInLearning(DateTime startDate)
@@ -469,6 +486,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var isValid = !Model.PausePayments;
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.PaymentsNotPaused, isValid));
+        }
+
+        public void ValidateMinimumRequiredAgreementVersion(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
+        {
+            if (account == null || Account.Id != account.Id)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided Account record does not match the one against the incentive.");
+            }
+
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+                        
+            var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
+
+            var isValid = legalEntity.SignedAgreementVersion >= MinimumAgreementVersion.MinimumRequiredVersion;
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasSignedMinVersion, isValid));
         }
 
         private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)

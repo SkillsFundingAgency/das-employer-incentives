@@ -125,7 +125,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     today,
                     _fixture.Create<DateTime>(),
                     _fixture.Create<string>(),
-                    _fixture.Create<int>());
+                    new AgreementVersion(_fixture.Create<int>()),
+                    new IncentivePhase(Phase.Phase1));
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
