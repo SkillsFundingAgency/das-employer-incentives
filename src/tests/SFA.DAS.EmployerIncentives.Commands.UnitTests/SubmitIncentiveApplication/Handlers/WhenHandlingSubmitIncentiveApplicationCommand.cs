@@ -101,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             //Arrange
             var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
                 _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), DateTime.MinValue);
+                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), null);
 
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             incentiveApplication.SetApprenticeships(new List<Apprenticeship> {apprentice});
@@ -117,6 +117,41 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             // Assert
             action.Should().Throw<InvalidRequestException>();
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
+        }
+
+        [TestCase("2021-03-31", true)]
+        [TestCase("2021-04-01", false)]
+        [TestCase("2021-09-30", false)]
+        [TestCase("2021-10-01", true)]
+        public void Then_application_with_ineligible_employment_start_date_is_rejected(DateTime employmentStartdate, bool isRejected)
+        {
+            //Arrange
+            var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
+                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), employmentStartdate);
+
+            var incentiveApplication = _fixture.Create<IncentiveApplication>();
+            incentiveApplication.SetApprenticeships(new List<Apprenticeship> { apprentice });
+
+            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
+
+            _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
+                .ReturnsAsync(incentiveApplication);
+
+            // Act
+            Func<Task> action = async () => await _sut.Handle(command);
+
+            // Assert
+            if (isRejected)
+            {
+                action.Should().Throw<InvalidRequestException>();
+                _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
+            }
+            else
+            {
+                action.Should().NotThrow<InvalidRequestException>();
+                _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Once);
+            }
         }
     }
 }
