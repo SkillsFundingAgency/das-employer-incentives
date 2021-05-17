@@ -167,7 +167,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
 
-        public static int MinimumAgreementVersion(DateTime startDate) => 6;
+        public static int MinimumAgreementVersion() => 6;
     }
 
     public class EligibilityPeriod

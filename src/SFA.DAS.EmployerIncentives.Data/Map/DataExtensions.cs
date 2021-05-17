@@ -25,7 +25,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             HashedLegalEntityId = i.HashedLegalEntityId,
                                                             LegalEntityId = i.Id,
                                                             LegalEntityName = i.Name,
-                                                            HasSignedIncentivesTerms = i.HasSignedAgreementTerms,
                                                             SignedAgreementVersion = i.SignedAgreementVersion,
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
@@ -61,7 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             {
                 Id = model.LegalEntityId,
                 AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedAgreementTerms = model.HasSignedIncentivesTerms,
                 SignedAgreementVersion = model.SignedAgreementVersion,
                 Name = model.LegalEntityName,
                 HashedLegalEntityId = model.HashedLegalEntityId,
@@ -110,7 +108,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             {
                 AccountId = model.Id,
                 AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedIncentivesTerms = model.HasSignedIncentivesTerms,
                 SignedAgreementVersion = model.SignedAgreementVersion,
                 LegalEntityName = model.LegalEntityName,
                 VrfVendorId = model.VrfVendorId,
@@ -194,21 +191,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 CourseName = x.CourseName,
                 Phase = x.Phase
             }).ToList();
-        }
-
-        public static LegalEntityDto Map(this LegalEntityModel model, long accountId)
-        {
-            return new LegalEntityDto
-            {
-                AccountId = accountId,
-                AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedIncentivesTerms = model.HasSignedAgreementTerms,
-                LegalEntityId = model.Id,
-                LegalEntityName = model.Name,
-                VrfVendorId = model.VrfVendorId,
-                VrfCaseStatus = model.VrfCaseStatus,
-                HashedLegalEntityId = model.HashedLegalEntityId
-            };
         }
 
         private static bool HasVendorId(Models.Account model)

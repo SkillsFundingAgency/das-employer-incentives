@@ -41,7 +41,6 @@ namespace SFA.DAS.EmployerIncentives.Data
                 else
                 {
                     legalEntity.LegalEntityName = item.LegalEntityName;
-                    legalEntity.HasSignedIncentivesTerms = item.HasSignedIncentivesTerms;
                     legalEntity.SignedAgreementVersion = item.SignedAgreementVersion;
                     legalEntity.VrfCaseId = item.VrfCaseId;
                     legalEntity.VrfCaseStatus = item.VrfCaseStatus;
@@ -80,7 +79,6 @@ namespace SFA.DAS.EmployerIncentives.Data
                                            {
                                                AccountLegalEntityId = account.AccountLegalEntityId,
                                                HashedLegalEntityId = account.HashedLegalEntityId,
-                                               HasSignedIncentivesTerms = account.HasSignedIncentivesTerms,
                                                SignedAgreementVersion = account.SignedAgreementVersion,
                                                Id = account.Id,
                                                LegalEntityId = account.LegalEntityId,
