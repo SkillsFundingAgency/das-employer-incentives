@@ -108,11 +108,12 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             {
                 AccountId = model.Id,
                 AccountLegalEntityId = model.AccountLegalEntityId,
-                SignedAgreementVersion = model.SignedAgreementVersion,
+                LegalEntityId = model.LegalEntityId,
                 LegalEntityName = model.LegalEntityName,
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
-                HashedLegalEntityId = model.HashedLegalEntityId
+                HashedLegalEntityId = model.HashedLegalEntityId,
+                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion()
             };
         }
 
