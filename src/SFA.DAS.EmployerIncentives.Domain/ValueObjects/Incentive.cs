@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -31,6 +32,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
+
+        private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
+        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
 
         protected Incentive(
             DateTime dateOfBirth, 
@@ -74,6 +78,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 {
                     return true;
                 }
+            }
+
+            return false;
+        }
+
+        public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
+        {
+            if (apprenticeship.EmploymentStartDate.HasValue &&
+                (apprenticeship.EmploymentStartDate.Value.Date >= EmployerEligibilityStartDate.Date) &&
+                (apprenticeship.EmploymentStartDate.Value.Date <= EmployerEligibilityEndDate.Date))
+            {
+                return true;
             }
 
             return false;

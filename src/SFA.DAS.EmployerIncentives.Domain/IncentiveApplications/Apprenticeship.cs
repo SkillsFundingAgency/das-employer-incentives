@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 
@@ -26,10 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public bool WithdrawnByCompliance => Model.WithdrawnByCompliance;
         public string CourseName => Model.CourseName;
         public bool HasEligibleEmploymentStartDate => Model.HasEligibleEmploymentStartDate;
-
-        private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
-        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
-
+        public DateTime? EmploymentStartDate => Model.EmploymentStartDate;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
@@ -52,9 +50,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 TotalIncentiveAmount = CalculateTotalIncentiveAmount(dateOfBirth, plannedStartDate),
                 UKPRN = ukprn,
                 CourseName = courseName,
-                EmploymentStartDate = employmentStartDate,
-                HasEligibleEmploymentStartDate = IsEmployerStartDateEligible(employmentStartDate)
+                EmploymentStartDate = employmentStartDate                
             };
+
+            Model.HasEligibleEmploymentStartDate = Incentive.EmployerStartDateIsEligible(this);
         }
 
         public void SetEarningsCalculated(bool isCalculated = true)
@@ -102,18 +101,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         private static int CalculateAgeAtStartOfApprenticeship(in DateTime apprenticeDateOfBirth, in DateTime plannedStartDate)
         {
             return apprenticeDateOfBirth.AgeOnThisDay(plannedStartDate);
-        }
-
-        private static bool IsEmployerStartDateEligible(DateTime? employmentStartDate)
-        {
-            if (employmentStartDate.HasValue &&
-                (employmentStartDate.Value.Date >= EmployerEligibilityStartDate.Date) &&
-                (employmentStartDate.Value.Date <= EmployerEligibilityEndDate.Date))
-            {
-                return true;
-            }
-
-            return false;
         }
     }
 }
