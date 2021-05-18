@@ -104,6 +104,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             apprenticeship.SetEarningsCalculated(true);
         }
 
+        public void RemoveApprenticeshipsWithIneligibleStartDates()
+        {
+            _apprenticeships.RemoveAll(x => !x.HasEligibleEmploymentStartDate);
+            var ineligibleApprenticeships = Model.ApprenticeshipModels.Where(x => !x.HasEligibleEmploymentStartDate).ToList();
+            foreach (var ineligibleApprenticeship in ineligibleApprenticeships)
+            {
+                Model.ApprenticeshipModels.Remove(ineligibleApprenticeship);
+            }
+        }
+
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
             var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
