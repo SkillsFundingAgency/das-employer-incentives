@@ -5,8 +5,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.RemoveIneligibleApprenticesFromApp
 {
     public class RemoveIneligibleApprenticesFromApplicationCommand : ICommand
     {
-        public Guid IncentiveApplicationId { get; private set; }
-        public long AccountId { get; private set; }
+        public Guid IncentiveApplicationId { get; }
+        public long AccountId { get; }
 
         public RemoveIneligibleApprenticesFromApplicationCommand(
             Guid incentiveApplicationId,

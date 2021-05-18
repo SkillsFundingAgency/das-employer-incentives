@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly TestContext _testContext;
         private readonly Fixture _fixture;
         private readonly CreateIncentiveApplicationRequest _createRequest;
-        private readonly SubmitIncentiveApplicationRequest _submitRequest;
+        private readonly PatchIncentiveApplicationRequest _patchRequest;
         private HttpResponseMessage _response;
         private long _firstApprenticeshipId;
         private long _secondApprenticeshipId;
@@ -44,9 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Build<CreateIncentiveApplicationRequest>()
                 .With(r => r.Apprenticeships, apprenticeships)
                 .Create();
-            _submitRequest = _fixture.Build<SubmitIncentiveApplicationRequest>().With(r => r.DateSubmitted, new DateTime(2021, 5, 31)).Create();
-            _submitRequest.IncentiveApplicationId = _createRequest.IncentiveApplicationId;
-            _submitRequest.AccountId = _createRequest.AccountId;
+            _patchRequest = _fixture.Build<PatchIncentiveApplicationRequest>().With(r => r.DateSubmitted, new DateTime(2021, 5, 31)).Create();
+            _patchRequest.IncentiveApplicationId = _createRequest.IncentiveApplicationId;
+            _patchRequest.AccountId = _createRequest.AccountId;
         }
 
         [Given(@"an employer has entered incentive claim application details")]
@@ -59,18 +59,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var application = await dbConnection.QueryAsync<IncentiveApplication>("SELECT * FROM IncentiveApplication WHERE Id = @IncentiveApplicationId",
-                    new { _submitRequest.IncentiveApplicationId });
+                    new { _patchRequest.IncentiveApplicationId });
 
                 application.Should().HaveCount(1);
-                application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
+                application.Single().Id.Should().Be(_patchRequest.IncentiveApplicationId);
             }
         }
 
         [When(@"the application is submitted")]
         public async Task WhenTheApplicationIsSubmitted()
         {
-            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
+            var url = $"applications/{_patchRequest.IncentiveApplicationId}";
+            _response = await EmployerIncentiveApi.Patch(url, _patchRequest);
         }
 
         [When(@"the application is submitted and the system errors")]
@@ -89,13 +89,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var application = await dbConnection.QueryAsync<IncentiveApplication>("SELECT * FROM IncentiveApplication WHERE Id = @IncentiveApplicationId AND Status = 'Submitted'",
-                    new { _submitRequest.IncentiveApplicationId });
+                    new { _patchRequest.IncentiveApplicationId });
 
                 application.Should().HaveCount(1);
-                application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
+                application.Single().Id.Should().Be(_patchRequest.IncentiveApplicationId);
 
                 var apprenticeships = await dbConnection.QueryAsync<IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
-                    new { _submitRequest.IncentiveApplicationId });
+                    new { _patchRequest.IncentiveApplicationId });
 
                 apprenticeships.Count().Should().Be(2);
                 apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase2);
@@ -111,16 +111,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             publishedCommand.Count().Should().Be(_createRequest.Apprenticeships.Count());
 
             var cmd = publishedCommand.First() as CreateIncentiveCommand;
-            cmd.AccountId.Should().Be(_submitRequest.AccountId);
+            cmd.AccountId.Should().Be(_patchRequest.AccountId);
         }
 
         [When(@"the invalid application id is submitted")]
         public async Task WhenTheInvalidApplicationIdIsSubmitted()
         {
             var invalidApplicationId = _fixture.Create<Guid>();
-            _submitRequest.IncentiveApplicationId = invalidApplicationId;
-            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _patchRequest.IncentiveApplicationId = invalidApplicationId;
+            var url = $"applications/{_patchRequest.IncentiveApplicationId}";
+            _response = await EmployerIncentiveApi.Patch(url, _patchRequest);
         }
 
         [Then(@"the application changes are not saved")]
@@ -137,7 +137,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 var application = await dbConnection.QueryAsync<IncentiveApplication>("SELECT * FROM IncentiveApplication WHERE Id = @IncentiveApplicationId AND Status = 'Submitted'",
-                    new { _submitRequest.IncentiveApplicationId });
+                    new { _patchRequest.IncentiveApplicationId });
 
                 application.Should().HaveCount(0);
             }
@@ -171,9 +171,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheInvalidAccountIdIsSubmittted()
         {
             var invalidAccountId = _fixture.Create<long>();
-            _submitRequest.AccountId = invalidAccountId;
-            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            _response =  await EmployerIncentiveApi.Patch(url, _submitRequest);
+            _patchRequest.AccountId = invalidAccountId;
+            var url = $"applications/{_patchRequest.IncentiveApplicationId}";
+            _response =  await EmployerIncentiveApi.Patch(url, _patchRequest);
         }
 
     }

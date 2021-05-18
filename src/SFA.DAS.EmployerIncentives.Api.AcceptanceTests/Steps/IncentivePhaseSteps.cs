@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private readonly TestContext _testContext;
         private readonly Fixture _fixture;
-        private SubmitIncentiveApplicationRequest _submitRequest;
+        private PatchIncentiveApplicationRequest _patchRequest;
         private HttpResponseMessage _response;
         private readonly Account _accountModel;
         private readonly IncentiveApplication _applicationModel;
@@ -81,19 +81,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var submissionDate = DateTime.ParseExact(date, "yyyy-MM-d", CultureInfo.InvariantCulture);
             
-            _submitRequest = _fixture.Build<SubmitIncentiveApplicationRequest>()
+            _patchRequest = _fixture.Build<PatchIncentiveApplicationRequest>()
                 .With(r => r.DateSubmitted, submissionDate)
                 .Create();
 
-            _submitRequest.IncentiveApplicationId = _applicationModel.Id;
-            _submitRequest.AccountId = _accountModel.Id;
+            _patchRequest.IncentiveApplicationId = _applicationModel.Id;
+            _patchRequest.AccountId = _accountModel.Id;
 
-            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
+            var url = $"applications/{_patchRequest.IncentiveApplicationId}";
 
             await _testContext.WaitFor(
                 async (cancellationToken) =>
                 {
-                    _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
+                    _response = await EmployerIncentiveApi.Patch(url, _patchRequest);
                 },
                 (context) => HasExpectedEvents(context),
                 assertOnError: false

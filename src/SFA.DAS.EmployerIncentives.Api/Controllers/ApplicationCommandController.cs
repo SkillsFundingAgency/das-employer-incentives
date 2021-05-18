@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
+using SFA.DAS.EmployerIncentives.Commands.RemoveIneligibleApprenticesFromApplication;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication;
 using System.Net;
@@ -35,11 +36,23 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPatch("/applications/{applicationId}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SubmitIncentiveApplication([FromBody] SubmitIncentiveApplicationRequest request)
+        public async Task<IActionResult> SubmitIncentiveApplication([FromBody] PatchIncentiveApplicationRequest request)
         {
             try
             {
-                await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedByEmail, request.SubmittedByName));
+                switch (request.Action)
+                {
+                    case "RemoveIneligibleApprentices":
+                    {
+                        await SendCommandAsync(new RemoveIneligibleApprenticesFromApplicationCommand(request.IncentiveApplicationId, request.AccountId));
+                        break;
+                    }
+                    default:
+                    {
+                        await SendCommandAsync(new SubmitIncentiveApplicationCommand(request.IncentiveApplicationId, request.AccountId, request.DateSubmitted, request.SubmittedByEmail, request.SubmittedByName));
+                        break;
+                    }
+                }
                 return Ok();
             }
             catch (InvalidRequestException)
