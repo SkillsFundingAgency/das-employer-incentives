@@ -20,7 +20,8 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
             _fixture.Create<DateTime>(),
             _fixture.Create<long>(),
             _fixture.Create<ApprenticeshipEmployerType>(),
-            _fixture.Create<string>());
+            _fixture.Create<string>(),
+            _fixture.Create<DateTime>());
         }
 
         public ApprenticeshipBuilder WithDateOfBirth(DateTime dateOfBirth)
@@ -32,7 +33,8 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
                 dateOfBirth,
                 _apprenticeship.UniqueLearnerNumber,
                 _apprenticeship.EmployerType,
-                _apprenticeship.CourseName);
+                _apprenticeship.CourseName,
+                _apprenticeship.EmploymentStartDate);
             return this;
         }
 

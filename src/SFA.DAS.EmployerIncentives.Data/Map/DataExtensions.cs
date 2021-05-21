@@ -152,6 +152,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
+                EmploymentStartDate = x.EmploymentStartDate,
+                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
                 Phase = x.Phase                
             }).ToList();
         }
@@ -190,6 +192,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
+                EmploymentStartDate = x.EmploymentStartDate,
+                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
                 Phase = x.Phase
             }).ToList();
         }

@@ -51,6 +51,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.WithdrawnByEmployer, false)
                 .With(p => p.DateOfBirth, today.AddYears(-20))
                 .With(p => p.Phase, Phase.NotSet)
+                .With(p => p.EmploymentStartDate, new DateTime(2021, 04, 01))
+                .With(p => p.HasEligibleEmploymentStartDate, true)                
                 .Create();
 
             _apprenticeshipsModels = new List<IncentiveApplicationApprenticeship>
