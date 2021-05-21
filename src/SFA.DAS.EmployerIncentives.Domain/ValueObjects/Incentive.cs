@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -17,21 +16,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     public abstract class Incentive : ValueObject
     {
         private readonly DateTime _dateOfBirth;
-        private readonly DateTime _startDate;
+        protected readonly DateTime StartDate;
         private readonly List<Payment> _payments;
         private readonly int _breakInLearningDayCount;
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
 
-        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
-        {
-            new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
-            new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
-        };
-
-        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
-        public bool IsEligible => _startDate >= EligibilityStartDate && _startDate <= EligibilityEndDate;
+        public abstract bool IsEligible { get; }
 
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
         private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
@@ -43,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             int breakInLearningDayCount)
         {
             _dateOfBirth = dateOfBirth;
-            _startDate = startDate;
+            StartDate = startDate;
             _breakInLearningDayCount = breakInLearningDayCount;
             _payments = Generate(paymentProfiles, _breakInLearningDayCount);
         }
@@ -65,24 +56,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return Create(incentiveApplication.Phase, incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, 0);
         }
 
-        public static bool IsNewAgreementRequired(IncentiveApplicationDto application, LegalEntityDto legalEntityDto)
-        {
-            if(application.AccountLegalEntityId != legalEntityDto.AccountLegalEntityId)
-            {
-                throw new ArgumentException($"Legal entity {legalEntityDto.AccountLegalEntityId} is not related to the application {application.AccountLegalEntityId} when checking IsNewAgreementRequired");
-            }
-
-            foreach (var apprenticeship in application.Apprenticeships)
-            {
-                if (IsNewAgreementRequired(apprenticeship, legalEntityDto.SignedAgreementVersion ?? 0))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
         {
             if (apprenticeship.EmploymentStartDate.HasValue &&
@@ -93,17 +66,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
 
             return false;
-        }
-
-        private static bool IsNewAgreementRequired(IncentiveApplicationApprenticeshipDto application, int signedAgreementVersion)
-        {
-            var isEligible = application.PlannedStartDate >= EligibilityStartDate && application.PlannedStartDate <= EligibilityEndDate;
-            if (!isEligible)
-            {
-                return true;
-            }
-            var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= application.PlannedStartDate && x.EndDate >= application.PlannedStartDate);
-            return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
         }
 
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
@@ -123,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                payments.Add(new Payment(paymentProfile.AmountPayable, _startDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart).AddDays(breakInLearningDayCount), _earningTypes[paymentIndex]));
+                payments.Add(new Payment(paymentProfile.AmountPayable, StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart).AddDays(breakInLearningDayCount), _earningTypes[paymentIndex]));
                 paymentIndex++;
             }
 
@@ -133,7 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return _dateOfBirth;
-            yield return _startDate;
+            yield return StartDate;
             yield return _breakInLearningDayCount;
 
             foreach (var payment in Payments)
@@ -190,6 +152,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
         }
 
+        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
+        public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
+
         private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
             new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
@@ -213,7 +179,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
         }
 
-        public static int MinimumAgreementVersion(DateTime startDate) => 6;
+        public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
+        public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
+        public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
+
+        public static int MinimumAgreementVersion() => 6;
     }
 
     public class EligibilityPeriod
