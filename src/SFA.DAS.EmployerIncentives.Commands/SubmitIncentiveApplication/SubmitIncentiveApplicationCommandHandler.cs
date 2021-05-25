@@ -29,10 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             {
                 throw new InvalidRequestException();
             }
-            if (application.Apprenticeships.Any(apprenticeship => !apprenticeship.HasEligibleEmploymentStartDate))
-            {
-                throw new InvalidRequestException();
-            }            
 
             foreach (var apprenticeship in application.Apprenticeships)
             {

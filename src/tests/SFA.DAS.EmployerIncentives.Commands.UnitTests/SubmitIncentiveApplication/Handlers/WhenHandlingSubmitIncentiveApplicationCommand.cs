@@ -2,21 +2,20 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
+using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
-using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Domain.Exceptions;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using IncentiveApplication = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplication.Handlers
@@ -102,30 +101,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         }
 
         [Test]
-        public void Then_application_with_invalid_employment_start_date_is_rejected()
-        {
-            //Arrange
-            var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
-                _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), null);
-
-            var incentiveApplication = _fixture.Create<IncentiveApplication>();
-            incentiveApplication.SetApprenticeships(new List<Apprenticeship> {apprentice});
-
-            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
-
-            _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
-                .ReturnsAsync(incentiveApplication);
-            
-            // Act
-            Func<Task> action = async () => await _sut.Handle(command);
-
-            // Assert
-            action.Should().Throw<InvalidRequestException>();
-            _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
-        }
-
-        [Test]
         public void Then_an_application_with_an_already_submitted_uln_is_rejected()
         {
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
@@ -142,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            action.Should().Throw<InvalidRequestException>();
+            action.Should().Throw<UlnAlreadySubmittedException>();
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
 
@@ -150,7 +125,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         [TestCase("2021-04-01", false)]
         [TestCase("2021-09-30", false)]
         [TestCase("2021-10-01", true)]
-        public void Then_application_with_ineligible_employment_start_date_is_rejected(DateTime employmentStartdate, bool isRejected)
+        public async Task Then_application_with_ineligible_employment_start_date_is_removed(DateTime employmentStartdate, bool isRemoved)
         {
             //Arrange
             var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
@@ -167,18 +142,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
 
 
             // Act
-            Func<Task> action = async () => await _sut.Handle(command);
+            await _sut.Handle(command);
 
             // Assert
-            if (isRejected)
+            incentiveApplication.Status.Should().Be(IncentiveApplicationStatus.Submitted);            
+            _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Once);
+
+            // Assert
+            if (isRemoved)
             {
-                action.Should().Throw<InvalidRequestException>();
-                _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
+                incentiveApplication.Apprenticeships.Count.Should().Be(0);
             }
             else
             {
-                action.Should().NotThrow<InvalidRequestException>();
-                _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Once);
+                incentiveApplication.Apprenticeships.Count.Should().Be(1);
+                incentiveApplication.Apprenticeships.Single().Id.Should().Be(apprentice.Id);
             }
 
         }

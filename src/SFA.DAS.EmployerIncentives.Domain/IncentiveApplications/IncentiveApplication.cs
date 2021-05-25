@@ -49,7 +49,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.DateSubmitted = submittedAt;
             Model.SubmittedByEmail = submittedByEmail;
             Model.SubmittedByName = submittedByName;
+
             Model.ApprenticeshipModels.ToList().ForEach(m => m.Phase = IncentivePhase.Create().Identifier);
+
+            // remove ineligible ones
+            Model.ApprenticeshipModels = new List<ApprenticeshipModel>(Model.ApprenticeshipModels.Where(a => a.HasEligibleEmploymentStartDate));
+
+            _apprenticeships.Clear();
+            foreach (var apprenticeshipModel in Model.ApprenticeshipModels.ToList())
+            {
+                _apprenticeships.Add(Apprenticeship.Create(apprenticeshipModel));
+            }
 
             AddEvent(new Submitted(Model));
         }
