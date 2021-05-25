@@ -18,48 +18,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             _fixture = new Fixture();
         }
 
-        [Test]
-        public void Then_the_total_incentive_amount_is_the_24_or_under_total_if_the_apprentice_is_one_day_under_25_at_the_start_date()
+        [TestCase(18)]
+        [TestCase(24)]
+        [TestCase(25)]
+        [TestCase(42)]
+        public void Then_the_total_incentive_amount_is_the_expected_amount_regardless_of_the_apprentices_age(int ageInYears)
         {
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
-            var dateOfBirth = startDate.AddYears(-25).AddDays(1);
+            var dateOfBirth = startDate.AddYears(-1 * ageInYears);
 
             var apprenticeship = CreateApprenticeship(startDate, dateOfBirth);
 
-            apprenticeship.TotalIncentiveAmount.Should().Be(2000);
-        }
-
-        [Test]
-        public void Then_the_total_incentive_amount_is_the_24_or_under_total_if_the_apprentice_is_under_24_at_the_start_date()
-        {
-            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
-            var dateOfBirth = startDate.AddYears(-18);
-
-            var apprenticeship = CreateApprenticeship(startDate, dateOfBirth);
-
-            apprenticeship.TotalIncentiveAmount.Should().Be(2000);
-        }
-
-        [Test]
-        public void Then_the_total_incentive_amount_is_the_25_or_over_total_if_the_apprentice_is_exactly_25_at_the_start_date()
-        {
-            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
-            var dateOfBirth = startDate.AddYears(-25);
-
-            var apprenticeship = CreateApprenticeship(startDate, dateOfBirth);
-
-            apprenticeship.TotalIncentiveAmount.Should().Be(1500);
-        }
-
-        [Test]
-        public void Then_the_total_incentive_amount_is_the_25_or_over_total_if_the_apprentice_is_over_25_at_the_start_date()
-        {
-            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
-            var dateOfBirth = startDate.AddYears(-26);
-
-            var apprenticeship = CreateApprenticeship(startDate, dateOfBirth);
-
-            apprenticeship.TotalIncentiveAmount.Should().Be(1500);
+            apprenticeship.TotalIncentiveAmount.Should().Be(3000);
         }
 
         [TestCase(null, false)]
