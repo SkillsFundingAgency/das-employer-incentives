@@ -22,8 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public string SubmittedByEmail => Model.SubmittedByEmail;
         public string SubmittedByName => Model.SubmittedByName;
 
-        private readonly List<Apprenticeship> _apprenticeships = new List<Apprenticeship>();
-        public ReadOnlyCollection<Apprenticeship> Apprenticeships => _apprenticeships.AsReadOnly();        
+        public ReadOnlyCollection<Apprenticeship> Apprenticeships => Map(Model.ApprenticeshipModels).AsReadOnly();        
 
         internal static IncentiveApplication New(Guid id, long accountId, long accountLegalEntityId)
         {
@@ -37,10 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private IncentiveApplication(Guid id, IncentiveApplicationModel model, bool isNew = false) : base(id, model, isNew)
         {
-            foreach (var apprenticeshipModel in model.ApprenticeshipModels.ToList())
-            {
-                _apprenticeships.Add(Apprenticeship.Create(apprenticeshipModel));
-            }
         }
 
         public void Submit(DateTime submittedAt, string submittedByEmail, string submittedByName)
@@ -52,17 +47,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
             Model.ApprenticeshipModels.ToList().ForEach(m => m.Phase = IncentivePhase.Create().Identifier);
 
-            // remove ineligible ones
-            Model.ApprenticeshipModels = new List<ApprenticeshipModel>(Model.ApprenticeshipModels.Where(a => a.HasEligibleEmploymentStartDate));
-
-            _apprenticeships.Clear();
-            foreach (var apprenticeshipModel in Model.ApprenticeshipModels.ToList())
-            {
-                _apprenticeships.Add(Apprenticeship.Create(apprenticeshipModel));
-            }
+            Model.ApprenticeshipModels = FilterEligibleApprenticeships(Model.ApprenticeshipModels);
 
             AddEvent(new Submitted(Model));
-        }
+        }        
 
         public void Resubmit()
         {
@@ -76,7 +64,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         public void SetApprenticeships(IEnumerable<Apprenticeship> apprenticeships)
         {
-            _apprenticeships.Clear();
             Model.ApprenticeshipModels.Clear();
             foreach (var a in apprenticeships)
             {
@@ -86,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
         {
-            var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            var apprenticeToWithdraw = Apprenticeships.Single(m => m.Id == apprenticeship.Id);
             apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.EmployerWithdrawn);
             
             AddEvent(new EmployerWithdrawn(
@@ -98,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         public void ComplianceWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
         {
-            var apprenticeToWithdraw = _apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            var apprenticeToWithdraw = Apprenticeships.Single(m => m.Id == apprenticeship.Id);
             apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.ComplianceWithdrawn);
 
             AddEvent(new ComplianceWithdrawn(
@@ -110,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         public void EarningsCalculated(Guid apprenticeshipId)
         {
-            var apprenticeship = _apprenticeships.Single(a => a.Id == apprenticeshipId);
+            var apprenticeship = Apprenticeships.Single(a => a.Id == apprenticeshipId);
             apprenticeship.SetEarningsCalculated(true);
         }
 
@@ -118,9 +105,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         {
             var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
             apprenticeship.SetPlannedStartDate(endOfStartMonth);
-
-            _apprenticeships.Add(apprenticeship);
+                        
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
+        }
+
+        private static List<ApprenticeshipModel> FilterEligibleApprenticeships(ICollection<ApprenticeshipModel> apprenticeshipModels)
+        {
+            return new List<ApprenticeshipModel>(apprenticeshipModels.Where(a => a.HasEligibleEmploymentStartDate));
+        }
+
+        private static List<Apprenticeship> Map(ICollection<ApprenticeshipModel> apprenticeshipModels)
+        {
+            var apprenticeships = new List<Apprenticeship>();
+            foreach (var apprenticeshipModel in apprenticeshipModels.ToList())
+            {
+                apprenticeships.Add(Apprenticeship.Create(apprenticeshipModel));
+            }
+
+            return apprenticeships;
         }
     }
 }
