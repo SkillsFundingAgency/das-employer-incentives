@@ -14,19 +14,33 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
     public class OrchestrationStatusCheck
     {
         [FunctionName("GetStatus")]
-        public static async Task<HttpResponseMessage> Run1(
+        public static async Task<HttpResponseMessage> GetStatus(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "orchestrators/GetStatus/{instanceId}")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient client,
             string instanceId,
-            ILogger log)
+            ILogger logger)
         {
-            DurableOrchestrationStatus status = await client.GetStatusAsync(instanceId);
+            var status = await client.GetStatusAsync(instanceId);
+           
+            logger.LogInformation(JsonConvert.SerializeObject(status, Formatting.Indented));
+            
             return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(status, Formatting.Indented)) };
         }
 
+        [FunctionName("GetStatusFunc")]
+        public static async Task GetStatusFunc(
+            [DurableClient] IDurableOrchestrationClient client,
+            [ActivityTrigger] string instanceId,
+            ILogger logger)
+        {
+            var status = await client.GetStatusAsync(instanceId);
+
+            logger.LogInformation(JsonConvert.SerializeObject(status, Formatting.Indented));
+        }
+
         [FunctionName("GetAllStatus")]
-        public static async Task<HttpResponseMessage> Run2(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "orchestrators/GetAllStatus")] HttpRequestMessage req,
+        public static async Task<HttpResponseMessage> GetAllStatus(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/GetAllStatus")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
