@@ -38,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 AccountModel = _fixture.Create<Account>();
                 var startDate = DateTime.Today.AddDays(1);
                 var dueDate = startDate.AddDays(90);
+                AccountModel.SignedAgreementVersion = 5;
 
                 IncentiveApplicationModel = _fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
@@ -60,6 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.StartDate, startDate)
                     .With(p => p.DateOfBirth, startDate.AddYears(-20))
                     .With(p => p.PausePayments, false)
+                    .With(p => p.MinimumAgreementVersion, AccountModel.SignedAgreementVersion)
                     .Create();
 
                 PendingPaymentModel1 = _fixture.Build<PendingPayment>()

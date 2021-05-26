@@ -1,4 +1,5 @@
-﻿Feature: ValidatePayments
+﻿@activeCalendarPeriod
+Feature: ValidatePayments
 	In order to make employer incentives payments
 	As a employer incentives service
 	I want to be validate and submit payment requests
@@ -37,11 +38,12 @@ Scenario: When at least one validation check fails
 
 
 Examples:
-	| ValidationStep    |
-	| HasBankDetails    |
-	| IsInLearning      |
-	| HasLearningRecord |
-	| HasNoDataLocks    |
-	| HasIlrSubmission  |
-	| HasDaysInLearning |
-	| PaymentsNotPaused |
+	| ValidationStep      |
+	| HasBankDetails      |
+	| IsInLearning        |
+	| HasLearningRecord   |
+	| HasNoDataLocks      |
+	| HasIlrSubmission    |
+	| HasDaysInLearning   |
+	| PaymentsNotPaused   |
+	| HasSignedMinVersion |

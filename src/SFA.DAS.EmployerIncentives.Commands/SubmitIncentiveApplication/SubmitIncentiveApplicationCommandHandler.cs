@@ -4,16 +4,20 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
 {
     public class SubmitIncentiveApplicationCommandHandler : ICommandHandler<SubmitIncentiveApplicationCommand>
     {
-        private readonly IIncentiveApplicationDomainRepository _domainRepository;        
+        private readonly IIncentiveApplicationDomainRepository _domainRepository;
+        private readonly IUlnValidationService _ulnValidationService;
 
-        public SubmitIncentiveApplicationCommandHandler(IIncentiveApplicationDomainRepository domainRepository)
+        public SubmitIncentiveApplicationCommandHandler(IIncentiveApplicationDomainRepository domainRepository, IUlnValidationService ulnValidationService)
         {
             _domainRepository = domainRepository;
+            _ulnValidationService = ulnValidationService;
         }
 
         public async Task Handle(SubmitIncentiveApplicationCommand command, CancellationToken cancellationToken = default)
@@ -23,6 +27,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication
             if (application == null || application.AccountId != command.AccountId)
             {
                 throw new InvalidRequestException();
+            }
+
+            foreach (var apprenticeship in application.Apprenticeships)
+            {
+                if (await _ulnValidationService.UlnAlreadyOnSubmittedIncentiveApplication(apprenticeship.ULN))
+                {
+                    throw new UlnAlreadySubmittedException();
+                }
             }
 
             application.Submit(command.DateSubmitted, command.SubmittedByEmail, command.SubmittedByName);

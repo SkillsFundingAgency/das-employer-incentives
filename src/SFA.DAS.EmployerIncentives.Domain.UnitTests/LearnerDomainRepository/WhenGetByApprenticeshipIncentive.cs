@@ -42,7 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
         public async Task Then_the_existing_learner_is_returned()
         {
             // Arrange
-            var incentiveModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            var incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .Without(x => x.BreakInLearnings)
+                .Create();
             var payments = _fixture.Build<PendingPaymentModel>()
                 .With(pp => pp.ApprenticeshipIncentiveId, incentiveModel.ApplicationApprenticeshipId)
                 .Without(pp => pp.PaymentMadeDate) // null for "not paid"
@@ -69,12 +71,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             result.Id.Should().Be(learner.Id, "should return existing");
         }
 
-
         [Test]
         public async Task Then_a_new_learner_is_returned()
         {
             // Arrange
-            var incentiveModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            var incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .Without(x => x.BreakInLearnings)
+                .Create();
             var payments = _fixture.Build<PendingPaymentModel>()
                 .With(pp => pp.ApprenticeshipIncentiveId, incentiveModel.ApplicationApprenticeshipId)
                 .Without(pp => pp.PaymentMadeDate) // null for "not paid"

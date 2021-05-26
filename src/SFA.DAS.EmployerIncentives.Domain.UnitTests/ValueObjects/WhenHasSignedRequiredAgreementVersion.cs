@@ -28,10 +28,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [TestCase("2020-07-31")]
-        [TestCase("2021-04-01")]
+        [TestCase("2021-06-01")]
         public void Then_returns_true_when_ineligible(DateTime startDate)
         {
-            var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles);
+            var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles, 0);
 
             var result = incentive.IsNewAgreementRequired(10);
 
@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         [TestCase("2021-02-05", 4)]
         public void Then_returns_true_when_incorrect_agreement_signed(DateTime startDate, int signedAgreementVersion)
         {
-            var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles);
+            var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles, 0);
 
             var result = incentive.IsNewAgreementRequired(signedAgreementVersion);
 
@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         [TestCase("2021-02-05", 6)]
         public void Then_returns_false_when_correct_agreement_signed(DateTime startDate, int signedAgreementVersion)
         {
-            var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles);
+            var incentive = new Incentive(DateTime.Now.AddYears(-20), startDate, _incentivePaymentProfiles, 0);
 
             var result = incentive.IsNewAgreementRequired(signedAgreementVersion);
 

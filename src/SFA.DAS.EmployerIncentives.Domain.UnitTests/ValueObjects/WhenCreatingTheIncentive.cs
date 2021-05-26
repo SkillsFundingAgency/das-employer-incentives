@@ -34,10 +34,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         {
             var date = new DateTime(2020, 10, 1);
             
-            var result = new Incentive(date.AddYears(-1*age), date, _incentivePaymentProfiles);
+            var result = new Incentive(date.AddYears(-1*age), date, _incentivePaymentProfiles, 0);
 
             result.IncentiveType.Should().Be(expectedIncentiveType);
-            result.IsEligible.Should().BeTrue();
+            result.IsEligible.Should().BeTrue();            
             var payments = result.Payments.ToList();
             payments.Count.Should().Be(2);
             payments[0].Amount.Should().Be(expectedAmount1);
@@ -48,11 +48,32 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             payments[1].EarningType.Should().Be(EarningType.SecondPayment);
         }
 
+        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
+        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
+        public void Then_the_due_date_includes_the_break_in_learning(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
+        {
+            var date = new DateTime(2020, 10, 1);
+            int breakInLearning = 10;
+
+            var result = new Incentive(date.AddYears(-1 * age), date, _incentivePaymentProfiles, breakInLearning);
+
+            result.IncentiveType.Should().Be(expectedIncentiveType);
+            result.IsEligible.Should().BeTrue();
+            var payments = result.Payments.ToList();
+            payments.Count.Should().Be(2);
+            payments[0].Amount.Should().Be(expectedAmount1);
+            payments[0].PaymentDate.Should().Be(date.AddDays(expectedDays1).AddDays(breakInLearning));
+            payments[0].EarningType.Should().Be(EarningType.FirstPayment);
+            payments[1].Amount.Should().Be(expectedAmount2);
+            payments[1].PaymentDate.Should().Be(date.AddDays(expectedDays2).AddDays(breakInLearning));
+            payments[1].EarningType.Should().Be(EarningType.SecondPayment);
+        }
+
         [Test]
-        public void And_Date_Is_Before_August_Then_the_apprentice_is_not_eligible()
+        public void And_Date_Is_Before_August_Then_the_application_is_not_eligible()
         {
             var date = new DateTime(2020, 07, 31);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles);
+            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles, 0);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
@@ -60,10 +81,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [Test]
-        public void And_Date_Is_After_March_Then_the_apprentice_is_not_eligible()
+        public void And_Date_Is_After_May_Then_the_application_is_not_eligible()
         {
-            var date = new DateTime(2021, 04, 1);
-            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles);
+            var date = new DateTime(2021, 06, 1);
+            var result = new Incentive(date.AddYears(-1 * 25), date, _incentivePaymentProfiles, 0);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();

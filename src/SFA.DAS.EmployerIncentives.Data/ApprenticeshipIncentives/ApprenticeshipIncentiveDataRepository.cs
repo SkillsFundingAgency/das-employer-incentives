@@ -22,7 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task Add(ApprenticeshipIncentiveModel apprenticeshipIncentive)
         {
-            await _dbContext.AddAsync(apprenticeshipIncentive.Map());
+            var incentive = apprenticeshipIncentive.Map();
+            await _dbContext.AddAsync(incentive);
         }
 
         public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments()
@@ -47,6 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
                .Include(x => x.Payments)
                .Include(x => x.ClawbackPayments)
+               .Include(x => x.BreakInLearnings)
                .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
             if (apprenticeshipIncentive != null)
             {
@@ -70,6 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .ThenInclude(x => x.ValidationResults)
                 .Include(x => x.Payments)
                 .Include(x => x.ClawbackPayments)
+                .Include(x => x.BreakInLearnings)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
@@ -149,6 +152,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 else
                 {
                     _dbContext.ClawbackPayments.Add(clawback);
+                }
+            }
+
+            foreach (var breakInLearning in updatedIncentive.BreakInLearnings)
+            {
+                var existingBreakInLearning = existingIncentive.BreakInLearnings.SingleOrDefault(p => p.StartDate == breakInLearning.StartDate);
+
+                if (existingBreakInLearning != null)
+                {
+                    _dbContext.Entry(existingBreakInLearning).CurrentValues.SetValues(breakInLearning);
+                }
+                else
+                {
+                    _dbContext.BreakInLearnings.Add(breakInLearning);
                 }
             }
         }

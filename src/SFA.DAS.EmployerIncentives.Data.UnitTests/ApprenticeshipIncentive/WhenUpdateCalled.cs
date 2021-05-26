@@ -2,15 +2,12 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CollectionPeriod = SFA.DAS.EmployerIncentives.Domain.ValueObjects.CollectionPeriod;
-using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -41,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             expected.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
             expected.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
+            expected.Phase = new Domain.ValueObjects.IncentivePhase(Enums.Phase.Phase1);
 
             var pendingPayments = _fixture.Build<PendingPaymentModel>().With(
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
@@ -77,7 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                      x.EmployerType == expected.Apprenticeship.EmployerType &&
                      x.SubmittedByEmail == expected.SubmittedByEmail &&
                      x.SubmittedDate == expected.SubmittedDate &&
-                     x.CourseName == expected.Apprenticeship.CourseName
+                     x.CourseName == expected.Apprenticeship.CourseName &&
+                     x.Phase == expected.Phase.Identifier
                 )
                 .Should().Be(1);
 
@@ -127,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
         private async Task<ApprenticeshipIncentiveModel> SaveAndGetApprenticeshipIncentive()
         {
-            var incentive = _fixture.Create<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>().Without(m => m.BreakInLearnings).With(p => p.Phase, Enums.Phase.NotSet).Create();
             foreach (var pendingPayment in incentive.PendingPayments)
             {
                 pendingPayment.PaymentYear = Convert.ToInt16(_collectionPeriod.AcademicYear);
