@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedAccount.DateSubmitted.Should().Be(testApplication.DateSubmitted);
             storedAccount.Status.Should().Be(testApplication.Status);
             storedAccount.SubmittedByEmail.Should().Be(testApplication.SubmittedByEmail);
-            storedAccount.SubmittedByName.Should().Be(testApplication.SubmittedByName);
+            storedAccount.SubmittedByName.Should().Be(testApplication.SubmittedByName);            
         }
 
         [Test]
@@ -94,6 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationDataRepo
             storedApprenticeship.TotalIncentiveAmount.Should().Be(testApprenticeship.TotalIncentiveAmount);
             storedApprenticeship.UKPRN.Should().Be(testApprenticeship.UKPRN);
             storedApprenticeship.CourseName.Should().Be(testApprenticeship.CourseName);
+            storedApprenticeship.Phase.Should().Be(testApprenticeship.Phase);
         }
     }
 }

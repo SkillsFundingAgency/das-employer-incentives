@@ -55,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.DateSubmitted = submittedAt;
             Model.SubmittedByEmail = submittedByEmail;
             Model.SubmittedByName = submittedByName;
+            Model.ApprenticeshipModels.ToList().ForEach(m => m.Phase = IncentivePhase.Create(Model.DateSubmitted.Value).Identifier);
 
             AddEvent(new Submitted(Model));
         }
@@ -111,10 +112,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private void AddApprenticeship(Apprenticeship apprenticeship)
         {
-            var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year,
-                apprenticeship.PlannedStartDate.Month,
-                DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
-            apprenticeship.SetPlannedStartDate(endOfStartMonth);
+            var endOfStartMonth = new DateTime(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month, DateTime.DaysInMonth(apprenticeship.PlannedStartDate.Year, apprenticeship.PlannedStartDate.Month));
+            apprenticeship.SetPlannedStartDate(endOfStartMonth);           
+
             _apprenticeships.Add(apprenticeship);
             Model.ApprenticeshipModels.Add(apprenticeship.GetModel());
         }
