@@ -13,5 +13,6 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public bool PaymentSent { get; set; }
         public bool PaymentSentIsEstimated { get; set; }
         public bool RequiresNewEmployerAgreement { get; set; }
+        public bool PaymentIsStopped { get; set; }        
     }
 }
