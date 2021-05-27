@@ -31,6 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
+        public IncentiveStatus Status => Model.Status;
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
@@ -206,16 +207,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         
         public async Task Withdraw(ICollectionCalendarService collectionCalendarService)
         {
+            Model.Status = IncentiveStatus.Withdrawn;
             if (HasPaidEarnings)
             {
                 var calendarService = await collectionCalendarService.Get();
                 ClawbackAllPayments(calendarService.GetActivePeriod());
                 Model.PausePayments = false;
-                Model.Status = IncentiveStatus.Withdrawn;
             }
             else
             {
-                IsDeleted = true;
+                RemoveUnpaidEarnings();
             }
         }
 
