@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.ULN,
                      entity.EmployerType,
                      entity.CourseName,
-                     entity.EmploymentStartDate.Value
+                     entity.EmploymentStartDate
                      );
 
             if (entity.UKPRN.HasValue)
