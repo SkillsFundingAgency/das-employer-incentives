@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public Provider Provider { get; private set; }
         public ApprenticeshipEmployerType EmployerType { get; }
         public string CourseName { get; set; }
-        public DateTime EmploymentStartDate { get; set; }
+        public DateTime? EmploymentStartDate { get; set; }
 
         public Apprenticeship(
             long id, 
@@ -25,14 +25,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             long uniqueLearnerNumber,
             ApprenticeshipEmployerType employerType,
             string courseName,
-            DateTime employmentStartDate)
+            DateTime? employmentStartDate)
         {
             if (id <= 0) throw new ArgumentException("Apprenticeship Id must be greater than 0", nameof(id));
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("FirstName must be set", nameof(firstName));
             if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("LastName must be set", nameof(lastName));
             if (uniqueLearnerNumber <= 0) throw new ArgumentException("UniqueLearnerNumber must be greater than 0", nameof(uniqueLearnerNumber));
             if (string.IsNullOrWhiteSpace(courseName)) throw new ArgumentException("CourseName must be set", nameof(courseName));
-            if (employmentStartDate == DateTime.MinValue) throw new ArgumentException("EmploymentStartDate must be set", nameof(employmentStartDate));
             Id = id;
             FirstName = firstName;
             LastName = lastName;
