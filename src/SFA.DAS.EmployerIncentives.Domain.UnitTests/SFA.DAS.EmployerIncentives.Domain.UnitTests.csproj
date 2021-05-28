@@ -26,4 +26,5 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.ValueObjects\SFA.DAS.EmployerIncentives.ValueObjects.csproj" />
   </ItemGroup>
+
 </Project>

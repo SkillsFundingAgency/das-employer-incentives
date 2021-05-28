@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 {
     public class WhenCreatePayment
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private CollectionPeriod _collectionPeriod;
         private Fixture _fixture;
@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange
             var apprenticeship = new Apprenticeship(_fixture.Create<long>(), _fixture.Create<string>(),
-                _fixture.Create<string>(), dob, _fixture.Create<long>(), employerType, _fixture.Create<string>());
+                _fixture.Create<string>(), dob, _fixture.Create<long>(), employerType, _fixture.Create<string>(), _fixture.Create<DateTime>());
 
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x=>x.StartDate, plannedStartDate)
@@ -138,9 +138,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             pendingPayment.PaymentMadeDate.Should().Be(DateTime.Today);
         }
 
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }

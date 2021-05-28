@@ -24,15 +24,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             newIncentivePhase.Identifier.Should().Be(phase);
         }
 
-        [TestCase("2021-6-1", Phase.NotSet)]
-        [TestCase("2021-5-31", Phase.Phase1)]
-        public void Then_the_incentive_phase_is_created_by_the_factory_method(DateTime applicationSubmissionDate, Phase expectedPhaseId)
+        [Test()]
+        public void Then_the_current_incentive_phase_is_created_by_the_factory_method()
         {
             // Arrange
-            var expectedPhase = new IncentivePhase(expectedPhaseId);
+            var expectedPhase = new IncentivePhase(Phase.Phase2);
 
             // Act
-            var result = IncentivePhase.Create(applicationSubmissionDate);
+            var result = IncentivePhase.Create();
 
             // Assert
             result.Should().BeEquivalentTo(expectedPhase);

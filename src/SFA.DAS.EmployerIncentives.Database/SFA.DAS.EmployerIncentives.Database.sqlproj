@@ -95,7 +95,6 @@
     <Build Include="Views\BusinessValidationRulesDashboard.sql" />
     <Build Include="StoredProcedures\PaymentEnquiry.sql" />
     <Build Include="Schemas\Support.sql" />
-    <None Include="Scripts\Update.AccountsSignedAgreementVersion.sql" />
     <Build Include="Views\BusinessValidationRulesByPeriodDashboard.sql" />
     <Build Include="Views\BusinessGetMonthEndRuntimes.sql" />
     <Build Include="Tables\ClawbackPayment.sql" />

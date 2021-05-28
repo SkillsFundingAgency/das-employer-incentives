@@ -47,7 +47,11 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 Id = x.Application.Id,
                 AccountId = x.Application.AccountId,
                 AccountLegalEntityId = x.Application.AccountLegalEntityId,
-                Apprenticeships = x.Application.Apprenticeships.Select(y => MapToApprenticeshipDto(y)),
+                Apprenticeships = x.Application.Apprenticeships
+                                    .OrderBy(o => o.FirstName)
+                                    .ThenBy(o => o.LastName)
+                                    .ThenBy(o=> o.ULN)
+                                    .Select(y => MapToApprenticeshipDto(y)),
                 LegalEntityId = x.Account.LegalEntityId,
                 SubmittedByEmail = x.Application.SubmittedByEmail,
                 SubmittedByName = x.Application.SubmittedByName,
@@ -66,7 +70,10 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
                 Uln = apprenticeship.ULN,
                 PlannedStartDate = apprenticeship.PlannedStartDate,
-                DateOfBirth = apprenticeship.DateOfBirth
+                DateOfBirth = apprenticeship.DateOfBirth,
+                EmploymentStartDate = apprenticeship.EmploymentStartDate,                
+                Phase = apprenticeship.Phase,
+                HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
             };
         }
 

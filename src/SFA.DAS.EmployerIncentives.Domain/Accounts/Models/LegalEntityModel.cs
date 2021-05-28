@@ -10,7 +10,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts.Models
         public string HashedLegalEntityId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string Name { get; set; }
-        public bool HasSignedAgreementTerms { get; set; }
         public int? SignedAgreementVersion { get; set; }
         public string VrfVendorId { get; set; }
         public string VrfCaseId { get; set; }
