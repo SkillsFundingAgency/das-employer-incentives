@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 {
     public class WhenWithdrawn
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
@@ -51,9 +51,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.IsDeleted.Should().BeFalse();
         }
 
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }

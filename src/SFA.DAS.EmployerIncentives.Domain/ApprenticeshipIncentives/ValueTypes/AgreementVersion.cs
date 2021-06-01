@@ -1,13 +1,13 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using System;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class AgreementVersion : ValueObject
     {
-        private const int MinimumEmployerIncentivesAgreementVersion = 4;
-        private const int SchemeEligibilityExtensionAgreementVersion = 5;
         public int? MinimumRequiredVersion { get; }
 
         public AgreementVersion(int? minimumRequiredVersion)
@@ -15,28 +15,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             MinimumRequiredVersion = minimumRequiredVersion;
         }
         
-        public static AgreementVersion Create(DateTime startDate)
+        public static AgreementVersion Create(Phase phase, DateTime startDate)
         {
-            var schemeEligibilityExtensionStartDate = new DateTime(2021, 02, 01);
-            int minimumAgreementVersion = SchemeEligibilityExtensionAgreementVersion;
-            if (startDate < schemeEligibilityExtensionStartDate)
+            int minimumAgreementVersion;
+            if (phase == Phase.Phase1)
             {
-                minimumAgreementVersion = MinimumEmployerIncentivesAgreementVersion;
+                minimumAgreementVersion = Phase1Incentive.MinimumAgreementVersion(startDate);
+            }
+            else
+            {
+                minimumAgreementVersion = Phase2Incentive.MinimumAgreementVersion();
             }
 
             return new AgreementVersion(minimumAgreementVersion);
         }
 
-        public AgreementVersion ChangedStartDate(DateTime startDate)
+        public AgreementVersion ChangedStartDate(Phase phase, DateTime startDate)
         {
-            var schemeEligibilityExtensionEndDate = new DateTime(2021, 05, 31);
-
-            if (startDate > schemeEligibilityExtensionEndDate)
-            {
-                return this; // no need to change the version outside the eligibility window 
-            }
-
-            var newVersion = Create(startDate);
+            var newVersion = Create(phase, startDate);
 
             if(newVersion.MinimumRequiredVersion > MinimumRequiredVersion)
             {
