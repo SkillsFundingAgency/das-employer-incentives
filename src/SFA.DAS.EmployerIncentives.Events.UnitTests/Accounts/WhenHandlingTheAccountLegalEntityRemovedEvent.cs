@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.Accounts
     public class WhenHandlingTheAccountLegalEntityRemovedEvent
     {
         private Mock<IIncentiveApplicationDataRepository> _applicationRepository;
-        private Mock<ICommandDispatcher> _commandDispatcher;
+        private Mock<ICommandPublisher> _commandPublisher;
         private AccountLegalEntityRemovedHandler _sut;
         private Fixture _fixture;
 
@@ -25,8 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.Accounts
         public void Arrange()
         {
             _applicationRepository = new Mock<IIncentiveApplicationDataRepository>();
-            _commandDispatcher = new Mock<ICommandDispatcher>();
-            _sut = new AccountLegalEntityRemovedHandler(_applicationRepository.Object, _commandDispatcher.Object);
+            _commandPublisher = new Mock<ICommandPublisher>();
+            _sut = new AccountLegalEntityRemovedHandler(_applicationRepository.Object, _commandPublisher.Object);
             _fixture = new Fixture();
         }
 
@@ -48,12 +48,12 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.Accounts
             await _sut.Handle(accountLegalEntityRemovedEvent);
 
             //Assert
-            _commandDispatcher.Verify(x => x.Send(It.IsAny<WithdrawCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(applications.Sum(x => x.ApprenticeshipModels.Count)));
+            _commandPublisher.Verify(x => x.Publish(It.IsAny<WithdrawCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(applications.Sum(x => x.ApprenticeshipModels.Count)));
             foreach (var application in applications)
             {
                 foreach (var apprenticeship in application.ApprenticeshipModels)
                 {
-                    _commandDispatcher.Verify(x => x.Send(It.Is<WithdrawCommand>(y => y.IncentiveApplicationApprenticeshipId == apprenticeship.Id), It.IsAny<CancellationToken>()), Times.Once);
+                    _commandPublisher.Verify(x => x.Publish(It.Is<WithdrawCommand>(y => y.IncentiveApplicationApprenticeshipId == apprenticeship.Id), It.IsAny<CancellationToken>()), Times.Once);
                 }
             }
         }

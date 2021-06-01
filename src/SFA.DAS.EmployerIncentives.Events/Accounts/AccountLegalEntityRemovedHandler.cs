@@ -12,13 +12,13 @@ namespace SFA.DAS.EmployerIncentives.Events.Accounts
     public class AccountLegalEntityRemovedHandler : IDomainEventHandler<AccountLegalEntityRemoved>
     {
         private readonly IIncentiveApplicationDataRepository _incentiveApplicationDataRepository;
-        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly ICommandPublisher _commandPublisher;
 
         public AccountLegalEntityRemovedHandler(IIncentiveApplicationDataRepository incentiveApplicationDataRepository, 
-                                                ICommandDispatcher commandDispatcher)
+                                                ICommandPublisher commandPublisher)
         {
             _incentiveApplicationDataRepository = incentiveApplicationDataRepository;
-            _commandDispatcher = commandDispatcher;
+            _commandPublisher = commandPublisher;
         }
 
         public async Task Handle(AccountLegalEntityRemoved @event, CancellationToken cancellationToken = default)
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Events.Accounts
                 {
                     var withdrawCommand = new WithdrawCommand(application.AccountId, apprenticeship.Id);
 
-                    withdrawTasks.Add(_commandDispatcher.Send(withdrawCommand));
+                    withdrawTasks.Add(_commandPublisher.Publish(withdrawCommand));
                 }
             }
 
