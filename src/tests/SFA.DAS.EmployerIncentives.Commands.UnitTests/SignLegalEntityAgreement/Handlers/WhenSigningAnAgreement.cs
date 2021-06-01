@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using AutoFixture;
-using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -16,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
     public class WhenSigningAnAgreement
     {
         private SignLegalEntityAgreementCommandHandler _sut;
-        private Mock<IAccountDomainRepository> _mockDomainRespository;
+        private Mock<IAccountDomainRepository> _mockDomainRepository;
         private Mock<IOptions<ApplicationSettings>> _mockOptions;
 
         private Fixture _fixture;
@@ -28,11 +27,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
         {
             _fixture = new Fixture();
 
-            _mockDomainRespository = new Mock<IAccountDomainRepository>();
+            _mockDomainRepository = new Mock<IAccountDomainRepository>();
             _mockOptions = new Mock<IOptions<ApplicationSettings>>();
             _mockOptions.Setup(x => x.Value.MinimumAgreementVersion).Returns(ExpectedMinimumVersion);
 
-            _sut = new SignLegalEntityAgreementCommandHandler(_mockDomainRespository.Object, _mockOptions.Object);
+            _sut = new SignLegalEntityAgreementCommandHandler(_mockDomainRepository.Object, _mockOptions.Object);
         }
 
         [Test]
@@ -40,9 +39,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
         {
             //Arrange
             var command = new SignLegalEntityAgreementCommand(_fixture.Create<long>(), _fixture.Create<long>(), ExpectedMinimumVersion);
-            var legalEntityModel = new LegalEntityModel { Id = command.AccountLegalEntityId, AccountLegalEntityId = command.AccountLegalEntityId, HasSignedAgreementTerms = false };
+            var legalEntityModel = new LegalEntityModel { Id = command.AccountLegalEntityId, AccountLegalEntityId = command.AccountLegalEntityId };
             var expectedAccount = Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<LegalEntityModel> { legalEntityModel } });
-            _mockDomainRespository
+            _mockDomainRepository
                 .Setup(m => m.Find(command.AccountId))
                 .ReturnsAsync(expectedAccount);
 
@@ -50,8 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
             await _sut.Handle(command);
 
             //Assert
-            legalEntityModel.HasSignedAgreementTerms.Should().BeTrue();
-            _mockDomainRespository.Verify(m => m.Save(expectedAccount), Times.Once);
+            _mockDomainRepository.Verify(m => m.Save(expectedAccount), Times.Once);
         }
     }
 }

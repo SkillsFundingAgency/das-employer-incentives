@@ -22,7 +22,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var fixture = new Fixture();
             _testAccountTable = _testContext.TestData.GetOrCreate<Account>(null,
                 () => fixture.Build<Account>()
-                    .With(x => x.HasSignedIncentivesTerms, false)
                     .With(x => x.SignedAgreementVersion, (int?)null)
                     .With(x => x.VrfCaseId, (string)null)
                     .With(x => x.VrfCaseStatus, (string)null)

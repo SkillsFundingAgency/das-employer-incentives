@@ -36,8 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _secondApprenticeshipId = _firstApprenticeshipId + 1;
             var apprenticeships = new List<IncentiveApplicationApprenticeshipDto>
             {
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2020, 8, 1)).Create(),
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 2, 1)).Create()
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 5, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 04, 01)).Create(),
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 7, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 06, 01)).Create()
             };
 
             _createRequest = _fixture
@@ -98,8 +98,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     new { _submitRequest.IncentiveApplicationId });
 
                 apprenticeships.Count().Should().Be(2);
-                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1);
-                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase1);
+                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase2);
+                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase2);
             }
 
             var publishedCommand = _testContext.CommandsPublished
