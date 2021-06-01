@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoFixture;
+﻿using AutoFixture;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.ObjectModel;
-using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using Account = SFA.DAS.EmployerIncentives.Domain.Accounts.Account;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Handlers
 {
@@ -21,8 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
     {
         private RemoveLegalEntityCommandHandler _sut;
         private Mock<IAccountDomainRepository> _accountDomainRepository;
-        private Mock<IIncentiveApplicationDomainRepository> _applicationDomainRepository;
-        private Mock<ICommandDispatcher> _commandDispatcher;
         
         private Fixture _fixture;
 
@@ -32,10 +24,8 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             _fixture = new Fixture();
 
             _accountDomainRepository = new Mock<IAccountDomainRepository>();
-            _applicationDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
-            _commandDispatcher = new Mock<ICommandDispatcher>();
-            
-            _sut = new RemoveLegalEntityCommandHandler(_accountDomainRepository.Object, _applicationDomainRepository.Object, _commandDispatcher.Object);
+          
+            _sut = new RemoveLegalEntityCommandHandler(_accountDomainRepository.Object);
         }
 
         [Test]
@@ -99,53 +89,5 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             _accountDomainRepository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
         }
 
-        [Test]
-        public async Task Then_any_applications_for_the_account_legal_entity_are_withdrawn()
-        {
-            //Arrange
-            var command = _fixture.Create<RemoveLegalEntityCommand>();
-            var legalEntityModel = _fixture.Create<LegalEntityModel>();
-            legalEntityModel.Id = command.AccountId;
-            legalEntityModel.AccountLegalEntityId = command.AccountLegalEntityId;
-
-            _accountDomainRepository
-                .Setup(m => m.Find(command.AccountId))
-                .ReturnsAsync(Account.Create(
-                    new AccountModel
-                    {
-                        Id = command.AccountId,
-                        LegalEntityModels = new Collection<LegalEntityModel>() {
-                            _fixture.Create<LegalEntityModel>(),
-                            legalEntityModel
-                        }
-                    }));
-
-            var applications = new List<IncentiveApplication>
-            {
-                IncentiveApplication.New(Guid.NewGuid(), command.AccountId, command.AccountLegalEntityId),
-                IncentiveApplication.New(Guid.NewGuid(), command.AccountId, command.AccountLegalEntityId),
-                IncentiveApplication.New(Guid.NewGuid(), command.AccountId, command.AccountLegalEntityId)
-            };
-            foreach(var application in applications)
-            {
-                application.SetApprenticeships(_fixture.CreateMany<Apprenticeship>(2));
-            }
-
-            _applicationDomainRepository.Setup(x => x.FindByAccountLegalEntity(command.AccountLegalEntityId))
-                .ReturnsAsync(applications);
-
-            //Act
-            await _sut.Handle(command);
-
-            //Assert
-            _commandDispatcher.Verify(x => x.Send(It.Is<WithdrawCommand>(y => y.AccountId == command.AccountId), It.IsAny<CancellationToken>()), Times.Exactly(6));
-            foreach(var application in applications)
-            {
-                foreach(var apprenticeship in application.Apprenticeships)
-                {
-                    _commandDispatcher.Verify(x => x.Send(It.Is<WithdrawCommand>(y => y.IncentiveApplicationApprenticeshipId == apprenticeship.Id), It.IsAny<CancellationToken>()), Times.Once);
-                }
-            }
-        }
     }
 }
