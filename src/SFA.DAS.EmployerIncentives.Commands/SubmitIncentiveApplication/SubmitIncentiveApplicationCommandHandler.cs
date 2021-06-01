@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data;

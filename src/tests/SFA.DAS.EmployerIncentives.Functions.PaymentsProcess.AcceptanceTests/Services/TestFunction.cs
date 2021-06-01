@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -46,28 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             _testContext = testContext;
 
-            var paymentProfiles = new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile
-                {
-                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
-                    PaymentProfiles = new List<PaymentProfile>
-                    {
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
-                    }
-                },
-                new IncentivePaymentProfile
-                {
-                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
-                    PaymentProfiles = new List<PaymentProfile>
-                    {
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
-                    }
-                }
-            };
-
+            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
             _host = new HostBuilder()
                 .ConfigureAppConfiguration(a =>
                     {

@@ -28,7 +28,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _testAccountTable = _testContext.TestData.GetOrCreate(null, () => 
                 fixture
                 .Build<Account>()
-                .With(x => x.HasSignedIncentivesTerms, false)
                 .With(x => x.SignedAgreementVersion, (int?)null)
                 .Create());            
         }
@@ -36,7 +35,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"the legal entity is already available in Employer Incentives with a signed version")]
         public Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
-            _testAccountTable.HasSignedIncentivesTerms = true;
             _testAccountTable.SignedAgreementVersion = _agreementVersion - 1;
             return DataAccess.SetupAccount(_testAccountTable);
         }
@@ -59,7 +57,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
 
                 account.Should().HaveCount(1);
-                account.Single().HasSignedIncentivesTerms.Should().BeTrue();
                 account.Single().SignedAgreementVersion.Should().Be(_agreementVersion);
             }
         }

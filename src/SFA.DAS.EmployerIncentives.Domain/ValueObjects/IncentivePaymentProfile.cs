@@ -1,23 +1,22 @@
 ﻿using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
     public class IncentivePaymentProfile : ValueObject
     {
-        public IncentivePaymentProfile(IncentiveType incentiveType, List<PaymentProfile> paymentProfiles)
+        public IncentivePaymentProfile(IncentivePhase incentivePhase, List<PaymentProfile> paymentProfiles)
         {
-            IncentiveType = incentiveType;
+            IncentivePhase = incentivePhase;
             PaymentProfiles = paymentProfiles;
         }
 
-        public IncentiveType IncentiveType { get; }
+        public IncentivePhase IncentivePhase { get; }
         public List<PaymentProfile> PaymentProfiles { get; }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
-            yield return IncentiveType;
+            yield return IncentivePhase.Identifier;
             foreach (var paymentProfile in PaymentProfiles)
             {
                 yield return paymentProfile;
