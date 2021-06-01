@@ -35,7 +35,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
-                
+        public int BreakInLearningDayCount => Model.BreakInLearningDayCount;
+        public IncentivePhase Phase => Model.Phase;
+
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
             return new ApprenticeshipIncentive(
@@ -68,10 +70,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
             var collectionCalendar = await collectionCalendarService.Get();
 
-            var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles, Model.BreakInLearningDayCount);
+            var incentive = await Incentive.Create(this, incentivePaymentProfilesService);
             if (!incentive.IsEligible)
             {
                 ClawbackAllPayments(collectionCalendar.GetActivePeriod());
@@ -297,7 +298,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void SetMinimumAgreementVersion(DateTime startDate)
         {
             var existingMinimumAgreementVersion = Model.MinimumAgreementVersion;
-            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(startDate);
+            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(Phase.Identifier, startDate);
             if (existingMinimumAgreementVersion != Model.MinimumAgreementVersion)
             {
                 AddEvent(new MinimumAgreementVersionChanged(

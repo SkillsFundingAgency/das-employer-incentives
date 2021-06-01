@@ -29,6 +29,7 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.TestHelpers\SFA.DAS.EmployerIncentives.Functions.TestHelpers.csproj" />
+    <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

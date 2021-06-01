@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
             var application = _sut.GetExisting(_id, _model);
 
             // Assert
-            application.Apprenticeships.Should().BeEquivalentTo(_model.ApprenticeshipModels, opt => opt.Excluding(x => x.Phase));
+            application.Apprenticeships.Should().BeEquivalentTo(_model.ApprenticeshipModels, opt => opt.Excluding(x => x.Phase).Excluding(x => x.EmploymentStartDate));
         }
     }
 }

@@ -2,17 +2,20 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.SubmitIncentiveApplication;
-using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
-using System;
-using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
+using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using IncentiveApplication = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.IncentiveApplication;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplication.Handlers
@@ -102,12 +105,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         {
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             incentiveApplication.SetApprenticeships(_fixture.CreateMany<Apprenticeship>(3));
+
             var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
+
+            _mockUlnValidationService.Setup(x => x.UlnAlreadyOnSubmittedIncentiveApplication(incentiveApplication.Apprenticeships[1].ULN)).ReturnsAsync(true);
 
             _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
                 .ReturnsAsync(incentiveApplication);
-
-            _mockUlnValidationService.Setup(x => x.UlnAlreadyOnSubmittedIncentiveApplication(incentiveApplication.Apprenticeships[1].ULN)).ReturnsAsync(true);
 
             // Act
             Func<Task> action = async () => await _sut.Handle(command);
@@ -115,6 +119,46 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             // Assert
             action.Should().Throw<UlnAlreadySubmittedException>();
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
+        }
+
+        [TestCase("2021-03-31", true)]
+        [TestCase("2021-04-01", false)]
+        [TestCase("2021-09-30", false)]
+        [TestCase("2021-10-01", true)]
+        public async Task Then_application_with_ineligible_employment_start_date_is_removed(DateTime employmentStartdate, bool isRemoved)
+        {
+            //Arrange
+            var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
+                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), employmentStartdate);
+
+            var incentiveApplication = _fixture.Create<IncentiveApplication>();
+            incentiveApplication.SetApprenticeships(new List<Apprenticeship> { apprentice });
+
+            var command = new SubmitIncentiveApplicationCommand(incentiveApplication.Id, incentiveApplication.AccountId, _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<string>());
+
+            _mockDomainRepository.Setup(x => x.Find(command.IncentiveApplicationId))
+                .ReturnsAsync(incentiveApplication);
+
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            incentiveApplication.Status.Should().Be(IncentiveApplicationStatus.Submitted);            
+            _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Once);
+
+            // Assert
+            if (isRemoved)
+            {
+                incentiveApplication.Apprenticeships.Count.Should().Be(0);
+            }
+            else
+            {
+                incentiveApplication.Apprenticeships.Count.Should().Be(1);
+                incentiveApplication.Apprenticeships.Single().Id.Should().Be(apprentice.Id);
+            }
+
         }
     }
 }
