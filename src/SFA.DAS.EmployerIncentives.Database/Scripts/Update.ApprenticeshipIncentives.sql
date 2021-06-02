@@ -18,7 +18,7 @@ AND  i.PausePayments = 1
 GO
 ALTER TABLE [archive].[PendingPayment] DROP CONSTRAINT IF EXISTS [FK_PendingPaymentArchive_ApprenticeshipIncentive]
 GO
--- EI-914 reinstate [ApprenticeshipIncentive] records for prevous withdrawals
+-- EI-914 reinstate [ApprenticeshipIncentive] records for previous withdrawals
 INSERT INTO [incentives].[ApprenticeshipIncentive]
 (
 	[Id]
