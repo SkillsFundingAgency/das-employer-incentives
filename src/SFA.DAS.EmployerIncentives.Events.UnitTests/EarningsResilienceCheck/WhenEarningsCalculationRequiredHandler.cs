@@ -57,7 +57,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.EarningsResilienceCheck
                         x.SubmittedDate == @event.Model.DateSubmitted &&
                         x.SubmittedByEmail == @event.Model.SubmittedByEmail &&
                         x.CourseName == apprenticeship.CourseName &&
-                        x.EmploymentStartDate == apprenticeship.EmploymentStartDate
+                        x.EmploymentStartDate == apprenticeship.EmploymentStartDate &&
+                        x.Phase == apprenticeship.Phase
                     ),
                     It.IsAny<CancellationToken>()), Times.Once);
             }
