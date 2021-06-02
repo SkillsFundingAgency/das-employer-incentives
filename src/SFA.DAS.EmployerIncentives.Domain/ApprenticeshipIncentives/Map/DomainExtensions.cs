@@ -44,7 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
                 new Account(legalEntityDto.AccountId, legalEntityDto.AccountLegalEntityId),
                 legalEntityDto.LegalEntityId,
                 legalEntityDto.LegalEntityName,
-                legalEntityDto.VrfVendorId);
+                legalEntityDto.VrfVendorId,
+                legalEntityDto.VrfCaseStatus,
+                legalEntityDto.HashedLegalEntityId);
         }
 
         public static IEnumerable<ClawbackPayment> Map(this IEnumerable<ClawbackPaymentModel> models)

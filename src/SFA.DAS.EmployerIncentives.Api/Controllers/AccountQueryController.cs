@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers

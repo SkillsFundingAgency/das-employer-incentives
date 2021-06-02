@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions;
 using SFA.DAS.EmployerIncentives.Data.Account;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
@@ -56,6 +55,32 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             actual.All(x => x.AccountId == accountId).Should().BeTrue();
             actual.Should().BeEquivalentTo(new [] {allAccounts[0], allAccounts[1]},
                 opts => opts.ExcludingMissingMembers());
+        }
+
+
+        [Test]
+        [TestCase(null,false)]
+        [TestCase(1,false)]
+        [TestCase(2,false)]
+        [TestCase(3,false)]
+        [TestCase(4,false)]
+        [TestCase(5,false)]
+        [TestCase(6,true)]
+        [TestCase(7,true)]
+        public async Task Then_has_signed_agreement_version_is_set(int? signedAgreementVersion, bool expected)
+        {
+            // Arrange
+            var account = _fixture.Create<Models.Account>();
+            account.SignedAgreementVersion = signedAgreementVersion;
+
+            await _context.Accounts.AddAsync(account);
+            await _context.SaveChangesAsync();
+
+            // Act
+            var actual = (await _sut.GetList(x => x.AccountId == account.Id)).Single();
+
+            // Assert
+            actual.IsAgreementSigned.Should().Be(expected);
         }
     }
 }

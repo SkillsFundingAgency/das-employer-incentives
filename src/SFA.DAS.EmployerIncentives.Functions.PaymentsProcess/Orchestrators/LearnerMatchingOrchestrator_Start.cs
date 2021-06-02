@@ -15,7 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-
             log.LogInformation("Triggering LearnerMatchingOrchestrator");
 
             string instanceId = await starter.StartNewAsync(nameof(LearnerMatchingOrchestrator));

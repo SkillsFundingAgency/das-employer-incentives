@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
@@ -10,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     [TestFixture]
     public class WhenCalculateEarnings
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Mock<IIncentivePaymentProfilesService> _mockPaymentProfilesService;
@@ -46,23 +46,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _firstPaymentDaysAfterApprenticeshipStart = 10;
             _secondPaymentDaysAfterApprenticeshipStart = 50;
 
-            var under25PaymentProfiles = new List<PaymentProfile>
-            {
-                new PaymentProfile(_firstPaymentDaysAfterApprenticeshipStart, 100),
-                new PaymentProfile(_secondPaymentDaysAfterApprenticeshipStart, 300)
-            };
-
-            var over25PaymentProfiles = new List<PaymentProfile>
-            {
-                new PaymentProfile(_firstPaymentDaysAfterApprenticeshipStart, 200),
-                new PaymentProfile(_secondPaymentDaysAfterApprenticeshipStart, 400)
-            };
-
-            _paymentProfiles = new List<IncentivePaymentProfile>()
-            {
-                new IncentivePaymentProfile(Enums.IncentiveType.UnderTwentyFiveIncentive, under25PaymentProfiles),
-                new IncentivePaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, over25PaymentProfiles)
-            };
+            _paymentProfiles = new IncentivePaymentProfileListBuilder()
+                .WithIncentivePaymentProfiles(
+                    new List<IncentivePaymentProfile>()
+                    {
+                        new IncentivePaymentProfile(
+                            new IncentivePhase(Phase.Phase1),
+                            new List<PaymentProfile>
+                                {
+                                    new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, _firstPaymentDaysAfterApprenticeshipStart, 100),
+                                    new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, _secondPaymentDaysAfterApprenticeshipStart, 300),
+                                    new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, _firstPaymentDaysAfterApprenticeshipStart, 200),
+                                    new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, _secondPaymentDaysAfterApprenticeshipStart, 400)
+                                }
+                            )
+                    })
+                .Build();
 
             _collectionPeriods = new List<CollectionPeriod>()
             {
@@ -79,12 +78,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_paymentProfiles);
 
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Status, IncentiveStatus.Active)
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
+                .Create();
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.StartDate = _plannedStartDate;
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sutModel.PaymentModels = new List<PaymentModel>();
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
+            _sutModel.BreakInLearningDayCount = 0;
             _sut = Sut(_sutModel);
         }
 
@@ -93,8 +96,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange            
             var apprentiveshipDob = DateTime.Now.AddYears(-24);
-            _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName);
+            _sutModel.StartDate = Phase1Incentive.EligibilityStartDate.AddDays(-1);
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprentiveshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate);
 
             _collectionPeriods.Add(new CollectionPeriod(4, (byte)_collectionPeriod.AddMonths(3).Month, (short)_collectionPeriod.AddMonths(3).Year, _collectionPeriod.AddMonths(3).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), true));
 
@@ -167,6 +170,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
             secondPayment.Account.Id.Should().Be(_sutModel.Account.Id);
             secondPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
+        }
+
+        [Test]
+        public async Task Then_the_earnings_are_calculated_and_the_pending_payments_due_date_includes_any_break_in_learning()
+        {
+            // arrange                        
+            _sutModel.BreakInLearningDayCount = 44;
+            _sut = Sut(_sutModel);
+
+            // act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // assert
+            _sut.PendingPayments.Count.Should().Be(2);
+
+            var firstPayment = _sut.PendingPayments.First();
+            var secondPayment = _sut.PendingPayments.Last();
+
+            firstPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart + 44));
+            secondPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart + 44));
         }
 
         [Test]
@@ -301,7 +324,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             var apprenticeshipDob = DateTime.Now.AddYears(-26);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName);
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate);
             await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
@@ -327,7 +350,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             var apprenticeshipDob = DateTime.Now.AddYears(-26);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName);
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate);
             await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
@@ -358,7 +381,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionPeriods.Add(new CollectionPeriod(4, (byte)_collectionPeriod.AddMonths(3).Month, (short)_collectionPeriod.AddMonths(3).Year, _collectionPeriod.AddMonths(3).AddDays(1), _fixture.Create<DateTime>(), _fixture.Create<short>(), true));
 
             // act
-            _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
+            _sutModel.StartDate = Phase1Incentive.EligibilityStartDate.AddDays(-1);
             await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
@@ -383,7 +406,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionPeriods.Add(activePeriod);
 
             // act
-            _sutModel.StartDate = Incentive.EligibilityStartDate.AddDays(-1);
+            _sutModel.StartDate = Phase2Incentive.EligibilityStartDate.AddDays(-1);
             await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
             // assert
@@ -474,10 +497,37 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.PendingPayments.ToList().ForEach(p => hashCodes.Contains(p.GetHashCode()).Should().BeTrue());
         }
 
-
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        [Test]
+        public async Task Then_earnings_are_not_calculated_when_the_apprenticeship_is_stopped()
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            // Arrange
+            _sutModel.Status = IncentiveStatus.Stopped;
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task Then_earnings_are_not_calculated_when_the_apprenticeship_is_withdrawn()
+        {
+            // Arrange
+            _sutModel.Status = IncentiveStatus.Withdrawn;
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Should().BeEmpty();
+        }
+
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        {
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
 
         [Test]
@@ -493,7 +543,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _fixture.Create<ApprenticeshipIncentives.ValueTypes.Apprenticeship>(),
                 _fixture.Create<DateTime>(),
                 _fixture.Create<DateTime>(),
-                _fixture.Create<string>());
+                _fixture.Create<string>(),
+                new AgreementVersion(_fixture.Create<int>()),
+                new IncentivePhase(Phase.Phase1));
 
             // Assert
             incentive.PendingPayments.Count.Should().Be(0);

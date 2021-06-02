@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Services.NewApprenticeInce
         public async Task Then_false_is_returned_when_the_apprenticeship_start_date_is_after_the_scheme_cut_off()
         {
             var apprenticeship = new ApprenticeshipBuilder()
-                .WithStartDate(new DateTime(2021, 4, 1))
+                .WithStartDate(new DateTime(2021, 12, 1))
                 .Build();
 
             var result = await _sut.IsApprenticeshipEligible(apprenticeship);

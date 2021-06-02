@@ -3,8 +3,10 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives;
+using System;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.ApprenticeshipIncentives
@@ -30,7 +32,15 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.ApprenticeshipIncentives
         public async Task Then_a_ChangeOfCircumstance_is_persisted()
         {
             //Arrange
-            var @event = _fixture.Create<StartDateChanged>();
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .Without(x => x.BreakInLearnings)
+                .Create();
+
+            var @event = new StartDateChanged(
+                apprenticeshipIncentiveModel.Id,
+                _fixture.Create<DateTime>(),
+                _fixture.Create<DateTime>(),
+                apprenticeshipIncentiveModel);
 
             //Act
             await _sut.Handle(@event);

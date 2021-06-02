@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
@@ -362,11 +363,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         DateTime.Today.AddYears(-26),
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
-                        _fixture.Create<string>()
+                        _fixture.Create<string>(),
+                        _fixture.Create<DateTime>()
                     ),
                     DateTime.Today,
                     _fixture.Create<DateTime>(),
-                    _fixture.Create<string>());
+                    _fixture.Create<string>(),
+                    new AgreementVersion(_fixture.Create<int>()),
+                    new IncentivePhase(Phase.Phase1));
 
             return incentive;
         }
