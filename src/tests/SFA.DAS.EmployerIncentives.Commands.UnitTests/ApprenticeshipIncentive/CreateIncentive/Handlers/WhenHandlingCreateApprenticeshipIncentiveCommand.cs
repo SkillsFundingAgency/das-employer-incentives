@@ -61,7 +61,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         i.GetModel().SubmittedDate == command.SubmittedDate &&
                         i.GetModel().SubmittedByEmail == command.SubmittedByEmail &&
                         i.Apprenticeship.CourseName == command.CourseName &&
-                        i.Apprenticeship.EmploymentStartDate == command.EmploymentStartDate
+                        i.Apprenticeship.EmploymentStartDate == command.EmploymentStartDate &&
+                        i.Phase.Identifier == command.Phase
                 )), Times.Once());
         }
 
