@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             _apprenticeshipsModels = _fixture.Build<IncentiveApplicationApprenticeship>()
                 .With(p => p.IncentiveApplicationId, _applicationModel.Id)
-                .With(p => p.PlannedStartDate, today.AddDays(1))
+                .With(p => p.PlannedStartDate, today.AddMonths(-2))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
                 .With(p => p.EarningsCalculated, false)
                 .With(p => p.WithdrawnByCompliance, false)
@@ -152,7 +152,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     _applicationModel.DateSubmitted.Value,
                     _applicationModel.SubmittedByEmail,
                     apprenticeship.CourseName,
-                    apprenticeship.EmploymentStartDate.Value);
+                    apprenticeship.EmploymentStartDate.Value,
+                    apprenticeship.Phase);
 
                 await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());

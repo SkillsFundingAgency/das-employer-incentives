@@ -37,7 +37,8 @@ namespace SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck
                     @event.Model.DateSubmitted.Value,
                     @event.Model.SubmittedByEmail,
                     apprenticeship.CourseName,
-                    apprenticeship.EmploymentStartDate.Value
+                    apprenticeship.EmploymentStartDate.Value,
+                    apprenticeship.Phase
                 );
 
                 var task = _commandPublisher.Publish(command);
