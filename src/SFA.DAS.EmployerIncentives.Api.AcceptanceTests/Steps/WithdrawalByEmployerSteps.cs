@@ -289,17 +289,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Should().Be(2);
         }
 
-        [Then(@"the apprenticeship incentive and it's pending payments are removed from the system")]
-        public async Task ThenTheIncentiveAndPendingPaymentsAreRemovedFromTheSystem()
+        [Then(@"the apprenticeship incentive is marked as withdrawn and it's pending payments are removed from the system")]
+        public async Task ThenTheIncentiveIsWithdrawnAndPendingPaymentsAreRemovedFromTheSystem()
         {
             await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheEmployerWithdrawal();
 
             await using var dbConnection = new SqlConnection(_connectionString);
             var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
             var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
+            var pendingPaymentValidationResults = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
 
-            incentives.Should().HaveCount(0);
+            incentives.Should().HaveCount(1);
+            var incentive = incentives.FirstOrDefault();
+            incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
             pendingPayments.Should().HaveCount(0);
+            pendingPaymentValidationResults.Should().HaveCount(0);
         }
 
         [Then(@"clawbacks are created for the apprenticeship incentive payments and it's pending payments are archived")]

@@ -210,8 +210,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 24
- testRunner.Then("the apprenticeship incentive and it\'s pending payments are removed from the syste" +
-                        "m", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("the apprenticeship incentive is marked as withdrawn and it\'s pending payments are" +
+                        " removed from the system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
