@@ -283,3 +283,4 @@ SonarQube.Analysis.xml
 
 #Test generated nservicebus queues
 **/.learningtransport/**
+/src/choices.json
