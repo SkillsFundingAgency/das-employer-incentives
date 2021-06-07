@@ -318,14 +318,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.BreakInLearnings.Add(new BreakInLearning(startDate));
         }
 
-        private void StopBreakInLearning(DateTime stopDate)
+        private void StopBreakInLearning(LearningStoppedStatus status)
         {
+            var stopDate = status.DateResumed.Value.AddDays(-1);
             if (Model.BreakInLearnings.Any(b => b.EndDate == stopDate.Date) || Model.BreakInLearnings.Count == 0)
             {
                 return;
             }
 
-            Model.BreakInLearnings.Single(b => !b.EndDate.HasValue).SetEndDate(stopDate);            
+            var activeBreak = Model.BreakInLearnings.Single(b => !b.EndDate.HasValue);
+            if (stopDate.Date <= activeBreak.StartDate) // EI-1195
+            {
+                Model.BreakInLearnings.Remove(activeBreak);
+                status.Undo();
+                AddEvent(new BreakInLearningDeleted(Model.Id));
+            }
+            else
+            {
+                Model.BreakInLearnings.Single(b => !b.EndDate.HasValue).SetEndDate(stopDate);
+            }
         }
 
         private async Task SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus, ICollectionCalendarService collectionCalendarService)
@@ -342,11 +353,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped)
             {
                 Model.Status = IncentiveStatus.Active;
-                StopBreakInLearning(learningStoppedStatus.DateResumed.Value.AddDays(-1));
-                AddEvent(new LearningResumed(
-                   Model.Id,
-                   learningStoppedStatus.DateResumed.Value));
-            }            
+                StopBreakInLearning(learningStoppedStatus);
+
+                if (learningStoppedStatus.DateResumed.HasValue)
+                    AddEvent(new LearningResumed(
+                        Model.Id,
+                        learningStoppedStatus.DateResumed.Value));
+            }
         }
 
         private void SetBreakInLearningDayCount(int breakInLearningDayCount)

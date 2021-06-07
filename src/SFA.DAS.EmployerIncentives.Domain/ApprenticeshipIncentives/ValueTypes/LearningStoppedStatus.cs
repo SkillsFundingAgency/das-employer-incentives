@@ -8,8 +8,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
     {
         public bool LearningStopped { get; }
 
-        public DateTime? DateStopped { get; }
-        public DateTime? DateResumed { get; }
+        public DateTime? DateStopped { get; private set; }
+        public DateTime? DateResumed { get; private set; }
 
         public LearningStoppedStatus(bool isStopped, DateTime? dateChanged = null)
         {
@@ -35,6 +35,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return LearningStopped;
             yield return DateStopped;
             yield return DateResumed;
+        }
+
+        public void Undo()
+        {
+            DateStopped = null;
+            DateResumed = null;
         }
     }
 }
