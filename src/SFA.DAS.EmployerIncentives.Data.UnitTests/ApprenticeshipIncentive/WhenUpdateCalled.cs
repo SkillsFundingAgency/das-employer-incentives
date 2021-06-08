@@ -125,9 +125,26 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             result.Should().BeEquivalentTo(expected);
         }
 
+        [Test]
+        public async Task Then_removed_break_in_learning_is_deleted()
+        {
+            // Arrange
+            var expected = await SaveAndGetApprenticeshipIncentive();
+            var lastBreakInLearning = expected.BreakInLearnings.Last();
+            expected.BreakInLearnings.Remove(lastBreakInLearning);
+
+            // Act
+            await _sut.Update(expected);
+            await _dbContext.SaveChangesAsync();
+
+            // Assert 
+            var result = await _sut.Get(expected.Id);
+            result.BreakInLearnings.Count.Should().Be(2);
+        }
+
         private async Task<ApprenticeshipIncentiveModel> SaveAndGetApprenticeshipIncentive()
         {
-            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>().Without(m => m.BreakInLearnings).With(p => p.Phase, Enums.Phase.NotSet).Create();
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>().With(p => p.Phase, Enums.Phase.NotSet).Create();
             foreach (var pendingPayment in incentive.PendingPayments)
             {
                 pendingPayment.PaymentYear = Convert.ToInt16(_collectionPeriod.AcademicYear);

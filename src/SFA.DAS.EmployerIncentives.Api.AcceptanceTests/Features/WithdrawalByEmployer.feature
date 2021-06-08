@@ -21,7 +21,7 @@ Scenario: Withdrawal status set against a ULN with multiple apprenticeships in a
 Scenario: Employer withdrawal removes incentive after an apprenticeship application has been submitted
 	Given an apprenticeship incentive with pending payments exists as a result of an incentive application
 	When the apprenticeship application is withdrawn from the scheme
-	Then the apprenticeship incentive and it's pending payments are removed from the system
+	Then the apprenticeship incentive is marked as withdrawn and it's pending payments are removed from the system
 
 Scenario: Employer withdrawal for an apprenticeship that has paid payments (earnings)
 	Given an apprenticeship incentive with paid payments exists as a result of an incentive application

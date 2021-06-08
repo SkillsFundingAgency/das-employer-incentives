@@ -36,3 +36,11 @@ Scenario: Learner data contains a learning resumed change
 	And the resumed change of circumstance is saved
 	And the learner data resumed date is stored
 	And the learner resume break in learning is stored
+	
+Scenario: Learner data contains a learning resumed change with start date before the start of assumed break in learning (defect EI-1195)
+	Given an apprenticeship incentive exists that has stopped learning
+	And the learner data identifies the learner as in learning with start date before recorded break date
+	When the incentive learner data is refreshed
+	Then the incentive is updated to active
+	And the most recent break in learning record is deleted
+	And the learner data stopped and resumed dates are deleted
