@@ -68,6 +68,7 @@ FROM
 		ON i.IncentiveApplicationApprenticeshipId = aa.Id
 WHERE
 	(aa.WithdrawnByCompliance = 1 OR aa.WithdrawnByEmployer = 1)
+	AND aa.EarningsCalculated = 1
 	AND i.Id IS NULL
 	AND NOT EXISTS (SELECT * FROM [incentives].[ApprenticeshipIncentive] ia WHERE ia.AccountId =  a.AccountId AND ia.ApprenticeshipId = aa.ApprenticeshipId)
 GO
