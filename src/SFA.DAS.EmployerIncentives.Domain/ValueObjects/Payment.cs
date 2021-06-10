@@ -8,8 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     public class Payment : ValueObject
     {
         public decimal Amount { get; }
-        public DateTime PaymentDate { get; }
-
+        public DateTime PaymentDate { get; private set; }
         public EarningType EarningType { get; }
         public Payment(decimal amount, DateTime paymentDate, EarningType earningType)
         {
@@ -19,12 +18,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             PaymentDate = paymentDate;
             EarningType = earningType;
         }
-      
+            
+        public void AddDays(int days)
+        {
+            PaymentDate = PaymentDate.AddDays(days);
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return Amount;
             yield return PaymentDate;
             yield return EarningType;
         }
+
     }
 }

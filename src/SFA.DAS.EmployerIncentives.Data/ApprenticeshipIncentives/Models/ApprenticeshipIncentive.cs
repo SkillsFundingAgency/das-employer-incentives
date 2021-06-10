@@ -41,7 +41,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Column(TypeName = "nvarchar(50)")]
         public IncentiveStatus Status { get; set; }
 
-        public int BreakInLearningDayCount { get; set; }
 
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
