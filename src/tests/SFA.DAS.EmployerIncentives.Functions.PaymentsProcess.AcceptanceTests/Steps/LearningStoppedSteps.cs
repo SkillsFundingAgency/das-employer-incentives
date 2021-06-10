@@ -37,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly DateTime _plannedStartDate;
         private readonly DateTime _periodEndDate;
         private readonly int _breakInLearning;
+        private LearnerSubmissionDto _resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData;
 
         public LearningStoppedSteps(TestContext testContext)
         {
@@ -174,6 +175,37 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(b => b.StartDate, _plannedStartDate.AddDays(_breakInLearning * -1))
                 .With(b => b.EndDate, (DateTime?)null)
                 .Create();
+
+            _resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
+                .With(l => l.Training, new List<TrainingDto>
+                    {
+                        _fixture
+                            .Build<TrainingDto>()
+                            .With(p => p.Reference, "ZPROG001")
+                            .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>()
+                                {
+                                    _fixture.Build<PriceEpisodeDto>()
+                                        .With(pe => pe.Periods, new List<PeriodDto>()
+                                        {
+                                            _fixture.Build<PeriodDto>()
+                                                .With(period => period.ApprenticeshipId,
+                                                    _apprenticeshipIncentive.ApprenticeshipId)
+                                                .With(period => period.IsPayable, true)
+                                                .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                                .Create()
+                                        })
+                                        .With(pe => pe.StartDate, _apprenticeshipBreakinLearning.StartDate)
+                                        .With(pe => pe.EndDate, _apprenticeshipBreakinLearning.StartDate.AddMonths(12))
+                                        .Create(),
+                                }
+                            )
+                            .Create()
+                    }
+                )
+                .Create();
         }
 
         [Given(@"an apprenticeship incentive exists")]
@@ -213,6 +245,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void GivenTheIncentiveLearnerDataIdentifiesTheLearnerAsInLearning()
         {
             SetupMockLearnerMatchResponse(_resumedLearnerMatchApiData);
+        }
+
+        [Given(@"the learner data identifies the learner as in learning with start date before recorded break date")]
+        public void GivenTheLearnerDataIdentifiesTheLearnerAsInLearningWithStartDateBeforeRecordedBreakDate()
+        {
+            SetupMockLearnerMatchResponse(_resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData);
+        }
+
+        [Then(@"the most recent break in learning record is deleted")]
+        public void ThenTheMostRecentBreakInLearningRecordIsDeleted()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var breakInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>();
+            breakInLearning.Should().BeEmpty();
         }
 
         [Given(@"the learner data identifies the learner as in leaning with a break in learning")]
@@ -318,7 +364,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var learner = dbConnection.GetAll<Learner>();
 
             learner.Single().LearningResumedDate.Should().Be(_plannedStartDate);
-            learner.Single().LearningStoppedDate.Should().Be(null);            
+            learner.Single().LearningStoppedDate.Should().Be(null);
+        }
+
+        [Then(@"the learner data stopped and resumed dates are deleted")]
+        public void ThenTheLearnerDataStoppedAndResumedDatesAreDeleted()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var learner = dbConnection.GetAll<Learner>();
+
+            learner.Single().LearningStoppedDate.Should().BeNull();
+            learner.Single().LearningResumedDate.Should().BeNull();
         }
 
         [Then(@"the incentive is updated to active")]
