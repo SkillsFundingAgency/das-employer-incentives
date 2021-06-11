@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     {
         private SendPaymentRequestsCommandHandler _sut;
         private Mock<IPaymentsQueryRepository> _mockPayableLegalEntityQueryRepository;
-        private Mock<IAccountDataRepository> _mockAccountDataRepository;
+        private Mock<IPaymentDataRepository> _mockPaymentDataRepository;
         private Mock<IBusinessCentralFinancePaymentsService> _mockBusinessCentralFinancePaymentsService;
         private List<PaymentDto> _paymentsToSend;
         private List<PaymentDto> _unsentPayments;
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _paymentRequestsLimit = 3;
 
             _mockPayableLegalEntityQueryRepository = new Mock<IPaymentsQueryRepository>();
-            _mockAccountDataRepository = new Mock<IAccountDataRepository>();
+            _mockPaymentDataRepository = new Mock<IPaymentDataRepository>();
             _mockBusinessCentralFinancePaymentsService = new Mock<IBusinessCentralFinancePaymentsService>();
             _mockBusinessCentralFinancePaymentsService.Setup(x => x.PaymentRequestsLimit)
                 .Returns(_paymentRequestsLimit);
@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _command = new SendPaymentRequestsCommand(_fixture.Create<long>(), _fixture.Create<DateTime>());
 
-            _sut = new SendPaymentRequestsCommandHandler(_mockAccountDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
+            _sut = new SendPaymentRequestsCommandHandler(_mockPaymentDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
         }
 
         [Test]
@@ -71,9 +71,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(_command);
 
             // Assert
-            _mockAccountDataRepository.Verify(x =>
-                x.UpdatePaidDateForPaymentIds(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
-                    _command.AccountLegalEntityId, _command.PaidDate));
+            _mockPaymentDataRepository.Verify(x =>
+                x.UpdatePaidDates(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit), _command.PaidDate));
         }
 
         [Test]
@@ -102,15 +101,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(_command);
 
             // Assert
-            _mockAccountDataRepository.Verify(x =>
-                x.UpdatePaidDateForPaymentIds(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
-                    _command.AccountLegalEntityId, _command.PaidDate));
+            _mockPaymentDataRepository.Verify(x =>
+                x.UpdatePaidDates(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit), _command.PaidDate));
 
-            _mockAccountDataRepository.Verify(x =>
-                x.UpdatePaidDateForPaymentIds(It.Is<List<Guid>>(l => l.Count == _unsentPayments.Count),
-                    _command.AccountLegalEntityId, _command.PaidDate));
+            _mockPaymentDataRepository.Verify(x =>
+                x.UpdatePaidDates(It.Is<List<Guid>>(l => l.Count == _unsentPayments.Count), _command.PaidDate));
         }
-
 
         public void SetupSingleCallScenario()
         {

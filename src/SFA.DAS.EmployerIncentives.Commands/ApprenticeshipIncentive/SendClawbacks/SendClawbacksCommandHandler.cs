@@ -13,16 +13,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawba
 {
     public class SendClawbacksCommandHandler : ICommandHandler<SendClawbacksCommand>
     {
-        private readonly IAccountDataRepository _accountRepository;
+        private readonly IPaymentDataRepository _paymentsRepository;
         private readonly IPaymentsQueryRepository _queryRepository;
         private readonly IBusinessCentralFinancePaymentsService _businessCentralFinancePaymentsService;
 
         public SendClawbacksCommandHandler(
-            IAccountDataRepository accountRepository,
+            IPaymentDataRepository paymentsRepository,
             IPaymentsQueryRepository queryRepository,
             IBusinessCentralFinancePaymentsService businessCentralFinancePaymentsService)
         {
-            _accountRepository = accountRepository;
+            _paymentsRepository = paymentsRepository;
             _queryRepository = queryRepository;
             _businessCentralFinancePaymentsService = businessCentralFinancePaymentsService;
         }
@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawba
 
             await _businessCentralFinancePaymentsService.SendPaymentRequests(clawbacksToSend);
 
-            await _accountRepository.UpdateClawbackDateForClawbackIds(clawbacksToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, clawbackDate);
+            await _paymentsRepository.UpdateClawbackDates(clawbacksToSend.Select(s => s.PaymentId).ToList(), clawbackDate);
 
             if (clawbacks.Count > clawbacksToSend.Count)
             {
