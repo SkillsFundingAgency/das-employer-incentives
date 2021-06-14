@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Builders.ValueObjects
 
         public ApprenticeshipBuilder WithValidIncentiveProperties()
         {
-            _startDate = new DateTime(2020, 8, 1);
+            _startDate = new DateTime(2021, 8, 1);
             _isApproved = true;
             return this;
         }

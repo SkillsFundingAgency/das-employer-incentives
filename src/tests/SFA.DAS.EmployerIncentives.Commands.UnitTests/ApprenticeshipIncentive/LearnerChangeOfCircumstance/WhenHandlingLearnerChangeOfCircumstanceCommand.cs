@@ -11,6 +11,9 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,11 +62,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                             DateTime.Today.AddYears(-26),
                             _fixture.Create<long>(),
                             ApprenticeshipEmployerType.Levy,
-                            _fixture.Create<string>()
+                            _fixture.Create<string>(),
+                            _fixture.Create<DateTime>()
                         ))
                 .With(p => p.StartDate, DateTime.Today)
                 .With(p => p.Status, Enums.IncentiveStatus.Active)
                 .With(p => p.HasPossibleChangeOfCircumstances, true)
+                .With(p => p.Phase, new IncentivePhase(Phase.Phase1))
+                .With(p => p.MinimumAgreementVersion, new AgreementVersion(_fixture.Create<int>()))
                 .With(p => p.PendingPaymentModels, new List<PendingPaymentModel>())
                 .Create();
             _incentiveModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());

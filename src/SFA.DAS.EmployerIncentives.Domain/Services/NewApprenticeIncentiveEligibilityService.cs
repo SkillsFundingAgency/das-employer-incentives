@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
 
         private static bool IsStartDateOutsideSchemeRange(Apprenticeship apprenticeship)
         {
-            return apprenticeship.StartDate < Incentive.EligibilityStartDate || apprenticeship.StartDate > Incentive.EligibilityEndDate;
+            return apprenticeship.StartDate < Phase2Incentive.EligibilityStartDate || apprenticeship.StartDate > Phase2Incentive.EligibilityEndDate;
         }
     }
 }

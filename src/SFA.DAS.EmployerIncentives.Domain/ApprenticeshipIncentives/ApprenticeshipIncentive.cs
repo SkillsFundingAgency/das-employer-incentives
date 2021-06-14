@@ -31,11 +31,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
+        public IncentiveStatus Status => Model.Status;
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
+        public int BreakInLearningDayCount => Model.BreakInLearningDayCount;
+        public IncentivePhase Phase => Model.Phase;
 
-        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, int? minimumAgreementVersion)
+        internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
             return new ApprenticeshipIncentive(
                 id,
@@ -50,7 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     SubmittedDate = submittedDate,
                     SubmittedByEmail = submittedByEmail,
                     Status = IncentiveStatus.Active,
-                    MinimumAgreementVersion = new AgreementVersion(minimumAgreementVersion)
+                    MinimumAgreementVersion = agreementVersion,
+                    Phase = phase
                 }, true);
         }
         
@@ -66,10 +70,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
             var collectionCalendar = await collectionCalendarService.Get();
 
-            var incentive = new Incentive(Apprenticeship.DateOfBirth, StartDate, paymentProfiles, Model.BreakInLearningDayCount);
+            var incentive = await Incentive.Create(this, incentivePaymentProfilesService);
             if (!incentive.IsEligible)
             {
                 ClawbackAllPayments(collectionCalendar.GetActivePeriod());
@@ -205,16 +208,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         
         public async Task Withdraw(ICollectionCalendarService collectionCalendarService)
         {
+            Model.Status = IncentiveStatus.Withdrawn;
             if (HasPaidEarnings)
             {
                 var calendarService = await collectionCalendarService.Get();
                 ClawbackAllPayments(calendarService.GetActivePeriod());
                 Model.PausePayments = false;
-                Model.Status = IncentiveStatus.Withdrawn;
             }
             else
             {
-                IsDeleted = true;
+                RemoveUnpaidEarnings();
             }
         }
 
@@ -295,7 +298,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void SetMinimumAgreementVersion(DateTime startDate)
         {
             var existingMinimumAgreementVersion = Model.MinimumAgreementVersion;
-            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(startDate);
+            Model.MinimumAgreementVersion = Model.MinimumAgreementVersion.ChangedStartDate(Phase.Identifier, startDate);
             if (existingMinimumAgreementVersion != Model.MinimumAgreementVersion)
             {
                 AddEvent(new MinimumAgreementVersionChanged(
@@ -315,14 +318,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.BreakInLearnings.Add(new BreakInLearning(startDate));
         }
 
-        private void StopBreakInLearning(DateTime stopDate)
+        private void StopBreakInLearning(LearningStoppedStatus status)
         {
+            var stopDate = status.DateResumed.Value.AddDays(-1);
             if (Model.BreakInLearnings.Any(b => b.EndDate == stopDate.Date) || Model.BreakInLearnings.Count == 0)
             {
                 return;
             }
 
-            Model.BreakInLearnings.Single(b => !b.EndDate.HasValue).SetEndDate(stopDate);            
+            var activeBreak = Model.BreakInLearnings.Single(b => !b.EndDate.HasValue);
+            if (stopDate.Date <= activeBreak.StartDate) // EI-1195
+            {
+                Model.BreakInLearnings.Remove(activeBreak);
+                status.Undo();
+                AddEvent(new BreakInLearningDeleted(Model.Id));
+            }
+            else
+            {
+                Model.BreakInLearnings.Single(b => !b.EndDate.HasValue).SetEndDate(stopDate);
+            }
         }
 
         private async Task SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus, ICollectionCalendarService collectionCalendarService)
@@ -339,11 +353,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped)
             {
                 Model.Status = IncentiveStatus.Active;
-                StopBreakInLearning(learningStoppedStatus.DateResumed.Value.AddDays(-1));
-                AddEvent(new LearningResumed(
-                   Model.Id,
-                   learningStoppedStatus.DateResumed.Value));
-            }            
+                StopBreakInLearning(learningStoppedStatus);
+
+                if (learningStoppedStatus.DateResumed.HasValue)
+                    AddEvent(new LearningResumed(
+                        Model.Id,
+                        learningStoppedStatus.DateResumed.Value));
+            }
         }
 
         private void SetBreakInLearningDayCount(int breakInLearningDayCount)

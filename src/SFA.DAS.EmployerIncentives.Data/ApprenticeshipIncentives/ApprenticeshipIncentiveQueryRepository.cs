@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
@@ -23,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         public Task<List<ApprenticeshipIncentiveDto>> GetList()
         {
             return _context.ApprenticeshipIncentives
+                .Where(a => a.Status != IncentiveStatus.Withdrawn)
                 .Select(x => new ApprenticeshipIncentiveDto { Id = x.Id, ApprenticeshipId = x.ApprenticeshipId, ULN = x.ULN, UKPRN = x.UKPRN }).ToListAsync();
         }
 

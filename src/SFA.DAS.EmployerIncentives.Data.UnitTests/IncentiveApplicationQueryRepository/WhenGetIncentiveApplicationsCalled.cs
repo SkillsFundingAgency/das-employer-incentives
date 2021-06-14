@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -55,6 +56,54 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             //Assert
             actual.All(x => x.AccountId == accountId).Should().BeTrue();
             actual.Should().BeEquivalentTo(new[] {allApplications[0], allApplications[3]}, opts => opts.ExcludingMissingMembers());
+        }
+
+        [Test]
+        public async Task Then_apprenticeships_are_ordered()
+        {
+            // Arrange
+            var account = _fixture.Create<Models.Account>();
+            var application = _fixture.Build<Models.IncentiveApplication>()
+                            .With(x => x.AccountId, account.Id)
+                            .With(x => x.AccountLegalEntityId, account.AccountLegalEntityId)
+                            .Create();
+
+            application.Apprenticeships = new List<Models.IncentiveApplicationApprenticeship>()
+            {
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "ZFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 1).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ZLast").With(a => a.ULN, 9).Create()
+            };
+
+            _context.Accounts.Add(account);
+            _context.Applications.AddRange(application);
+            _context.SaveChanges();
+
+            // Act
+            var actual = (await _sut.GetList(x => x.AccountId == account.Id)).Single();
+
+            //Assert
+            actual.Apprenticeships.Count().Should().Be(4);
+
+            IncentiveApplicationApprenticeshipDto previous = null;
+            foreach (var apprenticeship in actual.Apprenticeships)
+            {
+                if (previous != null)
+                {
+                    apprenticeship.FirstName.CompareTo(previous.FirstName).Should().BeGreaterOrEqualTo(0);
+                    if (apprenticeship.FirstName.CompareTo(previous.FirstName) == 0)
+                    {
+                        apprenticeship.LastName.CompareTo(previous.LastName).Should().BeGreaterOrEqualTo(0);
+                        if (apprenticeship.LastName.CompareTo(previous.LastName) == 0)
+                        {
+                            previous.Uln.Should().BeLessOrEqualTo(apprenticeship.Uln);
+                        }
+                    }
+                }
+
+                previous = apprenticeship;
+            }            
         }
     }
 }
