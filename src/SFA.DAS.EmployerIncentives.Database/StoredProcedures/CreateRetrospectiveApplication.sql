@@ -32,7 +32,7 @@ BEGIN
 	INSERT INTO dbo.IncentiveApplicationApprenticeship
 		(Id, IncentiveApplicationId, ApprenticeshipId, FirstName, LastName, DateOfBirth, ULN, PlannedStartDate, ApprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount, UKPRN, EarningsCalculated, WithdrawnByEmployer, WithdrawnByCompliance, CourseName, EmploymentStartDate, Phase, HasEligibleEmploymentStartDate)
 	VALUES
-		(NEWID(), @applicationId, @apprenticeshipId, @firstName, @LastName, @dateOfBirth, @uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount, @ukprn, 0, 0, 0, @courseName, NULL, @phase, 1)
+		(NEWID(), @applicationId, @apprenticeshipId, @firstName, @LastName, @dateOfBirth, @uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount, @ukprn, 0, 0, 0, @courseName, @plannedStartDate, @phase, 1)
 
 	COMMIT TRAN
 END
