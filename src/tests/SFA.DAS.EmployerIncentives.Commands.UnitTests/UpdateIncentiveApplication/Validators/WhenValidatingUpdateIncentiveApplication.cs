@@ -63,20 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
         }
 
         [Test]
-        public async Task Then_the_command_is_invalid_when_the_apprenticeships_are_not_provided()
-        {
-            //Arrange
-            var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), default);
-
-            //Act
-            var result = await _sut.Validate(command);
-
-            //Assert
-            result.ValidationDictionary.Count.Should().Be(1);
-        }
-
-        [Test]
-        public async Task Then_the_command_is_invalid_when_there_are_no_apprenticeships()
+        public async Task Then_the_command_is_valid_when_there_are_no_apprenticeships() // EI-999
         {
             //Arrange
             var command = new UpdateIncentiveApplicationCommand(_fixture.Create<Guid>(), _fixture.Create<long>(), new List<IncentiveApplicationApprenticeshipDto>());
@@ -85,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.UpdateIncentiveApplicati
             var result = await _sut.Validate(command);
 
             //Assert
-            result.ValidationDictionary.Count.Should().Be(1);
+            result.ValidationDictionary.Count.Should().Be(0);
         }
 
         [Test]

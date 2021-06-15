@@ -29,17 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
 
         private static void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
         {
-            if (apprenticeships == null)
-            {
-                result.AddError("Apprenticeships", "Is not set");
-                return;
-            }
-
-            if (!apprenticeships.Any())
-            {
-                result.AddError("Apprenticeships", "Have not been provided");
-                return;
-            }
+            if (apprenticeships == null) return;
 
             foreach (var apprenticeship in apprenticeships)
             {
