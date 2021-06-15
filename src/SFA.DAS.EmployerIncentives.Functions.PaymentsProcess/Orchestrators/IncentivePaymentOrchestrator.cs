@@ -10,9 +10,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 {
     public class IncentivePaymentOrchestrator
     {
-        private readonly ILogger<IncentivePaymentOrchestrator> _logger;
+        private readonly ILogger _logger;
 
-        public IncentivePaymentOrchestrator(ILogger<IncentivePaymentOrchestrator> logger)
+        public IncentivePaymentOrchestrator(ILogger logger)
         {
             _logger = logger;
         }
