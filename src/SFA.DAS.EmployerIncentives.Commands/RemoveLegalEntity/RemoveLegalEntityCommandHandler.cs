@@ -7,24 +7,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity
 {
     public class RemoveLegalEntityCommandHandler : ICommandHandler<RemoveLegalEntityCommand>
     {
-        private readonly IAccountDomainRepository _domainRepository;
+        private readonly IAccountDomainRepository _accountDomainRepository;
 
-        public RemoveLegalEntityCommandHandler(IAccountDomainRepository domainRepository, CancellationToken cancellationToken = default)
+        public RemoveLegalEntityCommandHandler(IAccountDomainRepository accountDomainRepository, 
+            CancellationToken cancellationToken = default)
         {
-            _domainRepository = domainRepository;
+            _accountDomainRepository = accountDomainRepository;
         }
 
         public async Task Handle(RemoveLegalEntityCommand command, CancellationToken cancellationToken = default)
         {
-            var account = await _domainRepository.Find(command.AccountId);
+            var account = await _accountDomainRepository.Find(command.AccountId);
 
-            if (account == null)
-            {
-                // already deleted
-                return;
-            }
-
-            var legalEntity = account.GetLegalEntity(command.AccountLegalEntityId);
+            var legalEntity = account?.GetLegalEntity(command.AccountLegalEntityId);
             if (legalEntity == null)
             {
                 // already deleted
@@ -32,8 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity
             }
 
             account.RemoveLegalEntity(legalEntity);
-
-            await _domainRepository.Save(account);
+            
+            await _accountDomainRepository.Save(account);
         }
     }
 }
