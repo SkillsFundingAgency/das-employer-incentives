@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers": {
+      "commandName": "Project",
+      "commandLineArgs": "host start --port 7074"
+    }
+  }
+}
