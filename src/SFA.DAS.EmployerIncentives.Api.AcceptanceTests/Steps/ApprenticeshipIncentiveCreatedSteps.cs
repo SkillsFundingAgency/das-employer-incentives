@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _testContext = testContext;
             _fixture = new Fixture();
-            var today = new DateTime(2021, 1, 30);
+            var today = new DateTime(2021, 6, 30);
 
             _accountModel = _fixture.Create<Account>();
 
@@ -53,6 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.EarningsCalculated, false)
                 .With(p => p.WithdrawnByCompliance, false)
                 .With(p => p.WithdrawnByEmployer, false)
+                .With(p => p.Phase, Phase.Phase1)
                 .CreateMany(NumberOfApprenticeships).ToList();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -62,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
                 .With(p => p.StartDate, today.AddDays(1))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
+                .With(p => p.Phase, Phase.Phase2)
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()
@@ -149,7 +151,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     apprenticeship.UKPRN,
                     _applicationModel.DateSubmitted.Value,
                     _applicationModel.SubmittedByEmail,
-                    apprenticeship.CourseName);
+                    apprenticeship.CourseName,
+                    apprenticeship.EmploymentStartDate.Value);
 
                 await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());

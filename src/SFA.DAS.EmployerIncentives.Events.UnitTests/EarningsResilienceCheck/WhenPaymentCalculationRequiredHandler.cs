@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Events.EarningsResilienceCheck;
 using System.Threading;
@@ -31,7 +32,11 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.EarningsResilienceCheck
         public async Task Then_a_calculate_earnings_command_is_published_for_the_incentive()
         {
             //Arrange
-            var @event = _fixture.Create<PaymentsCalculationRequired>();
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .Without(x => x.BreakInLearnings)
+                .Create();
+
+            var @event =new PaymentsCalculationRequired(model);
 
             //Act
             await _sut.Handle(@event);

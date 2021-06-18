@@ -69,6 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _vrfVendorId = Guid.NewGuid().ToString();
             var legalEntity = _fixture.Build<LegalEntityModel>()
                 .With(l => l.VrfVendorId, _vrfVendorId)
+                .With(l => l.SignedAgreementVersion, 5)
                 .Create();
 
             var accountModel = _fixture.Build<AccountModel>()
@@ -95,6 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(m => m.StartDate, _startDate)
                 .With(m => m.PendingPaymentModels, pendingPayments)
                 .With(m => m.PausePayments, false)
+                .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
                 .Create();
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
@@ -286,7 +288,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 3)
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 4)
                 .PendingPaymentValidationResults.Single(x => x.Step == "HasIlrSubmission");
             validationResult.Result.Should().BeFalse();
         }

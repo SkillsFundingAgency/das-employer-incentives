@@ -40,6 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     .With(a => a.WithdrawnByCompliance, false)
                     .With(a => a.WithdrawnByEmployer, false)
                     .With(a => a.EarningsCalculated, false)
+                    .With(a => a.HasEligibleEmploymentStartDate, true)
                     .CreateMany(2).ToList();
 
                 foreach (var apprenticeship in apprenticeships)

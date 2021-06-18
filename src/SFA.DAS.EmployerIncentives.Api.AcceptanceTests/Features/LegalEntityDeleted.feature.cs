@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.DescriptionAttribute("LegalEntityDeleted")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
+    [NUnit.Framework.CategoryAttribute("activeCalendarPeriod")]
     public partial class LegalEntityDeletedFeature
     {
         
@@ -30,7 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         private string[] _featureTags = new string[] {
                 "database",
-                "api"};
+                "api",
+                "activeCalendarPeriod"};
         
 #line 1 "LegalEntityDeleted.feature"
 #line hidden
@@ -42,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "LegalEntityDeleted", "\tWhen a legal entity has been removed from an account\r\n\tThen is is no longer avai" +
                     "lable in Employer Incentives", ProgrammingLanguage.CSharp, new string[] {
                         "database",
-                        "api"});
+                        "api",
+                        "activeCalendarPeriod"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -87,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity has been removed from an account", null, tagsOfScenario, argumentsOfScenario);
-#line 7
+#line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -107,13 +110,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 10
  testRunner.Given("a legal entity that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 9
+#line 11
  testRunner.When("a legal entity is removed from an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 10
+#line 12
  testRunner.Then("the legal entity should no longer be available in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -127,7 +130,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity that has is not available  in employer incentives", null, tagsOfScenario, argumentsOfScenario);
-#line 12
+#line 14
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -147,14 +150,54 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 13
+#line 15
  testRunner.Given("a legal entity is not available in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 16
  testRunner.When("a legal entity is removed from an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 17
  testRunner.Then("the legal entity is still not available in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("A legal entity with applications has been removed from an account")]
+        public virtual void ALegalEntityWithApplicationsHasBeenRemovedFromAnAccount()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A legal entity with applications has been removed from an account", null, tagsOfScenario, argumentsOfScenario);
+#line 19
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 20
+ testRunner.Given("a legal entity has submitted one or more applications", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 21
+ testRunner.When("a legal entity is removed from an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 22
+ testRunner.Then("the applications for that legal entity should be withdrawn", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

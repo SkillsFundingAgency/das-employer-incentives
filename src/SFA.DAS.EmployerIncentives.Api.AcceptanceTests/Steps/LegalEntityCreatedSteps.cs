@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the legal entity is added to an account")]
         public async Task WhenAddedLegalEntityEventIsTriggered()
         {
-            _response = await EmployerIncentiveApi.Post(
+            _response = await EmployerIncentiveApi.Put(
                     $"/accounts/{_testAccountTable.Id}/legalEntities",
                     new AddLegalEntityRequest
                     {

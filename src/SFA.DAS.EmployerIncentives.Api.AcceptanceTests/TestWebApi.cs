@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
@@ -40,27 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
-            _paymentProfiles = new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile
-                {
-                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
-                    PaymentProfiles = new List<PaymentProfile>
-                    {
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
-                    }
-                },
-                new IncentivePaymentProfile
-                {
-                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
-                    PaymentProfiles = new List<PaymentProfile>
-                    {
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
-                    }
-                }
-            };
+            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
         }
 

@@ -14,5 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval { get; set; }
         public long? UKPRN { get; set; }
         public string CourseName { get; set; }
+        public DateTime? EmploymentStartDate { get; set; }
     }
 }

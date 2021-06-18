@@ -15,6 +15,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using LegalEntity = SFA.DAS.EmployerIncentives.Domain.Accounts.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CreatePayment
@@ -122,23 +123,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         today.AddYears(-26),
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
-                        _fixture.Create<string>()
+                        _fixture.Create<string>(),
+                        _fixture.Create<DateTime>()
                     ),
                     today,
                     _fixture.Create<DateTime>(),
-                    _fixture.Create<string>());
+                    _fixture.Create<string>(),
+                    new AgreementVersion(_fixture.Create<int>()),
+                    new IncentivePhase(Phase.Phase1));
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
-            var paymentProfiles = new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile(
-                    IncentiveType.TwentyFiveOrOverIncentive, new List<PaymentProfile>
-                    {
-                        new PaymentProfile(10, 100),
-                        new PaymentProfile(100, 1000)
-                    })
-            };
+            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
             var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {

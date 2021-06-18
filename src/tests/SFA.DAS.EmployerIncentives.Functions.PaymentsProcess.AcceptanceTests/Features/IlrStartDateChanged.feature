@@ -56,9 +56,9 @@ Scenario: Clawbacks - Start Date Change Of Circumstance with eligible start date
 	And existing payment record is retained
 	And existing pending payment validation record is retained
 
-
 Scenario: Learner data contains a new start date change of circumstance
 	Given an apprenticeship incentive exists
 	When the learner data is updated with new valid start date for the apprenticeship incentive
 	And the incentive learner data is refreshed
 	Then the start date change of circumstance is saved
+	And the minimum agreement version is changed

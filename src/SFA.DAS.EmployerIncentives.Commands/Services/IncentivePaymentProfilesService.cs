@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
                 return Task.FromResult(Enumerable.Empty<Domain.ValueObjects.IncentivePaymentProfile>());
             }
             return Task.FromResult(_applicationSettings.IncentivePaymentProfiles.Select(x =>
-                new Domain.ValueObjects.IncentivePaymentProfile(x.IncentiveType,
+                new Domain.ValueObjects.IncentivePaymentProfile(new Domain.ValueObjects.IncentivePhase(x.IncentivePhase),
                     MapToDomainPaymentProfiles(x.PaymentProfiles).ToList())));
         }
 
@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
             {
                 return Enumerable.Empty<Domain.ValueObjects.PaymentProfile>();
             }
-            return paymentProfiles.Select(x => new Domain.ValueObjects.PaymentProfile(x.DaysAfterApprenticeshipStart, x.AmountPayable));
+            return paymentProfiles.Select(x => new Domain.ValueObjects.PaymentProfile(x.IncentiveType, x.DaysAfterApprenticeshipStart, x.AmountPayable));
         }
     }
 }

@@ -13,11 +13,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public bool? IsInlearning { get; private set; }
         public DateTime? StartDate { get; private set; }
         public int? DaysinLearning { get; private set; }
-
+        public LearningStoppedStatus StoppedStatus { get; private set; }
+        
         public LearningData(bool isFound, string notFoundReason = "")
         {
             LearningFound = isFound;
-            NotFoundReason = notFoundReason;            
+            NotFoundReason = notFoundReason;
+            StoppedStatus = new LearningStoppedStatus(false);
         }
 
         public void SetHasDataLock(bool hasDataLock)
@@ -35,6 +37,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             IsInlearning = LearningFound ? isInLearning : null;            
         }
 
+        public void SetIsStopped(LearningStoppedStatus stoppedStatus)
+        {
+            StoppedStatus = LearningFound ? stoppedStatus : null;
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return NotFoundReason;
@@ -42,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return IsInlearning;
             yield return StartDate;
             yield return DaysinLearning;
+            yield return StoppedStatus;
         }
 
         public Log Log
@@ -51,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
                 return new Log
                 {
-                    OnProcessed = () => $"Learning data : LearningFound : {LearningFound}, StartDate : {StartDate}, HasDataLock : {HasDataLock}, IsInlearning : {IsInlearning}, DaysinLearning : {DaysinLearning} "
+                    OnProcessed = () => $"Learning data : LearningFound : {LearningFound}, StartDate : {StartDate}, HasDataLock : {HasDataLock}, IsInlearning : {IsInlearning}, DaysinLearning : {DaysinLearning}, StoppedStatus : {StoppedStatus} "
                 };
             }
         }

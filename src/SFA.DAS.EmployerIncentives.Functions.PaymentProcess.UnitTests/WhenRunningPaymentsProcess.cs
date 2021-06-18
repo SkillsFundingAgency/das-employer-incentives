@@ -29,13 +29,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _collectionPeriod = _fixture.Create<CollectionPeriod>();
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
-            _mockOrchestrationContext.Setup(x => x.GetInput<CollectionPeriod>()).Returns(_collectionPeriod);
 
             _payableLegalEntities = _fixture.CreateMany<PayableLegalEntityDto>(3).ToList();           
 
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PayableLegalEntityDto>>("GetPayableLegalEntities", _collectionPeriod)).ReturnsAsync(_payableLegalEntities);            
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<ClawbackLegalEntityDto>>("GetUnsentClawbacks", _collectionPeriod)).ReturnsAsync(new List<ClawbackLegalEntityDto>());
-            
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), _collectionPeriod)).ReturnsAsync(_payableLegalEntities);            
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), _collectionPeriod)).ReturnsAsync(new List<ClawbackLegalEntityDto>());
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<CollectionPeriod> (nameof(GetActiveCollectionPeriod), null)).ReturnsAsync(_collectionPeriod);
+
             _mockLogger = new Mock<ILogger<IncentivePaymentOrchestrator>>();
 
             _orchestrator = new IncentivePaymentOrchestrator(_mockLogger.Object);
@@ -149,6 +149,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             // assert
             _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), _collectionPeriod), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_call_is_made_to_get_the_active_collection_period()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            // assert
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null), Times.Once);
         }
 
         [Test]

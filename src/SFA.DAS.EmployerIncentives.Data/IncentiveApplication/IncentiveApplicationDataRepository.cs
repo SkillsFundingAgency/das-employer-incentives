@@ -71,6 +71,16 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             return await Task.FromResult(queryResult);
         }
 
+        public async Task<IEnumerable<IncentiveApplicationModel>> FindApplicationsByAccountLegalEntity(long accountLegalEntity)
+        {
+            var queryResult = (from result in (_dbContext.Applications.Include(x => x.Apprenticeships)
+                    .Where(x => x.AccountLegalEntityId == accountLegalEntity))
+                let item = ApplicationToIncentiveApplicationModel(result)
+                select item);
+
+            return await Task.FromResult(queryResult);
+        }
+
         private static IncentiveApplicationModel ApplicationToIncentiveApplicationModel(Models.IncentiveApplication application)
         {
             return new IncentiveApplicationModel
@@ -105,7 +115,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                                             UKPRN = apprenticeship.UKPRN,
                                             WithdrawnByEmployer = apprenticeship.WithdrawnByEmployer,
                                             WithdrawnByCompliance = apprenticeship.WithdrawnByCompliance,
-                                            CourseName = apprenticeship.CourseName
+                                            CourseName = apprenticeship.CourseName,
+                                            EmploymentStartDate = apprenticeship.EmploymentStartDate,
+                                            HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
                                         }
                                         select apprenticeshipModel).ToList();
             return new Collection<ApprenticeshipModel>(apprenticeshipModels);

@@ -26,7 +26,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             await dbConnection.UpdateAsync(period);
 
             context.ActivePeriod = period;
-        }
-
+        }        
     }
 }

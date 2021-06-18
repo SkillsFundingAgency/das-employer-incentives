@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollectionPeriod;
@@ -20,11 +19,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         }
 
         [FunctionName(nameof(GetActiveCollectionPeriod))]
-        public async Task<CollectionPeriodDto> Get([ActivityTrigger] object input)
+        public async Task<CollectionPeriod> Get([ActivityTrigger] object input)
         {
             _logger.LogInformation("Getting active collection period");
-            var activePeriod = (await _queryDispatcher.Send<GetActiveCollectionPeriodRequest, GetActiveCollectionPeriodResponse>(new GetActiveCollectionPeriodRequest())).CollectionPeriod;
-            _logger.LogInformation($"Active collection period number : {activePeriod.CollectionPeriodNumber}, CollectionYear : {activePeriod.CollectionYear}");
+            var activePeriodDto = (await _queryDispatcher.Send<GetActiveCollectionPeriodRequest, GetActiveCollectionPeriodResponse>(new GetActiveCollectionPeriodRequest())).CollectionPeriod;
+            var activePeriod = new CollectionPeriod() { Period = activePeriodDto.CollectionPeriodNumber, Year = activePeriodDto.CollectionYear };
+            _logger.LogInformation($"Active collection period number : {activePeriod.Period}, CollectionYear : {activePeriod.Year}");
             return activePeriod;
         }
     }
