@@ -401,7 +401,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             archivedPendingPayment.AccountLegalEntityId.Should().Be(_apprenticeshipIncentive.AccountLegalEntityId);
             archivedPendingPayment.Amount.Should().Be(_pendingPayment.Amount);
             archivedPendingPayment.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            archivedPendingPayment.CalculatedDate.ToLongTimeString().Should().Be(_pendingPayment.CalculatedDate.ToLongTimeString());
+            archivedPendingPayment.CalculatedDate.Should().BeCloseTo(_pendingPayment.CalculatedDate, 1000);
             archivedPendingPayment.ClawedBack.Should().Be(_pendingPayment.ClawedBack);
             archivedPendingPayment.DueDate.ToLongTimeString().Should().Be(_pendingPayment.DueDate.ToLongTimeString());
             archivedPendingPayment.EarningType.Should().Be(_pendingPayment.EarningType);
