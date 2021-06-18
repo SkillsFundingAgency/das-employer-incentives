@@ -59,7 +59,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                     i.SubmittedDate == @event.Model.DateSubmitted &&
                     i.SubmittedByEmail == @event.Model.SubmittedByEmail &&
                     i.CourseName == apprenticeship.CourseName &&
-                    i.EmploymentStartDate == apprenticeship.EmploymentStartDate
+                    i.EmploymentStartDate == apprenticeship.EmploymentStartDate &&
+                    i.Phase == apprenticeship.Phase
                 ), It.IsAny<CancellationToken>()), Times.Once);
             }
         }
@@ -101,7 +102,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                     i.DateOfBirth == apprenticeship.DateOfBirth &&
                     i.Uln == apprenticeship.ULN &&
                     i.PlannedStartDate == apprenticeship.PlannedStartDate &&
-                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval &&
+                    i.Phase == apprenticeship.Phase
                 ), It.IsAny<CancellationToken>()), Times.Once);
             }
             else
