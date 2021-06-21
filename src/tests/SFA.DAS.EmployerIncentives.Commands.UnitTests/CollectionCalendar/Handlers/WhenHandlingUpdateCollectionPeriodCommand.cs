@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
             _service = new Mock<ICollectionCalendarService>();
             _sut = new UpdateCollectionPeriodCommandHandler(_service.Object);
 
-            var calendarPeriods = new List<Domain.ValueObjects.CollectionPeriod>
+            var calendarPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>
             {
                 CollectionPeriod(1, 2021),
                 CollectionPeriod(2, 2021),
@@ -60,9 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
             _service.Verify(x => x.Save(It.IsAny<Domain.ValueObjects.CollectionCalendar>()), Times.Never);
         }
 
-        private Domain.ValueObjects.CollectionPeriod CollectionPeriod(byte periodNumber, short academicYear)
+        private Domain.ValueObjects.CollectionCalendarPeriod CollectionPeriod(byte periodNumber, short academicYear)
         {
-            return new Domain.ValueObjects.CollectionPeriod(periodNumber, 1, academicYear, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), academicYear, false);
+            return new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(periodNumber, academicYear), 1, academicYear, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         {
             // Arrange
             var incentive = _fixture.Create<ApprenticeshipIncentiveModel>();
-            var cpData = _fixture.Build<ApprenticeshipIncentives.Models.CollectionPeriod>()
+            var cpData = _fixture.Build<ApprenticeshipIncentives.Models.CollectionCalendarPeriod>()
                 .With(x => x.Active, true)
                 .With(x => x.PeriodNumber, 2)
                 .With(x => x.CalendarMonth, 9)
@@ -43,10 +43,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .With(x => x.AcademicYear, "2021")
                 .Create();
 
-            var cp = new AcademicPeriod(cpData.PeriodNumber, Convert.ToInt16(cpData.AcademicYear));
+            var cp = new CollectionPeriod(cpData.PeriodNumber, Convert.ToInt16(cpData.AcademicYear));
 
             var validationResults = _fixture.Build<PendingPaymentValidationResultModel>()
-                .With(x => x.AcademicPeriod, cp)
+                .With(x => x.CollectionPeriod, cp)
                 .CreateMany(4).ToList();
 
             var pendingPayments = _fixture

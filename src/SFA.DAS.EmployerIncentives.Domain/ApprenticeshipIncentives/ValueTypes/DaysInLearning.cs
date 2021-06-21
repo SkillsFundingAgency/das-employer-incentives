@@ -6,18 +6,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class DaysInLearning : ValueObject
     {
-        public DaysInLearning(AcademicPeriod academicPeriod, int numberOfDays)
+        public DaysInLearning(CollectionPeriod collectionPeriod, int numberOfDays)
         {
-            AcademicPeriod = academicPeriod;
+            CollectionPeriod = collectionPeriod;
             NumberOfDays = numberOfDays;
         }
 
-        public AcademicPeriod AcademicPeriod { get; }
+        public CollectionPeriod CollectionPeriod { get; }
         public int NumberOfDays { get; }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
-            yield return AcademicPeriod;
+            yield return CollectionPeriod;
             yield return NumberOfDays;
         }
     }

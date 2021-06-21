@@ -5,7 +5,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 {
     [Dapper.Contrib.Extensions.Table("incentives.CollectionCalendar")]
     [Table("CollectionCalendar", Schema = "incentives")]
-    public partial class CollectionPeriod
+    public partial class CollectionCalendarPeriod
     {
         [Dapper.Contrib.Extensions.ExplicitKey]
         public int Id { get; set; }

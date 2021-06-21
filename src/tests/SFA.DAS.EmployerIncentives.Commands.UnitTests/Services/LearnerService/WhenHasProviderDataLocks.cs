@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             _nextPendingPaymentDue = _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
-                    .With(pp => pp.AcademicPeriod, new AcademicPeriod(_periodNumber, paymentYear))
+                    .With(pp => pp.CollectionPeriod, new Domain.ValueObjects.CollectionPeriod(_periodNumber, paymentYear))
                     .With(pp => pp.DueDate, _dueDate)// earliest
                     .Create();
 
@@ -46,12 +46,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                     _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, _dueDate.AddMonths(1))
-                    .With(pp => pp.AcademicPeriod, (AcademicPeriod)null)
+                    .With(pp => pp.CollectionPeriod, (Domain.ValueObjects.CollectionPeriod)null)
                     .Create(),
                     _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, _dueDate.AddMonths(2))
-                    .With(pp => pp.AcademicPeriod, (AcademicPeriod)null)
+                    .With(pp => pp.CollectionPeriod, (Domain.ValueObjects.CollectionPeriod)null)
                     .Create(),
                     _nextPendingPaymentDue
                 })
@@ -134,7 +134,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_is_false_when_the_next_pending_payment_due_has_a_null_Academic_period()
         {
             //Arrange            
-            _nextPendingPaymentDue.AcademicPeriod = null;
+            _nextPendingPaymentDue.CollectionPeriod = null;
             _incentive = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
 
             //Act

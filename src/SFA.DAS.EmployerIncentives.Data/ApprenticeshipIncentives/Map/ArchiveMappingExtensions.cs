@@ -18,8 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Amount = model.Amount,
                 DueDate = model.DueDate,
                 CalculatedDate = model.CalculatedDate,
-                PeriodNumber = model.AcademicPeriod.PeriodNumber,
-                PaymentYear = model.AcademicPeriod.AcademicYear,
+                PeriodNumber = model.CollectionPeriod.PeriodNumber,
+                PaymentYear = model.CollectionPeriod.AcademicYear,
                 PaymentMadeDate = model.PaymentMadeDate,
                 EarningType = model.EarningType,
                 ClawedBack = model.ClawedBack,
@@ -59,8 +59,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PendingPaymentId = pendingPaymentId,
                 Step = model.Step,
                 Result = model.Result,
-                PeriodNumber = model.AcademicPeriod.PeriodNumber,
-                PaymentYear = model.AcademicPeriod.AcademicYear,
+                PeriodNumber = model.CollectionPeriod.PeriodNumber,
+                PaymentYear = model.CollectionPeriod.AcademicYear,
                 CreatedDateUtc = model.CreatedDateUtc,
                 ArchiveDateUTC = DateTime.UtcNow
             };

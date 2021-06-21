@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateD
             if (learner.SubmissionData.SubmissionFound)
             {
                 var calendar = await _collectionCalendarService.Get();
-                var collectionPeriod = calendar.GetPeriod(command.CollectionYear, command.CollectionPeriodNumber);
+                var collectionPeriod = calendar.GetPeriod(new Domain.ValueObjects.CollectionPeriod(command.CollectionPeriodNumber, command.CollectionYear));
 
                 learner.SetDaysInLearning(collectionPeriod);
             }

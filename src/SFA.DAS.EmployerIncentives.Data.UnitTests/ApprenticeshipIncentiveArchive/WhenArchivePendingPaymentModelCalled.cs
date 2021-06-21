@@ -64,8 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedPendingPayment.DueDate.Should().Be(testPendingPayment.DueDate);
             storedPendingPayment.CalculatedDate.Should().Be(testPendingPayment.CalculatedDate);
             storedPendingPayment.PaymentMadeDate.Should().Be(testPendingPayment.PaymentMadeDate);
-            storedPendingPayment.PeriodNumber.Should().Be(testPendingPayment.AcademicPeriod.PeriodNumber);
-            storedPendingPayment.PaymentYear.Should().Be(testPendingPayment.AcademicPeriod.AcademicYear);
+            storedPendingPayment.PeriodNumber.Should().Be(testPendingPayment.CollectionPeriod.PeriodNumber);
+            storedPendingPayment.PaymentYear.Should().Be(testPendingPayment.CollectionPeriod.AcademicYear);
             storedPendingPayment.EarningType.Should().Be(testPendingPayment.EarningType);
             storedPendingPayment.ClawedBack.Should().Be(testPendingPayment.ClawedBack);
             storedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
@@ -73,8 +73,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var storedValidationResult = _dbContext.ArchivedPendingPaymentValidationResults.Single();
             storedValidationResult.PendingPaymentId.Should().Be(testPendingPayment.Id);
             storedValidationResult.PendingPaymentValidationResultId.Should().Be(testPendingPaymentValidationResult.Id);
-            storedValidationResult.PaymentYear.Should().Be(testPendingPaymentValidationResult.AcademicPeriod.AcademicYear);
-            storedValidationResult.PeriodNumber.Should().Be(testPendingPaymentValidationResult.AcademicPeriod.PeriodNumber);
+            storedValidationResult.PaymentYear.Should().Be(testPendingPaymentValidationResult.CollectionPeriod.AcademicYear);
+            storedValidationResult.PeriodNumber.Should().Be(testPendingPaymentValidationResult.CollectionPeriod.PeriodNumber);
             storedValidationResult.Result.Should().Be(testPendingPaymentValidationResult.Result);
             storedValidationResult.Step.Should().Be(testPendingPaymentValidationResult.Step);
             storedValidationResult.CreatedDateUtc.Should().Be(testPendingPaymentValidationResult.CreatedDateUtc);

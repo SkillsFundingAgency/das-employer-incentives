@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
         private Learner _sut;
         private LearnerModel _sutModel;
         private DaysInLearning _daysInLearning;
-        private AcademicPeriod _academicPeriod;
+        private CollectionPeriod _collectionPeriod;
         private Fixture _fixture;
 
         [SetUp]
@@ -26,14 +26,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
                 .Build<LearnerModel>()
                 .Create();
 
-            _academicPeriod = _fixture.Create<AcademicPeriod>();
+            _collectionPeriod = _fixture.Create<CollectionPeriod>();
 
-            _daysInLearning = new DaysInLearning(_academicPeriod, _fixture.Create<int>());
+            _daysInLearning = new DaysInLearning(_collectionPeriod, _fixture.Create<int>());
 
             _sutModel.DaysInLearnings = new List<DaysInLearning>() {
-                new DaysInLearning(new AcademicPeriod((byte)(_academicPeriod.PeriodNumber - 1), (short)(_academicPeriod.AcademicYear - 1)), _fixture.Create<int>()),
+                new DaysInLearning(new CollectionPeriod((byte)(_collectionPeriod.PeriodNumber - 1), (short)(_collectionPeriod.AcademicYear - 1)), _fixture.Create<int>()),
                 _daysInLearning,
-                new DaysInLearning(new AcademicPeriod((byte)(_academicPeriod.PeriodNumber + 1), (short)(_academicPeriod.AcademicYear + 1)), _fixture.Create<int>()),
+                new DaysInLearning(new CollectionPeriod((byte)(_collectionPeriod.PeriodNumber + 1), (short)(_collectionPeriod.AcademicYear + 1)), _fixture.Create<int>()),
             };
 
             _sut = Sut(_sutModel);
@@ -45,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
             // arrange 
 
             // act
-            var days = _sut.GetDaysInLearning(_academicPeriod);
+            var days = _sut.GetDaysInLearning(_collectionPeriod);
 
             // assert            
             days.Should().Be(_daysInLearning.NumberOfDays);
@@ -55,13 +55,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
         public void Then_zero_days_is_returned_when_there_are_no_matching_days_in_learnings_for_the_collection_period()
         {
             // arrange 
-            var academicPeriod = new AcademicPeriod(
-                (byte)(_academicPeriod.PeriodNumber + 1),
-                _academicPeriod.AcademicYear
+            var collectionPeriod = new CollectionPeriod(
+                (byte)(_collectionPeriod.PeriodNumber + 1),
+                _collectionPeriod.AcademicYear
                 );
 
             // act
-            int days = _sut.GetDaysInLearning(academicPeriod);
+            int days = _sut.GetDaysInLearning(collectionPeriod);
 
             // assert            
             days.Should().Be(0);

@@ -8,19 +8,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
     public class PendingPaymentValidationResult : Entity<Guid, PendingPaymentValidationResultModel>
     {
         public string Step => Model.Step;
-        public AcademicPeriod AcademicPeriod => Model.AcademicPeriod;
+        public CollectionPeriod CollectionPeriod => Model.CollectionPeriod;
         public bool Result => Model.Result;
 
         internal static PendingPaymentValidationResult New(
             Guid id,
-            AcademicPeriod academicPeriod,
+            CollectionPeriod collectionPeriod,
             string step,
             bool result)
         {
             return new PendingPaymentValidationResult(new PendingPaymentValidationResultModel
             {
                 Id = id,
-                AcademicPeriod = academicPeriod,
+                CollectionPeriod = collectionPeriod,
                 Step = step,
                 Result = result,
                 CreatedDateUtc = DateTime.Today

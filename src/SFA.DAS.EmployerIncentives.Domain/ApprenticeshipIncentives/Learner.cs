@@ -101,9 +101,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return numberOfDays;
         }
 
-        public int GetDaysInLearning(AcademicPeriod academicPeriod)
+        public int GetDaysInLearning(CollectionPeriod collectionPeriod)
         {
-            var daysInLearningForCollectionPeriod = Model.DaysInLearnings.FirstOrDefault(d => d.AcademicPeriod == academicPeriod);
+            var daysInLearningForCollectionPeriod = Model.DaysInLearnings.FirstOrDefault(d => d.CollectionPeriod == collectionPeriod);
 
             return daysInLearningForCollectionPeriod != null ? daysInLearningForCollectionPeriod.NumberOfDays : 0;
         }
@@ -113,9 +113,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.DaysInLearnings.Clear();
         }
         
-        public void SetDaysInLearning(CollectionPeriod collectionPeriod)
+        public void SetDaysInLearning(CollectionCalendarPeriod collectionCalendarPeriod)
         {
-            var censusDate = collectionPeriod.CensusDate;
+            var censusDate = collectionCalendarPeriod.CensusDate;
 
             int days = 0;
             foreach (var learningPeriod in Model.LearningPeriods)
@@ -137,8 +137,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
             }
 
-            var daysInLearning = new DaysInLearning(new AcademicPeriod(collectionPeriod.PeriodNumber, collectionPeriod.AcademicYear), days);
-            var existing = Model.DaysInLearnings.SingleOrDefault(d => d.AcademicPeriod.PeriodNumber == collectionPeriod.PeriodNumber && d.AcademicPeriod.AcademicYear == collectionPeriod.AcademicYear);
+            var daysInLearning = new DaysInLearning(collectionCalendarPeriod.CollectionPeriod, days);
+            var existing = Model.DaysInLearnings.SingleOrDefault(d => d.CollectionPeriod == collectionCalendarPeriod.CollectionPeriod);
             if (existing != null)
             {
                 Model.DaysInLearnings.Remove(existing);

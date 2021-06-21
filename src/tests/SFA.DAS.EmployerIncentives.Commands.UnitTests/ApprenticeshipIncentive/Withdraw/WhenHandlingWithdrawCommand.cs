@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private WithdrawCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private Domain.ValueObjects.CollectionPeriod _activePeriod;
+        private CollectionCalendarPeriod _activePeriod;
 
         private Fixture _fixture;           
 
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _activePeriod = CollectionPeriod(2, 2020);
             _activePeriod.SetActive(true);
 
-            var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            var collectionPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
             {
                 CollectionPeriod(1, 2020),
                 _activePeriod,
@@ -305,8 +305,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             clawback.SubnominalCode.Should().Be(paymentModel.SubnominalCode);
             clawback.PaymentId.Should().Be(paymentModel.Id);
             clawback.CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
-            clawback.CollectionPeriod.Should().Be(_activePeriod.PeriodNumber);
-            clawback.CollectionPeriodYear.Should().Be(_activePeriod.AcademicYear);
+            clawback.CollectionPeriod.Should().Be(_activePeriod.CollectionPeriod);
         }
 
         [Test]
@@ -351,9 +350,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 Times.Never);
         }
 
-        private Domain.ValueObjects.CollectionPeriod CollectionPeriod(byte periodNumber, short academicYear)
+        private CollectionCalendarPeriod CollectionPeriod(byte periodNumber, short academicYear)
         {
-            return new Domain.ValueObjects.CollectionPeriod(periodNumber, 1, academicYear, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), academicYear, false);
+            return new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(periodNumber, academicYear), 1, academicYear, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false);
         }
 
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive ApprenticeshipIncentiveCreator()

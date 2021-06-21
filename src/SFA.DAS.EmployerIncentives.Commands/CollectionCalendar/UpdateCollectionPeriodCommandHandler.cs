@@ -17,11 +17,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.CollectionCalendar
         public async Task Handle(UpdateCollectionPeriodCommand command, CancellationToken cancellationToken = default)
         {
             var collectionCalendar = await _collectionCalendarService.Get();
-            var academicPeriod = new Domain.ValueObjects.AcademicPeriod(command.PeriodNumber, command.AcademicYear);
+            var collectionPeriod = new Domain.ValueObjects.CollectionPeriod(command.PeriodNumber, command.AcademicYear);
 
             if (command.Active) 
             {
-                collectionCalendar.SetActive(academicPeriod);
+                collectionCalendar.SetActive(collectionPeriod);
 
                 await _collectionCalendarService.Save(collectionCalendar);
             }

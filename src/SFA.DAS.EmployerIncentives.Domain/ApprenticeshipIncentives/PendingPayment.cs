@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Account Account => Model.Account;
         public DateTime DueDate => Model.DueDate;
         public decimal Amount => Model.Amount;
-        public AcademicPeriod AcademicPeriod => Model.AcademicPeriod;
+        public CollectionPeriod CollectionPeriod => Model.CollectionPeriod;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
         public bool ClawedBack => Model.ClawedBack;
@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetPaymentPeriod(CollectionCalendar collectionCalendar)
         {
-            Model.AcademicPeriod = collectionCalendar.GetAcademicPeriod(DueDate);
+            Model.CollectionPeriod = collectionCalendar.GetPeriod(DueDate)?.CollectionPeriod;
         }
 
         public void SetPaymentMadeDate(DateTime paymentDate)
@@ -59,8 +59,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var existing = Model
                 .PendingPaymentValidationResultModels
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
-                                      v.AcademicPeriod.AcademicYear == validationResult.AcademicPeriod.AcademicYear &&
-                                      v.AcademicPeriod.AcademicYear == validationResult.AcademicPeriod.AcademicYear);
+                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear &&
+                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear);
 
             if (existing != null)
             {
@@ -84,17 +84,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
         }
 
-        public bool IsValidated(AcademicPeriod academicPeriod)
+        public bool IsValidated(CollectionPeriod collectionPeriod)
         {
             return Model.PendingPaymentValidationResultModels.Count() > 0
-                   && AllPendingPaymentsForPeriodAreValid(academicPeriod);
+                   && AllPendingPaymentsForPeriodAreValid(collectionPeriod);
         }
 
-        private bool AllPendingPaymentsForPeriodAreValid(AcademicPeriod academicPeriod)
+        private bool AllPendingPaymentsForPeriodAreValid(CollectionPeriod collectionPeriod)
         {
             return Model.PendingPaymentValidationResultModels
                 .Where(v =>
-                    v.AcademicPeriod == academicPeriod)
+                    v.CollectionPeriod == collectionPeriod)
                 .All(r => r.Result);
         }
 
@@ -114,7 +114,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public bool RequiresNewPayment(PendingPayment pendingPayment)
         {
-            return Amount != pendingPayment.Amount || AcademicPeriod != pendingPayment.AcademicPeriod;
+            return Amount != pendingPayment.Amount || CollectionPeriod != pendingPayment.CollectionPeriod;
         }
 
         public override bool Equals(object obj)
@@ -126,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             return Amount == pendingPayment.Amount &&
-                   AcademicPeriod == pendingPayment.AcademicPeriod &&
+                   CollectionPeriod == pendingPayment.CollectionPeriod &&
                    DueDate == pendingPayment.DueDate &&
                    PaymentMadeDate == pendingPayment.PaymentMadeDate &&
                    EarningType == pendingPayment.EarningType &&

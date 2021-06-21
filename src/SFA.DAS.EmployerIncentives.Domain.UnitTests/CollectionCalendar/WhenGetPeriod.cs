@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
     public class GetPeriod
     {
         private CollectionCalendar _sut;
-        private List<CollectionPeriod> _collectionPeriods;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
         private DateTime testDate;
 
@@ -21,11 +21,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             testDate = DateTime.Now;
 
-            var period1 = new CollectionPeriod(1, (byte)testDate.AddMonths(13).Month, (short)testDate.AddMonths(13).Year, testDate.AddMonths(13), _fixture.Create<DateTime>(), _fixture.Create<short>(), false);
-            var period2 = new CollectionPeriod(2, (byte)testDate.Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), _fixture.Create<short>(), false);
-            var period3 = new CollectionPeriod(3, (byte)testDate.AddMonths(-13).Month, (short)testDate.AddMonths(-13).Year, testDate.AddMonths(-13), _fixture.Create<DateTime>(), _fixture.Create<short>(), false);
+            var period1 = new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)testDate.AddMonths(13).Month, (short)testDate.AddMonths(13).Year, testDate.AddMonths(13), _fixture.Create<DateTime>(), false);
+            var period2 = new CollectionCalendarPeriod(new CollectionPeriod(2, _fixture.Create<short>()), (byte)testDate.Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), false);
+            var period3 = new CollectionCalendarPeriod(new CollectionPeriod(3, _fixture.Create<short>()), (byte)testDate.AddMonths(-13).Month, (short)testDate.AddMonths(-13).Year, testDate.AddMonths(-13), _fixture.Create<DateTime>(), false);
 
-            _collectionPeriods = new List<CollectionPeriod>() { period1, period2, period3 };
+            _collectionPeriods = new List<CollectionCalendarPeriod>() { period1, period2, period3 };
 
             _sut = new CollectionCalendar(_collectionPeriods);
         }
@@ -37,10 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             var date = testDate.AddDays(1);
 
             // Act
-            var period = _sut.GetPeriod(_sut.GetAcademicPeriod(date));
+            var period = _sut.GetPeriod(date);
 
             // Assert
-            period.PeriodNumber.Should().Be(2);
+            period.CollectionPeriod.PeriodNumber.Should().Be(2);
             period.CalendarMonth.Should().Be((byte)testDate.Month);
             period.CalendarYear.Should().Be((short)testDate.Year);
             period.OpenDate.Should().Be(testDate);
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             var date = testDate.AddMonths(-13).AddDays(-1);
 
             // Act
-            var period = _sut.GetPeriod(_sut.GetAcademicPeriod(date));
+            var period = _sut.GetPeriod(date);
 
             // Assert
             period.Should().BeNull();

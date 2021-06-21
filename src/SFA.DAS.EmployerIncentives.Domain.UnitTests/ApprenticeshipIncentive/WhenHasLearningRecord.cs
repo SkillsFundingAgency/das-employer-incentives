@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
-        private AcademicPeriod _academicPeriod;
+        private CollectionPeriod _collectionPeriod;
         private Learner _learner;
         private short _collectionYear;
         private Fixture _fixture;
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionYear = _fixture.Create<short>();
 
-            _academicPeriod = new AcademicPeriod(1, _collectionYear);
+            _collectionPeriod = new CollectionPeriod(1, _collectionYear);
 
             _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
 
@@ -65,13 +65,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SubmissionData.SetLearningData(new LearningData(hasLearning));
 
             // act
-            _sut.ValidateHasLearningRecord(pendingPayment.Id, _learner, _academicPeriod);
+            _sut.ValidateHasLearningRecord(pendingPayment.Id, _learner, _collectionPeriod);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.HasLearningRecord);
-            validationresult.AcademicPeriod.Should().Be(_academicPeriod);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(hasLearning);
         }
 
@@ -82,13 +82,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            _sut.ValidateHasLearningRecord(pendingPayment.Id, null, _academicPeriod);
+            _sut.ValidateHasLearningRecord(pendingPayment.Id, null, _collectionPeriod);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.HasLearningRecord);
-            validationresult.AcademicPeriod.Should().Be(_academicPeriod);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(false);
         }
 
@@ -101,13 +101,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetSubmissionData(null);
 
             // act
-            _sut.ValidateHasLearningRecord(pendingPayment.Id, _learner, _academicPeriod);
+            _sut.ValidateHasLearningRecord(pendingPayment.Id, _learner, _collectionPeriod);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.HasLearningRecord);
-            validationresult.AcademicPeriod.Should().Be(_academicPeriod);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(false);
         }
 

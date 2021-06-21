@@ -43,9 +43,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRespository = new Mock<ILearnerDomainRepository>();
 
-            var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<short>(), true),
+                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<short>()), _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true),
             };
             var collectionCalendar = new Domain.ValueObjects.CollectionCalendar(collectionPeriods);
 

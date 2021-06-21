@@ -144,7 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }     
 
-        private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
+        private void AddClawback(PendingPayment pendingPayment, CollectionCalendarPeriod collectionPeriod)
         {
             pendingPayment.ClawBack();
             var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
@@ -195,7 +195,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return true;
         }
 
-        private void ClawbackAllPayments(CollectionPeriod collectionPeriod)
+        private void ClawbackAllPayments(CollectionCalendarPeriod collectionPeriod)
         {
             RemoveUnpaidEarnings();
             ClawbackPayments(PendingPayments, collectionPeriod);
@@ -221,10 +221,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        public void CreatePayment(Guid pendingPaymentId, AcademicPeriod academicPeriod)
+        public void CreatePayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
-            if (!pendingPayment.IsValidated(academicPeriod))
+            if (!pendingPayment.IsValidated(collectionPeriod))
             {
                 return;
             }
@@ -235,14 +235,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (existingPayment != null)
             {
                 existingPayment.CalculatedDate = paymentDate;
-                existingPayment.PaymentPeriod = academicPeriod.PeriodNumber;
-                existingPayment.PaymentYear = academicPeriod.AcademicYear;
+                existingPayment.PaymentPeriod = collectionPeriod.PeriodNumber;
+                existingPayment.PaymentYear = collectionPeriod.AcademicYear;
                 existingPayment.SubnominalCode = DetermineSubnominalCode();
                 existingPayment.Amount = pendingPayment.Amount;
             }
             else
             {
-                AddPayment(pendingPaymentId, academicPeriod, pendingPayment, paymentDate);
+                AddPayment(pendingPaymentId, collectionPeriod, pendingPayment, paymentDate);
             }
             
             pendingPayment.SetPaymentMadeDate(paymentDate);
@@ -375,7 +375,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ClawbackPayments(PendingPayments.Where(x => x.DueDate >= dateStopped), collectionCalendar.GetActivePeriod());
         }
 
-        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionPeriod collectionPeriod)
+        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionCalendarPeriod collectionPeriod)
         {
             foreach (var paidPendingPayment in pendingPayments)
             {
@@ -421,7 +421,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        private void AddPayment(Guid pendingPaymentId, AcademicPeriod academicPeriod, PendingPayment pendingPayment, DateTime paymentDate)
+        private void AddPayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var subnominalCode = DetermineSubnominalCode();
 
@@ -432,8 +432,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 pendingPaymentId,
                 pendingPayment.Amount,
                 paymentDate,
-                academicPeriod.AcademicYear,
-                academicPeriod.PeriodNumber,
+                collectionPeriod.AcademicYear,
+                collectionPeriod.PeriodNumber,
                 subnominalCode);
 
             Model.PaymentModels.Add(payment.GetModel());
@@ -478,7 +478,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return pendingPayment;
         }
 
-        public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, AcademicPeriod academicPeriod)
+        public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {
             if (Account.Id != account.Id)
             {
@@ -491,19 +491,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var isValid = !string.IsNullOrEmpty(legalEntity.VrfVendorId);
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.HasBankDetails, isValid));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasBankDetails, isValid));
         }
 
-        public void ValidatePaymentsNotPaused(Guid pendingPaymentId, AcademicPeriod academicPeriod)
+        public void ValidatePaymentsNotPaused(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
             var isValid = !Model.PausePayments;
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.PaymentsNotPaused, isValid));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.PaymentsNotPaused, isValid));
         }
 
-        public void ValidateMinimumRequiredAgreementVersion(Guid pendingPaymentId, Accounts.Account account, AcademicPeriod academicPeriod)
+        public void ValidateMinimumRequiredAgreementVersion(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {
             if (account == null || Account.Id != account.Id)
             {
@@ -516,17 +516,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var isValid = legalEntity.SignedAgreementVersion >= MinimumAgreementVersion.MinimumRequiredVersion;
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.HasSignedMinVersion, isValid));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasSignedMinVersion, isValid));
         }
 
-        private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, AcademicPeriod academicPeriod)
+        private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.HasIlrSubmission, learner.SubmissionData.SubmissionFound));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasIlrSubmission, learner.SubmissionData.SubmissionFound));
         }
 
-        public void ValidateIsInLearning(Guid pendingPaymentId, Learner matchedLearner, AcademicPeriod academicPeriod)
+        public void ValidateIsInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
@@ -536,10 +536,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 isInLearning = matchedLearner.SubmissionData.SubmissionFound && matchedLearner.SubmissionData.LearningData.IsInlearning == true;
             }
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.IsInLearning, isInLearning));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.IsInLearning, isInLearning));
         }
 
-        public void ValidateHasLearningRecord(Guid pendingPaymentId, Learner learner, AcademicPeriod academicPeriod)
+        public void ValidateHasLearningRecord(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
@@ -550,10 +550,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 hasLearningRecord = learner.SubmissionData.LearningData.LearningFound;
             }
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.HasLearningRecord, hasLearningRecord));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasLearningRecord, hasLearningRecord));
         }
 
-        public void ValidateHasNoDataLocks(Guid pendingPaymentId, Learner matchedLearner, AcademicPeriod academicPeriod)
+        public void ValidateHasNoDataLocks(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
@@ -563,7 +563,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 hasDataLock = matchedLearner.SubmissionData.SubmissionFound && matchedLearner.SubmissionData.LearningData.HasDataLock == true;
             }
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
         }
 
         public void LearnerRefreshCompleted()
@@ -571,17 +571,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.RefreshedLearnerForEarnings = true;
         }
 
-        public void ValidateDaysInLearning(Guid pendingPaymentId, Learner matchedLearner, AcademicPeriod academicPeriod)
+        public void ValidateDaysInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
             var hasEnoughDaysInLearning = false;
             if (matchedLearner != null)
             {
-                hasEnoughDaysInLearning = StartDate.Date.AddDays(matchedLearner.GetDaysInLearning(academicPeriod)) >= pendingPayment.DueDate.Date;
+                hasEnoughDaysInLearning = StartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) >= pendingPayment.DueDate.Date;
             }
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), academicPeriod, ValidationStep.HasDaysInLearning, hasEnoughDaysInLearning));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasDaysInLearning, hasEnoughDaysInLearning));
         }
 
         public void PauseSubsequentPayments(ServiceRequest serviceRequest)
@@ -640,21 +640,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private PendingPayment GetNextDuePayment()
         {
             var next = Model.PendingPaymentModels
-                .Where(pp => pp.PaymentMadeDate == null && pp.AcademicPeriod != null)
+                .Where(pp => pp.PaymentMadeDate == null && pp.CollectionPeriod != null)
                 .OrderBy(pp => pp.DueDate).FirstOrDefault();
 
             return next?.Map();
         }
 
-        public void ValidateLearningData(Guid pendingPaymentId, Learner learner, AcademicPeriod academicPeriod)
+        public void ValidateLearningData(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
         {
-            ValidateSubmissionFound(pendingPaymentId, learner, academicPeriod);
+            ValidateSubmissionFound(pendingPaymentId, learner, collectionPeriod);
             if (!learner.SubmissionData.SubmissionFound) return;
 
-            ValidateHasLearningRecord(pendingPaymentId, learner, academicPeriod);
-            ValidateIsInLearning(pendingPaymentId, learner, academicPeriod);
-            ValidateHasNoDataLocks(pendingPaymentId, learner, academicPeriod);
-            ValidateDaysInLearning(pendingPaymentId, learner, academicPeriod);
+            ValidateHasLearningRecord(pendingPaymentId, learner, collectionPeriod);
+            ValidateIsInLearning(pendingPaymentId, learner, collectionPeriod);
+            ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
+            ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
         }
 
     }

@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel = _fixture
                 .Build<PendingPaymentModel>()
                 .With(p => p.DueDate, DateTime.Today)
-                .With(p => p.AcademicPeriod, new AcademicPeriod(1, 2021))
+                .With(p => p.CollectionPeriod, new CollectionPeriod(1, 2021))
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Create();
 
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(p => p.Account, _sutModel.Account)
                 .With(p => p.ApprenticeshipIncentiveId, _sutModel.ApprenticeshipIncentiveId)
                 .With(p => p.Amount, _sutModel.Amount)
-                .With(p => p.AcademicPeriod, new AcademicPeriod(_sutModel.AcademicPeriod.PeriodNumber, _sutModel.AcademicPeriod.AcademicYear))
+                .With(p => p.CollectionPeriod, new CollectionPeriod(_sutModel.CollectionPeriod.PeriodNumber, _sutModel.CollectionPeriod.AcademicYear))
                 .Create();
 
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);

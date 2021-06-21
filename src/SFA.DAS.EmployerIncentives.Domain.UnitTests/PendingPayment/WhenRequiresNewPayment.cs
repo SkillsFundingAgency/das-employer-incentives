@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel = _fixture
                 .Build<PendingPaymentModel>()
                 .With(p => p.DueDate, DateTime.Today)
-                .With(p => p.AcademicPeriod, new AcademicPeriod((byte)1, (short)2021))
+                .With(p => p.CollectionPeriod, new CollectionPeriod((byte)1, (short)2021))
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Create();
 
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(p => p.Account, _sutModel.Account)
                 .With(p => p.ApprenticeshipIncentiveId, _sutModel.ApprenticeshipIncentiveId)
                 .With(p => p.Amount, _sutModel.Amount)
-                .With(p => p.AcademicPeriod, new AcademicPeriod(_sutModel.AcademicPeriod.PeriodNumber, _sutModel.AcademicPeriod.AcademicYear))
+                .With(p => p.CollectionPeriod, new CollectionPeriod(_sutModel.CollectionPeriod.PeriodNumber, _sutModel.CollectionPeriod.AcademicYear))
                 .Create();
 
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange            
 
-            _newPendingPaymentModel.AcademicPeriod = new AcademicPeriod((byte)(_sut.AcademicPeriod.PeriodNumber + 1), _sut.AcademicPeriod.AcademicYear);
+            _newPendingPaymentModel.CollectionPeriod = new CollectionPeriod((byte)(_sut.CollectionPeriod.PeriodNumber + 1), _sut.CollectionPeriod.AcademicYear);
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
 
             // act
@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange            
 
-            _newPendingPaymentModel.AcademicPeriod = new AcademicPeriod(_sut.AcademicPeriod.PeriodNumber, (short)(_sut.AcademicPeriod.AcademicYear +  1));
+            _newPendingPaymentModel.CollectionPeriod = new CollectionPeriod(_sut.CollectionPeriod.PeriodNumber, (short)(_sut.CollectionPeriod.AcademicYear +  1));
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
 
             // act

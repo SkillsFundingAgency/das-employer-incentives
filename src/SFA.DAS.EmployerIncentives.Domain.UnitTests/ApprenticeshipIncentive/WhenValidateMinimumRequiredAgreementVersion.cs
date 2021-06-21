@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
-        private AcademicPeriod _academicPeriod;
+        private CollectionPeriod _collectionPeriod;
         private Accounts.Account _account;
         private short _collectionYear;
         private long _accountLegalEntityId;
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionYear = _fixture.Create<short>();
             
-            _academicPeriod = new AcademicPeriod(1, _collectionYear);
+            _collectionPeriod = new CollectionPeriod(1, _collectionYear);
 
             _accountLegalEntityId = _fixture.Create<long>();
             _account = Accounts.Account.Create(_fixture.Build<AccountModel>().Without(a => a.LegalEntityModels).Create());
@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            Action result = () => _sut.ValidateMinimumRequiredAgreementVersion(pendingPayment.Id, null, _academicPeriod);
+            Action result = () => _sut.ValidateMinimumRequiredAgreementVersion(pendingPayment.Id, null, _collectionPeriod);
 
             // assert
             result.Should().Throw<InvalidPendingPaymentException>().WithMessage($"Unable to validate PendingPayment {pendingPayment.Id} of ApprenticeshipIncentive {_sut.Id} because the provided Account record does not match the one against the incentive.");
@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            Action result = () => _sut.ValidateMinimumRequiredAgreementVersion(pendingPayment.Id, _fixture.Create<Accounts.Account>(), _academicPeriod);
+            Action result = () => _sut.ValidateMinimumRequiredAgreementVersion(pendingPayment.Id, _fixture.Create<Accounts.Account>(), _collectionPeriod);
 
             // assert
             result.Should().Throw<InvalidPendingPaymentException>().WithMessage($"Unable to validate PendingPayment {pendingPayment.Id} of ApprenticeshipIncentive {_sut.Id} because the provided Account record does not match the one against the incentive.");
@@ -109,13 +109,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // act
-            _sut.ValidateMinimumRequiredAgreementVersion(pendingPayment.Id, _account, _academicPeriod);
+            _sut.ValidateMinimumRequiredAgreementVersion(pendingPayment.Id, _account, _collectionPeriod);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.HasSignedMinVersion);
-            validationresult.AcademicPeriod.Should().Be(_academicPeriod);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(validationResult);
         }
         
