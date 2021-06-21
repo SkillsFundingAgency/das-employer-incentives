@@ -1,34 +1,28 @@
-﻿using System;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using System;
 using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
-{
+{   
     public class CollectionPeriod : ValueObject
     {
-        public CollectionPeriod(byte periodNumber, byte calendarMonth, short calendarYear, DateTime openDate, DateTime censusDate, short academicYear, bool active)
+        public CollectionPeriod(byte periodNumber, byte calendarMonth, short calendarYear, DateTime openDate, DateTime censusDate, short academicYear, bool active) 
         {
             PeriodNumber = periodNumber;
+            AcademicYear = academicYear;
             CalendarMonth = calendarMonth;
             CalendarYear = calendarYear;
             OpenDate = openDate;
             CensusDate = censusDate;
-            AcademicYear = academicYear;
             Active = active;
         }
 
-        public CollectionPeriod(byte periodNumber, short academicYear)
-        {
-            PeriodNumber = periodNumber;
-            AcademicYear = academicYear;
-        }
-
         public byte PeriodNumber { get; }
+        public short AcademicYear { get; }
         public byte CalendarMonth { get; }
         public short CalendarYear { get; }
         public DateTime OpenDate { get; }
         public DateTime CensusDate { get; }
-        public short AcademicYear { get; }
         public bool Active { get; private set; }
 
         public void SetActive(bool active)

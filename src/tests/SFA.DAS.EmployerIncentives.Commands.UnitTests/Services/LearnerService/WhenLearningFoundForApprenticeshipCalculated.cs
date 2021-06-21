@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,12 +38,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                      _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, dueDate.AddMonths(1))
-                    .With(pp => pp.PaymentYear, (short?)null)
+                    .With(pp => pp.AcademicPeriod, (AcademicPeriod)null)
                     .Create(),
                     _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, dueDate.AddMonths(2))
-                    .With(pp => pp.PaymentYear, (short?)null)
+                    .With(pp => pp.AcademicPeriod, (AcademicPeriod)null)
                     .Create(),
                     pendingPaymentModel
                     })

@@ -15,15 +15,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _collectionPeriods = collectionPeriods;
         }
 
-        public CollectionPeriod GetPeriod(DateTime dateTime)
+        public AcademicPeriod GetAcademicPeriod(DateTime dateTime)
         {
-            var period =
-                _collectionPeriods
-                .Where(d => d.OpenDate <= dateTime)
-                .OrderByDescending(d => d.OpenDate)
-                .FirstOrDefault();
+            var collectionPeriod = GetPeriod(dateTime);
 
-            return period;
+            return collectionPeriod == null ? null : new AcademicPeriod(collectionPeriod.PeriodNumber, collectionPeriod.AcademicYear);
         }
 
         public CollectionPeriod GetActivePeriod()
@@ -31,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return
                 _collectionPeriods
                 .Single(d => d.Active);
-        }
+        }        
 
         public CollectionPeriod GetNextPeriod(CollectionPeriod period)
         {
@@ -41,17 +37,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 .Single(d => d.CalendarMonth == nextPeriodDate.Month && d.CalendarYear == nextPeriodDate.Year);
         }
 
-        public CollectionPeriod GetPeriod(short collectionYear, byte periodNumber)
+        public CollectionPeriod GetPeriod(AcademicPeriod academicPeriod)
+        {
+            return academicPeriod == null
+                ? null
+                : _collectionPeriods
+                .Single(d => d.AcademicYear == academicPeriod.AcademicYear && d.PeriodNumber == academicPeriod.PeriodNumber);
+        }
+
+        public CollectionPeriod GetPeriod(short academicYear, byte periodNumber)
         {
             return 
                 _collectionPeriods
-                .Single(d => d.AcademicYear == collectionYear && d.PeriodNumber == periodNumber);
+                .Single(d => d.AcademicYear == academicYear && d.PeriodNumber == periodNumber);
         }
 
-        public void SetActive(CollectionPeriod collectionPeriod)
+        public void SetActive(AcademicPeriod academicPeriod)
         {
-            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.AcademicYear == collectionPeriod.AcademicYear 
-                                                                                 && x.PeriodNumber == collectionPeriod.PeriodNumber);
+            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.AcademicYear == academicPeriod.AcademicYear 
+                                                                                 && x.PeriodNumber == academicPeriod.PeriodNumber);
             if (collectionPeriodToActivate == null)
             {
                 return;
@@ -68,6 +72,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public ReadOnlyCollection<CollectionPeriod> GetAllPeriods()
         {
             return new ReadOnlyCollection<CollectionPeriod>(_collectionPeriods.ToList());
+        }
+
+        private CollectionPeriod GetPeriod(DateTime dateTime)
+        {
+            var period =
+                _collectionPeriods
+                .Where(d => d.OpenDate <= dateTime)
+                .OrderByDescending(d => d.OpenDate)
+                .FirstOrDefault();
+
+            return period;
         }
 
         protected override IEnumerable<object> GetAtomicValues()

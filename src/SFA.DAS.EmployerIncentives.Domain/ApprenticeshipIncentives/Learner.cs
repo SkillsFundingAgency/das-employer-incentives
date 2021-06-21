@@ -101,9 +101,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return numberOfDays;
         }
 
-        public int GetDaysInLearning(CollectionPeriod collectionPeriod)
+        public int GetDaysInLearning(AcademicPeriod academicPeriod)
         {
-            var daysInLearningForCollectionPeriod = Model.DaysInLearnings.FirstOrDefault(d => d.CollectionYear == collectionPeriod.AcademicYear && d.CollectionPeriodNumber == collectionPeriod.PeriodNumber);
+            var daysInLearningForCollectionPeriod = Model.DaysInLearnings.FirstOrDefault(d => d.AcademicPeriod == academicPeriod);
 
             return daysInLearningForCollectionPeriod != null ? daysInLearningForCollectionPeriod.NumberOfDays : 0;
         }
@@ -137,8 +137,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
             }
 
-            var daysInLearning = new DaysInLearning(collectionPeriod.PeriodNumber, collectionPeriod.AcademicYear, days);
-            var existing = Model.DaysInLearnings.SingleOrDefault(d => d.CollectionPeriodNumber == collectionPeriod.PeriodNumber && d.CollectionYear == collectionPeriod.AcademicYear);
+            var daysInLearning = new DaysInLearning(new AcademicPeriod(collectionPeriod.PeriodNumber, collectionPeriod.AcademicYear), days);
+            var existing = Model.DaysInLearnings.SingleOrDefault(d => d.AcademicPeriod.PeriodNumber == collectionPeriod.PeriodNumber && d.AcademicPeriod.AcademicYear == collectionPeriod.AcademicYear);
             if (existing != null)
             {
                 Model.DaysInLearnings.Remove(existing);

@@ -154,7 +154,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();
             account.AddLegalEntity(incentive.PendingPayments.First().Account.AccountLegalEntityId, LegalEntity.Create(legalEntityModel));
-            incentive.ValidatePendingPaymentBankDetails(incentive.PendingPayments.First().Id, account, _collectionPeriods.First());
+            incentive.ValidatePendingPaymentBankDetails(incentive.PendingPayments.First().Id, account, new AcademicPeriod(_collectionPeriods.First().PeriodNumber, _collectionPeriods.First().AcademicYear));
 
             return incentive;
         }

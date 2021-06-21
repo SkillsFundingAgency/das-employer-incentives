@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,8 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             _nextPendingPaymentDue = _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
-                    .With(pp => pp.PaymentYear, paymentYear)
-                    .With(pp => pp.PeriodNumber, _periodNumber)
+                    .With(pp => pp.AcademicPeriod, new AcademicPeriod(_periodNumber, paymentYear))
                     .With(pp => pp.DueDate, _dueDate)// earliest
                     .Create();
 
@@ -46,12 +46,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                     _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, _dueDate.AddMonths(1))
-                    .With(pp => pp.PaymentYear, (short?)null)
+                    .With(pp => pp.AcademicPeriod, (AcademicPeriod)null)
                     .Create(),
                     _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, _dueDate.AddMonths(2))
-                    .With(pp => pp.PaymentYear, (short?)null)
+                    .With(pp => pp.AcademicPeriod, (AcademicPeriod)null)
                     .Create(),
                     _nextPendingPaymentDue
                 })
@@ -129,25 +129,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             hasDataLock.Should().BeFalse();
         }
 
-        [Test]
-        public void Then_is_false_when_the_next_pending_payment_due_has_a_null_payment_year()
-        {
-            //Arrange            
-            _nextPendingPaymentDue.PaymentYear = null;
-            _incentive = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
-
-            //Act
-            var hasDataLock = _sut.HasProviderDataLocks(_incentive);
-
-            //Assert
-            hasDataLock.Should().BeFalse();
-        }
 
         [Test]
-        public void Then_is_false_when_the_next_pending_payment_due_has_a_null_periodNumber()
+        public void Then_is_false_when_the_next_pending_payment_due_has_a_null_Academic_period()
         {
             //Arrange            
-            _nextPendingPaymentDue.PeriodNumber = null;
+            _nextPendingPaymentDue.AcademicPeriod = null;
             _incentive = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
 
             //Act

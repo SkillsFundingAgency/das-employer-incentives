@@ -3,6 +3,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 
@@ -26,8 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel = _fixture
                 .Build<PendingPaymentModel>()
                 .With(p => p.DueDate, DateTime.Today)
-                .With(p => p.PeriodNumber, (byte)1)
-                .With(p => p.PaymentYear, (short)2021)
+                .With(p => p.AcademicPeriod, new AcademicPeriod((byte)1, (short)2021))
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Create();
 
@@ -37,8 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(p => p.Account, _sutModel.Account)
                 .With(p => p.ApprenticeshipIncentiveId, _sutModel.ApprenticeshipIncentiveId)
                 .With(p => p.Amount, _sutModel.Amount)
-                .With(p => p.PeriodNumber, _sutModel.PeriodNumber)
-                .With(p => p.PaymentYear, _sutModel.PaymentYear)
+                .With(p => p.AcademicPeriod, new AcademicPeriod(_sutModel.AcademicPeriod.PeriodNumber, _sutModel.AcademicPeriod.AcademicYear))
                 .Create();
 
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
@@ -78,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange            
 
-            _newPendingPaymentModel.PeriodNumber = (byte?)(_sut.PeriodNumber.Value + 1);
+            _newPendingPaymentModel.AcademicPeriod = new AcademicPeriod((byte)(_sut.AcademicPeriod.PeriodNumber + 1), _sut.AcademicPeriod.AcademicYear);
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
 
             // act
@@ -94,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange            
 
-            _newPendingPaymentModel.PaymentYear = (short?)(_sut.PaymentYear.Value + 1);
+            _newPendingPaymentModel.AcademicPeriod = new AcademicPeriod(_sut.AcademicPeriod.PeriodNumber, (short)(_sut.AcademicPeriod.AcademicYear +  1));
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
 
             // act

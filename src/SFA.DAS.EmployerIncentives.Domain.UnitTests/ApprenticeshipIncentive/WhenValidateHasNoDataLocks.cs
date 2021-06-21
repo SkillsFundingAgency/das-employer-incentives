@@ -15,10 +15,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
-        private CollectionPeriod _collectionPeriod;
+        private AcademicPeriod _academicPeriod;
         private Learner _learner;
         private short _collectionYear;
-        private byte _collectionMonth;
         private Fixture _fixture;
 
         [SetUp]
@@ -27,9 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture = new Fixture();
 
             _collectionYear = _fixture.Create<short>();
-            _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true);
+            _academicPeriod = new AcademicPeriod(1, _collectionYear);
 
             _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
 
@@ -68,13 +66,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SubmissionData.LearningData.SetHasDataLock(hasDataLock);
 
             // act
-            _sut.ValidateHasNoDataLocks(pendingPayment.Id, _learner, _collectionPeriod);
+            _sut.ValidateHasNoDataLocks(pendingPayment.Id, _learner, _academicPeriod);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
-            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+            validationresult.AcademicPeriod.Should().Be(_academicPeriod);
             validationresult.Result.Should().Be(!hasDataLock);
             validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
@@ -86,13 +84,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            _sut.ValidateHasNoDataLocks(pendingPayment.Id, null, _collectionPeriod);
+            _sut.ValidateHasNoDataLocks(pendingPayment.Id, null, _academicPeriod);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
-            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+            validationresult.AcademicPeriod.Should().Be(_academicPeriod);
             validationresult.Result.Should().Be(true);
             validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
@@ -106,13 +104,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetSubmissionData(null);
             
             // act
-            _sut.ValidateHasNoDataLocks(pendingPayment.Id, _learner, _collectionPeriod);
+            _sut.ValidateHasNoDataLocks(pendingPayment.Id, _learner, _academicPeriod);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
             var validationresult = pendingPayment.PendingPaymentValidationResults.First();
             validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
-            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+            validationresult.AcademicPeriod.Should().Be(_academicPeriod);
             validationresult.Result.Should().Be(true);
             validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }        

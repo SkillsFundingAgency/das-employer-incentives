@@ -77,13 +77,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             //Arrange
             var pendingPayment = _sutModel.PendingPaymentModels.First();
             pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
-            _sut.CreatePayment(pendingPayment.Id, collectionYear, collectionPeriod);
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.AcademicPeriod, new AcademicPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, new AcademicPeriod(collectionPeriod, collectionYear));
 
             pendingPayment = _sutModel.PendingPaymentModels.Last();
             pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
-            _sut.CreatePayment(pendingPayment.Id, collectionYear, collectionPeriod);
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.AcademicPeriod, new AcademicPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, new AcademicPeriod(collectionPeriod, collectionYear));
 
             var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
 
@@ -103,13 +103,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             //Arrange
             var pendingPayment = _sutModel.PendingPaymentModels.First();
             pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
-            _sut.CreatePayment(pendingPayment.Id, collectionYear, collectionPeriod);
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.AcademicPeriod, new AcademicPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, new AcademicPeriod(collectionPeriod, collectionYear));
             
             pendingPayment = _sutModel.PendingPaymentModels.Last();
             pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
-            _sut.CreatePayment(pendingPayment.Id, collectionYear, collectionPeriod);
+            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.AcademicPeriod, new AcademicPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            _sut.CreatePayment(pendingPayment.Id, new AcademicPeriod(collectionPeriod, collectionYear));
 
             _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
             _sutModel.PaymentModels.Last().PaidDate = DateTime.Now;

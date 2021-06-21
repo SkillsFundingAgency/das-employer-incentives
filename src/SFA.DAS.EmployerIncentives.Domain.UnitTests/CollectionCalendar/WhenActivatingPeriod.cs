@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_active_period_is_changed()
         {
             // Arrange / Act
-            var period = new CollectionPeriod(2, 2021);
+            var period = new AcademicPeriod(2, 2021);
             _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();
@@ -54,14 +54,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeFalse();
             periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeTrue();
             periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
-            periods.Count(x => x.Active == true).Should().Be(1);
+            periods.Count(x => x.Active).Should().Be(1);
         }
 
         [Test]
         public void Then_the_active_period_is_not_changed_when_the_period_and_year_not_matched()
         {
-            // Arrange / Act
-            var period = new CollectionPeriod(4, 2021);
+            // Arrange / Act            
+            var period = new AcademicPeriod(4, 2021);
             _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();
@@ -69,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeTrue();
             periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeFalse();
             periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
-            periods.Count(x => x.Active == true).Should().Be(1);
+            periods.Count(x => x.Active).Should().Be(1);
         }      
     }
 }

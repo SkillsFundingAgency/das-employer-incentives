@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public Guid Id { get; set; }
         public string Step { get; set; }
         public bool Result { get; set; }
-        public CollectionPeriod CollectionPeriod { get; set; }
+        public AcademicPeriod AcademicPeriod { get; set; }
         public DateTime CreatedDateUtc { get; set; }
     }
 }

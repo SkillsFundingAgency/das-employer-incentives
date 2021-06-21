@@ -356,7 +356,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                     new List<PeriodDto>{
                                         _fixture
                                         .Build<PeriodDto>()
-                                        .With(p => p.Period, pendingPaymentModel.PeriodNumber)
+                                        .With(p => p.Period, pendingPaymentModel.AcademicPeriod.PeriodNumber)
                                         .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
                                         .Create()
                                     })

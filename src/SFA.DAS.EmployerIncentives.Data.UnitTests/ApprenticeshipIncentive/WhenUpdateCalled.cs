@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             expected.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
             expected.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
-            expected.Phase = new Domain.ValueObjects.IncentivePhase(Enums.Phase.Phase1);
+            expected.Phase = new IncentivePhase(Enums.Phase.Phase1);
 
             var pendingPayments = _fixture.Build<PendingPaymentModel>().With(
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
@@ -84,12 +85,13 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var savedPendingPayments = _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
             savedPendingPayments.Should().BeEquivalentTo(pendingPayments, opt => opt
                 .Excluding(x => x.Account)
-                .Excluding(x => x.PendingPaymentValidationResultModels));
+                .Excluding(x => x.PendingPaymentValidationResultModels)
+                .Excluding(x => x.AcademicPeriod));
 
             var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
                 x.PendingPaymentId == expected.PendingPaymentModels.First().Id);
             savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
-                .Excluding(x => x.CollectionPeriod)
+                .Excluding(x => x.AcademicPeriod)
             );
 
             _dbContext.PendingPayments.Count().Should().Be(expected.PendingPaymentModels.Count);
@@ -98,9 +100,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             foreach (var result in savedValidationResults)
             {
                 result.PeriodNumber.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
+                    .Be(validationResults.Single(x => x.Id == result.Id).AcademicPeriod.PeriodNumber);
                 result.PaymentYear.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
+                    .Be(validationResults.Single(x => x.Id == result.Id).AcademicPeriod.AcademicYear);
                 result.CreatedDateUtc.Should().BeCloseTo(validationResults.Single(x => x.Id == result.Id).CreatedDateUtc, TimeSpan.FromMinutes(1));
             }
 
@@ -183,27 +185,23 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             expected.PaymentModels.First().Amount -= 250;
             var newPendingPayment = _fixture.Build<PendingPaymentModel>()
                 .With(x => x.ApprenticeshipIncentiveId, expected.Id)
-                .With(x => x.PaymentYear, _collectionPeriod.PeriodNumber)
-                .With(x => x.PeriodNumber, _collectionPeriod.PeriodNumber)
+                .With(x => x.AcademicPeriod, new AcademicPeriod(_collectionPeriod.PeriodNumber, Convert.ToInt16(_collectionPeriod.AcademicYear)))
                 .Without(x => x.PendingPaymentValidationResultModels)
                 .Create();
 
-            var cp = new CollectionPeriod(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarMonth,
-                _collectionPeriod.CalendarYear,
-                _collectionPeriod.EIScheduledOpenDateUTC, _collectionPeriod.CensusDate,
-                Convert.ToInt16(_collectionPeriod.AcademicYear), true);
+            var cp = new AcademicPeriod(_collectionPeriod.PeriodNumber, Convert.ToInt16(_collectionPeriod.AcademicYear));
 
             expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels
                 .Remove(expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels.First());
             expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels.Add(
                 _fixture.Build<PendingPaymentValidationResultModel>()
-                    .With(x => x.CollectionPeriod, cp)
+                    .With(x => x.AcademicPeriod, cp)
                     .Create()
             );
 
             newPendingPayment.PendingPaymentValidationResultModels.Add(
                 _fixture.Build<PendingPaymentValidationResultModel>()
-                    .With(x => x.CollectionPeriod, cp)
+                    .With(x => x.AcademicPeriod, cp)
                     .Create()
             );
 

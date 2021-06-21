@@ -1,25 +1,23 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class DaysInLearning : ValueObject
     {
-        public DaysInLearning(byte collectionPeriodNumber, short collectionYear, int numberOfDays)
+        public DaysInLearning(AcademicPeriod academicPeriod, int numberOfDays)
         {
-            CollectionPeriodNumber = collectionPeriodNumber;
-            CollectionYear = collectionYear;
+            AcademicPeriod = academicPeriod;
             NumberOfDays = numberOfDays;
         }
 
-        public byte CollectionPeriodNumber { get; }
-        public short CollectionYear { get; }
+        public AcademicPeriod AcademicPeriod { get; }
         public int NumberOfDays { get; }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
-            yield return CollectionPeriodNumber;
-            yield return CollectionYear;
+            yield return AcademicPeriod;
             yield return NumberOfDays;
         }
     }

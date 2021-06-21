@@ -27,8 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Domain.ValueObjects.CollectionPeriod _activePeriod;
 
-        private Fixture _fixture;
-     
+        private Fixture _fixture;           
+
         [SetUp]
         public void Arrange()
         {
@@ -37,14 +37,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
-            _activePeriod = new Domain.ValueObjects.CollectionPeriod(2, 2020);
+            _activePeriod = CollectionPeriod(2, 2020);
             _activePeriod.SetActive(true);
 
             var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, 2020),
+                CollectionPeriod(1, 2020),
                 _activePeriod,
-                new Domain.ValueObjects.CollectionPeriod(3, 2020)
+                CollectionPeriod(3, 2020)
             };
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
 
@@ -349,6 +349,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRepository
                 .Verify(m => m.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()),
                 Times.Never);
+        }
+
+        private Domain.ValueObjects.CollectionPeriod CollectionPeriod(byte periodNumber, short academicYear)
+        {
+            return new Domain.ValueObjects.CollectionPeriod(periodNumber, 1, academicYear, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), academicYear, false);
         }
 
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive ApprenticeshipIncentiveCreator()

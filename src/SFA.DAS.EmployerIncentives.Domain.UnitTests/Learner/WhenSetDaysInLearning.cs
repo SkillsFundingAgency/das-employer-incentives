@@ -59,8 +59,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
 
             // assert            
             var daysInLearning = _sut.GetModel().DaysInLearnings.Single();
-            daysInLearning.CollectionYear.Should().Be(_collectionPeriod.AcademicYear);
-            daysInLearning.CollectionPeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
+            daysInLearning.AcademicPeriod.AcademicYear.Should().Be(_collectionPeriod.AcademicYear);
+            daysInLearning.AcademicPeriod.PeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
             daysInLearning.NumberOfDays.Should().Be(expectedDays);
         }
 
@@ -89,8 +89,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
 
             // assert            
             var daysInLearning = _sut.GetModel().DaysInLearnings.Single();
-            daysInLearning.CollectionYear.Should().Be(_collectionPeriod.AcademicYear);
-            daysInLearning.CollectionPeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
+            daysInLearning.AcademicPeriod.AcademicYear.Should().Be(_collectionPeriod.AcademicYear);
+            daysInLearning.AcademicPeriod.PeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
             daysInLearning.NumberOfDays.Should().Be(expectedDays);
         }
 
@@ -119,8 +119,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
 
             // assert            
             var daysInLearning = _sut.GetModel().DaysInLearnings.Single();
-            daysInLearning.CollectionYear.Should().Be(_collectionPeriod.AcademicYear);
-            daysInLearning.CollectionPeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
+            daysInLearning.AcademicPeriod.AcademicYear.Should().Be(_collectionPeriod.AcademicYear);
+            daysInLearning.AcademicPeriod.PeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
             daysInLearning.NumberOfDays.Should().Be(expectedDays);
         }
 
@@ -142,8 +142,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
 
             // assert            
             var daysInLearning = _sut.GetModel().DaysInLearnings.Single();
-            daysInLearning.CollectionYear.Should().Be(_collectionPeriod.AcademicYear);
-            daysInLearning.CollectionPeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
+            daysInLearning.AcademicPeriod.AcademicYear.Should().Be(_collectionPeriod.AcademicYear);
+            daysInLearning.AcademicPeriod.PeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
             daysInLearning.NumberOfDays.Should().Be(expectedDays);
         }
 
@@ -151,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
         public void Then_the_existing_daya_in_learning_is_updated_for_the_collection_period()
         {
             // arrange             
-            _sutModel.DaysInLearnings.Add(new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear, 5));
+            _sutModel.DaysInLearnings.Add(new DaysInLearning(new AcademicPeriod(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear), 5));
 
             int expectedDays = 18 + 16 + 13;
             _sut = Sut(_sutModel);
@@ -161,8 +161,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
 
             // assert            
             var daysInLearning = _sut.GetModel().DaysInLearnings.Single();
-            daysInLearning.CollectionYear.Should().Be(_collectionPeriod.AcademicYear);
-            daysInLearning.CollectionPeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
+            daysInLearning.AcademicPeriod.AcademicYear.Should().Be(_collectionPeriod.AcademicYear);
+            daysInLearning.AcademicPeriod.PeriodNumber.Should().Be(_collectionPeriod.PeriodNumber);
             daysInLearning.NumberOfDays.Should().Be(expectedDays);
         }
 

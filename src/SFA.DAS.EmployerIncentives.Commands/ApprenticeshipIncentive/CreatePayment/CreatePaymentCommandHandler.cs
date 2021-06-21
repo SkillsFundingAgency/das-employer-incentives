@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePaym
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
 
-            incentive.CreatePayment(command.PendingPaymentId, command.CollectionYear, command.CollectionPeriod);
+            incentive.CreatePayment(command.PendingPaymentId, new Domain.ValueObjects.AcademicPeriod(command.CollectionPeriod, command.CollectionYear));
 
             await _domainRepository.Save(incentive);
         }

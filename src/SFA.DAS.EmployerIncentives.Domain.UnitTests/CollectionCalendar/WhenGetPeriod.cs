@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             var date = testDate.AddDays(1);
 
             // Act
-            var period = _sut.GetPeriod(date);
+            var period = _sut.GetPeriod(_sut.GetAcademicPeriod(date));
 
             // Assert
             period.PeriodNumber.Should().Be(2);
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             var date = testDate.AddMonths(-13).AddDays(-1);
 
             // Act
-            var period = _sut.GetPeriod(date);
+            var period = _sut.GetPeriod(_sut.GetAcademicPeriod(date));
 
             // Assert
             period.Should().BeNull();
