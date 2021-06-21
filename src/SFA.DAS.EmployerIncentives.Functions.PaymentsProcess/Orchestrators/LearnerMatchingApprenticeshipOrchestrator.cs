@@ -24,14 +24,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             if (!context.IsReplaying)
                 _logger.LogInformation("LearnerMatchingApprenticeshipOrchestrator Started for Apprenticeship: {incentive}", incentive);
 
+            await SetSuccessfulLearnerMatch(context, incentive, false);
+
             await PerformLearnerMatch(context, incentive);
 
             await PerformChangeOfCircumstances(context, incentive);
 
             await CalculateDaysInLearning(context, incentive);
 
+            await SetSuccessfulLearnerMatch(context, incentive, true);
+
             if (!context.IsReplaying)
                 _logger.LogInformation("LearnerMatchingApprenticeshipOrchestrator Completed for Apprenticeship: {incentive}", incentive);
+        }
+
+        private async Task SetSuccessfulLearnerMatch(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive, bool succeeded)
+        {
+            await context.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
+                new SetSuccessfulLearnerMatchInput
+                {
+                    ApprenticeshipIncentiveId = incentive.Id,
+                    Uln = incentive.ULN,
+                    Succeeded = succeeded
+                });
         }
 
         private static async Task CalculateDaysInLearning(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive)

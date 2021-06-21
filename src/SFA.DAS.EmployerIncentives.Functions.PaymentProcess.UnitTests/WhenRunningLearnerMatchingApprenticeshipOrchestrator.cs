@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         }
 
         [Test]
-        public async Task Then_PCalculateDaysInLearning_activity_is_called()
+        public async Task Then_CalculateDaysInLearning_activity_is_called()
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
             
@@ -59,6 +59,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                     It.Is<LearnerChangeOfCircumstanceInput>(input =>
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
                         input.Uln == _expectedInput.ULN)), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_SetSuccessfulLearnerMatch_activity_is_called()
+        {
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(
+                x => x.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator),
+                    It.Is<SetSuccessfulLearnerMatchInput>(input =>
+                        input.ApprenticeshipIncentiveId == _expectedInput.Id &&
+                        input.Uln == _expectedInput.ULN &&
+                        input.Succeeded == false
+                        )), Times.Once);
+            _mockOrchestrationContext.Verify(
+                x => x.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator),
+                    It.Is<SetSuccessfulLearnerMatchInput>(input =>
+                        input.ApprenticeshipIncentiveId == _expectedInput.Id &&
+                        input.Uln == _expectedInput.ULN &&
+                        input.Succeeded
+                        )), Times.Once);
         }
     }
 }

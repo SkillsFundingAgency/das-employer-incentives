@@ -35,11 +35,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
             return jobs;
         }
 
-        public static async Task<IJobHost> Start(this IJobHost jobs, OrchestrationStarterInfo starterInfo)
+        public static async Task<IJobHost> Start(this IJobHost jobs, OrchestrationStarterInfo starterInfo,
+            bool throwIfFailed)
         {
             await jobs.CallAsync(starterInfo.StarterName, starterInfo.StarterArgs);
 
-            await jobs.WaitFor(starterInfo.OrchestrationName, starterInfo.Timeout, starterInfo.ExpectedCustomStatus).ThrowIfFailed();
+            if (throwIfFailed)
+            {
+                await jobs.WaitFor(starterInfo.OrchestrationName, starterInfo.Timeout, starterInfo.ExpectedCustomStatus).ThrowIfFailed();
+            }
+            else
+            {
+                await jobs.WaitFor(starterInfo.OrchestrationName, starterInfo.Timeout, starterInfo.ExpectedCustomStatus);
+            }
 
             return jobs;
         }

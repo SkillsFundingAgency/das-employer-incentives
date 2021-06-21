@@ -54,6 +54,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -171,6 +172,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateVendorRegistrationCaseStatusForAccountCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendClawbacksCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<SetSuccessfulLearnerMatchCommand>), new NullValidator())
                 ;
 
             return serviceCollection;

@@ -126,9 +126,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
-        public Task Start(OrchestrationStarterInfo starter)
+        public Task Start(OrchestrationStarterInfo starter, bool throwIfFailed = true)
         {
-            return Jobs.Start(starter);
+            return Jobs.Start(starter, throwIfFailed);
         }
 
         public async Task<ObjectResult> CallEndpoint(EndpointInfo endpoint)
