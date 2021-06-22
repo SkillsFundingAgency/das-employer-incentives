@@ -67,18 +67,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             _mockOrchestrationContext.Verify(
-                x => x.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator),
+                x => x.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
                     It.Is<SetSuccessfulLearnerMatchInput>(input =>
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
                         input.Uln == _expectedInput.ULN &&
                         input.Succeeded == false
                         )), Times.Once);
+
             _mockOrchestrationContext.Verify(
-                x => x.CallSubOrchestratorAsync(nameof(ChangeOfCircumstanceOrchestrator),
+                x => x.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
                     It.Is<SetSuccessfulLearnerMatchInput>(input =>
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
                         input.Uln == _expectedInput.ULN &&
-                        input.Succeeded
+                        input.Succeeded == true
                         )), Times.Once);
         }
     }

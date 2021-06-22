@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     .Create());
 
             _mockIncentiveDomainRepository.Setup(x => x.Find(_incentive.Id)).ReturnsAsync(_incentive);
-            _mockLearnerDomainRepository.Setup(m => m.Get(_incentive)).ReturnsAsync(_learner);
+            _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
 
             _sut = new SetSuccessfulLearnerMatchCommandHandler(
                 _mockIncentiveDomainRepository.Object,

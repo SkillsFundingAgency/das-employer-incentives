@@ -24,7 +24,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccess
 
             if (incentive == null) return;
 
-            var learner = await _learnerDomainRepository.Get(incentive);
+            var learner = await _learnerDomainRepository.GetOrCreate(incentive);
+
             learner.SetSuccessfulLearnerMatch(command.Succeeded);
 
             await _learnerDomainRepository.Save(learner);

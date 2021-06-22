@@ -73,6 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Build<Learner>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive1.UKPRN)
                 .With(s => s.ULN, _apprenticeshipIncentive1.ULN)
+                .With(s => s.StartDate, _apprenticeshipIncentive1.StartDate)
                 .With(s => s.ApprenticeshipId, _apprenticeshipIncentive1.ApprenticeshipId)
                 .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive1.Id)
                 .With(s => s.HasDataLock, false)
@@ -89,8 +90,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         .Without(p => p.EndDate)
                             .Create()})
                 .Create();
-                        
-           _learner2 = _fixture
+
+            _learner2 = _fixture
                 .Build<Learner>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive2.UKPRN)
                 .With(s => s.ULN, _apprenticeshipIncentive2.ULN)
@@ -112,7 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
         }
 
-        [Given(@"existing learner data successfully updated in the past")]
+        [Given(@"existing apprenticeship incentives")]
         public async Task GivenExistingLearnerDataSuccessfullyUpdatedInThePast()
         {
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
@@ -122,49 +123,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await dbConnection.InsertAsync(_learner1);
             await dbConnection.InsertAsync(_learner2);
         }
-        
+
         [Given(@"the learner match process has been triggered")]
         public void GivenTheLearnerMatchProcessHasBeenTriggered()
         {
-            // ApprenticeshipId change
-            var learner1Data = _fixture
-                .Build<LearnerSubmissionDto>()
-                .With(s => s.Ukprn, _apprenticeshipIncentive1.UKPRN)
-                .With(s => s.Uln, _apprenticeshipIncentive1.ULN)
-                .With(l => l.Training, new List<TrainingDto>
-                    {
-                        _fixture
-                            .Build<TrainingDto>()
-                            .With(p => p.Reference, "ZPROG001")
-                            .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>()
-                                {
-                                    _fixture.Build<PriceEpisodeDto>()
-                                        .With(pe => pe.Periods, new List<PeriodDto>()
-                                        {
-                                            _fixture.Build<PeriodDto>()
-                                                .With(period => period.ApprenticeshipId,
-                                                    _apprenticeshipIncentive1.ApprenticeshipId - 1)
-                                                .With(period => period.IsPayable, true)
-                                                .With(period => period.Period, _periodNumber)
-                                                .Create()
-                                        })
-                                        .With(pe => pe.StartDate, _startDate)
-                                        .With(pe => pe.EndDate, (DateTime?) null)
-                                        .Create()
-                                }
-                            )
-                            .Create()
-                    }
-                )
-                .Create();
-
-            SetupMockLearnerMatchResponse(learner1Data);
+            SetupMockLearnerMatchErrorResponse(_apprenticeshipIncentive1.UKPRN.Value, _apprenticeshipIncentive1.ULN);
 
             // no change
             var learner2Data = _fixture
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive2.UKPRN)
                 .With(s => s.Uln, _apprenticeshipIncentive2.ULN)
+                .With(s => s.StartDate, _apprenticeshipIncentive2.StartDate)
                 .With(l => l.Training, new List<TrainingDto>
                     {
                         _fixture
@@ -206,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenARecordOfLearnerMatchFailureIsCreatedForTheLearner()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var learner = dbConnection.GetAll<Learner>().Single(l => l.Id == _learner1.Id);
+            var learner = dbConnection.GetAll<Learner>().Single(l => l.ApprenticeshipIncentiveId == _apprenticeshipIncentive1.Id);
             learner.SuccessfulLearnerMatch.Should().BeFalse();
         }
         
@@ -214,7 +184,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenTheLearnerMatchProcessIsContinuedForAllRemainingLearners()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var learner = dbConnection.GetAll<Learner>().Single(l => l.Id == _learner2.Id);
+            var learner = dbConnection.GetAll<Learner>().Single(l => l.ApprenticeshipIncentiveId == _apprenticeshipIncentive2.Id);
             learner.UpdatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
         }
         
@@ -222,7 +192,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenARecordOfLearnerMatchSuccessIsCreatedForAllRemainingLearners()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var learner = dbConnection.GetAll<Learner>().Single(l => l.Id == _learner2.Id);
+            var learner = dbConnection.GetAll<Learner>().Single(l => l.ApprenticeshipIncentiveId == _apprenticeshipIncentive2.Id);
             learner.SuccessfulLearnerMatch.Should().BeTrue();
         }
 
@@ -239,6 +209,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .WithStatusCode(HttpStatusCode.OK)
                     .WithHeader("Content-Type", "application/json")
                     .WithBodyAsJson(learnerMatchApiData));
+        }
+
+        private void SetupMockLearnerMatchErrorResponse(long ukprn, long uln)
+        {
+            _testContext.LearnerMatchApi.MockServer
+                .Given(
+                    Request
+                        .Create()
+                        .WithPath($"/api/v1.0/{ukprn}/{uln}")
+                        .UsingGet()
+                )
+                .RespondWith(Response.Create()
+                    .WithStatusCode(HttpStatusCode.BadRequest));
         }
 
         private async Task StartLearnerMatching()

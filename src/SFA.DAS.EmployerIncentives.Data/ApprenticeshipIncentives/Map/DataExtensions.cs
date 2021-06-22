@@ -300,8 +300,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             learner.HasDataLock = model.SubmissionData.LearningData.HasDataLock;
             learner.InLearning = model.SubmissionData.LearningData.IsInlearning;
             learner.RawJSON = model.SubmissionData.RawJson;
-            learner.LearningStoppedDate = model.SubmissionData.LearningData.StoppedStatus.DateStopped;
-            learner.LearningResumedDate = model.SubmissionData.LearningData.StoppedStatus.DateResumed;
+            learner.LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped;
+            learner.LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed;
             learner.SuccessfulLearnerMatch = model.SuccessfulLearnerMatch;
             return learner;
         }

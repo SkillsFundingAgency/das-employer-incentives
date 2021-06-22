@@ -3,8 +3,8 @@ Feature: LearnerMatchFailed
 	When the Learner Match process fails for a given learner
 	Then the the fact of failure is recorded and the Learner Match process is not stopped
 
-Scenario: Learner Match fails due to a change in Apprenticeship Id
-	Given existing learner data successfully updated in the past
+Scenario: Learner Match fails for one of the learners
+	Given existing apprenticeship incentives
 	And the learner match process has been triggered
 	When an exception occurs for a learner
 	Then a record of learner match failure is created for the learner
