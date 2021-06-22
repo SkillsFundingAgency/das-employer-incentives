@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
-                BankDetailsStatus = MapBankDetailsStatus(model)
+                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status
             };
         }
 
@@ -198,38 +198,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             }).ToList();
         }
 
-        private static bool HasVendorId(Models.Account model)
-        {
-            return !string.IsNullOrEmpty(model.VrfVendorId) && model.VrfVendorId != "000000";
-        }
-
-        private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
-        {
-            if (HasVendorId(model))
-            {
-                return BankDetailsStatus.Completed;
-            }
-
-            if (string.IsNullOrWhiteSpace(model.VrfCaseStatus))
-            {
-                return BankDetailsStatus.NotSupplied;
-            }
-
-            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
-                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
-                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return BankDetailsStatus.Rejected;
-            }
-
-            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return BankDetailsStatus.Completed;
-            }
-
-            return BankDetailsStatus.InProgress;
-        }
-      
         internal static IncentiveApplicationStatusAudit Map(this IncentiveApplicationAudit entity)
         {
             return new IncentiveApplicationStatusAudit
