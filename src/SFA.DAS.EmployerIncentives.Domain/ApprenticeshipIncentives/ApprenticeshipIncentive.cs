@@ -128,7 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             RemoveUnpaidPaymentIfExists(existingPendingPayment);
-            if (!existingPendingPayment.Equals(pendingPayment))
+            if (!existingPendingPayment.EquivalentTo(pendingPayment))
             {
                 if(!existingPendingPayment.RequiresNewPaymentAfterBreakInLearning(Model.BreakInLearnings))
                 {
