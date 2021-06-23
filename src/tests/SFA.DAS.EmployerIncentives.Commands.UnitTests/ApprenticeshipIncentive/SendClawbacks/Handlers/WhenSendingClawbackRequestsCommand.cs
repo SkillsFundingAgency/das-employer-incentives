@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _mockAccountDataRepository.Verify(x =>
-                x.UpdateClawbackDateForClawbackIds(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
+                x.RecordClawbacksSent(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
                     _command.AccountLegalEntityId, _command.ClawbackDate));
         }
 
@@ -102,11 +102,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _mockAccountDataRepository.Verify(x =>
-                x.UpdateClawbackDateForClawbackIds(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
+                x.RecordClawbacksSent(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
                     _command.AccountLegalEntityId, _command.ClawbackDate));
 
             _mockAccountDataRepository.Verify(x =>
-                x.UpdateClawbackDateForClawbackIds(It.Is<List<Guid>>(l => l.Count == _unsentClawbacks.Count),
+                x.RecordClawbacksSent(It.Is<List<Guid>>(l => l.Count == _unsentClawbacks.Count),
                     _command.AccountLegalEntityId, _command.ClawbackDate));
         }
 

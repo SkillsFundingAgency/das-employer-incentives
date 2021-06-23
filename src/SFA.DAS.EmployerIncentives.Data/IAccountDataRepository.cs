@@ -13,8 +13,8 @@ namespace SFA.DAS.EmployerIncentives.Data
         Task<AccountModel> Find(long accountId);
         Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId);
         Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus);
-        Task UpdatePaidDateForPaymentIds(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate);
-        Task UpdateClawbackDateForClawbackIds(List<Guid> clawbackIds, long accountLegalEntityId, DateTime clawbackDate);
+        Task RecordPaymentsSent(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate);
+        Task RecordClawbacksSent(List<Guid> clawbackIds, long accountLegalEntityId, DateTime clawbackDate);
         Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime();
     }
 }

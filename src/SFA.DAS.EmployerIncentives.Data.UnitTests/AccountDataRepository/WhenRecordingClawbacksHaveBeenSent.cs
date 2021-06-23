@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
-    public class WhenUpdateClawbackDateForClawbackIds
+    public class WhenRecordingClawbacksHaveBeenSent
     {
         private Data.AccountDataRepository _sut;
         private Fixture _fixture;
@@ -39,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
+            var account = new Models.Account { AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>() };
             var clawbacks = _fixture
                 .Build<ClawbackPayment>()
                 .Without(p => p.DateClawbackSent)
@@ -46,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
                 .CreateMany(5).ToList();
             clawbacks.First().AccountLegalEntityId = accountLegalEntityId + 1;
 
+            await _dbContext.AddAsync(account);
             await _dbContext.AddRangeAsync(clawbacks);
             await _dbContext.SaveChangesAsync();
 
@@ -53,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             var expected = _fixture.Create<DateTime>();
 
             // Act
-            await _sut.UpdateClawbackDateForClawbackIds(clawbacksIds, accountLegalEntityId, expected);
+            await _sut.RecordClawbacksSent(clawbacksIds, accountLegalEntityId, expected);
 
             // Assert
             var matching = _dbContext.ClawbackPayments.Where(p =>
@@ -71,6 +73,40 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             {
                 clawback.DateClawbackSent.Should().BeNull();
             }
+        }
+
+        [Test]
+        public async Task Then_the_vendor_id_is_recorded_with_the_clawback()
+        {
+            // Arrange
+            var accountLegalEntityId = _fixture.Create<long>();
+            var account = new Models.Account {AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>()};
+            var clawbacks = _fixture
+                .Build<ClawbackPayment>()
+                .Without(p => p.DateClawbackSent)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .CreateMany(5).ToList();
+            clawbacks.First().AccountLegalEntityId = accountLegalEntityId + 1;
+
+            await _dbContext.AddAsync(account);
+            await _dbContext.AddRangeAsync(clawbacks);
+            await _dbContext.SaveChangesAsync();
+
+            var clawbacksIds = clawbacks.Take(4).Select(p => p.Id).ToList();
+            var expected = _fixture.Create<DateTime>();
+
+            // Act
+            await _sut.RecordClawbacksSent(clawbacksIds, accountLegalEntityId, expected);
+
+            // Assert
+            var matching = _dbContext.ClawbackPayments.Where(p =>
+                clawbacksIds.Contains(p.Id) && p.AccountLegalEntityId == accountLegalEntityId);
+            matching.Count().Should().Be(3);
+            foreach (var clawback in matching)
+            {
+                clawback.VrfVendorId.Should().Be(account.VrfVendorId);
+            }
+
         }
     }
 }

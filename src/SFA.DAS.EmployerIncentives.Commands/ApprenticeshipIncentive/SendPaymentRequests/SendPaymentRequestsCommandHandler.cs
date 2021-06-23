@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
 
             await _businessCentralFinancePaymentsService.SendPaymentRequests(paymentsToSend);
 
-            await _accountRepository.UpdatePaidDateForPaymentIds(paymentsToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, paidDate);
+            await _accountRepository.RecordPaymentsSent(paymentsToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, paidDate);
 
             if (payments.Count > paymentsToSend.Count)
             {

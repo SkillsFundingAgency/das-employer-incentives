@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawba
 
             await _businessCentralFinancePaymentsService.SendPaymentRequests(clawbacksToSend);
 
-            await _accountRepository.UpdateClawbackDateForClawbackIds(clawbacksToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, clawbackDate);
+            await _accountRepository.RecordClawbacksSent(clawbacksToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, clawbackDate);
 
             if (clawbacks.Count > clawbacksToSend.Count)
             {

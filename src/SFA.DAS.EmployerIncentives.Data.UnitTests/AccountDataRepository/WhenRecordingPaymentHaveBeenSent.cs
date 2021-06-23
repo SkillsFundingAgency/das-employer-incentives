@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
-    public class WhenUpdatePaidDateForPaymentIds
+    public class WhenRecordingPaymentHaveBeenSent
     {
         private Data.AccountDataRepository _sut;
         private Fixture _fixture;
@@ -39,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
+            var account = new Models.Account { AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>() };
             var payments = _fixture
                 .Build<Payment>()
                 .Without(p => p.PaidDate)
@@ -46,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
                 .CreateMany(5).ToList();
             payments.First().AccountLegalEntityId = accountLegalEntityId + 1;
 
+            await _dbContext.AddAsync(account);
             await _dbContext.AddRangeAsync(payments);
             await _dbContext.SaveChangesAsync();
 
@@ -53,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             var expected = _fixture.Create<DateTime>();
 
             // Act
-            await _sut.UpdatePaidDateForPaymentIds(paymentIds, accountLegalEntityId, expected);
+            await _sut.RecordPaymentsSent(paymentIds, accountLegalEntityId, expected);
 
             // Assert
             var matching = _dbContext.Payments.Where(p =>
@@ -70,6 +72,39 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             foreach (var payment in nonMatching)
             {
                 payment.PaidDate.Should().BeNull();
+            }
+        }
+
+        [Test]
+        public async Task Then_the_vendor_id_is_recorded_with_the_updated_payment()
+        {
+            // Arrange
+            var accountLegalEntityId = _fixture.Create<long>();
+            var account = new Models.Account {AccountLegalEntityId = accountLegalEntityId, VrfVendorId = _fixture.Create<string>()};
+            var payments = _fixture
+                .Build<Payment>()
+                .Without(p => p.PaidDate)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .CreateMany(5).ToList();
+            payments.First().AccountLegalEntityId = accountLegalEntityId + 1;
+
+            await _dbContext.AddAsync(account);
+            await _dbContext.AddRangeAsync(payments);
+            await _dbContext.SaveChangesAsync();
+
+            var paymentIds = payments.Take(4).Select(p => p.Id).ToList();
+            var expected = _fixture.Create<DateTime>();
+
+            // Act
+            await _sut.RecordPaymentsSent(paymentIds, accountLegalEntityId, expected);
+
+            // Assert
+            var matching = _dbContext.Payments.Where(p =>
+                paymentIds.Contains(p.Id) && p.AccountLegalEntityId == accountLegalEntityId);
+            matching.Count().Should().Be(3);
+            foreach (var payment in matching)
+            {
+                payment.VrfVendorId.Should().Be(account.VrfVendorId);
             }
         }
     }

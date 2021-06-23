@@ -1,4 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
@@ -86,6 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.PaymentPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(2);
             results.Any(x => !x.PaidDate.HasValue).Should().BeFalse();
+            results.Any(x => String.IsNullOrEmpty(x.VrfVendorId)).Should().BeFalse();
         }
 
         [Then(@"the clawbacks are sent to Business Central")]
@@ -100,6 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.CollectionPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(1);
             results.Any(x => !x.DateClawbackSent.HasValue).Should().BeFalse();
+            results.Any(x => String.IsNullOrEmpty(x.VrfVendorId)).Should().BeFalse();
         }
 
         [Then(@"the payments are not sent to Business Central")]
