@@ -489,6 +489,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
 
+            if (legalEntity == null)
+            {
+                pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasBankDetails, false));
+                return;
+            }
+
             var isValid = !string.IsNullOrEmpty(legalEntity.VrfVendorId);
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasBankDetails, isValid));

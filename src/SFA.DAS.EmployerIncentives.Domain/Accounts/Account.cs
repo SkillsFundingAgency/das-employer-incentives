@@ -39,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             if (legalEntityModel != null)
             {
                 Model.LegalEntityModels.Remove(legalEntityModel);
+                AddEvent(new AccountLegalEntityRemoved { AccountLegalEntityId = accountLegalEntityId });
             }
         }
 
