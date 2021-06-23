@@ -12,6 +12,7 @@
 	[CollectionPeriodYear] SMALLINT NULL,
 	[SubNominalCode] INT NOT NULL,
 	[PaymentId] UNIQUEIDENTIFIER NOT NULL,
+	[VrfVendorId] NVARCHAR(100) NULL,
     CONSTRAINT FK_ClawbackPayment_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].ApprenticeshipIncentive(Id),
 	CONSTRAINT FK_ClawbackPayment_PendingPayment FOREIGN KEY (PendingPaymentId) REFERENCES [incentives].PendingPayment(Id),
 	CONSTRAINT FK_ClawbackPayment_Payment FOREIGN KEY (PaymentId) REFERENCES [incentives].Payment(Id)

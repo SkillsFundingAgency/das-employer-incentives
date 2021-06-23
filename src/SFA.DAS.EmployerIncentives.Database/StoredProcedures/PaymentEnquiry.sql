@@ -33,7 +33,7 @@ AS
 			p.PaymentPeriod,
 			p.PaymentYear, 
 			p.PaidDate,
-			VrfVendorId,
+			a.VrfVendorId,
 			HashedLegalEntityId
 	from [incentives].[Learner] l
 	left join (select id, AccountLegalEntityId, case when PausePayments = 1 then 1 else 0 end as PausedPayments from [incentives].[ApprenticeshipIncentive]) ai on ai.Id = l.ApprenticeshipIncentiveId
@@ -62,7 +62,7 @@ AS
 			p.PaymentPeriod,
 			p.PaymentYear, 
 			p.PaidDate, 
-			VrfVendorId, 
+			a.VrfVendorId, 
 			HashedLegalEntityId
 	order by uln, pp.PaymentYear,pp.PeriodNumber
 
