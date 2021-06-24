@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                 $"src\\{DatabaseProjectName}\\bin\\{environment}\\{DatabaseProjectName}.dacpac");
 
             if (!File.Exists(_dacpacFileLocation))
-                throw new FileNotFoundException($"DACPAC file not found in: {_dacpacFileLocation}");
+                throw new FileNotFoundException($"DACPAC file not found in: {_dacpacFileLocation}.  Rebuid the database project.");
         }
 
         private static void PublishModel()

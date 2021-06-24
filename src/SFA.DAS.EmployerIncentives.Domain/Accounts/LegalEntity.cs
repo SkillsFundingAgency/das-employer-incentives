@@ -8,18 +8,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
     {
         public string HashedLegalEntityId => Model.HashedLegalEntityId;
         public string Name => Model.Name;
-        public bool HasSignedAgreementTerms => Model.HasSignedAgreementTerms;
         public string VrfVendorId => Model.VrfVendorId;
         public string VrfCaseId => Model.VrfCaseId;
         public string VrfCaseStatus => Model.VrfCaseStatus;
         public DateTime? VrfCaseStatusLastUpdatedDateTime => Model.VrfCaseStatusLastUpdatedDateTime;
+        public int? SignedAgreementVersion => Model.SignedAgreementVersion;
 
         public static LegalEntity New(long id, string name)
         {
             var model = new LegalEntityModel
             {
                 Name = name,
-                HasSignedAgreementTerms = false
             };
 
             return new LegalEntity(id, model, true);
@@ -30,7 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             var model = new LegalEntityModel
             {
                 Name = name,
-                HasSignedAgreementTerms = false,
                 HashedLegalEntityId = hashedId
             };
 
@@ -52,7 +50,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         {
             if (signedAgreementVersion >= minimumRequiredVersion)
             {
-                Model.HasSignedAgreementTerms = true;
                 if (Model.SignedAgreementVersion == null || signedAgreementVersion > Model.SignedAgreementVersion)
                 {
                     Model.SignedAgreementVersion = signedAgreementVersion;

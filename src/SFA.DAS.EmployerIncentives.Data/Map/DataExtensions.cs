@@ -25,7 +25,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             HashedLegalEntityId = i.HashedLegalEntityId,
                                                             LegalEntityId = i.Id,
                                                             LegalEntityName = i.Name,
-                                                            HasSignedIncentivesTerms = i.HasSignedAgreementTerms,
                                                             SignedAgreementVersion = i.SignedAgreementVersion,
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
@@ -61,7 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             {
                 Id = model.LegalEntityId,
                 AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedAgreementTerms = model.HasSignedIncentivesTerms,
                 SignedAgreementVersion = model.SignedAgreementVersion,
                 Name = model.LegalEntityName,
                 HashedLegalEntityId = model.HashedLegalEntityId,
@@ -110,10 +108,12 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             {
                 AccountId = model.Id,
                 AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedIncentivesTerms = model.HasSignedIncentivesTerms,
-                SignedAgreementVersion = model.SignedAgreementVersion,
+                LegalEntityId = model.LegalEntityId,
                 LegalEntityName = model.LegalEntityName,
-                VrfVendorId = model.VrfVendorId
+                VrfVendorId = model.VrfVendorId,
+                VrfCaseStatus = model.VrfCaseStatus,
+                HashedLegalEntityId = model.HashedLegalEntityId,
+                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion()
             };
         }
 
@@ -151,7 +151,10 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN,
-                CourseName = x.CourseName
+                CourseName = x.CourseName,
+                EmploymentStartDate = x.EmploymentStartDate,
+                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                Phase = x.Phase                
             }).ToList();
         }
 
@@ -188,21 +191,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
                 UKPRN = x.UKPRN,
-                CourseName = x.CourseName
+                CourseName = x.CourseName,
+                EmploymentStartDate = x.EmploymentStartDate,
+                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                Phase = x.Phase
             }).ToList();
-        }
-
-        public static LegalEntityDto Map(this LegalEntityModel model, long accountId)
-        {
-            return new LegalEntityDto
-            {
-                AccountId = accountId,
-                AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedIncentivesTerms = model.HasSignedAgreementTerms,
-                LegalEntityId = model.Id,
-                LegalEntityName = model.Name,
-                VrfVendorId = model.VrfVendorId
-            };
         }
 
         private static bool HasVendorId(Models.Account model)

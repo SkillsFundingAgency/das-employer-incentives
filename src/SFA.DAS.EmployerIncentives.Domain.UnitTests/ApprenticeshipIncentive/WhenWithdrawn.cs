@@ -6,12 +6,13 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
     public class WhenWithdrawn
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
@@ -38,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]        
-        public void Then_the_incentive_is_marked_as_deleted_when_withdrawn_called_and_no_payments_have_been_made()
+        public void Then_the_incentive_status_is_updated_when_withdrawn_called_and_no_payments_have_been_made()
         {
             // arrange            
 
@@ -46,12 +47,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.Withdraw(_mockCollectionCalendarService.Object);
 
             // assert            
-            _sut.IsDeleted.Should().BeTrue();
+            _sut.Status.Should().Be(IncentiveStatus.Withdrawn);
+            _sut.IsDeleted.Should().BeFalse();
         }
 
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }

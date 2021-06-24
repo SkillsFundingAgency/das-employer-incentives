@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\IlrStartDateChanged - Copy.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
@@ -25,9 +29,13 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.TestHelpers\SFA.DAS.EmployerIncentives.Functions.TestHelpers.csproj" />
+    <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\LearningStopped.feature.cs">
+      <DependentUpon>LearningStopped.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\SendPayments.feature.cs">
       <DesignTime>True</DesignTime>
     </Compile>
@@ -46,6 +54,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\LearningStopped.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\SendPayments.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>SendPayments.feature.cs</LastGenOutput>

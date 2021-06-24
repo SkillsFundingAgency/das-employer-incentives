@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveArchi
             storedPayment.SubnominalCode.Should().Be(testPayment.SubnominalCode);
             storedPayment.PaymentPeriod.Should().Be(testPayment.PaymentPeriod);
             storedPayment.PaymentYear.Should().Be(testPayment.PaymentYear);
-            storedPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            storedPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         }
     }
 }

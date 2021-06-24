@@ -76,6 +76,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                 result.AddError("CourseName", "Is not set");
             }
 
+            if (item.EmploymentStartDate == default)
+            {
+                result.AddError("EmploymentStartDate", "Is not set");
+            }
+
             return Task.FromResult(result);
         }
     }

@@ -3,17 +3,18 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
-using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Account = SFA.DAS.EmployerIncentives.Domain.Accounts.Account;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Handlers
 {
+    [TestFixture]
     public class WhenHandlingRemoveLegalEntityCommand
     {
         private RemoveLegalEntityCommandHandler _sut;
-        private Mock<IAccountDomainRepository> _mockDomainRespository;
+        private Mock<IAccountDomainRepository> _accountDomainRepository;
         
         private Fixture _fixture;
 
@@ -22,9 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
         {
             _fixture = new Fixture();
 
-            _mockDomainRespository = new Mock<IAccountDomainRepository>();
-            
-            _sut = new RemoveLegalEntityCommandHandler(_mockDomainRespository.Object);
+            _accountDomainRepository = new Mock<IAccountDomainRepository>();
+          
+            _sut = new RemoveLegalEntityCommandHandler(_accountDomainRepository.Object);
         }
 
         [Test]
@@ -36,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             legalEntityModel.Id = command.AccountId;
             legalEntityModel.AccountLegalEntityId = command.AccountLegalEntityId;
 
-            _mockDomainRespository
+            _accountDomainRepository
                 .Setup(m => m.Find(command.AccountId))
                 .ReturnsAsync(Account.Create(
                     new AccountModel
@@ -53,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             await _sut.Handle(command);
 
             //Assert
-            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId && i.LegalEntities.Count == 2)), Times.Once);
+            _accountDomainRepository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId && i.LegalEntities.Count == 2)), Times.Once);
         }
 
         [Test]
@@ -61,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
         {
             //Arrange
             var command = _fixture.Create<RemoveLegalEntityCommand>();
-            _mockDomainRespository
+            _accountDomainRepository
                 .Setup(m => m.Find(command.AccountId))
                 .ReturnsAsync(null as Account);
 
@@ -69,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             await _sut.Handle(command);
 
             //Assert
-            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
+            _accountDomainRepository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
         }
 
         [Test]
@@ -77,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
         {
             //Arrange
             var command = _fixture.Create<RemoveLegalEntityCommand>();
-            _mockDomainRespository
+            _accountDomainRepository
                 .Setup(m => m.Find(command.AccountId))
                 .ReturnsAsync(Account.Create(new AccountModel { Id = 1, LegalEntityModels = new Collection<LegalEntityModel>() { _fixture.Create<LegalEntityModel>() } }));
 
@@ -85,7 +86,8 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.RemoveLegalEntity.Han
             await _sut.Handle(command);
 
             //Assert
-            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
+            _accountDomainRepository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
         }
+
     }
 }

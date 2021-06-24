@@ -8,7 +8,7 @@ using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Events.IncentiveApplications;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -58,46 +58,39 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                     i.UKPRN == apprenticeship.UKPRN &&
                     i.SubmittedDate == @event.Model.DateSubmitted &&
                     i.SubmittedByEmail == @event.Model.SubmittedByEmail &&
-                    i.CourseName == apprenticeship.CourseName
+                    i.CourseName == apprenticeship.CourseName &&
+                    i.EmploymentStartDate == apprenticeship.EmploymentStartDate &&
+                    i.Phase == apprenticeship.Phase
                 ), It.IsAny<CancellationToken>()), Times.Once);
             }
         }
 
-        [Test]
-        public async Task Then_a_CreateIncentiveCommand_is_not_published_for_withdrawn_apprenticeships()
+        [TestCase(false, false, true, true)]
+        [TestCase(false, false, false, false)]
+        [TestCase(false, true, true, false)]
+        [TestCase(true, false, true, false)]
+        [TestCase(true, true, true, false)]
+        [TestCase(true, true, false, false)]
+        public async Task Then_a_CreateIncentiveCommand_is_published_for_eligible_apprenticeships(
+            bool withdrawnByEmployer, bool withdrawnByCompliance, bool hasEligibleEmploymentStartDate, bool accepted)
         {
             //Arrange
-            var apprenticeships = _fixture.CreateMany<ApprenticeshipModel>(7).ToList();
-            apprenticeships[0].WithdrawnByEmployer = true;
-            apprenticeships[0].WithdrawnByCompliance = false;
-
-            apprenticeships[1].WithdrawnByEmployer = false;
-            apprenticeships[1].WithdrawnByCompliance = false;
-
-            apprenticeships[2].WithdrawnByEmployer = false;
-            apprenticeships[2].WithdrawnByCompliance = false;
-
-            apprenticeships[3].WithdrawnByEmployer = true;
-            apprenticeships[3].WithdrawnByCompliance = false;
-
-            apprenticeships[4].WithdrawnByEmployer = true;
-            apprenticeships[4].WithdrawnByCompliance = false;
-
-            apprenticeships[5].WithdrawnByEmployer = false;
-            apprenticeships[5].WithdrawnByCompliance = true;
-
-            apprenticeships[6].WithdrawnByEmployer = false;
-            apprenticeships[6].WithdrawnByCompliance = true;
+            var apprenticeship = _fixture.Create<ApprenticeshipModel>();
+            apprenticeship.WithdrawnByEmployer = withdrawnByEmployer;
+            apprenticeship.WithdrawnByCompliance = withdrawnByCompliance;
+            apprenticeship.HasEligibleEmploymentStartDate = hasEligibleEmploymentStartDate;
 
             var model = _fixture.Build<IncentiveApplicationModel>()
-                .With(x => x.ApprenticeshipModels, apprenticeships).Create();
+                .With(x => x.ApprenticeshipModels,
+                    new List<ApprenticeshipModel> {apprenticeship}).Create();
+
             var @event = new Submitted(model);
 
             //Act
             await _sut.Handle(@event);
 
             //Assert
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels.Where(a => a.WithdrawnByEmployer == false && a.WithdrawnByCompliance == false))
+            if (accepted)
             {
                 _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
                     i.AccountId == @event.Model.AccountId &&
@@ -109,25 +102,17 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                     i.DateOfBirth == apprenticeship.DateOfBirth &&
                     i.Uln == apprenticeship.ULN &&
                     i.PlannedStartDate == apprenticeship.PlannedStartDate &&
-                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval
+                    i.ApprenticeshipEmployerTypeOnApproval == apprenticeship.ApprenticeshipEmployerTypeOnApproval &&
+                    i.Phase == apprenticeship.Phase
                 ), It.IsAny<CancellationToken>()), Times.Once);
             }
-
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels.Where(a => a.WithdrawnByEmployer == true))
-            {
-                _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
-                    i.IncentiveApplicationApprenticeshipId == apprenticeship.Id
-                ), It.IsAny<CancellationToken>()), Times.Never);
-            }
-
-            foreach (var apprenticeship in @event.Model.ApprenticeshipModels.Where(a => a.WithdrawnByCompliance == true))
+            else
             {
                 _mockCommandPublisher.Verify(m => m.Publish(It.Is<CreateIncentiveCommand>(i =>
                     i.IncentiveApplicationApprenticeshipId == apprenticeship.Id
                 ), It.IsAny<CancellationToken>()), Times.Never);
             }
         }
-
 
     }
 }

@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 {
     public class WhenValidateHasNoDataLocks
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private CollectionPeriod _collectionPeriod;
         private Learner _learner;
@@ -76,6 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(!hasDataLock);
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
 
         [Test()]
@@ -93,6 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(true);
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
 
         [Test()]
@@ -112,11 +114,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(true);
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }        
 
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }
