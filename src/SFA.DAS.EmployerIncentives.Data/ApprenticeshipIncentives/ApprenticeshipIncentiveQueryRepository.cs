@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             return _context.ApprenticeshipIncentives
                 .Where(a => a.Status != IncentiveStatus.Withdrawn)
-                .Select(x => new ApprenticeshipIncentiveDto { Id = x.Id, ApprenticeshipId = x.ApprenticeshipId, ULN = x.ULN, UKPRN = x.UKPRN }).ToListAsync();
+                .Select(ApprenticeshipIncentiveToApprenticeshipIncentiveDto()).ToListAsync();
         }
 
         public Task<ApprenticeshipIncentive> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
@@ -55,6 +55,24 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 return Get(predicate);
             }
+        }
+
+        public Task<List<ApprenticeshipIncentiveDto>> GetWithdrawable(long accountId, long accountLegalEntityId)
+        {
+            return _context.ApprenticeshipIncentives
+                .Where(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId && x.Status != IncentiveStatus.Withdrawn)
+                .Select(ApprenticeshipIncentiveToApprenticeshipIncentiveDto()).ToListAsync();
+        }
+
+        private Expression<Func<ApprenticeshipIncentive, ApprenticeshipIncentiveDto>> ApprenticeshipIncentiveToApprenticeshipIncentiveDto()
+        {
+            return x => new ApprenticeshipIncentiveDto
+            {
+                Id = x.Id,
+                ApprenticeshipId = x.ApprenticeshipId,
+                ULN = x.ULN,
+                UKPRN = x.UKPRN
+            };
         }
     }
 }

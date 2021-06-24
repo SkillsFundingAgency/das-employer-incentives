@@ -11,5 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         Task<List<ApprenticeshipIncentiveDto>> GetList();
 
         Task<Models.ApprenticeshipIncentive> Get(Expression<Func<Models.ApprenticeshipIncentive, bool>> predicate, bool includePayments = false);
+
+        Task<List<ApprenticeshipIncentiveDto>> GetWithdrawable(long accountId, long accountLegalEntityId);
     }
 }
