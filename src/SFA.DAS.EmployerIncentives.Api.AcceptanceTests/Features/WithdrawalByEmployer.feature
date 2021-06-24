@@ -32,3 +32,4 @@ Scenario: Employer withdrawal for an apprenticeship that has a clawed back paid 
 	Given an apprenticeship incentive with a clawedback paid payment exists as a result of an incentive application
 	When the apprenticeship application is withdrawn from the scheme
 	Then the pending payments are archived
+
