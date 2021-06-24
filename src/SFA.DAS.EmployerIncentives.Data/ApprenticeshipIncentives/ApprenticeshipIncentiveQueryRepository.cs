@@ -71,7 +71,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 Id = x.Id,
                 ApprenticeshipId = x.ApprenticeshipId,
                 ULN = x.ULN,
-                UKPRN = x.UKPRN
+                UKPRN = x.UKPRN,
+                CourseName = x.CourseName,
+                StartDate = x.StartDate,
+                FirstName = x.FirstName,
+                LastName = x.LastName
             };
         }
     }
