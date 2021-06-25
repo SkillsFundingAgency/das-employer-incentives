@@ -4,30 +4,24 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
 {
     internal class ApprenticeshipIncentiveBuilder
     {
-        private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentiveModel _apprenticeshipIncentiveModel;
 
         public ApprenticeshipIncentiveBuilder()
         {
-            _fixture = new Fixture();
+            var fixture = new Fixture();
 
-            _apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>().Create();
+            _apprenticeshipIncentiveModel = fixture.Build<ApprenticeshipIncentiveModel>().Create();
         }
 
         public ApprenticeshipIncentiveBuilder WithApprenticeship(Apprenticeship apprenticeship)
         {
             _apprenticeshipIncentiveModel.Apprenticeship = apprenticeship;
-            return this;
-        }
-
-        public ApprenticeshipIncentiveBuilder WithBreakInLearningDayCount(int breakInLearningDayCount)
-        {
-            _apprenticeshipIncentiveModel.BreakInLearningDayCount = breakInLearningDayCount;
             return this;
         }
 
@@ -46,6 +40,12 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
         public ApprenticeshipIncentive Build()
         {
             return ApprenticeshipIncentive.Get(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
+        }
+
+        public ApprenticeshipIncentiveBuilder WithBreaksInLearning(List<BreakInLearning> breaks)
+        {
+            _apprenticeshipIncentiveModel.BreakInLearnings = breaks;
+            return this;
         }
     }
 }

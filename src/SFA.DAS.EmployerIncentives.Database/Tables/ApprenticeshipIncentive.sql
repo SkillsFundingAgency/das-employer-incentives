@@ -21,8 +21,7 @@
 	[Status] NVARCHAR(50) NULL,
 	[MinimumAgreementVersion] INT NULL,
 	[EmploymentStartDate] DATETIME2 NULL,
-	[Phase] NVARCHAR(50) NULL,
-	[BreakInLearningDayCount] INT NOT NULL DEFAULT (0)
+	[Phase] NVARCHAR(50) NULL
 )
 GO
 CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, ApprenticeshipId)
