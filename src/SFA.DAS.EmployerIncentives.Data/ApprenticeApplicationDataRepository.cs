@@ -82,11 +82,34 @@ namespace SFA.DAS.EmployerIncentives.Data
                     }                    
                 };
 
+                if (data.incentive.Status == IncentiveStatus.Stopped)
+                {
+                    SetStoppedStatus(apprenticeApplicationDto);
+                }
+
                 result.Add(apprenticeApplicationDto);
 
             }
 
             return result;
+        }
+
+        private static void SetStoppedStatus(ApprenticeApplicationDto model)
+        {
+            if (model.FirstPaymentStatus == null)
+            {
+                if (model.SecondPaymentStatus == null)
+                {
+                    model.FirstPaymentStatus = new PaymentStatusDto { PaymentIsStopped = true };
+                }
+            }
+            else
+            {
+                if (model.SecondPaymentStatus == null)
+                {
+                    model.SecondPaymentStatus = new PaymentStatusDto { PaymentIsStopped = true };
+                }
+            }
         }
 
         private static bool LearnerMatchFound(Learner learner)
