@@ -124,9 +124,6 @@
         },
         "tags": {
             "type": "object"
-        },
-        "runtimeScaleMonitoringEnabled": {
-            "type": "bool"
         }
     },
     "variables": {
@@ -650,7 +647,7 @@
                         "value": "[reference('payment-process-function-subnet').outputs.SubnetResourceId.value]"
                     },
                     "runtimeScaleMonitoringEnabled": {
-                        "value": "[parameters('runtimeScaleMonitoringEnabled')]"
+                        "value": true
                     },
                     "functionAppAppSettings": {
                         "value": {
