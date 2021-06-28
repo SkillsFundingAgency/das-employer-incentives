@@ -127,7 +127,7 @@
         }
     },
     "variables": {
-        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/function-app-v2_changes_to_add_runtime_scale_monitoring/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
         "apiAppServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
@@ -647,7 +647,7 @@
                         "value": "[reference('payment-process-function-subnet').outputs.SubnetResourceId.value]"
                     },
                     "runtimeScaleMonitoringEnabled": {
-                        "value": true
+                        "value": false
                     },
                     "functionAppAppSettings": {
                         "value": {
