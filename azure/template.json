@@ -647,7 +647,7 @@
                         "value": "[reference('payment-process-function-subnet').outputs.SubnetResourceId.value]"
                     },
                     "runtimeScaleMonitoringEnabled": {
-                        "value": true
+                        "value": false
                     },
                     "functionAppAppSettings": {
                         "value": {
