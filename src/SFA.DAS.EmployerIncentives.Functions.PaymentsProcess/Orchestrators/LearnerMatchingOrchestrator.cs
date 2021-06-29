@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
@@ -24,12 +25,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
            
             _logger.LogInformation("[LearnerMatchingOrchestrator] {count} apprenticeship incentives found", apprenticeshipIncentives.Count);
 
-            foreach (var incentive in apprenticeshipIncentives)
-            {
-                await context.CallSubOrchestratorAsync(nameof(LearnerMatchingApprenticeshipOrchestrator), incentive);
-            }
+            var tasks = apprenticeshipIncentives.Select(incentive => context.CallSubOrchestratorAsync(nameof(LearnerMatchingApprenticeshipOrchestrator), incentive)).ToList();
+            await Task.WhenAll(tasks);
 
-            if(!context.IsReplaying) _logger.LogInformation("[LearnerMatchingOrchestrator] Learner matching process completed");
+            if (!context.IsReplaying) _logger.LogInformation("[LearnerMatchingOrchestrator] Learner matching process completed");
         }
     }
 }
