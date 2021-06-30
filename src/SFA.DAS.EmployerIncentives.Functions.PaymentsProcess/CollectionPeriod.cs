@@ -4,6 +4,7 @@
     {
         public short Year { get; set; }
         public byte Period { get; set; }
+        public bool IsInProgress { get; set; }
 
         public override string ToString()
         {
