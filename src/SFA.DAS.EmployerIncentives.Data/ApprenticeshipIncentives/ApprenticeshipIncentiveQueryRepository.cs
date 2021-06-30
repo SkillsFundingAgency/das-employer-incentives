@@ -28,19 +28,28 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Select(ApprenticeshipIncentiveToApprenticeshipIncentiveDto()).ToListAsync();
         }
 
-        public Task<ApprenticeshipIncentive> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
-        {
-            return _context
-                .Set<ApprenticeshipIncentive>()
-                .SingleOrDefaultAsync(predicate);
-        }
-
         public Task<List<ApprenticeshipIncentive>> GetList(Expression<Func<ApprenticeshipIncentive, bool>> predicate = null)
         {
             return _context.Set<ApprenticeshipIncentive>()
                 .Where(predicate)
                 .ToListAsync();
         }
+
+        public Task<List<ApprenticeshipIncentiveDto>> GetDtoList(Expression<Func<ApprenticeshipIncentive, bool>> predicate = null)
+        {
+            return _context.Set<ApprenticeshipIncentive>()
+                .Where(predicate)
+                .Select(ApprenticeshipIncentiveToApprenticeshipIncentiveDto())
+                .ToListAsync();
+        }
+
+        public Task<ApprenticeshipIncentive> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
+        {
+            return _context
+                .Set<ApprenticeshipIncentive>()
+                .SingleOrDefaultAsync(predicate);
+        }
+        
 
         public Task<ApprenticeshipIncentive> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate, bool includePayments = false)
         {
@@ -55,13 +64,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 return Get(predicate);
             }
-        }
-
-        public Task<List<ApprenticeshipIncentiveDto>> GetWithdrawable(long accountId, long accountLegalEntityId)
-        {
-            return _context.ApprenticeshipIncentives
-                .Where(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId && x.Status != IncentiveStatus.Withdrawn)
-                .Select(ApprenticeshipIncentiveToApprenticeshipIncentiveDto()).ToListAsync();
         }
 
         private Expression<Func<ApprenticeshipIncentive, ApprenticeshipIncentiveDto>> ApprenticeshipIncentiveToApprenticeshipIncentiveDto()

@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
                                       from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
                                       where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
-                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent };
+                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent};
 
             var result = new List<ApprenticeApplicationDto>();
 
@@ -55,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     ULN = data.incentive.ULN,
                     LegalEntityName = data.account.LegalEntityName,
                     SubmittedByEmail = data.incentive.SubmittedByEmail,
+
                     TotalIncentiveAmount = data.incentive.PendingPayments.Sum(x => x.Amount),
                     CourseName = data.incentive.CourseName,
                     FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto

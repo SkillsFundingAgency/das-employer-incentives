@@ -11,7 +11,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQueryRepository
 {
     [TestFixture]
-    public class WhenGetWithdrawableIsCalled
+    public class WhenGetDtoListIsCalled
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
             _context.ApprenticeshipIncentives.AddRange(apprenticeshipIncentives);
             _context.SaveChanges();
 
-            var actual = await _sut.GetWithdrawable(accountId, accountLegalEntityId);
+            var actual = await _sut.GetDtoList(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId);
 
             actual.Count.Should().Be(apprenticeshipIncentives.Count);
             actual.Should().Contain(x => x.Id == apprenticeshipIncentives[0].Id);
@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
             _context.ApprenticeshipIncentives.AddRange(apprenticeshipIncentives);
             _context.SaveChanges();
 
-            var actual = await _sut.GetWithdrawable(accountId, accountLegalEntityId);
+            var actual = await _sut.GetDtoList(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId && x.Status != IncentiveStatus.Withdrawn);
 
             actual.Count.Should().Be(apprenticeshipIncentives.Count - 1);
             actual.Should().NotContain(x => x.ULN == apprenticeshipIncentives[0].ULN);
@@ -100,7 +100,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
             _context.ApprenticeshipIncentives.AddRange(apprenticeshipIncentives);
             _context.SaveChanges();
 
-            var actual = await _sut.GetWithdrawable(accountId, accountLegalEntityId);
+            var actual = await _sut.GetDtoList(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId);
 
             actual.Count.Should().Be(apprenticeshipIncentives.Count - 1);
             actual.Should().NotContain(x => x.ULN == apprenticeshipIncentives[0].ULN);
@@ -122,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
             _context.ApprenticeshipIncentives.AddRange(apprenticeshipIncentives);
             _context.SaveChanges();
 
-            var actual = await _sut.GetWithdrawable(accountId, accountLegalEntityId);
+            var actual = await _sut.GetDtoList(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId);
 
             actual.Count.Should().Be(apprenticeshipIncentives.Count - 1);
             actual.Should().NotContain(x => x.ULN == apprenticeshipIncentives[0].ULN);

@@ -15,9 +15,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpGet("/accounts/{accountId}/legalEntities/{accountLegalEntityId}/apprenticeshipIncentives")]
-        public async Task<IActionResult> GetApprenticeshipIncentives(long accountId, long accountLegalEntityId)
+        public async Task<IActionResult> GetApprenticeshipIncentives(long accountId, long accountLegalEntityId, bool includeWithdrawn = false)
         {
-            var request = new GetApprenticeshipIncentivesForAccountLegalEntityRequest(accountId, accountLegalEntityId);
+            var request = new GetApprenticeshipIncentivesForAccountLegalEntityRequest(accountId, accountLegalEntityId, includeWithdrawn);
             var response = await QueryAsync<GetApprenticeshipIncentivesForAccountLegalEntityRequest, GetApprenticeshipIncentivesForAccountLegalEntityResponse>(request);
 
             if (response?.ApprenticeshipIncentives?.Count() > 0)

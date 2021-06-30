@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprenticeshipIncentivesForAccountLegalEntity
 {
@@ -16,7 +17,10 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprent
 
         public async Task<GetApprenticeshipIncentivesForAccountLegalEntityResponse> Handle(GetApprenticeshipIncentivesForAccountLegalEntityRequest query, CancellationToken cancellationToken = default)
         {
-            var apprenticeshipIncentives = await _queryRepository.GetWithdrawable(query.AccountId, query.AccountLegalEntityId);
+            var apprenticeshipIncentives = await _queryRepository.GetDtoList(
+                x => x.AccountId == query.AccountId 
+                && x.AccountLegalEntityId == query.AccountLegalEntityId 
+                && query.IncludeWithdrawn ? x.Status == IncentiveStatus.Withdrawn : x.Status != IncentiveStatus.Withdrawn);
 
             var response = new GetApprenticeshipIncentivesForAccountLegalEntityResponse(apprenticeshipIncentives);
 

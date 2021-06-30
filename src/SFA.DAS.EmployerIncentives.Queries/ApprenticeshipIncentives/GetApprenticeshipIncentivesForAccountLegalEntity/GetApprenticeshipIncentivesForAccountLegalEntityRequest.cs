@@ -8,10 +8,13 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprent
 
         public long AccountLegalEntityId { get; }
 
-        public GetApprenticeshipIncentivesForAccountLegalEntityRequest(long accountId, long accountLegalEntityId)
+        public bool IncludeWithdrawn { get; }
+
+        public GetApprenticeshipIncentivesForAccountLegalEntityRequest(long accountId, long accountLegalEntityId, bool includeWithdrawn = false)
         {
             AccountId = accountId;
             AccountLegalEntityId = accountLegalEntityId;
+            IncludeWithdrawn = includeWithdrawn;
         }
     }
 }
