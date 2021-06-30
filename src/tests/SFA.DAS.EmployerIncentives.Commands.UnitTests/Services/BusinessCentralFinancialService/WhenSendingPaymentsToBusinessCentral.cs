@@ -46,8 +46,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         public async Task Then_the_nonsensitive_payment_data_is_logged()
         {
             //Arrange
-            var loggerMock = new Mock<ILogger<BusinessCentralFinancePaymentsService>>();
+            var loggerMock = new Mock<ILogger<BusinessCentralFinancePaymentsServiceWithLogging>>();
             _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
+            var decorator = new BusinessCentralFinancePaymentsServiceWithLogging(_sut, loggerMock.Object, false);
             _httpClient.SetUpPostAsAsync(HttpStatusCode.Accepted);
             var payment1 = _fixture.Create<PaymentDto>();
             var payment2 = _fixture.Create<PaymentDto>();
@@ -55,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             var req2 = payment2.Map(false);
 
             //Act
-            await _sut.SendPaymentRequests(new List<PaymentDto> { payment1, payment2 });
+            await decorator.SendPaymentRequests(new List<PaymentDto> { payment1, payment2 });
 
             //Assert
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.ActivityCode);
