@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
@@ -22,6 +21,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
         {
             if(!context.IsReplaying)
                 _logger.LogInformation("LearnerMatchOrchestrator Started");
+
+            var collectionPeriod = await context.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null);
+            if (collectionPeriod.IsInProgress)
+            {
+                _logger.LogInformation("Learner match not performed as payment run is in process.");
+                return;
+            }
 
             var apprenticeshipIncentives = await context.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>(nameof(GetAllApprenticeshipIncentives), null);
 

@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
+using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using System.Threading;
 using System.Threading.Tasks;
 
