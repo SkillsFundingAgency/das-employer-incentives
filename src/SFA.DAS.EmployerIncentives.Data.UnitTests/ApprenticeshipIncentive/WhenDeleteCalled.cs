@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .Create();
 
             var cp = new CollectionPeriod(cpData.PeriodNumber, cpData.CalendarMonth, cpData.CalendarYear,
-                cpData.EIScheduledOpenDateUTC, cpData.CensusDate, Convert.ToInt16(cpData.AcademicYear), true);
+                cpData.EIScheduledOpenDateUTC, cpData.CensusDate, Convert.ToInt16(cpData.AcademicYear), true, false);
 
             var validationResults = _fixture.Build<PendingPaymentValidationResultModel>()
                 .With(x => x.CollectionPeriod, cp)

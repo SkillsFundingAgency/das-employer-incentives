@@ -2,8 +2,8 @@
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
-using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetActiveCollectionPeriod;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollectionPeriod;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             _logger.LogInformation("Getting active collection period");
             var activePeriodDto = (await _queryDispatcher.Send<GetActiveCollectionPeriodRequest, GetActiveCollectionPeriodResponse>(new GetActiveCollectionPeriodRequest())).CollectionPeriod;
-            var activePeriod = new CollectionPeriod() { Period = activePeriodDto.CollectionPeriodNumber, Year = activePeriodDto.CollectionYear };
+            var activePeriod = new CollectionPeriod() { Period = activePeriodDto.CollectionPeriodNumber, Year = activePeriodDto.CollectionYear, IsInProgress = activePeriodDto.IsInProgress };
             _logger.LogInformation($"Active collection period number : {activePeriod.Period}, CollectionYear : {activePeriod.Year}");
             return activePeriod;
         }
