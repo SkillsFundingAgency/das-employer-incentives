@@ -6,7 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
     public class CollectionPeriod : ValueObject
     {
-        public CollectionPeriod(byte periodNumber, byte calendarMonth, short calendarYear, DateTime openDate, DateTime censusDate, short academicYear, bool active)
+        public CollectionPeriod(byte periodNumber, byte calendarMonth, short calendarYear, DateTime openDate, DateTime censusDate, short academicYear, bool active, bool periodEndInProgress)
         {
             PeriodNumber = periodNumber;
             CalendarMonth = calendarMonth;
@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             CensusDate = censusDate;
             AcademicYear = academicYear;
             Active = active;
+            PeriodEndInProgress = periodEndInProgress;
         }
 
         public CollectionPeriod(byte periodNumber, short academicYear)
@@ -30,10 +31,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public DateTime CensusDate { get; }
         public short AcademicYear { get; }
         public bool Active { get; private set; }
+        public bool PeriodEndInProgress { get; private set; }
+        public DateTime? MonthEndProcessingCompletedDate { get; private set; }
 
         public void SetActive(bool active)
         {
             Active = active;
+        }
+
+        public void SetPeriodEndInProgress(bool periodEndInProgress)
+        {
+            PeriodEndInProgress = periodEndInProgress;
+        }
+
+        public void SetMonthEndProcessingCompletedDate(DateTime processingCompletedDate)
+        {
+            MonthEndProcessingCompletedDate = processingCompletedDate;
         }
 
         protected override IEnumerable<object> GetAtomicValues()
@@ -45,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             yield return CensusDate;
             yield return AcademicYear;
             yield return Active;
+            yield return MonthEndProcessingCompletedDate;
         }
     }
 }

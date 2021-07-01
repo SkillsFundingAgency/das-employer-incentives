@@ -11,5 +11,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
     {
         Task<List<IncentiveApplication>> FindIncentiveApplicationsWithoutEarningsCalculations();
         Task<IEnumerable<IncentiveApplication>> Find(WithdrawalCommand withdrawalCommand);
+        Task<IEnumerable<IncentiveApplication>> FindByAccountLegalEntity(long accountLegalEntityId);
     }
 }

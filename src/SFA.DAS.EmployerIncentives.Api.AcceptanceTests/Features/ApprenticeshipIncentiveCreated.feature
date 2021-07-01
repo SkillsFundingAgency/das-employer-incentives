@@ -2,6 +2,7 @@
 @api
 @domainMessageHandlers
 @messageBus
+@activeCalendarPeriod
 Feature: ApprenticeshipIncentiveCreated
 	When an application has been submitted
 	Then an apprenticeship incentive is created for each apprentiveship in the applicaiton

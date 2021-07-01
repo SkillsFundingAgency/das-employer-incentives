@@ -4,7 +4,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
-using SFA.DAS.EmployerIncentives.Queries.EarningsResilienceCheck;
+using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

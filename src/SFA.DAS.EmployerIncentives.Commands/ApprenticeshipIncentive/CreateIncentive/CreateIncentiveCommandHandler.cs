@@ -49,8 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                 command.PlannedStartDate,
                 command.SubmittedDate,
                 command.SubmittedByEmail,
-                AgreementVersion.Create(Phase.Phase2, command.PlannedStartDate),
-                IncentivePhase.Create()
+                AgreementVersion.Create(command.Phase, command.PlannedStartDate),
+                new IncentivePhase(command.Phase)
                 );
 
             if (command.UKPRN.HasValue)

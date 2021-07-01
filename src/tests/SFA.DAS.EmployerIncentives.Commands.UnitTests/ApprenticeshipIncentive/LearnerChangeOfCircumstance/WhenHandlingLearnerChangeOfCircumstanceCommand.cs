@@ -45,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<short>(), true),
+                new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<short>(), true, false),
             };
             var collectionCalendar = new Domain.ValueObjects.CollectionCalendar(collectionPeriods);
 

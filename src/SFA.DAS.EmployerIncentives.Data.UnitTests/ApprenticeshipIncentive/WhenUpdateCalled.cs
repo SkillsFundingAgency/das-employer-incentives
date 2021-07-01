@@ -171,6 +171,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .With(x => x.EIScheduledOpenDateUTC, new DateTime(2020, 9, 6))
                 .With(x => x.CensusDate, new DateTime(2020, 9, 30))
                 .With(x => x.AcademicYear, "2021")
+                .Without(x => x.MonthEndProcessingCompleteUTC)
                 .Create();
             await _dbContext.AddAsync(_collectionPeriod);
         }
@@ -191,7 +192,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var cp = new CollectionPeriod(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarMonth,
                 _collectionPeriod.CalendarYear,
                 _collectionPeriod.EIScheduledOpenDateUTC, _collectionPeriod.CensusDate,
-                Convert.ToInt16(_collectionPeriod.AcademicYear), true);
+                Convert.ToInt16(_collectionPeriod.AcademicYear), true, false);
 
             expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels
                 .Remove(expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels.First());
