@@ -62,7 +62,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
                 _collectionPeriod.OpenDate,
                 _collectionPeriod.CensusDate,
                 _collectionPeriod.AcademicYear,
-                _collectionPeriod.Active
+                _collectionPeriod.Active,
+                _collectionPeriod.PeriodEndInProgress
                 );
 
             // act

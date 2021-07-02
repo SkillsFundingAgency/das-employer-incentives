@@ -50,7 +50,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.RefreshedLearnerForEarnings, true)
                 .With(p => p.PausePayments, false)
                 .With(p => p.Status, IncentiveStatus.Active)
-                .With(p => p.BreakInLearningDayCount, 0)
                 .With(p => p.BreakInLearnings, new List<ApprenticeshipBreakInLearning>())
                 .With(p => p.Phase, Phase.Phase2)
                 .Create();
@@ -64,7 +63,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.RefreshedLearnerForEarnings, true)
                 .With(p => p.PausePayments, false)
                 .With(p => p.Status, IncentiveStatus.Active)
-                .With(p => p.BreakInLearningDayCount, 0)
                 .With(p => p.BreakInLearnings, new List<ApprenticeshipBreakInLearning>())
                 .With(p => p.Phase, Phase.Phase2)
                 .Create();

@@ -13,16 +13,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
 {
     public class SendPaymentRequestsCommandHandler : ICommandHandler<SendPaymentRequestsCommand>
     {
-        private readonly IAccountDataRepository _accountRepository;
+        private readonly IPaymentDataRepository _paymentRepository;
         private readonly IPaymentsQueryRepository _queryRepository;
         private readonly IBusinessCentralFinancePaymentsService _businessCentralFinancePaymentsService;
 
         public SendPaymentRequestsCommandHandler(
-            IAccountDataRepository accountRepository,
+            IPaymentDataRepository paymentRepository,
             IPaymentsQueryRepository queryRepository,
             IBusinessCentralFinancePaymentsService businessCentralFinancePaymentsService)
         {
-            _accountRepository = accountRepository;
+            _paymentRepository = paymentRepository;
             _queryRepository = queryRepository;
             _businessCentralFinancePaymentsService = businessCentralFinancePaymentsService;
         }
@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
 
             await _businessCentralFinancePaymentsService.SendPaymentRequests(paymentsToSend);
 
-            await _accountRepository.UpdatePaidDateForPaymentIds(paymentsToSend.Select(s => s.PaymentId).ToList(), accountLegalEntityId, paidDate);
+            await _paymentRepository.UpdatePaidDates(paymentsToSend.Select(s => s.PaymentId).ToList(), paidDate);
 
             if (payments.Count > paymentsToSend.Count)
             {

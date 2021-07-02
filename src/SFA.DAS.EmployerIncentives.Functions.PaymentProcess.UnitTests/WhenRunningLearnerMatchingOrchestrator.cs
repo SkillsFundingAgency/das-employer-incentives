@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private LearnerMatchingOrchestrator _orchestrator;
         private List<ApprenticeshipIncentiveOutput> _apprenticeshipIncentives;
+        private CollectionPeriod _activeCollectionPeriod;
 
         [SetUp]
         public void Setup()
@@ -24,12 +25,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
 
+            _activeCollectionPeriod = new CollectionPeriod { IsInProgress = false };
+
             _apprenticeshipIncentives = _fixture.CreateMany<ApprenticeshipIncentiveOutput>(3).ToList();
             _mockOrchestrationContext
                 .Setup(x => x.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>("GetAllApprenticeshipIncentives",
                     null)).ReturnsAsync(_apprenticeshipIncentives);
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<CollectionPeriod>("GetActiveCollectionPeriod", null)).ReturnsAsync(_activeCollectionPeriod);
 
             _orchestrator = new LearnerMatchingOrchestrator(Mock.Of<ILogger<LearnerMatchingOrchestrator>>());
+        }
+
+        [Test]
+        public async Task Then_learner_match_is_not_performed_if_payment_run_is_in_progress()
+        {
+            _activeCollectionPeriod.IsInProgress = true;
+
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>("GetAllApprenticeshipIncentives", null), Times.Never);
         }
 
         [Test]

@@ -10,7 +10,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
-using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -18,21 +17,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.LearnerChangeOfCircumstance
 {
     public class WhenHandlingLearnerChangeOfCircumstanceCommand
     {
         private LearnerChangeOfCircumstanceCommandHandler _sut;
-        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
+        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
         private Fixture _fixture;
-        private Mock<ILearnerDomainRepository> _mockLearnerDomainRespository;        
+        private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;        
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
         private ApprenticeshipIncentiveModel _incentiveModel;
         private Learner _learner;
-        private int? _miniumAgreementVersion;
-        private DateTime _plannedStartDate;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
 
         [SetUp]
@@ -40,12 +36,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             _fixture = new Fixture();
 
-            _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
-            _mockLearnerDomainRespository = new Mock<ILearnerDomainRepository>();
+            _mockIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
+            _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
 
             var collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<short>(), true),
+                new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<short>(), true, false),
             };
             var collectionCalendar = new Domain.ValueObjects.CollectionCalendar(collectionPeriods);
 
@@ -77,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(_incentiveModel.Id, _incentiveModel);
             _fixture.Register(() => incentive);
 
-            _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRespository.Object, _mockLearnerDomainRespository.Object, _mockCollectionCalendarService.Object);
+            _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRepository.Object, _mockLearnerDomainRepository.Object, _mockCollectionCalendarService.Object);
 
             _incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _learner = new LearnerFactory().GetExisting(
@@ -86,8 +82,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(x=> x.ApprenticeshipIncentiveId, _incentive.Id)
                 .Create());
 
-            _mockIncentiveDomainRespository.Setup(x => x.Find(incentive.Id)).ReturnsAsync(_incentive);
-            _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(incentive)).ReturnsAsync(_learner);
+            _mockIncentiveDomainRepository.Setup(x => x.Find(incentive.Id)).ReturnsAsync(_incentive);
+            _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(incentive)).ReturnsAsync(_learner);
         }
 
         [Test]
@@ -107,36 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_break_in_learning_day_count_is_calculated()
-        {
-            //Arrange
-            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
-
-            var learningPeriod1 = new LearningPeriod(new DateTime(2020, 11, 12), new DateTime(2020, 12, 4));
-            var learningPeriod2 = new LearningPeriod(new DateTime(2021, 1, 18), null);
-
-            var learnerModel =
-                _fixture.Build<LearnerModel>()
-                .With(x => x.SubmissionData, _fixture.Create<SubmissionData>())
-                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
-                .With(x => x.LearningPeriods, new List<LearningPeriod>() { learningPeriod2, learningPeriod1 })
-                .Create();
-
-            _learner = new LearnerFactory().GetExisting(learnerModel);
-            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
-            _learner.SubmissionData.SetLearningData(new LearningData(true));
-
-            _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
-
-            // Act
-            await _sut.Handle(command);
-
-            // Assert
-            _incentive.GetModel().BreakInLearningDayCount.Should().Be(44);
-        }
-
-        [Test]
-        public async Task Then_the_StartdateChanged_event_is_raised()
+        public async Task Then_the_StartDateChanged_event_is_raised()
         {
             //Arrange
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
@@ -157,7 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_StartdateChanged_event_is_not_raised_if_the_start_date_is_the_same_as_the_previous_start_date()
+        public async Task Then_the_StartDateChanged_event_is_not_raised_if_the_start_date_is_the_same_as_the_previous_start_date()
         {
             //Arrange
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
@@ -180,7 +147,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _learner.SubmissionData.LearningData.SetStartDate(_fixture.Create<DateTime>());
 
             int itemsPersisted = 0;
-            _mockIncentiveDomainRespository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.Id == command.ApprenticeshipIncentiveId)))
+            _mockIncentiveDomainRepository.Setup(m => m.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.Id == command.ApprenticeshipIncentiveId)))
                 .Callback(() =>
                 {
                     itemsPersisted++;
@@ -248,8 +215,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            _mockLearnerDomainRespository.Verify(x => x.GetOrCreate(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
-            _mockIncentiveDomainRespository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
+            _mockLearnerDomainRepository.Verify(x => x.GetOrCreate(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
+            _mockIncentiveDomainRepository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
         }
 
         [Test]
@@ -300,7 +267,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                .Create());
 
-            _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
+            _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
 
             // Act
             await _sut.Handle(command);
@@ -331,7 +298,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                .Create());
 
-            _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
+            _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
 
             // Act
             await _sut.Handle(command);
@@ -363,7 +330,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                .Create());
 
-            _mockLearnerDomainRespository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
+            _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
 
             // Act
             await _sut.Handle(command);

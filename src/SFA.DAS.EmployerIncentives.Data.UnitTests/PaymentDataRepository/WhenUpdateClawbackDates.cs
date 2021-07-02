@@ -8,11 +8,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
+namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentDataRepository
 {
-    public class WhenUpdateClawbackDateForClawbackIds
+    public class WhenUpdateClawbackDates
     {
-        private Data.AccountDataRepository _sut;
+        private ApprenticeshipIncentives.PaymentDataRepository _sut;
         private Fixture _fixture;
         private EmployerIncentivesDbContext _dbContext;
 
@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
-            _sut = new Data.AccountDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
+            _sut = new ApprenticeshipIncentives.PaymentDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 
         [TearDown]
@@ -38,13 +38,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         public async Task Then_clawback_send_date_is_updated_for_correct_clawbacks()
         {
             // Arrange
-            var accountLegalEntityId = _fixture.Create<long>();
             var clawbacks = _fixture
                 .Build<ClawbackPayment>()
                 .Without(p => p.DateClawbackSent)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .CreateMany(5).ToList();
-            clawbacks.First().AccountLegalEntityId = accountLegalEntityId + 1;
 
             await _dbContext.AddRangeAsync(clawbacks);
             await _dbContext.SaveChangesAsync();
@@ -53,20 +50,22 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             var expected = _fixture.Create<DateTime>();
 
             // Act
-            await _sut.UpdateClawbackDateForClawbackIds(clawbacksIds, accountLegalEntityId, expected);
+            await _sut.UpdateClawbackDates(clawbacksIds, expected);
 
             // Assert
-            var matching = _dbContext.ClawbackPayments.Where(p =>
-                clawbacksIds.Contains(p.Id) && p.AccountLegalEntityId == accountLegalEntityId);
-            matching.Count().Should().Be(3);
+            var matching = _dbContext.ClawbackPayments.Where(p => clawbacksIds.Contains(p.Id));
+
+            matching.Count().Should().Be(4);
+
             foreach (var clawback in matching)
             {
                 clawback.DateClawbackSent.Should().Be(expected);
             }
 
-            var nonMatching = _dbContext.ClawbackPayments.Where(p =>
-                !clawbacksIds.Contains(p.Id) || p.AccountLegalEntityId != accountLegalEntityId);
-            nonMatching.Count().Should().Be(2);
+            var nonMatching = _dbContext.ClawbackPayments.Where(p => !clawbacksIds.Contains(p.Id));
+
+            nonMatching.Count().Should().Be(1);
+
             foreach (var clawback in nonMatching)
             {
                 clawback.DateClawbackSent.Should().BeNull();
