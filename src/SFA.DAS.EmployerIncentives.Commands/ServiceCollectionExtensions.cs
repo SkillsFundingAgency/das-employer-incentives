@@ -121,6 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         public static IServiceCollection AddPersistenceServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
+            serviceCollection.AddScoped<IPaymentDataRepository, PaymentDataRepository>();            
             serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();
             serviceCollection.AddScoped<IApprenticeApplicationDataRepository, ApprenticeApplicationDataRepository>();
 
