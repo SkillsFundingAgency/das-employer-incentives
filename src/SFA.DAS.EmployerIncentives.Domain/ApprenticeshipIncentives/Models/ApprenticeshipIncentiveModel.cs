@@ -23,7 +23,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public DateTime? SubmittedDate { get; set; }
         public string SubmittedByEmail { get; set; }
         public IncentiveStatus Status { get; set; }
-        public int BreakInLearningDayCount { get; set; }
         public ICollection<BreakInLearning> BreakInLearnings { get; set; }
         public AgreementVersion MinimumAgreementVersion { get; set; }
         public IncentivePhase Phase { get; set; }

@@ -127,6 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             hostBuilder.UseEnvironment("LOCAL");
 
             host = await hostBuilder.StartAsync(_testContext.CancellationToken);
+
         }
 
         public async Task Stop()

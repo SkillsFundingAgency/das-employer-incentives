@@ -91,10 +91,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                    {
                        ["req"] = new DummyHttpRequest
                        {
-                           Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{CollectionPeriodYear}/{CollectionPeriod}"
-                       },
-                       ["collectionPeriodYear"] = CollectionPeriodYear,
-                       ["collectionPeriodNumber"] = CollectionPeriod
+                           Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
+                       }
                    },
                    expectedCustomStatus: "WaitingForPaymentApproval"
                    ));

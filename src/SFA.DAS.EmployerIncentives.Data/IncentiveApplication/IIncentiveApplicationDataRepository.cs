@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
@@ -12,5 +13,6 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         Task Update(IncentiveApplicationModel incentiveApplication);
         Task<List<IncentiveApplicationModel>> FindApplicationsWithoutEarningsCalculated();
         Task<IEnumerable<IncentiveApplicationModel>> FindApplicationsByAccountLegalEntityAndUln(long accountLegalEntity, long uln);
+        Task<IEnumerable<IncentiveApplicationModel>> FindApplicationsByAccountLegalEntity(long accountLegalEntity);
     }
 }
