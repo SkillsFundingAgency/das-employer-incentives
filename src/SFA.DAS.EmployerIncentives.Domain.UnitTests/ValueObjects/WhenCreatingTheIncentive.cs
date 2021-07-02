@@ -48,7 +48,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
-                .WithBreakInLearningDayCount(0)
                 .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
@@ -69,36 +68,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             payments[1].EarningType.Should().Be(EarningType.SecondPayment);
         }
 
-        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
-        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
-        public async Task Then_the_due_date_includes_the_break_in_learning(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
-        {
-            var date = new DateTime(2020, 10, 1);
-            int breakInLearning = 10;
-
-            var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
-                .WithStartDate(date)
-                .WithBreakInLearningDayCount(breakInLearning)
-                .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
-                .WithApprenticeship(
-                        new ApprenticeshipBuilder()
-                        .WithDateOfBirth(date.AddYears(-1 * age))
-                        .Build())
-                .Build();
-
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
-
-            result.IsEligible.Should().BeTrue();
-            var payments = result.Payments.ToList();
-            payments.Count.Should().Be(2);
-            payments[0].Amount.Should().Be(expectedAmount1);
-            payments[0].PaymentDate.Should().Be(date.AddDays(expectedDays1).AddDays(breakInLearning));
-            payments[0].EarningType.Should().Be(EarningType.FirstPayment);
-            payments[1].Amount.Should().Be(expectedAmount2);
-            payments[1].PaymentDate.Should().Be(date.AddDays(expectedDays2).AddDays(breakInLearning));
-            payments[1].EarningType.Should().Be(EarningType.SecondPayment);
-        }
-
         [Test]
         public async Task And_Date_Is_Before_August_Then_the_application_is_not_eligible()
         {
@@ -106,7 +75,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
-                .WithBreakInLearningDayCount(0)
                 .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
@@ -128,7 +96,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)
-                .WithBreakInLearningDayCount(0)
                 .WithIncentivePhase(new IncentivePhase(Phase.Phase1))
                 .WithApprenticeship(
                         new ApprenticeshipBuilder()
