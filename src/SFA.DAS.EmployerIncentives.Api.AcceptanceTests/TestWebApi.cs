@@ -11,6 +11,8 @@ using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using NServiceBus;
+using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -93,6 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _eventMessageHook));
                 s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>

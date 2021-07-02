@@ -35,7 +35,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
-        public int BreakInLearningDayCount => Model.BreakInLearningDayCount;
         public IncentivePhase Phase => Model.Phase;
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
@@ -268,7 +267,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);
                 }
 
-                SetBreakInLearningDayCount(learner.GetBreakInLearningDayCount());
                 await SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus, collectionCalendarService);                
             }
 
@@ -361,11 +359,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                         Model.Id,
                         learningStoppedStatus.DateResumed.Value));
             }
-        }
-
-        private void SetBreakInLearningDayCount(int breakInLearningDayCount)
-        {
-            Model.BreakInLearningDayCount = breakInLearningDayCount;
         }
 
         private async Task RemoveEarningsAfterStopDate(DateTime dateStopped, ICollectionCalendarService collectionCalendarService)

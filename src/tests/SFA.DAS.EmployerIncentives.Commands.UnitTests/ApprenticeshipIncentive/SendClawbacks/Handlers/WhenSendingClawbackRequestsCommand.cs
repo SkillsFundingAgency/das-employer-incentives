@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     {
         private SendClawbacksCommandHandler _sut;
         private Mock<IPaymentsQueryRepository> _mockPayableLegalEntityQueryRepository;
-        private Mock<IAccountDataRepository> _mockAccountDataRepository;
+        private Mock<IPaymentDataRepository> _mockPaymentDataRepository;
         private Mock<IBusinessCentralFinancePaymentsService> _mockBusinessCentralFinancePaymentsService;
         private List<PaymentDto> _clawbacksToSend;
         private List<PaymentDto> _unsentClawbacks;
@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _paymentRequestsLimit = 3;
 
             _mockPayableLegalEntityQueryRepository = new Mock<IPaymentsQueryRepository>();
-            _mockAccountDataRepository = new Mock<IAccountDataRepository>();
+            _mockPaymentDataRepository = new Mock<IPaymentDataRepository>();
             _mockBusinessCentralFinancePaymentsService = new Mock<IBusinessCentralFinancePaymentsService>();
             _mockBusinessCentralFinancePaymentsService.Setup(x => x.PaymentRequestsLimit)
                 .Returns(_paymentRequestsLimit);
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _command = new SendClawbacksCommand(_fixture.Create<long>(), _fixture.Create<DateTime>());
 
-            _sut = new SendClawbacksCommandHandler(_mockAccountDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
+            _sut = new SendClawbacksCommandHandler(_mockPaymentDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(_command);
 
             // Assert
-            _mockAccountDataRepository.Verify(x =>
+            _mockPaymentDataRepository.Verify(x =>
                 x.RecordClawbacksSent(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
                     _command.AccountLegalEntityId, _command.ClawbackDate));
         }
@@ -101,11 +101,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(_command);
 
             // Assert
-            _mockAccountDataRepository.Verify(x =>
+            _mockPaymentDataRepository.Verify(x =>
                 x.RecordClawbacksSent(It.Is<List<Guid>>(l => l.Count == _paymentRequestsLimit),
                     _command.AccountLegalEntityId, _command.ClawbackDate));
 
-            _mockAccountDataRepository.Verify(x =>
+            _mockPaymentDataRepository.Verify(x =>
                 x.RecordClawbacksSent(It.Is<List<Guid>>(l => l.Count == _unsentClawbacks.Count),
                     _command.AccountLegalEntityId, _command.ClawbackDate));
         }

@@ -91,47 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                            }).ToListAsync();
 
             return accountsWithApplications?.MapDto();
-        }
-        public async Task RecordPaymentsSent(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate)
-        {
-            var account = _dbContext.Accounts.FirstOrDefault(x => x.AccountLegalEntityId == accountLegalEntityId);
-            if (account == null)
-            {
-                return;
-            }
-
-            var payments = await _dbContext.Payments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
-            foreach (var paymentId in paymentIds)
-            {
-                var payment = payments.SingleOrDefault(p => p.Id == paymentId);
-                if (payment != null)
-                {
-                    payment.PaidDate ??= paidDate;
-                    payment.VrfVendorId = account.VrfVendorId;
-                }
-            }
-        }
-
-        public async Task RecordClawbacksSent(List<Guid> clawbackIds, long accountLegalEntityId, DateTime clawbackDate)
-        {
-            var account = _dbContext.Accounts.FirstOrDefault(x => x.AccountLegalEntityId == accountLegalEntityId);
-            if (account == null)
-            {
-                return;
-            }
-
-            var clawbacks = await _dbContext.ClawbackPayments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
-
-            foreach (var clawbackId in clawbackIds)
-            {
-                var clawback = clawbacks.SingleOrDefault(p => p.Id == clawbackId);
-                if (clawback != null)
-                {
-                    clawback.DateClawbackSent ??= clawbackDate;
-                    clawback.VrfVendorId = account.VrfVendorId;
-                }
-            }
-        }
+        }        
 
         public async Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime()
         {

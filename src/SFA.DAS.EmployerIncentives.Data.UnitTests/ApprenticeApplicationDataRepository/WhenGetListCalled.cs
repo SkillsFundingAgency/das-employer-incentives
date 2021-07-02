@@ -42,8 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             
             _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, (short)DateTime.Now.Year, true),
-                new Domain.ValueObjects.CollectionPeriod(2, (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), (short)DateTime.Now.AddMonths(1).Year, false)
+                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, (short)DateTime.Now.Year, true, false),
+                new Domain.ValueObjects.CollectionPeriod(2, (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), (short)DateTime.Now.AddMonths(1).Year, false, false)
             };
 
             _mockCollectionCalendarService
@@ -1043,6 +1043,85 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             // Assert
             result[0].FirstPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
             result[0].SecondPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
+        }
+
+        [TestCase(false, false, false, null, null)]
+        [TestCase(false, true, false, null, null)]
+        [TestCase(false, true, true, null, null)]
+        [TestCase(true, false, false, true, null)]
+        [TestCase(true, true, false, false, true)]
+        [TestCase(true, true, true, false, false)]
+        public async Task Then_payment_isStopped_is_set(
+            bool apprenticehipStopped, 
+            bool hasFirstPaymentStatus, 
+            bool hasSecondPaymentStatus, 
+            bool? firstPaymentStatusPaymentIsStopped, 
+            bool? secondPaymentStatusPaymentIsStopped)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, apprenticehipStopped? IncentiveStatus.Stopped: IncentiveStatus.Active)
+                .Create();
+
+            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
+                .With(p => p.IncentiveApplicationId, incentive.Id)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>();
+
+            if (hasFirstPaymentStatus)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Create());                
+            }
+
+            if (hasSecondPaymentStatus)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.SecondPayment)
+                .Create());
+            }
+           
+            incentive.PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+            _context.ApplicationApprenticeships.AddRange(apprenticeship);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            if (firstPaymentStatusPaymentIsStopped != null)
+            {
+                result[0].FirstPaymentStatus.PaymentIsStopped.Should().Be(firstPaymentStatusPaymentIsStopped.Value);
+            }
+            if (secondPaymentStatusPaymentIsStopped != null)
+            {
+                result[0].SecondPaymentStatus.PaymentIsStopped.Should().Be(secondPaymentStatusPaymentIsStopped.Value);
+            }
         }
     }
 }

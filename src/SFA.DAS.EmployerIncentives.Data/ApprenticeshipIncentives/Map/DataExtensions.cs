@@ -39,7 +39,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CourseName = model.Apprenticeship.CourseName,
                 EmploymentStartDate = model.Apprenticeship.EmploymentStartDate,
                 Status = model.Status,
-                BreakInLearningDayCount = model.BreakInLearningDayCount,
                 BreakInLearnings = model.BreakInLearnings.Map(model.Id),
                 
                 MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
@@ -81,7 +80,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
-                BreakInLearningDayCount = entity.BreakInLearningDayCount,
                 BreakInLearnings = entity.BreakInLearnings.Map(),                
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase)
@@ -189,19 +187,26 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 VrfVendorId = x.VrfVendorId
             }).ToList();
         }
-
         private static Domain.ValueObjects.CollectionPeriod Map(this CollectionPeriod model)
         {
             if (model != null)
             {
-                return new Domain.ValueObjects.CollectionPeriod(
+                var period = new Domain.ValueObjects.CollectionPeriod(
                     model.PeriodNumber,
                     model.CalendarMonth,
                     model.CalendarYear,
                     model.EIScheduledOpenDateUTC,
                     model.CensusDate,
                     Convert.ToInt16(model.AcademicYear),
-                    model.Active);
+                    model.Active,
+                    model.PeriodEndInProgress);
+           
+                if (model.MonthEndProcessingCompleteUTC.HasValue)
+                {
+                    period.SetMonthEndProcessingCompletedDate(model.MonthEndProcessingCompleteUTC.Value);
+                }
+
+                return period;
             }
 
             return null;
@@ -209,19 +214,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
         internal static ICollection<Domain.ValueObjects.CollectionPeriod> Map(this ICollection<CollectionPeriod> models)
         {
-            return models.Select(x =>
-                new Domain.ValueObjects.CollectionPeriod(
-                    x.PeriodNumber,
-                    x.CalendarMonth,
-                    x.CalendarYear,
-                    x.EIScheduledOpenDateUTC,
-                    x.CensusDate,
-                    Convert.ToInt16(x.AcademicYear),
-                    x.Active)
-            ).ToList();
+            return models.Select(x => x.Map()).ToList();
         }
 
-        internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
+       internal static ICollection<CollectionPeriod> Map(this ICollection<Domain.ValueObjects.CollectionPeriod> models)
         {
             return models.Select(x =>
                 new CollectionPeriod
@@ -232,7 +228,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     CalendarYear = x.CalendarYear,
                     CensusDate = x.CensusDate,
                     EIScheduledOpenDateUTC = x.OpenDate,
-                    PeriodNumber = x.PeriodNumber
+                    PeriodNumber = x.PeriodNumber,
+                    PeriodEndInProgress = x.PeriodEndInProgress,
+                    MonthEndProcessingCompleteUTC = x.MonthEndProcessingCompletedDate
                 }).ToList();
         }
 

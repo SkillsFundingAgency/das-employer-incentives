@@ -14,6 +14,7 @@
 	[VrfVendorId] NVARCHAR(100) NULL
 )
 GO
-CREATE INDEX IX_Payment_ApprenticeshipIncentiveId ON [incentives].[Payment] (ApprenticeshipIncentiveId)
+CREATE CLUSTERED INDEX IX_Payment_PaidDate ON [incentives].[Payment] (PaidDate)
 GO
-CREATE INDEX IX_Payment_PaidDate ON [incentives].[Payment] (PaidDate)
+CREATE INDEX IX_Payment_ApprenticeshipIncentiveId ON [incentives].[Payment] (ApprenticeshipIncentiveId, PendingPaymentId)
+GO

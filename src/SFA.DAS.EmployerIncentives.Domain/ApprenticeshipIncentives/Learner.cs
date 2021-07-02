@@ -65,42 +65,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        public int GetBreakInLearningDayCount()
-        {
-            if (!Model.LearningPeriods.Any())
-            {               
-                return 0;
-            }
-            var learningPeriods = Model.LearningPeriods.OrderBy(p => p.StartDate);
-
-            if (!learningPeriods.First().EndDate.HasValue)
-            {
-                return 0;
-            }
-
-            int numberOfDays = 0;
-            var previousEndDate = learningPeriods.First().EndDate.Value;
-
-            foreach (var learningPeriod in Model.LearningPeriods.OrderBy(p => p.StartDate))
-            {
-                if (learningPeriod.StartDate > previousEndDate.AddDays(1))
-                {
-                    numberOfDays += (learningPeriod.StartDate - previousEndDate.AddDays(1)).Days;
-                }
-
-                if (!learningPeriod.EndDate.HasValue)
-                {
-                    break;
-                }
-                else
-                {
-                    previousEndDate = learningPeriod.EndDate.Value;
-                }
-            }
-
-            return numberOfDays;
-        }
-
         public int GetDaysInLearning(CollectionPeriod collectionPeriod)
         {
             var daysInLearningForCollectionPeriod = Model.DaysInLearnings.FirstOrDefault(d => d.CollectionYear == collectionPeriod.AcademicYear && d.CollectionPeriodNumber == collectionPeriod.PeriodNumber);

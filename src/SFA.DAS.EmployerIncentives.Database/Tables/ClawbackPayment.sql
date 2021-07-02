@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [incentives].[ClawbackPayment]
 (
-	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,
 	[ApprenticeshipIncentiveId] UNIQUEIDENTIFIER NOT NULL,
 	[PendingPaymentId] UNIQUEIDENTIFIER NOT NULL,
 	[AccountId] BIGINT NOT NULL,	
@@ -17,5 +17,7 @@
 	CONSTRAINT FK_ClawbackPayment_PendingPayment FOREIGN KEY (PendingPaymentId) REFERENCES [incentives].PendingPayment(Id),
 	CONSTRAINT FK_ClawbackPayment_Payment FOREIGN KEY (PaymentId) REFERENCES [incentives].Payment(Id)
 )
+GO
+CREATE CLUSTERED INDEX IX_ClawbackPayment_DateClawbackSent ON [incentives].[ClawbackPayment] (DateClawbackSent)
 GO
 CREATE UNIQUE INDEX IX_ClawbackPayment_ApprenticeshipIncentiveId ON [incentives].[ClawbackPayment] (ApprenticeshipIncentiveId, PendingPaymentId)
