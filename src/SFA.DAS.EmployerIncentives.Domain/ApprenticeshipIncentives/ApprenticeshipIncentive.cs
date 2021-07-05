@@ -36,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
+        public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
@@ -205,9 +206,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEvent(new PaymentsCalculationRequired(Model));
         }
         
-        public async Task Withdraw(ICollectionCalendarService collectionCalendarService)
+        public async Task Withdraw(WithdrawnBy withdrawnBy, ICollectionCalendarService collectionCalendarService)
         {
             Model.Status = IncentiveStatus.Withdrawn;
+            Model.WithdrawnBy = withdrawnBy;
             if (HasPaidEarnings)
             {
                 var calendarService = await collectionCalendarService.Get();

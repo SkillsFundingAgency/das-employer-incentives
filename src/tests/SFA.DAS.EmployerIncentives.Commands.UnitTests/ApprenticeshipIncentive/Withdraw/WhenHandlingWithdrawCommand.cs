@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Compliance);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
 
@@ -68,6 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.WithdrawnBy.Should().Be(command.WithdrawnBy);
             incentive.IsDeleted.Should().BeFalse();
         }
 
@@ -97,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Compliance);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
 
@@ -134,7 +135,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Employer);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
 
@@ -171,7 +172,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Compliance);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
 
@@ -209,7 +210,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Compliance);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
 
@@ -247,7 +248,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Compliance);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
 
@@ -288,7 +289,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Compliance);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
 
@@ -315,7 +316,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Compliance);
 
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
                         
@@ -335,7 +336,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
-            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id);
+            var command = new WithdrawCommand(incentive.Account.Id, incentive.Id, WithdrawnBy.Employer);
 
             _mockIncentiveDomainRepository
                 .Setup(x => x.FindByApprenticeshipId(

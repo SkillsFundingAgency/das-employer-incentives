@@ -76,13 +76,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].PausePayments = false;
             incentives[0].MinimumAgreementVersion = allAccounts[0].SignedAgreementVersion;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -98,7 +91,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
 
             _context.SaveChanges();
 
@@ -145,13 +137,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
             incentives[0].PausePayments = false;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -167,7 +152,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
 
             _context.SaveChanges();
 
@@ -202,14 +186,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
+            
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -229,7 +206,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -258,13 +234,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -285,7 +254,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -314,13 +282,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -341,7 +302,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -370,13 +330,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -397,7 +350,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -425,13 +377,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -453,7 +398,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -481,13 +425,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -520,7 +457,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -547,13 +483,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -587,7 +516,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -615,13 +543,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -643,7 +564,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -671,13 +591,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -699,7 +612,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -728,13 +640,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -765,7 +670,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -793,13 +697,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -821,7 +718,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -849,13 +745,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -876,7 +765,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -936,13 +824,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -982,7 +863,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -1016,10 +896,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
             incentives[0].MinimumAgreementVersion = incentiveVersion;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(1).ToArray();
-            allApprenticeships[0].IncentiveApplicationId = incentives[0].Id;
-
+            
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -1033,7 +910,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
 
             _context.SaveChanges();
 
@@ -1072,10 +948,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.Status, apprenticehipStopped? IncentiveStatus.Stopped: IncentiveStatus.Active)
                 .Create();
 
-            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
-                .With(p => p.IncentiveApplicationId, incentive.Id)
-                .Create();
-
             var pendingPayments = new List<PendingPayment>();
 
             if (hasFirstPaymentStatus)
@@ -1106,7 +978,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentive);
-            _context.ApplicationApprenticeships.AddRange(apprenticeship);
 
             _context.SaveChanges();
 
@@ -1121,6 +992,122 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             if (secondPaymentStatusPaymentIsStopped != null)
             {
                 result[0].SecondPaymentStatus.PaymentIsStopped.Should().Be(secondPaymentStatusPaymentIsStopped.Value);
+            }
+        }
+
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public async Task Then_withdrawn_by_employer_is_set(
+            bool hasFirstPayment,
+            bool withdrawnByEmployer)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Withdrawn)
+                .With(p => p.WithdrawnBy, withdrawnByEmployer ? WithdrawnBy.Employer : WithdrawnBy.Compliance)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>();
+
+            if (hasFirstPayment)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Create());
+            }
+
+            incentive.PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            if(!hasFirstPayment)
+            {
+                result[0].FirstPaymentStatus.WithdrawnByEmployer.Should().Be(withdrawnByEmployer);
+            }
+            else
+            {
+                result[0].SecondPaymentStatus.WithdrawnByEmployer.Should().Be(withdrawnByEmployer);
+            }
+        }
+
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public async Task Then_withdrawn_by_compliance_is_set(
+            bool hasFirstPayment,
+            bool withdrawnByCompliance)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Withdrawn)
+                .With(p => p.WithdrawnBy, withdrawnByCompliance ? WithdrawnBy.Compliance : WithdrawnBy.Employer)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>();
+
+            if (hasFirstPayment)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Create());
+            }
+
+            incentive.PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            if (!hasFirstPayment)
+            {
+                result[0].FirstPaymentStatus.WithdrawnByCompliance.Should().Be(withdrawnByCompliance);
+            }
+            else
+            {
+                result[0].SecondPaymentStatus.WithdrawnByCompliance.Should().Be(withdrawnByCompliance);
             }
         }
     }

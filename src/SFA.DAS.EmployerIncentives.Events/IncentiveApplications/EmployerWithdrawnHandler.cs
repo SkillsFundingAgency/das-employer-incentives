@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 {
@@ -21,7 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
             return _commandPublisher.Publish(
                 new WithdrawCommand(
                     @event.AccountId,
-                    @event.Model.Id));
+                    @event.Model.Id,
+                    WithdrawnBy.Employer));
         }
     }
 }
