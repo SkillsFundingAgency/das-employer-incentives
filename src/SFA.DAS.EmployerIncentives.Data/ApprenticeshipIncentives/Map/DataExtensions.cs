@@ -165,7 +165,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentYear = x.PaymentYear,
                 PaidDate = x.PaidDate,
                 SubnominalCode = x.SubnominalCode,
-                PendingPaymentId = x.PendingPaymentId
+                PendingPaymentId = x.PendingPaymentId,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
 
@@ -182,7 +183,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentPeriod = x.PaymentPeriod,
                 PaymentYear = x.PaymentYear,
                 SubnominalCode = x.SubnominalCode,
-                PendingPaymentId = x.PendingPaymentId
+                PendingPaymentId = x.PendingPaymentId,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
         private static Domain.ValueObjects.CollectionPeriod Map(this CollectionPeriod model)
@@ -376,7 +378,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubnominalCode = x.SubnominalCode,
                 DateClawbackSent = x.DateClawbackSent,
                 CollectionPeriod = x.CollectionPeriod,
-                CollectionPeriodYear = x.CollectionPeriodYear
+                CollectionPeriodYear = x.CollectionPeriodYear,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
 
@@ -394,7 +397,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PendingPaymentId = x.PendingPaymentId,
                 DateClawbackSent = x.DateClawbackSent,
                 CollectionPeriod = x.CollectionPeriod,
-                CollectionPeriodYear = x.CollectionPeriodYear
+                CollectionPeriodYear = x.CollectionPeriodYear,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
 

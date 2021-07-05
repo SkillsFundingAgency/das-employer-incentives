@@ -14,6 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public short PaymentYear => Model.PaymentYear;
         public DateTime? PaidDate => Model.PaidDate;
         public SubnominalCode SubnominalCode => Model.SubnominalCode;
+        public string VrfVendorId => Model.VrfVendorId;
 
         internal static Payment New(
             Guid id,
@@ -24,7 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             DateTime calculatedDate,
             short paymentYear,
             byte paymentPeriod,
-            SubnominalCode subnominalCode
+            SubnominalCode subnominalCode,
+            string vrfVendorId
         )
         {
             return new Payment(new PaymentModel
@@ -37,7 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     CalculatedDate = calculatedDate,
                     PaymentYear = paymentYear,
                     PaymentPeriod = paymentPeriod,
-                    SubnominalCode = subnominalCode
+                    SubnominalCode = subnominalCode,
+                    VrfVendorId = vrfVendorId
                 },
                 true);
         }

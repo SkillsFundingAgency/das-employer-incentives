@@ -21,5 +21,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public short? CollectionPeriodYear { get; set; }
         public SubnominalCode SubnominalCode { get; set; }
         public Guid PaymentId { get; set; }
+        public string VrfVendorId { get; set; }
     }
 }

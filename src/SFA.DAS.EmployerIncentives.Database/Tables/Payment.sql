@@ -10,7 +10,8 @@
 	[SubNominalCode] INT NOT NULL,
 	[PaymentPeriod] TINYINT NOT NULL,
 	[PaymentYear] SMALLINT NOT NULL, 
-	[Amount] DECIMAL(9, 2) NOT NULL
+	[Amount] DECIMAL(9, 2) NOT NULL,
+	[VrfVendorId] NVARCHAR(100) NULL
 )
 GO
 CREATE CLUSTERED INDEX IX_Payment_PaidDate ON [incentives].[Payment] (PaidDate)

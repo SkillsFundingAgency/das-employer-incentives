@@ -6,7 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public interface IPaymentDataRepository
     {
-        Task UpdatePaidDates(List<Guid> paymentIds, DateTime paidDate);
-        Task UpdateClawbackDates(List<Guid> clawbackIds, DateTime clawbackDate);
+        Task RecordPaymentsSent(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate);
+        Task RecordClawbacksSent(List<Guid> clawbackIds, long accountLegalEntityId, DateTime clawbackDate);
     }
 }
