@@ -79,6 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
             storedLearner.LearningResumedDate.Should().Be(testLearner.SubmissionData.LearningData.StoppedStatus.DateResumed);
             storedLearner.LearningStoppedDate.Should().BeNull();
+            storedLearner.SuccessfulLearnerMatch.Should().Be(testLearner.SuccessfulLearnerMatch);
         }
 
         [Test]

@@ -18,5 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public DateTime? DateClawbackSent { get; set; }
         public byte? CollectionPeriod { get; set; }
         public short? CollectionPeriodYear { get; set; }
+        public string VrfVendorId { get; set; }
     }
 }

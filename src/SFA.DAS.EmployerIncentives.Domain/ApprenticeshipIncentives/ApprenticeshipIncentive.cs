@@ -158,7 +158,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     -pendingPayment.Amount,
                     DateTime.Now,
                     payment.SubnominalCode,
-                    payment.Id);
+                    payment.Id,
+                    payment.VrfVendorId);
 
                 clawback.SetPaymentPeriod(collectionPeriod);
 
@@ -417,6 +418,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var subnominalCode = DetermineSubnominalCode();
+            var account = Model.Account;
 
             var payment = Payment.New(
                 Guid.NewGuid(),
@@ -427,7 +429,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 paymentDate,
                 collectionYear,
                 collectionPeriod,
-                subnominalCode);
+                subnominalCode,
+                string.Empty);
 
             Model.PaymentModels.Add(payment.GetModel());
         }
