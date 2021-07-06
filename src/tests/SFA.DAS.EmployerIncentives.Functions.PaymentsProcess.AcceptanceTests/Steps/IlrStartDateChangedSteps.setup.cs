@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _testContext = testContext;
             _fixture = new Fixture();
 
-            _plannedStartDate = new DateTime(2020, 8, 1);
+            _plannedStartDate = new DateTime(2021, 7, 1);
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
-                .With(p => p.Phase, Phase.Phase1)
+                .With(p => p.Phase, Phase.Phase2)
                 .With(p => p.MinimumAgreementVersion, 1)
                 .With(p => p.Status, IncentiveStatus.Active)
                 .Create();
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.DueDate, _plannedStartDate.AddMonths(1))
                 .With(p => p.PeriodNumber, _paymentPeriod.Number)
                 .With(p => p.PaymentYear, _paymentPeriod.Year)
-                .With(p => p.Amount, 750)
+                .With(p => p.Amount, 1000)
                 .With(p => p.ClawedBack, false)
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Without(p => p.PaymentMadeDate)

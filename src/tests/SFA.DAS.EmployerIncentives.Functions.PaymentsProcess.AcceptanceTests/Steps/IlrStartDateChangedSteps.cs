@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the learner data is updated with new invalid start date for the apprenticeship incentive")]
         public void WhenTheLearnerDataIsUpdatedWithNewInvalidStartDateForTheApprenticeshipIncentive()
         {
-            _actualStartDate = _plannedStartDate.AddMonths(-1);
+            _actualStartDate = _plannedStartDate.AddYears(-3);
         }
 
         [When(@"the incentive learner data is refreshed")]
@@ -132,7 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             clawback.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
                 .Excluding(x => x.Amount)
                 .Excluding(x => x.Id));
-            clawback.Amount.Should().Be(-750);
+            clawback.Amount.Should().Be(-1000);
         }
 
         [Given(@"an earning has not been paid for an apprenticeship incentive application")]
@@ -217,7 +217,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.FirstPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(750);
+            pp.Amount.Should().Be(1500);
             pp.PaymentMadeDate.Should().BeNull();
             pp.PeriodNumber.Should().Be(1);
             pp.PaymentYear.Should().Be(2122);
@@ -233,7 +233,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.SecondPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(750);
+            pp.Amount.Should().Be(1500);
             pp.PaymentMadeDate.Should().BeNull();
             pp.PeriodNumber.Should().Be(10);
             pp.PaymentYear.Should().Be(2122);
@@ -249,10 +249,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.FirstPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(750);
+            pp.Amount.Should().Be(1500);
             pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(5);
-            pp.PaymentYear.Should().Be(2021);
+            pp.PeriodNumber.Should().Be(4);
+            pp.PaymentYear.Should().Be(2122);
         }
 
         [Then(@"a new pending second payment record is created with a new amount and payment period")]
@@ -265,10 +265,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.SecondPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(750);
+            pp.Amount.Should().Be(1500);
             pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(2);
-            pp.PaymentYear.Should().Be(2122);
+            pp.PeriodNumber.Should().Be(1);
+            pp.PaymentYear.Should().Be(2223);
         }
 
         [Then(@"existing payment record is retained")]
@@ -300,7 +300,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>()
                 .Single(x => x.Id == _apprenticeshipIncentive.Id);
 
-            incentive.MinimumAgreementVersion.Should().Be(5);
+            incentive.MinimumAgreementVersion.Should().Be(6);
         }
         
     }
