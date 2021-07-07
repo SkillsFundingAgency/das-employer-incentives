@@ -113,7 +113,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 HashedLegalEntityId = model.HashedLegalEntityId,
-                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion()
+                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion(),
+                BankDetailsRequired = MapBankDetailsRequired(model.VrfCaseStatus, model.VrfVendorId)
             };
         }
 
@@ -242,6 +243,19 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 CreatedDateTime = DateTime.Now
             };
+        }
+
+        internal static bool MapBankDetailsRequired(string vrfCaseStatus, string vrfVendorId)
+        {
+            if (!string.IsNullOrWhiteSpace(vrfVendorId) && vrfVendorId != "000000")
+            {
+                return false;
+            }
+
+            return (string.IsNullOrWhiteSpace(vrfCaseStatus)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }
