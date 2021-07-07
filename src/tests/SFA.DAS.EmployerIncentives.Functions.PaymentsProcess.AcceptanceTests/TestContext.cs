@@ -63,6 +63,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             ActivePeriod = period;
         }
 
+        public async Task<Data.ApprenticeshipIncentives.Models.CollectionPeriod> GetCollectionCalendarPeriod(DateTime date)
+        {
+            await using var dbConnection = new SqlConnection(SqlDatabase.DatabaseInfo.ConnectionString);
+            var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionPeriod>();
+
+            var period = calendar
+                    .Where(d => d.EIScheduledOpenDateUTC <= date)
+                    .OrderByDescending(d => d.EIScheduledOpenDateUTC)
+                    .FirstOrDefault();
+
+            return period;
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (_isDisposed) return;

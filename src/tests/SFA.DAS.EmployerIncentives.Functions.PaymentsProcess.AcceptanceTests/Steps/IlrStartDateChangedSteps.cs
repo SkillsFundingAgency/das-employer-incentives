@@ -15,15 +15,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     [Scope(Feature = "IlrStartDateChanged")]
     public partial class IlrStartDateChangedSteps
     {
-        [Given(@"an apprenticeship incentive exists")]
-        public async Task GivenAnApprenticeshipIncentiveExists()
+        [Given(@"a '(.*)' apprenticeship incentive exists")]
+        public async Task GivenAnApprenticeshipIncentiveExists(string phase)
         {
+            CreateIncentive(phase);
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_accountModel);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             await dbConnection.InsertAsync(_pendingPayment);
             await dbConnection.InsertAsync(_pendingPaymentValidationResult);
         }
+
 
         [Given(@"an earning has been paid for an apprenticeship incentive application")]
         public async Task WhenTheExistingEarningHasBeenPaid()
@@ -62,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task WhenTheIncentiveLearnerDataIsRefreshed()
         {
             _learnerMatchApiData.Training.First().PriceEpisodes.First().StartDate = _actualStartDate;
-            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = _actualStartDate.AddYears(1);
+            _learnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = _actualStartDate.AddYears(3);
             SetupMockLearnerMatchResponse();
             await StartLearnerMatching();
         }
@@ -90,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             change.ChangeType.Should().Be(ChangeOfCircumstanceType.StartDate);
             change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            change.PreviousValue.Should().Be(_initialStartDate.ToString("yyy-MM-dd"));
+            change.PreviousValue.Should().Be(_plannedStartDate.ToString("yyy-MM-dd"));
             change.NewValue.Should().Be(_actualStartDate.ToString("yyy-MM-dd"));
         }
 
@@ -207,8 +209,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _newPendingPayments = dbConnection.GetAll<PendingPayment>().ToList();
         }
 
-        [Then(@"a new pending first payment record is created")]
-        public void ThenANewPendingFirstPaymentRecordIsCreated()
+        [Then(@"a new first earning of '(.*)' is created")]
+        public async Task ThenANewFirstEarningOfIsCreated(decimal amount)
         {
             var pp = _newPendingPayments.Single(x =>
                 x.AccountId == _accountModel.Id
@@ -217,14 +219,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.FirstPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(1500);
+            pp.Amount.Should().Be(amount);
             pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(1);
-            pp.PaymentYear.Should().Be(2122);
+
+            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(90));
+            pp.PeriodNumber.Should().Be(period.PeriodNumber);
+            pp.PaymentYear.ToString().Should().Be(period.AcademicYear);
         }
 
-        [Then(@"a new pending second payment record is created")]
-        public void ThenANewPendingSecondPaymentRecordIsCreated()
+        [Then(@"a new second earning of '(.*)' is created")]
+        public async Task ThenANewSecondEarningOfIsCreated(decimal amount)
         {
             var pp = _newPendingPayments.Single(x =>
                 x.AccountId == _accountModel.Id
@@ -233,42 +237,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && x.EarningType == EarningType.SecondPayment
                 && !x.ClawedBack);
 
-            pp.Amount.Should().Be(1500);
+            pp.Amount.Should().Be(amount);
             pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(10);
-            pp.PaymentYear.Should().Be(2122);
-        }
-
-        [Then(@"a new pending first payment record is created with a new amount and payment period")]
-        public void ThenANewPendingFirstPaymentRecordIsCreatedWithANewAmount()
-        {
-            var pp = _newPendingPayments.Single(x =>
-                x.AccountId == _accountModel.Id
-                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
-                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
-                && x.EarningType == EarningType.FirstPayment
-                && !x.ClawedBack);
-
-            pp.Amount.Should().Be(1500);
-            pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(4);
-            pp.PaymentYear.Should().Be(2122);
-        }
-
-        [Then(@"a new pending second payment record is created with a new amount and payment period")]
-        public void ThenANewPendingSecondPaymentRecordIsCreatedWithANewAmount()
-        {
-            var pp = _newPendingPayments.Single(x =>
-                x.AccountId == _accountModel.Id
-                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
-                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
-                && x.EarningType == EarningType.SecondPayment
-                && !x.ClawedBack);
-
-            pp.Amount.Should().Be(1500);
-            pp.PaymentMadeDate.Should().BeNull();
-            pp.PeriodNumber.Should().Be(1);
-            pp.PaymentYear.Should().Be(2223);
+            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(365));
+            pp.PeriodNumber.Should().Be(period.PeriodNumber);
+            pp.PaymentYear.ToString().Should().Be(period.AcademicYear);
         }
 
         [Then(@"existing payment record is retained")]
@@ -293,14 +266,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Should().NotBeNull("Should not have deleted existing pending payment validation result");
         }
 
-        [Then(@"the minimum agreement version is changed")]
-        public void ThenTheMinimumAgreementVersionIsChanged()
+        [Then(@"the minimum agreement version is changed to '(.*)'")]
+        public void ThenTheMinimumAgreementVersionIsChanged(short version)
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var incentive = dbConnection.GetAll<ApprenticeshipIncentive>()
                 .Single(x => x.Id == _apprenticeshipIncentive.Id);
 
-            incentive.MinimumAgreementVersion.Should().Be(6);
+            incentive.MinimumAgreementVersion.Should().Be(version);
         }
         
     }
