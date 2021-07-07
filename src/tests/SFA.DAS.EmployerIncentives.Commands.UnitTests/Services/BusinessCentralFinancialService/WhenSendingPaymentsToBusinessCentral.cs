@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             _fixture = new Fixture();
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false, Mock.Of<ILogger<BusinessCentralFinancePaymentsService>>());
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
         }
 
         [Test]
@@ -46,16 +46,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         public async Task Then_the_nonsensitive_payment_data_is_logged()
         {
             //Arrange
-            var loggerMock = new Mock<ILogger<BusinessCentralFinancePaymentsService>>();
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false, loggerMock.Object);
+            var loggerMock = new Mock<ILogger<BusinessCentralFinancePaymentsServiceWithLogging>>();
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
+            var decorator = new BusinessCentralFinancePaymentsServiceWithLogging(_sut, loggerMock.Object, false);
             _httpClient.SetUpPostAsAsync(HttpStatusCode.Accepted);
             var payment1 = _fixture.Create<PaymentDto>();
             var payment2 = _fixture.Create<PaymentDto>();
-            var req1 = _sut.MapToBusinessCentralPaymentRequest(payment1);
-            var req2 = _sut.MapToBusinessCentralPaymentRequest(payment2);
+            var req1 = payment1.Map(false);
+            var req2 = payment2.Map(false);
 
             //Act
-            await _sut.SendPaymentRequests(new List<PaymentDto> { payment1, payment2 });
+            await decorator.SendPaymentRequests(new List<PaymentDto> { payment1, payment2 });
 
             //Assert
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.ActivityCode);
@@ -121,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
 
             var payment = _fixture.Build<PaymentDto>().Create();
 
-            var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
+            var paymentRequest = payment.Map(false);
 
             paymentRequest.RequestorUniquePaymentIdentifier.Should().Be(payment.PaymentId.ToString("N"));
             paymentRequest.Requestor.Should().Be("ApprenticeServiceEI");
@@ -145,7 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         {
             var payment = _fixture.Build<PaymentDto>().With(x => x.SubnominalCode, subnominalCode).Create();
 
-            var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
+            var paymentRequest = payment.Map(false);
 
             paymentRequest.AccountCode.Should().Be(expectedAccountCode);
         }
@@ -158,7 +159,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         {
             var payment = _fixture.Build<PaymentDto>().With(x => x.SubnominalCode, subnominalCode).Create();
 
-            var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
+            var paymentRequest = payment.Map(false);
 
             paymentRequest.ActivityCode.Should().Be(expectedActivityCode);
         }
@@ -174,7 +175,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
                 .With(x => x.ULN, uln)
                 .Create();
 
-            var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
+            var paymentRequest = payment.Map(false);
 
             paymentRequest.PaymentLineDescription.Should().Be(expected);
         }
@@ -183,7 +184,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         [TestCase(123456789, "*****6789")]
         public void Then_the_PaymentLineDescription_is_constructed_with_uln_obfuscated(long uln, string expected)
         {
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true, Mock.Of<ILogger<BusinessCentralFinancePaymentsService>>());
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true);
 
             var payment = _fixture.Build<PaymentDto>()
                 .With(x => x.EarningType, EarningType.FirstPayment)
@@ -192,7 +193,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
                 .With(x => x.ULN, uln)
                 .Create();
 
-            var paymentRequest = _sut.MapToBusinessCentralPaymentRequest(payment);
+            var paymentRequest = payment.Map(true);
 
             paymentRequest.PaymentLineDescription.Should().Be($"Hire a new apprentice (first payment). Employer: ABCD ULN: {expected}");
         }
