@@ -34,12 +34,16 @@ namespace SFA.DAS.EmployerIncentives.Data
 
             var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
                                       from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
-                                      from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment).DefaultIfEmpty()
-                                      from secondPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment).DefaultIfEmpty()
+                                      from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && !x.ClawedBack).DefaultIfEmpty()
+                                      from secondPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment && !x.ClawedBack).DefaultIfEmpty()
                                       from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
                                       from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
+                                      from firstClawbackPendingPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && !x.ClawedBack).DefaultIfEmpty()
+                                      from firstClawback in _dbContext.ClawbackPayments.Where(x => x.PendingPaymentId == firstClawbackPendingPayment.Id).DefaultIfEmpty()
+                                      from secondClawbackPendingPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment && x.ClawedBack).DefaultIfEmpty()
+                                      from secondClawback in _dbContext.ClawbackPayments.Where(x => x.PendingPaymentId == secondClawbackPendingPayment.Id).DefaultIfEmpty()
                                       where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
-                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent };
+                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent, firstClawback, secondClawback };
 
             var result = new List<ApprenticeApplicationDto>();
 
@@ -69,6 +73,11 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
                     },
+                    FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
+                    {
+                        ClawbackAmount = data.firstClawback.Amount,
+                        ClawbackDate = data.firstClawback.DateClawbackSent
+                    },
                     SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                     {
                         PaymentDate = data.secondPayment.DueDate.AddMonths(1),
@@ -79,7 +88,12 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PausePayments = data.incentive.PausePayments,
                         PaymentSentIsEstimated = true, // change to use IsPaymentEstimated when implementing ticket EI-827,
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
-                    }                    
+                    },
+                    SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
+                    {
+                        ClawbackAmount = data.secondClawback.Amount,
+                        ClawbackDate = data.secondClawback.DateClawbackSent
+                    },
                 };
 
                 if (data.incentive.Status == IncentiveStatus.Stopped)
