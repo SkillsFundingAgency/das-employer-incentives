@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Data.Map;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -55,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 LegalEntityId = x.Account.LegalEntityId,
                 SubmittedByEmail = x.Application.SubmittedByEmail,
                 SubmittedByName = x.Application.SubmittedByName,
-                BankDetailsRequired = DataExtensions.MapBankDetailsRequired(x.Account.VrfCaseStatus, x.Account.VrfVendorId)
+                BankDetailsRequired = (new VendorBankStatus(x.Account.VrfVendorId, new VendorCase(x.Account.VrfCaseId, x.Account.VrfCaseStatus, x.Account.VrfCaseStatusLastUpdatedDateTime))).BankDetailsRequired
             };
         }
 
@@ -75,6 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 Phase = apprenticeship.Phase,
                 HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
             };
-        }        
+        }
+     
     }
 }

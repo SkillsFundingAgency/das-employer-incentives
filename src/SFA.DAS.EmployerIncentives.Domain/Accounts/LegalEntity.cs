@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts
@@ -62,11 +63,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.HashedLegalEntityId = hashedId;
         }
 
-        internal void UpdateVendorRegistrationCaseStatus(string caseId, string status, DateTime caseStatusLastUpdatedDate)
+        internal void UpdateVendorRegistrationCaseStatus(VendorCase vendorCase)
         {
-            Model.VrfCaseId = caseId;
-            Model.VrfCaseStatus = status;
-            Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
+            Model.VrfCaseId = vendorCase.CaseId;
+            Model.VrfCaseStatus = vendorCase.Status;
+            Model.VrfCaseStatusLastUpdatedDateTime = vendorCase.Updated;
         }
 
         public void AddEmployerVendorId(string employerVendorId)
