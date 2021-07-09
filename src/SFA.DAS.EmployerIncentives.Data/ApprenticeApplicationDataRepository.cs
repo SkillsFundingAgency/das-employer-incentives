@@ -99,11 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     SetStoppedStatus(apprenticeApplicationDto);
                 }
                 
-                if (result.FirstOrDefault(x => x.ULN == apprenticeApplicationDto.ULN) == null)
-                {
-                    result.Add(apprenticeApplicationDto);
-                }
-
+                result.Add(apprenticeApplicationDto);
             }
 
             return result;
