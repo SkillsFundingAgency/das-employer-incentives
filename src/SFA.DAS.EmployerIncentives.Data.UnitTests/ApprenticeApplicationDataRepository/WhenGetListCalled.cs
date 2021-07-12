@@ -948,6 +948,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -992,6 +993,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.Should().NotBeNull();
             application.FirstPaymentStatus.PaymentSentIsEstimated.Should().Be(expected);
         }
 
@@ -1122,6 +1124,156 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             {
                 result[0].SecondPaymentStatus.PaymentIsStopped.Should().Be(secondPaymentStatusPaymentIsStopped.Value);
             }
+        }
+
+        [Test]
+        public async Task Then_clawback_status_is_populated_if_first_payment_clawed_back()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Active)
+                .Create();
+
+            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
+                .With(p => p.IncentiveApplicationId, incentive.Id)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>
+            {
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .Create()
+            };
+
+            var payments = _fixture
+                .Build<Payment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .CreateMany(2).ToList();
+            payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payments[0].PaidDate.Value.Day);
+
+            var clawback = _fixture.Build<ClawbackPayment>()
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.AccountId, accountId)
+                .With(p => p.PaymentId, payments[0].Id)
+                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .Create();
+                
+            incentive.PendingPayments = pendingPayments;
+            incentive.Payments = payments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+            _context.ApplicationApprenticeships.AddRange(apprenticeship);
+            _context.ClawbackPayments.AddRange(clawback);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result[0].FirstClawbackStatus.Should().NotBeNull();
+            result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
+            result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent);
+        }
+
+        [Test]
+        public async Task Then_clawback_status_is_populated_if_second_payment_clawed_back()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Active)
+                .Create();
+
+            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
+                .With(p => p.IncentiveApplicationId, incentive.Id)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>
+            {
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .Create()
+            };
+
+            var payments = _fixture
+                .Build<Payment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.PendingPaymentId, pendingPayments[1].Id)
+                .CreateMany(2).ToList();
+            payments[1].PaidDate = new DateTime(pendingPayments[1].DueDate.Year, 1, payments[1].PaidDate.Value.Day);
+
+            var clawback = _fixture.Build<ClawbackPayment>()
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.AccountId, accountId)
+                .With(p => p.PaymentId, payments[1].Id)
+                .With(p => p.PendingPaymentId, pendingPayments[1].Id)
+                .Create();
+
+            incentive.PendingPayments = pendingPayments;
+            incentive.Payments = payments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+            _context.ApplicationApprenticeships.AddRange(apprenticeship);
+            _context.ClawbackPayments.AddRange(clawback);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result[0].SecondClawbackStatus.Should().NotBeNull();
+            result[0].SecondClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
+            result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent);
         }
     }
 }
