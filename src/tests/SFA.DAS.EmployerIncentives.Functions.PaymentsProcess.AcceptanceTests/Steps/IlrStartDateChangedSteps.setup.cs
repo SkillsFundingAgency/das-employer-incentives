@@ -17,25 +17,30 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     public partial class IlrStartDateChangedSteps
     {
         private readonly TestContext _testContext;
-        private readonly Account _accountModel;
         private readonly Fixture _fixture;
-        private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
-        private readonly PendingPayment _pendingPayment;
-        private readonly LearnerSubmissionDto _learnerMatchApiData;
-        private readonly DateTime _plannedStartDate;
-        private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
+        private Account _accountModel;
+        private  ApprenticeshipIncentive _apprenticeshipIncentive;
+        private  PendingPayment _pendingPayment;
+        private  LearnerSubmissionDto _learnerMatchApiData;
+        private DateTime _plannedStartDate;
+        private  PendingPaymentValidationResult _pendingPaymentValidationResult;
         private Payment _payment;
         private List<PendingPayment> _newPendingPayments;
         private DateTime _actualStartDate;
-        private readonly DateTime _initialStartDate;
+        private Phase _phase;
         private readonly (byte Number, short Year) _paymentPeriod = (1, 2021);
 
         public IlrStartDateChangedSteps(TestContext testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
+        }
 
-            _plannedStartDate = new DateTime(2020, 8, 1);
+        private void CreateIncentive(string phase)
+        {
+            _phase = Enum.Parse<Phase>(phase);
+            _plannedStartDate = (_phase == Phase.Phase1) ? new DateTime(2020, 8, 1) : new DateTime(2021, 7, 1);
+            
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -43,12 +48,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
-                .With(p => p.Phase, Phase.Phase1)
+                .With(p => p.Phase, _phase)
                 .With(p => p.MinimumAgreementVersion, 1)
+                .With(p => p.StartDate, _plannedStartDate)
                 .With(p => p.Status, IncentiveStatus.Active)
                 .Create();
 
-            _initialStartDate = _apprenticeshipIncentive.StartDate;
 
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.AccountId, _accountModel.Id)
@@ -57,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.DueDate, _plannedStartDate.AddMonths(1))
                 .With(p => p.PeriodNumber, _paymentPeriod.Number)
                 .With(p => p.PaymentYear, _paymentPeriod.Year)
-                .With(p => p.Amount, 750)
+                .With(p => p.Amount, 1000)
                 .With(p => p.ClawedBack, false)
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Without(p => p.PaymentMadeDate)
@@ -88,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                     .Create()
                             })
                             .With(pe => pe.StartDate, _plannedStartDate)
-                            .With(pe => pe.EndDate, _plannedStartDate.AddYears(1))
+                            .With(pe => pe.EndDate, _plannedStartDate.AddYears(3))
                             .Create() }
                         )
                         .Create()}
