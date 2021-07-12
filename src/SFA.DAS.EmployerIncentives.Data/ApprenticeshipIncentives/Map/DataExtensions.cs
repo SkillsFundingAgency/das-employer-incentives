@@ -201,16 +201,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
         internal static ICollection<Domain.ValueObjects.CollectionCalendarPeriod> Map(this ICollection<CollectionCalendarPeriod> models)
         {
-            return models.Select(x =>
-                new Domain.ValueObjects.CollectionCalendarPeriod(
-                    new Domain.ValueObjects.CollectionPeriod(x.PeriodNumber, Convert.ToInt16(x.AcademicYear)),
-                    x.CalendarMonth,
-                    x.CalendarYear,
-                    x.EIScheduledOpenDateUTC,
-                    x.CensusDate,
-                    x.Active)
-            ).ToList();
-        }
+            return models.Select(x => x.MapCollectionCalendarPeriod()).ToList();
+        }        
 
         internal static ICollection<CollectionCalendarPeriod> Map(this ICollection<Domain.ValueObjects.CollectionCalendarPeriod> models)
         {
@@ -223,7 +215,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     CalendarYear = x.CalendarYear,
                     CensusDate = x.CensusDate,
                     EIScheduledOpenDateUTC = x.OpenDate,
-                    PeriodNumber = x.CollectionPeriod.PeriodNumber
+                    PeriodNumber = x.CollectionPeriod.PeriodNumber,
+                    PeriodEndInProgress = x.PeriodEndInProgress,
+                    MonthEndProcessingCompleteUTC = x.MonthEndProcessingCompletedDate
                 }).ToList();
         }
 
@@ -401,7 +395,32 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 NewValue = model.NewValue,
                 ChangedDate = model.ChangedDate
             };
-        }        
+        }
+
+        internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)
+        {
+            if (model != null)
+            {
+                var collectionCalendarPeriod = new Domain.ValueObjects.CollectionCalendarPeriod(
+                    new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, Convert.ToInt16(model.AcademicYear)),
+                    model.CalendarMonth,
+                    model.CalendarYear,
+                    model.EIScheduledOpenDateUTC,
+                    model.CensusDate,
+                    model.Active,
+                    model.PeriodEndInProgress);
+
+                if (model.MonthEndProcessingCompleteUTC.HasValue)
+                {
+                    collectionCalendarPeriod.SetMonthEndProcessingCompletedDate(model.MonthEndProcessingCompleteUTC.Value);
+                }
+
+                return collectionCalendarPeriod;
+
+            }
+
+            return null;
+        }
 
     }
 }

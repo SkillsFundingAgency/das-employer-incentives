@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
             await AddCollectionPeriods();
 
             var data = (await _sut.GetAll()).ToList();
-            data.Add(new CollectionCalendarPeriod(new CollectionPeriod(1, 2030), 1, 2030, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false));
+            data.Add(new CollectionCalendarPeriod(new CollectionPeriod(1, 2030), 1, 2030, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, false));
 
             // Act
             await _sut.Save(data);

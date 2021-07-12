@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _collectionPeriods = new List<CollectionCalendarPeriod>()
             {
-                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<short>()), (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), false)
+                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<short>()), (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), false, false)
             };
 
             _mockCollectionCalendarService

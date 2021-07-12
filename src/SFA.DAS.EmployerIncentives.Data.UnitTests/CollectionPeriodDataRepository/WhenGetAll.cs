@@ -43,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
                 .Excluding(x => x.AcademicYear)
                 .Excluding(x => x.EIScheduledOpenDateUTC)
                 .Excluding(x => x.PeriodNumber)
+                .Excluding(x => x.MonthEndProcessingCompleteUTC)
                 );
 
             result.Select(x => x.CollectionPeriod.AcademicYear).Should()

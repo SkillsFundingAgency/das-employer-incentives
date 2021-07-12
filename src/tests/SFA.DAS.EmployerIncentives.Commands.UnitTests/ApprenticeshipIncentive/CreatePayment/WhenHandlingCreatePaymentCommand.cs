@@ -46,6 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     (short)today.Year,
                     today.AddDays(-1),
                     today.AddDays(-1),
+                    false,
                     false),
                 new CollectionCalendarPeriod(
                 new Domain.ValueObjects.CollectionPeriod(1, (short)today.AddMonths(1).Year),
@@ -53,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 (short)today.AddMonths(1).Year,
                 today.AddMonths(1).AddDays(-1),
                 today.AddMonths(1).AddDays(-1),
+                false,
                 false)
             };
             _firstCollectionPeriod = _collectionPeriods.First().CollectionPeriod;
@@ -140,7 +142,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     (short)today.Year,
                     today.AddDays(-1),
                     today,
-                    true)
+                    true,
+                    false)
             };
 
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(collectionPeriods));

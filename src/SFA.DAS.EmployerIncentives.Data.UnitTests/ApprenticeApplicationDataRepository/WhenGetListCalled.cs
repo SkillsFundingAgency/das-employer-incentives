@@ -42,8 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             
             _collectionPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year), (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, true),
-                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(2, (short)DateTime.Now.AddMonths(1).Year), (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), false)
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year), (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, true, false),
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(2, (short)DateTime.Now.AddMonths(1).Year), (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), false, false)
             };
 
             _mockCollectionCalendarService

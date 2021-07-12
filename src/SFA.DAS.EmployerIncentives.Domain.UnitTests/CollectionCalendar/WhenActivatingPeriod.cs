@@ -23,9 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             testDate = DateTime.Now;
 
-            var period1 = new CollectionCalendarPeriod(new CollectionPeriod(1, 2021), (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true);
-            var period2 = new CollectionCalendarPeriod(new CollectionPeriod(2, 2021), (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), false);
-            var period3 = new CollectionCalendarPeriod(new CollectionPeriod(3, 2021), (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false);
+            var period1 = new CollectionCalendarPeriod(new CollectionPeriod(1, 2021), (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true, false);
+            var period2 = new CollectionCalendarPeriod(new CollectionPeriod(2, 2021), (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), false, false);
+            var period3 = new CollectionCalendarPeriod(new CollectionPeriod(3, 2021), (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, false);
 
             _collectionPeriods = new List<CollectionCalendarPeriod>() { period1, period2, period3 };
 
