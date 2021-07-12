@@ -19,11 +19,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly TestContext _testContext;
         private readonly Fixture _fixture;
         private Account _accountModel;
-        private ApprenticeshipIncentive _apprenticeshipIncentive;
-        private PendingPayment _pendingPayment;
-        private LearnerSubmissionDto _learnerMatchApiData;
+        private  ApprenticeshipIncentive _apprenticeshipIncentive;
+        private  PendingPayment _pendingPayment;
+        private  LearnerSubmissionDto _learnerMatchApiData;
         private DateTime _plannedStartDate;
-        private PendingPaymentValidationResult _pendingPaymentValidationResult;
+        private  PendingPaymentValidationResult _pendingPaymentValidationResult;
         private Payment _payment;
         private List<PendingPayment> _newPendingPayments;
         private DateTime _actualStartDate;
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _phase = Enum.Parse<Phase>(phase);
             _plannedStartDate = (_phase == Phase.Phase1) ? new DateTime(2020, 8, 1) : new DateTime(2021, 7, 1);
-
+            
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()

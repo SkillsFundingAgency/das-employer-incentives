@@ -39,7 +39,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CourseName = model.Apprenticeship.CourseName,
                 EmploymentStartDate = model.Apprenticeship.EmploymentStartDate,
                 Status = model.Status,
-                BreakInLearningDayCount = model.BreakInLearningDayCount,
                 BreakInLearnings = model.BreakInLearnings.Map(model.Id),
                 
                 MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
@@ -81,7 +80,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
-                BreakInLearningDayCount = entity.BreakInLearningDayCount,
                 BreakInLearnings = entity.BreakInLearnings.Map(),                
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase)
@@ -166,7 +164,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentYear = x.PaymentYear,
                 PaidDate = x.PaidDate,
                 SubnominalCode = x.SubnominalCode,
-                PendingPaymentId = x.PendingPaymentId
+                PendingPaymentId = x.PendingPaymentId,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
 
@@ -183,7 +182,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 PaymentPeriod = x.PaymentPeriod,
                 PaymentYear = x.PaymentYear,
                 SubnominalCode = x.SubnominalCode,
-                PendingPaymentId = x.PendingPaymentId
+                PendingPaymentId = x.PendingPaymentId,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
       
@@ -191,9 +191,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
         {
             if (model != null)
             {
-                return new Domain.ValueObjects.CollectionPeriod(
+                var period = new Domain.ValueObjects.CollectionPeriod(
                     model.PeriodNumber,
                     Convert.ToInt16(model.AcademicYear));
+
+                return period;
             }
 
             return null;
@@ -231,6 +233,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
                 CreatedDate = model.CreatedDate,
+                SuccessfulLearnerMatch = model.SuccessfulLearnerMatch,
                 LearningPeriods = model.LearningPeriods.Map(),
                 DaysInLearnings = model.DaysInLearnings.Map(),
                 SubmissionData = new SubmissionData()
@@ -286,8 +289,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             learner.HasDataLock = model.SubmissionData.LearningData.HasDataLock;
             learner.InLearning = model.SubmissionData.LearningData.IsInlearning;
             learner.RawJSON = model.SubmissionData.RawJson;
-            learner.LearningStoppedDate = model.SubmissionData.LearningData.StoppedStatus.DateStopped;
-            learner.LearningResumedDate = model.SubmissionData.LearningData.StoppedStatus.DateResumed;
+            learner.LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped;
+            learner.LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed;
+            learner.SuccessfulLearnerMatch = model.SuccessfulLearnerMatch;
             return learner;
         }
 
@@ -363,7 +367,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubnominalCode = x.SubnominalCode,
                 DateClawbackSent = x.DateClawbackSent,
                 CollectionPeriod = x.CollectionPeriod.PeriodNumber,
-                CollectionPeriodYear = x.CollectionPeriod.AcademicYear
+                CollectionPeriodYear = x.CollectionPeriod.AcademicYear,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
 
@@ -380,7 +385,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubnominalCode = x.SubnominalCode,
                 PendingPaymentId = x.PendingPaymentId,
                 DateClawbackSent = x.DateClawbackSent,
-                CollectionPeriod = x.CollectionPeriod.HasValue ? new Domain.ValueObjects.CollectionPeriod(x.CollectionPeriod.Value, x.CollectionPeriodYear.Value) : null
+                CollectionPeriod = x.CollectionPeriod.HasValue ? new Domain.ValueObjects.CollectionPeriod(x.CollectionPeriod.Value, x.CollectionPeriodYear.Value) : null,
+                VrfVendorId = x.VrfVendorId
             }).ToList();
         }
 

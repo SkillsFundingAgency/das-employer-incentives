@@ -28,12 +28,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Fixture _fixture;
         private readonly Account _accountModel;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
-        private readonly ApprenticeshipBreakInLearning _apprenticeshipBreakinLearning;
+        private readonly ApprenticeshipBreakInLearning _apprenticeshipBreakInLearning;
         private LearnerSubmissionDto _resumedLearnerMatchApiData;
 
-        private Payment _payment;
-        private ClawbackPayment _clawbackPayment;
-        private PendingPayment _pendingPayment;
+        private readonly Payment _payment;
+        private readonly ClawbackPayment _clawbackPayment;
+        private readonly PendingPayment _pendingPayment;
 
         private readonly DateTime _plannedStartDate;
         private DateTime _stoppedDate;
@@ -59,12 +59,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.RefreshedLearnerForEarnings, true)
                 .With(p => p.PausePayments, false)
                 .With(p => p.Status, IncentiveStatus.Stopped)
-                .With(p => p.BreakInLearningDayCount, 0)
                 .With(p => p.BreakInLearnings, new List<ApprenticeshipBreakInLearning>())
                 .With(p => p.Phase, Phase.Phase1)
                 .Create();
 
-            _apprenticeshipBreakinLearning = _fixture
+            _apprenticeshipBreakInLearning = _fixture
                 .Build<ApprenticeshipBreakInLearning>()
                 .With(b => b.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(b => b.StartDate, new DateTime(2021, 02, 08))
@@ -135,11 +134,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     break;
             }
 
-            _apprenticeshipBreakinLearning.StartDate = _stoppedDate.AddDays(1);
+            _apprenticeshipBreakInLearning.StartDate = _stoppedDate.AddDays(1);
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                await dbConnection.InsertAsync(_apprenticeshipBreakinLearning);
+                await dbConnection.InsertAsync(_apprenticeshipBreakInLearning);
             }
 
             _resumedLearnerMatchApiData = _fixture
@@ -246,7 +245,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             switch (isCalculated)
             {
                 case "Calculated":
-                    ThenThePendingPaymentDueDateIncludestheBreakInLearning();
+                    ThenThePendingPaymentDueDateIncludesTheBreakInLearning();
                     return;
                 case "NotCalculated":
                     ThenThePendingPaymentDueDateIsNotChanged();
@@ -257,13 +256,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
-        private void ThenThePendingPaymentDueDateIncludestheBreakInLearning()
+        private void ThenThePendingPaymentDueDateIncludesTheBreakInLearning()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
-            pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment && !p.ClawedBack).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(89).AddDays(_breakInLearning).AddDays(-1));
-            pendingPayments.Single(p => p.EarningType == EarningType.SecondPayment).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(364).AddDays(_breakInLearning).AddDays(-1));
+            pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment && !p.ClawedBack).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(89).AddDays(_breakInLearning -  2));
+            pendingPayments.Single(p => p.EarningType == EarningType.SecondPayment).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(364).AddDays(_breakInLearning - 2));
         }
 
         private void ThenThePendingPaymentDueDateIsNotChanged()
@@ -272,7 +271,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
             pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment && !p.ClawedBack).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(89));
-            pendingPayments.Single(p => p.EarningType == EarningType.SecondPayment).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(364).AddDays(_breakInLearning).AddDays(-1));
+            pendingPayments.Single(p => p.EarningType == EarningType.SecondPayment).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(364).AddDays(_breakInLearning - 2));
         }
 
         private async Task SetUpUnpaidFirstPayment()

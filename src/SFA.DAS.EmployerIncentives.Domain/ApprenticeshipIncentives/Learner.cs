@@ -15,8 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public long UniqueLearnerNumber => Model.UniqueLearnerNumber;
         public long ApprenticeshipId => Model.ApprenticeshipId;
         public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;
-
         public SubmissionData SubmissionData => Model.SubmissionData;
+        public bool SuccessfulLearnerMatch => Model.SuccessfulLearnerMatch;
 
         internal static Learner New(
             Guid id,
@@ -65,42 +65,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        public int GetBreakInLearningDayCount()
-        {
-            if (!Model.LearningPeriods.Any())
-            {               
-                return 0;
-            }
-            var learningPeriods = Model.LearningPeriods.OrderBy(p => p.StartDate);
-
-            if (!learningPeriods.First().EndDate.HasValue)
-            {
-                return 0;
-            }
-
-            int numberOfDays = 0;
-            var previousEndDate = learningPeriods.First().EndDate.Value;
-
-            foreach (var learningPeriod in Model.LearningPeriods.OrderBy(p => p.StartDate))
-            {
-                if (learningPeriod.StartDate > previousEndDate.AddDays(1))
-                {
-                    numberOfDays += (learningPeriod.StartDate - previousEndDate.AddDays(1)).Days;
-                }
-
-                if (!learningPeriod.EndDate.HasValue)
-                {
-                    break;
-                }
-                else
-                {
-                    previousEndDate = learningPeriod.EndDate.Value;
-                }
-            }
-
-            return numberOfDays;
-        }
-
         public int GetDaysInLearning(CollectionPeriod collectionPeriod)
         {
             var daysInLearningForCollectionPeriod = Model.DaysInLearnings.FirstOrDefault(d => d.CollectionPeriod == collectionPeriod);
@@ -146,6 +110,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             
             Model.DaysInLearnings.Add(daysInLearning);
         }
+
+        public void SetSuccessfulLearnerMatch(bool succeeded) => Model.SuccessfulLearnerMatch = succeeded;
 
         private Learner(LearnerModel model, bool isNew = false) : base(model.Id, model, isNew)
         {

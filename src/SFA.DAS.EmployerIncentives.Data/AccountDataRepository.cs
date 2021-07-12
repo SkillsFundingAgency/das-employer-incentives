@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -90,33 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                            }).ToListAsync();
 
             return accountsWithApplications?.MapDto();
-        }
-        public async Task UpdatePaidDateForPaymentIds(List<Guid> paymentIds, long accountLegalEntityId, DateTime paidDate)
-        {
-            var payments = await _dbContext.Payments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
-            foreach (var paymentId in paymentIds)
-            {
-                var payment = payments.SingleOrDefault(p => p.Id == paymentId);
-                if (payment != null)
-                {
-                    payment.PaidDate ??= paidDate;
-                }
-            }
-        }
-
-        public async Task UpdateClawbackDateForClawbackIds(List<Guid> clawbackIds, long accountLegalEntityId, DateTime clawbackDate)
-        {
-            var clawbacks = await _dbContext.ClawbackPayments.Where(x => x.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
-
-            foreach (var clawbackId in clawbackIds)
-            {
-                var clawback = clawbacks.SingleOrDefault(p => p.Id == clawbackId);
-                if (clawback != null)
-                {
-                    clawback.DateClawbackSent ??= clawbackDate;
-                }
-            }
-        }
+        }        
 
         public async Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime()
         {

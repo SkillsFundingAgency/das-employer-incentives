@@ -21,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
             var period = calendar.Single(x => x.CalendarYear == 2020 && x.CalendarMonth == 8);
             period.Active = true;
+            period.PeriodEndInProgress = false;
 
             await dbConnection.UpdateAsync(period);
 

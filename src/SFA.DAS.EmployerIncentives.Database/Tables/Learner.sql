@@ -13,6 +13,7 @@
 	[InLearning] BIT NULL,
 	[LearningStoppedDate] DATETIME2 NULL,
 	[LearningResumedDate] DATETIME2 NULL,
+	[SuccessfulLearnerMatch] BIT NOT NULL DEFAULT(1),
 	[RawJSON] NVARCHAR(MAX) NULL,
 	[CreatedDate] DATETIME2 NOT NULL,
 	[UpdatedDate] DATETIME2 NULL

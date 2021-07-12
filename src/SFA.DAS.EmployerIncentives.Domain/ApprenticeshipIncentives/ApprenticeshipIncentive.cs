@@ -35,7 +35,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
-        public int BreakInLearningDayCount => Model.BreakInLearningDayCount;
         public IncentivePhase Phase => Model.Phase;
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
@@ -159,7 +158,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     -pendingPayment.Amount,
                     DateTime.Now,
                     payment.SubnominalCode,
-                    payment.Id);
+                    payment.Id,
+                    payment.VrfVendorId);
 
                 clawback.SetPaymentPeriod(collectionPeriod);
 
@@ -267,7 +267,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);
                 }
 
-                SetBreakInLearningDayCount(learner.GetBreakInLearningDayCount());
                 await SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus, collectionCalendarService);                
             }
 
@@ -362,11 +361,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        private void SetBreakInLearningDayCount(int breakInLearningDayCount)
-        {
-            Model.BreakInLearningDayCount = breakInLearningDayCount;
-        }
-
         private async Task RemoveEarningsAfterStopDate(DateTime dateStopped, ICollectionCalendarService collectionCalendarService)
         {
             var collectionCalendar = await collectionCalendarService.Get();
@@ -424,6 +418,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void AddPayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var subnominalCode = DetermineSubnominalCode();
+            var account = Model.Account;
 
             var payment = Payment.New(
                 Guid.NewGuid(),
@@ -434,7 +429,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 paymentDate,
                 collectionPeriod.AcademicYear,
                 collectionPeriod.PeriodNumber,
-                subnominalCode);
+                subnominalCode,
+                string.Empty);
 
             Model.PaymentModels.Add(payment.GetModel());
         }

@@ -29,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture = new Fixture();
 
             _collectionYear = _fixture.Create<short>();
+
             
             _collectionPeriod = new CollectionPeriod(1, _collectionYear);
 

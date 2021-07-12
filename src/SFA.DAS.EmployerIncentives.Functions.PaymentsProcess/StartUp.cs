@@ -55,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             configBuilder.AddJsonFile("local.settings.json", optional: true);
 
             var config = configBuilder.Build();
+            builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config));
 
             builder.Services.AddOptions();
             builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
