@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Events.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.Accounts
@@ -53,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.Accounts
             {
                 foreach (var apprenticeship in application.ApprenticeshipModels)
                 {
-                    _commandPublisher.Verify(x => x.Publish(It.Is<WithdrawCommand>(y => y.IncentiveApplicationApprenticeshipId == apprenticeship.Id), It.IsAny<CancellationToken>()), Times.Once);
+                    _commandPublisher.Verify(x => x.Publish(It.Is<WithdrawCommand>(y => y.IncentiveApplicationApprenticeshipId == apprenticeship.Id && y.WithdrawnBy == WithdrawnBy.Employer), It.IsAny<CancellationToken>()), Times.Once);
                 }
             }
         }
