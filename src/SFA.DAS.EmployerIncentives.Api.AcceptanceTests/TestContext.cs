@@ -24,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }
         public List<object> EventsPublished { get; set; }
+        public List<PublishedEvent> PublishedEvents { get; set; }
         public List<PublishedCommand> CommandsPublished { get; set; }
         public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
@@ -43,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             HashingService = new HashingService.HashingService("46789BCDFGHJKLMNPRSTVWXY", "SFA: digital apprenticeship service");
             Hooks = new List<IHook>();
             EventsPublished = new List<object>();
+            PublishedEvents = new List<PublishedEvent>();
             CommandsPublished = new List<PublishedCommand>();
         }
     }

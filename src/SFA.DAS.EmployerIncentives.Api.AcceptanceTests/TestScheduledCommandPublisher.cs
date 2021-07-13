@@ -10,15 +10,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     public class TestScheduledCommandPublisher : IScheduledCommandPublisher
     {
         private readonly IScheduledCommandPublisher _messageSession;
-        private readonly IHook<object> _hook;
+        private readonly IHook<ICommand> _hook;
 
-        public TestScheduledCommandPublisher(IScheduledCommandPublisher messageSession, IHook<object> hook)
+        public TestScheduledCommandPublisher(IScheduledCommandPublisher messageSession, IHook<ICommand> hook)
         {
             _messageSession = messageSession;
             _hook = hook;
         }
 
-        public async Task Send<T>(T command, TimeSpan delay, CancellationToken cancellationToken = default(CancellationToken)) where T : class, ICommand
+        public async Task Send<T>(T command, TimeSpan delay, CancellationToken cancellationToken = default(CancellationToken)) where T : ICommand
         {
             if (_hook != null)
             {
@@ -31,9 +31,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
                     await _messageSession.Send(command, delay, cancellationToken);
 
-                    if (_hook?.OnProcessed != null)
+                    if (_hook?.OnDelayed != null)
                     {
-                        _hook.OnProcessed(command);
+                        _hook.OnDelayed(command);
                     }
                 }
                 catch (Exception ex)

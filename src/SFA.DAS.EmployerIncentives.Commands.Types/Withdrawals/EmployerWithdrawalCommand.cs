@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
+namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
 {
-    public class EmployerWithdrawalCommand : WithdrawalCommand
+    public class EmployerWithdrawalCommand : WithdrawalCommand , IPeriodEndIncompatible
     {
         public EmployerWithdrawalCommand(
             long accountLegalEntityId,
@@ -18,5 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
                   serviceRequestCreated)
         {
         }
+
+        public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
     }
 }
