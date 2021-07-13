@@ -8,12 +8,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
     {
         public string ValidationStep { get; }
         public bool ValidationResult { get; }
-        public CollectionPeriod CollectionPeriod { get; }
+        public CollectionCalendarPeriod CollectionPeriod { get; }
 
         public PendingPaymentValidationResult(
             string validationStep,
             bool validationResult,
-            CollectionPeriod collectionPeriod)
+            CollectionCalendarPeriod collectionPeriod)
         {
             ValidationStep = validationStep;
             ValidationResult = validationResult;

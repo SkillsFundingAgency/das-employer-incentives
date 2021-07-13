@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
     public class WhenActivatingPeriod
     {
         private CollectionCalendar _sut;
-        private List<CollectionPeriod> _collectionPeriods;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
         private DateTime testDate;
 
@@ -23,11 +23,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             testDate = DateTime.Now;
 
-            var period1 = new CollectionPeriod(1, (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), 2021, true, false);
-            var period2 = new CollectionPeriod(2, (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), 2021, false, false);
-            var period3 = new CollectionPeriod(3, (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), 2021, false, false);
+            var period1 = new CollectionCalendarPeriod(new CollectionPeriod(1, 2021), (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true, false);
+            var period2 = new CollectionCalendarPeriod(new CollectionPeriod(2, 2021), (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), false, false);
+            var period3 = new CollectionCalendarPeriod(new CollectionPeriod(3, 2021), (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, false);
 
-            _collectionPeriods = new List<CollectionPeriod>() { period1, period2, period3 };
+            _collectionPeriods = new List<CollectionCalendarPeriod>() { period1, period2, period3 };
 
             _sut = new CollectionCalendar(_collectionPeriods);
         }
@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_initial_period_is_set_to_active()
         {
             // Arrange / Act
-            var activePeriod = _sut.GetPeriod(2021, 1);
+            var activePeriod = _sut.GetPeriod(new CollectionPeriod(1, 2021));
 
             // Assert
             activePeriod.Active.Should().BeTrue();
@@ -51,9 +51,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             var periods = _sut.GetAllPeriods().ToList();
 
-            periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeTrue();
-            periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 1).Active.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 2).Active.Should().BeTrue();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 3).Active.Should().BeFalse();
             periods.Count(x => x.Active).Should().Be(1);
         }
 
@@ -61,31 +61,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_period_in_progress_is_false_when_the_active_period_is_changed()
         {
             // Arrange / Act
-            _collectionPeriods.Add(new CollectionPeriod(4, (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), 2021, false, true));
+            _collectionPeriods.Add(new CollectionCalendarPeriod(new CollectionPeriod(4, 2021), (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, true));
             var period = new CollectionPeriod(2, 2021);
-            _sut.SetActive(period);            
+            _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();
 
-            periods.FirstOrDefault(x => x.PeriodNumber == 1).PeriodEndInProgress.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 2).PeriodEndInProgress.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 3).PeriodEndInProgress.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 4).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 1).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 2).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 3).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 4).PeriodEndInProgress.Should().BeFalse();
             periods.Count(x => x.Active).Should().Be(1);
         }
 
         [Test]
         public void Then_the_active_period_is_not_changed_when_the_period_and_year_not_matched()
         {
-            // Arrange / Act
+            // Arrange / Act            
             var period = new CollectionPeriod(4, 2021);
             _sut.SetActive(period);
 
             var periods = _sut.GetAllPeriods().ToList();
 
-            periods.FirstOrDefault(x => x.PeriodNumber == 1).Active.Should().BeTrue();
-            periods.FirstOrDefault(x => x.PeriodNumber == 2).Active.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 3).Active.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 1).Active.Should().BeTrue();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 2).Active.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 3).Active.Should().BeFalse();
             periods.Count(x => x.Active).Should().Be(1);
         }      
     }

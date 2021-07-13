@@ -275,6 +275,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             incentive.MinimumAgreementVersion.Should().Be(version);
         }
-        
+
     }
 }
