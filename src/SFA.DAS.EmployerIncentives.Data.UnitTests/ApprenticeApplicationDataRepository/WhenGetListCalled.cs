@@ -1198,7 +1198,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             // Assert
             result[0].FirstClawbackStatus.Should().NotBeNull();
             result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
-            result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent);
+            result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
         }
 
         [Test]
@@ -1273,7 +1273,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             // Assert
             result[0].SecondClawbackStatus.Should().NotBeNull();
             result[0].SecondClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
-            result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent);
+            result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
         }
     }
 }
