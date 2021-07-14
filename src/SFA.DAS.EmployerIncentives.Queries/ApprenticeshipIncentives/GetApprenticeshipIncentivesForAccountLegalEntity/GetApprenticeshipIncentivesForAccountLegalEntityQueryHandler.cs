@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprent
             var apprenticeshipIncentives = await _queryRepository.GetDtoList(
                 x => x.AccountId == query.AccountId 
                 && x.AccountLegalEntityId == query.AccountLegalEntityId 
-                && query.IncludeWithdrawn ? x.Status == IncentiveStatus.Withdrawn : x.Status != IncentiveStatus.Withdrawn);
+                && (query.IncludeWithdrawn ? x.Status == IncentiveStatus.Withdrawn : x.Status != IncentiveStatus.Withdrawn)); // don't remove the brackets
 
             var response = new GetApprenticeshipIncentivesForAccountLegalEntityResponse(apprenticeshipIncentives);
 
