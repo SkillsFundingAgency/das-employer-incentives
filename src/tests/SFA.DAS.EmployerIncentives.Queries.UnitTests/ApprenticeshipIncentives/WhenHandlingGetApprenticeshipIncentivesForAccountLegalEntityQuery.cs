@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
             var data = _fixture.CreateMany<ApprenticeshipIncentiveDto>().ToList();
             var expected = new GetApprenticeshipIncentivesResponse(data);
 
-            _repositoryMock.Setup(x => x.GetDtoList(q => q.AccountId == query.AccountId && q.AccountLegalEntityId == query.AccountLegalEntityId && query.IncludeWithdrawn ? q.Status == Enums.IncentiveStatus.Withdrawn : q.Status != Enums.IncentiveStatus.Withdrawn)).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.GetDtoList(q => q.AccountId == query.AccountId && q.AccountLegalEntityId == query.AccountLegalEntityId && (query.IncludeWithdrawn ? q.Status == Enums.IncentiveStatus.Withdrawn : q.Status != Enums.IncentiveStatus.Withdrawn))).ReturnsAsync(data);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
