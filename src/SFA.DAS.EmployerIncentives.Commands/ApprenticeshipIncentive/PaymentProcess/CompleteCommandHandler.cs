@@ -19,10 +19,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
         public async Task Handle(CompleteCommand command, CancellationToken cancellationToken = default)
         {
             var collectionCalendar = await _collectionCalendarService.Get();
-            var currentPeriod = collectionCalendar.GetPeriod(command.CollectionPeriod.AcademicYear, command.CollectionPeriod.PeriodNumber);
+            var currentPeriod = collectionCalendar.GetPeriod(new Domain.ValueObjects.CollectionPeriod(command.CollectionPeriod.PeriodNumber, command.CollectionPeriod.AcademicYear));
 
             currentPeriod.SetMonthEndProcessingCompletedDate(command.CompletionDateTime);
-            collectionCalendar.SetActive(collectionCalendar.GetNextPeriod(currentPeriod));
+            collectionCalendar.SetActive(collectionCalendar.GetNextPeriod(currentPeriod).CollectionPeriod);
 
             await _collectionCalendarService.Save(collectionCalendar);
         }

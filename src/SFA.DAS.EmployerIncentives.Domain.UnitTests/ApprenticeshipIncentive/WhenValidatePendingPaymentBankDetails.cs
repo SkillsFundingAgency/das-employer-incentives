@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var collectionYear = _fixture.Create<short>();
             var collectionMonth = _fixture.Create<byte>();
             
-            _collectionPeriod = new CollectionPeriod(1, collectionMonth, collectionYear, DateTime.Now, DateTime.Now, collectionYear, true, false);
+            _collectionPeriod = new CollectionPeriod(1, collectionYear);
 
             var legalEntityModels = new List<LegalEntityModel>
             {

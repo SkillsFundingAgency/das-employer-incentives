@@ -126,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task ThenTheValidationStepWillHaveAFailedValidationResult()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionPeriod>().Result.Where(x => x.Active).ToList();
+            var results = connection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>().Result.Where(x => x.Active).ToList();
             results.Should().HaveCount(1);
             results.First().PeriodEndInProgress.Should().BeTrue();
         }

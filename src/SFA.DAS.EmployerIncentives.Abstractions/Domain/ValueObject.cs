@@ -4,12 +4,12 @@ using System.Linq;
 namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
 {
 #pragma warning disable IDE0041 // Use 'is null' check
+#pragma warning disable S3875 // "operator==" should not be overloaded on reference types
     //https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects
     public abstract class ValueObject
     {
-        protected static bool EqualOperator(ValueObject left, ValueObject right)
+        public static bool operator ==(ValueObject left, ValueObject right)
         {
-
             if (ReferenceEquals(left, null) ^ ReferenceEquals(right, null))
             {
                 return false;
@@ -17,10 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
             return ReferenceEquals(left, null) || left.Equals(right);
         }
 
-        protected static bool NotEqualOperator(ValueObject left, ValueObject right)
-        {
-            return !(EqualOperator(left, right));
-        }
+        public static bool operator !=(ValueObject left, ValueObject right) => !(left == right);
+
 
         protected abstract IEnumerable<object> GetAtomicValues();
 
@@ -60,4 +58,5 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
         // Other utility methods
     }
 #pragma warning restore IDE0041 // Use 'is null' check
+#pragma warning restore S3875 // "operator==" should not be overloaded on reference types
 }

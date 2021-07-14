@@ -18,7 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private CollectionPeriod _collectionPeriod;
         private Learner _learner;
         private short _collectionYear;
-        private byte _collectionMonth;
         private Fixture _fixture;
 
         [SetUp]
@@ -27,9 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture = new Fixture();
 
             _collectionYear = _fixture.Create<short>();
-            _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true, false);
+            _collectionPeriod = new CollectionPeriod(1, _collectionYear);
 
             _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
 

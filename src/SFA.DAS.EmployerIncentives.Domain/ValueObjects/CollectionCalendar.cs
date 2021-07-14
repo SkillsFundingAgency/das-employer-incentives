@@ -8,50 +8,48 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
     public class CollectionCalendar : ValueObject
     {
-        private readonly IEnumerable<CollectionPeriod> _collectionPeriods;
+        private readonly IEnumerable<CollectionCalendarPeriod> _collectionPeriods;
 
-        public CollectionCalendar(IEnumerable<CollectionPeriod> collectionPeriods)
+        public CollectionCalendar(IEnumerable<CollectionCalendarPeriod> collectionPeriods)
         {
             _collectionPeriods = collectionPeriods;
         }
 
-        public CollectionPeriod GetPeriod(DateTime dateTime)
+        public CollectionCalendarPeriod GetPeriod(DateTime dateTime)
         {
-            var period =
-                _collectionPeriods
+            return _collectionPeriods
                 .Where(d => d.OpenDate <= dateTime)
                 .OrderByDescending(d => d.OpenDate)
                 .FirstOrDefault();
-
-            return period;
         }
 
-        public CollectionPeriod GetActivePeriod()
+        public CollectionCalendarPeriod GetPeriod(CollectionPeriod collectionPeriod)
+        {
+            return collectionPeriod == null
+                ? null
+                : _collectionPeriods
+                .Single(d => d.CollectionPeriod == collectionPeriod);
+        }
+
+        public CollectionCalendarPeriod GetActivePeriod()
         {
             return
                 _collectionPeriods
                 .Single(d => d.Active);
-        }
+        }        
 
-        public CollectionPeriod GetNextPeriod(CollectionPeriod period)
+        public CollectionCalendarPeriod GetNextPeriod(CollectionCalendarPeriod period)
         {
             var nextPeriodDate = new DateTime(period.CalendarYear, period.CalendarMonth, 1).AddMonths(1);
             return
                 _collectionPeriods
                 .Single(d => d.CalendarMonth == nextPeriodDate.Month && d.CalendarYear == nextPeriodDate.Year);
-        }
-
-        public CollectionPeriod GetPeriod(short collectionYear, byte periodNumber)
-        {
-            return 
-                _collectionPeriods
-                .Single(d => d.AcademicYear == collectionYear && d.PeriodNumber == periodNumber);
-        }
+        }        
 
         public void SetActive(CollectionPeriod collectionPeriod)
         {
-            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.AcademicYear == collectionPeriod.AcademicYear 
-                                                                                 && x.PeriodNumber == collectionPeriod.PeriodNumber);
+            var collectionPeriodToActivate = _collectionPeriods.FirstOrDefault(x => x.CollectionPeriod == collectionPeriod);
+
             if (collectionPeriodToActivate == null)
             {
                 return;
@@ -77,19 +75,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             activePeriod.SetPeriodEndInProgress(true);
         }
 
-        public ReadOnlyCollection<CollectionPeriod> GetAllPeriods()
+        public ReadOnlyCollection<CollectionCalendarPeriod> GetAllPeriods()
         {
-            return new ReadOnlyCollection<CollectionPeriod>(_collectionPeriods.ToList());
+            return new ReadOnlyCollection<CollectionCalendarPeriod>(_collectionPeriods.ToList());
         }
 
         protected override IEnumerable<object> GetAtomicValues()
         {
             foreach (var collectionPeriod in _collectionPeriods)
             {
-                yield return collectionPeriod.PeriodNumber;
+                yield return collectionPeriod.CollectionPeriod;
                 yield return collectionPeriod.CalendarMonth;
                 yield return collectionPeriod.CalendarYear;
-                yield return collectionPeriod.AcademicYear;
                 yield return collectionPeriod.OpenDate;
             }
         }

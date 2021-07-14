@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity
         public async Task Handle(UpdateVendorRegistrationCaseStatusForAccountCommand command, CancellationToken cancellationToken = default)
         {
             var account = await _domainRepository.Find(command.AccountId);
-            account.SetVendorRegistrationCaseDetails(command.HashedLegalEntityId, command.CaseId, command.Status, command.LastUpdatedDate);
+            account.SetVendorRegistrationCaseDetails(command.HashedLegalEntityId, new Domain.ValueObjects.VendorCase(command.CaseId, command.Status, command.LastUpdatedDate));
             await _domainRepository.Save(account);
         }
     }
