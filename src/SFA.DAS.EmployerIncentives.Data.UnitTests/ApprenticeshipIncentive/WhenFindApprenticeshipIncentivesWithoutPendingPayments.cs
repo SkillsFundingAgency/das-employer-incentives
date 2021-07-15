@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var expected = (IncentiveWithPendingPayments: incentives[0].Id,
                 IncentivesWithoutPendingPyaments: new[] { incentives[1], incentives[2] });
 
-            var cpData = _fixture.Build<CollectionPeriod>()
+            var cpData = _fixture.Build<CollectionCalendarPeriod>()
                 .With(x => x.Active, true)
                 .With(x => x.PeriodNumber, 2)
                 .With(x => x.CalendarMonth, 9)

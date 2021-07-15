@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
         private List<IncentivePaymentProfile> _paymentProfiles;
-        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionPeriods;
 
         [SetUp]
         public void Arrange()
@@ -47,9 +47,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                .Setup(m => m.Get())
                .ReturnsAsync(_paymentProfiles);
 
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            _collectionPeriods = new List<CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(), true, false)
+                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<short>()), (byte)today.Month, (short)today.Year, today.AddDays(-1), _fixture.Create<DateTime>(), true, false)
             };
 
             _mockCollectionCalendarService

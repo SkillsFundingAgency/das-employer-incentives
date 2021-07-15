@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 
@@ -16,8 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public SubnominalCode SubnominalCode { get; set; }
         public Guid PaymentId { get; set; }
         public DateTime? DateClawbackSent { get; set; }
-        public byte? CollectionPeriod { get; set; }
-        public short? CollectionPeriodYear { get; set; }
+        public CollectionPeriod CollectionPeriod { get; set; }
         public string VrfVendorId { get; set; }
     }
 }

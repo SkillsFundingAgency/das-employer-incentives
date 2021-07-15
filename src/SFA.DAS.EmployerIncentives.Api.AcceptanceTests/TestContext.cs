@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public List<PublishedEvent> PublishedEvents { get; set; }
         public List<PublishedCommand> CommandsPublished { get; set; }
         public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
-        public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
+        public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
         public TestContext()
         {

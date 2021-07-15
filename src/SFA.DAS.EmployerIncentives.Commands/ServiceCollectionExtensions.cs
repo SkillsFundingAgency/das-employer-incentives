@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IScheduledCommandPublisher, ScheduledCommandPublisher>();
 
             serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, obfuscateSensitiveData) =>
-                new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData, s.GetRequiredService<ILogger<BusinessCentralFinancePaymentsService>>()));
+                new BusinessCentralFinancePaymentsServiceWithLogging(new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData), s.GetRequiredService<ILogger<BusinessCentralFinancePaymentsServiceWithLogging>>(), obfuscateSensitiveData));
 
             return serviceCollection;
         }
