@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionCalendarPeriods;
         private string _vrfVendorId;
         private Account _account;
         private LearnerModel _learnerModel;
@@ -49,22 +49,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
 
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            _collectionCalendarPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(
-                    1,
+                new Domain.ValueObjects.CollectionCalendarPeriod(
+                    new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year),
                     (byte)DateTime.Now.Month,
                     (short)DateTime.Now.Year,
                     DateTime.Now.AddDays(-1),
                     DateTime.Now,
-                    (short)DateTime.Now.Year,
                     true,
                     false)
             };
 
             _mockCollectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionCalendarPeriods));
 
             _vrfVendorId = Guid.NewGuid().ToString();
             var legalEntity = _fixture.Build<LegalEntityModel>()
@@ -116,7 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             submissionData.SetLearningData(new LearningData(true));
             submissionData.LearningData.SetIsInLearning(true);
 
-            _daysInLearning = new DaysInLearning(1, (short)DateTime.Now.Year, 90);
+            _daysInLearning = new DaysInLearning(new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year), 90);
 
             _learnerModel = _fixture.Build<LearnerModel>()
                 .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)
@@ -146,7 +145,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             var pendingPayment = incentive.PendingPayments.First();
-            var collectionPeriod = _collectionPeriods.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
 
             var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
 
@@ -155,19 +154,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(1);
-            incentive.PendingPayments.First().IsValidated(collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber).Should().BeTrue();
+            incentive.PendingPayments.First().IsValidated(new Domain.ValueObjects.CollectionPeriod(collectionPeriod.PeriodNumber, collectionPeriod.AcademicYear)).Should().BeTrue();
         }
 
         [Test]
         public void Then_a_pendingPayment_is_not_valid_if_no_validations_have_been_run()
         {
             //Arrange
-            var collectionPeriod = _collectionPeriods.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             // Assert
             incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(0);
-            incentive.PendingPayments.First().IsValidated(collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber).Should().BeFalse();
+            incentive.PendingPayments.First().IsValidated(collectionPeriod).Should().BeFalse();
         }
 
         [Test]
@@ -177,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             var pendingPayment = incentive.PendingPayments.First();
-            var collectionPeriod = _collectionPeriods.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
 
             var accountModel = _fixture.Build<AccountModel>()
                 .With(a => a.Id, _account.Id)
@@ -201,7 +200,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(1);
-            incentive.PendingPayments.First().IsValidated(collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber).Should().BeFalse();
+            incentive.PendingPayments.First().IsValidated(new Domain.ValueObjects.CollectionPeriod(collectionPeriod.PeriodNumber, collectionPeriod.AcademicYear)).Should().BeFalse();
         }
 
         [Test]
@@ -211,7 +210,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             var pendingPayment = incentive.PendingPayments.First();
-            var collectionPeriod = _collectionPeriods.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
 
             var accountModel = _fixture.Build<AccountModel>()
                 .With(a => a.Id, _account.Id)
@@ -230,7 +229,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
             await _sut.Handle(command);
-            incentive.PendingPayments.First().IsValidated(collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber).Should().BeFalse();
+            incentive.PendingPayments.First().IsValidated(collectionPeriod).Should().BeFalse();
 
             // Act
             accountModel = _fixture.Build<AccountModel>()
@@ -252,7 +251,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             incentive.PendingPayments.Count(p => p.PendingPaymentValidationResults.Count >= 1).Should().Be(1);
-            incentive.PendingPayments.First().IsValidated(collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber).Should().BeTrue();
+            incentive.PendingPayments.First().IsValidated(new Domain.ValueObjects.CollectionPeriod(collectionPeriod.PeriodNumber, collectionPeriod.AcademicYear)).Should().BeTrue();
         }
 
 
@@ -265,7 +264,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             Assert.IsFalse(_learner.SubmissionData.SubmissionFound);
 
             var pendingPayment = incentive.PendingPayments.First();
-            var collectionPeriod = _collectionPeriods.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
 
             var accountModel = _fixture.Build<AccountModel>()
                 .With(a => a.Id, _account.Id)

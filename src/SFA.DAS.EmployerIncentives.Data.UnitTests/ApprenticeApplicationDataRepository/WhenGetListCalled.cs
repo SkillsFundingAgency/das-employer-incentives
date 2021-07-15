@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         private DbContextOptions<EmployerIncentivesDbContext> _options;
         private Mock<IDateTimeService> _mockDateTimeService;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionPeriods;
 
         [SetUp]
         public void Arrange()
@@ -40,10 +40,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
             
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, (short)DateTime.Now.Year, true, false),
-                new Domain.ValueObjects.CollectionPeriod(2, (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), (short)DateTime.Now.AddMonths(1).Year, false, false)
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year), (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, true, false),
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(2, (short)DateTime.Now.AddMonths(1).Year), (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), false, false)
             };
 
             _mockCollectionCalendarService
@@ -598,7 +598,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
                 .CreateMany(2).ToList();
 
-            pendingPayments[0].DueDate = _collectionPeriods.Single(p => p.PeriodNumber == 1).OpenDate.AddDays(-1);
+            pendingPayments[0].DueDate = _collectionPeriods.Single(p => p.CollectionPeriod.PeriodNumber == 1).OpenDate.AddDays(-1);
             pendingPayments[0].EarningType = EarningType.FirstPayment;
             pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
@@ -621,8 +621,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.PaymentDate.Value.Year.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).AcademicYear);
-            application.FirstPaymentStatus.PaymentDate.Value.Month.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).CalendarMonth);
+            application.FirstPaymentStatus.PaymentDate.Value.Year.Should().Be(_collectionPeriods.Single(p => p.CollectionPeriod.PeriodNumber == 2).CollectionPeriod.AcademicYear);
+            application.FirstPaymentStatus.PaymentDate.Value.Month.Should().Be(_collectionPeriods.Single(p => p.CollectionPeriod.PeriodNumber == 2).CalendarMonth);
             application.FirstPaymentStatus.PaymentDate.Value.Day.Should().Be(27);
         }
 

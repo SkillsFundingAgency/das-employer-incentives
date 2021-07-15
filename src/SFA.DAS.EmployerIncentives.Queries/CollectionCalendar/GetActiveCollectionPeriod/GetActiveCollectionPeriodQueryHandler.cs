@@ -19,8 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollect
             var activePeriod = new Domain.ValueObjects.CollectionCalendar(await _queryRepository.GetAll()).GetActivePeriod();
             return new GetActiveCollectionPeriodResponse(new Abstractions.DTOs.Queries.ApprenticeshipIncentives.CollectionPeriodDto() 
             {
-                CollectionPeriodNumber = activePeriod.PeriodNumber,
-                CollectionYear = activePeriod.AcademicYear,
+                CollectionPeriodNumber = activePeriod.CollectionPeriod.PeriodNumber,
+                CollectionYear = activePeriod.CollectionPeriod.AcademicYear,
                 IsInProgress = activePeriod.PeriodEndInProgress
             });
         }

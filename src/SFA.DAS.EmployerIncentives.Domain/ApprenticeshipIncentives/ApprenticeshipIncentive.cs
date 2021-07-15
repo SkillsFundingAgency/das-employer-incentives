@@ -128,7 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             RemoveUnpaidPaymentIfExists(existingPendingPayment);
-            if (!existingPendingPayment.Equals(pendingPayment))
+            if (!existingPendingPayment.EquivalentTo(pendingPayment))
             {
                 if(!existingPendingPayment.RequiresNewPaymentAfterBreakInLearning(Model.BreakInLearnings))
                 {
@@ -144,7 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }     
 
-        private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
+        private void AddClawback(PendingPayment pendingPayment, CollectionCalendarPeriod collectionPeriod)
         {
             pendingPayment.ClawBack();
             var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
@@ -196,7 +196,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return true;
         }
 
-        private void ClawbackAllPayments(CollectionPeriod collectionPeriod)
+        private void ClawbackAllPayments(CollectionCalendarPeriod collectionPeriod)
         {
             RemoveUnpaidEarnings();
             ClawbackPayments(PendingPayments, collectionPeriod);
@@ -223,10 +223,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        public void CreatePayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
+        public void CreatePayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
-            if (!pendingPayment.IsValidated(collectionYear, collectionPeriod))
+            if (!pendingPayment.IsValidated(collectionPeriod))
             {
                 return;
             }
@@ -237,14 +237,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (existingPayment != null)
             {
                 existingPayment.CalculatedDate = paymentDate;
-                existingPayment.PaymentPeriod = collectionPeriod;
-                existingPayment.PaymentYear = collectionYear;
+                existingPayment.PaymentPeriod = collectionPeriod.PeriodNumber;
+                existingPayment.PaymentYear = collectionPeriod.AcademicYear;
                 existingPayment.SubnominalCode = DetermineSubnominalCode();
                 existingPayment.Amount = pendingPayment.Amount;
             }
             else
             {
-                AddPayment(pendingPaymentId, collectionYear, collectionPeriod, pendingPayment, paymentDate);
+                AddPayment(pendingPaymentId, collectionPeriod, pendingPayment, paymentDate);
             }
             
             pendingPayment.SetPaymentMadeDate(paymentDate);
@@ -371,7 +371,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ClawbackPayments(PendingPayments.Where(x => x.DueDate >= dateStopped), collectionCalendar.GetActivePeriod());
         }
 
-        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionPeriod collectionPeriod)
+        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionCalendarPeriod collectionPeriod)
         {
             foreach (var paidPendingPayment in pendingPayments)
             {
@@ -417,7 +417,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        private void AddPayment(Guid pendingPaymentId, short collectionYear, byte collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
+        private void AddPayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var subnominalCode = DetermineSubnominalCode();
             var account = Model.Account;
@@ -429,8 +429,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 pendingPaymentId,
                 pendingPayment.Amount,
                 paymentDate,
-                collectionYear,
-                collectionPeriod,
+                collectionPeriod.AcademicYear,
+                collectionPeriod.PeriodNumber,
                 subnominalCode,
                 string.Empty);
 
@@ -644,7 +644,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private PendingPayment GetNextDuePayment()
         {
             var next = Model.PendingPaymentModels
-                .Where(pp => pp.PaymentMadeDate == null && pp.PaymentYear.HasValue && pp.PeriodNumber.HasValue)
+                .Where(pp => pp.PaymentMadeDate == null && pp.CollectionPeriod != null)
                 .OrderBy(pp => pp.DueDate).FirstOrDefault();
 
             return next?.Map();
