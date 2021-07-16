@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var incentive = await Incentive.Create(this, incentivePaymentProfilesService);
             if (!incentive.IsEligible)
             {
-                ClawbackAllPayments(collectionCalendar.GetActivePeriod().CollectionPeriod);
+                ClawbackAllPayments(collectionCalendar.GetActivePeriod());
                 return;
             }
 
@@ -121,7 +121,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     return;
                 }
 
-                AddClawback(existingPendingPayment, collectionCalendar.GetActivePeriod().CollectionPeriod);
+                AddClawback(existingPendingPayment, collectionCalendar.GetActivePeriod());
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
                 return;
             }
@@ -143,7 +143,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }     
 
-        private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
+        private void AddClawback(PendingPayment pendingPayment, CollectionCalendarPeriod collectionPeriod)
         {
             pendingPayment.ClawBack();
             var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
@@ -195,7 +195,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return true;
         }
 
-        private void ClawbackAllPayments(CollectionPeriod collectionPeriod)
+        private void ClawbackAllPayments(CollectionCalendarPeriod collectionPeriod)
         {
             RemoveUnpaidEarnings();
             ClawbackPayments(PendingPayments, collectionPeriod);
@@ -212,7 +212,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (HasPaidEarnings)
             {
                 var calendarService = await collectionCalendarService.Get();
-                ClawbackAllPayments(calendarService.GetActivePeriod().CollectionPeriod);
+                ClawbackAllPayments(calendarService.GetActivePeriod());
                 Model.PausePayments = false;
             }
             else
@@ -366,10 +366,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var collectionCalendar = await collectionCalendarService.Get();
 
             RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate >= dateStopped));
-            ClawbackPayments(PendingPayments.Where(x => x.DueDate >= dateStopped), collectionCalendar.GetActivePeriod().CollectionPeriod);
+            ClawbackPayments(PendingPayments.Where(x => x.DueDate >= dateStopped), collectionCalendar.GetActivePeriod());
         }
 
-        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionPeriod collectionPeriod)
+        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionCalendarPeriod collectionPeriod)
         {
             foreach (var paidPendingPayment in pendingPayments)
             {
