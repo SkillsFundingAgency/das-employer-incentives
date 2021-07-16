@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
         private Mock<ICommandHandler<TestCommand>> _mockHandler;
         private Mock<IScheduledCommandPublisher> _mockScheduledPublisher;
         private Mock<ICollectionCalendarService> __mockCollectionCalendarService;
-        private Domain.ValueObjects.CollectionPeriod _collectionPeriod;
+        private Domain.ValueObjects.CollectionCalendarPeriod _collectionCalendarPeriod;
 
         public class DelayableTestCommand : TestCommand, IPeriodEndIncompatible
         {
@@ -33,12 +33,12 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             _mockHandler = new Mock<ICommandHandler<TestCommand>>();
             _mockScheduledPublisher = new Mock<IScheduledCommandPublisher>();
 
-            _collectionPeriod = new Domain.ValueObjects.CollectionPeriod(1, 6, 2021, DateTime.Now, DateTime.Now, 2021, true, false);
+            _collectionCalendarPeriod = new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, 2021), 6, 2021, DateTime.Now, DateTime.Now, true, false);
 
             __mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             __mockCollectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<Domain.ValueObjects.CollectionPeriod>() { _collectionPeriod }));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<Domain.ValueObjects.CollectionCalendarPeriod>() { _collectionCalendarPeriod }));
 
             _sut = new CommandHandlerWithPeriodEndDelay<TestCommand>(_mockHandler.Object, _mockScheduledPublisher.Object, __mockCollectionCalendarService.Object);
         }
@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
         {
             //Arrange
             var command = new DelayableTestCommand();
-            _collectionPeriod.SetPeriodEndInProgress(true);
+            _collectionCalendarPeriod.SetPeriodEndInProgress(true);
 
             //Act
             await _sut.Handle(command);
