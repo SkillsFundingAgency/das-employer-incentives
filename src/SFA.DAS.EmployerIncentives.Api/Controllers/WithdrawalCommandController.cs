@@ -2,8 +2,6 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -32,7 +30,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                         request.ULN,
                         request.ServiceRequest.TaskId,
                         request.ServiceRequest.DecisionReference,
-                        request.ServiceRequest.TaskCreatedDate??DateTime.UtcNow));
+                        request.ServiceRequest.TaskCreatedDate??DateTime.UtcNow,
+                        request.AccountId,
+                        request.EmailAddress
+                        ));
                 return Accepted();
             }
             else if(request.WithdrawalType == WithdrawalType.Compliance)

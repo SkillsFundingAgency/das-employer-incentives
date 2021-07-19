@@ -12,12 +12,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
 
             if (item.AccountLegalEntityId == default)
             {
-                result.AddError("AccountLegalEntityId", "Is not set");
+                result.AddIsNotSetError(nameof(item.AccountLegalEntityId));
             }
 
             if (item.ULN == default)
             {
-                result.AddError("ULN", "Is not set");
+                result.AddIsNotSetError(nameof(item.ULN));
+            }
+
+            if (item.AccountId == default)
+            {
+                result.AddIsNotSetError(nameof(item.AccountId));
+            }
+
+            if (item.EmailAddress == default)
+            {
+                result.AddIsNotSetError(nameof(item.EmailAddress));
             }
 
             return Task.FromResult(result);

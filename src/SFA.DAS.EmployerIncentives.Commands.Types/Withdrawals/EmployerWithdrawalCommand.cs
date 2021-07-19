@@ -9,7 +9,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
             long uln,
             string serviceRequestTaskId,
             string decisionReference,
-            DateTime serviceRequestCreated)
+            DateTime serviceRequestCreated,
+            long accountId,
+            string emailAddress)
             : base(
                   accountLegalEntityId,
                   uln,
@@ -17,8 +19,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
                   decisionReference,
                   serviceRequestCreated)
         {
+            AccountId = accountId;
+            EmailAddress = emailAddress;
         }
 
         public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
+        public long AccountId { get; }
+        public string EmailAddress { get; }
     }
 }
