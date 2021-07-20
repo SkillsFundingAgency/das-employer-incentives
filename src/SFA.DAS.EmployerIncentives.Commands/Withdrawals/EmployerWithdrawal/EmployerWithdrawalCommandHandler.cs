@@ -12,10 +12,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
     public class EmployerWithdrawalCommandHandler : ICommandHandler<EmployerWithdrawalCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _domainRepository;
+        private readonly IAccountDomainRepository _accountDomainRepository;
 
-        public EmployerWithdrawalCommandHandler(IIncentiveApplicationDomainRepository domainRepository)
+        public EmployerWithdrawalCommandHandler(IIncentiveApplicationDomainRepository domainRepository,
+            IAccountDomainRepository accountDomainRepository)
         {
             _domainRepository = domainRepository;
+            _accountDomainRepository = accountDomainRepository;
         }
 
         public async Task Handle(EmployerWithdrawalCommand command, CancellationToken cancellationToken = default)
@@ -26,14 +29,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
                 throw new WithdrawalException($"Unable to handle Employer withdrawal command.  No matching incentive applications found for {command}");
             }
 
-            foreach(var application in applications)
+            var account = await _accountDomainRepository.Find(command.AccountId);
+            var legalEntity = account?.GetLegalEntity(command.AccountLegalEntityId);
+
+            foreach (var application in applications)
             {
                 foreach(var apprenticeship in application.Apprenticeships)
                 {
                     if(apprenticeship.ULN == command.ULN)
                     {
                         application.EmployerWithdrawal(
-                            apprenticeship, 
+                            apprenticeship,
+                            legalEntity,
+                            command.EmailAddress,
                             new ServiceRequest(
                                 command.ServiceRequestTaskId, 
                                 command.DecisionReference,
