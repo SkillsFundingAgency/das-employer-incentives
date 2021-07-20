@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
-        public void EmployerWithdrawal(Apprenticeship apprenticeship, LegalEntity legalEntity, string emailAddress, ServiceRequest serviceRequest)
+        public void EmployerWithdrawal(Apprenticeship apprenticeship, LegalEntity legalEntity, string withdrawnByEmailAddress, ServiceRequest serviceRequest)
         {
             var apprenticeToWithdraw = Apprenticeships.Single(m => m.Id == apprenticeship.Id);
             apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.EmployerWithdrawn);
@@ -81,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 Model.AccountId,
                 Model.AccountLegalEntityId,
                 legalEntity.Name,
-                emailAddress,
+                withdrawnByEmailAddress,
                 apprenticeToWithdraw.GetModel(),
                 serviceRequest));
         }

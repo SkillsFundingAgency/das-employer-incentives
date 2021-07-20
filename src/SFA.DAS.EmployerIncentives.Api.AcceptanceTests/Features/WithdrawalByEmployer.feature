@@ -12,6 +12,7 @@ Scenario: Withdrawal status set against an apprenticeship in an application
 	Given an incentive application has been made without being submitted
 	When the apprenticeship application is withdrawn from the scheme
 	Then the incentive application status is updated to indicate the employer withdrawal
+	And an email notification is sent to confirm the employer withdrawal
 
 Scenario: Withdrawal status set against a ULN with multiple apprenticeships in applications 
 	Given multiple incentive applications have been made for the same ULN without being submitted

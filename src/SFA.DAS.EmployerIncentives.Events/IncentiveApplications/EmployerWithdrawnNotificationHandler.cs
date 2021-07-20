@@ -1,33 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
-using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.HashingService;
 using SFA.DAS.Notifications.Messages.Commands;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 {
     public class EmployerWithdrawnNotificationHandler :  IDomainEventHandler<EmployerWithdrawn>
     {
         private readonly ICommandPublisher _commandPublisher;
-        private readonly EmailTemplateSettings _emailTemplates;
         private readonly IHashingService _hashingService;
+        private readonly EmailTemplateSettings _emailTemplates;
         private readonly ApplicationSettings _applicationSettings;
 
         private const string ViewApplicationsUrlToken = "view applications url";
         private const string OrganisationNameToken = "organisation name";
-        public const string Uln = "uln";
+        private const string Uln = "uln";
 
-        public EmployerWithdrawnNotificationHandler(ICommandPublisher commandPublisher,
+        public EmployerWithdrawnNotificationHandler(
+            ICommandPublisher commandPublisher,
             IOptions<EmailTemplateSettings> emailTemplates,
             IHashingService hashingService,
             IOptions<ApplicationSettings> applicationSettings)

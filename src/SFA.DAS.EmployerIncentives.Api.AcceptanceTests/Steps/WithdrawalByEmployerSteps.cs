@@ -10,10 +10,12 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using SFA.DAS.Notifications.Messages.Commands;
 using TechTalk.SpecFlow;
@@ -260,11 +262,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
-            var publishedCommand = _testContext
-                .CommandsPublished
-                .Single(c => c.IsPublished &&
-                             c.Command is WithdrawCommand).Command as WithdrawCommand;
-
             await using var dbConnection = new SqlConnection(_connectionString);
             var apprenticeships = await dbConnection.GetAllAsync<IncentiveApplicationApprenticeship>();
             apprenticeships.Should().HaveCount(1);
@@ -278,13 +275,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             auditRecord.ServiceRequestDecisionReference.Should().Be(_withdrawApplicationRequest.ServiceRequest.DecisionReference);
             auditRecord.ServiceRequestCreatedDate.Should().Be(_withdrawApplicationRequest.ServiceRequest.TaskCreatedDate.Value);
 
-            //var publishedCommand = _testContext
-            //    .CommandsPublished
-            //    .Single(c => c.IsPublished &&
-            //    c.Command is WithdrawCommand).Command as WithdrawCommand;
+            var publishedCommand = _testContext
+                .CommandsPublished
+                .Single(c => c.IsPublished &&
+                c.Command is WithdrawCommand).Command as WithdrawCommand;
 
             publishedCommand.AccountId.Should().Be(_application.AccountId);
             publishedCommand.IncentiveApplicationApprenticeshipId.Should().Be(_apprenticeship.Id);
+        }
+
+        [Then(@"an email notification is sent to confirm the employer withdrawal")]
+        public void ThenAnEmailNotificationIsSentToConfirmTheEmployerWithdrawal()
+        {
+            var notification = _testContext
+                .EventsPublished
+                .Single(e => e is SendEmailCommand) as SendEmailCommand;
+
+            Debug.Assert(notification != null, nameof(notification) + " != null");
+            notification.RecipientsAddress.Should().Be(_withdrawApplicationRequest.EmailAddress);
+            notification.Tokens["uln"].Should().Be(_apprenticeship.ULN.ToString());
+            notification.Tokens["organisation name"].Should().Be(_account.LegalEntityName);
         }
 
         [Then(@"each incentive application status is updated to indicate the employer withdrawal")]
