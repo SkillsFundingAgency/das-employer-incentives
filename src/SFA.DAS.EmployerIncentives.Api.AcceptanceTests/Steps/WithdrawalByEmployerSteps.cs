@@ -324,6 +324,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             incentives.Should().HaveCount(1);
             var incentive = incentives.FirstOrDefault();
             incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.WithdrawnBy.Should().Be(WithdrawnBy.Employer);
             pendingPayments.Should().HaveCount(0);
             pendingPaymentValidationResults.Should().HaveCount(0);
         }
@@ -352,6 +353,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var incentive = incentives.Single();
             incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.WithdrawnBy.Should().Be(WithdrawnBy.Employer);
             incentive.PausePayments.Should().BeFalse();
 
             payments.Single().Id.Should().Be(_payment.Id);
@@ -413,6 +415,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var incentive = incentives.Single();
             incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.WithdrawnBy.Should().Be(WithdrawnBy.Employer);
             incentive.PausePayments.Should().BeFalse();
 
             payments.Single().Id.Should().Be(_payment2.Id);

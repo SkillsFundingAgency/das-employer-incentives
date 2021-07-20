@@ -35,6 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\ApprenticeshipIncentivesRequested.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Update="Features\MonthEndInProgress.feature.cs">
       <DesignTime>True</DesignTime>
     </Compile>
@@ -83,6 +86,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\ApprenticeshipIncentivesRequested.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ApprenticeshipIncentivesRequested.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\MonthEndInProgress.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>MonthEndInProgress.feature.cs</LastGenOutput>
