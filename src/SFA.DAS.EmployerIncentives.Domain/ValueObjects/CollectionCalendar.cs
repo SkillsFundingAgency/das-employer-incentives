@@ -82,6 +82,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return new ReadOnlyCollection<CollectionCalendarPeriod>(_collectionPeriods.ToList());
         }
 
+        public DateTime GetAcademicYearEndDate(string academicYearId)
+        {
+            var academicYear = _academicYears.Single(x => x.AcademicYearId == academicYearId);
+            return academicYear.EndDate;
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             foreach (var collectionPeriod in _collectionPeriods)
