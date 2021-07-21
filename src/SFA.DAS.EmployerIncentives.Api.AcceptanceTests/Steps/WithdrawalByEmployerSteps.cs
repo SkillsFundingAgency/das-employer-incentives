@@ -1,13 +1,14 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -15,9 +16,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using NUnit.Framework;
-using SFA.DAS.Notifications.Messages.Commands;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -289,7 +287,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var notification = _testContext
                 .EventsPublished
-                .Single(e => e is SendEmailCommand) as SendEmailCommand;
+                .First(e => e is SendEmailCommand) as SendEmailCommand;
 
             Debug.Assert(notification != null, nameof(notification) + " != null");
             notification.RecipientsAddress.Should().Be(_withdrawApplicationRequest.EmailAddress);
@@ -459,21 +457,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var badRequestResponse = JsonConvert.DeserializeObject<BadRequestResponse>(await _response.Content.ReadAsStringAsync());
             badRequestResponse.Error.Should().Be("Cannot withdraw an application that has been submitted and has received payments");
-        }
-
-        [Then(@"an email is sent to confirm the cancelled application")]
-        public async Task ThenAnEmailIsSentToConfirmTheCancelledApplication()
-        {
-            //var thyingdsfsfsdfsd =_testContext;
-            Assert.Pass();
-            //var publishedCommands = _testContext.CommandsPublished
-            //    .Where(c => c.IsPublished 
-            //                // && c.Command is SendEmailCommand
-            //                )
-            //    .Select(c => c.Command)
-            //    .ToArray();
-
-            //publishedCommands.Count(x => x is SendEmailCommand).Should().Be(1);
         }
 
         public class BadRequestResponse
