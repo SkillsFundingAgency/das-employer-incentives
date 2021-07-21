@@ -139,7 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private async Task ThenTheActivePeriodIsUpdatedToTheNextPeriod()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var collectionPeriods = await connection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionPeriod>();
+            var collectionPeriods = await connection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
 
             var exitingPeriod = collectionPeriods.Single(p => p.MonthEndProcessingCompleteUTC.HasValue);
 

@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
         private EarningsResilienceCommandController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
 
         [SetUp]
@@ -28,9 +28,9 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
 
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Today.Month, (short)DateTime.Today.Year, DateTime.Today.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(),true, false)
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<short>()), (byte)DateTime.Today.Month, (short)DateTime.Today.Year, DateTime.Today.AddDays(-1), _fixture.Create<DateTime>(), true, false)
             };
 
             _mockCollectionCalendarService
@@ -59,9 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
         public async Task Then_no_earning_resilience_check_command_is_dispatched_when_the_active_period_is_in_progress()
         {
             // Arrange
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Today.Month, (short)DateTime.Today.Year, DateTime.Today.AddDays(-1), _fixture.Create<DateTime>(), _fixture.Create<short>(),true, true)
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<short>()), (byte)DateTime.Today.Month, (short)DateTime.Today.Year, DateTime.Today.AddDays(-1), _fixture.Create<DateTime>(), true, true)
             };
             _mockCollectionCalendarService
                .Setup(m => m.Get())

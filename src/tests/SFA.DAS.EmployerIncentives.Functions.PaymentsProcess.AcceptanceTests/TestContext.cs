@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public MockApi LearnerMatchApi { get; set; }
         
         public MockApi PaymentsApi { get; set; }
-        public Data.ApprenticeshipIncentives.Models.CollectionPeriod ActivePeriod { get; set; }
+        public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
         public TestContext()
         {
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public async Task SetActiveCollectionCalendarPeriod(CollectionPeriod collectionPeriod)
         {
             await using var dbConnection = new SqlConnection(SqlDatabase.DatabaseInfo.ConnectionString);
-            var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionPeriod>();
+            var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
             var currentActivePeriod = calendar.SingleOrDefault(x => x.Active);
             if (currentActivePeriod != null)
             {
@@ -63,10 +63,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             ActivePeriod = period;
         }
 
-        public async Task<Data.ApprenticeshipIncentives.Models.CollectionPeriod> GetCollectionCalendarPeriod(DateTime date)
+        public async Task<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod> GetCollectionCalendarPeriod(DateTime date)
         {
             await using var dbConnection = new SqlConnection(SqlDatabase.DatabaseInfo.ConnectionString);
-            var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionPeriod>();
+            var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
 
             var period = calendar
                     .Where(d => d.EIScheduledOpenDateUTC <= date)
