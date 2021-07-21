@@ -8,10 +8,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
     public class CollectionCalendar : ValueObject
     {
+        private readonly IEnumerable<AcademicYear> _academicYears;
         private readonly IEnumerable<CollectionCalendarPeriod> _collectionPeriods;
 
-        public CollectionCalendar(IEnumerable<CollectionCalendarPeriod> collectionPeriods)
+        public CollectionCalendar(IEnumerable<AcademicYear> academicYears, IEnumerable<CollectionCalendarPeriod> collectionPeriods)
         {
+            _academicYears = academicYears;
             _collectionPeriods = collectionPeriods;
         }
 
