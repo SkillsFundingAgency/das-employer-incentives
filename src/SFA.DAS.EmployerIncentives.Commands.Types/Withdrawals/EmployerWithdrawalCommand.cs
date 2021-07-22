@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
 {
-    public class EmployerWithdrawalCommand : WithdrawalCommand , IPeriodEndIncompatible
+    public class EmployerWithdrawalCommand : WithdrawalCommand, IPeriodEndIncompatible
     {
         public EmployerWithdrawalCommand(
             long accountLegalEntityId,

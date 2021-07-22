@@ -9,8 +9,6 @@ using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
@@ -109,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
         private bool HasExpectedWithdrawEvents(TestContext testContext)
         {   
-            var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is EmployerWithdrawalCommand);
+            var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.Withdrawals.EmployerWithdrawalCommand);
             return processedCommands == 1;
         }
 
@@ -144,10 +142,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
 
             var delayedWithdrawCommands = _testContext.CommandsPublished
-                .Where(c => c.IsDelayed && c.Command is EmployerWithdrawalCommand);
+                .Where(c => c.IsDelayed && c.Command is Commands.Types.Withdrawals.EmployerWithdrawalCommand);
 
             delayedWithdrawCommands.Count().Should().Be(1);            
-            ((EmployerWithdrawalCommand)delayedWithdrawCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
+            ((Commands.Types.Withdrawals.EmployerWithdrawalCommand)delayedWithdrawCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
         }
     }
 }
