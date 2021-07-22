@@ -726,5 +726,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 !l.SubmissionData.LearningData.StoppedStatus.DateStopped.HasValue)
                 ), Times.Once);
         }
+
+        [Test]
+        public async Task Then_null_price_episode_end_dates_are_set_to_the_end_of_the_academic_year()
+        {
+            Assert.Fail();
+        }
     }
 }
