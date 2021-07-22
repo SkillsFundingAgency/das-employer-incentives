@@ -18,10 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
 
         public async Task<Domain.ValueObjects.CollectionCalendar> Get()
         {
-            var academicYears = _academicYearDataRepository.GetAll();
-            var periods = _collectionPeriodDataRepository.GetAll();
-            await Task.WhenAll(academicYears, periods);
-            return new Domain.ValueObjects.CollectionCalendar(academicYears.Result, periods.Result);
+            var academicYears = await _academicYearDataRepository.GetAll();
+            var periods = await _collectionPeriodDataRepository.GetAll();
+            return new Domain.ValueObjects.CollectionCalendar(academicYears, periods);
         }
 
         public async Task Save(Domain.ValueObjects.CollectionCalendar collectionCalendar)
