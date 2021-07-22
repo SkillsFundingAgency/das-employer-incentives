@@ -162,7 +162,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return learningStoppedStatus;
         }
 
-        public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
             if(learnerData == null)
             {
@@ -175,7 +175,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                from pe in tr.PriceEpisodes
                from p in pe.Periods
                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new LearningPeriod(pe.StartDate, pe.EndDate)).Distinct();
+               select new LearningPeriod(pe.StartDate, pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate("2021"))).Distinct(); // TODO: Replace "2021" with the academic year from the price episode when we have it
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)

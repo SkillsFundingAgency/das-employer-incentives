@@ -12,7 +12,10 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 {
@@ -23,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ILearnerService> _mockLearnerService;
         private Mock<ILogger<RefreshLearnerCommandHandler>> _mockLogger;
+        private Mock<ICollectionCalendarService> _collectionCalendarService;
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
         private LearnerSubmissionDto _learnerSubmissionDto;
@@ -31,12 +35,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Learner _learner;
         private DateTime _testStartDate;
         private DateTime _censusDate;
+        private AcademicYear _academicYear;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _testStartDate = _fixture.Create<DateTime>();
+            _testStartDate = new DateTime(2021,01,01);
             _censusDate = _testStartDate.AddDays(5);
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
@@ -74,11 +79,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .Setup(m => m.GetOrCreate(_apprenticeshipIncentive))
                 .ReturnsAsync(_learner);
 
+            _collectionCalendarService = new Mock<ICollectionCalendarService>();
+            _academicYear = new AcademicYear("2021", new DateTime(2021, 07, 31));
+
+            _collectionCalendarService
+                .Setup(m => m.Get())
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear> { _academicYear }, new List<CollectionCalendarPeriod>()));
+
             _sut = new RefreshLearnerCommandHandler(
                 _mockLogger.Object,
                 _mockApprenticeshipIncentiveDomainRepository.Object,
                 _mockLearnerService.Object,
-                _mockLearnerDomainRepository.Object);
+                _mockLearnerDomainRepository.Object,
+                _collectionCalendarService.Object);
         }
 
         [Test]
@@ -730,7 +743,66 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         [Test]
         public async Task Then_null_price_episode_end_dates_are_set_to_the_end_of_the_academic_year()
         {
-            Assert.Fail();
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            var apprenticeship = _fixture.Create<Apprenticeship>();
+            apprenticeship.SetProvider(_fixture.Create<Provider>());
+
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+               .With(p => p.Apprenticeship, apprenticeship)
+               .With(p => p.Status, Enums.IncentiveStatus.Active)
+               .Create();
+
+            _mockApprenticeshipIncentiveDomainRepository
+                .Setup(m => m.Find(_apprenticeshipIncentiveId))
+                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.ApplicationApprenticeshipId, apprenticeshipIncentiveModel));
+
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(apprenticeshipIncentive))
+                .ReturnsAsync(learner);
+
+            var learnerSubmissionDto = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(t => t.PriceEpisodes,
+                        new List<PriceEpisodeDto>{
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
+                            .With(pe => pe.EndDate, (DateTime?)null)
+                            .Create()
+                            }).Create(),
+                        _fixture.Create<TrainingDto>()
+                   })
+               .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockLearnerDomainRepository.Verify(m => m.Save(
+                It.Is<Learner>(l => l.GetModel().LearningPeriods.Single().EndDate == _academicYear.EndDate)
+                ), Times.Once);
         }
     }
 }

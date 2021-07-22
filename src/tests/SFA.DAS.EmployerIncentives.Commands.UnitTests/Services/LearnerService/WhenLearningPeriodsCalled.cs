@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
@@ -21,6 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
         private ApprenticeshipIncentiveModel _apprenticeshipIncentiveModel;
         private Fixture _fixture;
+        private AcademicYear _academicYear;
+        private Domain.ValueObjects.CollectionCalendar _collectionCalendar;
 
         [SetUp]
         public void Arrange()
@@ -45,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.PriceEpisodes.Add(_testPriceEpisode1Dto);
 
             _testPriceEpisode2Dto = _fixture.Create<PriceEpisodeDto>();
-            _testPriceEpisode2Dto.EndDate = null;
+            //_testPriceEpisode2Dto.EndDate = null;
             // probbaly not valid data but add multiple apprenticeship periods by price episode just in case
             _testPriceEpisode2Dto.Periods.ToList().ForEach(p => p.ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id);
             _testTrainingDto.PriceEpisodes.Add(_testPriceEpisode2Dto);
@@ -57,6 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisode3Dto.EndDate = _testPriceEpisode1Dto.EndDate;
             _testPriceEpisode3Dto.Periods.First().ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id;
             _testTrainingDto.PriceEpisodes.Add(_testPriceEpisode3Dto);
+
+            _academicYear = new AcademicYear("2021", new DateTime(2021, 7, 31));
+            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear> { _academicYear }, new List<CollectionCalendarPeriod>());
         }
 
         [Test]
@@ -65,12 +71,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Arrange              
 
             //Act
-            var learningPeriods = _sut.LearningPeriods(_incentive);
+            var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
 
             //Assert
             learningPeriods.Count().Should().Be(2);
             learningPeriods.Single(e => e.StartDate == _testPriceEpisode1Dto.StartDate && e.EndDate == _testPriceEpisode1Dto.EndDate);
-            learningPeriods.Single(e => e.StartDate == _testPriceEpisode2Dto.StartDate && e.EndDate == null);
+            learningPeriods.Single(e => e.StartDate == _testPriceEpisode2Dto.StartDate && e.EndDate == _testPriceEpisode2Dto.EndDate);
+        }
+
+        [Test]
+        public void Then_null_end_dates_are_set_to_the_end_of_the_academic_year()
+        {
+            //Arrange
+            _testPriceEpisode2Dto.EndDate = null;
+
+            //Act
+            var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
+
+            //Assert
+            learningPeriods.Count().Should().Be(2);
+            learningPeriods.Single(e => e.StartDate == _testPriceEpisode1Dto.StartDate && e.EndDate == _testPriceEpisode1Dto.EndDate);
+            learningPeriods.Single(e => e.StartDate == _testPriceEpisode2Dto.StartDate && e.EndDate == _academicYear.EndDate);
         }
 
         [Test]
@@ -79,7 +100,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Arrange  
 
             //Act
-            var learningPeriods = LearnerDataExtensions.LearningPeriods(null, _incentive);
+            var learningPeriods = LearnerDataExtensions.LearningPeriods(null, _incentive, _collectionCalendar);
 
             //Assert
             learningPeriods.Count().Should().Be(0);
