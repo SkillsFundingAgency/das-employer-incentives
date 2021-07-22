@@ -1155,6 +1155,15 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                     .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                     .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                     .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.ClawedBack, true)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.ClawedBack, false)
                     .Create(),
                 _fixture
                     .Build<PendingPayment>()
@@ -1196,6 +1205,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Length.Should().Be(1);
             result[0].FirstClawbackStatus.Should().NotBeNull();
             result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
             result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
@@ -1237,6 +1247,15 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                     .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                     .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                     .With(p => p.EarningType, EarningType.SecondPayment)
+                    .With(p => p.ClawedBack, true)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .With(p => p.ClawedBack, false)
                     .Create()
             };
 
@@ -1271,6 +1290,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Length.Should().Be(1);
             result[0].SecondClawbackStatus.Should().NotBeNull();
             result[0].SecondClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
             result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
