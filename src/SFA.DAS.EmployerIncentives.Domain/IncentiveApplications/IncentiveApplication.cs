@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 
 [assembly: InternalsVisibleTo("SFA.DAS.EmployerIncentives.Commands.UnitTests")]
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
@@ -71,14 +72,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
-        public void EmployerWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
+        public void EmployerWithdrawal(Apprenticeship apprenticeship, LegalEntity legalEntity, string withdrawnByEmailAddress, ServiceRequest serviceRequest)
         {
             var apprenticeToWithdraw = Apprenticeships.Single(m => m.Id == apprenticeship.Id);
             apprenticeToWithdraw.Withdraw(IncentiveApplicationStatus.EmployerWithdrawn);
             
             AddEvent(new EmployerWithdrawn(
                 Model.AccountId,
-                Model.AccountLegalEntityId, 
+                Model.AccountLegalEntityId,
+                legalEntity.Name,
+                withdrawnByEmailAddress,
                 apprenticeToWithdraw.GetModel(),
                 serviceRequest));
         }
@@ -124,5 +127,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
             return apprenticeships;
         }
+
     }
 }

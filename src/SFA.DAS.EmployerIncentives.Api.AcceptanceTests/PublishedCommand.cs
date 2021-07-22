@@ -9,6 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public bool IsReceived { get; set; }
         public bool IsPublished { get; set; }
         public bool IsProcessed { get; set; }
+        public bool IsDelayed { get; set; }
         public bool IsDomainCommand { get; set; }
         public bool IsPublishedWithNoListener { get; set; }
         public bool IsErrored { get; set; }

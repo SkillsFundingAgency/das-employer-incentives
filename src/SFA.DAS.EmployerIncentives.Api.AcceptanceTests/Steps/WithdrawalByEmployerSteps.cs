@@ -1,14 +1,17 @@
 ﻿using AutoFixture;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -40,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private bool _waitForMessage = true;
         private HttpResponseMessage _response;
         private bool _isMultipleApplications;
+        private readonly Account _account;
 
         public WithdrawalByEmployerSteps(TestContext testContext) : base(testContext)
         {
@@ -47,7 +51,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _fixture = new Fixture();
             _connectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
 
+            _account = TestContext.TestData.GetOrCreate<Account>();
+
             _application = _fixture.Create<IncentiveApplication>();
+            _application.AccountId = _account.Id;
+            _application.AccountLegalEntityId = _account.AccountLegalEntityId;
+
             _apprenticeship = _fixture
                 .Build<IncentiveApplicationApprenticeship>()
                 .With(a => a.IncentiveApplicationId, _application.Id)
@@ -134,6 +143,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnIncentiveApplicationHasBeenMadeWithoutBeingSubmitted()
         {
             using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_account);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
         }
@@ -142,6 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnIncentiveApplicationHasBeenMadeSubmittedAndHasPayments()
         {
             using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_account);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
@@ -154,6 +165,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenMultipleIncentiveApplicationsHaveBeenMadeWithoutBeingSubmitted()
         {
             using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_account);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeship2);
@@ -165,6 +177,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnApprenticeshipIncentiveWithPendingPaymentsExistsForAnApplication()
         {
             using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_account);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
@@ -176,6 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnApprenticeshipIncentiveWithAClawedBackPaymentExistsForAnApplication()
         {
             using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_account);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
@@ -190,6 +204,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnApprenticeshipIncentiveWithPaidPaymentsExistsForAnApplication()
         {
             using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.InsertAsync(_account);
             await dbConnection.InsertAsync(_application);
             await dbConnection.InsertAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
@@ -207,11 +222,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(r => r.WithdrawalType, WithdrawalType.Employer)
                 .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
                 .With(r => r.ULN, _apprenticeship.ULN)
+                .With(r => r.AccountId, _application.AccountId)
+                .With(r => r.EmailAddress, "test@email.com")
                 .Create();
 
             var url = $"withdrawals";
 
-                        
             if (_waitForMessage)
             {
                 await _testContext.WaitFor(
@@ -231,6 +247,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private bool HasExpectedEvents(TestContext testContext)
         {
             var processedEvents = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is WithdrawCommand);
+
             if (_isMultipleApplications)
             {
                 return processedEvents == 2;
@@ -263,6 +280,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             publishedCommand.AccountId.Should().Be(_application.AccountId);
             publishedCommand.IncentiveApplicationApprenticeshipId.Should().Be(_apprenticeship.Id);
+        }
+
+        [Then(@"an email notification is sent to confirm the employer withdrawal")]
+        public void ThenAnEmailNotificationIsSentToConfirmTheEmployerWithdrawal()
+        {
+            var notification = _testContext
+                .EventsPublished
+                .First(e => e is SendEmailCommand) as SendEmailCommand;
+
+            Debug.Assert(notification != null, nameof(notification) + " != null");
+            notification.RecipientsAddress.Should().Be(_withdrawApplicationRequest.EmailAddress);
+            notification.Tokens["uln"].Should().Be(_apprenticeship.ULN.ToString());
+            notification.Tokens["organisation name"].Should().Be(_account.LegalEntityName);
         }
 
         [Then(@"each incentive application status is updated to indicate the employer withdrawal")]

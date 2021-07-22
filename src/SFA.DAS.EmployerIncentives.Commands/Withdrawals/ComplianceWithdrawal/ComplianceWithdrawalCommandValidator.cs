@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
