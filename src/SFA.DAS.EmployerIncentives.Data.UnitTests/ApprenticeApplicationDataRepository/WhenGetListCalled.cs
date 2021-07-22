@@ -1174,25 +1174,26 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                     .Create()
             };
 
-            var payments = _fixture
+            var payment = _fixture
                 .Build<Payment>()
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.PendingPaymentId, pendingPayments[0].Id)
-                .CreateMany(2).ToList();
-            payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payments[0].PaidDate.Value.Day);
+                .With(p => p.PaidDate, new DateTime(2021, 1, 1))
+                .Create();
+            payment.PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payment.PaidDate.Value.Day);
 
             var clawback = _fixture.Build<ClawbackPayment>()
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.AccountId, accountId)
-                .With(p => p.PaymentId, payments[0].Id)
+                .With(p => p.PaymentId, payment.Id)
                 .With(p => p.PendingPaymentId, pendingPayments[0].Id)
                 .Create();
                 
             incentive.PendingPayments = pendingPayments;
-            incentive.Payments = payments;
+            incentive.Payments = new List<Payment> { payment };
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentive);
@@ -1209,6 +1210,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             result[0].FirstClawbackStatus.Should().NotBeNull();
             result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
             result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
+            result[0].FirstClawbackStatus.OriginalPaymentDate.Should().Be(payment.PaidDate.Value);
         }
 
         [Test]
@@ -1265,6 +1267,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.PendingPaymentId, pendingPayments[1].Id)
+                .With(p => p.PaidDate, new DateTime(2021, 1, 1))
                 .CreateMany(2).ToList();
             payments[1].PaidDate = new DateTime(pendingPayments[1].DueDate.Year, 1, payments[1].PaidDate.Value.Day);
 
@@ -1294,6 +1297,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             result[0].SecondClawbackStatus.Should().NotBeNull();
             result[0].SecondClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
             result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
+            result[0].SecondClawbackStatus.OriginalPaymentDate.Should().Be(payments[1].PaidDate.Value);
         }
 
         [Test]
@@ -1350,6 +1354,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .With(p => p.PaidDate, new DateTime(2021, 1, 1))
                 .CreateMany(2).ToList();
             payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payments[0].PaidDate.Value.Day);
 
@@ -1381,6 +1386,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             result[0].FirstClawbackStatus.Should().NotBeNull();
             result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
             result[0].FirstClawbackStatus.ClawbackDate.Should().BeNull();
+            result[0].FirstClawbackStatus.OriginalPaymentDate.Should().Be(payments[0].PaidDate.Value);
         }
     }
 }
