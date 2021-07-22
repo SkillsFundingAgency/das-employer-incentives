@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
                     {
                         ClawbackAmount = data.firstClawback.Amount,
-                        ClawbackDate = data.firstClawback.DateClawbackSent.Value
+                        ClawbackDate = data.firstClawback.DateClawbackSent
                     },
                     SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                     {
@@ -92,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
                     {
                         ClawbackAmount = data.secondClawback.Amount,
-                        ClawbackDate = data.secondClawback.DateClawbackSent.Value
+                        ClawbackDate = data.secondClawback.DateClawbackSent
                     },
                 };
 
