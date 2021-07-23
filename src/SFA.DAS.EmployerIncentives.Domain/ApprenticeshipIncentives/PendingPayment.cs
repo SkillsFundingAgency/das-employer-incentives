@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 .PendingPaymentValidationResultModels
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
                                       v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear &&
-                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear);
+                                      v.CollectionPeriod.PeriodNumber == validationResult.CollectionPeriod.PeriodNumber);
 
             if (existing != null)
             {
