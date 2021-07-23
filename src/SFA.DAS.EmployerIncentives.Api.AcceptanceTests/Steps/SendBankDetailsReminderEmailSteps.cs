@@ -1,16 +1,13 @@
-﻿using System;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using System.IO;
+using SFA.DAS.Notifications.Messages.Commands;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using TechTalk.SpecFlow;
 using System.Net.Http;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using System.Threading.Tasks;
+using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -18,19 +15,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "SendBankDetailsReminderEmail")]
     public class SendBankDetailsReminderEmailSteps : StepsBase
     {
-        private readonly TestContext _testContext;
         private readonly Fixture _fixture;
-        private SendBankDetailsEmailRequest _request;
         private readonly string _url;
-        private readonly string _storageDirectory;
+        private SendBankDetailsEmailRequest _request;
         private HttpResponseMessage _response;
 
-        public SendBankDetailsReminderEmailSteps(TestContext testContext) : base(testContext)
+        public SendBankDetailsReminderEmailSteps(TestContext context) : base(context)
         {
-            _testContext = testContext;
             _fixture = new Fixture();
             _url = "/api/EmailCommand/bank-details-reminder";
-            _storageDirectory = testContext.MessageBus.StorageDirectory.FullName;
         }
 
         [When(@"an employer selects to start the external bank details journey")]
@@ -38,28 +31,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request);
         }
 
         [Then(@"the employer is sent a reminder email to supply their bank details with a link in case they do not complete the journey")]
         public void ThenTheEmployerIsSentAReminderEmailToSupplyTheirBankDetailsWithALinkInCaseTheyDoNotCompleteTheJourney()
         {
             _response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var directoryInfo = new DirectoryInfo($"{_storageDirectory}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
-            var recentFiles = directoryInfo.GetFiles().OrderByDescending(x => x.CreationTimeUtc >= DateTime.Now.AddMinutes(-2));
-
-            foreach (var file in recentFiles)
-            {
-                var contents = File.ReadAllText(file.FullName, Encoding.UTF8);
-
-                if (contents.Contains(_request.EmailAddress) && contents.Contains(_request.AddBankDetailsUrl))
-                {
-                    return;
-                }
-            }
-
-            Assert.Fail($"No NServiceBus Message found with {_request.EmailAddress} and {_request.AddBankDetailsUrl}");
+            var command = TestContext.EventsPublished.SingleOrDefault(e => e is SendEmailCommand) as SendEmailCommand;
+            Debug.Assert(command != null, nameof(command) + " != null");
+            command.RecipientsAddress.Should().Be(_request.EmailAddress);
+            command.TemplateId.Should().Be(EmailTemplateIds.BankDetailsReminder);
+            command.Tokens["bank details url"].Should().Be(_request.AddBankDetailsUrl);
         }
 
         [When(@"a bank details required email is sent with an invalid email address")]
@@ -83,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AccountId = 0;
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request);
         }
 
         [When(@"a bank details required email is sent with an invalid account legal entity id")]
@@ -92,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AccountLegalEntityId = 0;
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request);
         }
 
         [When(@"a bank details required email is sent with an invalid account bank details url")]
@@ -101,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AddBankDetailsUrl = null;
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request);
         }
     }
 }

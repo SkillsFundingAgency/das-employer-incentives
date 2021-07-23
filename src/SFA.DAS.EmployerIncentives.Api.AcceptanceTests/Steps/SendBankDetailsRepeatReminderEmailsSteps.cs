@@ -1,16 +1,16 @@
 ﻿using FluentAssertions;
-using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Data.SqlClient;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private DateTime _applicationCutOffDate;
         private HttpResponseMessage _response;
 
-        public SendBankDetailsRepeatReminderEmailsSteps(TestContext testContext) : base(testContext) { }
+        public SendBankDetailsRepeatReminderEmailsSteps(TestContext context) : base(context) { }
 
         [When(@"an employer has submitted an application after the cut off date and not supplied bank details")]
         public async Task WhenAnEmployerHasSubmittedAnApplicationAndNotSuppliedBankDetails()
@@ -94,11 +94,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _response.IsSuccessStatusCode.Should().BeTrue();
         }
 
-        private bool HasExpectedSendBankDetailsRepeatReminderEmailEvents(TestContext testContext)
+        private static bool HasExpectedSendBankDetailsRepeatReminderEmailEvents(TestContext testContext)
         {
             var processedEvents = testContext.CommandsPublished.Count(c =>
-            c.IsProcessed &&
-            c.Command is SendBankDetailsRepeatReminderEmailCommand);
+                c.IsProcessed &&
+                c.Command is SendBankDetailsRepeatReminderEmailCommand);
 
             return processedEvents == 1;
         }
@@ -106,30 +106,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the employer is sent a reminder email to supply their bank details in order to receive payment")]
         public void ThenTheEmployerIsSentAReminderEmailToSupplyTheirBankDetailsInOrderToReceivePayment()
         {
-            var directoryInfo = new DirectoryInfo($"{TestContext.MessageBus.StorageDirectory.FullName}\\SFA.DAS.Notifications.MessageHandlers\\.bodies\\");
-            IOrderedEnumerable<FileInfo> recentFiles;
-            try
-            {
-                recentFiles = directoryInfo.GetFiles().OrderByDescending(x => x.CreationTimeUtc >= DateTime.Now.AddMinutes(-2));
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                Assert.Fail(e.Message + " Check query handlers to ensure domain commands were added");
-                return;
-            }
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            foreach (var file in recentFiles)
-            {
-                var contents = File.ReadAllText(file.FullName, Encoding.UTF8);
-
-                if (contents.Contains(_apprenticeshipIncentive.SubmittedByEmail))
-                {
-                    Assert.Pass();
-                    return;
-                }
-            }
-
-            Assert.Fail($"No NServiceBus Message found with {_application.SubmittedByEmail}");
+            var command = TestContext.EventsPublished.SingleOrDefault(e => e is SendEmailCommand) as SendEmailCommand;
+            Debug.Assert(command != null, nameof(command) + " != null");
+            command.TemplateId.Should().Be(EmailTemplateIds.BankDetailsRepeatReminder);
+            command.RecipientsAddress.Should().Be(_apprenticeshipIncentive.SubmittedByEmail);
+            command.Tokens["organisation name"].Should().Be(_account.LegalEntityName);
+            var expectedUrl = $"{TestContext.EmployerIncentiveApi.BaseAddress}{TestContext.HashingService.HashValue(_application.AccountId)}/bank-details/{_application.Id}/add-bank-details";
+            command.Tokens["bank details url"].Should().Be(expectedUrl);
         }
     }
 }
+

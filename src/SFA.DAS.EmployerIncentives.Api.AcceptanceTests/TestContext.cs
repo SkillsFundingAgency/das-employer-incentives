@@ -19,7 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public TestLearnerMatchApi LearnerMatchApi { get; set; }
         public TestMessageBus MessageBus { get; set; }
         public TestDomainMessageHandlers DomainMessageHandlers { get; set; }
-
         public TestData TestData { get; set; }
         public IHashingService HashingService { get; set; }
         public List<IHook> Hooks { get; set; }
@@ -27,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public List<PublishedCommand> CommandsPublished { get; set; }
         public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
+        public (string AllowedHashstringCharacters, string HashString) HashingServiceConfig = ("46789BCDFGHJKLMNPRSTVWXY", Guid.NewGuid().ToString());
 
         public TestContext()
         {
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             TestData.GetOrCreate("ThrowErrorAfterPublishCommand", () => false);
             TestData.GetOrCreate("ThrowErrorAfterProcessedCommand", () => false);
             TestData.GetOrCreate("ThrowErrorAfterPublishEvent", () => false);
-            HashingService = new HashingService.HashingService("46789BCDFGHJKLMNPRSTVWXY", "SFA: digital apprenticeship service");
+            HashingService = new HashingService.HashingService(HashingServiceConfig.AllowedHashstringCharacters, HashingServiceConfig.HashString);
             Hooks = new List<IHook>();
             EventsPublished = new List<object>();
             CommandsPublished = new List<PublishedCommand>();

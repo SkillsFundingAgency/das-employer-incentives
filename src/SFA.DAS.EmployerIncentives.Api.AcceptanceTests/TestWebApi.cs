@@ -8,10 +8,8 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using SFA.DAS.NServiceBus.Services;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using NServiceBus;
 using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -44,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
         }
-
+        //
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(s =>
@@ -53,8 +51,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
                     a.DistributedLockStorage = "UseDevelopmentStorage=true";
-                    a.AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY";
-                    a.Hashstring = "Test Hashstring";
+                    a.AllowedHashstringCharacters = _context.HashingServiceConfig.AllowedHashstringCharacters;
+                    a.Hashstring = _context.HashingServiceConfig.HashString;
                     a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                     a.MinimumAgreementVersion = 4;
                     a.IncentivePaymentProfiles = _paymentProfiles;
@@ -71,9 +69,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 });
                 s.Configure<EmailTemplateSettings>(e =>
                 {
-                    e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
-                    e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
-                    e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.BankDetailsReminder = new EmailTemplate { TemplateId = EmailTemplateIds.BankDetailsReminder };
+                    e.BankDetailsRequired = new EmailTemplate { TemplateId = EmailTemplateIds.BankDetailsRequired };
+                    e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = EmailTemplateIds.BankDetailsRepeatReminder };
                 });
                 s.Configure<MatchedLearnerApi>(l =>
                 {
