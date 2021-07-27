@@ -55,6 +55,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveQuery
             actual.Should().Contain(x => x.ApprenticeshipId == apprenticeshipIncentives[0].ApprenticeshipId);
             actual.Should().Contain(x => x.ULN == apprenticeshipIncentives[0].ULN);
             actual.Should().Contain(x => x.UKPRN == apprenticeshipIncentives[0].UKPRN);
+            actual.Should().Contain(x => x.FirstName == apprenticeshipIncentives[0].FirstName);
+            actual.Should().Contain(x => x.LastName == apprenticeshipIncentives[0].LastName);
+            actual.Should().Contain(x => x.CourseName == apprenticeshipIncentives[0].CourseName);
+            actual.Should().Contain(x => x.StartDate == apprenticeshipIncentives[0].StartDate);
         }
 
         [Test]

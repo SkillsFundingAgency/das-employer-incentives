@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                    Expression<Func<TestContext, bool>> predicate,
                    bool assertOnTimeout = true,
                    bool assertOnError = true,
-                   int timeoutInMs = 90000)
+                   int timeoutInMs = 30000)
         {
             return new TestHelper(context)
                 .WaitFor(
