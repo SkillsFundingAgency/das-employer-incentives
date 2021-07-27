@@ -37,9 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment).DefaultIfEmpty()
                                       from secondPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment).DefaultIfEmpty()
                                       from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
+                                      from secondPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (secondPayment == null ? Guid.Empty : secondPayment.Id)).DefaultIfEmpty()
                                       from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
                                       where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
-                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent };
+                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent, secondPaymentSent };
 
             var result = new List<ApprenticeApplicationDto>();
 
@@ -77,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         HasDataLock = HasDataLock(data.learner),
                         InLearning = InLearning(data.learner),
                         PausePayments = data.incentive.PausePayments,
-                        PaymentSentIsEstimated = true, // change to use IsPaymentEstimated when implementing ticket EI-827,
+                        PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
                     }                    
                 };

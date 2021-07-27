@@ -1123,5 +1123,169 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 result[0].SecondPaymentStatus.PaymentIsStopped.Should().Be(secondPaymentStatusPaymentIsStopped.Value);
             }
         }
+
+        [Test]
+        public async Task Then_second_payment_is_estimated_when_the_payment_does_not_exist()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.SecondPaymentStatus.PaymentSentIsEstimated.Should().BeTrue();
+        }
+
+        [Test()]
+        public async Task Then_second_payment_is_estimated_when_the_payment_has_not_been_made()
+        {
+            for (int i = 1; i < 31; i++)
+            {
+                await Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, false, true);
+            }
+            Assert.Pass();
+        }
+
+        [Test()]
+        public async Task Then_second_payment_is_not_estimated_when_the_payment_has_been_made_and_the_current_date_is_day_27_or_greater()
+        {
+            for (int i = 27; i < 31; i++)
+            {
+                await Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, false);
+            }
+            Assert.Pass();
+        }
+
+        [Test()]
+        public async Task Then_second_payment_is_estimated_when_the_payment_has_been_made_and_the_current_date_is_less_than_day_27()
+        {
+            for (int i = 1; i < 27; i++)
+            {
+                await Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, true);
+            }
+            Assert.Pass();
+        }
+        private async Task Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(
+            int day,
+            bool paymentMade,
+            bool expected)
+        {
+            // Arrange            
+            _context = new EmployerIncentivesDbContext(_options);
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            var payments = _fixture
+                .Build<Payment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            
+            payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, pendingPayments[0].DueDate.Month, payments[0].PaidDate.Value.Day);
+
+            _mockDateTimeService.Setup(m => m.Now()).Returns(new DateTime(pendingPayments[1].DueDate.Year, 12, day));
+            if (!paymentMade)
+            {
+                payments[1].PaidDate = null;
+            }
+            else
+            {
+                payments[1].PaidDate = new DateTime(pendingPayments[1].DueDate.Year, 12, payments[1].PaidDate.Value.Day);
+            }
+            payments[1].PendingPaymentId = pendingPayments[1].Id;
+
+            incentives[0].PendingPayments = pendingPayments;
+            incentives[0].Payments = payments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.SecondPaymentStatus.PaymentSentIsEstimated.Should().Be(expected);
+        }
+
     }
 }
