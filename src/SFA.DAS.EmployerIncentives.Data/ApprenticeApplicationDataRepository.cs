@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
                                       from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
                                       where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
-                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent };
+                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent};
 
             var result = new List<ApprenticeApplicationDto>();
 
@@ -55,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     ULN = data.incentive.ULN,
                     LegalEntityName = data.account.LegalEntityName,
                     SubmittedByEmail = data.incentive.SubmittedByEmail,
+
                     TotalIncentiveAmount = data.incentive.PendingPayments.Sum(x => x.Amount),
                     CourseName = data.incentive.CourseName,
                     FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
@@ -85,6 +86,10 @@ namespace SFA.DAS.EmployerIncentives.Data
                 if (data.incentive.Status == IncentiveStatus.Stopped)
                 {
                     SetStoppedStatus(apprenticeApplicationDto);
+                } 
+                else if (data.incentive.Status == IncentiveStatus.Withdrawn)
+                {
+                    SetWithdrawnStatus(apprenticeApplicationDto, data.incentive.WithdrawnBy.Value);
                 }
 
                 result.Add(apprenticeApplicationDto);
@@ -96,18 +101,30 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         private static void SetStoppedStatus(ApprenticeApplicationDto model)
         {
+            var paymentStatus = new PaymentStatusDto { PaymentIsStopped = true };
+            SetIncentiveStatus(paymentStatus, model);
+        }
+
+        private static void SetWithdrawnStatus(ApprenticeApplicationDto model, WithdrawnBy withdrawnBy)
+        {
+            var paymentStatus = new PaymentStatusDto { WithdrawnByCompliance = withdrawnBy == WithdrawnBy.Compliance, WithdrawnByEmployer = withdrawnBy == WithdrawnBy.Employer};
+            SetIncentiveStatus(paymentStatus, model);
+        }
+
+        private static void SetIncentiveStatus(PaymentStatusDto paymentStatus, ApprenticeApplicationDto model)
+        {
             if (model.FirstPaymentStatus == null)
             {
                 if (model.SecondPaymentStatus == null)
                 {
-                    model.FirstPaymentStatus = new PaymentStatusDto { PaymentIsStopped = true };
+                    model.FirstPaymentStatus = paymentStatus;
                 }
             }
             else
             {
                 if (model.SecondPaymentStatus == null)
                 {
-                    model.SecondPaymentStatus = new PaymentStatusDto { PaymentIsStopped = true };
+                    model.SecondPaymentStatus = paymentStatus;
                 }
             }
         }

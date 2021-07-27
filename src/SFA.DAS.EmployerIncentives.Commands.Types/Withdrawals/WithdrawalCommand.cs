@@ -1,9 +1,9 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals
+namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
 {
-    public abstract class WithdrawalCommand : ICommand
+    public abstract class WithdrawalCommand : DomainCommand
     {   
         public long AccountLegalEntityId { get; }
         public long ULN { get; }
