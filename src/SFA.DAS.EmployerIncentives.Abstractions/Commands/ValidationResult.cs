@@ -22,6 +22,11 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Commands
             ValidationDictionary.Add(propertyName, validationError);
         }
 
+        public void AddIsNotSetError(string propertyName)
+        {
+            ValidationDictionary.Add(propertyName, "Is not set");
+        }
+
         public bool IsValid()
         {
             if (ValidationDictionary == null)

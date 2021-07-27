@@ -25,14 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             return _context.ApprenticeshipIncentives
                 .Where(a => a.Status != IncentiveStatus.Withdrawn)
-                .Select(x => new ApprenticeshipIncentiveDto { Id = x.Id, ApprenticeshipId = x.ApprenticeshipId, ULN = x.ULN, UKPRN = x.UKPRN }).ToListAsync();
-        }
-
-        public Task<ApprenticeshipIncentive> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
-        {
-            return _context
-                .Set<ApprenticeshipIncentive>()
-                .SingleOrDefaultAsync(predicate);
+                .Select(ApprenticeshipIncentiveToApprenticeshipIncentiveDto()).ToListAsync();
         }
 
         public Task<List<ApprenticeshipIncentive>> GetList(Expression<Func<ApprenticeshipIncentive, bool>> predicate = null)
@@ -41,6 +34,22 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Where(predicate)
                 .ToListAsync();
         }
+
+        public Task<List<ApprenticeshipIncentiveDto>> GetDtoList(Expression<Func<ApprenticeshipIncentive, bool>> predicate = null)
+        {
+            return _context.Set<ApprenticeshipIncentive>()
+                .Where(predicate)
+                .Select(ApprenticeshipIncentiveToApprenticeshipIncentiveDto())
+                .ToListAsync();
+        }
+
+        public Task<ApprenticeshipIncentive> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
+        {
+            return _context
+                .Set<ApprenticeshipIncentive>()
+                .SingleOrDefaultAsync(predicate);
+        }
+        
 
         public Task<ApprenticeshipIncentive> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate, bool includePayments = false)
         {
@@ -55,6 +64,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             {
                 return Get(predicate);
             }
+        }
+
+        private Expression<Func<ApprenticeshipIncentive, ApprenticeshipIncentiveDto>> ApprenticeshipIncentiveToApprenticeshipIncentiveDto()
+        {
+            return x => new ApprenticeshipIncentiveDto
+            {
+                Id = x.Id,
+                ApprenticeshipId = x.ApprenticeshipId,
+                ULN = x.ULN,
+                UKPRN = x.UKPRN,
+                CourseName = x.CourseName,
+                StartDate = x.StartDate,
+                FirstName = x.FirstName,
+                LastName = x.LastName
+            };
         }
     }
 }

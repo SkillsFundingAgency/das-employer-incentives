@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 {
@@ -48,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             apprenticeship.WithdrawnByEmployer.Should().BeFalse();
 
             // Act
-            _sut.EmployerWithdrawal(apprenticeship, serviceRequest);
+            _sut.EmployerWithdrawal(apprenticeship, _fixture.Create<LegalEntity>(), _fixture.Create<string>(), serviceRequest);
 
             // Assert
             apprenticeship.WithdrawnByEmployer.Should().BeTrue();
@@ -60,9 +61,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             // Arrange
             var serviceRequest = _fixture.Create<ServiceRequest>();
             var apprenticeship = _sut.Apprenticeships.Single();
-      
+
             // Act
-            _sut.EmployerWithdrawal(apprenticeship, serviceRequest);
+            _sut.EmployerWithdrawal(apprenticeship, _fixture.Create<LegalEntity>(), _fixture.Create<string>(), serviceRequest);
 
             // Assert
             var raisedEvent = _sut.FlushEvents().Single() as EmployerWithdrawn;
