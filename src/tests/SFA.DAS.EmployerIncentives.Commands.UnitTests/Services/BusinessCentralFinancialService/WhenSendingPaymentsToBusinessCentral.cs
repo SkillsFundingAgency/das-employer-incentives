@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Application.UnitTests;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentralFinancialService
@@ -94,10 +95,33 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             _httpClient.SetUpPostAsAsync(statusCode);
             var payment = _fixture.Create<PaymentDto>();
 
-            //Act
-            Func<Task> act = async () => await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
-
-            act.Should().Throw<BusinessCentralApiException>().WithMessage("Business Central API is unavailable and returned an internal*");
+            //Act / Assert
+            try
+            {
+                await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+            }
+            catch(BusinessCentralApiException exception)
+            {
+                exception.Message.Should().StartWith("Business Central API is unavailable and returned an internal");
+                var delimiter = "Data sent: ";
+                var json = exception.Message.Substring(exception.Message.IndexOf(delimiter) + delimiter.Length - 1);
+                var paymentRequests = JsonConvert.DeserializeObject<PaymentRequestContainer>(json);
+                foreach(var paymentRequest in paymentRequests.PaymentRequests)
+                {
+                    paymentRequest.DueDate.Should().NotBeNull();
+                    paymentRequest.RequestorUniquePaymentIdentifier.Should().NotBeNull();
+                    paymentRequest.AccountCode.Should().NotBeNull();
+                    paymentRequest.CostCentreCode.Should().NotBeNull();
+                    paymentRequest.ActivityCode.Should().NotBeNull();
+                    paymentRequest.Amount.Should().Be(0);
+                    paymentRequest.Approver.Should().BeNullOrEmpty();
+                    paymentRequest.Currency.Should().BeNullOrEmpty();
+                    paymentRequest.ExternalReference.Should().BeNull();
+                    paymentRequest.FundingStream.Should().BeNull();
+                    paymentRequest.PaymentLineDescription.Should().BeNullOrEmpty();
+                    paymentRequest.Requestor.Should().BeNullOrEmpty();
+                }
+            }
         }
 
         [TestCase(HttpStatusCode.BadRequest)]

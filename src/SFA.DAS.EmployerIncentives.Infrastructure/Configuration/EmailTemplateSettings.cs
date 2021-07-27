@@ -5,7 +5,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
     {
         public EmailTemplate BankDetailsRequired { get; set; }
         public EmailTemplate BankDetailsReminder { get; set; }
-
         public EmailTemplate BankDetailsRepeatReminder { get; set; }
+        public EmailTemplate ApplicationCancelled { get; set; }
     }
 }

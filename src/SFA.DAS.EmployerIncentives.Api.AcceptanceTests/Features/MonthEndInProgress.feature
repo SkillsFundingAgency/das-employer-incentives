@@ -13,3 +13,9 @@ Scenario: Earnings calculation is deferred when payment process in progress.
 	And the active collection period is currently in progress
 	When an earnings calculation is requested
 	Then the earnings calculation is deferred
+
+Scenario: Withdrawal request is deferred when payment process in progress.
+	Given an apprenticeship incentive exists
+	And the active collection period is currently in progress
+	When an employer withdrawal is requested
+	Then the employer withdrawal is deferred

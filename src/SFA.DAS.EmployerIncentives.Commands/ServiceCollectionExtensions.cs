@@ -154,6 +154,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithUnitOfWork<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithPeriodEndDelay<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 
