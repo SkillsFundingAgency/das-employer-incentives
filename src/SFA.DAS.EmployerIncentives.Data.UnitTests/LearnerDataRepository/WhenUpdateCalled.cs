@@ -79,6 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
             storedLearner.LearningResumedDate.Should().Be(testLearner.SubmissionData.LearningData.StoppedStatus.DateResumed);
             storedLearner.LearningStoppedDate.Should().BeNull();
+            storedLearner.SuccessfulLearnerMatch.Should().Be(testLearner.SuccessfulLearnerMatch);
         }
 
         [Test]
@@ -122,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
                     .Create();
 
             var d = existingLearner.DaysInLearnings.First();
-            var expected = new DaysInLearning(d.CollectionPeriodNumber, d.CollectionPeriodYear, _fixture.Create<int>());
+            var expected = new DaysInLearning(new Domain.ValueObjects.CollectionPeriod(d.CollectionPeriodNumber, d.CollectionPeriodYear), _fixture.Create<int>());
             testLearner.DaysInLearnings.Add(expected);
 
             // Act
@@ -132,8 +133,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             // Assert
             var storedLearner = _dbContext.Learners.Single();
             storedLearner.DaysInLearnings.Should().HaveCount(4);
-            storedLearner.DaysInLearnings.Any(x => x.CollectionPeriodNumber == expected.CollectionPeriodNumber
-                                                   && x.CollectionPeriodYear == expected.CollectionYear
+            storedLearner.DaysInLearnings.Any(x => x.CollectionPeriodNumber == expected.CollectionPeriod.PeriodNumber
+                                                   && x.CollectionPeriodYear == expected.CollectionPeriod.AcademicYear
                                                    && x.NumberOfDaysInLearning == expected.NumberOfDays)
                 .Should().BeTrue();
         }

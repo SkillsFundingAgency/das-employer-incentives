@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.Accounts
@@ -8,7 +9,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
     {
         public string HashedLegalEntityId => Model.HashedLegalEntityId;
         public string Name => Model.Name;
-        public bool HasSignedAgreementTerms => Model.HasSignedAgreementTerms;
         public string VrfVendorId => Model.VrfVendorId;
         public string VrfCaseId => Model.VrfCaseId;
         public string VrfCaseStatus => Model.VrfCaseStatus;
@@ -20,7 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             var model = new LegalEntityModel
             {
                 Name = name,
-                HasSignedAgreementTerms = false
             };
 
             return new LegalEntity(id, model, true);
@@ -31,7 +30,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             var model = new LegalEntityModel
             {
                 Name = name,
-                HasSignedAgreementTerms = false,
                 HashedLegalEntityId = hashedId
             };
 
@@ -53,7 +51,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         {
             if (signedAgreementVersion >= minimumRequiredVersion)
             {
-                Model.HasSignedAgreementTerms = true;
                 if (Model.SignedAgreementVersion == null || signedAgreementVersion > Model.SignedAgreementVersion)
                 {
                     Model.SignedAgreementVersion = signedAgreementVersion;
@@ -66,11 +63,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.HashedLegalEntityId = hashedId;
         }
 
-        internal void UpdateVendorRegistrationCaseStatus(string caseId, string status, DateTime caseStatusLastUpdatedDate)
+        internal void UpdateVendorRegistrationCaseStatus(VendorCase vendorCase)
         {
-            Model.VrfCaseId = caseId;
-            Model.VrfCaseStatus = status;
-            Model.VrfCaseStatusLastUpdatedDateTime = caseStatusLastUpdatedDate;
+            Model.VrfCaseId = vendorCase.CaseId;
+            Model.VrfCaseStatus = vendorCase.Status;
+            Model.VrfCaseStatusLastUpdatedDateTime = vendorCase.Updated;
         }
 
         public void AddEmployerVendorId(string employerVendorId)

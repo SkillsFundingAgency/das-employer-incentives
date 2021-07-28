@@ -28,10 +28,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             if (hook != null)
             {
+                hook.OnReceived += (message) =>
+                {
+                    lock (_lock)
+                    {
+                        testContext.PublishedEvents.Add(
+                            new PublishedEvent(message)
+                            {
+                                IsReceived = true
+                            });
+                    }
+                };
+
                 hook.OnProcessed += (message) =>
                 {
                     lock (_lock)
                     {
+                        testContext.PublishedEvents.Add(
+                            new PublishedEvent(message)
+                            {
+                                IsProcessed = true
+                            });
+
                         testContext.EventsPublished.Add(message);
                         var throwError = testContext.TestData.Get<bool>("ThrowErrorAfterPublishEvent");
                         if (throwError)
@@ -59,6 +77,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     }
                 };
 
+                commandsHook.OnDelayed += (command) =>
+                {
+                    lock (_lock)
+                    {
+                        testContext.CommandsPublished.Where(c => c.Command == command && c.IsDomainCommand == command is DomainCommand).ToList().ForEach(c => c.IsDelayed = true);
+                    }
+                };
+
                 commandsHook.OnProcessed += (command) =>
                 {
                     lock (_lock)
@@ -72,6 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         }
                     }
                 };
+
                 commandsHook.OnHandled += (command) =>
                 {
                     lock (_lock)

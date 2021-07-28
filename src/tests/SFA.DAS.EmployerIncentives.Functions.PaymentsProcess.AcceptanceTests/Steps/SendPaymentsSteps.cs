@@ -1,8 +1,10 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -86,7 +88,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.PaymentPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(2);
             results.Any(x => !x.PaidDate.HasValue).Should().BeFalse();
-        }
+            results.Any(x => String.IsNullOrEmpty(x.VrfVendorId)).Should().BeFalse();
+
+            await ThenTheActivePeriodIsUpdatedToTheNextPeriod();
+        }        
 
         [Then(@"the clawbacks are sent to Business Central")]
         public async Task ThenTheClawbacksAreSent()
@@ -100,6 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.CollectionPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(1);
             results.Any(x => !x.DateClawbackSent.HasValue).Should().BeFalse();
+            results.Any(x => String.IsNullOrEmpty(x.VrfVendorId)).Should().BeFalse();
         }
 
         [Then(@"the payments are not sent to Business Central")]
@@ -128,6 +134,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.CollectionPeriod <= CollectionPeriod).ToList();
             results.Count.Should().Be(1);
             results.Any(x => x.DateClawbackSent.HasValue).Should().BeFalse();
+        }
+
+        private async Task ThenTheActivePeriodIsUpdatedToTheNextPeriod()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var collectionPeriods = await connection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
+
+            var exitingPeriod = collectionPeriods.Single(p => p.MonthEndProcessingCompleteUTC.HasValue);
+
+            exitingPeriod.PeriodNumber.Should().Be(CollectionPeriod);
+            exitingPeriod.AcademicYear.Should().Be(CollectionPeriodYear.ToString());
+            exitingPeriod.MonthEndProcessingCompleteUTC.Value.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 1, 0));
+            exitingPeriod.PeriodEndInProgress.Should().BeFalse(); ;
+
+            var nextPeriod = collectionPeriods.Single(p => p.Active);
+            nextPeriod.PeriodNumber.Should().Be(CollectionPeriod + 1);
+            nextPeriod.AcademicYear.Should().Be(CollectionPeriodYear.ToString());
         }
 
         private async Task RunPaymentsProcess()

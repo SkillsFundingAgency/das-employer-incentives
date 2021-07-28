@@ -103,7 +103,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 }
                 _dbContext.Remove(pendingPayment);
             }
-            _dbContext.Remove(existingIncentive);
         }
 
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
@@ -113,6 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             RemoveDeletedClawbacks(updatedIncentive, existingIncentive);
             RemoveDeletedPayments(updatedIncentive, existingIncentive);
             RemoveDeletedPendingPayments(updatedIncentive, existingIncentive);
+            RemoveDeletedBreaksInLearning(updatedIncentive, existingIncentive);
 
             foreach (var pendingPayment in updatedIncentive.PendingPayments)
             {
@@ -167,6 +167,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 else
                 {
                     _dbContext.BreakInLearnings.Add(breakInLearning);
+                }
+            }
+        }
+
+        private void RemoveDeletedBreaksInLearning(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var breakInLearning in existingIncentive.BreakInLearnings)
+            {
+                if (updatedIncentive.BreakInLearnings.All(c => c.StartDate != breakInLearning.StartDate))
+                {
+                    _dbContext.BreakInLearnings.Remove(breakInLearning);
                 }
             }
         }

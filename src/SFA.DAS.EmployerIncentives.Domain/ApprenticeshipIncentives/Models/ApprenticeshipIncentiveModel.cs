@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
@@ -22,9 +23,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public DateTime? SubmittedDate { get; set; }
         public string SubmittedByEmail { get; set; }
         public IncentiveStatus Status { get; set; }
-        public int BreakInLearningDayCount { get; set; }
+        public WithdrawnBy? WithdrawnBy { get; set; }
         public ICollection<BreakInLearning> BreakInLearnings { get; set; }
         public AgreementVersion MinimumAgreementVersion { get; set; }
+        public IncentivePhase Phase { get; set; }
 
         public ApprenticeshipIncentiveModel()
         {

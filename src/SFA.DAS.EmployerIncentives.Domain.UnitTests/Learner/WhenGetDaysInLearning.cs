@@ -28,12 +28,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
 
             _collectionPeriod = _fixture.Create<CollectionPeriod>();
 
-            _daysInLearning = new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear, _fixture.Create<int>());
+            _daysInLearning = new DaysInLearning(_collectionPeriod, _fixture.Create<int>());
 
             _sutModel.DaysInLearnings = new List<DaysInLearning>() {
-                new DaysInLearning((byte)(_collectionPeriod.PeriodNumber - 1), (short)(_collectionPeriod.AcademicYear - 1), _fixture.Create<int>()),
+                new DaysInLearning(new CollectionPeriod((byte)(_collectionPeriod.PeriodNumber - 1), (short)(_collectionPeriod.AcademicYear - 1)), _fixture.Create<int>()),
                 _daysInLearning,
-                new DaysInLearning((byte)(_collectionPeriod.PeriodNumber + 1), (short)(_collectionPeriod.AcademicYear + 1), _fixture.Create<int>()),
+                new DaysInLearning(new CollectionPeriod((byte)(_collectionPeriod.PeriodNumber + 1), (short)(_collectionPeriod.AcademicYear + 1)), _fixture.Create<int>()),
             };
 
             _sut = Sut(_sutModel);
@@ -57,12 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
             // arrange 
             var collectionPeriod = new CollectionPeriod(
                 (byte)(_collectionPeriod.PeriodNumber + 1),
-                _collectionPeriod.CalendarMonth,
-                _collectionPeriod.CalendarYear,
-                _collectionPeriod.OpenDate,
-                _collectionPeriod.CensusDate,
-                _collectionPeriod.AcademicYear,
-                _collectionPeriod.Active
+                _collectionPeriod.AcademicYear
                 );
 
             // act

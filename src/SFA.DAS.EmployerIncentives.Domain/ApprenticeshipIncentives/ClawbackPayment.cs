@@ -11,6 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
     {
         public Account Account => Model.Account;
         public bool Sent => Model.DateClawbackSent.HasValue;
+        public string VrfVendorId => Model.VrfVendorId;
 
         internal static ClawbackPayment New(
             Guid id,
@@ -20,7 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             decimal amount,
             DateTime createdDate,
             SubnominalCode subnominalCode,
-            Guid paymentId
+            Guid paymentId,
+            string vrfVendorId
         )
         {
             return new ClawbackPayment(new ClawbackPaymentModel
@@ -32,7 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Amount = amount,
                 CreatedDate = createdDate,
                 SubnominalCode = subnominalCode,
-                PaymentId = paymentId
+                PaymentId = paymentId,
+                VrfVendorId = vrfVendorId
             },
                 true);
         }
@@ -44,8 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetPaymentPeriod(CollectionPeriod period)
         {
-            Model.CollectionPeriod = period.PeriodNumber;
-            Model.CollectionPeriodYear = period.AcademicYear;
+            Model.CollectionPeriod = period;
         }
 
         private ClawbackPayment(ClawbackPaymentModel model, bool isNew = false) : base(model.Id, model, isNew)

@@ -6,6 +6,8 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 using System;
 using System.Threading.Tasks;
@@ -58,7 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         i.Account.Id == command.AccountId &&
                         i.GetModel().SubmittedDate == command.SubmittedDate &&
                         i.GetModel().SubmittedByEmail == command.SubmittedByEmail &&
-                        i.Apprenticeship.CourseName == command.CourseName
+                        i.Apprenticeship.CourseName == command.CourseName &&
+                        i.Apprenticeship.EmploymentStartDate == command.EmploymentStartDate &&
+                        i.Phase.Identifier == command.Phase
                 )), Times.Once());
         }
 
@@ -66,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_apprenticeship_incentive_is_not_created_if_one_exists_for_the_apprenticeship_id()
         {
             var command = _fixture.Create<CreateIncentiveCommand>();
-            var existingAppenticeshipIncentive = (new ApprenticeshipIncentiveFactory()).CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), _fixture.Create<int>());
+            var existingAppenticeshipIncentive = (new ApprenticeshipIncentiveFactory()).CreateNew(Guid.NewGuid(), Guid.NewGuid(), _fixture.Create<Account>(), _fixture.Create<Apprenticeship>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), _fixture.Create<string>(), new AgreementVersion(_fixture.Create<int>()), new IncentivePhase(Phase.Phase1));
             _mockIncentiveDomainRepository.Setup(x => x.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId)).ReturnsAsync(existingAppenticeshipIncentive);
 
             // Act

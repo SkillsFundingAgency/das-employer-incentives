@@ -29,11 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         public void CleanUp() => _dbContext.Dispose();
 
         [Test]
-        public async Task Then_the_apprenticeship_incentive_is_deleted_from_the_database()
+        public async Task Then_the_associated_payments_for_the_incentive_are_archived()
         {
             // Arrange
             var incentive = _fixture.Create<ApprenticeshipIncentiveModel>();
-            var cpData = _fixture.Build<ApprenticeshipIncentives.Models.CollectionPeriod>()
+            var cpData = _fixture.Build<ApprenticeshipIncentives.Models.CollectionCalendarPeriod>()
                 .With(x => x.Active, true)
                 .With(x => x.PeriodNumber, 2)
                 .With(x => x.CalendarMonth, 9)
@@ -43,8 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .With(x => x.AcademicYear, "2021")
                 .Create();
 
-            var cp = new CollectionPeriod(cpData.PeriodNumber, cpData.CalendarMonth, cpData.CalendarYear,
-                cpData.EIScheduledOpenDateUTC, cpData.CensusDate, Convert.ToInt16(cpData.AcademicYear), true);
+            var cp = new CollectionPeriod(cpData.PeriodNumber, Convert.ToInt16(cpData.AcademicYear));
 
             var validationResults = _fixture.Build<PendingPaymentValidationResultModel>()
                 .With(x => x.CollectionPeriod, cp)
@@ -75,10 +74,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             await _dbContext.SaveChangesAsync();
 
             // Assert
-            _dbContext.ApprenticeshipIncentives.Should().BeEmpty();
+            _dbContext.ApprenticeshipIncentives.Count().Should().Be(1);
             _dbContext.PendingPayments.Should().BeEmpty();
             _dbContext.PendingPaymentValidationResults.Should().BeEmpty();
-            _dbContext.Payments.Should().BeEmpty();
+            _dbContext.Payments.Count().Should().Be(2);
         }
     }
 }

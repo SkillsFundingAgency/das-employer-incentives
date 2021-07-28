@@ -15,9 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Account Account => Model.Account;
         public DateTime DueDate => Model.DueDate;
         public decimal Amount => Model.Amount;
-        public byte? PeriodNumber => Model.PeriodNumber;
-        public short? PaymentYear => Model.PaymentYear;
-        public CollectionPeriod CollectionPeriod => Model.PeriodNumber.HasValue ? new CollectionPeriod(Model.PeriodNumber.Value, Model.PaymentYear.Value) : null;
+        public CollectionPeriod CollectionPeriod => Model.CollectionPeriod;
         public DateTime? PaymentMadeDate => Model.PaymentMadeDate;
         public EarningType EarningType => Model.EarningType;
         public bool ClawedBack => Model.ClawedBack;
@@ -48,9 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetPaymentPeriod(CollectionCalendar collectionCalendar)
         {
-            var period = collectionCalendar.GetPeriod(DueDate);
-            Model.PeriodNumber = period.PeriodNumber;
-            Model.PaymentYear = period.AcademicYear;
+            Model.CollectionPeriod = collectionCalendar.GetPeriod(DueDate)?.CollectionPeriod;
         }
 
         public void SetPaymentMadeDate(DateTime paymentDate)
@@ -63,8 +59,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var existing = Model
                 .PendingPaymentValidationResultModels
                 .SingleOrDefault(v => v.Step.Equals(validationResult.Step) &&
-                                      v.CollectionPeriod.CalendarMonth == validationResult.CollectionPeriod.CalendarMonth &&
-                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear);
+                                      v.CollectionPeriod.AcademicYear == validationResult.CollectionPeriod.AcademicYear &&
+                                      v.CollectionPeriod.PeriodNumber == validationResult.CollectionPeriod.PeriodNumber);
 
             if (existing != null)
             {
@@ -88,18 +84,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
         }
 
-        public bool IsValidated(short collectionYear, byte collectionPeriod)
+        public bool IsValidated(CollectionPeriod collectionPeriod)
         {
             return Model.PendingPaymentValidationResultModels.Count() > 0
-                   && AllPendingPaymentsForPeriodAreValid(collectionYear, collectionPeriod);
+                   && AllPendingPaymentsForPeriodAreValid(collectionPeriod);
         }
 
-        private bool AllPendingPaymentsForPeriodAreValid(short collectionYear, byte collectionPeriod)
+        private bool AllPendingPaymentsForPeriodAreValid(CollectionPeriod collectionPeriod)
         {
             return Model.PendingPaymentValidationResultModels
                 .Where(v =>
-                    v.CollectionPeriod.AcademicYear == collectionYear &&
-                    v.CollectionPeriod.PeriodNumber == collectionPeriod)
+                    v.CollectionPeriod == collectionPeriod)
                 .All(r => r.Result);
         }
 
@@ -119,20 +114,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public bool RequiresNewPayment(PendingPayment pendingPayment)
         {
-            return Amount != pendingPayment.Amount || PeriodNumber != pendingPayment.PeriodNumber || PaymentYear != pendingPayment.PaymentYear;
+            return Amount != pendingPayment.Amount || CollectionPeriod != pendingPayment.CollectionPeriod;
         }
 
-        public override bool Equals(object obj)
+        public bool EquivalentTo(PendingPayment pendingPayment)
         {
-            var pendingPayment = obj as PendingPayment;
             if (pendingPayment == null)
             {
                 return false;
             }
 
             return Amount == pendingPayment.Amount &&
-                   PeriodNumber == pendingPayment.PeriodNumber &&
-                   PaymentYear == pendingPayment.PaymentYear &&
+                   CollectionPeriod == pendingPayment.CollectionPeriod &&
                    DueDate == pendingPayment.DueDate &&
                    PaymentMadeDate == pendingPayment.PaymentMadeDate &&
                    EarningType == pendingPayment.EarningType &&

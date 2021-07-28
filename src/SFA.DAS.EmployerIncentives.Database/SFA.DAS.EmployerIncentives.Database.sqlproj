@@ -95,7 +95,6 @@
     <Build Include="Views\BusinessValidationRulesDashboard.sql" />
     <Build Include="StoredProcedures\PaymentEnquiry.sql" />
     <Build Include="Schemas\Support.sql" />
-    <None Include="Scripts\Update.AccountsSignedAgreementVersion.sql" />
     <Build Include="Views\BusinessValidationRulesByPeriodDashboard.sql" />
     <Build Include="Views\BusinessGetMonthEndRuntimes.sql" />
     <Build Include="Tables\ClawbackPayment.sql" />
@@ -105,6 +104,7 @@
     <Build Include="Tables\Archive.PendingPaymentValidationResult.sql" />
     <Build Include="Tables\ChangeOfCircumstances.sql" />
     <Build Include="Tables\ApprenticeshipBreakInLearning.sql" />
+    <Build Include="StoredProcedures\CreateRetrospectiveApplication.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />

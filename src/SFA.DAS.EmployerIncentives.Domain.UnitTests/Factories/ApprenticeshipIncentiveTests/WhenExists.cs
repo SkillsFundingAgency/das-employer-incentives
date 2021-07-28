@@ -40,8 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                 .Excluding(x => x.ApplicationApprenticeshipId)
                 .Excluding(x => x.ClawbackPaymentModels)
                 .Excluding(x => x.Status)
-                .Excluding(x => x.BreakInLearningDayCount)
                 .Excluding(x => x.BreakInLearnings)
+                .Excluding(x => x.Phase)
             );
         }
 
@@ -112,7 +112,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                         .Excluding(x => x.PaymentId)
                         .Excluding(x => x.DateClawbackSent)
                         .Excluding(x => x.CollectionPeriod)
-                        .Excluding(x => x.CollectionPeriodYear)
                         );
         }
 

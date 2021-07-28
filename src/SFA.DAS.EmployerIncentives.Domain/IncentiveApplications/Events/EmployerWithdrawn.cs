@@ -9,6 +9,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
         public EmployerWithdrawn(
             long accountId,
             long accountLegalEntityId,
+            string legalEntity,
+            string emailAddress,
             ApprenticeshipModel model,
             ServiceRequest serviceRequest)
             : base(
@@ -18,6 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
                   model,
                   serviceRequest)
         {
+            LegalEntity = legalEntity;
+            EmailAddress = emailAddress;
         }
+
+        public string LegalEntity { get; }
+        public string EmailAddress { get; }
     }
 }

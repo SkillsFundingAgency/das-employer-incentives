@@ -35,7 +35,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
 
             var data = (await _sut.GetAll()).ToList();
             data.Single(x => x.Active).SetActive(false);
-            data.OrderBy(x => x.PeriodNumber).Last().SetActive(true);
+            data.OrderBy(x => x.CollectionPeriod.PeriodNumber).Last().SetActive(true);
+            data.OrderBy(x => x.CollectionPeriod.PeriodNumber).Last().SetPeriodEndInProgress(true);
 
             // Act
             await _sut.Save(data);
@@ -43,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
             // Assert
             _dbContext.CollectionPeriods.Should().HaveCount(data.Count);
             _dbContext.CollectionPeriods.Single(x => x.PeriodNumber == 3).Active.Should().BeTrue();
+            _dbContext.CollectionPeriods.Single(x => x.PeriodNumber == 3).PeriodEndInProgress.Should().BeTrue();
         }
 
         [Test]
@@ -52,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
             await AddCollectionPeriods();
 
             var data = (await _sut.GetAll()).ToList();
-            data.Add(new CollectionPeriod(1, 2030));
+            data.Add(new CollectionCalendarPeriod(new CollectionPeriod(1, 2030), 1, 2030, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, false));
 
             // Act
             await _sut.Save(data);
@@ -83,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
         {
             var collectionPeriod = new[]
             {
-                _fixture.Build<ApprenticeshipIncentives.Models.CollectionPeriod>()
+                _fixture.Build<ApprenticeshipIncentives.Models.CollectionCalendarPeriod>()
                     .With(x => x.Active, false)
                     .With(x => x.PeriodNumber, 1)
                     .With(x => x.CalendarMonth, 8)
@@ -91,8 +93,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
                     .With(x => x.EIScheduledOpenDateUTC, new DateTime(2020, 8, 6))
                     .With(x => x.CensusDate, new DateTime(2020, 8, 30))
                     .With(x => x.AcademicYear, "2021")
+                    .With(x => x.PeriodEndInProgress, false)
                     .Create(),
-                _fixture.Build<ApprenticeshipIncentives.Models.CollectionPeriod>()
+                _fixture.Build<ApprenticeshipIncentives.Models.CollectionCalendarPeriod>()
                     .With(x => x.Active, true)
                     .With(x => x.PeriodNumber, 2)
                     .With(x => x.CalendarMonth, 9)
@@ -100,8 +103,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
                     .With(x => x.EIScheduledOpenDateUTC, new DateTime(2020, 9, 6))
                     .With(x => x.CensusDate, new DateTime(2020, 9, 30))
                     .With(x => x.AcademicYear, "2021")
+                    .With(x => x.PeriodEndInProgress, false)
                     .Create(),
-                _fixture.Build<ApprenticeshipIncentives.Models.CollectionPeriod>()
+                _fixture.Build<ApprenticeshipIncentives.Models.CollectionCalendarPeriod>()
                     .With(x => x.Active, false)
                     .With(x => x.PeriodNumber, 3)
                     .With(x => x.CalendarMonth, 10)
@@ -109,6 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
                     .With(x => x.EIScheduledOpenDateUTC, new DateTime(2020, 10, 6))
                     .With(x => x.CensusDate, new DateTime(2020, 10, 30))
                     .With(x => x.AcademicYear, "2021")
+                    .With(x => x.PeriodEndInProgress, false)
                     .Create()
             };
             await _dbContext.AddRangeAsync(collectionPeriod);

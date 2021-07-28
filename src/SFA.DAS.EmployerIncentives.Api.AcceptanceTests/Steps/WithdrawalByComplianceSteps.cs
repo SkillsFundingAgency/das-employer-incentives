@@ -220,8 +220,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 c.Command is WithdrawCommand)
                 .Should().Be(2);
         }
-        [Then(@"the apprenticeship incentive and it's pending payments are removed from the system")]
-        public async Task ThenTheIncentiveAndPendingPaymentsAreRemovedFromTheSystem()
+        [Then(@"the apprenticeship incentive is marked as withdrawn and it's pending payments are removed from the system")]
+        public async Task ThenTheIncentiveIsWithdrawnAndPendingPaymentsAreRemovedFromTheSystem()
         {
             await ThenTheIncentiveApplicationStatusIsUpdatedToIndicateTheComplianceWithdrawal();
 
@@ -230,7 +230,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var pendingPaymentValidationResults = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
             var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
 
-            incentives.Should().HaveCount(0);
+            incentives.Should().HaveCount(1); 
+            var incentive = incentives.FirstOrDefault();
+            incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.WithdrawnBy.Should().Be(WithdrawnBy.Compliance);
             pendingPaymentValidationResults.Should().HaveCount(0);
             pendingPayments.Should().HaveCount(0);
         }
@@ -259,6 +262,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var incentive = incentives.Single();
             incentive.Status.Should().Be(IncentiveStatus.Withdrawn);
+            incentive.WithdrawnBy.Should().Be(WithdrawnBy.Compliance);
             incentive.PausePayments.Should().BeFalse();
 
             payments.Single().Id.Should().Be(_payment.Id);

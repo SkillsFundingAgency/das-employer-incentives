@@ -64,8 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedPendingPayment.DueDate.Should().Be(testPendingPayment.DueDate);
             storedPendingPayment.CalculatedDate.Should().Be(testPendingPayment.CalculatedDate);
             storedPendingPayment.PaymentMadeDate.Should().Be(testPendingPayment.PaymentMadeDate);
-            storedPendingPayment.PeriodNumber.Should().Be(testPendingPayment.PeriodNumber);
-            storedPendingPayment.PaymentYear.Should().Be(testPendingPayment.PaymentYear);
+            storedPendingPayment.PeriodNumber.Should().Be(testPendingPayment.CollectionPeriod.PeriodNumber);
+            storedPendingPayment.PaymentYear.Should().Be(testPendingPayment.CollectionPeriod.AcademicYear);
             storedPendingPayment.EarningType.Should().Be(testPendingPayment.EarningType);
             storedPendingPayment.ClawedBack.Should().Be(testPendingPayment.ClawedBack);
             storedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));

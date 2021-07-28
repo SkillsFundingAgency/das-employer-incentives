@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Map;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,6 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             if (legalEntityModel != null)
             {
                 Model.LegalEntityModels.Remove(legalEntityModel);
+                AddEvent(new AccountLegalEntityRemoved { AccountLegalEntityId = accountLegalEntityId });
             }
         }
 
@@ -54,11 +56,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.LegalEntityModels.Add(legalEntityModel);
         }
 
-        public void SetVendorRegistrationCaseDetails(string hashedLegalEntityId, string caseId, string status, DateTime lastUpdatedDate)
+        public void SetVendorRegistrationCaseDetails(string hashedLegalEntityId, VendorCase vendorCase)
         {
             foreach (var legalEntity in LegalEntitiesWithIncompleteVendorRegistration(hashedLegalEntityId))
             {
-                legalEntity.UpdateVendorRegistrationCaseStatus(caseId, status, lastUpdatedDate);
+                legalEntity.UpdateVendorRegistrationCaseStatus(vendorCase);
             }
 
             AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });

@@ -13,13 +13,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 {
     public class WhenValidateDaysInLearning
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private CollectionPeriod _collectionPeriod;
         private Learner _learner;
         private LearnerModel _learnerModel;
         private short _collectionYear;
-        private byte _collectionMonth;
         private Fixture _fixture;
 
         [SetUp]
@@ -28,9 +27,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture = new Fixture();
 
             _collectionYear = _fixture.Create<short>();
-            _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true);
+            _collectionPeriod = new CollectionPeriod(1, _collectionYear);
 
             var startDate = DateTime.Now.Date;
             var dueDate = startDate.AddDays(90).Date;
@@ -50,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _learnerModel = _fixture
                 .Build<LearnerModel>()
-                .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear, 90) })
+                .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod, 90) })
                 .Create();
 
             _learner = Learner.Get(_learnerModel);                
@@ -85,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             _learnerModel.DaysInLearnings = new List<DaysInLearning>() {
-                new DaysInLearning(_collectionPeriod.PeriodNumber, _collectionPeriod.AcademicYear, daysInLearning)
+                new DaysInLearning(_collectionPeriod, daysInLearning)
             };
 
             _learner = Learner.Get(_learnerModel);
@@ -102,9 +100,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
         
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }

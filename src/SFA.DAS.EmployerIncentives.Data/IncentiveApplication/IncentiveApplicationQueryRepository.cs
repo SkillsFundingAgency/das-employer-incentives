@@ -6,7 +6,9 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -47,11 +49,15 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 Id = x.Application.Id,
                 AccountId = x.Application.AccountId,
                 AccountLegalEntityId = x.Application.AccountLegalEntityId,
-                Apprenticeships = x.Application.Apprenticeships.Select(y => MapToApprenticeshipDto(y)),
+                Apprenticeships = x.Application.Apprenticeships
+                                    .OrderBy(o => o.FirstName)
+                                    .ThenBy(o => o.LastName)
+                                    .ThenBy(o=> o.ULN)
+                                    .Select(y => MapToApprenticeshipDto(y)),
                 LegalEntityId = x.Account.LegalEntityId,
                 SubmittedByEmail = x.Application.SubmittedByEmail,
                 SubmittedByName = x.Application.SubmittedByName,
-                BankDetailsRequired = MapBankDetailsRequired(x.Account.VrfCaseStatus, x.Account.VrfVendorId)
+                BankDetailsRequired = (new VendorBankStatus(x.Account.VrfVendorId, new VendorCase(x.Account.VrfCaseId, x.Account.VrfCaseStatus, x.Account.VrfCaseStatusLastUpdatedDateTime))).BankDetailsRequired
             };
         }
 
@@ -66,21 +72,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
                 Uln = apprenticeship.ULN,
                 PlannedStartDate = apprenticeship.PlannedStartDate,
-                DateOfBirth = apprenticeship.DateOfBirth
+                DateOfBirth = apprenticeship.DateOfBirth,
+                EmploymentStartDate = apprenticeship.EmploymentStartDate,                
+                Phase = apprenticeship.Phase,
+                HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
             };
         }
-
-        private static bool MapBankDetailsRequired(string vrfCaseStatus, string vrfVendorId)
-        {
-            if (!string.IsNullOrWhiteSpace(vrfVendorId) && vrfVendorId != "000000")
-            {
-                return false;
-            }
-
-            return (String.IsNullOrWhiteSpace(vrfCaseStatus) 
-                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
-                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
-                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase));
-        }
+     
     }
 }

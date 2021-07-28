@@ -1,6 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using System;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateIncentive
@@ -74,6 +73,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
             if (item.CourseName == default)
             {
                 result.AddError("CourseName", "Is not set");
+            }
+
+            if (item.EmploymentStartDate == default)
+            {
+                result.AddError("EmploymentStartDate", "Is not set");
             }
 
             return Task.FromResult(result);

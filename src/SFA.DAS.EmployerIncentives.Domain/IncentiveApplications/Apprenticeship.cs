@@ -1,18 +1,15 @@
-﻿using System;
-using SFA.DAS.Common.Domain.Types;
+﻿using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.ValueObjects;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public class Apprenticeship : Entity<Guid, ApprenticeshipModel>
     {
-        private const decimal TwentyFiveOrOverIncentiveAmount = 2000;
-        private const decimal UnderTwentyFiveIncentiveAmount = 1500;
+        private const decimal EmployerIncentivesTotalPaymentAmount = 3000;
 
         public long ApprenticeshipId => Model.ApprenticeshipId;
         public string FirstName => Model.FirstName;
@@ -27,13 +24,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
         public bool WithdrawnByCompliance => Model.WithdrawnByCompliance;
         public string CourseName => Model.CourseName;
+        public bool HasEligibleEmploymentStartDate => Model.HasEligibleEmploymentStartDate;
+        public DateTime? EmploymentStartDate => Model.EmploymentStartDate;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
             return new Apprenticeship(model.Id, model, false);
         }
 
-        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, string courseName)
+        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, string courseName, DateTime? employmentStartDate)
         {
             IsNew = false;
             Model = new ApprenticeshipModel
@@ -46,10 +45,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 ULN = uln,
                 PlannedStartDate = plannedStartDate,
                 ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval,
-                TotalIncentiveAmount = CalculateTotalIncentiveAmount(dateOfBirth, plannedStartDate),
+                TotalIncentiveAmount = EmployerIncentivesTotalPaymentAmount,
                 UKPRN = ukprn,
-                CourseName = courseName
+                CourseName = courseName,
+                EmploymentStartDate = employmentStartDate                
             };
+
+            Model.HasEligibleEmploymentStartDate = Incentive.EmployerStartDateIsEligible(this);
         }
 
         public void SetEarningsCalculated(bool isCalculated = true)
@@ -76,27 +78,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public void SetPlannedStartDate(DateTime plannedStartDate)
         {
             Model.PlannedStartDate = plannedStartDate;
-        }
+        }           
 
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)
         {
-        }
-
-        private decimal CalculateTotalIncentiveAmount(DateTime apprenticeDateOfBirth, DateTime plannedStartDate)
-        {
-            var apprenticeAge = CalculateAgeAtStartOfApprenticeship(apprenticeDateOfBirth, plannedStartDate);
-
-            if (apprenticeAge > 24)
-            {
-                return UnderTwentyFiveIncentiveAmount;
-            }
-
-            return TwentyFiveOrOverIncentiveAmount;
-        }
-
-        private static int CalculateAgeAtStartOfApprenticeship(in DateTime apprenticeDateOfBirth, in DateTime plannedStartDate)
-        {
-            return apprenticeDateOfBirth.AgeOnThisDay(plannedStartDate);
         }
     }
 }

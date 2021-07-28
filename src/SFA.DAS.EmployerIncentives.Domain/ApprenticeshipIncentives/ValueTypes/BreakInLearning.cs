@@ -13,14 +13,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
         public DateTime StartDate { get; }
         public DateTime? EndDate { get; private set; }
+        public int Days => EndDate.HasValue ? (EndDate.Value - StartDate).Days : 0;
 
-        public void SetEndDate(DateTime dateTime)
+        public BreakInLearning SetEndDate(DateTime value)
         {
-            if (dateTime.Date < StartDate)
+            if (value.Date < StartDate)
             {
                 throw new ArgumentException("End date of break in learning can't be before the start date");
             }
-            EndDate = dateTime.Date;
+            EndDate = value.Date;
+            return this;
         }
 
         protected override IEnumerable<object> GetAtomicValues()

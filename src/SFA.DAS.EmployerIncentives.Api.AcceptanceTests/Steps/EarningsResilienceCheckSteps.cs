@@ -1,7 +1,9 @@
 ﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -38,6 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     .With(a => a.WithdrawnByCompliance, false)
                     .With(a => a.WithdrawnByEmployer, false)
                     .With(a => a.EarningsCalculated, false)
+                    .With(a => a.HasEligibleEmploymentStartDate, true)
                     .CreateMany(2).ToList();
 
                 foreach (var apprenticeship in apprenticeships)
@@ -46,6 +49,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 }
             }
         }
+        [Given(@"the active period month end processing is in progress")]
+        public async Task GivenTheActivePeriodMonthEndProcessingIsInProgress()
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            _testContext.ActivePeriod.PeriodEndInProgress = true;
+            await dbConnection.UpdateAsync(_testContext.ActivePeriod);
+        }        
 
         [When(@"the earnings resilience check is requested")]
         public async Task WhenTheEarningsResilienceCheckIsRequested()

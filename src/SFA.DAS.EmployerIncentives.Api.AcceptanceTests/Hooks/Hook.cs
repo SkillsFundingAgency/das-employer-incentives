@@ -7,6 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks
         public Action<T> OnReceived { get; set; }
         public Action<T> OnPublished { get; set; }
         public Action<T> OnProcessed { get; set; }
+        public Action<T> OnDelayed { get; set; }
         public Action<T> OnHandled { get; set; }
         public Func<Exception, T, bool> OnErrored { get; set; }
     }

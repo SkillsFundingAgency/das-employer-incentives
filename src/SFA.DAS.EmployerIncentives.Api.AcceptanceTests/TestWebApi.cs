@@ -6,10 +6,13 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using NServiceBus;
+using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -38,27 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
-            _paymentProfiles = new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile
-                {
-                    IncentiveType = Enums.IncentiveType.UnderTwentyFiveIncentive,
-                    PaymentProfiles = new List<PaymentProfile>
-                    {
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 1000, DaysAfterApprenticeshipStart = 364},
-                    }
-                },
-                new IncentivePaymentProfile
-                {
-                    IncentiveType = Enums.IncentiveType.TwentyFiveOrOverIncentive,
-                    PaymentProfiles = new List<PaymentProfile>
-                    {
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 89},
-                        new PaymentProfile {AmountPayable = 750, DaysAfterApprenticeshipStart = 364},
-                    }
-                }
-            };
+            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
         }
 
@@ -91,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.ApplicationCancelled = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
                 s.Configure<MatchedLearnerApi>(l =>
                 {
@@ -112,6 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _commandMessageHook));
                 s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>

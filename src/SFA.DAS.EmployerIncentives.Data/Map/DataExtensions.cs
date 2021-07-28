@@ -25,7 +25,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             HashedLegalEntityId = i.HashedLegalEntityId,
                                                             LegalEntityId = i.Id,
                                                             LegalEntityName = i.Name,
-                                                            HasSignedIncentivesTerms = i.HasSignedAgreementTerms,
                                                             SignedAgreementVersion = i.SignedAgreementVersion,
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
@@ -61,7 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             {
                 Id = model.LegalEntityId,
                 AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedAgreementTerms = model.HasSignedIncentivesTerms,
                 SignedAgreementVersion = model.SignedAgreementVersion,
                 Name = model.LegalEntityName,
                 HashedLegalEntityId = model.HashedLegalEntityId,
@@ -69,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
-                BankDetailsStatus = MapBankDetailsStatus(model)
+                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status
             };
         }
 
@@ -110,12 +108,13 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             {
                 AccountId = model.Id,
                 AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedIncentivesTerms = model.HasSignedIncentivesTerms,
-                SignedAgreementVersion = model.SignedAgreementVersion,
+                LegalEntityId = model.LegalEntityId,
                 LegalEntityName = model.LegalEntityName,
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
-                HashedLegalEntityId = model.HashedLegalEntityId
+                HashedLegalEntityId = model.HashedLegalEntityId,
+                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion(),
+                BankDetailsRequired = MapBankDetailsRequired(model.VrfCaseStatus, model.VrfVendorId)
             };
         }
 
@@ -153,7 +152,10 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ULN = x.ULN,
                 TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN,
-                CourseName = x.CourseName
+                CourseName = x.CourseName,
+                EmploymentStartDate = x.EmploymentStartDate,
+                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                Phase = x.Phase                
             }).ToList();
         }
 
@@ -190,57 +192,13 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
                 UKPRN = x.UKPRN,
-                CourseName = x.CourseName
+                CourseName = x.CourseName,
+                EmploymentStartDate = x.EmploymentStartDate,
+                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                Phase = x.Phase
             }).ToList();
         }
 
-        public static LegalEntityDto Map(this LegalEntityModel model, long accountId)
-        {
-            return new LegalEntityDto
-            {
-                AccountId = accountId,
-                AccountLegalEntityId = model.AccountLegalEntityId,
-                HasSignedIncentivesTerms = model.HasSignedAgreementTerms,
-                LegalEntityId = model.Id,
-                LegalEntityName = model.Name,
-                VrfVendorId = model.VrfVendorId,
-                VrfCaseStatus = model.VrfCaseStatus,
-                HashedLegalEntityId = model.HashedLegalEntityId
-            };
-        }
-
-        private static bool HasVendorId(Models.Account model)
-        {
-            return !string.IsNullOrEmpty(model.VrfVendorId) && model.VrfVendorId != "000000";
-        }
-
-        private static BankDetailsStatus MapBankDetailsStatus(Models.Account model)
-        {
-            if (HasVendorId(model))
-            {
-                return BankDetailsStatus.Completed;
-            }
-
-            if (string.IsNullOrWhiteSpace(model.VrfCaseStatus))
-            {
-                return BankDetailsStatus.NotSupplied;
-            }
-
-            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
-                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
-                 || model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return BankDetailsStatus.Rejected;
-            }
-
-            if (model.VrfCaseStatus.Equals(LegalEntityVrfCaseStatus.Completed, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return BankDetailsStatus.Completed;
-            }
-
-            return BankDetailsStatus.InProgress;
-        }
-      
         internal static IncentiveApplicationStatusAudit Map(this IncentiveApplicationAudit entity)
         {
             return new IncentiveApplicationStatusAudit
@@ -253,6 +211,19 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 CreatedDateTime = DateTime.Now
             };
+        }
+
+        internal static bool MapBankDetailsRequired(string vrfCaseStatus, string vrfVendorId)
+        {
+            if (!string.IsNullOrWhiteSpace(vrfVendorId) && vrfVendorId != "000000")
+            {
+                return false;
+            }
+
+            return (string.IsNullOrWhiteSpace(vrfCaseStatus)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedDataValidation, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVer1, StringComparison.InvariantCultureIgnoreCase)
+                || vrfCaseStatus.Equals(LegalEntityVrfCaseStatus.RejectedVerification, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }
