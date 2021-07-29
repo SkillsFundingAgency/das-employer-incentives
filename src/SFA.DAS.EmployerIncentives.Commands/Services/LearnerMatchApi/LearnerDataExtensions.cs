@@ -175,7 +175,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                from pe in tr.PriceEpisodes
                from p in pe.Periods
                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new LearningPeriod(pe.StartDate, pe.EndDate)).Distinct();
+               select new LearningPeriod(pe.StartDate, pe.EndDate)).Distinct().DeDupe();
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)
@@ -193,6 +193,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 && (pe.EndDate >= paymentDueDate || pe.EndDate == null)))
                 .SelectMany(e => e.Periods)
                 .Where(p => p.ApprenticeshipId == apprenticeshipId);
+        }
+
+        private static IEnumerable<LearningPeriod> DeDupe(this IEnumerable<LearningPeriod> periods)
+        {
+            // There should never be price episodes with the same start date returned on the ILR as it is invalid but it's happened so we need the defensive code to stop it breaking our payment run!
+            var updatedPeriods = periods.ToList();
+            var duplicateStartDates = periods.GroupBy(x => x.StartDate).Where(y => y.Count() > 1);
+            foreach (var duplicateStartDate in duplicateStartDates)
+            {
+                foreach (var duplicatePeriod in duplicateStartDate.OrderByDescending(x => x.EndDate).Skip(1))
+                {
+                    updatedPeriods.Remove(duplicatePeriod);
+                }
+            }
+
+            return updatedPeriods;
         }
     }
 }
