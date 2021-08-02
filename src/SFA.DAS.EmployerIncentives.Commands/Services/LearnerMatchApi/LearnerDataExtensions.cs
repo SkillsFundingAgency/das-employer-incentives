@@ -176,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                from pe in tr.PriceEpisodes
                from p in pe.Periods
                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new LearningPeriod(pe.StartDate, pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate("2021"))).Distinct(); // TODO: Replace "2021" with the academic year from the price episode when we have it
+               select new LearningPeriod(pe.StartDate, pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate(pe.AcademicYear))).Distinct();
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)

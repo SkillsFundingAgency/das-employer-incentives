@@ -44,10 +44,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.PriceEpisodes.Clear();
 
             _testPriceEpisode1Dto = _fixture.Create<PriceEpisodeDto>();
+            _testPriceEpisode1Dto.AcademicYear = "2021";
             _testPriceEpisode1Dto.Periods.First().ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id;
             _testTrainingDto.PriceEpisodes.Add(_testPriceEpisode1Dto);
 
             _testPriceEpisode2Dto = _fixture.Create<PriceEpisodeDto>();
+            _testPriceEpisode2Dto.AcademicYear = "2021";
             //_testPriceEpisode2Dto.EndDate = null;
             // probbaly not valid data but add multiple apprenticeship periods by price episode just in case
             _testPriceEpisode2Dto.Periods.ToList().ForEach(p => p.ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id);
@@ -56,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.PriceEpisodes.Add(_fixture.Create<PriceEpisodeDto>()); // non matching
 
             _testPriceEpisode3Dto = _fixture.Create<PriceEpisodeDto>(); // duplicate
+            _testPriceEpisode3Dto.AcademicYear = "2021";
             _testPriceEpisode3Dto.StartDate = _testPriceEpisode1Dto.StartDate;
             _testPriceEpisode3Dto.EndDate = _testPriceEpisode1Dto.EndDate;
             _testPriceEpisode3Dto.Periods.First().ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id;
