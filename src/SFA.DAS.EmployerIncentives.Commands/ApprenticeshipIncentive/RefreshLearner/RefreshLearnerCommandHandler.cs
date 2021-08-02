@@ -47,6 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             _logger.LogInformation("End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN}",
                 learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber);
 
+            var collectionCalendar = await _collectionCalendarService.Get();
+
             if (learnerData != null)
             {
                 if (LearnerAndEarningsHaveNotChanged(learnerData, learner, incentive))
@@ -64,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetStartDate(learnerData.LearningStartDate(incentive));
                     submissionData.LearningData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
                     submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
-                    submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive));
+                    submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive, collectionCalendar));
                 }
                 submissionData.SetRawJson(learnerData.RawJson);
             }
@@ -77,7 +79,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             learner.SetSubmissionData(submissionData);
             incentive.LearnerRefreshCompleted();
 
-            var collectionCalendar = await _collectionCalendarService.Get();
             learner.SetLearningPeriods(learnerData.LearningPeriods(incentive, collectionCalendar));
             
             if (!learner.SubmissionData.LearningData.LearningFound)
