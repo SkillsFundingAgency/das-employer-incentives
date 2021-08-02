@@ -193,6 +193,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                 .With(p => p.Reference, "ZPROG001")
                                 .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){
                                     _fixture.Build<PriceEpisodeDto>()
+                                    .With(x => x.AcademicYear,"2021")
                                     .With(pe => pe.Periods, new List<PeriodDto>(){
                                         _fixture.Build<PeriodDto>()
                                         .With(p => p.ApprenticeshipId, _apprenticeshipIncentive.Apprenticeship.Id)
@@ -262,6 +263,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         .Build<TrainingDto>()
                         .With(p => p.Reference, "ZPROG001")
                         .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                                                    .With(x => x.AcademicYear,"2021")
                                                     .With(pe => pe.Periods, new List<PeriodDto>(){
                                                         _fixture.Build<PeriodDto>()
                                                        .With(period => period.ApprenticeshipId, _incentiveModel.Apprenticeship.Id)
@@ -363,6 +365,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(-2))
                             .With(pe => pe.StartDate, pendingPaymentModel.DueDate.AddDays(-1))
                             .With(pe => pe.EndDate, pendingPaymentModel.DueDate.AddDays(1))
                             .With(pe => pe.Periods,
@@ -541,6 +544,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(x => x.AcademicYear,"2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -548,11 +552,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                         .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
                                         .Create()
                                     })
-                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
-                            .With(pe => pe.EndDate, DateTime.Today.AddDays(-10))
+                            .With(pe => pe.StartDate, _academicYear.EndDate.AddDays(-20))
+                            .With(pe => pe.EndDate, _academicYear.EndDate.AddDays(-10))
                             .Create(),
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(x => x.AcademicYear,"2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -560,8 +565,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                         .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
                                         .Create()
                                     })
-                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-10))
-                            .With(pe => pe.EndDate, DateTime.Today.AddDays(-2))
+                            .With(pe => pe.StartDate, _academicYear.EndDate.AddDays(-10))
+                            .With(pe => pe.EndDate, _academicYear.EndDate.AddDays(-2))
                             .Create()
                             }).Create(),
                         _fixture.Create<TrainingDto>()
@@ -578,7 +583,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.LearningData.StoppedStatus.LearningStopped &&
-                l.SubmissionData.LearningData.StoppedStatus.DateStopped == DateTime.Today.AddDays(-1) &&
+                l.SubmissionData.LearningData.StoppedStatus.DateStopped == _academicYear.EndDate.AddDays(-1) &&
                 !l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue)
                 ), Times.Once);
         }
@@ -784,6 +789,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                         .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
                                         .Create()
                                     })
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
                             .With(pe => pe.EndDate, (DateTime?)null)
                             .Create()
