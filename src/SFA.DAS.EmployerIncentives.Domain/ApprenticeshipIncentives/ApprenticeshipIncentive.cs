@@ -530,6 +530,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasIlrSubmission, learner.SubmissionData.SubmissionFound));
         }
 
+        private void ValidateLearnerMatchSuccessful(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
+        {
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.LearnerMatchSuccessful, learner.SuccessfulLearnerMatch));
+        }
+
         public void ValidateIsInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
@@ -652,6 +659,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void ValidateLearningData(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
         {
+            ValidateLearnerMatchSuccessful(pendingPaymentId, learner, collectionPeriod);
+            if (!learner.SuccessfulLearnerMatch) return;
+
             ValidateSubmissionFound(pendingPaymentId, learner, collectionPeriod);
             if (!learner.SubmissionData.SubmissionFound) return;
 

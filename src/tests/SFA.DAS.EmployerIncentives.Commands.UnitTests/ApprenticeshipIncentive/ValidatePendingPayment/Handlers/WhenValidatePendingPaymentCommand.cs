@@ -118,6 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _daysInLearning = new DaysInLearning(new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year), 90);
 
             _learnerModel = _fixture.Build<LearnerModel>()
+                .With(x => x.SuccessfulLearnerMatch, true)
                 .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)
                 .With(m => m.ApprenticeshipIncentiveId, incentive.Id)
                 .With(m => m.UniqueLearnerNumber, incentive.Apprenticeship.UniqueLearnerNumber)
@@ -287,10 +288,46 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 4)
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 5)
                 .PendingPaymentValidationResults.Single(x => x.Step == "HasIlrSubmission");
             validationResult.Result.Should().BeFalse();
         }
-               
+
+        [Test]
+        public async Task Then_a_failed_pendingPayment_validation_result_is_saved_and_no_further_validation_performed_when_learner_match_was_unsuccessful()
+        {
+            // Arrange
+            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
+            _learner.SetSuccessfulLearnerMatch(false);
+            
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var accountModel = _fixture.Build<AccountModel>()
+                .With(a => a.Id, _account.Id)
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() {
+                    _fixture.Build<LegalEntityModel>()
+                        .With(l => l.VrfVendorId, "VENDORID")
+                        .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
+                        .Create()})
+                .Create();
+
+            var domainAccount = Domain.Accounts.Account.Create(accountModel);
+
+            _mockAccountDomainRepository
+                .Setup(m => m.Find(incentive.Account.Id))
+                .ReturnsAsync(domainAccount);
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 4)
+                .PendingPaymentValidationResults.Single(x => x.Step == "LearnerMatchSuccessful");
+            validationResult.Result.Should().BeFalse();
+        }
+
     }
 }
