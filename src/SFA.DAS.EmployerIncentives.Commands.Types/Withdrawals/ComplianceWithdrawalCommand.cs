@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
+namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
 {
     public class ComplianceWithdrawalCommand : WithdrawalCommand
     {  

@@ -39,12 +39,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 return;
             }
 
-            throw new BusinessCentralApiException(response.StatusCode, content);
+            throw new BusinessCentralApiException(response.StatusCode, CreateErrorLogJsonContent(paymentRequests));
         }
 
         private static HttpContent CreateJsonContent(IEnumerable<BusinessCentralFinancePaymentRequest> payments)
         {
             var body = new PaymentRequestContainer { PaymentRequests = payments.ToArray() };
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default, "application/json");
+        }
+
+        private static HttpContent CreateErrorLogJsonContent(IEnumerable<BusinessCentralFinancePaymentRequest> payments)
+        {
+            var body = new PaymentRequestContainer {PaymentRequests = payments.ToErrorLogOutput()};
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()

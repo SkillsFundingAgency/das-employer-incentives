@@ -45,9 +45,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ClawbackPayment(model);
         }
 
-        public void SetPaymentPeriod(CollectionCalendarPeriod period)
+        public void SetPaymentPeriod(CollectionPeriod period)
         {
-            Model.CollectionPeriod = period.CollectionPeriod;
+            Model.CollectionPeriod = period;
         }
 
         private ClawbackPayment(ClawbackPaymentModel model, bool isNew = false) : base(model.Id, model, isNew)

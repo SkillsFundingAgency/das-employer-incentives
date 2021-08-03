@@ -33,11 +33,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly LearnerSubmissionDto _stoppedLearnerMatchApiData;
         private readonly LearnerSubmissionDto _resumedLearnerMatchApiData;
         private readonly LearnerSubmissionDto _resumedLearnerWithBreakInLearningMatchApiData;
-        private readonly ApprenticeshipBreakInLearning _apprenticeshipBreakinLearning;
+        private readonly LearnerSubmissionDto _resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData;
+        private readonly ApprenticeshipBreakInLearning _apprenticeshipBreakInLearning;
         private readonly DateTime _plannedStartDate;
         private readonly DateTime _periodEndDate;
         private readonly int _breakInLearning;
-        private LearnerSubmissionDto _resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData;
 
         public LearningStoppedSteps(TestContext testContext)
         {
@@ -169,7 +169,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 )
                 .Create();
 
-            _apprenticeshipBreakinLearning = _fixture
+            _apprenticeshipBreakInLearning = _fixture
                 .Build<ApprenticeshipBreakInLearning>()
                 .With(b => b.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(b => b.StartDate, _plannedStartDate.AddDays(_breakInLearning * -1))
@@ -229,7 +229,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
-                await dbConnection.InsertAsync(_apprenticeshipBreakinLearning);
+                await dbConnection.InsertAsync(_apprenticeshipBreakInLearning);
                 await dbConnection.InsertAsync(_pendingPayment);
                 await dbConnection.InsertAsync(_learner);
                 await dbConnection.InsertAsync(_learningPeriod1);
