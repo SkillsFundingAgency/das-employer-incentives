@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandlerWithPeriodEndDelay
 {
@@ -38,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             __mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             __mockCollectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<Domain.ValueObjects.CollectionCalendarPeriod>() { _collectionCalendarPeriod }));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(),  new List<Domain.ValueObjects.CollectionCalendarPeriod>() { _collectionCalendarPeriod }));
 
             _sut = new CommandHandlerWithPeriodEndDelay<TestCommand>(_mockHandler.Object, _mockScheduledPublisher.Object, __mockCollectionCalendarService.Object);
         }

@@ -198,7 +198,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                                 .With(period => period.Period, _pendingPayment.PeriodNumber)
                                                 .Create()
                                         })
-                                        .With(pe => pe.StartDate, _apprenticeshipBreakinLearning.StartDate)
+                                        .With(pe => pe.StartDate, _apprenticeshipBreakInLearning.StartDate)
                                         .With(pe => pe.EndDate, DateTime.Now.AddMonths(12))
                                         .Create(),
                                 }
