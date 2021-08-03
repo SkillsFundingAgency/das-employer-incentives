@@ -365,6 +365,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(x => x.AcademicYear, "2021")
                             .With(pe => pe.EndDate, DateTime.Today.AddDays(-2))
                             .With(pe => pe.StartDate, pendingPaymentModel.DueDate.AddDays(-1))
                             .With(pe => pe.EndDate, pendingPaymentModel.DueDate.AddDays(1))
@@ -431,6 +432,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(x => x.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
