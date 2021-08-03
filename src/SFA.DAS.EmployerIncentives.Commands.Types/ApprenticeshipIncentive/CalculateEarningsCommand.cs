@@ -5,7 +5,7 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
-    public class CalculateEarningsCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class CalculateEarningsCommand : DomainCommand, ILockIdentifier, ILogWriter, IPeriodEndIncompatible
     {
         public Guid ApprenticeshipIncentiveId { get; private set; }
 
@@ -30,5 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
                 };
             }
         }
+
+        public TimeSpan CommandDelay => TimeSpan.FromHours(1);
     }
 }

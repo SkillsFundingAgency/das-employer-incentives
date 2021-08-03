@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Events;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Events.Accounts
 {
@@ -30,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Events.Accounts
             {
                 foreach (var apprenticeship in application.ApprenticeshipModels)
                 {
-                    var withdrawCommand = new WithdrawCommand(application.AccountId, apprenticeship.Id);
+                    var withdrawCommand = new WithdrawCommand(application.AccountId, apprenticeship.Id, WithdrawnBy.Employer);
 
                     withdrawTasks.Add(_commandPublisher.Publish(withdrawCommand));
                 }

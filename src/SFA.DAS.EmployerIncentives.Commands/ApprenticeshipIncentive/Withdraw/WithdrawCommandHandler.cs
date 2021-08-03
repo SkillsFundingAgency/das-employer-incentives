@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Withdraw
                 return;
             }
             
-            await incentive.Withdraw(_collectionCalendarService);
+            await incentive.Withdraw(command.WithdrawnBy, _collectionCalendarService);
 
             await _domainRepository.Save(incentive);
         }

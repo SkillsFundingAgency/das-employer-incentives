@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -36,6 +38,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             };
         }
 
+        public static BusinessCentralFinancePaymentRequest[] ToErrorLogOutput(this IEnumerable<BusinessCentralFinancePaymentRequest> payments)
+        {
+            return payments.Select(payment => new BusinessCentralFinancePaymentRequest
+                {
+                    RequestorUniquePaymentIdentifier = payment.RequestorUniquePaymentIdentifier,
+                    DueDate = payment.DueDate,
+                    AccountCode = payment.AccountCode,
+                    CostCentreCode = payment.CostCentreCode,
+                    ActivityCode = payment.ActivityCode
+                }).ToArray();
+        }
 
         private static string MapToActivityCode(SubnominalCode subnominalCode)
         {
