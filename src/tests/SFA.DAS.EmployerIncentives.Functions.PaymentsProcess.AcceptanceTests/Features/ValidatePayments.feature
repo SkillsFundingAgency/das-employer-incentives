@@ -22,6 +22,15 @@ Scenario: When no ILR submission found
 	And no payment records are created
 	And pending payments are not marked as paid
 
+Scenario: When learner match failed
+	Given there are pending payments
+	And the learner match was unsuccessful
+	When the payment process is run
+	Then the Learner Match Successful check will have a failed validation result
+	And no further ILR validation is performed
+	And no payment records are created
+	And pending payments are not marked as paid
+
 Scenario: When there is a sent payment clawback
 	Given there are pending payments
 	Given there are payments with sent clawbacks
@@ -38,12 +47,13 @@ Scenario: When at least one validation check fails
 
 
 Examples:
-	| ValidationStep      |
-	| HasBankDetails      |
-	| IsInLearning        |
-	| HasLearningRecord   |
-	| HasNoDataLocks      |
-	| HasIlrSubmission    |
-	| HasDaysInLearning   |
-	| PaymentsNotPaused   |
-	| HasSignedMinVersion |
+	| ValidationStep         |
+	| HasBankDetails         |
+	| IsInLearning           |
+	| HasLearningRecord      |
+	| HasNoDataLocks         |
+	| HasIlrSubmission       |
+	| HasDaysInLearning      |
+	| PaymentsNotPaused      |
+	| HasSignedMinVersion    |
+	| LearnerMatchSuccessful |

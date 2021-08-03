@@ -10,5 +10,6 @@
         public const string HasDaysInLearning = "HasDaysInLearning";
         public const string PaymentsNotPaused = "PaymentsNotPaused";
         public const string HasSignedMinVersion = "HasSignedMinVersion";
+        public const string LearnerMatchSuccessful = "LearnerMatchSuccessful";
     }
 }
