@@ -349,7 +349,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.Id,
                     learningStoppedStatus.DateStopped.Value));
             }
-            else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped)
+            else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped && learningStoppedStatus.DateResumed != null)
             {
                 Model.Status = IncentiveStatus.Active;
                 StopBreakInLearning(learningStoppedStatus);
