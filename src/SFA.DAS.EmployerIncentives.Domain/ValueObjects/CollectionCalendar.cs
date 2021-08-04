@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
@@ -84,6 +85,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public DateTime GetAcademicYearEndDate(string academicYearId)
         {
+            if (_academicYears.All(ay => ay.AcademicYearId != academicYearId))
+            {
+                throw new AcademicYearNotFoundException($"Unknown Academic Year: {academicYearId}");
+            }
             var academicYear = _academicYears.Single(x => x.AcademicYearId == academicYearId);
             return academicYear.EndDate;
         }

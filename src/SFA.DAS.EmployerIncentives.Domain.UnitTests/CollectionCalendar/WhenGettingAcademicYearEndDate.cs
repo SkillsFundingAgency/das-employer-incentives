@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 {
@@ -35,6 +36,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             var endDate = _sut.GetAcademicYearEndDate(academicYear);
 
             endDate.Should().Be(expectedEndDate);
+        }
+
+        [Test]
+        public void Then_throws_custom_exception_when_unknown_year_supplied()
+        {
+            Action action = () => _sut.GetAcademicYearEndDate("1984");
+            action.Should().Throw<AcademicYearNotFoundException>()
+                .WithMessage("Unknown Academic Year: 1984");
         }
     }
 }
