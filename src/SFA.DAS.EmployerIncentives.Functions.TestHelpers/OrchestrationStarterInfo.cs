@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
             }
             if (timeout == null)
             {
-                timeout = new TimeSpan(0, 0, 60);
+                timeout = new TimeSpan(0, 60, 0);
             }
             Timeout = timeout;
             StarterArgs = args;

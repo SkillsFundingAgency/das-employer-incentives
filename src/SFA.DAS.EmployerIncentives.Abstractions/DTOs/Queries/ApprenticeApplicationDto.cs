@@ -16,5 +16,8 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public string SubmittedByEmail { get; set; }
         public PaymentStatusDto FirstPaymentStatus { get; set; }
         public PaymentStatusDto SecondPaymentStatus { get; set; }
+        public ClawbackStatusDto FirstClawbackStatus { get; set; }
+        public ClawbackStatusDto SecondClawbackStatus { get; set; }
     }
+
 }

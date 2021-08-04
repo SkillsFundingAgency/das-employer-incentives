@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Events.IncentiveApplications;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
 {
@@ -40,7 +41,8 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             _mockCommandPublisher.Verify(m =>
             m.Publish(It.Is<WithdrawCommand>(i =>
                    i.AccountId == @event.AccountId &&
-                   i.IncentiveApplicationApprenticeshipId == @event.Model.Id
+                   i.IncentiveApplicationApprenticeshipId == @event.Model.Id &&
+                   i.WithdrawnBy == WithdrawnBy.Employer
                ), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
