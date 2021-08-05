@@ -224,6 +224,25 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 }).ToList();
         }
 
+        private static Domain.ValueObjects.AcademicYear Map(this AcademicYear model)
+        {
+            if (model != null)
+            {
+                var academicYear = new Domain.ValueObjects.AcademicYear(
+                    model.Id,
+                    model.EndDate);
+
+                return academicYear;
+            }
+
+            return null;
+        }
+
+        internal static ICollection<Domain.ValueObjects.AcademicYear> Map(this ICollection<AcademicYear> models)
+        {
+            return models.Select(x => x.Map()).ToList();
+        }
+
         internal static LearnerModel Map(this Learner model)
         {
             var learner = new LearnerModel

@@ -102,6 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(l => l.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
                     .With(l => l.CreatedDate, DateTime.Today.AddDays(-1))
                     .With(l => l.ULN, ApprenticeshipIncentiveModel.ULN)
+                    .With(l => l.SuccessfulLearnerMatch, true)
                     .With(l => l.SubmissionFound, true)
                     .With(l => l.LearningFound, true)
                     .With(l => l.InLearning, true)

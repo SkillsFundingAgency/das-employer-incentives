@@ -133,6 +133,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
             serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
+            serviceCollection.AddScoped<IAcademicYearDataRepository, AcademicYearDataRepository>();
             serviceCollection.AddScoped<ILearnerDataRepository, LearnerDataRepository>();
             serviceCollection.AddScoped<ILearnerDomainRepository, LearnerDomainRepository>();
             serviceCollection.Decorate<ILearnerDomainRepository, LearnerDomainRepositoryWithLogging>();

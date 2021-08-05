@@ -17,6 +17,7 @@
             "StartDate": "2020-10-10T00:00:00",
             "PriceEpisodes": [
                 {
+                    "AcademicYear": "2021",
                     "Identifier": "25-61-10/10/2020",
                     "AgreedPrice": 15000.00000,
                     "StartDate": "2020-10-10T00:00:00",

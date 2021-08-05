@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 _activePeriod,
                 CollectionPeriod(3, 2020)
             };
-            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(collectionPeriods));
+            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), collectionPeriods));
 
             _fixture.Register(ApprenticeshipIncentiveCreator);
 

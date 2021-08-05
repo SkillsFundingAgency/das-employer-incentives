@@ -73,6 +73,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 case ValidationStep.HasSignedMinVersion:
                     _validatePaymentData.ApprenticeshipIncentiveModel.MinimumAgreementVersion = _validatePaymentData.AccountModel.SignedAgreementVersion + 1;
                     break;
+                case ValidationStep.LearnerMatchSuccessful:
+                    _validatePaymentData.LearnerModel.SuccessfulLearnerMatch = false;
+                    break;
             }
 
             await _validatePaymentData.Create();
@@ -181,10 +184,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
         }
 
+        [Given(@"the learner match was unsuccessful")]
+        public async Task GivenTheLearnerMatchWasUnsuccessful()
+        {
+            await GivenTheValidationStepWillFail(ValidationStep.LearnerMatchSuccessful);
+        }
+
         [Then(@"the ILR Submission check will have a failed validation result")]
         public async Task ThenTheIlrSubmissionCheckWillHaveAFailedValidationResult()
         {
             await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.HasIlrSubmission);
+        }
+
+        [Then(@"the Learner Match Successful check will have a failed validation result")]
+        public async Task ThenTheLearnerMatchSuccessfulCheckWillHaveAFailedValidationResult()
+        {
+            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.LearnerMatchSuccessful);
         }
 
         [Then(@"no further ILR validation is performed")]
