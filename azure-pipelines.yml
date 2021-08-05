@@ -79,9 +79,11 @@ stages:
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
 
     - task: CmdLine@2
-      displayName: 'Install MsSqlLocalDb'
+      displayName: 'Install test dependencies'
       inputs:
-        script: 'choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb'
+        script: | 
+          choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb
+          choco install azurestorageemulator
         failOnStderr: true
 
     - task: DotNetCoreCLI@2
