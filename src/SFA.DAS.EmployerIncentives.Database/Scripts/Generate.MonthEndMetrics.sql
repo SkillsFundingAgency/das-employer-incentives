@@ -61,6 +61,7 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
    max(iif(step='HasBankDetails',1,0)) as HasBankDetails,
    max(iif(step='PaymentsNotPaused',1,0)) as PaymentsNotPaused,
    max(iif(step='HasSignedMinVersion',1,0)) as HasSignedMinVersion,
+   max(iif(step='LearnerMatchSuccessful',1,0)) as LearnerMatchSuccessful,
    Result,
    PeriodNumber, 
    PaymentYear
@@ -71,7 +72,7 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
  group by PendingPaymentId, result, PeriodNumber, PaymentYear
 )
 select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Validation}) CountOfPayments], 
- HasLearningRecord, 
+  HasLearningRecord,
   IsInLearning, 
   HasDaysInLearning, 
   HasNoDataLocks, 
@@ -80,6 +81,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Vali
   '' as HasNoUnsentClawbacks, --Just used to space out the putput in the excel template,
   HasIlrSubmission,
   HasSignedMinVersion,
+  LearnerMatchSuccessful,
   count(distinct a.[AccountLegalEntityId]) as [AccountLegalEntityId],
   sum(pp.amount) as EarningAmount
 from PendingPaymentValidations ppv
@@ -93,6 +95,7 @@ group by HasIlrSubmission,
   HasBankDetails, 
   PaymentsNotPaused, 
   HasSignedMinVersion,
+  LearnerMatchSuccessful,
   Result
     order by 
   HasLearningRecord desc, 
@@ -102,8 +105,9 @@ group by HasIlrSubmission,
   HasBankDetails desc, 
   PaymentsNotPaused desc,
   HasIlrSubmission desc,
-  HasSignedMinVersion desc
-  
+  HasSignedMinVersion desc,
+  LearnerMatchSuccessful desc
+
 -- YTD Validation (Paste underneath the Period Validation table on the [YTD Validation] tab) 
 ;with latestValidations as (
 select max(ppv.periodnumber) MaxPeriod, 
@@ -117,6 +121,7 @@ select max(ppv.periodnumber) MaxPeriod,
     max(iif(step='PaymentsNotPaused' and result=1,1,0)) as PaymentsNotPaused,
     max((case when ppv.periodnumber <> 6 and ppv.paymentyear = 2021 then 1 else iif(step='HasNoUnsentClawbacks' and result=1,1,0) end)) as HasNoUnsentClawbacks,
     max((case when ppv.periodnumber < 9 and ppv.paymentyear = 2021 then 1 else iif(step='HasSignedMinVersion' and result=1,1,0) end)) as HasSignedMinVersion,
+    max((case when ppv.periodnumber < 12 and ppv.paymentyear = 2021 then 1 else iif(step='LearnerMatchSuccessful' and result=1,1,0) end)) as LearnerMatchSuccessful,
     Amount,
     a.[AccountLegalEntityId] --Should only be one
 from [incentives].[PendingPaymentValidationResult] ppv
@@ -134,6 +139,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A37 on tab {YTD Val
   HasNoUnsentClawbacks,
   HasIlrSubmission,
   HasSignedMinVersion,
+  LearnerMatchSuccessful,
   count(distinct [AccountLegalEntityId] ) as [AccountLegalEntityId],
   sum(amount) as EarningAmount
 from latestValidations
@@ -146,7 +152,8 @@ group by
   PaymentsNotPaused,
   HasNoUnsentClawbacks,
   HasIlrSubmission,
-  HasSignedMinVersion
+  HasSignedMinVersion,
+  LearnerMatchSuccessful
 order by 
   HasLearningRecord desc, 
   IsInLearning desc, 
@@ -156,4 +163,5 @@ order by
   PaymentsNotPaused desc,
   HasNoUnsentClawbacks desc,
   HasIlrSubmission desc,
-  HasSignedMinVersion desc
+  HasSignedMinVersion desc,
+  LearnerMatchSuccessful desc
