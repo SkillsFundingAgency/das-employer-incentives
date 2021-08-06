@@ -84,6 +84,7 @@ stages:
         script: | 
           choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb
           choco install azurestorageemulator
+          choco install azure-functions-core-tools-3
           "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /server "(localdb)\MsSqlLocalDb"
           "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" start
         failOnStderr: true
