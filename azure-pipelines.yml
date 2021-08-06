@@ -54,22 +54,6 @@ stages:
         projects: 'src/**/*.csproj'
         noCache: true
 
-    - task: DotNetCoreCLI@2
-      displayName: Build UnitTests
-      inputs:
-        command: 'build'
-        projects: |
-          src/**/*.UnitTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-restore'
-
-    - task: DotNetCoreCLI@2
-      displayName: UnitTest
-      inputs:
-        command: test
-        projects: |
-          src/**/*.UnitTests.csproj
-        arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
-
     - task: VSBuild@1
       displayName: 'Build DACPAC'
       inputs:
@@ -82,11 +66,11 @@ stages:
       displayName: 'Install test dependencies'
       inputs:
         script: | 
-          choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb
+          choco install sqllocaldb -y
+          refreshenv
+          sqllocaldb start mssqllocaldb
           choco install azurestorageemulator
           choco install azure-functions-core-tools-3
-          "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /server "(localdb)\MsSqlLocalDb"
-          "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" start
         failOnStderr: true
 
     - task: DotNetCoreCLI@2
@@ -102,7 +86,7 @@ stages:
       inputs:
         command: test
         projects: |
-          src/**/*.AcceptanceTests.csproj
+          !src/**/*.AcceptanceTests.csproj
           src/**/*.PaymentsProcess.AcceptanceTests.csproj
         arguments: '--configuration $(BuildConfiguration) --no-build --logger trx --collect "Code coverage"'
 
