@@ -9,13 +9,12 @@ USAGE: Run the script below and then copy and paste each of the result sets into
 
 
 
-declare @CALC_DATE_TIME DATETIME = '2021-06-09T11:24:36'; -- exact start date time for IncentivePaymentOrchestrator_HttpStart 
 declare @PERIOD int 
 
 SELECT @PERIOD=periodnumber
   FROM [incentives].[CollectionCalendar]
   where active = 1
-Select @period as [(Paste into cell B1) Current_Period], @CALC_DATE_TIME as 'Start of IncentivePaymentOrchestrator_HttpStart' 
+Select @period as [(Paste into cell B1) Current_Period]
 
 -- Payments made (Paste into cell A6) 
 SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*) as NumPayments,sum(p.[Amount]) as PaymentsAmount
@@ -37,7 +36,6 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
   ;SELECT PeriodNumber as [(Paste into cell G6) PeriodNumber], PaymentYear, sum(amount) as Amount, count(*) NumEarnings
   FROM [incentives].[PendingPayment] pp
   where 1=1
-  and CalculatedDate <=  @CALC_DATE_TIME
   group by PeriodNumber, PaymentYear
   order by PaymentYear ,PeriodNumber
 
