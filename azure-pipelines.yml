@@ -71,13 +71,13 @@ stages:
     - task: CmdLine@2
       displayName: 'Install test functions'
       inputs:
-        script: choco install azure-functions-core-tools-3
+        script: choco install azure-functions-core-tools-3 -y
         failOnStderr: true
 
     - task: CmdLine@2
       displayName: 'Install test storage emulator'
       inputs:
-        script: choco install azurestorageemulator
+        script: choco install azurestorageemulator -y
         failOnStderr: true
 
     - task: DotNetCoreCLI@2
