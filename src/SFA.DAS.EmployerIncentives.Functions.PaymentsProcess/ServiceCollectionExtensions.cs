@@ -55,6 +55,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             this IServiceCollection serviceCollection,
             IConfiguration configuration)
         {
+            Console.WriteLine("******************* Configuration variables *******************");
+            Console.WriteLine("EnvironmentName" + configuration["EnvironmentName"]);
+            Console.WriteLine("ApplicationSettings:DbConnectionString" + configuration["ApplicationSettings:DbConnectionString"]);
+            Console.WriteLine("ApplicationSettings:NServiceBusConnectionString" + configuration["ApplicationSettings:NServiceBusConnectionString"]);
+            Console.WriteLine("ApplicationSettings:UseLearningEndpointStorageDirectory" + configuration["ApplicationSettings:UseLearningEndpointStorageDirectory"]);
+            Console.WriteLine("ApplicationSettings:NServiceBusLicense" + configuration["ApplicationSettings:NServiceBusLicense"]);
+
             var webBuilder = serviceCollection.AddWebJobs(x => { });
             webBuilder.AddExecutionContextBinding();
 
