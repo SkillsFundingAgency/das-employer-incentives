@@ -56,11 +56,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             IConfiguration configuration)
         {
             Console.WriteLine("******************* Configuration variables *******************");
-            Console.WriteLine("EnvironmentName" + configuration["EnvironmentName"]);
-            Console.WriteLine("ApplicationSettings:DbConnectionString" + configuration["ApplicationSettings:DbConnectionString"]);
-            Console.WriteLine("ApplicationSettings:NServiceBusConnectionString" + configuration["ApplicationSettings:NServiceBusConnectionString"]);
-            Console.WriteLine("ApplicationSettings:UseLearningEndpointStorageDirectory" + configuration["ApplicationSettings:UseLearningEndpointStorageDirectory"]);
-            Console.WriteLine("ApplicationSettings:NServiceBusLicense" + configuration["ApplicationSettings:NServiceBusLicense"]);
+            Console.WriteLine("EnvironmentName: " + configuration["EnvironmentName"]);
+            Console.WriteLine("DbConnectionString: " + configuration["DbConnectionString"]);
+            Console.WriteLine("NServiceBusConnectionString: " + configuration["NServiceBusConnectionString"]);
+            Console.WriteLine("UseLearningEndpointStorageDirectory: " + configuration["UseLearningEndpointStorageDirectory"]);
+            Console.WriteLine("NServiceBusLicense: " + configuration["NServiceBusLicense"]);
 
             var webBuilder = serviceCollection.AddWebJobs(x => { });
             webBuilder.AddExecutionContextBinding();
@@ -69,27 +69,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
-                .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
+                .UseSqlServerPersistence(() => new SqlConnection(configuration["DbConnectionString"]))
                 .UseUnitOfWork();
 
             endpointConfiguration.UseContainer<ServicesBuilder>((Action<ContainerCustomizations>)(c => c.ExistingServices(serviceCollection)));
             
-            if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
+            if (configuration["NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
                 endpointConfiguration
                     .UseTransport<LearningTransport>()
-                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
+                    .StorageDirectory(configuration.GetValue("UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
                 endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
             {
                 endpointConfiguration
-                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => r.AddRouting());
+                    .UseAzureServiceBusTransport(configuration["NServiceBusConnectionString"], r => r.AddRouting());
             }
 
-            if (!string.IsNullOrEmpty(configuration["ApplicationSettings:NServiceBusLicense"]))
+            if (!string.IsNullOrEmpty(configuration["NServiceBusLicense"]))
             {
-                endpointConfiguration.License(configuration["ApplicationSettings:NServiceBusLicense"]);
+                endpointConfiguration.License(configuration["NServiceBusLicense"]);
             }
 
             var endpoint = Endpoint.Start(endpointConfiguration);
