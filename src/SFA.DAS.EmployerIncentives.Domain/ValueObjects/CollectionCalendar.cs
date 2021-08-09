@@ -3,15 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
     public class CollectionCalendar : ValueObject
     {
+        private readonly IEnumerable<AcademicYear> _academicYears;
         private readonly IEnumerable<CollectionCalendarPeriod> _collectionPeriods;
 
-        public CollectionCalendar(IEnumerable<CollectionCalendarPeriod> collectionPeriods)
+        public CollectionCalendar(IEnumerable<AcademicYear> academicYears, IEnumerable<CollectionCalendarPeriod> collectionPeriods)
         {
+            _academicYears = academicYears;
             _collectionPeriods = collectionPeriods;
         }
 
@@ -78,6 +81,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public ReadOnlyCollection<CollectionCalendarPeriod> GetAllPeriods()
         {
             return new ReadOnlyCollection<CollectionCalendarPeriod>(_collectionPeriods.ToList());
+        }
+
+        public DateTime GetAcademicYearEndDate(string academicYearId)
+        {
+            if (_academicYears.All(ay => ay.AcademicYearId != academicYearId))
+            {
+                throw new AcademicYearNotFoundException($"Unknown Academic Year: {academicYearId}");
+            }
+            var academicYear = _academicYears.Single(x => x.AcademicYearId == academicYearId);
+            return academicYear.EndDate;
         }
 
         protected override IEnumerable<object> GetAtomicValues()

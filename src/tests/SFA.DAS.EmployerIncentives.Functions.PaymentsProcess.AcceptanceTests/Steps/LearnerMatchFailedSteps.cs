@@ -141,6 +141,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>()
                                 {
                                     _fixture.Build<PriceEpisodeDto>()
+                                        .With(x => x.AcademicYear,"2021")
                                         .With(pe => pe.Periods, new List<PeriodDto>()
                                         {
                                             _fixture.Build<PeriodDto>()

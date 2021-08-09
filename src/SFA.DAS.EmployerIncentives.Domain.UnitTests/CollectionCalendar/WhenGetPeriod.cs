@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             _collectionPeriods = new List<CollectionCalendarPeriod>() { period1, period2, period3 };
 
-            _sut = new CollectionCalendar(_collectionPeriods);
+            _sut = new CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
         }
 
         [Test]

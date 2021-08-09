@@ -128,7 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return isInLearning;
         }
 
-        public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
             var learningStoppedStatus = new LearningStoppedStatus(false);
 
@@ -145,13 +145,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                     p.ApprenticeshipId,
                     pe.StartDate,
                     pe.EndDate,
+                    pe.AcademicYear
                 }).ToArray();
 
             if (matchedRecords.Any())
             {
                 var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
 
-                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date)
+                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date && latestPriceEpisode.EndDate.Value.Date != collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear))
                 {
                     learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
                 }
@@ -164,7 +165,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return learningStoppedStatus;
         }
 
-        public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
             if(learnerData == null)
             {
@@ -177,7 +178,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                from pe in tr.PriceEpisodes
                from p in pe.Periods
                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new LearningPeriod(pe.StartDate, pe.EndDate)).Distinct();
+               select new LearningPeriod(pe.StartDate, pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate(pe.AcademicYear))).Distinct();
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)

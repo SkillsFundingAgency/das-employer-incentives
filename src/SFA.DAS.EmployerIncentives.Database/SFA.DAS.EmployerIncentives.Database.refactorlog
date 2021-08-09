@@ -91,4 +91,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Result" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="b1ca484c-872d-44a2-b888-de5a17689bfa" ChangeDateTime="07/20/2021 13:54:31">
+    <Property Name="ElementName" Value="[incentives].[AcademicYear].[AcademicYear]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[incentives].[AcademicYear]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
 </Operations>
