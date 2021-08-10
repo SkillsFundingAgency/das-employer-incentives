@@ -150,7 +150,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_isStopped_is_true_is_returned_when_the_latest_price_episode_end_date_is_before_today()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = DateTime.Today.AddDays(-1);
+            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(DateTime.Today.AddDays(-1));
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
@@ -165,7 +165,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_isStopped_stopped_date_is_the_day_after_the_end_date_when_the_latest_price_episode_end_date_is_before_today()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = DateTime.Today.AddDays(-10);
+            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(DateTime.Today.AddDays(-10));
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
@@ -174,6 +174,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             isStoppedStatus.LearningStopped.Should().BeTrue();
             isStoppedStatus.DateStopped.Should().Be(_testPriceEpisodeDto.EndDate.Value.AddDays(1));
             isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
+        }
+
+        private DateTime GetValidPastEndDate(DateTime endDate)
+        {
+            if (endDate.Date == _academicYears.Single().EndDate.Date)
+            {
+                return endDate.AddDays(-1);
+            }
+
+            return endDate;
         }
     }
 }
