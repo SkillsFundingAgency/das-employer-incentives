@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Without(p => p.PaymentMadeDate)
                 .Create();
 
-            _periodEndDate = DateTime.Today.AddDays(-10);
+            _periodEndDate = GetPastEndDate(DateTime.Today.AddDays(-10));
 
             _learner = _fixture
                 .Build<Learner>()
@@ -207,6 +207,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     }
                 )
                 .Create();
+        }
+
+        private DateTime GetPastEndDate(DateTime endDate)
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var academicYears = dbConnection.GetAll<AcademicYear>();
+
+            if (academicYears.Any(x => x.EndDate == endDate))
+            {
+                return endDate.AddDays(-1);
+            }
+
+            return endDate;
         }
 
         [Given(@"an apprenticeship incentive exists")]
