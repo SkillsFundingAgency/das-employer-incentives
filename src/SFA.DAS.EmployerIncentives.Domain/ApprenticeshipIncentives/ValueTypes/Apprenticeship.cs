@@ -14,8 +14,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public long UniqueLearnerNumber { get; }
         public Provider Provider { get; private set; }
         public ApprenticeshipEmployerType EmployerType { get; }
-        public string CourseName { get; set; }
-        public DateTime? EmploymentStartDate { get; set; }
+        public string CourseName { get; private set; }
+        public DateTime? EmploymentStartDate { get; private set; }
 
         public Apprenticeship(
             long id, 
