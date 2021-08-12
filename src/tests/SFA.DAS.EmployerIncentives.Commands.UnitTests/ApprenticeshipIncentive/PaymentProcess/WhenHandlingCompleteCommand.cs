@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.PaymentProcess
 {
@@ -47,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _secondCollectionPeriod = _collectionPeriods.First(p => p.CollectionPeriod.PeriodNumber != _firstCollectionPeriod.CollectionPeriod.PeriodNumber);
             _completionDate = DateTime.UtcNow;
 
-            var calendar = new Domain.ValueObjects.CollectionCalendar(_collectionPeriods);
+            var calendar = new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
 
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 

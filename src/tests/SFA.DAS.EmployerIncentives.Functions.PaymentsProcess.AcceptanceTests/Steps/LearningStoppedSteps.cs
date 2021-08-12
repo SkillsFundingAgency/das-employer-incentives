@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Without(p => p.PaymentMadeDate)
                 .Create();
 
-            _periodEndDate = DateTime.Today.AddDays(-10);
+            _periodEndDate = GetPastEndDate(DateTime.Today.AddDays(-10));
 
             _learner = _fixture
                 .Build<Learner>()
@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     _fixture
                         .Build<TrainingDto>()
                         .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>().With(x => x.AcademicYear,"2021")
                             .With(pe => pe.Periods, new List<PeriodDto>(){
                                 _fixture.Build<PeriodDto>()
                                     .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
@@ -117,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     _fixture
                         .Build<TrainingDto>()
                         .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>().With(x => x.AcademicYear,"2021")
                             .With(pe => pe.Periods, new List<PeriodDto>(){
                                 _fixture.Build<PeriodDto>()
                                     .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
@@ -142,7 +142,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         .Build<TrainingDto>()
                         .With(p => p.Reference, "ZPROG001")
                         .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){
-                            _fixture.Build<PriceEpisodeDto>()
+                            _fixture.Build<PriceEpisodeDto>().With(x => x.AcademicYear,"2021")
                             .With(pe => pe.Periods, new List<PeriodDto>(){
                                 _fixture.Build<PeriodDto>()
                                     .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
@@ -153,7 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             .With(pe => pe.StartDate, _plannedStartDate)
                             .With(pe => pe.EndDate, DateTime.Today.AddDays(_breakInLearning * -1))
                             .Create(),
-                            _fixture.Build<PriceEpisodeDto>()
+                            _fixture.Build<PriceEpisodeDto>().With(x => x.AcademicYear,"2021")
                             .With(pe => pe.Periods, new List<PeriodDto>(){
                                 _fixture.Build<PeriodDto>()
                                     .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
@@ -188,6 +188,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>()
                                 {
                                     _fixture.Build<PriceEpisodeDto>()
+                                        .With(x => x.AcademicYear,"2021")
                                         .With(pe => pe.Periods, new List<PeriodDto>()
                                         {
                                             _fixture.Build<PeriodDto>()
@@ -198,7 +199,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                                 .Create()
                                         })
                                         .With(pe => pe.StartDate, _apprenticeshipBreakInLearning.StartDate)
-                                        .With(pe => pe.EndDate, DateTime.Today.AddMonths(12))
+                                        .With(pe => pe.EndDate, DateTime.Now.AddMonths(12))
                                         .Create(),
                                 }
                             )
@@ -206,6 +207,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     }
                 )
                 .Create();
+        }
+
+        private DateTime GetPastEndDate(DateTime endDate)
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var academicYears = dbConnection.GetAll<AcademicYear>();
+
+            if (academicYears.Any(x => x.EndDate == endDate))
+            {
+                return endDate.AddDays(-1);
+            }
+
+            return endDate;
         }
 
         [Given(@"an apprenticeship incentive exists")]

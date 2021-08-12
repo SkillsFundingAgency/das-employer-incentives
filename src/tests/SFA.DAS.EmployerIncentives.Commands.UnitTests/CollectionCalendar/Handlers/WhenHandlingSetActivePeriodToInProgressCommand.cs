@@ -6,6 +6,7 @@ using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriodToInProgress;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handlers
 {
@@ -45,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
                 1, 2021, DateTime.Now, DateTime.Now, false, false)
             };
 
-            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(calendarPeriods);
+            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), calendarPeriods);
             _service.Setup(x => x.Get()).ReturnsAsync(_collectionCalendar);
         }
 

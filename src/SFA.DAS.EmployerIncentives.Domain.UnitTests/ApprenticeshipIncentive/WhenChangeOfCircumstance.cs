@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             {
                 new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true, false),
             };
-            var collectionCalendar = new CollectionCalendar(collectionPeriods);
+            var collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), collectionPeriods);
 
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(collectionCalendar);
