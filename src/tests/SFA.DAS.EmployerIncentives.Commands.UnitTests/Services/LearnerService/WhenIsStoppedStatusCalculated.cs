@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         {
             _fixture = new Fixture();
 
-            _sut = _fixture.Create<LearnerSubmissionDto>();            
+            _sut = _fixture.Build<LearnerSubmissionDto>().With(p => p.AcademicYear, 2021).Create();
             _startDate = DateTime.Now.AddMonths(-1);
             _endDate = DateTime.Today.AddDays(-1);
             _periodNumber = 3;
@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.Period = _periodNumber;
             _testPeriodDto.IsPayable = true;
 
-            _academicYears = new List<AcademicYear> {new AcademicYear("2021", new DateTime(2021, 07, 31))};
+            _academicYears = new List<AcademicYear> {new AcademicYear("2021", new DateTime(2021, 07, 31)), new AcademicYear("2122", new DateTime(2022, 07, 31)) };
             _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(_academicYears, new List<CollectionCalendarPeriod>());
         }
 
@@ -135,7 +135,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_isStopped_is_false_is_returned_when_the_latest_price_episode_end_date_is_the_end_of_the_academic_year()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = _academicYears.Single().EndDate;
+            _testPriceEpisodeDto.EndDate = _academicYears.Single(ay => ay.AcademicYearId == "2021").EndDate;
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
@@ -144,6 +144,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             isStoppedStatus.LearningStopped.Should().BeFalse();
             isStoppedStatus.DateStopped.HasValue.Should().BeFalse();
             isStoppedStatus.DateResumed.Value.Should().Be(_testPriceEpisodeDto.StartDate);
+        }
+
+        [Test]
+        public void Then_isStopped_is_true_is_returned_when_the_latest_price_episode_end_date_is_the_end_of_the_academic_year_but_the_submission_is_for_the_next_academic_year()
+        {
+            //Arrange    
+            _testPriceEpisodeDto.EndDate = _academicYears.Single(ay => ay.AcademicYearId == "2021").EndDate;
+            _sut.AcademicYear = 2122; // next academic year
+            _sut.IlrSubmissionWindowPeriod = 1;
+
+            // Act
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
+
+            //Assert
+            isStoppedStatus.LearningStopped.Should().BeTrue();
+            isStoppedStatus.DateStopped.HasValue.Should().BeTrue();
+            isStoppedStatus.DateStopped.Value.Should().Be(_testPriceEpisodeDto.EndDate.Value.AddDays(1));
         }
 
         [Test]
@@ -178,7 +195,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
         private DateTime GetValidPastEndDate(DateTime endDate)
         {
-            if (endDate.Date == _academicYears.Single().EndDate.Date)
+            if (endDate.Date == _academicYears.Single(ay => ay.AcademicYearId == "2021").EndDate.Date)
             {
                 return endDate.AddDays(-1);
             }

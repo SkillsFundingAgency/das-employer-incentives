@@ -149,10 +149,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             if (matchedRecords.Any())
             {
                 var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
-
-                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date && latestPriceEpisode.EndDate.Value.Date != collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear))
+                
+                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date)
                 {
-                    learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
+                    if (IsEndOfAcademicYear(latestPriceEpisode as dynamic, learnerData, collectionCalendar))
+                    {
+                        learningStoppedStatus = new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
+                    }
+                    else
+                    {
+                        learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
+                    }
                 }
                 else
                 {
@@ -161,6 +168,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             }
 
             return learningStoppedStatus;
+        }
+
+        private static bool IsEndOfAcademicYear(dynamic latestPriceEpisode, LearnerSubmissionDto learnerData, Domain.ValueObjects.CollectionCalendar collectionCalendar)
+        {
+            if (latestPriceEpisode.EndDate.Date == collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear) 
+                && collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear) == collectionCalendar.GetAcademicYearEndDate(learnerData.AcademicYear.ToString()))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
