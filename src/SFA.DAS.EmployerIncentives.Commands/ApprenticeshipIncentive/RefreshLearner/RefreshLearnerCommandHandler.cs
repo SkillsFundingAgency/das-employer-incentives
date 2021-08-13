@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Linq;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
@@ -6,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
@@ -15,17 +17,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         private readonly IApprenticeshipIncentiveDomainRepository _incentiveDomainRepository;
         private readonly ILearnerService _learnerService;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
+        private readonly ICollectionCalendarService _collectionCalendarService;
 
         public RefreshLearnerCommandHandler(
             ILogger<RefreshLearnerCommandHandler> logger,
             IApprenticeshipIncentiveDomainRepository incentiveDomainRepository,
             ILearnerService learnerService,
-            ILearnerDomainRepository learnerDomainRepository)
+            ILearnerDomainRepository learnerDomainRepository,
+            ICollectionCalendarService collectionCalendarService)
         {
             _logger = logger;
             _incentiveDomainRepository = incentiveDomainRepository;
             _learnerService = learnerService;
             _learnerDomainRepository = learnerDomainRepository;
+            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(RefreshLearnerCommand command, CancellationToken cancellationToken = default)
@@ -41,6 +46,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             _logger.LogInformation("End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN}",
                 learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber);
+
+            var collectionCalendar = await _collectionCalendarService.Get();
 
             if (learnerData != null)
             {
@@ -59,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetStartDate(learnerData.LearningStartDate(incentive));
                     submissionData.LearningData.SetHasDataLock(learnerData.HasProviderDataLocks(incentive));
                     submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
-                    submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive));
+                    submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive, collectionCalendar));
                 }
                 submissionData.SetRawJson(learnerData.RawJson);
             }
@@ -72,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             learner.SetSubmissionData(submissionData);
             incentive.LearnerRefreshCompleted();
 
-            learner.SetLearningPeriods(learnerData.LearningPeriods(incentive));
+            learner.SetLearningPeriods(learnerData.LearningPeriods(incentive, collectionCalendar));
             
             if (!learner.SubmissionData.LearningData.LearningFound)
             {

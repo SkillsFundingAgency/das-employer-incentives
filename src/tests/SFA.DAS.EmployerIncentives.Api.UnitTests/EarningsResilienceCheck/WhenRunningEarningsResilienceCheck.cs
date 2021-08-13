@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
 {
@@ -35,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
 
             _mockCollectionCalendarService
                .Setup(m => m.Get())
-               .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
+               .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), _collectionPeriods));
 
             _sut = new EarningsResilienceCommandController(_mockCommandDispatcher.Object, _mockCollectionCalendarService.Object);
 
@@ -65,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EarningsResilienceCheck
             };
             _mockCollectionCalendarService
                .Setup(m => m.Get())
-               .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
+               .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), _collectionPeriods));
 
             // Act
             await _sut.CheckApplications();
