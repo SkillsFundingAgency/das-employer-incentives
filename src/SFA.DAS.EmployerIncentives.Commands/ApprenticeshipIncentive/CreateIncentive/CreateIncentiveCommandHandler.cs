@@ -32,6 +32,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                 return;
             }
 
+            Provider provider = null;
+            if (command.UKPRN.HasValue)
+            {
+                provider = new Provider(command.UKPRN.Value);
+            }
+
             var incentive = _apprenticeshipIncentiveFactory.CreateNew(
                 Guid.NewGuid(),
                 command.IncentiveApplicationApprenticeshipId,
@@ -44,7 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                     command.Uln,
                     command.ApprenticeshipEmployerTypeOnApproval,
                     command.CourseName,
-                    command.EmploymentStartDate
+                    command.EmploymentStartDate,
+                    provider
                 ),
                 command.PlannedStartDate,
                 command.SubmittedDate,
@@ -52,11 +59,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
                 AgreementVersion.Create(command.Phase, command.PlannedStartDate),
                 new IncentivePhase(command.Phase)
                 );
-
-            if (command.UKPRN.HasValue)
-            {
-                incentive.Apprenticeship.SetProvider(new Provider(command.UKPRN.Value));
-            }
 
             await _apprenticeshipIncentiveDomainRepository.Save(incentive);
         }

@@ -44,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
                         _fixture.Create<string>(),
-                        _fixture.Create<DateTime>()
+                        _fixture.Create<DateTime>(),
+                        _fixture.Create<Provider>()
                     ))
                 .With(p => p.StartDate, DateTime.Today)
                 .With(p => p.Status, Enums.IncentiveStatus.Active)
