@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.AccountId, _applicationModel.AccountId)
                 .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
-                .With(p => p.StartDate, today.AddDays(1))
+                .With(p => p.StartDate, today.AddDays(-31))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
                 .With(p => p.Phase, Phase.Phase2)
                 .Create();
@@ -105,6 +105,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 await dbConnection.InsertAsync(_apprenticeshipsModels);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
             }
+        }
+
+        [Given(@"an apprenticeship incentive exists with a payment due within the delay period")]
+        public async Task GivenAnApprenticeshipIncentiveExistsWithAPaymentDueWithinTheDelayPeriod()
+        {
+            await GivenAnApprenticeshipIncentiveExists();
         }
 
         [Given(@"an apprenticeship incentive earnings have been calculated")]
@@ -236,6 +242,30 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 var createdIncentives = dbConnection.GetAll<ApprenticeshipIncentive>();
 
                 createdIncentives.Count().Should().Be(NumberOfApprenticeships);
+            }
+        }
+
+        [Then(@"the first pending payment is due at the end of the delay period")]
+        public void ThenTheFirstPendingPaymentIsDueAtTheEndOfTheDelayPeriod()
+        {
+            var completeCalculationCommandsPublished = _testContext.CommandsPublished
+                .Where(c => c.IsProcessed &&
+                            c.IsDomainCommand &&
+                            c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
+
+            completeCalculationCommandsPublished.Count().Should().Be(1);
+
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var createdIncentives = dbConnection.GetAll<ApprenticeshipIncentive>();
+
+                createdIncentives.Count().Should().Be(1);
+                var pendingPayments = dbConnection.GetAll<PendingPayment>();
+
+                var expectedDueDate = DateTime.Now.Date.AddDays(21);
+
+                var firstPendingPayment = pendingPayments.Single(p => p.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id && p.EarningType == EarningType.FirstPayment);
+                firstPendingPayment.DueDate.Date.Should().Be(expectedDueDate.Date);
             }
         }
 
