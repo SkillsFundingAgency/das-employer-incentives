@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 
@@ -40,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _phase = Enum.Parse<Phase>(phase);
             _plannedStartDate = (_phase == Phase.Phase1) ? new DateTime(2020, 8, 1) : new DateTime(2021, 7, 1);
+            _testContext.DateTimeService.SetCurrentDate(_plannedStartDate.AddMonths(-1));
             
             _accountModel = _fixture.Create<Account>();
 

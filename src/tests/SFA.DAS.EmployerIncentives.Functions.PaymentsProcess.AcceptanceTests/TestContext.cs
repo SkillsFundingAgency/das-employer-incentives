@@ -25,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         
         public MockApi PaymentsApi { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
+        public TestDateTimeService DateTimeService { get; set; }
 
         public TestContext()
         {
@@ -36,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             }
             TestData = new TestData();
             Hooks = new List<IHook>();
+            DateTimeService = new TestDateTimeService();
         }
 
         private bool _isDisposed;

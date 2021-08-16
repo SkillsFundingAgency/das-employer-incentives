@@ -46,6 +46,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _fixture = new Fixture();
 
             _plannedStartDate = new DateTime(2020, 11, 10);
+            _testContext.DateTimeService.SetCurrentDate(_plannedStartDate.AddMonths(-1));
+
             _breakInLearning = 15;
             _accountModel = _fixture.Create<Account>();
             _periodNumber = 1;

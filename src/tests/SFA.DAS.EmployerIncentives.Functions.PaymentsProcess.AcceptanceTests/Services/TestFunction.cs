@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
@@ -103,6 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            });
 
                            s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
+                           s.AddSingleton<IDateTimeService>(testContext.DateTimeService);
                            s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
                            s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
                        })

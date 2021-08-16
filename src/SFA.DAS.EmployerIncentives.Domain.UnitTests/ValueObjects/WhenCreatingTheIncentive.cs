@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     {
         private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfileService;
         private List<IncentivePaymentProfile> _incentivePaymentProfiles;
+        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void SetUp()
@@ -38,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                 .Build();
 
             _mockIncentivePaymentProfileService.Setup(m => m.Get()).ReturnsAsync(_incentivePaymentProfiles);
+            _mockDateTimeService = new Mock<IDateTimeService>();
         }        
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
@@ -55,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
+            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object, _mockDateTimeService.Object);
 
             result.IsEligible.Should().BeTrue();            
             var payments = result.Payments.ToList();
@@ -82,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
+            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object, _mockDateTimeService.Object);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
@@ -103,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
+            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object, _mockDateTimeService.Object);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
