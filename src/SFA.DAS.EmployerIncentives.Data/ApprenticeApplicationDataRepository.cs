@@ -92,6 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         HasDataLock = HasDataLock(data.learner),
                         InLearning = InLearning(data.learner),
                         PausePayments = data.incentive.PausePayments,
+                        PaymentSent = data.secondPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
                     },
