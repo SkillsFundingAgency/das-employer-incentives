@@ -93,6 +93,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return academicYear.EndDate;
         }
 
+        public DateTime GetCensusDate()
+        {
+            var collectionCalendarPeriod = _collectionPeriods.FirstOrDefault(x => x.Active);
+
+            return collectionCalendarPeriod.CensusDate;
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             foreach (var collectionPeriod in _collectionPeriods)
