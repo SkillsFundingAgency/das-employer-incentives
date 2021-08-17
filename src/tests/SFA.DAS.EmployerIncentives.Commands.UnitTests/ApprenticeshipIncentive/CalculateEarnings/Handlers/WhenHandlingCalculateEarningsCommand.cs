@@ -29,7 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Fixture _fixture;
         private List<IncentivePaymentProfile> _paymentProfiles;
         private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionPeriods;
-        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void Arrange()
@@ -41,7 +40,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
-            _mockDateTimeService = new Mock<IDateTimeService>();
 
             _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
@@ -85,8 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new CalculateEarningsCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockPaymentProfilesService.Object,
-                _mockCollectionCalendarService.Object,
-                _mockDateTimeService.Object);
+                _mockCollectionCalendarService.Object);
         }
 
         [Test]

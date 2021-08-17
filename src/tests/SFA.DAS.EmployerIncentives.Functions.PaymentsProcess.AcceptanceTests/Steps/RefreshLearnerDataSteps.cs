@@ -37,8 +37,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _testContext = testContext;
             _fixture = new Fixture();
             _startDate = DateTime.Parse("2020-08-10");
-            _testContext.DateTimeService.SetCurrentDate(_startDate.AddMonths(-1));
-
             _submissionDate = DateTime.Parse("2020-11-09T16:53:17.293+00:00");
             _accountModel = _fixture.Create<Data.Models.Account>();
 

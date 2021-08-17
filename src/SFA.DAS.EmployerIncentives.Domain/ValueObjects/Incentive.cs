@@ -26,37 +26,32 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
         private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
 
-        private const int DelayPeriod = 21;
-
         protected Incentive(
-            DateTime dateOfBirth,
+            DateTime dateOfBirth, 
             DateTime startDate,
             IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breaksInLearning,
-            IDateTimeService dateTimeService)
+            IReadOnlyCollection<BreakInLearning> breaksInLearning)
         {
             _dateOfBirth = dateOfBirth;
             StartDate = startDate;
-            _payments = Generate(paymentProfiles, breaksInLearning, dateTimeService);
+            _payments = Generate(paymentProfiles, breaksInLearning);
         }
         
         public static async Task<Incentive> Create(
             ApprenticeshipIncentive incentive,            
-            IIncentivePaymentProfilesService incentivePaymentProfilesService,
-            IDateTimeService dateTimeService)
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
             var paymentProfiles = await incentivePaymentProfilesService.Get();
 
-            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings, dateTimeService);            
+            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings);            
         }        
 
         public static async Task<Incentive> Create(
             IncentiveApplicationApprenticeshipDto incentiveApplication,
-            IIncentivePaymentProfilesService incentivePaymentProfilesService,
-            IDateTimeService dateTimeService)
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
             var paymentProfiles = await incentivePaymentProfilesService.Get();
-            return Create(incentiveApplication.Phase, incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, new List<BreakInLearning>(), dateTimeService);
+            return Create(incentiveApplication.Phase, incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, new List<BreakInLearning>());
         }
 
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
@@ -76,22 +71,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return dateOfBirth.AgeOnThisDay(startDate);
         }
 
-        protected List<Payment> Generate(IEnumerable<PaymentProfile> paymentProfiles, IReadOnlyCollection<BreakInLearning> breaksInLearning, IDateTimeService dateTimeService)
+        protected List<Payment> Generate(IEnumerable<PaymentProfile> paymentProfiles, IReadOnlyCollection<BreakInLearning> breaksInLearning)
         {
             var payments = new List<Payment>();
             if (!IsEligible) return payments;
 
-            var minimumDueDate = dateTimeService.Now().AddDays(DelayPeriod);
-
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
-                if (paymentDueDate < minimumDueDate)
-                {
-                    paymentDueDate = minimumDueDate;
-                }
-                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning));
+                payments.Add(new Payment(paymentProfile.AmountPayable, StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart), _earningTypes[paymentIndex], breaksInLearning));
                 paymentIndex++;
             }
 
@@ -116,8 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             DateTime dateOfBirth,
             DateTime startDate,
             IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breaksInLearning,
-            IDateTimeService dateTimeService)
+            IReadOnlyCollection<BreakInLearning> breaksInLearning)
         {
             var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
 
@@ -137,11 +124,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
             if (phase == Phase.Phase1)
             {
-                return new Phase1Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning, dateTimeService);
+                return new Phase1Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning);
             }
             else if (phase == Phase.Phase2)
             {
-                return new Phase2Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning, dateTimeService);
+                return new Phase2Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning);
             }
 
             return null; // wouldn't get here

@@ -17,7 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
     {
         private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfileService;
         private List<IncentivePaymentProfile> _incentivePaymentProfiles;
-        private Mock<IDateTimeService> _mockDateTimeService;
         private static readonly DateTime StartDate = new DateTime(2020, 10, 1);
 
         [SetUp]
@@ -40,7 +39,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                 .Build();
 
             _mockIncentivePaymentProfileService.Setup(m => m.Get()).ReturnsAsync(_incentivePaymentProfiles);
-            _mockDateTimeService = new Mock<IDateTimeService>();
         }
 
         // ReSharper disable InconsistentNaming
@@ -120,7 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object, _mockDateTimeService.Object);
+            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
 
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();
@@ -165,7 +163,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object, _mockDateTimeService.Object);
+            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
 
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();

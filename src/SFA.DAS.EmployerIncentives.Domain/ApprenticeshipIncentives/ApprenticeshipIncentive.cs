@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ApprenticeshipIncentive(id, model);
         }
 
-        public async Task CalculateEarnings(IIncentivePaymentProfilesService incentivePaymentProfilesService, ICollectionCalendarService collectionCalendarService, IDateTimeService dateTimeService)
+        public async Task CalculateEarnings(IIncentivePaymentProfilesService incentivePaymentProfilesService, ICollectionCalendarService collectionCalendarService)
         {
             if(Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
             {
@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var collectionCalendar = await collectionCalendarService.Get();
 
-            var incentive = await Incentive.Create(this, incentivePaymentProfilesService, dateTimeService);
+            var incentive = await Incentive.Create(this, incentivePaymentProfilesService);
             if (!incentive.IsEligible)
             {
                 ClawbackAllPayments(collectionCalendar.GetActivePeriod().CollectionPeriod);
