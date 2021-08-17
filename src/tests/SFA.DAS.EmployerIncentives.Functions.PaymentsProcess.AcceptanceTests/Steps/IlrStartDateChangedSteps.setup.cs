@@ -51,6 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.Phase, _phase)
                 .With(p => p.MinimumAgreementVersion, 1)
                 .With(p => p.StartDate, _plannedStartDate)
+                .With(p => p.SubmittedDate, _plannedStartDate.AddDays(-30))
                 .With(p => p.Status, IncentiveStatus.Active)
                 .Create();
 

@@ -10,13 +10,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             DateTime dateOfBirth,
             DateTime startDate,
             IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
+            IReadOnlyCollection<BreakInLearning> breakInLearningDayCount,
+            DateTime submissionDate) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount, submissionDate)
         {
         }
 
         public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
+        protected override int DelayPeriod => 21;
 
         public static int MinimumAgreementVersion() => 6;
     }

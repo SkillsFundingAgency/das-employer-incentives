@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -12,13 +11,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             DateTime dateOfBirth,
             DateTime startDate,
             IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breaksInLearning) : base(dateOfBirth, startDate, paymentProfiles, breaksInLearning)
+            IReadOnlyCollection<BreakInLearning> breaksInLearning,
+            DateTime submissionDate) : base(dateOfBirth, startDate, paymentProfiles, breaksInLearning, submissionDate)
         {
         }
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
+        protected override int DelayPeriod => 0;
 
         private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
