@@ -90,3 +90,10 @@ Examples:
 	| Phase  | AgreementVersion |
 	| Phase1 | 5                |
 	| Phase2 | 6                |
+
+Scenario: Start date results in first earning due within the delay period
+	Given a 'Phase2' apprenticeship incentive exists
+	When the learner data is updated with new start date which will create earning in the delay period
+	And the incentive learner data is refreshed
+	Then earnings are recalculated
+	And a new first earning with a due date at the end of the delay period is created

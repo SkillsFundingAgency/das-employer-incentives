@@ -276,5 +276,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             incentive.MinimumAgreementVersion.Should().Be(version);
         }
 
+        [When(@"the learner data is updated with new start date which will create earning in the delay period")]
+        public void WhenTheLearnerDataIsUpdatedWithNewStartDateWhichWillCreateEarningInTheDelayPeriod()
+        {
+            _actualStartDate = new DateTime(2021, 4, 1);
+        }
+
+        [Then(@"a new first earning with a due date at the end of the delay period is created")]
+        public void ThenANewFirstEarningWithADueDateAtTheEndOfTheDelayPeriodIsCreated()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.FirstPayment
+                && !x.ClawedBack);
+
+            pp.DueDate.Date.Should().Be(_submissionDate.AddDays(21).Date);
+        }
     }
 }
