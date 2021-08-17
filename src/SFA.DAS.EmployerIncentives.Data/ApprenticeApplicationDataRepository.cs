@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     },
                     SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = data.secondPayment.DueDate.AddMonths(1),
+                        PaymentDate = PaymentDate(data.secondPayment, data.secondPaymentSent, nextActivePeriod),
                         LearnerMatchFound = LearnerMatchFound(data.learner),
                         PaymentAmount = data.secondPayment.Amount,
                         HasDataLock = HasDataLock(data.learner),

@@ -115,7 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             {
                 LearnerMatchFound = false,
                 PaymentAmount = pendingPayments[1].Amount,
-                PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB")),
+                PaymentDate = new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, 27),
                 PaymentSentIsEstimated = true,  // update when implementing EI-827
                 RequiresNewEmployerAgreement = false
             };
