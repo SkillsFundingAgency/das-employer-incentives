@@ -79,7 +79,7 @@ stages:
       inputs:
         script: |
           choco install azurestorageemulator -y
-          "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /forceCreate
+          "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init -server localhost -forcecreate
           "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" start
         failOnStderr: true
 
