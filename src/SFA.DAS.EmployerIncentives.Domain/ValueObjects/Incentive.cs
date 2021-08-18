@@ -76,16 +76,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
-                if (paymentDueDate < minimumDueDate)
-                {
-                    paymentDueDate = minimumDueDate;
-                }
+                var paymentDueDate = CalculateDueDate(paymentProfile, minimumDueDate);
                 payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning));
                 paymentIndex++;
             }
 
             return payments;
+        }
+
+        private DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime minimumDueDate)
+        {
+            var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+            if (paymentDueDate < minimumDueDate)
+            {
+                paymentDueDate = minimumDueDate;
+            }
+
+            return paymentDueDate;
         }
 
         protected override IEnumerable<object> GetAtomicValues()
