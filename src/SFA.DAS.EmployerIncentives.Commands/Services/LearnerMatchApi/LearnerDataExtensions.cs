@@ -150,7 +150,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             {
                 var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
 
-                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < collectionCalendar.GetCensusDate()
+                var activePeriod = collectionCalendar.GetActivePeriod();
+
+                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < activePeriod.CensusDate
                                                         && latestPriceEpisode.EndDate.Value.Date != collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear))
                 {
                     learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
