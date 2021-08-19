@@ -20,11 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
                 result.AddIsNotSetError(nameof(item.ULN));
             }
 
-            if (item.AccountId == default)
-            {
-                result.AddIsNotSetError(nameof(item.AccountId));
-            }
-
             return Task.FromResult(result);
         }
     }
