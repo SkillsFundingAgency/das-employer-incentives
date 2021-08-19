@@ -38,6 +38,11 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public async Task Handle(EmployerWithdrawn command, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrWhiteSpace(command.EmailAddress))
+            {
+                return;
+            }
+
             var template = _emailTemplates.ApplicationCancelled;
             var personalisationTokens = new Dictionary<string, string>
             {
