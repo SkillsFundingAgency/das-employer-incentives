@@ -85,26 +85,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
             result.ValidationDictionary.Count.Should().Be(1);
             result.ValidationDictionary["AccountId"].Should().Be("Is not set");
         }
-
-        [Test]
-        public async Task Then_the_command_is_invalid_when_the_EmailAddress_has_a_default_value()
-        {
-            //Arrange
-            var command = new EmployerWithdrawalCommand(
-                _fixture.Create<long>(),
-                _fixture.Create<long>(),
-                _fixture.Create<string>(),
-                _fixture.Create<string>(),
-                _fixture.Create<DateTime>(),
-                _fixture.Create<long>(),
-                default);
-
-            //Act
-            var result = await _sut.Validate(command);
-
-            //Assert
-            result.ValidationDictionary.Count.Should().Be(1);
-            result.ValidationDictionary["EmailAddress"].Should().Be("Is not set");
-        }
     }
 }
