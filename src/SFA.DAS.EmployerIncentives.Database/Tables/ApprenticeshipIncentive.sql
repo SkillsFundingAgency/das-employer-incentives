@@ -25,7 +25,7 @@
     [WithdrawnBy] NVARCHAR(50) NULL
 )
 GO
-CREATE UNIQUE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, AccountLegalEntityId, [Status])
+CREATE CLUSTERED INDEX IX_ApprenticeshipIncentive ON [incentives].[ApprenticeshipIncentive] (AccountId, AccountLegalEntityId, [Status])
 GO
 CREATE INDEX IX_ApprenticeshipIncentive_IncentiveAppAppId ON [incentives].[ApprenticeshipIncentive] ([IncentiveApplicationApprenticeshipId])
 GO

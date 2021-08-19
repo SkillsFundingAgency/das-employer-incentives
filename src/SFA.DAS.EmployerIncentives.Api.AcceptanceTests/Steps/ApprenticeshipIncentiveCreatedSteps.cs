@@ -84,19 +84,20 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
-        [Given(@"an employer is applying for the New single Apprenticeship Incentive")]
-        public async Task GivenAnEmployerIsApplyingForTheNewSingleApprenticeshipIncentive()
+        [Given(@"an existing withdrawn incentive")]
+        public async Task GivenAnExistingWithdrawnIncentive()
         {
-            _apprenticeshipsModels.RemoveRange(1,_apprenticeshipsModels.Count-1);
-            await GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive();
+            _apprenticeshipIncentive.Status = IncentiveStatus.Withdrawn;
+            _apprenticeshipIncentive.IncentiveApplicationApprenticeshipId = Guid.NewGuid();
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive, true);
         }
 
-        [Given(@"an existing withdrawn incentive for the same Apprenticeship")]
-        public async Task GivenAnExistingWithdrawnIncentiveForAnApprenticeship()
+        [Given(@"an employer is re-applying for apprenticeship incentive")]
+        public async Task GivenAnEmployerIsRe_ApplyingForApprenticeshipIncentive()
         {
-            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            _apprenticeshipIncentive.Status = IncentiveStatus.Withdrawn;
-            await dbConnection.InsertAsync(_apprenticeshipIncentive, true);
+            _apprenticeshipsModels.RemoveRange(1, _apprenticeshipsModels.Count - 1);
+            await GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive();
         }
 
         [Given(@"an employer has submitted an application")]

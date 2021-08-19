@@ -252,12 +252,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Incentive Application is submitted for withdrawn apprenticeship")]
+        [NUnit.Framework.DescriptionAttribute("Incentive application is submitted for withdrawn apprenticeship")]
         public virtual void IncentiveApplicationIsSubmittedForWithdrawnApprenticeship()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Incentive Application is submitted for withdrawn apprenticeship", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Incentive application is submitted for withdrawn apprenticeship", null, tagsOfScenario, argumentsOfScenario);
 #line 30
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -279,10 +279,10 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 31
- testRunner.Given("an employer is applying for the New single Apprenticeship Incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("an existing withdrawn incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 32
- testRunner.And("an existing withdrawn incentive for the same Apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Given("an employer is re-applying for apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 33
  testRunner.When("they submit the application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
         public async Task Handle(CreateIncentiveCommand command, CancellationToken cancellationToken = default)
         {
             var existing = await _apprenticeshipIncentiveDomainRepository.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId);
-            if (existing != null && existing.Status != IncentiveStatus.Withdrawn)
+            if (existing != null)
             {
                 return;
             }
