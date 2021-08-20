@@ -255,32 +255,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.StartDate = startDate;
         }
 
-        public async Task SetChangeOfCircumstances(Learner learner, ICollectionCalendarService collectionCalendarService)
-        {
-            if (Id != learner.ApprenticeshipIncentiveId)
-            {
-                throw new InvalidOperationException();
-            }
-
-            if (learner.SubmissionData.SubmissionFound)
-            {
-                if (learner.SubmissionData.LearningData.StartDate.HasValue)
-                {
-                    SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);
-                }
-
-                await SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus, collectionCalendarService);                
-            }
-
-            SetHasPossibleChangeOfCircumstances(false);
-        }
-
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
         {
             Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
         }
 
-        private void SetStartDateChangeOfCircumstance(DateTime startDate)
+        public bool StartDateHasChanged()
+        {
+            return Contains<StartDateChanged>();
+        }
+
+        public void SetStartDateChangeOfCircumstance(DateTime startDate)
         {
             var previousStartDate = Model.StartDate;
             SetStartDate(startDate);
@@ -340,7 +325,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        private async Task SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus, ICollectionCalendarService collectionCalendarService)
+        public async Task SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus, ICollectionCalendarService collectionCalendarService)
         {
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {

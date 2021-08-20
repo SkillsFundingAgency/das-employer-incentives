@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     [TestFixture]
     public class WhenChangeOfCircumstance
     {
-        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Fixture _fixture;
         private Learner _learner;
@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
 
             //Act
-            await _sut.SetChangeOfCircumstances(_learner, _mockCollectionCalendarService.Object);
+            await _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _mockCollectionCalendarService.Object);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -76,8 +76,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var collectionPeriod = (byte)6;
             //Arrange
             var pendingPayment = _sutModel.PendingPaymentModels.First();
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create());
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
+            {
+                _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.Result, true).Create()
+            };
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
 
             pendingPayment = _sutModel.PendingPaymentModels.Last();
@@ -88,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
 
             //Act
-            await _sut.SetChangeOfCircumstances(_learner, _mockCollectionCalendarService.Object);
+            await _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _mockCollectionCalendarService.Object);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -115,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PaymentModels.Last().PaidDate = DateTime.Now;
 
             //Act
-            await _sut.SetChangeOfCircumstances(_learner, _mockCollectionCalendarService.Object);
+            await _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _mockCollectionCalendarService.Object);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(2);
@@ -124,9 +126,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
         }
 
-        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }
