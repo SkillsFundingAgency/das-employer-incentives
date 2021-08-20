@@ -28,6 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         protected abstract int DelayPeriod { get; }
 
+        protected abstract DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate);
+
         protected Incentive(
             DateTime dateOfBirth, 
             DateTime startDate,
@@ -71,28 +73,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var payments = new List<Payment>();
             if (!IsEligible) return payments;
 
-            var minimumDueDate = submissionDate.AddDays(DelayPeriod);
-
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                var paymentDueDate = CalculateDueDate(paymentProfile, minimumDueDate);
+                var paymentDueDate = CalculateDueDate(paymentProfile, submissionDate);
                 payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning));
                 paymentIndex++;
             }
 
             return payments;
-        }
-
-        private DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime minimumDueDate)
-        {
-            var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
-            if (paymentDueDate < minimumDueDate)
-            {
-                paymentDueDate = minimumDueDate;
-            }
-
-            return paymentDueDate;
         }
 
         protected override IEnumerable<object> GetAtomicValues()

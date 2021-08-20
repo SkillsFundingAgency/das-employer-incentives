@@ -21,6 +21,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
         protected override int DelayPeriod => 0;
 
+        protected override DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
+        {
+            return StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+        }
+
         private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
             new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),

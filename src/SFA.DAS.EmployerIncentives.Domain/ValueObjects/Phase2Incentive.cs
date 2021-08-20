@@ -19,6 +19,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
         protected override int DelayPeriod => 21;
+        protected override DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
+        {
+            var minimumDueDate = submissionDate.AddDays(DelayPeriod);
+
+            var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+            if (paymentDueDate < minimumDueDate)
+            {
+                paymentDueDate = minimumDueDate;
+            }
+
+            return paymentDueDate;
+        }
 
         public static int MinimumAgreementVersion() => 6;
     }

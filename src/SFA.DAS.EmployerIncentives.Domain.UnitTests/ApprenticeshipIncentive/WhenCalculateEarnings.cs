@@ -502,6 +502,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.PendingPayments.Should().BeEmpty();
         }
 
+        [Test]
+        public async Task Then_the_first_earning_is_set_using_the_payment_profile()
+        {
+            // Arrange
+            _sutModel.SubmittedDate = _sutModel.StartDate.AddDays(20);
+            var expectedDueDate = _sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart);
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
+        }
+
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
