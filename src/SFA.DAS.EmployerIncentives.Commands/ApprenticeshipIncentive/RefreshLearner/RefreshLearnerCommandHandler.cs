@@ -93,6 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
         private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
+            //Commented out temporarily until the learner match api returns the correct date when an R13 is submitted after R01.
             //return learnerData.IlrSubmissionDate == learner.SubmissionData?.SubmissionDate && incentive.RefreshedLearnerForEarnings;
             return false;
         }
