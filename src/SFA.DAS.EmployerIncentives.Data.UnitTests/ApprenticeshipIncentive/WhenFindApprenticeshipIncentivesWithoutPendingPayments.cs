@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         }
 
         [Test]
-        public async Task Then_stopped_incentives_are_not_returned()
+        public async Task Then_stopped_incentives_are_not_returned_when_include_stopped_is_false()
         {
             // Arrange
             var stoppedIncentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
@@ -84,14 +84,33 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             await _dbContext.SaveChangesAsync();
 
             // Act
-            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments();
+            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments(false);
 
             // Assert
             result.Should().NotContain(x => x.Id == stoppedIncentive.Id);
         }
 
         [Test]
-        public async Task Then_withdrawn_incentives_are_not_returned()
+        public async Task Then_stopped_incentives_are_returned_when_include_stopped_is_true()
+        {
+            // Arrange
+            var stoppedIncentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(x => x.Status, IncentiveStatus.Stopped)
+                .Without(x => x.PendingPayments)
+                .Without(x => x.BreakInLearnings)
+                .Create();
+            await _dbContext.AddAsync(stoppedIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments(true);
+
+            // Assert
+            result.Should().Contain(x => x.Id == stoppedIncentive.Id);
+        }
+
+        [Test]
+        public async Task Then_withdrawn_incentives_are_not_returned_when_include_withdrawn_is_false()
         {
             // Arrange
             var withdrawnIncentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
@@ -103,10 +122,29 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             await _dbContext.SaveChangesAsync();
 
             // Act
-            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments();
+            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments(includeWithdrawn: false);
 
             // Assert
             result.Should().NotContain(x => x.Id == withdrawnIncentive.Id);
+        }
+
+        [Test]
+        public async Task Then_withdrawn_incentives_are_returned_when_include_withdrawn_is_true()
+        {
+            // Arrange
+            var withdrawnIncentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(x => x.Status, IncentiveStatus.Withdrawn)
+                .Without(x => x.PendingPayments)
+                .Without(x => x.BreakInLearnings)
+                .Create();
+            await _dbContext.AddAsync(withdrawnIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments(includeWithdrawn: true);
+
+            // Assert
+            result.Should().Contain(x => x.Id == withdrawnIncentive.Id);
         }
     }
 }

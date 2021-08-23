@@ -27,11 +27,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             await _dbContext.AddAsync(incentive);
         }
 
-        public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments()
+        public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments(bool includeStopped = false, bool includeWithdrawn = false)
         {
             var collectionPeriods = _dbContext.CollectionPeriods.AsEnumerable();
 
-            var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.Status != IncentiveStatus.Stopped && x.Status != IncentiveStatus.Withdrawn && x.PendingPayments.Count == 0);
+            var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.PendingPayments.Count == 0);
+            if(!includeStopped)
+                queryResults = queryResults.Where(x => x.Status != IncentiveStatus.Stopped);
+
+            if(!includeWithdrawn)
+                queryResults = queryResults.Where(x => x.Status != IncentiveStatus.Withdrawn);
+
             var results = new List<ApprenticeshipIncentiveModel>();
             foreach (var incentive in queryResults)
             {
