@@ -64,7 +64,7 @@ stages:
     - task: CmdLine@2
       displayName: 'Install test dependencies'
       inputs:
-        script: choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb
+        script: choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb && sqllocaldb start mssqllocaldb && sqllocaldb info MSSQLLocalDB
         failOnStderr: true
 
     - task: CmdLine@2
