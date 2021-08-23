@@ -51,11 +51,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             if (learnerData != null)
             {
-                if (LearnerAndEarningsHaveNotChanged(learnerData, learner, incentive))
-                {
-                    return;
-                }
-
                 submissionData.SetSubmissionDate(learnerData.IlrSubmissionDate);
 
                 var learningFoundStatus = learnerData.LearningFound(incentive);
@@ -89,12 +84,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             await _learnerDomainRepository.Save(learner);
             await _incentiveDomainRepository.Save(incentive);
-        }
-
-        private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
-        {
-            //return learnerData.IlrSubmissionDate == learner.SubmissionData?.SubmissionDate && incentive.RefreshedLearnerForEarnings;
-            return false;
         }
     }
 }
