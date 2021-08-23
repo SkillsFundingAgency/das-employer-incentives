@@ -5,8 +5,10 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -15,29 +17,15 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
         private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
+        private List<ApprenticeshipIncentives.Models.ApprenticeshipIncentive> _incentives;
+        private (Guid IncentiveWithPendingPayments, ApprenticeshipIncentives.Models.ApprenticeshipIncentive[] IncentivesWithoutPendingPyaments) _expected;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
-        }
-
-        [TearDown]
-        public void CleanUp() => _dbContext.Dispose();
-
-        [Test]
-        public async Task Then_expected_data_returned()
-        {
-            // Arrange
-            var incentives = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
-                .Without(x => x.PendingPayments)
-                .Without(x => x.BreakInLearnings)
-                .CreateMany(3).ToList();
-
-            var expected = (IncentiveWithPendingPayments: incentives[0].Id,
-                IncentivesWithoutPendingPyaments: new[] { incentives[1], incentives[2] });
 
             var cpData = _fixture.Build<CollectionCalendarPeriod>()
                 .With(x => x.Active, true)
@@ -49,21 +37,76 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .With(x => x.AcademicYear, "2021")
                 .Create();
 
+            await _dbContext.AddAsync(cpData);
+
+            _incentives = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(x => x.Status, IncentiveStatus.Active)
+                .Without(x => x.PendingPayments)
+                .Without(x => x.BreakInLearnings)
+                .CreateMany(3).ToList();
+
+            _expected = (IncentiveWithPendingPayments: _incentives[0].Id,
+                IncentivesWithoutPendingPyaments: new[] { _incentives[1], _incentives[2] });
+
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
-                .With(p => p.ApprenticeshipIncentiveId, expected.IncentiveWithPendingPayments)
+                .With(p => p.ApprenticeshipIncentiveId, _expected.IncentiveWithPendingPayments)
                 .CreateMany(2).ToList();
 
-            await _dbContext.AddAsync(cpData);
             await _dbContext.AddRangeAsync(pendingPayments);
-            await _dbContext.AddRangeAsync(incentives);
+            await _dbContext.AddRangeAsync(_incentives);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        [TearDown]
+        public void CleanUp() => _dbContext.Dispose();
+
+        [Test]
+        public async Task Then_expected_data_returned()
+        {
+            // Act
+            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments();
+
+            // Assert
+            result.Select(x => x.Id).Should().BeEquivalentTo(_expected.IncentivesWithoutPendingPyaments.Select(x => x.Id));
+        }
+
+        [Test]
+        public async Task Then_stopped_incentives_are_not_returned()
+        {
+            // Arrange
+            var stoppedIncentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(x => x.Status, IncentiveStatus.Stopped)
+                .Without(x => x.PendingPayments)
+                .Without(x => x.BreakInLearnings)
+                .Create();
+            await _dbContext.AddAsync(stoppedIncentive);
             await _dbContext.SaveChangesAsync();
 
             // Act
             var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments();
 
             // Assert
-            result.Select(x => x.Id).Should().BeEquivalentTo(expected.IncentivesWithoutPendingPyaments.Select(x => x.Id));
+            result.Should().NotContain(x => x.Id == stoppedIncentive.Id);
+        }
+
+        [Test]
+        public async Task Then_withdrawn_incentives_are_not_returned()
+        {
+            // Arrange
+            var withdrawnIncentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(x => x.Status, IncentiveStatus.Withdrawn)
+                .Without(x => x.PendingPayments)
+                .Without(x => x.BreakInLearnings)
+                .Create();
+            await _dbContext.AddAsync(withdrawnIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await _sut.FindApprenticeshipIncentivesWithoutPendingPayments();
+
+            // Assert
+            result.Should().NotContain(x => x.Id == withdrawnIncentive.Id);
         }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
@@ -30,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             var collectionPeriods = _dbContext.CollectionPeriods.AsEnumerable();
 
-            var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.PendingPayments.Count == 0);
+            var queryResults = _dbContext.ApprenticeshipIncentives.Where(x => x.Status != IncentiveStatus.Stopped && x.Status != IncentiveStatus.Withdrawn && x.PendingPayments.Count == 0);
             var results = new List<ApprenticeshipIncentiveModel>();
             foreach (var incentive in queryResults)
             {
