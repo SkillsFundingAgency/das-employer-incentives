@@ -35,9 +35,8 @@ stages:
   jobs:
   - job: 'BuildAndTest'
     pool:
-      name: 'DAS - Continuous Integration'
-      demands:
-        - Agent.OS -equals Windows_NT
+      name: 'Azure Pipelines'
+      vmImage: 'windows-2019'
     workspace:
       clean: all
     steps:
@@ -79,7 +78,7 @@ stages:
       inputs:
         script: |
           choco install azurestorageemulator -y
-          "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /forceCreate
+          "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /server "(localdb)\MsSqlLocalDb"
           "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" start
         failOnStderr: true
 
