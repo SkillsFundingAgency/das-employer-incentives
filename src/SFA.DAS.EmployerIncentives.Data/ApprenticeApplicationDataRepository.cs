@@ -138,6 +138,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 if (model.SecondPaymentStatus == null)
                 {
                     model.FirstPaymentStatus = paymentStatus;
+                    model.SecondPaymentStatus = paymentStatus;
                 }
             }
             else
