@@ -1,10 +1,12 @@
-﻿using FluentAssertions;
+﻿using Dapper.Contrib.Extensions;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System;
 using System.Data.SqlClient;
 using System.IO;
@@ -44,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _application = TestContext.TestData.GetOrCreate<IncentiveApplication>();
             _application.AccountId = _account.Id;
             _application.AccountLegalEntityId = _account.AccountLegalEntityId;
-            _application.Status = Enums.IncentiveApplicationStatus.Submitted;
+            _application.Status = IncentiveApplicationStatus.Submitted;
             _application.DateCreated = _applicationCutOffDate.AddDays(-1);
             _application.DateSubmitted = _applicationCutOffDate.AddDays(-1);
             _apprenticeship = TestContext.TestData.GetOrCreate<IncentiveApplicationApprenticeship>();
@@ -62,8 +64,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_account);
-            await dbConnection.InsertAsync(_application, true);
-            await dbConnection.InsertAsync(_apprenticeship, true);
+            await dbConnection.InsertWithEnumAsStringAsync(_application);
+            await dbConnection.InsertWithEnumAsStringAsync(_apprenticeship);
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
             _apprenticeshipIncentive.PendingPayments = _apprenticeshipIncentive.PendingPayments.Take(2).ToList();
             _apprenticeshipIncentive.PendingPayments.First().EarningType = EarningType.FirstPayment;
@@ -73,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 pendingPayment.DueDate = pendingPayment.DueDate.Date;
                 pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
-                await dbConnection.InsertAsync(pendingPayment, true);
+                await dbConnection.InsertWithEnumAsStringAsync(pendingPayment);
             }
         }
 

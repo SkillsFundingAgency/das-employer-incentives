@@ -345,7 +345,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     AddEvent(new LearningResumed(
                         Model.Id,
                         learningStoppedStatus.DateResumed.Value));
-            }
+            }            
         }
 
         private async Task RemoveEarningsAfterStopDate(DateTime dateStopped, ICollectionCalendarService collectionCalendarService)

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -55,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public async Task<long> InsertWithEnumAsString<T>(T entity) where T : class
         {
             await using var dbConnection = new SqlConnection(_connectionString);
-            return await dbConnection.InsertAsync(entity, true);
+            return await dbConnection.InsertWithEnumAsStringAsync(entity);
         }
     }
 }

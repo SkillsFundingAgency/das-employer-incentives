@@ -11,6 +11,8 @@ using System.Net;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using TechTalk.SpecFlow;
+using Dapper.Contrib.Extensions;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -80,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 pendingPayment.DueDate = pendingPayment.DueDate.Date;
                 pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
-                await dbConnection.InsertAsync(pendingPayment, true);
+                await dbConnection.InsertWithEnumAsStringAsync(pendingPayment);
             }
         }
     }

@@ -1,7 +1,9 @@
-﻿using FluentAssertions;
+﻿using Dapper.Contrib.Extensions;
+using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 using System;
 using System.Data.SqlClient;
@@ -90,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             {
                 pendingPayment.DueDate = pendingPayment.DueDate.Date;
                 pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
-                await dbConnection.InsertAsync(pendingPayment, true);
+                await dbConnection.InsertWithEnumAsStringAsync(pendingPayment);
             }
         }
     }

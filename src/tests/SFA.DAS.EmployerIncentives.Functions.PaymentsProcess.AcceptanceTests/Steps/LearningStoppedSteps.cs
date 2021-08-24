@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
-                .With(p => p.StartDate, new DateTime(2020, 11, 1))
+                .With(p => p.StartDate, _plannedStartDate)
                 .With(p => p.Phase, Phase.Phase1)
                 .Create();
 
@@ -228,8 +228,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_accountModel);
-                await dbConnection.InsertAsync(_apprenticeshipIncentive);
-                await dbConnection.InsertAsync(_pendingPayment);
+                await dbConnection.InsertAsync(_apprenticeshipIncentive);                
+                await dbConnection.InsertWithEnumAsStringAsync(_pendingPayment);
             }
         }
 
@@ -243,7 +243,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
                 await dbConnection.InsertAsync(_apprenticeshipBreakInLearning);
-                await dbConnection.InsertAsync(_pendingPayment);
+                await dbConnection.InsertWithEnumAsStringAsync(_pendingPayment);
                 await dbConnection.InsertAsync(_learner);
                 await dbConnection.InsertAsync(_learningPeriod1);
             }
@@ -319,7 +319,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
 
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            await dbConnection.InsertAsync(paidPendingPayment);
+            await dbConnection.InsertWithEnumAsStringAsync(paidPendingPayment);
             await dbConnection.InsertAsync(payment);
         }
 
@@ -449,7 +449,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
 
-            var pendingPayment = dbConnection.GetAll<PendingPayment>().Single(p => p.EarningType == EarningType.SecondPayment);
+            var pendingPayment = dbConnection.GetAll<PendingPayment>().Single(p => p.EarningType == EarningType.SecondPayment && p.ClawedBack);
             pendingPayment.ClawedBack.Should().BeTrue();
         }
 
