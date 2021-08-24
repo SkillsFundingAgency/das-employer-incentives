@@ -1,6 +1,6 @@
 ﻿@activeCalendarPeriod
 Feature: StartDateChangedWithLearningStoppedCoC
-	When the refreshed learner data contains a start date changed and alearning stopped change of circumstance
+	When the refreshed learner data contains a start date changed and a learning stopped change of circumstance
 	Then the apprenticeship incentive data is updated
 
 Scenario: Learner stopped date is before re-calculated due date as a result of a start date change
