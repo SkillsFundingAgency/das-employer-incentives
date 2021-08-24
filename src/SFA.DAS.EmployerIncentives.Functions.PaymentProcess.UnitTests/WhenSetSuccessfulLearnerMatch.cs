@@ -3,11 +3,11 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatchExecution;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             _mockCommandDispatcher.Verify(
                 x => x.Send(
-                    It.Is<SetSuccessfulLearnerMatchCommand>(p =>
+                    It.Is<SetSuccessfulLearnerMatchExecutionCommand>(p =>
                         p.ApprenticeshipIncentiveId == input.ApprenticeshipIncentiveId
                         && p.Succeeded == input.Succeeded
                         && p.Uln == input.Uln
