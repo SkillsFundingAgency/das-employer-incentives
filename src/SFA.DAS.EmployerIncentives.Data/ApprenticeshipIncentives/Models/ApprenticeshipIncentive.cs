@@ -50,6 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         
         [Column(TypeName = "nvarchar(50)")]
         public Phase Phase { get; set; }
+        [Column(TypeName = "nvarchar(50)")]
+        public WithdrawnBy? WithdrawnBy { get; set; }
 
         public ApprenticeshipIncentive()
         {

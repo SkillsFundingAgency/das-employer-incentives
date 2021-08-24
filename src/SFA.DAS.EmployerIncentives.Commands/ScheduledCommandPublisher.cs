@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             _messageSession = messageSession;
         }
 
-        public async Task Send<T>(T command, TimeSpan delay, CancellationToken cancellationToken = default(CancellationToken)) where T : class, ICommand
+        public async Task Send<T>(T command, TimeSpan delay, CancellationToken cancellationToken = default(CancellationToken)) where T : ICommand
         {
             var sendOptions = new SendOptions();
             sendOptions.DelayDeliveryWith(delay);

@@ -18,6 +18,6 @@
 	CONSTRAINT FK_ClawbackPayment_Payment FOREIGN KEY (PaymentId) REFERENCES [incentives].Payment(Id)
 )
 GO
-CREATE CLUSTERED INDEX IX_ClawbackPayment_DateClawbackSent ON [incentives].[ClawbackPayment] (DateClawbackSent)
+CREATE CLUSTERED INDEX IX_ClawbackPayment_DateClawbackSent ON [incentives].[ClawbackPayment] ([DateClawbackSent], [AccountLegalEntityId])
 GO
 CREATE UNIQUE INDEX IX_ClawbackPayment_ApprenticeshipIncentiveId ON [incentives].[ClawbackPayment] (ApprenticeshipIncentiveId, PendingPaymentId)

@@ -10,6 +10,45 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
+PRINT '********************* Prepping @ACADEMIC_YEAR temp table *****************************'
+DECLARE @ACADEMIC_YEAR TABLE
+(
+    [Id] VARCHAR(10) NOT NULL PRIMARY KEY,
+    [EndDate] DATETIME NOT NULL
+)
+INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2021', '2021-07-31')
+INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2122', '2022-07-31')
+INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2223', '2023-07-31')
+INSERT INTO @ACADEMIC_YEAR ([Id], [EndDate]) VALUES ('2324', '2024-07-31')
+
+PRINT '********************* Updating table [incentives].[AcademicYear] *****************************'
+
+MERGE [incentives].[AcademicYear] AS tgt
+USING (
+    SELECT
+        [Id],
+        [EndDate]
+    FROM @ACADEMIC_YEAR
+) AS src 
+ON (tgt.[Id] = src.[Id]) 
+
+WHEN NOT MATCHED BY TARGET THEN 
+INSERT 
+           ([Id]
+           ,[EndDate])
+     VALUES
+           (src.[Id]
+           ,src.[EndDate])
+
+WHEN MATCHED AND
+    src.[EndDate] <> tgt.[EndDate]
+THEN UPDATE
+   SET 
+       [EndDate] = src.[EndDate]
+
+WHEN NOT MATCHED BY SOURCE THEN
+    DELETE;
+
 PRINT '********************* Prepping @COLLECTION_CALENDAR temp table *****************************'
 DECLARE @COLLECTION_CALENDAR TABLE
 (

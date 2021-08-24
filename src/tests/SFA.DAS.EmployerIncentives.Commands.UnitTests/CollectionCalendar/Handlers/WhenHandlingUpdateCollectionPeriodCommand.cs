@@ -6,6 +6,8 @@ using SFA.DAS.EmployerIncentives.Commands.CollectionPeriod;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handlers
 {
@@ -19,17 +21,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
         [SetUp]
         public void Arrange()
         {
+            _fixture = new Fixture();
+
             _service = new Mock<ICollectionCalendarService>();
             _sut = new UpdateCollectionPeriodCommandHandler(_service.Object);
 
-            var calendarPeriods = new List<Domain.ValueObjects.CollectionPeriod>
+            var calendarPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>
             {
-                new Domain.ValueObjects.CollectionPeriod(1, 2021),
-                new Domain.ValueObjects.CollectionPeriod(2, 2021),
-                new Domain.ValueObjects.CollectionPeriod(3, 2021)
+                CollectionPeriod(1, 2021),
+                CollectionPeriod(2, 2021),
+                CollectionPeriod(3, 2021)
             };
 
-            var collectionCalendar = new Domain.ValueObjects.CollectionCalendar(calendarPeriods);
+            var collectionCalendar = new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), calendarPeriods);
             _service.Setup(x => x.Get()).ReturnsAsync(collectionCalendar);
         }
 
@@ -55,6 +59,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CollectionCalendar.Handl
             await _sut.Handle(command);
 
             _service.Verify(x => x.Save(It.IsAny<Domain.ValueObjects.CollectionCalendar>()), Times.Never);
+        }
+
+        private Domain.ValueObjects.CollectionCalendarPeriod CollectionPeriod(byte periodNumber, short academicYear)
+        {
+            return new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(periodNumber, academicYear), 1, academicYear, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, false);
         }
     }
 }

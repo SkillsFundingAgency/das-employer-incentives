@@ -35,8 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             _nextPendingPaymentDue = _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
-                    .With(pp => pp.PaymentYear, paymentYear)
-                    .With(pp => pp.PeriodNumber, _periodNumber)
+                    .With(pp => pp.CollectionPeriod, new Domain.ValueObjects.CollectionPeriod(_periodNumber, paymentYear))
                     .With(pp => pp.DueDate, _dueDate)// earliest
                     .Create();
 
@@ -46,12 +45,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                     _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, _dueDate.AddMonths(1))
-                    .With(pp => pp.PaymentYear, (short?)null)
+                    .With(pp => pp.CollectionPeriod, (Domain.ValueObjects.CollectionPeriod)null)
                     .Create(),
                     _fixture.Build<PendingPaymentModel>()
                     .With(pp => pp.PaymentMadeDate, (DateTime?)null)
                     .With(pp => pp.DueDate, _dueDate.AddMonths(2))
-                    .With(pp => pp.PaymentYear, (short?)null)
+                    .With(pp => pp.CollectionPeriod, (Domain.ValueObjects.CollectionPeriod)null)
                     .Create(),
                     _nextPendingPaymentDue
                 })
@@ -74,6 +73,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.ApprenticeshipId = _incentive.Apprenticeship.Id;
             _testPeriodDto.IsPayable = false;
             _testPeriodDto.Period = _periodNumber;
+
+            _sut.AcademicYear = _nextPendingPaymentDue.CollectionPeriod.AcademicYear;
         }
 
 
@@ -81,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_is_true_when_there_is_a_matching_record()
         {
             //Arrange            
-
+            
             //Act
             var hasDataLock = _sut.HasProviderDataLocks(_incentive);
 
@@ -129,25 +130,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             hasDataLock.Should().BeFalse();
         }
 
-        [Test]
-        public void Then_is_false_when_the_next_pending_payment_due_has_a_null_payment_year()
-        {
-            //Arrange            
-            _nextPendingPaymentDue.PaymentYear = null;
-            _incentive = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
-
-            //Act
-            var hasDataLock = _sut.HasProviderDataLocks(_incentive);
-
-            //Assert
-            hasDataLock.Should().BeFalse();
-        }
 
         [Test]
-        public void Then_is_false_when_the_next_pending_payment_due_has_a_null_periodNumber()
+        public void Then_is_false_when_the_next_pending_payment_due_has_a_null_Academic_period()
         {
             //Arrange            
-            _nextPendingPaymentDue.PeriodNumber = null;
+            _nextPendingPaymentDue.CollectionPeriod = null;
             _incentive = new ApprenticeshipIncentiveFactory().GetExisting(_apprenticeshipIncentiveModel.Id, _apprenticeshipIncentiveModel);
 
             //Act
@@ -233,6 +221,38 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             //Assert
             hasDataLock.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_is_false_when_period_is_not_payable_for_a_different_academic_year()
+        {
+            //Arrange
+            _nextPendingPaymentDue.CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(1, 2021);
+            _sut.AcademicYear = 2122;
+            _testPeriodDto.Period = 1;
+            _testPeriodDto.IsPayable = false;
+
+            //Act
+            var hasDataLock = _sut.HasProviderDataLocks(_incentive);
+
+            //Assert
+            hasDataLock.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_is_true_when_period_is_not_payable_for_the_same_academic_year()
+        {
+            //Arrange
+            _nextPendingPaymentDue.CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(1, 2021);
+            _sut.AcademicYear = _nextPendingPaymentDue.CollectionPeriod.AcademicYear;
+            _testPeriodDto.Period = _nextPendingPaymentDue.CollectionPeriod.PeriodNumber;
+            _testPeriodDto.IsPayable = false;
+
+            //Act
+            var hasDataLock = _sut.HasProviderDataLocks(_incentive);
+
+            //Assert
+            hasDataLock.Should().BeTrue();
         }
     }
 }
