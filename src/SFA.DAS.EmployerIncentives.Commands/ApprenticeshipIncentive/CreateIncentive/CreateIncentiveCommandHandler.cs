@@ -7,8 +7,6 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
-using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateIncentive
 {
@@ -16,16 +14,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
     {
         private readonly IApprenticeshipIncentiveFactory _apprenticeshipIncentiveFactory;
         private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;
-        private readonly ICommandPublisher _commandPublisher;
-
+        
         public CreateIncentiveCommandHandler(
             IApprenticeshipIncentiveFactory apprenticeshipIncentiveFactory,
-            IApprenticeshipIncentiveDomainRepository apprenticeshipIncentiveDomainRepository,
-            ICommandPublisher commandPublisher)
+            IApprenticeshipIncentiveDomainRepository apprenticeshipIncentiveDomainRepository)
         {
             _apprenticeshipIncentiveFactory = apprenticeshipIncentiveFactory;
             _apprenticeshipIncentiveDomainRepository = apprenticeshipIncentiveDomainRepository;
-            _commandPublisher = commandPublisher;
         }
 
         public async Task Handle(CreateIncentiveCommand command, CancellationToken cancellationToken = default)
@@ -33,13 +28,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
             var existing = await _apprenticeshipIncentiveDomainRepository.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId);
             if (existing != null)
             {
-                if (existing.PendingPayments.Count > 0)
-                {
-                    var completeEarningCalculationCommand = new CompleteEarningsCalculationCommand(existing.Account.Id,
-                        command.IncentiveApplicationApprenticeshipId, existing.Apprenticeship.Id, existing.Id);
-                    await _commandPublisher.Publish(completeEarningCalculationCommand);
-                }
-
                 return;
             }
 
