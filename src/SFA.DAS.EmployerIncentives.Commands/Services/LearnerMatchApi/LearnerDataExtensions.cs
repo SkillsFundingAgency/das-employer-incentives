@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             if (nextPayment == null) return false;
 
             var hasLock = data
-               .PaymentsForApprenticeshipInAcademicYear(incentive.Apprenticeship.Id, nextPayment.DueDate, nextPayment.CollectionPeriod.AcademicYear.ToString())
+               .PaymentsForApprenticeshipInAcademicYear(incentive.Apprenticeship.Id, nextPayment.DueDate)
                .Any(p => p.Period == nextPayment.CollectionPeriod?.PeriodNumber 
                          && !p.IsPayable);
 
@@ -188,12 +188,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 .Where(p => p.ApprenticeshipId == apprenticeshipId);
         }
 
-        private static IEnumerable<PeriodDto> PaymentsForApprenticeshipInAcademicYear(this LearnerSubmissionDto data, long apprenticeshipId, DateTime paymentDueDate, string academicYear)
+        private static IEnumerable<PeriodDto> PaymentsForApprenticeshipInAcademicYear(this LearnerSubmissionDto data, long apprenticeshipId, DateTime paymentDueDate)
         {
             return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
                 .SelectMany(t => t.PriceEpisodes.Where(pe => pe.StartDate <= paymentDueDate
-                && (pe.EndDate >= paymentDueDate || pe.EndDate == null)
-                && pe.AcademicYear == academicYear))
+                && (pe.EndDate >= paymentDueDate || pe.EndDate == null)))
                 .SelectMany(e => e.Periods)
                 .Where(p => p.ApprenticeshipId == apprenticeshipId);
         }
