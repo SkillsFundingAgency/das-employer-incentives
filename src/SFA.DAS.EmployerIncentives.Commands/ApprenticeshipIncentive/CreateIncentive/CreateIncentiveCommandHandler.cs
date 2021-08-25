@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreateInce
     {
         private readonly IApprenticeshipIncentiveFactory _apprenticeshipIncentiveFactory;
         private readonly IApprenticeshipIncentiveDomainRepository _apprenticeshipIncentiveDomainRepository;
-        
+
         public CreateIncentiveCommandHandler(
             IApprenticeshipIncentiveFactory apprenticeshipIncentiveFactory,
             IApprenticeshipIncentiveDomainRepository apprenticeshipIncentiveDomainRepository)
