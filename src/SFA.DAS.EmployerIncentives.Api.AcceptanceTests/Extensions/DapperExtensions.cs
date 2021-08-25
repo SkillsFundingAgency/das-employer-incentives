@@ -11,12 +11,17 @@ using System.Threading.Tasks;
 using TableAttribute = Dapper.Contrib.Extensions.TableAttribute;
 
 // ReSharper disable once CheckNamespace
-namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
+namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions
 {
     public static class DapperExtensions
     {
-        public static Task<int> InsertWithEnumAsStringAsync<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static Task<int> InsertAsync<T>(this IDbConnection connection, T entityToInsert, bool withEnumAsString = false, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
+            if(!withEnumAsString)
+            {
+                return connection.InsertAsync(entityToInsert, transaction, commandTimeout);
+            }
+
             var propertyValuesMap = new Dictionary<string, object>();
 
             var columns = new StringBuilder();

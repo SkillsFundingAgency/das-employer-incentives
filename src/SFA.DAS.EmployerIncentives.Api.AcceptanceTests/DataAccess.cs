@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
+using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public async Task Insert<T>(T entity) where T : class
         {
             await using var dbConnection = new SqlConnection(_connectionString);
-            await dbConnection.InsertAsync(entity);
+            await dbConnection.InsertAsync(entity, false);
         }
 
         public async Task Update<T>(T entity) where T : class
@@ -50,13 +50,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public async Task SetupAccount(Account account)
         {
             await using var dbConnection = new SqlConnection(_connectionString);
-            await dbConnection.InsertAsync(account);
+            await dbConnection.InsertAsync(account, false);
         }
 
         public async Task<long> InsertWithEnumAsString<T>(T entity) where T : class
         {
             await using var dbConnection = new SqlConnection(_connectionString);
-            return await dbConnection.InsertWithEnumAsStringAsync(entity);
+            return await dbConnection.InsertAsync(entity, true);
         }
     }
 }

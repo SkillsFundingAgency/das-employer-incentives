@@ -6,11 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\IlrStartDateChanged - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\LearningStopped - Copy.feature.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
