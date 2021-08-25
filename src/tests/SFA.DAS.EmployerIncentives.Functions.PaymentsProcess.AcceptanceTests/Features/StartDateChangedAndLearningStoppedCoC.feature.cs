@@ -37,8 +37,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "StartDateChangedWithLearningStoppedCoC", "\tWhen the refreshed learner data contains a start date changed and alearning stop" +
-                    "ped change of circumstance\r\n\tThen the apprenticeship incentive data is updated", ProgrammingLanguage.CSharp, new string[] {
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "StartDateChangedWithLearningStoppedCoC", "\tWhen the refreshed learner data contains a start date changed and a learning sto" +
+                    "pped change of circumstance\r\n\tThen the apprenticeship incentive data is updated", ProgrammingLanguage.CSharp, new string[] {
                         "activeCalendarPeriod"});
             testRunner.OnFeatureStart(featureInfo);
         }
