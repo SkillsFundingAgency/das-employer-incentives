@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 

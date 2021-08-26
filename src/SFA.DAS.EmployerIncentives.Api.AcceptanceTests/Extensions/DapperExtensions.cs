@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using TableAttribute = Dapper.Contrib.Extensions.TableAttribute;
 
 // ReSharper disable once CheckNamespace
-namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions
+namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
     public static class DapperExtensions
     {

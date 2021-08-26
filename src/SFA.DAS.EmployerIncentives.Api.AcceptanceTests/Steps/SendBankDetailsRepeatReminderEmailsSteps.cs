@@ -1,12 +1,10 @@
-﻿using Dapper.Contrib.Extensions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions;
 using System;
 using System.Data.SqlClient;
 using System.IO;

@@ -1,9 +1,7 @@
-﻿using Dapper.Contrib.Extensions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 using System;
 using System.Data.SqlClient;

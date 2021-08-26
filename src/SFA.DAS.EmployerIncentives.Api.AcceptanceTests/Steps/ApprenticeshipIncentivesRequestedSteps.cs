@@ -1,7 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Extensions;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
