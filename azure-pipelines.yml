@@ -61,11 +61,11 @@ stages:
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
 
-    - task: CmdLine@2
-      displayName: 'Install test dependencies'
-      inputs:
-        script: choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb && sqllocaldb start mssqllocaldb && sqllocaldb info MSSQLLocalDB
-        failOnStderr: true
+    # - task: CmdLine@2
+    #   displayName: 'Install test dependencies'
+    #   inputs:
+    #     script: choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb && sqllocaldb start mssqllocaldb && sqllocaldb info MSSQLLocalDB
+    #     failOnStderr: true
 
     - task: CmdLine@2
       displayName: 'Install test functions'
@@ -77,7 +77,7 @@ stages:
       displayName: 'Install test storage emulator'
       inputs:
         script: |
-          choco install azurestorageemulator -y
+          choco install azurestorageemulator -y && refresh env
           "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /server "(localdb)\MsSqlLocalDb"
           "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" start
         failOnStderr: true
