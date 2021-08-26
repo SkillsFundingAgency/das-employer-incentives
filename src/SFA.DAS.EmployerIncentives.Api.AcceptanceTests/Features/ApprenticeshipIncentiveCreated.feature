@@ -26,3 +26,10 @@ Scenario: Incentive application updated after earnings calculated
 	Given an apprenticeship incentive earnings have been calculated
 	When the earnings calculation against the apprenticeship incentive completes
 	Then the incentive application is updated to record that the earnings have been calculated
+
+Scenario: Incentive application is submitted for withdrawn apprenticeship
+	Given an existing withdrawn incentive
+	And an employer is re-applying for apprenticeship incentive
+	When they submit the application
+	Then the apprenticeship incentive is created for each apprenticeship in the application
+	And original withdrawn incentive is retained

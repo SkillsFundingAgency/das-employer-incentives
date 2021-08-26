@@ -54,6 +54,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 }
             }
 
+            if(!context.IsReplaying)
+                _logger.LogInformation("[IncentivePaymentOrchestrator] Setting status to WaitingForPaymentApproval.");
+
             context.SetCustomStatus("WaitingForPaymentApproval");
 
             var paymentsApproved = await context.WaitForExternalEvent<bool>("PaymentsApproved");
