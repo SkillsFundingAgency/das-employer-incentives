@@ -327,6 +327,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetLearningStoppedChangeOfCircumstance(
             LearningStoppedStatus learningStoppedStatus,
+            IEnumerable<IncentivePaymentProfile> paymentProfiles,
             CollectionCalendar collectionCalendar)
         {
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
@@ -344,9 +345,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 StopBreakInLearning(learningStoppedStatus);
 
                 if (learningStoppedStatus.DateResumed.HasValue)
+                {
+                    CalculateEarnings(paymentProfiles, collectionCalendar);
                     AddEvent(new LearningResumed(
                         Model.Id,
                         learningStoppedStatus.DateResumed.Value));
+                }   
             }            
         }
 
