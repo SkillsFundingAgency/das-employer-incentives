@@ -277,7 +277,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.StartDate,
                     Model));
 
-                SetMinimumAgreementVersion(startDate);
+                SetMinimumAgreementVersion(startDate);                
             }
         }
 
@@ -343,15 +343,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 Model.Status = IncentiveStatus.Active;
                 StopBreakInLearning(learningStoppedStatus);
-
+                                
                 if (learningStoppedStatus.DateResumed.HasValue)
                 {
                     CalculateEarnings(paymentProfiles, collectionCalendar);
+
                     AddEvent(new LearningResumed(
                         Model.Id,
                         learningStoppedStatus.DateResumed.Value));
-                }   
-            }            
+                }
+            }
         }
 
         private void RemoveEarningsAfterStopDate(

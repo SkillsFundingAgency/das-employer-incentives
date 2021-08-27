@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             if(hasPossibleChangeOfCircs)
             {
-                await context.CallActivityAsync(nameof(LearnerChangeOfCircumstanceActivity), learnerChangeOfCircumstanceInput);                
+                await context.CallActivityAsync(nameof(LearnerChangeOfCircumstanceActivity), learnerChangeOfCircumstanceInput);
                 await context.CallActivityWithRetryAsync(nameof(LearnerMatchAndUpdate), new RetryOptions(TimeSpan.FromSeconds(1), 3), new LearnerMatchInput { ApprenticeshipIncentiveId = learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId });
             }
 

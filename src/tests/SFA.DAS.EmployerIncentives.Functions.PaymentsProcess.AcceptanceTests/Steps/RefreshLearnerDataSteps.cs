@@ -59,9 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                     .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                     .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                    .With(p => p.PeriodNumber, (byte?) 2) // current period
+                    .With(p => p.PeriodNumber, (byte?) 4) // current period
                     .With(p => p.PaymentYear, (short?) 2021)
-                    .With(p => p.DueDate, DateTime.Parse("2020-09-09"))
+                    .With(p => p.DueDate, _startDate.AddDays(89))
                     .With(p => p.ClawedBack, false)
                     .With(p => p.EarningType, EarningType.FirstPayment)
                     .Without(p => p.PaymentMadeDate)
@@ -70,9 +70,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                     .With(p => p.AccountId, _apprenticeshipIncentive.AccountId)
                     .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
-                    .With(p => p.PeriodNumber, (byte?) 2) // future period
+                    .With(p => p.PeriodNumber, (byte?) 4) // future period
                     .With(p => p.PaymentYear, (short?) 2122)
-                    .With(p => p.DueDate, DateTime.Parse("2021-10-07"))
+                    .With(p => p.DueDate, _startDate.AddDays(364))
                     .With(p => p.ClawedBack, false)
                     .With(p => p.EarningType, EarningType.SecondPayment)
                     .Without(p => p.PaymentMadeDate)
@@ -350,7 +350,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the locked price episode period matches the next pending payment period")]
         public void TheLockedPriceEpisodePeriodMatchesTheNextPendingPaymentPeriod()
         {
-            const byte lockedPeriod = 2; // see Course-Price-Dlock-R03.json.txt
+            const byte lockedPeriod = 4; // see Course-Price-Dlock-R03.json.txt
             var nextPaymentPeriod = _pendingPayments.Where(x => x.PaymentMadeDate == null)
                 .OrderBy(x => x.DueDate).First().PeriodNumber;
             nextPaymentPeriod.Should().Be(lockedPeriod);
