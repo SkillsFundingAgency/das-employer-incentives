@@ -1,13 +1,10 @@
 ﻿using FluentAssertions;
-using Microsoft.Extensions.Options;
-using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
 {
@@ -15,41 +12,25 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
     public class WhenCallingIncentivePaymentProfilesService
     {
         private IncentivePaymentProfilesService _sut;
-        private Mock<IOptions<ApplicationSettings>> _mockApplicationSettings;
-        private List<IncentivePaymentProfile> _incentivePaymentProfiles;
 
         [SetUp]
         public void Arrange()
         {
-            _incentivePaymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-
-            _mockApplicationSettings = new Mock<IOptions<ApplicationSettings>>();
-            _mockApplicationSettings.Setup(x => x.Value).Returns(new ApplicationSettings { IncentivePaymentProfiles = _incentivePaymentProfiles });
-
-            _sut = new IncentivePaymentProfilesService(_mockApplicationSettings.Object);
+            _sut = new IncentivePaymentProfilesService();
         }
 
         [Test]
-        public async Task then_config_settings_should_map_to_domain_values()
+        public async Task Then_the_payment_profiles_should_contain_values_for_employer_incentives_phases()
         {
             var result = (await _sut.Get()).ToList();
 
             result.Count.Should().Be(2);
-            result[0].IncentivePhase.Identifier.Should().Be(_incentivePaymentProfiles[0].IncentivePhase);
-            result[0].PaymentProfiles[0].IncentiveType.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].IncentiveType);
-            result[0].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].AmountPayable);
-            result[0].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[0].DaysAfterApprenticeshipStart);
-            result[0].PaymentProfiles[1].IncentiveType.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[1].IncentiveType);
-            result[0].PaymentProfiles[1].AmountPayable.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[1].AmountPayable);
-            result[0].PaymentProfiles[1].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[0].PaymentProfiles[1].DaysAfterApprenticeshipStart);
-
-            result[1].IncentivePhase.Identifier.Should().Be(_incentivePaymentProfiles[1].IncentivePhase);
-            result[1].PaymentProfiles[0].IncentiveType.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].IncentiveType);
-            result[1].PaymentProfiles[0].AmountPayable.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].AmountPayable);
-            result[1].PaymentProfiles[0].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[0].DaysAfterApprenticeshipStart);
-            result[1].PaymentProfiles[1].IncentiveType.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[1].IncentiveType);
-            result[1].PaymentProfiles[1].AmountPayable.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[1].AmountPayable);
-            result[1].PaymentProfiles[1].DaysAfterApprenticeshipStart.Should().Be(_incentivePaymentProfiles[1].PaymentProfiles[1].DaysAfterApprenticeshipStart);
+            var phase1 = result.FirstOrDefault(x => x.IncentivePhase.Identifier == Phase.Phase1);
+            phase1.PaymentProfiles.FirstOrDefault(x => x.IncentiveType == IncentiveType.UnderTwentyFiveIncentive).Should().NotBeNull();
+            phase1.PaymentProfiles.FirstOrDefault(x => x.IncentiveType == IncentiveType.TwentyFiveOrOverIncentive).Should().NotBeNull();
+            var phase2 = result.FirstOrDefault(x => x.IncentivePhase.Identifier == Phase.Phase2);
+            phase2.PaymentProfiles.FirstOrDefault(x => x.IncentiveType == IncentiveType.UnderTwentyFiveIncentive).Should().NotBeNull();
+            phase2.PaymentProfiles.FirstOrDefault(x => x.IncentiveType == IncentiveType.TwentyFiveOrOverIncentive).Should().NotBeNull();
         }
     }
 }

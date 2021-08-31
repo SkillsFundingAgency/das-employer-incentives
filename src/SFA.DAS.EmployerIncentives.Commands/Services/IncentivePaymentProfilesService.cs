@@ -1,39 +1,37 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services
 {
     public class IncentivePaymentProfilesService : IIncentivePaymentProfilesService
     {
-        private readonly ApplicationSettings _applicationSettings;
-
-        public IncentivePaymentProfilesService(IOptions<ApplicationSettings> applicationSettings)
+        public Task<IEnumerable<IncentivePaymentProfile>> Get()
         {
-            _applicationSettings = applicationSettings.Value;
-        }
-
-        public Task<IEnumerable<Domain.ValueObjects.IncentivePaymentProfile>> Get()
-        {
-            if (_applicationSettings?.IncentivePaymentProfiles == null)
+            var incentivePaymentProfiles = new List<IncentivePaymentProfile>
             {
-                return Task.FromResult(Enumerable.Empty<Domain.ValueObjects.IncentivePaymentProfile>());
-            }
-            return Task.FromResult(_applicationSettings.IncentivePaymentProfiles.Select(x =>
-                new Domain.ValueObjects.IncentivePaymentProfile(new Domain.ValueObjects.IncentivePhase(x.IncentivePhase),
-                    MapToDomainPaymentProfiles(x.PaymentProfiles).ToList())));
-        }
+                new IncentivePaymentProfile(new IncentivePhase(Phase.Phase1),
+                    new List<PaymentProfile>
+                    {
+                        new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 1000),
+                        new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1000),
+                        new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 750),
+                        new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 750)
+                    }),
+                new IncentivePaymentProfile(new IncentivePhase(Phase.Phase2),
+                    new List<PaymentProfile>
+                    {
+                        new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 1500),
+                        new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1500),
+                        new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 1500),
+                        new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1500)
+                    }),
+            };
 
-        private IEnumerable<Domain.ValueObjects.PaymentProfile> MapToDomainPaymentProfiles(List<Infrastructure.Configuration.PaymentProfile> paymentProfiles)
-        {
-            if (paymentProfiles == null)
-            {
-                return Enumerable.Empty<Domain.ValueObjects.PaymentProfile>();
-            }
-            return paymentProfiles.Select(x => new Domain.ValueObjects.PaymentProfile(x.IncentiveType, x.DaysAfterApprenticeshipStart, x.AmountPayable));
+            return Task.FromResult(incentivePaymentProfiles.AsEnumerable());
         }
     }
 }

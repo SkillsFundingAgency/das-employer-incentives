@@ -6,12 +6,12 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using NServiceBus;
+using SFA.DAS.EmployerIncentives.Commands.Services;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly Dictionary<string, string> _config;
         private readonly IHook<object> _eventMessageHook;
         private readonly IHook<ICommand> _commandMessageHook;
-        private readonly List<IncentivePaymentProfile> _paymentProfiles;
+        private readonly IEnumerable<IncentivePaymentProfile> _paymentProfiles;
 
         public TestWebApi(TestContext context, IHook<object> eventMessageHook, IHook<ICommand> commandMessageHook)
         {
@@ -41,8 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
 
-            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-
+            _paymentProfiles = new IncentivePaymentProfilesService().Get().GetAwaiter().GetResult();
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -57,7 +56,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.Hashstring = "Test Hashstring";
                     a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                     a.MinimumAgreementVersion = 4;
-                    a.IncentivePaymentProfiles = _paymentProfiles;
                 });
                 s.Configure<PolicySettings>(a =>
                 {

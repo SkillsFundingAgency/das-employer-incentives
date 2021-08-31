@@ -9,12 +9,12 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.Services;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             _testContext = testContext;
 
-            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
+            var paymentProfiles = new IncentivePaymentProfilesService().Get().GetAwaiter().GetResult();
             _host = new HostBuilder()
                 .ConfigureAppConfiguration(a =>
                     {
@@ -99,7 +99,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.DistributedLockStorage = "UseDevelopmentStorage=true";
                                a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                                a.UseLearningEndpointStorageDirectory = Path.Combine(testContext.TestDirectory.FullName, ".learningtransport");
-                               a.IncentivePaymentProfiles = paymentProfiles;
                            });
 
                            s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
