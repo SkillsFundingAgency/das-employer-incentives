@@ -47,8 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetPaymentPeriod(CollectionPeriod period)
         {
-            Model.CollectionPeriod = period.PeriodNumber;
-            Model.CollectionPeriodYear = period.AcademicYear;
+            Model.CollectionPeriod = period;
         }
 
         private ClawbackPayment(ClawbackPaymentModel model, bool isNew = false) : base(model.Id, model, isNew)

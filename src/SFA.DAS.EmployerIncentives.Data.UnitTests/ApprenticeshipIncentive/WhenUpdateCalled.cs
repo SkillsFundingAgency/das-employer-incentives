@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CollectionPeriod = SFA.DAS.EmployerIncentives.Domain.ValueObjects.CollectionPeriod;
+using CollectionPeriod = SFA.DAS.EmployerIncentives.Domain.ValueObjects.CollectionCalendarPeriod;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -16,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
         private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
-        private ApprenticeshipIncentives.Models.CollectionPeriod _collectionPeriod;
+        private ApprenticeshipIncentives.Models.CollectionCalendarPeriod _collectionCalendarPeriod;
 
         [SetUp]
         public async Task Setup()
@@ -24,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
-            await AddCollectionPeriod();
+            await AddCollectionCalendarPeriod();
         }
 
         [TearDown]
@@ -38,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             expected.Account = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Account>();
             expected.Apprenticeship = _fixture.Create<Domain.ApprenticeshipIncentives.ValueTypes.Apprenticeship>();
-            expected.Phase = new Domain.ValueObjects.IncentivePhase(Enums.Phase.Phase1);
+            expected.Phase = new IncentivePhase(Enums.Phase.Phase1);
 
             var pendingPayments = _fixture.Build<PendingPaymentModel>().With(
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
@@ -77,14 +78,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                      x.SubmittedDate == expected.SubmittedDate &&
                      x.CourseName == expected.Apprenticeship.CourseName &&
                      x.EmploymentStartDate == expected.Apprenticeship.EmploymentStartDate &&
-                     x.Phase == expected.Phase.Identifier
+                     x.Phase == expected.Phase.Identifier &&
+                     x.WithdrawnBy == expected.WithdrawnBy
                 )
                 .Should().Be(1);
 
             var savedPendingPayments = _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
             savedPendingPayments.Should().BeEquivalentTo(pendingPayments, opt => opt
                 .Excluding(x => x.Account)
-                .Excluding(x => x.PendingPaymentValidationResultModels));
+                .Excluding(x => x.PendingPaymentValidationResultModels)
+                .Excluding(x => x.CollectionPeriod));
 
             var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
                 x.PendingPaymentId == expected.PendingPaymentModels.First().Id);
@@ -106,7 +109,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             var savedClawbackPayments = _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
             savedClawbackPayments.Should().BeEquivalentTo(clawbackPayments, opt => opt
-                .Excluding(x => x.Account).Excluding(x => x.CreatedDate));
+                .Excluding(x => x.Account).Excluding(x => x.CreatedDate).Excluding(x => x.CollectionPeriod));
+
+            foreach (var savedClawbackPayment in savedClawbackPayments)
+            {
+                var expectedClawbackPayment = clawbackPayments.Single(c => c.Id == savedClawbackPayment.Id);
+                expectedClawbackPayment.CollectionPeriod.PeriodNumber.Should().Be(savedClawbackPayment.CollectionPeriod);
+                expectedClawbackPayment.CollectionPeriod.AcademicYear.Should().Be(savedClawbackPayment.CollectionPeriodYear);
+            }
         }
 
         [Test]
@@ -155,12 +165,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             foreach (var pendingPayment in incentive.PendingPayments)
             {
-                pendingPayment.PaymentYear = Convert.ToInt16(_collectionPeriod.AcademicYear);
-                pendingPayment.PeriodNumber = _collectionPeriod.PeriodNumber;
+                pendingPayment.PaymentYear = Convert.ToInt16(_collectionCalendarPeriod.AcademicYear);
+                pendingPayment.PeriodNumber = _collectionCalendarPeriod.PeriodNumber;
                 foreach (var validationResult in pendingPayment.ValidationResults)
                 {
-                    validationResult.PaymentYear = Convert.ToInt16(_collectionPeriod.AcademicYear);
-                    validationResult.PeriodNumber = _collectionPeriod.PeriodNumber;
+                    validationResult.PaymentYear = Convert.ToInt16(_collectionCalendarPeriod.AcademicYear);
+                    validationResult.PeriodNumber = _collectionCalendarPeriod.PeriodNumber;
                 }
             }
 
@@ -169,9 +179,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             return await _sut.Get(incentive.Id);
         }
 
-        private async Task AddCollectionPeriod()
+        private async Task AddCollectionCalendarPeriod()
         {
-            _collectionPeriod = _fixture.Build<ApprenticeshipIncentives.Models.CollectionPeriod>()
+            _collectionCalendarPeriod = _fixture.Build<ApprenticeshipIncentives.Models.CollectionCalendarPeriod>()
                 .With(x => x.Active, true)
                 .With(x => x.PeriodNumber, 2)
                 .With(x => x.CalendarMonth, 9)
@@ -181,7 +191,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .With(x => x.AcademicYear, "2021")
                 .Without(x => x.MonthEndProcessingCompleteUTC)
                 .Create();
-            await _dbContext.AddAsync(_collectionPeriod);
+            await _dbContext.AddAsync(_collectionCalendarPeriod);
         }
 
         private void AddUpdateAndRemovePendingPaymentsAndValidationResults(ApprenticeshipIncentiveModel expected)
@@ -192,15 +202,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             expected.PaymentModels.First().Amount -= 250;
             var newPendingPayment = _fixture.Build<PendingPaymentModel>()
                 .With(x => x.ApprenticeshipIncentiveId, expected.Id)
-                .With(x => x.PaymentYear, _collectionPeriod.PeriodNumber)
-                .With(x => x.PeriodNumber, _collectionPeriod.PeriodNumber)
+                .With(x => x.CollectionPeriod, new Domain.ValueObjects.CollectionPeriod(_collectionCalendarPeriod.PeriodNumber, Convert.ToInt16(_collectionCalendarPeriod.AcademicYear)))
                 .Without(x => x.PendingPaymentValidationResultModels)
                 .Create();
 
-            var cp = new CollectionPeriod(_collectionPeriod.PeriodNumber, _collectionPeriod.CalendarMonth,
-                _collectionPeriod.CalendarYear,
-                _collectionPeriod.EIScheduledOpenDateUTC, _collectionPeriod.CensusDate,
-                Convert.ToInt16(_collectionPeriod.AcademicYear), true, false);
+            var cp = new Domain.ValueObjects.CollectionPeriod(_collectionCalendarPeriod.PeriodNumber, Convert.ToInt16(_collectionCalendarPeriod.AcademicYear));
 
             expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels
                 .Remove(expected.PendingPaymentModels.Last().PendingPaymentValidationResultModels.First());

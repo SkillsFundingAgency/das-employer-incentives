@@ -69,6 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedApprenticeshipIncentive.CourseName.Should().Be(testIncentive.Apprenticeship.CourseName);
             storedApprenticeshipIncentive.EmploymentStartDate.Should().Be(testIncentive.Apprenticeship.EmploymentStartDate);
             storedApprenticeshipIncentive.Phase.Should().Be(testIncentive.Phase.Identifier);
+            storedApprenticeshipIncentive.WithdrawnBy.Should().Be(testIncentive.WithdrawnBy);
         }
 
         [Test]

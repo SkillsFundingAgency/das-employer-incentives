@@ -44,10 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
 
             // act
-            _sut.Withdraw(_mockCollectionCalendarService.Object);
+            _sut.Withdraw(WithdrawnBy.Compliance, _mockCollectionCalendarService.Object);
 
             // assert            
             _sut.Status.Should().Be(IncentiveStatus.Withdrawn);
+            _sut.WithdrawnBy.Should().Be(WithdrawnBy.Compliance);
             _sut.IsDeleted.Should().BeFalse();
         }
 

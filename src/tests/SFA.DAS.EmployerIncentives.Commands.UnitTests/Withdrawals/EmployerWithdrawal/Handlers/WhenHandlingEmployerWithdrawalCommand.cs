@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWithdrawal.Handlers
 {
@@ -22,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRepository;
          
         private Fixture _fixture;
+        private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
 
         [SetUp]
         public void Arrange()
@@ -30,15 +33,21 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
             _fixture.Customize(new IncentiveApplicationCustomization());
 
             _mockDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
+            _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             
-            _sut = new EmployerWithdrawalCommandHandler(_mockDomainRepository.Object);
+            _sut = new EmployerWithdrawalCommandHandler(_mockDomainRepository.Object, _mockAccountDomainRepository.Object);
         }
 
         [Test]
         public async Task Then_changes_to_the_application_are_persisted_to_the_domain_repository_for_matching_ULNs()
         {
-            //Arrange            
+            //Arrange
             var command = _fixture.Create<EmployerWithdrawalCommand>();
+
+            var account = Account.New(command.AccountId);
+            var legalEntity = _fixture.Create<LegalEntity>();
+            account.AddLegalEntity(command.AccountLegalEntityId, legalEntity);
+            _mockAccountDomainRepository.Setup(r => r.Find(It.Is<long>(x => x == command.AccountId))).ReturnsAsync(account);
 
             var apprenticeshipModel = _fixture
                 .Build<ApprenticeshipModel>()
@@ -47,6 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
 
             var incentiveApplicationModel = _fixture
                 .Build<IncentiveApplicationModel>()
+                .With(x => x.AccountId, command.AccountId)
+                .With(x => x.AccountLegalEntityId, command.AccountLegalEntityId)
                 .With(i => i.ApprenticeshipModels, 
                     new List<ApprenticeshipModel> {
                         _fixture.Create<ApprenticeshipModel>(),
@@ -59,9 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
 
             var applications = new List<IncentiveApplication>()
             {
-                _fixture.Create<IncentiveApplication>(),
-                testApplication,
-                _fixture.Create<IncentiveApplication>()
+                testApplication
             };
 
             _mockDomainRepository
@@ -73,9 +82,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
 
             //Assert
             _mockDomainRepository
-                .Verify(m => m.Save(It.Is<IncentiveApplication>(a =>
-                 a.Id == testApplication.Id &&
-                 a.Apprenticeships.Count(a => 
+                .Verify(m => m.Save(It.Is<IncentiveApplication>(application =>
+                 application.Id == testApplication.Id &&
+                 application.Apprenticeships.Count(a => 
                     a.ULN == command.ULN &&
                     a.WithdrawnByEmployer) == 1)),
                  Times.Once);

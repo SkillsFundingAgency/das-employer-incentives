@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
     public class WhenSettingActivePeriodToInProgress
     {
         private CollectionCalendar _sut;
-        private List<CollectionPeriod> _collectionPeriods;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
         private DateTime testDate;
 
@@ -23,13 +23,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             testDate = DateTime.Now;
 
-            var period1 = new CollectionPeriod(1, (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), 2021, false, true);
-            var period2 = new CollectionPeriod(2, (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), 2021, true, false);
-            var period3 = new CollectionPeriod(3, (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), 2021, false, false);
+            var period1 = new CollectionCalendarPeriod(new CollectionPeriod(1, 2021),  (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, true);
+            var period2 = new CollectionCalendarPeriod(new CollectionPeriod(2, 2021), (byte)testDate.AddMonths(1).Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), true, false);
+            var period3 = new CollectionCalendarPeriod(new CollectionPeriod(3, 2021), (byte)testDate.AddMonths(2).Month, (short)testDate.Year, _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), false, false);
 
-            _collectionPeriods = new List<CollectionPeriod>() { period1, period2, period3 };
+            _collectionPeriods = new List<CollectionCalendarPeriod>() { period1, period2, period3 };
 
-            _sut = new CollectionCalendar(_collectionPeriods);
+            _sut = new CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
         }
 
         [Test]
@@ -40,9 +40,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             var periods = _sut.GetAllPeriods().ToList();
 
-            periods.FirstOrDefault(x => x.PeriodNumber == 1).PeriodEndInProgress.Should().BeFalse();
-            periods.FirstOrDefault(x => x.PeriodNumber == 2).PeriodEndInProgress.Should().BeTrue();
-            periods.FirstOrDefault(x => x.PeriodNumber == 3).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 1).PeriodEndInProgress.Should().BeFalse();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 2).PeriodEndInProgress.Should().BeTrue();
+            periods.FirstOrDefault(x => x.CollectionPeriod.PeriodNumber == 3).PeriodEndInProgress.Should().BeFalse();
             periods.Count(x => x.PeriodEndInProgress == true).Should().Be(1);
         }
     }

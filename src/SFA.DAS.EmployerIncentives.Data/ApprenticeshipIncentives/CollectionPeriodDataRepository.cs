@@ -21,9 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             _lazyContext = dbContext;
         }
 
-        public async Task<IEnumerable<Domain.ValueObjects.CollectionPeriod>> GetAll()
+        public async Task<IEnumerable<Domain.ValueObjects.CollectionCalendarPeriod>> GetAll()
         {
-            var collectionPeriods = await _dbContext.Set<Models.CollectionPeriod>().ToListAsync();
+            var collectionPeriods = await _dbContext.Set<Models.CollectionCalendarPeriod>().ToListAsync();
             if (collectionPeriods.Count > 0)
             {
                 return collectionPeriods.Map();
@@ -31,13 +31,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             return null;
         }
 
-        public async Task Save(IEnumerable<Domain.ValueObjects.CollectionPeriod> collectionPeriods)
+        public async Task Save(IEnumerable<Domain.ValueObjects.CollectionCalendarPeriod> collectionPeriods)
         {
-            var models = new Collection<Domain.ValueObjects.CollectionPeriod>(collectionPeriods.ToList()).Map();
+            var models = new Collection<Domain.ValueObjects.CollectionCalendarPeriod>(collectionPeriods.ToList()).Map();
 
             foreach(var model in models)
             {
-                var existingCollectionPeriod = await _dbContext.Set<CollectionPeriod>()
+                var existingCollectionPeriod = await _dbContext.Set<CollectionCalendarPeriod>()
                     .FirstOrDefaultAsync(x => x.CalendarYear == model.CalendarYear && x.PeriodNumber == model.PeriodNumber);
                 if (existingCollectionPeriod != null)
                 {

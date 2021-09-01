@@ -18,6 +18,7 @@
             "PriceEpisodes": [
                 {
                     "Identifier": "25-61-10/08/2020",
+                    "AcademicYear": "2021",
                     "AgreedPrice": 15000.00000,
                     "StartDate": "2020-08-10T00:00:00",
                     "EndDate": "2020-11-20T00:00:00",

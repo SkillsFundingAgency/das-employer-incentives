@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IScheduledCommandPublisher, ScheduledCommandPublisher>();
 
             serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, obfuscateSensitiveData) =>
-                new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData, s.GetRequiredService<ILogger<BusinessCentralFinancePaymentsService>>()));
+                new BusinessCentralFinancePaymentsServiceWithLogging(new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData), s.GetRequiredService<ILogger<BusinessCentralFinancePaymentsServiceWithLogging>>(), obfuscateSensitiveData));
 
             return serviceCollection;
         }
@@ -133,6 +133,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IApprenticeshipIncentiveDomainRepository, ApprenticeshipIncentiveDomainRepository>();
 
             serviceCollection.AddScoped<ICollectionPeriodDataRepository, CollectionPeriodDataRepository>();
+            serviceCollection.AddScoped<IAcademicYearDataRepository, AcademicYearDataRepository>();
             serviceCollection.AddScoped<ILearnerDataRepository, LearnerDataRepository>();
             serviceCollection.AddScoped<ILearnerDomainRepository, LearnerDomainRepository>();
             serviceCollection.Decorate<ILearnerDomainRepository, LearnerDomainRepositoryWithLogging>();
@@ -154,6 +155,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithUnitOfWork<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithDistributedLock<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithPeriodEndDelay<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
 

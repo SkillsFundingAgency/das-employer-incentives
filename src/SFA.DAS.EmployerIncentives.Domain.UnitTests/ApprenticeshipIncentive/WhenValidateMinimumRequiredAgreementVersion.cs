@@ -20,7 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private CollectionPeriod _collectionPeriod;
         private Accounts.Account _account;
         private short _collectionYear;
-        private byte _collectionMonth;
         private long _accountLegalEntityId;
         private Fixture _fixture;
 
@@ -30,9 +29,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture = new Fixture();
 
             _collectionYear = _fixture.Create<short>();
-            _collectionMonth = _fixture.Create<byte>();
 
-            _collectionPeriod = new CollectionPeriod(1, _collectionMonth, _collectionYear, DateTime.Now, DateTime.Now, _collectionYear, true, false);
+            
+            _collectionPeriod = new CollectionPeriod(1, _collectionYear);
 
             _accountLegalEntityId = _fixture.Create<long>();
             _account = Accounts.Account.Create(_fixture.Build<AccountModel>().Without(a => a.LegalEntityModels).Create());

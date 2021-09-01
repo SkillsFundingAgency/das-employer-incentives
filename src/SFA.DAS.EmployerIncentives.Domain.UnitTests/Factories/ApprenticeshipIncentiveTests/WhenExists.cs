@@ -112,7 +112,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                         .Excluding(x => x.PaymentId)
                         .Excluding(x => x.DateClawbackSent)
                         .Excluding(x => x.CollectionPeriod)
-                        .Excluding(x => x.CollectionPeriodYear)
                         );
         }
 

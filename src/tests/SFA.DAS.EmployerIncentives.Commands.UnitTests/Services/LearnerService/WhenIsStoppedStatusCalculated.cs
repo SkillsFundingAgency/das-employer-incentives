@@ -6,7 +6,9 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
 {
@@ -22,6 +24,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _incentive;
         private ApprenticeshipIncentiveModel _apprenticeshipIncentiveModel;
         private Fixture _fixture;
+        private List<AcademicYear> _academicYears;
+        private Domain.ValueObjects.CollectionCalendar _collectionCalendar;
 
         [SetUp]
         public void Arrange()
@@ -44,12 +48,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto = _testTrainingDto.PriceEpisodes.First();
             _testPriceEpisodeDto.StartDate = _startDate;
             _testPriceEpisodeDto.EndDate = _endDate;
+            _testPriceEpisodeDto.AcademicYear = "2021";
 
             _testPeriodDto = _testPriceEpisodeDto.Periods.First();            
 
             _testPeriodDto.ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id;
             _testPeriodDto.Period = _periodNumber;
             _testPeriodDto.IsPayable = true;
+
+            _academicYears = new List<AcademicYear> {new AcademicYear("2021", new DateTime(2021, 07, 31))};
+            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(_academicYears, new List<CollectionCalendarPeriod>());
         }
 
         [Test]
@@ -58,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Arrange    
 
             //Act
-            var isStoppedStatus = _sut.IsStopped(_incentive);
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeTrue();
@@ -70,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Arrange    
 
             // Act
-            var isStoppedStatus = _sut.IsStopped(null);
+            var isStoppedStatus = _sut.IsStopped(null, _collectionCalendar);
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
@@ -85,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.ApprenticeshipId = _fixture.Create<long>();
 
             // Act
-            var isStoppedStatus = _sut.IsStopped(_incentive);
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
@@ -100,7 +108,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.EndDate = DateTime.Today;
 
             // Act
-            var isStoppedStatus = _sut.IsStopped(_incentive);
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
@@ -115,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.EndDate = DateTime.Today.AddDays(1);
 
             // Act
-            var isStoppedStatus = _sut.IsStopped(_incentive);
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeFalse();
@@ -124,13 +132,28 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
+        public void Then_isStopped_is_false_is_returned_when_the_latest_price_episode_end_date_is_the_end_of_the_academic_year()
+        {
+            //Arrange    
+            _testPriceEpisodeDto.EndDate = _academicYears.Single().EndDate;
+
+            // Act
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
+
+            //Assert
+            isStoppedStatus.LearningStopped.Should().BeFalse();
+            isStoppedStatus.DateStopped.HasValue.Should().BeFalse();
+            isStoppedStatus.DateResumed.Value.Should().Be(_testPriceEpisodeDto.StartDate);
+        }
+
+        [Test]
         public void Then_isStopped_is_true_is_returned_when_the_latest_price_episode_end_date_is_before_today()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = DateTime.Today.AddDays(-1);
+            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(DateTime.Today.AddDays(-1));
 
             // Act
-            var isStoppedStatus = _sut.IsStopped(_incentive);
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeTrue();
@@ -142,15 +165,25 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_isStopped_stopped_date_is_the_day_after_the_end_date_when_the_latest_price_episode_end_date_is_before_today()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = DateTime.Today.AddDays(-10);
+            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(DateTime.Today.AddDays(-10));
 
             // Act
-            var isStoppedStatus = _sut.IsStopped(_incentive);
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
 
             //Assert
             isStoppedStatus.LearningStopped.Should().BeTrue();
             isStoppedStatus.DateStopped.Should().Be(_testPriceEpisodeDto.EndDate.Value.AddDays(1));
             isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
+        }
+
+        private DateTime GetValidPastEndDate(DateTime endDate)
+        {
+            if (endDate.Date == _academicYears.Single().EndDate.Date)
+            {
+                return endDate.AddDays(-1);
+            }
+
+            return endDate;
         }
     }
 }

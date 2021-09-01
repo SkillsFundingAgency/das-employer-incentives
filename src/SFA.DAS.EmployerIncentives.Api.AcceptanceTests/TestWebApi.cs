@@ -74,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     e.BankDetailsReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                     e.BankDetailsRepeatReminder = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
+                    e.ApplicationCancelled = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() };
                 });
                 s.Configure<MatchedLearnerApi>(l =>
                 {
@@ -95,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
-                s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _eventMessageHook));
+                s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _commandMessageHook));
                 s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>

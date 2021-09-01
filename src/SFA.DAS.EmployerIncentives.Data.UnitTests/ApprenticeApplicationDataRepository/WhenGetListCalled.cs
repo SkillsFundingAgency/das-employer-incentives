@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using AcademicYear = SFA.DAS.EmployerIncentives.Domain.ValueObjects.AcademicYear;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRepository
 {
@@ -25,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         private DbContextOptions<EmployerIncentivesDbContext> _options;
         private Mock<IDateTimeService> _mockDateTimeService;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<Domain.ValueObjects.CollectionPeriod> _collectionPeriods;
+        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionPeriods;
 
         [SetUp]
         public void Arrange()
@@ -39,16 +40,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _mockDateTimeService = new Mock<IDateTimeService>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
-            
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionPeriod>()
+
+            _collectionPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionPeriod(1, (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, (short)DateTime.Now.Year, true, false),
-                new Domain.ValueObjects.CollectionPeriod(2, (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), (short)DateTime.Now.AddMonths(1).Year, false, false)
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year), (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddDays(-1), DateTime.Now, true, false),
+                new Domain.ValueObjects.CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(2, (short)DateTime.Now.AddMonths(1).Year), (byte)DateTime.Now.AddMonths(1).Month, (short)DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).AddDays(-1), DateTime.Now.AddMonths(1), false, false)
             };
 
             _mockCollectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(_collectionPeriods));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), _collectionPeriods));
 
             _sut = new Data.ApprenticeApplicationDataRepository(new Lazy<EmployerIncentivesDbContext>(_context), _mockDateTimeService.Object, _mockCollectionCalendarService.Object);
         }
@@ -76,13 +77,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].PausePayments = false;
             incentives[0].MinimumAgreementVersion = allAccounts[0].SignedAgreementVersion;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -98,7 +92,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
 
             _context.SaveChanges();
 
@@ -122,7 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             {
                 LearnerMatchFound = false,
                 PaymentAmount = pendingPayments[1].Amount,
-                PaymentDate = DateTime.Parse("01-01-2021", new CultureInfo("en-GB")),
+                PaymentDate = new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, 27),
                 PaymentSentIsEstimated = true,  // update when implementing EI-827
                 RequiresNewEmployerAgreement = false
             };
@@ -145,13 +138,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
             incentives[0].PausePayments = false;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -163,11 +149,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            incentives[0].PendingPayments = pendingPayments;            
+            incentives[0].PendingPayments = pendingPayments;
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
 
             _context.SaveChanges();
 
@@ -175,7 +160,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
-            foreach(var application in result)
+            foreach (var application in result)
             {
                 application.FirstPaymentStatus.LearnerMatchFound.Should().BeFalse();
                 application.SecondPaymentStatus.LearnerMatchFound.Should().BeFalse();
@@ -203,13 +188,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -229,7 +207,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -242,7 +219,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             application.FirstPaymentStatus.LearnerMatchFound.Should().BeFalse();
             application.SecondPaymentStatus.LearnerMatchFound.Should().BeFalse();
         }
-        
+
         [Test]
         public async Task Then_learner_match_found_is_true_if_learner_record_with_match()
         {
@@ -257,13 +234,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -285,7 +255,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -314,13 +283,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -341,7 +303,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -370,13 +331,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -397,7 +351,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -425,13 +378,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -453,7 +399,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -481,13 +426,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -520,7 +458,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -547,13 +484,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -587,7 +517,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -615,13 +544,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -629,7 +551,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
                 .CreateMany(2).ToList();
 
-            pendingPayments[0].DueDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month,4);
+            pendingPayments[0].DueDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 4);
             pendingPayments[0].EarningType = EarningType.FirstPayment;
             pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
@@ -643,7 +565,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -671,13 +592,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -685,7 +599,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
                 .CreateMany(2).ToList();
 
-            pendingPayments[0].DueDate = _collectionPeriods.Single(p => p.PeriodNumber == 1).OpenDate.AddDays(-1);
+            pendingPayments[0].DueDate = _collectionPeriods.Single(p => p.CollectionPeriod.PeriodNumber == 1).OpenDate.AddDays(-1);
             pendingPayments[0].EarningType = EarningType.FirstPayment;
             pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
@@ -699,7 +613,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -709,8 +622,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.PaymentDate.Value.Year.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).AcademicYear);
-            application.FirstPaymentStatus.PaymentDate.Value.Month.Should().Be(_collectionPeriods.Single(p => p.PeriodNumber == 2).CalendarMonth);
+            application.FirstPaymentStatus.PaymentDate.Value.Year.Should().Be(_collectionPeriods.Single(p => p.CollectionPeriod.PeriodNumber == 2).CollectionPeriod.AcademicYear);
+            application.FirstPaymentStatus.PaymentDate.Value.Month.Should().Be(_collectionPeriods.Single(p => p.CollectionPeriod.PeriodNumber == 2).CalendarMonth);
             application.FirstPaymentStatus.PaymentDate.Value.Day.Should().Be(27);
         }
 
@@ -728,13 +641,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -765,7 +671,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -793,13 +698,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
-
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
                 .With(p => p.AccountId, accountId)
@@ -821,7 +719,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
@@ -836,6 +733,699 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
         [Test]
         public async Task Then_first_payment_is_estimated_when_the_payment_does_not_exist()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.PaymentSentIsEstimated.Should().BeTrue();
+        }
+
+        [Test()]
+        public async Task Then_first_payment_is_estimated_when_the_payment_has_not_been_made()
+        {
+            for (int i = 1; i < 31; i++)
+            {
+                await Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, false, true);
+            }
+            Assert.Pass();
+        }
+
+        [Test()]
+        public async Task Then_first_payment_is_not_estimated_when_the_payment_has_been_made_and_the_current_date_is_day_27_or_greater()
+        {
+            for (int i = 27; i < 31; i++)
+            {
+                await Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, false);
+            }
+            Assert.Pass();
+        }
+
+        [Test()]
+        public async Task Then_first_payment_is_estimated_when_the_payment_has_been_made_and_the_current_date_is_less_than_day_27()
+        {
+            for (int i = 1; i < 27; i++)
+            {
+                await Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, true);
+            }
+            Assert.Pass();
+        }
+        private async Task Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(
+            int day,
+            bool paymentMade,
+            bool expected)
+        {
+            // Arrange            
+            _context = new EmployerIncentivesDbContext(_options);
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
+                .CreateMany(2).ToList();
+
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            var payments = _fixture
+                .Build<Payment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .CreateMany(2).ToList();
+
+            _mockDateTimeService.Setup(m => m.Now()).Returns(new DateTime(pendingPayments[0].DueDate.Year, 1, day));
+            if (!paymentMade)
+            {
+                payments[0].PaidDate = null;
+            }
+            else
+            {
+                payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payments[0].PaidDate.Value.Day);
+            }
+
+            incentives[0].PendingPayments = pendingPayments;
+            incentives[0].Payments = payments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.PaymentSentIsEstimated.Should().Be(expected);
+        }
+
+        [Test]
+        public async Task Then_first_payment_is_not_sent_if_the_payment_record_has_not_been_created()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.Learners.AddRange(learners);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.PaymentSent.Should().BeFalse();
+        }
+
+        [TestCase(null, null, true)]
+        [TestCase(null, 1, true)]
+        [TestCase(1, null, false)]
+        [TestCase(1, 1, false)]
+        [TestCase(1, 2, true)]
+        [TestCase(2, 1, false)]
+        public async Task Then_requires_new_employer_agreement_is_set(int? accountVersion, int? incentiveVersion, bool requiresNewVersion)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+            allAccounts[0].SignedAgreementVersion = accountVersion;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(1).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+            incentives[0].MinimumAgreementVersion = incentiveVersion;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .CreateMany(2).ToList();
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result[0].FirstPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
+            result[0].SecondPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
+        }
+
+        [TestCase(false, false, false, null, null)]
+        [TestCase(false, true, false, null, null)]
+        [TestCase(false, true, true, null, null)]
+        [TestCase(true, false, false, true, null)]
+        [TestCase(true, true, false, false, true)]
+        [TestCase(true, true, true, false, false)]
+        public async Task Then_payment_isStopped_is_set(
+            bool apprenticehipStopped,
+            bool hasFirstPaymentStatus,
+            bool hasSecondPaymentStatus,
+            bool? firstPaymentStatusPaymentIsStopped,
+            bool? secondPaymentStatusPaymentIsStopped)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, apprenticehipStopped ? IncentiveStatus.Stopped : IncentiveStatus.Active)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>();
+
+            if (hasFirstPaymentStatus)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Create());
+            }
+
+            if (hasSecondPaymentStatus)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.SecondPayment)
+                .Create());
+            }
+
+            incentive.PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            if (firstPaymentStatusPaymentIsStopped != null)
+            {
+                result[0].FirstPaymentStatus.PaymentIsStopped.Should().Be(firstPaymentStatusPaymentIsStopped.Value);
+            }
+            if (secondPaymentStatusPaymentIsStopped != null)
+            {
+                result[0].SecondPaymentStatus.PaymentIsStopped.Should().Be(secondPaymentStatusPaymentIsStopped.Value);
+            }
+        }
+
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public async Task Then_withdrawn_by_employer_is_set(
+            bool hasFirstPayment,
+            bool withdrawnByEmployer)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Withdrawn)
+                .With(p => p.WithdrawnBy, withdrawnByEmployer ? WithdrawnBy.Employer : WithdrawnBy.Compliance)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>();
+
+            if (hasFirstPayment)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Create());
+            }
+
+            incentive.PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            if (!hasFirstPayment)
+            {
+                result[0].FirstPaymentStatus.WithdrawnByEmployer.Should().Be(withdrawnByEmployer);
+            }
+            else
+            {
+                result[0].SecondPaymentStatus.WithdrawnByEmployer.Should().Be(withdrawnByEmployer);
+            }
+        }
+
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public async Task Then_withdrawn_by_compliance_is_set(
+            bool hasFirstPayment,
+            bool withdrawnByCompliance)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Withdrawn)
+                .With(p => p.WithdrawnBy, withdrawnByCompliance ? WithdrawnBy.Compliance : WithdrawnBy.Employer)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>();
+
+            if (hasFirstPayment)
+            {
+                pendingPayments.Add(
+                    _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.EarningType, EarningType.FirstPayment)
+                .Create());
+            }
+
+            incentive.PendingPayments = pendingPayments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            if (!hasFirstPayment)
+            {
+                result[0].FirstPaymentStatus.WithdrawnByCompliance.Should().Be(withdrawnByCompliance);
+            }
+            else
+            {
+                result[0].SecondPaymentStatus.WithdrawnByCompliance.Should().Be(withdrawnByCompliance);
+            }
+        }
+
+        [Test]
+        public async Task Then_clawback_status_is_populated_if_first_payment_clawed_back()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Active)
+                .Create();
+
+            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
+                .With(p => p.IncentiveApplicationId, incentive.Id)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>
+            {
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.ClawedBack, true)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.ClawedBack, false)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .Create()
+            };
+
+            var payment = _fixture
+                .Build<Payment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .With(p => p.PaidDate, new DateTime(2021, 1, 1))
+                .Create();
+            payment.PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payment.PaidDate.Value.Day);
+
+            var clawback = _fixture.Build<ClawbackPayment>()
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.AccountId, accountId)
+                .With(p => p.PaymentId, payment.Id)
+                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .Create();
+
+            incentive.PendingPayments = pendingPayments;
+            incentive.Payments = new List<Payment> { payment };
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+            _context.ApplicationApprenticeships.AddRange(apprenticeship);
+            _context.ClawbackPayments.AddRange(clawback);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Length.Should().Be(1);
+            result[0].FirstClawbackStatus.Should().NotBeNull();
+            result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
+            result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
+            result[0].FirstClawbackStatus.OriginalPaymentDate.Should().Be(payment.PaidDate.Value);
+        }
+
+        [Test]
+        public async Task Then_clawback_status_is_populated_if_second_payment_clawed_back()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Active)
+                .Create();
+
+            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
+                .With(p => p.IncentiveApplicationId, incentive.Id)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>
+            {
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .With(p => p.ClawedBack, true)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .With(p => p.ClawedBack, false)
+                    .Create()
+            };
+
+            var payments = _fixture
+                .Build<Payment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.PendingPaymentId, pendingPayments[1].Id)
+                .With(p => p.PaidDate, new DateTime(2021, 1, 1))
+                .CreateMany(2).ToList();
+            payments[1].PaidDate = new DateTime(pendingPayments[1].DueDate.Year, 1, payments[1].PaidDate.Value.Day);
+
+            var clawback = _fixture.Build<ClawbackPayment>()
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.AccountId, accountId)
+                .With(p => p.PaymentId, payments[1].Id)
+                .With(p => p.PendingPaymentId, pendingPayments[1].Id)
+                .Create();
+
+            incentive.PendingPayments = pendingPayments;
+            incentive.Payments = payments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+            _context.ApplicationApprenticeships.AddRange(apprenticeship);
+            _context.ClawbackPayments.AddRange(clawback);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Length.Should().Be(1);
+            result[0].SecondClawbackStatus.Should().NotBeNull();
+            result[0].SecondClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
+            result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
+            result[0].SecondClawbackStatus.OriginalPaymentDate.Should().Be(payments[1].PaidDate.Value);
+        }
+
+        [Test]
+        public async Task Then_clawback_date_is_not_populated_if_first_payment_clawed_back_but_not_set()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.Status, IncentiveStatus.Active)
+                .Create();
+
+            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
+                .With(p => p.IncentiveApplicationId, incentive.Id)
+                .Create();
+
+            var pendingPayments = new List<PendingPayment>
+            {
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.ClawedBack, true)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.ClawedBack, false)
+                    .Create(),
+                _fixture
+                    .Build<PendingPayment>()
+                    .With(p => p.AccountId, accountId)
+                    .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .Create()
+            };
+
+            var payments = _fixture
+                .Build<Payment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .With(p => p.PaidDate, new DateTime(2021, 1, 1))
+                .CreateMany(2).ToList();
+            payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payments[0].PaidDate.Value.Day);
+
+            DateTime? nullClawbackDate = null;
+            var clawback = _fixture.Build<ClawbackPayment>()
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
+                .With(p => p.AccountId, accountId)
+                .With(p => p.PaymentId, payments[0].Id)
+                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
+                .With(p => p.DateClawbackSent, nullClawbackDate)
+                .Create();
+
+            incentive.PendingPayments = pendingPayments;
+            incentive.Payments = payments;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentive);
+            _context.ApplicationApprenticeships.AddRange(apprenticeship);
+            _context.ClawbackPayments.AddRange(clawback);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Length.Should().Be(1);
+            result[0].FirstClawbackStatus.Should().NotBeNull();
+            result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
+            result[0].FirstClawbackStatus.ClawbackDate.Should().BeNull();
+            result[0].FirstClawbackStatus.OriginalPaymentDate.Should().Be(payments[0].PaidDate.Value);
+        }
+
+        [Test]
+        public async Task Then_second_payment_is_estimated_when_the_payment_does_not_exist()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -886,40 +1476,40 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.PaymentSentIsEstimated.Should().BeTrue();
+            application.SecondPaymentStatus.PaymentSentIsEstimated.Should().BeTrue();
         }
-        
+
         [Test()]
-        public async Task Then_first_payment_is_estimated_when_the_payment_has_not_been_made()
+        public async Task Then_second_payment_is_estimated_when_the_payment_has_not_been_made()
         {
             for (int i = 1; i < 31; i++)
             {
-                await Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, false, true);
+                await Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, false, true);
             }
             Assert.Pass();
         }
 
         [Test()]
-        public async Task Then_first_payment_is_not_estimated_when_the_payment_has_been_made_and_the_current_date_is_day_27_or_greater()
+        public async Task Then_second_payment_is_not_estimated_when_the_payment_has_been_made_and_the_current_date_is_day_27_or_greater()
         {
             for (int i = 27; i < 31; i++)
             {
-                await Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, false);
+                await Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, false);
             }
             Assert.Pass();
         }
 
         [Test()]
-        public async Task Then_first_payment_is_estimated_when_the_payment_has_been_made_and_the_current_date_is_less_than_day_27()
+        public async Task Then_second_payment_is_estimated_when_the_payment_has_been_made_and_the_current_date_is_less_than_day_27()
         {
-            for(int i = 1; i < 27; i++ )
+            for (int i = 1; i < 27; i++)
             {
-                await Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, true);
+                await Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(i, true, true);
             }
             Assert.Pass();
         }
-        private async Task Then_first_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(
-            int day, 
+        private async Task Then_second_payment_is_as_expected_for_the_payment_and_the_calculated_date_is_set(
+            int day,
             bool paymentMade,
             bool expected)
         {
@@ -948,6 +1538,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -959,18 +1550,20 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(p => p.PendingPaymentId, pendingPayments[0].Id)
                 .CreateMany(2).ToList();
 
-            _mockDateTimeService.Setup(m => m.Now()).Returns(new DateTime(pendingPayments[0].DueDate.Year, 1, day));            
+            payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, pendingPayments[0].DueDate.Month, payments[0].PaidDate.Value.Day);
+
+            _mockDateTimeService.Setup(m => m.Now()).Returns(new DateTime(pendingPayments[1].DueDate.Year, 12, day));
             if (!paymentMade)
             {
-                payments[0].PaidDate = null;
+                payments[1].PaidDate = null;
             }
             else
             {
-                payments[0].PaidDate = new DateTime(pendingPayments[0].DueDate.Year, 1, payments[0].PaidDate.Value.Day);
+                payments[1].PaidDate = new DateTime(pendingPayments[1].DueDate.Year, 12, payments[1].PaidDate.Value.Day);
             }
+            payments[1].PendingPaymentId = pendingPayments[1].Id;
 
             incentives[0].PendingPayments = pendingPayments;
             incentives[0].Payments = payments;
@@ -992,33 +1585,30 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.PaymentSentIsEstimated.Should().Be(expected);
+            application.SecondPaymentStatus.PaymentSentIsEstimated.Should().Be(expected);
         }
 
-        [TestCase(null, null, true)]
-        [TestCase(null, 1, true)]
-        [TestCase(1, null, false)]
-        [TestCase(1, 1, false)]
-        [TestCase(1, 2, true)]
-        [TestCase(2, 1, false)]
-        public async Task Then_requires_new_employer_agreement_is_set(int? accountVersion, int? incentiveVersion, bool requiresNewVersion)
+        [Test]
+        public async Task Then_second_payment_is_not_sent_if_the_payment_record_has_not_been_created()
         {
             // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
             var accountId = _fixture.Create<long>();
             var accountLegalEntityId = _fixture.Create<long>();
 
             allAccounts[0].Id = accountId;
             allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
-            allAccounts[0].SignedAgreementVersion = accountVersion;
 
-            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(1).ToArray();
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
             incentives[0].AccountId = accountId;
             incentives[0].AccountLegalEntityId = accountLegalEntityId;
-            incentives[0].MinimumAgreementVersion = incentiveVersion;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(1).ToArray();
-            allApprenticeships[0].IncentiveApplicationId = incentives[0].Id;
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
             var pendingPayments = _fixture
                 .Build<PendingPayment>()
@@ -1026,14 +1616,22 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
                 .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
 
             incentives[0].PendingPayments = pendingPayments;
 
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].InLearning = false;
+
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+            _context.Learners.AddRange(learners);
 
             _context.SaveChanges();
 
@@ -1041,87 +1639,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
-            result[0].FirstPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
-            result[0].SecondPaymentStatus.RequiresNewEmployerAgreement.Should().Be(requiresNewVersion);
-        }
-
-        [TestCase(false, false, false, null, null)]
-        [TestCase(false, true, false, null, null)]
-        [TestCase(false, true, true, null, null)]
-        [TestCase(true, false, false, true, null)]
-        [TestCase(true, true, false, false, true)]
-        [TestCase(true, true, true, false, false)]
-        public async Task Then_payment_isStopped_is_set(
-            bool apprenticehipStopped, 
-            bool hasFirstPaymentStatus, 
-            bool hasSecondPaymentStatus, 
-            bool? firstPaymentStatusPaymentIsStopped, 
-            bool? secondPaymentStatusPaymentIsStopped)
-        {
-            // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
-            var accountId = _fixture.Create<long>();
-            var accountLegalEntityId = _fixture.Create<long>();
-
-            allAccounts[0].Id = accountId;
-            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
-
-            var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.Status, apprenticehipStopped? IncentiveStatus.Stopped: IncentiveStatus.Active)
-                .Create();
-
-            var apprenticeship = _fixture.Build<Models.IncentiveApplicationApprenticeship>()
-                .With(p => p.IncentiveApplicationId, incentive.Id)
-                .Create();
-
-            var pendingPayments = new List<PendingPayment>();
-
-            if (hasFirstPaymentStatus)
-            {
-                pendingPayments.Add(
-                    _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
-                .With(p => p.EarningType, EarningType.FirstPayment)
-                .Create());                
-            }
-
-            if (hasSecondPaymentStatus)
-            {
-                pendingPayments.Add(
-                    _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
-                .With(p => p.EarningType, EarningType.SecondPayment)
-                .Create());
-            }
-           
-            incentive.PendingPayments = pendingPayments;
-
-            _context.Accounts.AddRange(allAccounts);
-            _context.ApprenticeshipIncentives.AddRange(incentive);
-            _context.ApplicationApprenticeships.AddRange(apprenticeship);
-
-            _context.SaveChanges();
-
-            // Act
-            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
-
-            // Assert
-            if (firstPaymentStatusPaymentIsStopped != null)
-            {
-                result[0].FirstPaymentStatus.PaymentIsStopped.Should().Be(firstPaymentStatusPaymentIsStopped.Value);
-            }
-            if (secondPaymentStatusPaymentIsStopped != null)
-            {
-                result[0].SecondPaymentStatus.PaymentIsStopped.Should().Be(secondPaymentStatusPaymentIsStopped.Value);
-            }
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.SecondPaymentStatus.PaymentSent.Should().BeFalse();
         }
     }
 }
