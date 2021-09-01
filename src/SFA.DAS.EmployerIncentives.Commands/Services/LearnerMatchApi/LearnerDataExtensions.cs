@@ -75,7 +75,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
             var hasLock = data
                .PaymentsForApprenticeship(incentive.Apprenticeship.Id, nextPayment.DueDate)
-               .Any(p => p.Period == nextPayment.CollectionPeriod?.PeriodNumber && !p.IsPayable);
+               .Any(p => p.Period == nextPayment.CollectionPeriod?.PeriodNumber 
+                         && data.AcademicYear == nextPayment.CollectionPeriod?.AcademicYear
+                         && !p.IsPayable);
 
             return hasLock;
         }

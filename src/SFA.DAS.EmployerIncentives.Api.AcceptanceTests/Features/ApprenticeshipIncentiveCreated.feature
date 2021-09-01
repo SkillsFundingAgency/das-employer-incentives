@@ -31,3 +31,10 @@ Scenario: Apprenticeship incentive submitted within 21 days of first payment due
 	Given an apprenticeship incentive exists with a payment due within the delay period
 	When the apprenticeship incentive earnings are calculated
 	Then the first pending payment is due at the end of the delay period
+
+Scenario: Incentive application is submitted for withdrawn apprenticeship
+	Given an existing withdrawn incentive
+	And an employer is re-applying for apprenticeship incentive
+	When they submit the application
+	Then the apprenticeship incentive is created for each apprenticeship in the application
+	And original withdrawn incentive is retained
