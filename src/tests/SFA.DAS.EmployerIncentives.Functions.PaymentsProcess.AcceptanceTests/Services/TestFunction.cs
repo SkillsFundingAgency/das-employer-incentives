@@ -47,7 +47,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             _testContext = testContext;
 
-            var paymentProfiles = new IncentivePaymentProfilesService().Get().GetAwaiter().GetResult();
             _host = new HostBuilder()
                 .ConfigureAppConfiguration(a =>
                     {

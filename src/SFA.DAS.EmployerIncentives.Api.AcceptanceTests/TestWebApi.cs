@@ -10,8 +10,6 @@ using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using SFA.DAS.EmployerIncentives.Commands.Services;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -22,7 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly Dictionary<string, string> _config;
         private readonly IHook<object> _eventMessageHook;
         private readonly IHook<ICommand> _commandMessageHook;
-        private readonly IEnumerable<IncentivePaymentProfile> _paymentProfiles;
 
         public TestWebApi(TestContext context, IHook<object> eventMessageHook, IHook<ICommand> commandMessageHook)
         {
@@ -40,8 +37,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ApplicationSettings:NServiceBusEndpointName", _context.InstanceId },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
-
-            _paymentProfiles = new IncentivePaymentProfilesService().Get().GetAwaiter().GetResult();
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
