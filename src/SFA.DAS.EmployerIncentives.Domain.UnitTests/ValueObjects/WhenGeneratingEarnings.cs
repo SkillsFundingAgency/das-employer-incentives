@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                 })
                 .Build();
 
-            _mockIncentivePaymentProfileService.Setup(m => m.Get()).ReturnsAsync(_incentivePaymentProfiles);
+            _mockIncentivePaymentProfileService.Setup(m => m.Get()).Returns(_incentivePaymentProfiles);
         }
 
         // ReSharper disable InconsistentNaming

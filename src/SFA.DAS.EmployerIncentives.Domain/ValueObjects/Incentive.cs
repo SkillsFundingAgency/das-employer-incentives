@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             ApprenticeshipIncentive incentive,            
             IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
+            var paymentProfiles = incentivePaymentProfilesService.Get();
 
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings);            
         }        
@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             IncentiveApplicationApprenticeshipDto incentiveApplication,
             IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
+            var paymentProfiles = incentivePaymentProfilesService.Get();
             return Create(incentiveApplication.Phase, incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, new List<BreakInLearning>());
         }
 

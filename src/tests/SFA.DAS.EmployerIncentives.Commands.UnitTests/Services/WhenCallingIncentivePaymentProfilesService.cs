@@ -20,9 +20,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services
         }
 
         [Test]
-        public async Task Then_the_payment_profiles_should_contain_values_for_employer_incentives_phases()
+        public void Then_the_payment_profiles_should_contain_values_for_employer_incentives_phases()
         {
-            var result = (await _sut.Get()).ToList();
+            var result = _sut.Get().ToList();
 
             result.Count.Should().Be(2);
             var phase1 = result.FirstOrDefault(x => x.IncentivePhase.Identifier == Phase.Phase1);

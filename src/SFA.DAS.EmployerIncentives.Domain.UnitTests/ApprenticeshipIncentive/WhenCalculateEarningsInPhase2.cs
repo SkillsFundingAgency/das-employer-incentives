@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(_collectionCalendar);
 
             _mockPaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
-            _mockPaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(_paymentProfiles);
+            _mockPaymentProfilesService.Setup(m => m.Get()).Returns(_paymentProfiles);
 
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Status, IncentiveStatus.Active)

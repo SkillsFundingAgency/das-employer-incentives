@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                 })
                 .Build();
 
-            _mockIncentivePaymentProfileService.Setup(m => m.Get()).ReturnsAsync(_incentivePaymentProfiles);
+            _mockIncentivePaymentProfileService.Setup(m => m.Get()).Returns(_incentivePaymentProfiles);
         }        
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]

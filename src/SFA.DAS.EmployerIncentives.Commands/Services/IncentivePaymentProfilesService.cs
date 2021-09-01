@@ -9,9 +9,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
 {
     public class IncentivePaymentProfilesService : IIncentivePaymentProfilesService
     {
-        public Task<IEnumerable<IncentivePaymentProfile>> Get()
+        public IEnumerable<IncentivePaymentProfile> Get()
         {
-            var incentivePaymentProfiles = new List<IncentivePaymentProfile>
+            return new List<IncentivePaymentProfile>
             {
                 new IncentivePaymentProfile(new IncentivePhase(Phase.Phase1),
                     new List<PaymentProfile>
@@ -30,8 +30,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services
                         new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1500)
                     }),
             };
-
-            return Task.FromResult(incentivePaymentProfiles.AsEnumerable());
         }
     }
 }

@@ -147,7 +147,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             };
 
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), collectionPeriods));
-            _mockIncentivePaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
+            _mockIncentivePaymentProfilesService.Setup(m => m.Get()).Returns(paymentProfiles);
 
             await incentive.CalculateEarnings(_mockIncentivePaymentProfilesService.Object, _mockCollectionCalendarService.Object);
 
