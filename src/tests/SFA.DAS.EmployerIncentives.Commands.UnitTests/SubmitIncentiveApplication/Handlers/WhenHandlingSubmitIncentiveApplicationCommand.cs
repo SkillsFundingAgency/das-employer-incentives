@@ -123,8 +123,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
 
         [TestCase("2021-03-31", true)]
         [TestCase("2021-04-01", false)]
-        [TestCase("2021-09-30", false)]
-        [TestCase("2021-10-01", true)]
+        [TestCase("2021-11-30", false)]
+        [TestCase("2021-12-01", true)]
         public async Task Then_application_with_ineligible_employment_start_date_is_removed(DateTime employmentStartdate, bool isRemoved)
         {
             //Arrange
