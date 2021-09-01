@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
+ 
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
@@ -24,7 +24,7 @@
     <PackageReference Include="SpecFlow.NUnit" Version="3.5.14" />
     <PackageReference Include="WireMock.Net" Version="1.2.12" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Api\SFA.DAS.EmployerIncentives.Api.csproj" />
@@ -82,7 +82,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
     </Compile>
-
+    
   </ItemGroup>
 
   <ItemGroup>
