@@ -41,14 +41,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentProfiles = await incentivePaymentProfilesService.Get();
 
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings);            
-        }        
-
-        public static async Task<Incentive> Create(
-            IncentiveApplicationApprenticeshipDto incentiveApplication,
-            IIncentivePaymentProfilesService incentivePaymentProfilesService)
-        {
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
-            return Create(incentiveApplication.Phase, incentiveApplication.DateOfBirth, incentiveApplication.PlannedStartDate, paymentProfiles, new List<BreakInLearning>());
         }
 
         public static bool EmployerStartDateIsEligible(Phase phase, Apprenticeship apprenticeship)
@@ -176,7 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
 
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
-        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
+        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 11, 30);
 
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
 
