@@ -130,7 +130,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             //Arrange
             var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
                 _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), employmentStartdate);
+                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), employmentStartdate, Phase.Phase2);
 
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             incentiveApplication.SetApprenticeships(new List<Apprenticeship> { apprentice });
