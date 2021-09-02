@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly ApprenticeshipIncentive _incentive;
         private readonly LearnerSubmissionDto _lerner;
         private DateTime _expectedStopDate;
+        private readonly DateTime _endDate;
 
         public RefreshLearnerDataDuringAcademicYearRolloverSteps(TestContext context)
         {
@@ -46,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.Phase, Phase.Phase2)
                 .Create();
 
+            _endDate = DateTime.Parse("2021-07-31T00:00:00");
             _lerner = _fixture
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _incentive.UKPRN)
@@ -58,6 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             _fixture.Build<PriceEpisodeDto>()
                                 .With(x => x.AcademicYear,"2021")
                                 .With(x => x.StartDate, DateTime.Parse("2020-08-01T00:00:00"))
+                                .With(x => x.EndDate, _endDate)
                                 .With(pe => pe.Periods, new List<PeriodDto>{
                                     _fixture.Build<PeriodDto>()
                                         .With(period => period.ApprenticeshipId, _incentive.ApprenticeshipId)
@@ -94,21 +97,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await StartLearnerMatching();
         }
 
-        [When(@"the end date of the most recent price episode has no periods")]
-        public void WhenTheEndDateOfTheMostRecentPriceEpisodeHasNoPeriods()
+        [When(@"the most recent price episode has no periods")]
+        public void WhenTheMostRecentPriceEpisodeHasNoPeriods()
         {
-            var start = DateTime.Parse("2021-08-01T00:00:00");
-            var end = DateTime.Parse("2021-08-10T00:00:00");
             var episode = _fixture.Build<PriceEpisodeDto>()
                 .With(x => x.AcademicYear, "2122")
-                .With(x => x.StartDate, start)
-                .With(x => x.EndDate, end)
+                .With(x => x.StartDate, DateTime.Parse("2021-08-01T00:00:00"))
+                .With(x => x.EndDate, DateTime.Parse("2021-08-10T00:00:00"))
                 .With(pe => pe.Periods, new List<PeriodDto>())
                 .Create();
 
             _lerner.Training.First().PriceEpisodes.Add(episode);
-
-            _expectedStopDate = end.AddDays(1);
         }
 
         [When(@"the previous price episode has a period with a matching apprenticeship ID")]
@@ -120,12 +119,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"trigger a learning stopped Change of Circumstance")]
         public async Task ThenTriggerALearningStoppedChangeOfCircumstance()
         {
+            _lerner.IlrSubmissionDate = _lerner.IlrSubmissionDate.AddMonths(1);
             SetupMockLearnerMatchResponse();
             await StartLearnerMatching();
         }
         
         [Then(@"record the learning stopped date as the day after the previous price episode end date")]
         public async Task ThenRecordTheLearningStoppedDateAsTheDayAfterThePreviousPriceEpisodeEndDate()
+        {
+            await using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
+            var learner = (await dbConnection.GetAllAsync<Learner>()).Single(l => l.ApprenticeshipIncentiveId == _incentive.Id);
+
+            _expectedStopDate = _endDate.AddDays(1);
+            learner.LearningStoppedDate.Should().Be(_expectedStopDate);
+        }
+
+        [When(@"the previous price episode has null end date")]
+        public void WhenThePreviousPriceEpisodeHasNullEndDate()
+        {
+            _lerner.Training.Single().PriceEpisodes.First(pe => pe.Periods.Any()).EndDate = null;
+        }
+
+        [Then(@"record the learning stopped date as the day after the Census Date of the active period")]
+        public async Task ThenRecordTheLearningStoppedDateAsTheDayAfterTheCensusDateOfTheActivePeriod()
         {
             await using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
             var learner = (await dbConnection.GetAllAsync<Learner>()).Single(l => l.ApprenticeshipIncentiveId == _incentive.Id);
