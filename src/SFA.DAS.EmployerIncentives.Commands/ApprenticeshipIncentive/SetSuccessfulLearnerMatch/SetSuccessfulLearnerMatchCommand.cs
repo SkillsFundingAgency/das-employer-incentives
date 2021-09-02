@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccess
         {
             get
             {
-                var message = $"ApprenticeshipIncentive SetSuccessfulLearnerMatchExecutionCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, ULN {Uln}, Succeeded {Succeeded} ";
+                var message = $"ApprenticeshipIncentive SetSuccessfulLearnerMatchCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, ULN {Uln}, Succeeded {Succeeded} ";
                 return new Log
                 {
                     OnProcessing = () => message,
