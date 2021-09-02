@@ -6,10 +6,8 @@
             "type": "string",
             "defaultValue": ""
         },
-        "backendAccessRestrictions": {
-            "type": "array",
-            "defaultValue": [
-            ]
+        "backEndAccessRestrictions": {
+            "type": "array"
         },
         "configNames": {
             "type": "string",
@@ -267,7 +265,7 @@
                         "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference('api-app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     },
                     "ipSecurityRestrictions": {
-                        "value": "[parameters('backendAccessRestrictions')]"
+                        "value": "[parameters('backEndAccessRestrictions')]"
                     }
                 }
             },

@@ -84,6 +84,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
+        [Given(@"an existing withdrawn incentive")]
+        public async Task GivenAnExistingWithdrawnIncentive()
+        {
+            _apprenticeshipIncentive.Status = IncentiveStatus.Withdrawn;
+            _apprenticeshipIncentive.IncentiveApplicationApprenticeshipId = Guid.NewGuid();
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive, true);
+        }
+
+        [Given(@"an employer is re-applying for apprenticeship incentive")]
+        public async Task GivenAnEmployerIsRe_ApplyingForApprenticeshipIncentive()
+        {
+            _apprenticeshipsModels.RemoveRange(1, _apprenticeshipsModels.Count - 1);
+            await GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive();
+        }
+
         [Given(@"an employer has submitted an application")]
         public async Task GivenAnEmployerHasSubmittedAnApplication()
         {
@@ -135,6 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [When(@"the apprenticeship incentive is created for each apprenticeship in the application")]
+        [Then(@"the apprenticeship incentive is created for each apprenticeship in the application")]
         public async Task WhenTheApprenticeshipIncentiveIsCreatedForEachApprenticeshipInTheApplication()
         {
             foreach (var apprenticeship in _apprenticeshipsModels)
@@ -159,7 +176,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
-        
 
         [When(@"the apprenticeship incentive earnings are calculated")]
         public async Task WhenTheApprenticeshipIncentiveEarningsAreCalculated()
@@ -276,5 +292,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.EarningsCalculated.Should().BeTrue();
             }
         }
+
+        [Then(@"original withdrawn incentive is retained")]
+        public void ThenOriginalWithdrawnIncentiveIsRetained()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var incentives = dbConnection.GetAll<ApprenticeshipIncentive>().ToList();
+            incentives.Count().Should().Be(2);
+            incentives.Count(a => a.Status == IncentiveStatus.Withdrawn).Should().Be(1);
+            incentives.Count(a => a.Status == IncentiveStatus.Active).Should().Be(1);
+        }
+
     }
 }
