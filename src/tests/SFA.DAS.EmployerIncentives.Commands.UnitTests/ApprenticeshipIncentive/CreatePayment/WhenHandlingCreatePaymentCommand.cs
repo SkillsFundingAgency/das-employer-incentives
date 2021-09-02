@@ -15,7 +15,6 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using LegalEntity = SFA.DAS.EmployerIncentives.Domain.Accounts.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CreatePayment
@@ -25,7 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private CreatePaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfilesService;
         private Fixture _fixture;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private Domain.ValueObjects.CollectionPeriod _firstCollectionPeriod;
@@ -61,7 +59,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
-            _mockIncentivePaymentProfilesService = new Mock<IIncentivePaymentProfilesService>();
 
             _incentive = await ApprenticeshipIncentiveCreator();
 
@@ -132,8 +129,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
-            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-
             var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
                 new CollectionCalendarPeriod(
@@ -147,9 +142,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             };
 
             _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), collectionPeriods));
-            _mockIncentivePaymentProfilesService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
 
-            await incentive.CalculateEarnings(_mockIncentivePaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+            await incentive.CalculateEarnings(_mockCollectionCalendarService.Object);
 
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();

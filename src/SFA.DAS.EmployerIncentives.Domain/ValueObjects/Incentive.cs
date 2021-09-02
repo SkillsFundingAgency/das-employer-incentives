@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using Apprenticeship = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Apprenticeship;
 
@@ -23,25 +20,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public abstract bool IsEligible { get; }
+        public abstract List<PaymentProfile> PaymentProfiles { get; }
 
         protected Incentive(
             DateTime dateOfBirth, 
             DateTime startDate,
-            IEnumerable<PaymentProfile> paymentProfiles,
+            IncentiveType incentiveType,
             IReadOnlyCollection<BreakInLearning> breaksInLearning)
         {
             _dateOfBirth = dateOfBirth;
             StartDate = startDate;
-            _payments = Generate(paymentProfiles, breaksInLearning);
+            _payments = Generate(incentiveType, breaksInLearning);
         }
         
-        public static async Task<Incentive> Create(
-            ApprenticeshipIncentive incentive,            
-            IIncentivePaymentProfilesService incentivePaymentProfilesService)
+        public static Incentive Create(
+            ApprenticeshipIncentive incentive)
         {
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
-
-            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings);            
+            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, incentive.BreakInLearnings);            
         }
 
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
@@ -59,8 +54,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return dateOfBirth.AgeOnThisDay(startDate);
         }
 
-        protected List<Payment> Generate(IEnumerable<PaymentProfile> paymentProfiles, IReadOnlyCollection<BreakInLearning> breaksInLearning)
+        protected List<Payment> Generate(IncentiveType incentiveType, IReadOnlyCollection<BreakInLearning> breaksInLearning)
         {
+            var paymentProfiles = PaymentProfiles.Where(x => x.IncentiveType == incentiveType).ToList();
+            if (!paymentProfiles.Any())
+            {
+                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
+            }
+
             var payments = new List<Payment>();
             if (!IsEligible) return payments;
 
@@ -91,32 +92,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             Phase phase,
             DateTime dateOfBirth,
             DateTime startDate,
-            IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles,
             IReadOnlyCollection<BreakInLearning> breaksInLearning)
         {
-            var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
-
-            if (incentivePaymentProfile?.PaymentProfiles == null)
-            {
-                throw new MissingPaymentProfileException($"Incentive Payment profile not found for IncentivePhase {phase}");
-            }
 
             var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
-            var paymentProfiles = incentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).ToList();
-
-            if (!paymentProfiles.Any())
-            {
-                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
-            }
-
             if (phase == Phase.Phase1)
             {
-                return new Phase1Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning);
+                return new Phase1Incentive(dateOfBirth, startDate, incentiveType, breaksInLearning);
             }
             else if (phase == Phase.Phase2)
             {
-                return new Phase2Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning);
+                return new Phase2Incentive(dateOfBirth, startDate, incentiveType, breaksInLearning);
             }
 
             return null; // wouldn't get here
@@ -128,14 +115,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public Phase1Incentive(
             DateTime dateOfBirth,
             DateTime startDate,
-            IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breaksInLearning) : base(dateOfBirth, startDate, paymentProfiles, breaksInLearning)
+            IncentiveType incentiveType,
+            IReadOnlyCollection<BreakInLearning> breaksInLearning) : base(dateOfBirth, startDate, incentiveType, breaksInLearning)
         {
         }
 
         public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
         public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
+
+        public override List<PaymentProfile> PaymentProfiles =>
+            new List<PaymentProfile>
+            {
+                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 1000),
+                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1000),
+                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 750),
+                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 750)
+            };
 
         private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
         {
@@ -164,8 +160,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public Phase2Incentive(
             DateTime dateOfBirth,
             DateTime startDate,
-            IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
+            IncentiveType incentiveType,
+            IReadOnlyCollection<BreakInLearning> breakInLearningDayCount) : base(dateOfBirth, startDate, incentiveType, breakInLearningDayCount)
         {
         }
 
@@ -176,6 +172,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 11, 30);
 
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
+
+        public override List<PaymentProfile> PaymentProfiles =>
+            new List<PaymentProfile>
+            {
+                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 1500),
+                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1500),
+                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 89, amountPayable: 1500),
+                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1500)
+            };
 
         public static int MinimumAgreementVersion() => 6;
 

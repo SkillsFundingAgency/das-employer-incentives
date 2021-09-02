@@ -6,12 +6,10 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using NServiceBus;
 using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -22,7 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly Dictionary<string, string> _config;
         private readonly IHook<object> _eventMessageHook;
         private readonly IHook<ICommand> _commandMessageHook;
-        private readonly List<IncentivePaymentProfile> _paymentProfiles;
 
         public TestWebApi(TestContext context, IHook<object> eventMessageHook, IHook<ICommand> commandMessageHook)
         {
@@ -40,9 +37,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ApplicationSettings:NServiceBusEndpointName", _context.InstanceId },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
-
-            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -57,7 +51,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.Hashstring = "Test Hashstring";
                     a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                     a.MinimumAgreementVersion = 4;
-                    a.IncentivePaymentProfiles = _paymentProfiles;
                 });
                 s.Configure<PolicySettings>(a =>
                 {
