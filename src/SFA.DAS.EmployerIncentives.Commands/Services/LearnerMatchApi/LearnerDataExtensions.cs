@@ -74,9 +74,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             if (nextPayment == null) return false;
 
             var hasLock = data
-               .PaymentsForApprenticeship(incentive.Apprenticeship.Id, nextPayment.DueDate)
+               .PaymentsForApprenticeshipInAcademicYear(incentive.Apprenticeship.Id, nextPayment.DueDate)
                .Any(p => p.Period == nextPayment.CollectionPeriod?.PeriodNumber 
-                         && data.AcademicYear == nextPayment.CollectionPeriod?.AcademicYear
                          && !p.IsPayable);
 
             return hasLock;
@@ -189,7 +188,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 .Where(p => p.ApprenticeshipId == apprenticeshipId);
         }
 
-        private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId, DateTime paymentDueDate)
+        private static IEnumerable<PeriodDto> PaymentsForApprenticeshipInAcademicYear(this LearnerSubmissionDto data, long apprenticeshipId, DateTime paymentDueDate)
         {
             return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
                 .SelectMany(t => t.PriceEpisodes.Where(pe => pe.StartDate <= paymentDueDate
