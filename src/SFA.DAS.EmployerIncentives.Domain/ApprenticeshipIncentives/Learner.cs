@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public long ApprenticeshipId => Model.ApprenticeshipId;
         public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;
         public SubmissionData SubmissionData => Model.SubmissionData;
-        public bool SuccessfulLearnerMatchExecution => Model.SuccessfulLearnerMatchExecution;
+        public bool SuccessfulLearnerMatch => Model.SuccessfulLearnerMatch;
 
         internal static Learner New(
             Guid id,
@@ -111,7 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.DaysInLearnings.Add(daysInLearning);
         }
 
-        public void SetSuccessfulLearnerMatchExecution(bool succeeded) => Model.SuccessfulLearnerMatchExecution = succeeded;
+        public void SetSuccessfulLearnerMatch(bool succeeded) => Model.SuccessfulLearnerMatch = succeeded;
 
         private Learner(LearnerModel model, bool isNew = false) : base(model.Id, model, isNew)
         {

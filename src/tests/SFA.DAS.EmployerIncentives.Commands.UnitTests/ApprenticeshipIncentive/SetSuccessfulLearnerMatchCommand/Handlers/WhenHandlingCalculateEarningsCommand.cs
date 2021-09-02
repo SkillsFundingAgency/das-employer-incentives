@@ -12,13 +12,13 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatchExecution;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.SetSuccessfulLearnerMatchCommand.Handlers
 {
     public class WhenHandlingSetSuccessfulLearnerMatchCommand
     {
-        private SetSuccessfulLearnerMatchExecutionCommandHandler _sut;
+        private SetSuccessfulLearnerMatchCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Fixture _fixture;
@@ -61,14 +61,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
            
             _learner = new LearnerFactory().GetExisting(
                 _fixture.Build<LearnerModel>()
-                    .With(x => x.SuccessfulLearnerMatchExecution, !_succeeded)
+                    .With(x => x.SuccessfulLearnerMatch, !_succeeded)
                     .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                     .Create());
 
             _mockIncentiveDomainRepository.Setup(x => x.Find(_incentive.Id)).ReturnsAsync(_incentive);
             _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
 
-            _sut = new SetSuccessfulLearnerMatchExecutionCommandHandler(
+            _sut = new SetSuccessfulLearnerMatchCommandHandler(
                 _mockIncentiveDomainRepository.Object,
                 _mockLearnerDomainRepository.Object);
         }
@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_learner_record_is_updated()
         {
             // Arrange
-            var command = new Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatchExecution.SetSuccessfulLearnerMatchExecutionCommand(
+            var command = new Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch.SetSuccessfulLearnerMatchCommand(
                 _incentive.Id, _incentive.Apprenticeship.UniqueLearnerNumber, _succeeded);
 
             _mockIncentiveDomainRepository.Setup(
@@ -89,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _mockLearnerDomainRepository.Verify(r => r.Save(It.Is<Learner>(
-                l => l.Id == _learner.Id && l.SuccessfulLearnerMatchExecution == _succeeded
+                l => l.Id == _learner.Id && l.SuccessfulLearnerMatch == _succeeded
             )), Times.Once);
         }
     }

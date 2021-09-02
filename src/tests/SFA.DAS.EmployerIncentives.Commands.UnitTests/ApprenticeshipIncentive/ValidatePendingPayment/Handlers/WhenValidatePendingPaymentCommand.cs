@@ -119,7 +119,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _daysInLearning = new DaysInLearning(new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year), 90);
 
             _learnerModel = _fixture.Build<LearnerModel>()
-                .With(x => x.SuccessfulLearnerMatchExecution, true)
+                .With(x => x.SuccessfulLearnerMatch, true)
                 .With(m => m.ApprenticeshipId, incentive.Apprenticeship.Id)
                 .With(m => m.ApprenticeshipIncentiveId, incentive.Id)
                 .With(m => m.UniqueLearnerNumber, incentive.Apprenticeship.UniqueLearnerNumber)
@@ -299,7 +299,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             // Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
-            _learner.SetSuccessfulLearnerMatchExecution(false);
+            _learner.SetSuccessfulLearnerMatch(false);
             
             var pendingPayment = incentive.PendingPayments.First();
             var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;

@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatchExecution
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch
 {
-    public class SetSuccessfulLearnerMatchExecutionCommandHandler : ICommandHandler<SetSuccessfulLearnerMatchExecutionCommand>
+    public class SetSuccessfulLearnerMatchCommandHandler : ICommandHandler<SetSuccessfulLearnerMatchCommand>
     {
         private readonly IApprenticeshipIncentiveDomainRepository _incentiveDomainRepository;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
 
-        public SetSuccessfulLearnerMatchExecutionCommandHandler(
+        public SetSuccessfulLearnerMatchCommandHandler(
             IApprenticeshipIncentiveDomainRepository incentiveDomainRepository,
             ILearnerDomainRepository learnerDomainRepository)
         {
@@ -18,15 +18,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccess
             _learnerDomainRepository = learnerDomainRepository;
         }
 
-        public async Task Handle(SetSuccessfulLearnerMatchExecutionCommand executionCommand, CancellationToken cancellationToken = default)
+        public async Task Handle(SetSuccessfulLearnerMatchCommand command, CancellationToken cancellationToken = default)
         {
-            var incentive = await _incentiveDomainRepository.Find(executionCommand.ApprenticeshipIncentiveId);
+            var incentive = await _incentiveDomainRepository.Find(command.ApprenticeshipIncentiveId);
 
             if (incentive == null) return;
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
-            learner.SetSuccessfulLearnerMatchExecution(executionCommand.Succeeded);
+            learner.SetSuccessfulLearnerMatch(command.Succeeded);
 
             await _learnerDomainRepository.Save(learner);
         }

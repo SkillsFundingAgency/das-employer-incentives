@@ -3,16 +3,16 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatchExecution
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch
 {
-    public class SetSuccessfulLearnerMatchExecutionCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class SetSuccessfulLearnerMatchCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
         public Guid ApprenticeshipIncentiveId { get; }
         public long Uln { get; }
         public bool Succeeded { get; }
         public string LockId => $"{nameof(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive)}_{ApprenticeshipIncentiveId}";
 
-        public SetSuccessfulLearnerMatchExecutionCommand(Guid apprenticeshipIncentiveId, long uln, bool succeeded)
+        public SetSuccessfulLearnerMatchCommand(Guid apprenticeshipIncentiveId, long uln, bool succeeded)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
             Uln = uln;
