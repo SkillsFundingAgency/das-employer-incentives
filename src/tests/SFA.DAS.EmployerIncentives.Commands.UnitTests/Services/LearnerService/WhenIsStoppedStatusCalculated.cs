@@ -176,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test] // https://skillsfundingagency.atlassian.net/browse/EI-1403
-        public void Then_isStopped_is_recognised_when_latest_training_has_no_price_episodes()
+        public void Then_isStopped_is_true_when_latest_training_has_no_price_episodes()
         {
             // Arrange
             _sut.Training = new List<TrainingDto>
@@ -230,8 +230,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             // Assert
             isStoppedStatus.LearningStopped.Should().BeTrue();
-            var endDateOfLatestValidPriceEpisode = _sut.Training.Single().PriceEpisodes.First(pe => pe.Periods.Any()).EndDate.Value;
-            isStoppedStatus.DateStopped.Should().Be(endDateOfLatestValidPriceEpisode.AddDays(1));
+            var endDateOfLatestPriceEpisode = _sut.Training.Single().PriceEpisodes.First().EndDate.Value;
+            isStoppedStatus.DateStopped.Should().Be(endDateOfLatestPriceEpisode.AddDays(1));
             isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
         }
 
@@ -247,7 +247,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                     .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>
                         {
                             _fixture.Build<PriceEpisodeDto>()
-                                .With(x => x.AcademicYear, "2122")
+                                .With(x => x.AcademicYear, "2021")
                                 .With(x => x.StartDate, DateTime.Parse("2021-08-01T00:00:00"))
                                 .Without(x => x.EndDate)
                                 .With(pe => pe.Periods, new List<PeriodDto>())
