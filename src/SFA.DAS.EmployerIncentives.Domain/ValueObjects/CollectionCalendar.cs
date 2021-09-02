@@ -21,8 +21,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public CollectionCalendarPeriod GetPeriod(DateTime dateTime)
         {
             return _collectionPeriods
-                .Where(d => d.OpenDate <= dateTime)
-                .OrderByDescending(d => d.OpenDate)
+                .Where(d => d.CensusDate >= dateTime)
+                .OrderBy(d => d.CensusDate)
                 .FirstOrDefault();
         }
 

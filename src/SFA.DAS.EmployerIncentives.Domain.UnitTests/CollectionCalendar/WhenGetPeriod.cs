@@ -21,9 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
 
             testDate = DateTime.Now;
 
-            var period1 = new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)testDate.AddMonths(13).Month, (short)testDate.AddMonths(13).Year, testDate.AddMonths(13), _fixture.Create<DateTime>(), false, false);
-            var period2 = new CollectionCalendarPeriod(new CollectionPeriod(2, _fixture.Create<short>()), (byte)testDate.Month, (short)testDate.Year, testDate, _fixture.Create<DateTime>(), false, false);
-            var period3 = new CollectionCalendarPeriod(new CollectionPeriod(3, _fixture.Create<short>()), (byte)testDate.AddMonths(-13).Month, (short)testDate.AddMonths(-13).Year, testDate.AddMonths(-13), _fixture.Create<DateTime>(), false, false);
+            var period1 = new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)testDate.AddMonths(13).Month, (short)testDate.AddMonths(13).Year, _fixture.Create<DateTime>(), testDate.AddMonths(13), false, false);
+            var period2 = new CollectionCalendarPeriod(new CollectionPeriod(2, _fixture.Create<short>()), (byte)testDate.Month, (short)testDate.Year, _fixture.Create<DateTime>(), testDate, false, false);
+            var period3 = new CollectionCalendarPeriod(new CollectionPeriod(3, _fixture.Create<short>()), (byte)testDate.AddMonths(-13).Month, (short)testDate.AddMonths(-13).Year, _fixture.Create<DateTime>(), testDate.AddMonths(-13), false, false);
 
             _collectionPeriods = new List<CollectionCalendarPeriod>() { period1, period2, period3 };
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
         public void Then_the_latest_collection_period_is_returned_for_a_given_date()
         {
             // Arrange
-            var date = testDate.AddDays(1);
+            var date = testDate.AddDays(-1);
 
             // Act
             var period = _sut.GetPeriod(date);
@@ -43,14 +43,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.CollectionCalendarTests
             period.CollectionPeriod.PeriodNumber.Should().Be(2);
             period.CalendarMonth.Should().Be((byte)testDate.Month);
             period.CalendarYear.Should().Be((short)testDate.Year);
-            period.OpenDate.Should().Be(testDate);
+            period.CensusDate.Should().Be(testDate);
         }
 
         [Test]
         public void Then_null_is_returned_if_the_given_date_is_outside_the_collection_date_range()
         {
             // Arrange
-            var date = testDate.AddMonths(-13).AddDays(-1);
+            var date = testDate.AddMonths(13).AddDays(1);
 
             // Act
             var period = _sut.GetPeriod(date);
