@@ -130,42 +130,51 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
-            var learningStoppedStatus = new LearningStoppedStatus(false);
+            var status = new LearningStoppedStatus(false);
 
-            if (incentive == null) return learningStoppedStatus;
+            if (incentive == null) return status;
 
             var matchedRecords =
                (from tr in learnerData.Training
                 where tr.Reference == PROGRAM_REFERENCE
                 from pe in tr.PriceEpisodes
-                from p in pe.Periods
-                where p.ApprenticeshipId == incentive.Apprenticeship.Id
+                from p in pe.Periods.DefaultIfEmpty()
+                where (p is null || p.ApprenticeshipId == incentive.Apprenticeship.Id)
                 select new
                 {
-                    p.ApprenticeshipId,
+                    p?.ApprenticeshipId,
                     pe.StartDate,
-                    pe.EndDate,
+                    EndDate = pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate(pe.AcademicYear),
                     pe.AcademicYear
-                }).ToArray();
+                })
+               .OrderByDescending(x => x.StartDate)
+               .ToArray();
 
-            if (matchedRecords.Any())
+            if (!matchedRecords.Any()) return status;
+
+            var latestPriceEpisode = matchedRecords.First();
+
+            if (latestPriceEpisode.ApprenticeshipId == null)
             {
-                var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
-
+                var end = matchedRecords.First(x => x.ApprenticeshipId.HasValue).EndDate.AddDays(1);
+                status = new LearningStoppedStatus(true, end);
+            }
+            else
+            {
                 var activePeriod = collectionCalendar.GetActivePeriod();
 
-                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < activePeriod.CensusDate
-                                                        && latestPriceEpisode.EndDate.Value.Date != collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear))
+                if (latestPriceEpisode.EndDate.Date < activePeriod.CensusDate
+                    && latestPriceEpisode.EndDate.Date != collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear))
                 {
-                    learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
+                    status = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.AddDays(1));
                 }
                 else
                 {
-                    learningStoppedStatus = new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
+                    status = new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
                 }
             }
 
-            return learningStoppedStatus;
+            return status;
         }
 
         public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)

@@ -15,4 +15,4 @@ Scenario: Learning stops in R1 after learner has been added for R13 with <null> 
 	And the previous price episode has a period with a matching apprenticeship ID
 	And the previous price episode has null end date
 	Then trigger a learning stopped Change of Circumstance
-	And record the learning stopped date as the day after the Census Date of the active period
+	And record the learning stopped date as the day after the previous price episode period census date

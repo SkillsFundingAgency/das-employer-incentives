@@ -58,7 +58,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.Period = _periodNumber;
             _testPeriodDto.IsPayable = true;
 
-            _academicYears = new List<AcademicYear> {new AcademicYear("2021", new DateTime(2021, 07, 31))};
+            _academicYears = new List<AcademicYear>
+            {
+                new AcademicYear("2021", new DateTime(2021, 07, 31)),
+                new AcademicYear("2122", new DateTime(2022, 07, 31))
+            };
             _censusDate = new DateTime(2021, 07, 31);
             _collectionPeriods = new List<CollectionCalendarPeriod>
             {
@@ -130,7 +134,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_isStopped_is_false_is_returned_when_the_latest_price_episode_end_date_is_the_end_of_the_academic_year()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = _academicYears.Single().EndDate;
+            _testPriceEpisodeDto.EndDate = _academicYears.First().EndDate;
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
@@ -231,14 +235,68 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
         }
 
+        [Test] // https://skillsfundingagency.atlassian.net/browse/EI-1403
+        public void Then_isStopped_is_true_and_stop_date_is_a_day_after_last_period_end_date_when_there_is_no_end_date_supplied()
+        {
+            // Arrange
+            _sut.Training = new List<TrainingDto>
+            {
+                _fixture
+                    .Build<TrainingDto>()
+                    .With(p => p.Reference, "ZPROG001")
+                    .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>
+                        {
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(x => x.AcademicYear, "2122")
+                                .With(x => x.StartDate, DateTime.Parse("2021-08-01T00:00:00"))
+                                .Without(x => x.EndDate)
+                                .With(pe => pe.Periods, new List<PeriodDto>())
+                                .Create(),
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(x => x.AcademicYear, "2021")
+                                .With(x => x.StartDate, DateTime.Parse("2021-04-15T00:00:00"))
+                                .Without(x => x.EndDate)
+                                .With(pe => pe.Periods, new List<PeriodDto>
+                                {
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 9)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 10)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 11)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 12)
+                                        .Create()
+                                })
+                                .Create()
+                        }
+                    )
+                    .Create()
+            };
+
+            // Act
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
+
+            // Assert
+            isStoppedStatus.LearningStopped.Should().BeTrue();
+            isStoppedStatus.DateStopped.Should().Be(_censusDate.AddDays(1));
+            isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
+        }
+
         private DateTime GetValidPastEndDate(DateTime endDate)
         {
-            if (endDate.Date == _academicYears.Single().EndDate.Date)
-            {
-                return endDate.AddDays(-1);
-            }
-
-            return endDate;
+            return endDate.Date == _academicYears.First().EndDate.Date ? endDate.AddDays(-1) : endDate;
         }
     }
 }

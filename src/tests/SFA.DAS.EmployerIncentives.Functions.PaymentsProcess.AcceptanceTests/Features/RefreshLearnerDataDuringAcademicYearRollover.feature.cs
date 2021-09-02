@@ -166,8 +166,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("trigger a learning stopped Change of Circumstance", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 18
- testRunner.And("record the learning stopped date as the day after the Census Date of the active p" +
-                        "eriod", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("record the learning stopped date as the day after the previous price episode peri" +
+                        "od census date", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
