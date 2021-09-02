@@ -170,7 +170,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         }
 
         public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
+        public static DateTime EligibilityEndDate = new DateTime(2022, 1, 31);
 
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
         private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 11, 30);
