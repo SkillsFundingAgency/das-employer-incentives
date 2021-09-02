@@ -27,8 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _incentive;
         private readonly LearnerSubmissionDto _lerner;
-        private readonly DateTime _endDate;
-
+        private DateTime _endDate;
         public RefreshLearnerDataDuringAcademicYearRolloverSteps(TestContext context)
         {
             _context = context;
@@ -46,7 +45,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.Phase, Phase.Phase2)
                 .Create();
 
-            _endDate = DateTime.Parse("2021-07-31T00:00:00");
             _lerner = _fixture
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _incentive.UKPRN)
@@ -59,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             _fixture.Build<PriceEpisodeDto>()
                                 .With(x => x.AcademicYear,"2021")
                                 .With(x => x.StartDate, DateTime.Parse("2020-08-01T00:00:00"))
-                                .With(x => x.EndDate, _endDate)
+                                .With(x => x.EndDate, DateTime.Parse("2021-07-31T00:00:00"))
                                 .With(pe => pe.Periods, new List<PeriodDto>{
                                     _fixture.Build<PeriodDto>()
                                         .With(period => period.ApprenticeshipId, _incentive.ApprenticeshipId)
@@ -99,10 +97,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the most recent price episode has no periods")]
         public void WhenTheMostRecentPriceEpisodeHasNoPeriods()
         {
+            _endDate = DateTime.Parse("2021-08-10T00:00:00");
             var episode = _fixture.Build<PriceEpisodeDto>()
                 .With(x => x.AcademicYear, "2122")
                 .With(x => x.StartDate, DateTime.Parse("2021-08-01T00:00:00"))
-                .With(x => x.EndDate, DateTime.Parse("2021-08-10T00:00:00"))
+                .With(x => x.EndDate, _endDate)
                 .With(pe => pe.Periods, new List<PeriodDto>())
                 .Create();
 
@@ -123,29 +122,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await StartLearnerMatching();
         }
         
-        [Then(@"record the learning stopped date as the day after the previous price episode end date")]
-        public async Task ThenRecordTheLearningStoppedDateAsTheDayAfterThePreviousPriceEpisodeEndDate()
+        [Then(@"record the learning stopped date as the day after the last price episode end date")]
+        public async Task ThenRecordTheLearningStoppedDateAsTheDayAfterTheLastPriceEpisodeEndDate()
         {
             await using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
             var learner = (await dbConnection.GetAllAsync<Learner>()).Single(l => l.ApprenticeshipIncentiveId == _incentive.Id);
 
             var expectedStopDate = _endDate.AddDays(1);
-            learner.LearningStoppedDate.Should().Be(expectedStopDate);
-        }
-
-        [When(@"the previous price episode has null end date")]
-        public void WhenThePreviousPriceEpisodeHasNullEndDate()
-        {
-            _lerner.Training.Single().PriceEpisodes.First(pe => pe.Periods.Any()).EndDate = null;
-        }
-
-        [Then(@"record the learning stopped date as the day after the previous price episode period census date")]
-        public async Task ThenRecordTheLearningStoppedDateAsTheDayAfterThePreviousPriceEpisodePeriodCensusDate()
-        {
-            await using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
-            var learner = (await dbConnection.GetAllAsync<Learner>()).Single(l => l.ApprenticeshipIncentiveId == _incentive.Id);
-
-            var expectedStopDate = new DateTime(2021, 8, 1); // Census date of the last price episode + 1 day
             learner.LearningStoppedDate.Should().Be(expectedStopDate);
         }
 
