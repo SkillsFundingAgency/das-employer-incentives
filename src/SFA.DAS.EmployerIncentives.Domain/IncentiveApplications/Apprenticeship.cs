@@ -26,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public string CourseName => Model.CourseName;
         public bool HasEligibleEmploymentStartDate => Model.HasEligibleEmploymentStartDate;
         public DateTime? EmploymentStartDate => Model.EmploymentStartDate;
+        public Phase Phase => Model.Phase;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
@@ -52,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 Phase = phase
             };
 
-            Model.HasEligibleEmploymentStartDate = Incentive.EmployerStartDateIsEligible(Model.Phase, this);
+            Model.HasEligibleEmploymentStartDate = Incentive.EmployerStartDateIsEligible(this);
         }
 
         public void SetEarningsCalculated(bool isCalculated = true)

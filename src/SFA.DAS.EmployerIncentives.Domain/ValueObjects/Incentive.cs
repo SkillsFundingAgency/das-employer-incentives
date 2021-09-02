@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -43,9 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings);            
         }
 
-        public static bool EmployerStartDateIsEligible(Phase phase, Apprenticeship apprenticeship)
+        public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
         {
-            if (phase == Phase.Phase1)
+            if (apprenticeship.Phase == Phase.Phase1)
             {
                 return Phase1Incentive.EmployerStartDateIsEligible(apprenticeship);
             }
@@ -148,8 +149,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return applicablePeriod?.MinimumAgreementVersion ?? EligibilityPeriods.First().MinimumAgreementVersion;
         }
 
-        public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
+        public new static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
         {
+            if (apprenticeship.Phase != Phase.Phase1)
+            {
+                throw new InvalidPhaseException();
+            }
             return true;
         }
     }
@@ -174,8 +179,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public static int MinimumAgreementVersion() => 6;
 
-        public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
+        public new static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
         {
+            if (apprenticeship.Phase != Phase.Phase2)
+            {
+                throw new InvalidPhaseException();
+            }
+
             if (apprenticeship.EmploymentStartDate.HasValue &&
                 (apprenticeship.EmploymentStartDate.Value.Date >= EmployerEligibilityStartDate.Date) &&
                 (apprenticeship.EmploymentStartDate.Value.Date <= EmployerEligibilityEndDate.Date))
