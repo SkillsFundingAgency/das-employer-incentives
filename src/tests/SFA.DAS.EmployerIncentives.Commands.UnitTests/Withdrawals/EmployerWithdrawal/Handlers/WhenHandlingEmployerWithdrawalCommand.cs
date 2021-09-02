@@ -56,6 +56,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
 
             var incentiveApplicationModel = _fixture
                 .Build<IncentiveApplicationModel>()
+                .With(x => x.AccountId, command.AccountId)
+                .With(x => x.AccountLegalEntityId, command.AccountLegalEntityId)
                 .With(i => i.ApprenticeshipModels, 
                     new List<ApprenticeshipModel> {
                         _fixture.Create<ApprenticeshipModel>(),
@@ -68,9 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.EmployerWith
 
             var applications = new List<IncentiveApplication>()
             {
-                _fixture.Create<IncentiveApplication>(),
-                testApplication,
-                _fixture.Create<IncentiveApplication>()
+                testApplication
             };
 
             _mockDomainRepository
