@@ -40,7 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
         private async Task SetSuccessfulLearnerMatch(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive, bool succeeded)
         {
-            await context.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
+            await context.CallActivityWithRetryAsync(nameof(SetSuccessfulLearnerMatch),
+                new RetryOptions(TimeSpan.FromSeconds(1), 3),
                 new SetSuccessfulLearnerMatchInput
                 {
                     ApprenticeshipIncentiveId = incentive.Id,
@@ -53,7 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
         {
             var activePeriod = await context.CallActivityAsync<CollectionPeriod>(nameof(GetActiveCollectionPeriod), null);
             
-            await context.CallActivityAsync(nameof(Activities.CalculateDaysInLearning),
+            await context.CallActivityWithRetryAsync(nameof(Activities.CalculateDaysInLearning),
+                new RetryOptions(TimeSpan.FromSeconds(1), 3), 
                 new CalculateDaysInLearningInput {ApprenticeshipIncentiveId = incentive.Id, ActivePeriod = activePeriod});
         }
 

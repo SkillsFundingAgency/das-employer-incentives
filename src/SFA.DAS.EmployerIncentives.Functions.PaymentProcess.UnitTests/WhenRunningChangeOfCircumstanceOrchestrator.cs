@@ -33,22 +33,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("LearnerChangeOfCircumstanceActivity", _changeOfCircumstanceInput), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallActivityWithRetryAsync("LearnerChangeOfCircumstanceActivity", It.IsAny<RetryOptions>(), _changeOfCircumstanceInput), Times.Once);
         }
 
         [Test]
         public async Task Then_earnings_are_recalculated_after_the_change_of_circumstances()
         {
             var sequence = new MockSequence();
-            _mockOrchestrationContext.InSequence(sequence).Setup(x => x.CallActivityAsync("LearnerChangeOfCircumstanceActivity", _changeOfCircumstanceInput));
+            _mockOrchestrationContext.InSequence(sequence).Setup(x => x.CallActivityWithRetryAsync("LearnerChangeOfCircumstanceActivity", It.IsAny<RetryOptions>(), _changeOfCircumstanceInput));
             _mockOrchestrationContext.InSequence(sequence).Setup(
-                x => x.CallActivityAsync("CalculateEarningsActivity",
+                x => x.CallActivityWithRetryAsync("CalculateEarningsActivity", It.IsAny<RetryOptions>(),
                     It.Is<CalculateEarningsInput>(y =>  y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId &&  y.Uln == _changeOfCircumstanceInput.Uln)));
 
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync("CalculateEarningsActivity",
+                x => x.CallActivityWithRetryAsync("CalculateEarningsActivity",
+                    It.IsAny<RetryOptions>(),
                     It.Is<CalculateEarningsInput>(y =>
                         y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId &&
                         y.Uln == _changeOfCircumstanceInput.Uln)), Times.Once);
@@ -59,9 +60,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             var sequence = new MockSequence();
             _mockOrchestrationContext.InSequence(sequence).Setup(
-                x => x.CallActivityAsync("CalculateEarningsActivity",
+                x => x.CallActivityWithRetryAsync("CalculateEarningsActivity", It.IsAny<RetryOptions>(),
                     It.Is<LearnerMatchInput>(y =>  y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId)));
-            _mockOrchestrationContext.InSequence(sequence).Setup(x => x.CallActivityAsync("LearnerMatchAndUpdate",
+            _mockOrchestrationContext.InSequence(sequence).Setup(x => x.CallActivityWithRetryAsync("LearnerMatchAndUpdate", It.IsAny<RetryOptions>(),
                 It.Is<LearnerMatchInput>(y => y.ApprenticeshipIncentiveId == _changeOfCircumstanceInput.ApprenticeshipIncentiveId)));
 
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
@@ -78,8 +79,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("LearnerChangeOfCircumstanceActivity", It.IsAny<LearnerChangeOfCircumstanceInput>()), Times.Never);
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("CalculateEarningsActivity", It.IsAny<CalculateEarningsInput>()), Times.Never);
+            _mockOrchestrationContext.Verify(x => x.CallActivityWithRetryAsync("LearnerChangeOfCircumstanceActivity", It.IsAny<RetryOptions>(), It.IsAny<LearnerChangeOfCircumstanceInput>()), Times.Never);
+            _mockOrchestrationContext.Verify(x => x.CallActivityWithRetryAsync("CalculateEarningsActivity", It.IsAny<RetryOptions>(), It.IsAny<CalculateEarningsInput>()), Times.Never);
             _mockOrchestrationContext.Verify(x => x.CallActivityWithRetryAsync("LearnerMatchAndUpdate", It.IsAny<RetryOptions>(), It.IsAny<LearnerMatchInput>()), Times.Never);
         }
     }

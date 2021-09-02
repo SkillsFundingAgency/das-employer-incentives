@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
             
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync(nameof(CalculateDaysInLearning),
+                x => x.CallActivityWithRetryAsync(nameof(CalculateDaysInLearning), It.IsAny<RetryOptions>(),
                     It.Is<CalculateDaysInLearningInput>(input => input.ApprenticeshipIncentiveId == _expectedInput.Id)),
                 Times.Once);
         }
@@ -67,7 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
+                x => x.CallActivityWithRetryAsync(nameof(SetSuccessfulLearnerMatch),
+                    It.IsAny<RetryOptions>(),
                     It.Is<SetSuccessfulLearnerMatchInput>(input =>
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
                         input.Uln == _expectedInput.ULN &&
@@ -75,7 +76,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         )), Times.Once);
 
             _mockOrchestrationContext.Verify(
-                x => x.CallActivityAsync(nameof(SetSuccessfulLearnerMatch),
+                x => x.CallActivityWithRetryAsync(nameof(SetSuccessfulLearnerMatch),
+                    It.IsAny<RetryOptions>(),
                     It.Is<SetSuccessfulLearnerMatchInput>(input =>
                         input.ApprenticeshipIncentiveId == _expectedInput.Id &&
                         input.Uln == _expectedInput.ULN &&
