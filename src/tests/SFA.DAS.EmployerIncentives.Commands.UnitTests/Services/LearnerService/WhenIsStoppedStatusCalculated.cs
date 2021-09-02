@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPriceEpisodeDto.EndDate = _endDate;
             _testPriceEpisodeDto.AcademicYear = "2021";
 
-            _testPeriodDto = _testPriceEpisodeDto.Periods.First();            
+            _testPeriodDto = _testPriceEpisodeDto.Periods.First();
 
             _testPeriodDto.ApprenticeshipId = _apprenticeshipIncentiveModel.Apprenticeship.Id;
             _testPeriodDto.Period = _periodNumber;
@@ -173,6 +173,66 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             isStoppedStatus.LearningStopped.Should().BeTrue();
             isStoppedStatus.DateStopped.Should().Be(_testPriceEpisodeDto.EndDate.Value.AddDays(1));
+            isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
+        }
+
+        [Test] // https://skillsfundingagency.atlassian.net/browse/EI-1403
+        public void Then_isStopped_is_recognised_when_latest_training_has_no_price_episodes()
+        {
+            // Arrange
+            _sut.Training = new List<TrainingDto>
+            {
+                _fixture
+                    .Build<TrainingDto>()
+                    .With(p => p.Reference, "ZPROG001")
+                    .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>
+                        {
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(x => x.AcademicYear, "2122")
+                                .With(x => x.StartDate, DateTime.Parse("2021-08-01T00:00:00"))
+                                .With(x => x.EndDate, DateTime.Parse("2021-08-15T00:00:00"))
+                                .With(pe => pe.Periods, new List<PeriodDto>())
+                                .Create(),
+                            _fixture.Build<PriceEpisodeDto>()
+                                .With(x => x.AcademicYear, "2021")
+                                .With(x => x.StartDate, DateTime.Parse("2021-04-15T00:00:00"))
+                                .With(x => x.EndDate, DateTime.Parse("2021-07-31T00:00:00"))
+                                .With(pe => pe.Periods, new List<PeriodDto>
+                                {
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 9)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 10)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 11)
+                                        .Create(),
+                                    _fixture.Build<PeriodDto>()
+                                        .With(period => period.ApprenticeshipId, _incentive.Apprenticeship.Id)
+                                        .With(period => period.IsPayable, true)
+                                        .With(period => period.Period, 12)
+                                        .Create()
+                                })
+                                .Create()
+                        }
+                    )
+                    .Create()
+            };
+
+            // Act
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
+
+            // Assert
+            isStoppedStatus.LearningStopped.Should().BeTrue();
+            var endDateOfLatestValidPriceEpisode = _sut.Training.Single().PriceEpisodes.First(pe => pe.Periods.Any()).EndDate.Value;
+            isStoppedStatus.DateStopped.Should().Be(endDateOfLatestValidPriceEpisode.AddDays(1));
             isStoppedStatus.DateResumed.HasValue.Should().BeFalse();
         }
 
