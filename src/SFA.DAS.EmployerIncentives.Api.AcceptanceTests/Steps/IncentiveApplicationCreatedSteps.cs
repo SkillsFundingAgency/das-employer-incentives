@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 var apprenticeships = await dbConnection.QueryAsync<IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
                     new { _request.IncentiveApplicationId });
 
-                apprenticeships.ToList().ForEach(a => a.Phase.Should().Be(Enums.Phase.NotSet));
+                apprenticeships.ToList().ForEach(a => a.Phase.Should().Be(Enums.Phase.Phase2));
             }
 
         }
