@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         protected override int DelayPeriod => 21;
         protected override DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
         {
-            var minimumDueDate = submissionDate.AddDays(DelayPeriod);
+            var minimumDueDate = submissionDate.Date.AddDays(DelayPeriod);
 
             var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
             if (paymentDueDate < minimumDueDate)
