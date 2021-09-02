@@ -26,6 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         private Fixture _fixture;
         private List<AcademicYear> _academicYears;
         private Domain.ValueObjects.CollectionCalendar _collectionCalendar;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
+        private DateTime _censusDate;
 
         [SetUp]
         public void Arrange()
@@ -57,19 +59,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.IsPayable = true;
 
             _academicYears = new List<AcademicYear> {new AcademicYear("2021", new DateTime(2021, 07, 31))};
-            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(_academicYears, new List<CollectionCalendarPeriod>());
-        }
-
-        [Test]
-        public void Then_isStopped_true_is_returned_when_there_is_a_matching_period()
-        {
-            //Arrange    
-
-            //Act
-            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
-
-            //Assert
-            isStoppedStatus.LearningStopped.Should().BeTrue();
+            _censusDate = new DateTime(2021, 07, 31);
+            _collectionPeriods = new List<CollectionCalendarPeriod>
+            {
+                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(12, 2021), 7, 2021, new DateTime(2021, 07, 01), _censusDate, true, false)
+            };
+            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(_academicYears, _collectionPeriods);
         }
 
         [Test]
@@ -102,10 +97,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public void Then_isStopped_is_false_is_returned_when_the_latest_price_episode_end_date_is_today()
+        public void Then_isStopped_is_false_is_returned_when_the_latest_price_episode_end_date_is_the_census_date_of_the_active_period()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = DateTime.Today;
+            _testPriceEpisodeDto.EndDate = _censusDate;
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
@@ -117,10 +112,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public void Then_isStopped_is_false_is_returned_when_the_latest_price_episode_end_date_is_after_today()
+        public void Then_isStopped_is_false_is_returned_when_the_latest_price_episode_end_date_is_after_the_census_date_of_the_active_period()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = DateTime.Today.AddDays(1);
+            _testPriceEpisodeDto.EndDate = _censusDate.AddDays(1);
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
@@ -147,10 +142,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public void Then_isStopped_is_true_is_returned_when_the_latest_price_episode_end_date_is_before_today()
+        public void Then_isStopped_is_true_is_returned_when_the_latest_price_episode_end_date_is_before_the_census_date_of_the_active_period()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(DateTime.Today.AddDays(-1));
+            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(_censusDate.AddDays(-1));
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
@@ -162,10 +157,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public void Then_isStopped_stopped_date_is_the_day_after_the_end_date_when_the_latest_price_episode_end_date_is_before_today()
+        public void Then_isStopped_stopped_date_is_the_day_after_the_end_date_when_the_latest_price_episode_end_date_is_before_the_census_date_of_the_active_period()
         {
             //Arrange    
-            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(DateTime.Today.AddDays(-10));
+            _testPriceEpisodeDto.EndDate = GetValidPastEndDate(_censusDate.AddDays(-10));
 
             // Act
             var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);

@@ -60,13 +60,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                .With(p => p.DueDate, _plannedStartDate.AddMonths(1))
+                .With(p => p.DueDate, _plannedStartDate.AddDays(1))
                 .With(p => p.ClawedBack, false)
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
 
-            _periodEndDate = GetPastEndDate(DateTime.Today.AddDays(-10));
+            _periodEndDate = GetPastEndDate(-10);
 
             _learner = _fixture
                 .Build<Learner>()
@@ -209,10 +209,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
         }
 
-        private DateTime GetPastEndDate(DateTime endDate)
+        private DateTime GetPastEndDate(int daysFromEndDate)
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var academicYears = dbConnection.GetAll<AcademicYear>();
+
+            var collectionPeriods = dbConnection.GetAll<CollectionCalendarPeriod>();
+            var activePeriod = collectionPeriods.First(x => x.Active);
+
+            var endDate = activePeriod.CensusDate.AddDays(daysFromEndDate);
 
             if (academicYears.Any(x => x.EndDate == endDate))
             {
