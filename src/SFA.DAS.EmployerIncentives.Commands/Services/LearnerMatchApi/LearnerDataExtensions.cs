@@ -127,41 +127,51 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return isInLearning;
         }
 
-        public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
+        public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto data,
+            Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive,
+            Domain.ValueObjects.CollectionCalendar calendar)
         {
-            var learningStoppedStatus = new LearningStoppedStatus(false);
+            if (incentive == null) return new LearningStoppedStatus(false);
 
-            if (incentive == null) return learningStoppedStatus;
+            var training =
+                (from tr in data.Training
+                    where tr.Reference == PROGRAM_REFERENCE
+                    from pe in tr.PriceEpisodes
+                    from p in pe.Periods.DefaultIfEmpty()
+                    where (p is null || p.ApprenticeshipId == incentive.Apprenticeship.Id)
+                    select new
+                    {
+                        p?.ApprenticeshipId,
+                        pe.StartDate,
+                        EndDate = pe.EndDate ?? calendar.GetAcademicYearEndDate(pe.AcademicYear),
+                        pe.AcademicYear
+                    })
+                .OrderByDescending(x => x.StartDate)
+                .Select(c => (c.ApprenticeshipId, c.StartDate, c.EndDate, c.AcademicYear))
+                .ToArray();
 
-            var matchedRecords =
-               (from tr in learnerData.Training
-                where tr.Reference == PROGRAM_REFERENCE
-                from pe in tr.PriceEpisodes
-                from p in pe.Periods
-                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-                select new
-                {
-                    p.ApprenticeshipId,
-                    pe.StartDate,
-                    pe.EndDate,
-                    pe.AcademicYear
-                }).ToArray();
+            if (!training.Any()) return new LearningStoppedStatus(false);
 
-            if (matchedRecords.Any())
+            var latestPriceEpisode = training.First();
+
+            if (HasNoPeriods(latestPriceEpisode) || HasEndedAndNotOnAcademicYearsEve(calendar, latestPriceEpisode))
             {
-                var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
-
-                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date && latestPriceEpisode.EndDate.Value.Date != collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear))
-                {
-                    learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
-                }
-                else
-                {
-                    learningStoppedStatus = new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
-                }
+                return new LearningStoppedStatus(true, latestPriceEpisode.EndDate.AddDays(1));
             }
 
-            return learningStoppedStatus;
+            return new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
+        }
+
+        private static bool HasEndedAndNotOnAcademicYearsEve(Domain.ValueObjects.CollectionCalendar collectionCalendar,
+            (long? ApprenticeshipId, DateTime StartDate, DateTime EndDate, string AcademicYear) episode)
+        {
+            return episode.EndDate.Date < collectionCalendar.GetActivePeriod().CensusDate
+                   && episode.EndDate.Date != collectionCalendar.GetAcademicYearEndDate(episode.AcademicYear);
+        }
+
+        private static bool HasNoPeriods((long? ApprenticeshipId, DateTime StartDate, DateTime EndDate, string AcademicYear) episode)
+        {
+            return episode.ApprenticeshipId == null;
         }
 
         public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
