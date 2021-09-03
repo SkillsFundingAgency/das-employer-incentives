@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             }
             else
             {
-                minimumAgreementVersion = Phase2Incentive.MinimumAgreementVersion();
+                minimumAgreementVersion = Phase2Incentive.MinimumAgreementVersion(startDate);
             }
 
             return new AgreementVersion(minimumAgreementVersion);

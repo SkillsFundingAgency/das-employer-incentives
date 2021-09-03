@@ -113,7 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 HashedLegalEntityId = model.HashedLegalEntityId,
-                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion(),
+                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumPhase2AgreementVersion,
                 BankDetailsRequired = MapBankDetailsRequired(model.VrfCaseStatus, model.VrfVendorId)
             };
         }

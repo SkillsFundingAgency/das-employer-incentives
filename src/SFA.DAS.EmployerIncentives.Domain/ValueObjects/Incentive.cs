@@ -142,7 +142,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
             new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
         };
-
         public static int MinimumAgreementVersion(DateTime startDate)
         {
             var applicablePeriod = EligibilityPeriods.SingleOrDefault(x => x.StartDate <= startDate && x.EndDate >= startDate);
@@ -161,6 +160,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
     public class Phase2Incentive : Incentive
     {
+
         public Phase2Incentive(
             DateTime dateOfBirth,
             DateTime startDate,
@@ -168,6 +168,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             IReadOnlyCollection<BreakInLearning> breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
         {
         }
+
+        public static int MinimumPhase2AgreementVersion => 6;
 
         public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
         public static DateTime EligibilityEndDate = new DateTime(2022, 1, 31);
@@ -178,6 +180,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
 
         public static int MinimumAgreementVersion() => 6;
+
+        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
+        {
+            new EligibilityPeriod(new DateTime(2021, 4, 1), new DateTime(2021, 9, 30), 6),
+            new EligibilityPeriod(new DateTime(2021, 10, 1), new DateTime(2022, 1, 31), 7)
+        };
 
         public new static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
         {
@@ -194,6 +202,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
 
             return false;
+        }
+
+        public static int MinimumAgreementVersion(DateTime startDate)
+        {
+            var applicablePeriod = EligibilityPeriods.SingleOrDefault(x => x.StartDate <= startDate && x.EndDate >= startDate);
+            return applicablePeriod?.MinimumAgreementVersion ?? EligibilityPeriods.First().MinimumAgreementVersion;
         }
     }
 
