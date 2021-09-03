@@ -84,6 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .Create();
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.StartDate = _plannedStartDate;
+            _sutModel.SubmittedDate = _plannedStartDate.AddDays(-30);
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sutModel.PaymentModels = new List<PaymentModel>();
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
@@ -499,6 +500,34 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Assert
             _sut.PendingPayments.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task Then_the_first_earning_is_set_to_the_end_of_the_delay_period_when_it_falls_within_the_delay_period()
+        {
+            // Arrange
+            var submissionDate = _sutModel.StartDate.AddDays(20);
+            _sutModel.SubmittedDate = submissionDate;
+            var expectedDueDate = submissionDate.AddDays(21);
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
+        }
+
+        [Test]
+        public async Task Then_the_first_earning_is_set_using_the_payment_profile_when_it_is_not_within_the_delay_period()
+        {
+            // Arrange
+            var expectedDueDate = _sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart);
+
+            // Act
+            await _sut.CalculateEarnings(_mockPaymentProfilesService.Object, _mockCollectionCalendarService.Object);
+
+            // Assert
+            _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
         }
 
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
