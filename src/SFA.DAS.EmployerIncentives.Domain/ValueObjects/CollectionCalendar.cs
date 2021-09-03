@@ -92,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var academicYear = _academicYears.Single(x => x.AcademicYearId == academicYearId);
             return academicYear.EndDate;
         }
-        
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             foreach (var collectionPeriod in _collectionPeriods)

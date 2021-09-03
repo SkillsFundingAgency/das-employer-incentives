@@ -176,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test] // https://skillsfundingagency.atlassian.net/browse/EI-1403
-        public void Then_isStopped_is_true_when_latest_training_has_no_price_episodes()
+        public void Then_isStopped_is_true_and_stop_date_is_a_day_after_last_period_end_date_when_latest_period_has_no_price_episodes()
         {
             // Arrange
             _sut.Training = new List<TrainingDto>
@@ -236,7 +236,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test] // https://skillsfundingagency.atlassian.net/browse/EI-1403
-        public void Then_isStopped_is_true_and_stop_date_is_a_day_after_last_period_end_date_when_there_is_no_end_date_supplied()
+        public void Then_isStopped_is_true_and_stop_date_is_a_day_after_the_census_date_of_the_last_period_when_latest_period_has_no_price_episodes_and_no_end_date()
         {
             // Arrange
             _sut.Training = new List<TrainingDto>
