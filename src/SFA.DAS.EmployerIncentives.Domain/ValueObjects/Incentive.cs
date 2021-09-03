@@ -168,9 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             IReadOnlyCollection<BreakInLearning> breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
         {
         }
-
-        public static int MinimumPhase2AgreementVersion => 6;
-
+        
         public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
         public static DateTime EligibilityEndDate = new DateTime(2022, 1, 31);
 
