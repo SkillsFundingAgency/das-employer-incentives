@@ -222,7 +222,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             pp.Amount.Should().Be(amount);
             pp.PaymentMadeDate.Should().BeNull();
 
-            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(90));
+            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(89));
             pp.PeriodNumber.Should().Be(period.PeriodNumber);
             pp.PaymentYear.ToString().Should().Be(period.AcademicYear);
         }
@@ -239,7 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             pp.Amount.Should().Be(amount);
             pp.PaymentMadeDate.Should().BeNull();
-            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(365));
+            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(364));
             pp.PeriodNumber.Should().Be(period.PeriodNumber);
             pp.PaymentYear.ToString().Should().Be(period.AcademicYear);
         }

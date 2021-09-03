@@ -8,7 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         public DateTime StartDate { get; set; }
         public DateTime IlrSubmissionDate { get; set; }
         public int IlrSubmissionWindowPeriod { get; set; }
-        public int AcademicYear { get; set; }
+        public string AcademicYear { get; set; }
         public long Ukprn { get; set; }
         public long Uln { get; set; }
         public string RawJson { get; set; }
