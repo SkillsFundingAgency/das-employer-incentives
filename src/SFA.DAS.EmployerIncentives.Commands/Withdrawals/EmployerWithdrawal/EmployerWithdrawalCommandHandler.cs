@@ -29,12 +29,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
                 throw new WithdrawalException($"Unable to handle Employer withdrawal command. No matching incentive applications found for {command}");
             }
 
-            var account = await _accountDomainRepository.Find(command.AccountId);
-            var legalEntity = account.GetLegalEntity(command.AccountLegalEntityId);
-
             foreach (var application in applications)
             {
-                foreach(var apprenticeship in application.Apprenticeships)
+                var account = await _accountDomainRepository.Find(application.AccountId);
+                var legalEntity = account.GetLegalEntity(application.AccountLegalEntityId);
+
+                foreach (var apprenticeship in application.Apprenticeships)
                 {
                     if(apprenticeship.ULN == command.ULN)
                     {

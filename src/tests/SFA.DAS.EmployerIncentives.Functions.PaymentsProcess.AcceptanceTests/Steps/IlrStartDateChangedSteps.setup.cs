@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private Payment _payment;
         private List<PendingPayment> _newPendingPayments;
         private DateTime _actualStartDate;
+        private DateTime _submissionDate;
         private Phase _phase;
         private readonly (byte Number, short Year) _paymentPeriod = (1, 2021);
 
@@ -40,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _phase = Enum.Parse<Phase>(phase);
             _plannedStartDate = (_phase == Phase.Phase1) ? new DateTime(2020, 8, 1) : new DateTime(2021, 7, 1);
+            _submissionDate = _plannedStartDate.AddDays(30);
             
             _accountModel = _fixture.Create<Account>();
 
@@ -51,6 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.Phase, _phase)
                 .With(p => p.MinimumAgreementVersion, 1)
                 .With(p => p.StartDate, _plannedStartDate)
+                .With(p => p.SubmittedDate, _submissionDate)
                 .With(p => p.Status, IncentiveStatus.Active)
                 .Create();
 

@@ -13,6 +13,7 @@ using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -62,9 +63,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionPeriods = new List<CollectionCalendarPeriod>()
             {
-                new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _collectionPeriod.AddMonths(-1).AddDays(1), _fixture.Create<DateTime>(), false, false),
-                new CollectionCalendarPeriod(new CollectionPeriod(2, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _collectionPeriod.AddMonths(1).AddDays(1), _fixture.Create<DateTime>(), false, false),
-                new CollectionCalendarPeriod(new CollectionPeriod(3, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(2).Month, (short)_collectionPeriod.AddMonths(2).Year, _collectionPeriod.AddMonths(2).AddDays(1), _fixture.Create<DateTime>(), false, false)
+                new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(1).AddDays(1), false, false),
+                new CollectionCalendarPeriod(new CollectionPeriod(2, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(2).AddDays(1), false, false),
+                new CollectionCalendarPeriod(new CollectionPeriod(3, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(2).Month, (short)_collectionPeriod.AddMonths(2).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(3).AddDays(1), false, false)
             };
 
             _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
@@ -76,6 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .Create();
             _apprenticehip = _sutModel.Apprenticeship;
             _sutModel.StartDate = _plannedStartDate;
+            _sutModel.SubmittedDate = _plannedStartDate.AddDays(-30);
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sutModel.PaymentModels = new List<PaymentModel>();
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
@@ -505,6 +507,34 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Assert
             _sut.PendingPayments.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task Then_the_first_earning_is_set_to_the_end_of_the_delay_period_when_it_falls_within_the_delay_period()
+        {
+            // Arrange
+            var submissionDate = _sutModel.StartDate.AddDays(20);
+            _sutModel.SubmittedDate = submissionDate;
+            var expectedDueDate = submissionDate.AddDays(21);
+
+            // Act
+            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+
+            // Assert
+            _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
+        }
+
+        [Test]
+        public async Task Then_the_first_earning_is_set_using_the_payment_profile_when_it_is_not_within_the_delay_period()
+        {
+            // Arrange
+            var expectedDueDate = _sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart);
+
+            // Act
+            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+
+            // Assert
+            _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
         }
 
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)

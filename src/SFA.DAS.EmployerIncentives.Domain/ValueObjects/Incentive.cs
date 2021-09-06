@@ -25,22 +25,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
         private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
 
+        protected abstract int DelayPeriod { get; }
+
+        protected abstract DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate);
+
         protected Incentive(
             DateTime dateOfBirth, 
             DateTime startDate,
             IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breaksInLearning)
+            IReadOnlyCollection<BreakInLearning> breaksInLearning,
+            DateTime submissionDate)
         {
             _dateOfBirth = dateOfBirth;
             StartDate = startDate;
-            _payments = Generate(paymentProfiles, breaksInLearning);
+            _payments = Generate(paymentProfiles, breaksInLearning, submissionDate);
         }
 
         public static Incentive Create(
             ApprenticeshipIncentive incentive,
             IEnumerable<IncentivePaymentProfile> paymentProfiles)
         {
-            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings);
+            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings, incentive.SubmissionDate);
         }
 
         public static async Task<Incentive> Create(
@@ -49,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             var paymentProfiles = await incentivePaymentProfilesService.Get();
 
-            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings);            
+            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings, incentive.SubmissionDate);            
         }
 
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
@@ -69,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return dateOfBirth.AgeOnThisDay(startDate);
         }
 
-        protected List<Payment> Generate(IEnumerable<PaymentProfile> paymentProfiles, IReadOnlyCollection<BreakInLearning> breaksInLearning)
+        protected List<Payment> Generate(IEnumerable<PaymentProfile> paymentProfiles, IReadOnlyCollection<BreakInLearning> breaksInLearning, DateTime submissionDate)
         {
             var payments = new List<Payment>();
             if (!IsEligible) return payments;
@@ -77,7 +82,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                payments.Add(new Payment(paymentProfile.AmountPayable, StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart), _earningTypes[paymentIndex], breaksInLearning));
+                var paymentDueDate = CalculateDueDate(paymentProfile, submissionDate);
+                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning));
                 paymentIndex++;
             }
 
@@ -102,7 +108,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             DateTime dateOfBirth,
             DateTime startDate,
             IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breaksInLearning)
+            IReadOnlyCollection<BreakInLearning> breaksInLearning,
+            DateTime submissionDate)
         {
             var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
 
@@ -122,72 +129,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
             if (phase == Phase.Phase1)
             {
-                return new Phase1Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning);
+                return new Phase1Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning, submissionDate);
             }
             else if (phase == Phase.Phase2)
             {
-                return new Phase2Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning);
+                return new Phase2Incentive(dateOfBirth, startDate, paymentProfiles, breaksInLearning, submissionDate);
             }
 
             return null; // wouldn't get here
-        }
-    }
-
-    public class Phase1Incentive : Incentive
-    {
-        public Phase1Incentive(
-            DateTime dateOfBirth,
-            DateTime startDate,
-            IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breaksInLearning) : base(dateOfBirth, startDate, paymentProfiles, breaksInLearning)
-        {
-        }
-
-        public static DateTime EligibilityStartDate = new DateTime(2020, 8, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 5, 31);
-        public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
-
-        private static List<EligibilityPeriod> EligibilityPeriods = new List<EligibilityPeriod>
-        {
-            new EligibilityPeriod(new DateTime(2020, 8, 1), new DateTime(2021, 1, 31), 4),
-            new EligibilityPeriod(new DateTime(2021, 2, 1), new DateTime(2021, 5, 31), 5)
-        };
-
-        public static int MinimumAgreementVersion(DateTime startDate)
-        {
-            var applicablePeriod = EligibilityPeriods.SingleOrDefault(x => x.StartDate <= startDate && x.EndDate >= startDate);
-            return applicablePeriod?.MinimumAgreementVersion ?? EligibilityPeriods.First().MinimumAgreementVersion;
-        }
-    }
-
-    public class Phase2Incentive : Incentive
-    {
-        public Phase2Incentive(
-            DateTime dateOfBirth,
-            DateTime startDate,
-            IEnumerable<PaymentProfile> paymentProfiles,
-            IReadOnlyCollection<BreakInLearning> breakInLearningDayCount) : base(dateOfBirth, startDate, paymentProfiles, breakInLearningDayCount)
-        {
-        }
-
-        public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 11, 30);
-        public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
-
-        public static int MinimumAgreementVersion() => 6;
-    }
-
-    public class EligibilityPeriod
-    {
-        public DateTime StartDate { get; }
-        public DateTime EndDate { get; }
-        public int MinimumAgreementVersion { get; }
-
-        public EligibilityPeriod(DateTime startDate, DateTime endDate, int minimumAgreementVersion)
-        {
-            StartDate = startDate;
-            EndDate = endDate;
-            MinimumAgreementVersion = minimumAgreementVersion;
         }
     }
 }
