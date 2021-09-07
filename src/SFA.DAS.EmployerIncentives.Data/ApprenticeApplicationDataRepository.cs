@@ -86,13 +86,14 @@ namespace SFA.DAS.EmployerIncentives.Data
                     },
                     SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = data.secondPayment.DueDate.AddMonths(1),
+                        PaymentDate = PaymentDate(data.secondPayment, data.secondPaymentSent, nextActivePeriod),
                         LearnerMatchFound = LearnerMatchFound(data.learner),
                         PaymentAmount = data.secondPayment.Amount,
                         HasDataLock = HasDataLock(data.learner),
                         InLearning = InLearning(data.learner),
                         PausePayments = data.incentive.PausePayments,
-                        PaymentSentIsEstimated = true, // change to use IsPaymentEstimated when implementing ticket EI-827,
+                        PaymentSent = data.secondPaymentSent != null,
+                        PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
                     },
                     SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
@@ -137,6 +138,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 if (model.SecondPaymentStatus == null)
                 {
                     model.FirstPaymentStatus = paymentStatus;
+                    model.SecondPaymentStatus = paymentStatus;
                 }
             }
             else

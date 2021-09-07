@@ -30,13 +30,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly List<IncentiveApplicationApprenticeship> _apprenticeshipsModels;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
+        private DateTime _today;
         private const int NumberOfApprenticeships = 3;
 
         public ApprenticeshipIncentiveCreatedSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
-            var today = new DateTime(2021, 6, 30);
+            _today = new DateTime(2021, 6, 30);
 
             _accountModel = _fixture.Create<Account>();
 
@@ -48,8 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             _apprenticeshipsModels = _fixture.Build<IncentiveApplicationApprenticeship>()
                 .With(p => p.IncentiveApplicationId, _applicationModel.Id)
-                .With(p => p.PlannedStartDate, today.AddMonths(-2))
-                .With(p => p.DateOfBirth, today.AddYears(-20))
+                .With(p => p.PlannedStartDate, _today.AddMonths(-2))
+                .With(p => p.DateOfBirth, _today.AddYears(-20))
                 .With(p => p.EarningsCalculated, false)
                 .With(p => p.WithdrawnByCompliance, false)
                 .With(p => p.WithdrawnByEmployer, false)
@@ -61,8 +62,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.AccountId, _applicationModel.AccountId)
                 .With(p => p.AccountLegalEntityId, _applicationModel.AccountLegalEntityId)
                 .With(p => p.ApprenticeshipId, _apprenticeshipsModels.First().ApprenticeshipId)
-                .With(p => p.StartDate, today.AddDays(1))
-                .With(p => p.DateOfBirth, today.AddYears(-20))
+                .With(p => p.StartDate, _today.AddDays(1))
+                .With(p => p.SubmittedDate, _today)
+                .With(p => p.DateOfBirth, _today.AddYears(-20))
                 .With(p => p.Phase, Phase.Phase2)
                 .Create();
 
@@ -82,6 +84,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 await dbConnection.InsertAsync(_applicationModel);
                 await dbConnection.InsertAsync(_apprenticeshipsModels);
             }
+        }
+
+        [Given(@"an existing withdrawn incentive")]
+        public async Task GivenAnExistingWithdrawnIncentive()
+        {
+            _apprenticeshipIncentive.Status = IncentiveStatus.Withdrawn;
+            _apprenticeshipIncentive.IncentiveApplicationApprenticeshipId = Guid.NewGuid();
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive, true);
+        }
+
+        [Given(@"an employer is re-applying for apprenticeship incentive")]
+        public async Task GivenAnEmployerIsRe_ApplyingForApprenticeshipIncentive()
+        {
+            _apprenticeshipsModels.RemoveRange(1, _apprenticeshipsModels.Count - 1);
+            await GivenAnEmployerIsApplyingForTheNewApprenticeshipIncentive();
         }
 
         [Given(@"an employer has submitted an application")]
@@ -135,6 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [When(@"the apprenticeship incentive is created for each apprenticeship in the application")]
+        [Then(@"the apprenticeship incentive is created for each apprenticeship in the application")]
         public async Task WhenTheApprenticeshipIncentiveIsCreatedForEachApprenticeshipInTheApplication()
         {
             foreach (var apprenticeship in _apprenticeshipsModels)
@@ -159,7 +178,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                    await _testContext.MessageBus.Send(createCommand), numberOfOnProcessedEventsExpected: _apprenticeshipsModels.Count());
             }
         }
-        
 
         [When(@"the apprenticeship incentive earnings are calculated")]
         public async Task WhenTheApprenticeshipIncentiveEarningsAreCalculated()
@@ -275,6 +293,47 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
                 application.EarningsCalculated.Should().BeTrue();
             }
+        }
+
+        [Given(@"an apprenticeship incentive exists with a payment due within the delay period")]
+        public async Task GivenAnApprenticeshipIncentiveExistsWithAPaymentDueWithinTheDelayPeriod()
+        {
+            _apprenticeshipIncentive.SubmittedDate = _today.AddDays(90);
+            await GivenAnApprenticeshipIncentiveExists();
+        }
+
+        [Then(@"the first pending payment is due at the end of the delay period")]
+        public void ThenTheFirstPendingPaymentIsDueAtTheEndOfTheDelayPeriod()
+        {
+            var completeCalculationCommandsPublished = _testContext.CommandsPublished
+                .Where(c => c.IsProcessed &&
+                            c.IsDomainCommand &&
+                            c.Command.GetType() == typeof(CompleteEarningsCalculationCommand));
+
+            completeCalculationCommandsPublished.Count().Should().Be(1);
+
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var createdIncentives = dbConnection.GetAll<ApprenticeshipIncentive>();
+
+                createdIncentives.Count().Should().Be(1);
+                var pendingPayments = dbConnection.GetAll<PendingPayment>();
+
+                var expectedDueDate = _apprenticeshipIncentive.SubmittedDate.Value.AddDays(21);
+
+                var firstPendingPayment = pendingPayments.Single(p => p.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id && p.EarningType == EarningType.FirstPayment);
+                firstPendingPayment.DueDate.Date.Should().Be(expectedDueDate.Date);
+            }
+        }
+
+        [Then(@"original withdrawn incentive is retained")]
+        public void ThenOriginalWithdrawnIncentiveIsRetained()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var incentives = dbConnection.GetAll<ApprenticeshipIncentive>().ToList();
+            incentives.Count().Should().Be(2);
+            incentives.Count(a => a.Status == IncentiveStatus.Withdrawn).Should().Be(1);
+            incentives.Count(a => a.Status == IncentiveStatus.Active).Should().Be(1);
         }
     }
 }
