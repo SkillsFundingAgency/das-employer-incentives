@@ -74,8 +74,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             if (nextPayment == null) return false;
 
             var hasLock = data
-               .PaymentsForApprenticeshipInAcademicYear(incentive.Apprenticeship.Id, nextPayment.DueDate)
+               .PaymentsForApprenticeship(incentive.Apprenticeship.Id, nextPayment.DueDate)
                .Any(p => p.Period == nextPayment.CollectionPeriod?.PeriodNumber 
+                         && data.AcademicYear == nextPayment.CollectionPeriod?.AcademicYear
                          && !p.IsPayable);
 
             return hasLock;
@@ -127,51 +128,41 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return isInLearning;
         }
 
-        public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto data,
-            Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive,
-            Domain.ValueObjects.CollectionCalendar calendar)
+        public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
-            if (incentive == null) return new LearningStoppedStatus(false);
+            var learningStoppedStatus = new LearningStoppedStatus(false);
 
-            var training =
-                (from tr in data.Training
-                    where tr.Reference == PROGRAM_REFERENCE
-                    from pe in tr.PriceEpisodes
-                    from p in pe.Periods.DefaultIfEmpty()
-                    where (p is null || p.ApprenticeshipId == incentive.Apprenticeship.Id)
-                    select new
-                    {
-                        p?.ApprenticeshipId,
-                        pe.StartDate,
-                        EndDate = pe.EndDate ?? calendar.GetAcademicYearEndDate(pe.AcademicYear),
-                        pe.AcademicYear
-                    })
-                .OrderByDescending(x => x.StartDate)
-                .Select(c => (c.ApprenticeshipId, c.StartDate, c.EndDate, c.AcademicYear))
-                .ToArray();
+            if (incentive == null) return learningStoppedStatus;
 
-            if (!training.Any()) return new LearningStoppedStatus(false);
+            var matchedRecords =
+               (from tr in learnerData.Training
+                where tr.Reference == PROGRAM_REFERENCE
+                from pe in tr.PriceEpisodes
+                from p in pe.Periods
+                where p.ApprenticeshipId == incentive.Apprenticeship.Id
+                select new
+                {
+                    p.ApprenticeshipId,
+                    pe.StartDate,
+                    pe.EndDate,
+                    pe.AcademicYear
+                }).ToArray();
 
-            var latestPriceEpisode = training.First();
-
-            if (HasNoPeriods(latestPriceEpisode) || HasEndedAndNotOnAcademicYearsEve(calendar, latestPriceEpisode))
+            if (matchedRecords.Any())
             {
-                return new LearningStoppedStatus(true, latestPriceEpisode.EndDate.AddDays(1));
+                var latestPriceEpisode = matchedRecords.OrderByDescending(m => m.StartDate).First();
+
+                if (latestPriceEpisode.EndDate.HasValue && latestPriceEpisode.EndDate.Value.Date < DateTime.Today.Date && latestPriceEpisode.EndDate.Value.Date != collectionCalendar.GetAcademicYearEndDate(latestPriceEpisode.AcademicYear))
+                {
+                    learningStoppedStatus = new LearningStoppedStatus(true, latestPriceEpisode.EndDate.Value.AddDays(1));
+                }
+                else
+                {
+                    learningStoppedStatus = new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
+                }
             }
 
-            return new LearningStoppedStatus(false, latestPriceEpisode.StartDate);
-        }
-
-        private static bool HasEndedAndNotOnAcademicYearsEve(Domain.ValueObjects.CollectionCalendar collectionCalendar,
-            (long? ApprenticeshipId, DateTime StartDate, DateTime EndDate, string AcademicYear) episode)
-        {
-            return episode.EndDate.Date < collectionCalendar.GetActivePeriod().CensusDate
-                   && episode.EndDate.Date != collectionCalendar.GetAcademicYearEndDate(episode.AcademicYear);
-        }
-
-        private static bool HasNoPeriods((long? ApprenticeshipId, DateTime StartDate, DateTime EndDate, string AcademicYear) episode)
-        {
-            return episode.ApprenticeshipId == null;
+            return learningStoppedStatus;
         }
 
         public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
@@ -198,7 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 .Where(p => p.ApprenticeshipId == apprenticeshipId);
         }
 
-        private static IEnumerable<PeriodDto> PaymentsForApprenticeshipInAcademicYear(this LearnerSubmissionDto data, long apprenticeshipId, DateTime paymentDueDate)
+        private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId, DateTime paymentDueDate)
         {
             return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
                 .SelectMany(t => t.PriceEpisodes.Where(pe => pe.StartDate <= paymentDueDate
