@@ -34,6 +34,7 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders
         public ApprenticeshipIncentiveBuilder WithStartDate(DateTime startDate)
         {
             _apprenticeshipIncentiveModel.StartDate = startDate;
+            _apprenticeshipIncentiveModel.SubmittedDate = startDate.AddDays(-30);
             return this;
         }
 

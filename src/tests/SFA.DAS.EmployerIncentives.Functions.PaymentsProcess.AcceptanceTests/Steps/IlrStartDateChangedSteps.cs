@@ -222,7 +222,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             pp.Amount.Should().Be(amount);
             pp.PaymentMadeDate.Should().BeNull();
 
-            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(90));
+            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(89));
             pp.PeriodNumber.Should().Be(period.PeriodNumber);
             pp.PaymentYear.ToString().Should().Be(period.AcademicYear);
         }
@@ -239,7 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             pp.Amount.Should().Be(amount);
             pp.PaymentMadeDate.Should().BeNull();
-            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(365));
+            var period = await _testContext.GetCollectionCalendarPeriod(_actualStartDate.AddDays(364));
             pp.PeriodNumber.Should().Be(period.PeriodNumber);
             pp.PaymentYear.ToString().Should().Be(period.AcademicYear);
         }
@@ -276,5 +276,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             incentive.MinimumAgreementVersion.Should().Be(version);
         }
 
+        [When(@"the learner data is updated with new start date which will create earning in the delay period")]
+        public void WhenTheLearnerDataIsUpdatedWithNewStartDateWhichWillCreateEarningInTheDelayPeriod()
+        {
+            _actualStartDate = new DateTime(2021, 4, 1);
+        }
+
+        [Then(@"a new first earning with a due date at the end of the delay period is created")]
+        public void ThenANewFirstEarningWithADueDateAtTheEndOfTheDelayPeriodIsCreated()
+        {
+            var pp = _newPendingPayments.Single(x =>
+                x.AccountId == _accountModel.Id
+                && x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.AccountLegalEntityId == _accountModel.AccountLegalEntityId
+                && x.EarningType == EarningType.FirstPayment
+                && !x.ClawedBack);
+
+            pp.DueDate.Date.Should().Be(_submissionDate.AddDays(21).Date);
+        }
     }
 }

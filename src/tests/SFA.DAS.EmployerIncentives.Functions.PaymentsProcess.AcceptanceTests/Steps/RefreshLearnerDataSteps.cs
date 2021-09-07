@@ -48,6 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.StartDate, _startDate)
+                .With(p => p.SubmittedDate, _startDate.AddDays(-30))
                 .Without(p => p.PendingPayments)
                 .Without(p => p.Payments)
                 .With(p => p.Phase, Phase.Phase1)

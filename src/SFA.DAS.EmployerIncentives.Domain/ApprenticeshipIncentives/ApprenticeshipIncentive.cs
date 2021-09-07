@@ -37,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
+        public DateTime SubmissionDate => Model.SubmittedDate.Value;
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
@@ -351,7 +352,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.Id,
                     learningStoppedStatus.DateStopped.Value));
             }
-            else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped)
+            else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped && learningStoppedStatus.DateResumed != null)
             {
                 Model.Status = IncentiveStatus.Active;
                 StopBreakInLearning(learningStoppedStatus);

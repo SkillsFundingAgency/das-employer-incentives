@@ -56,6 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
                 .With(p => p.StartDate, _plannedStartDate)
+                .With(p => p.SubmittedDate, _plannedStartDate.AddDays(-30))
                 .With(p => p.RefreshedLearnerForEarnings, true)
                 .With(p => p.PausePayments, false)
                 .With(p => p.Status, IncentiveStatus.Stopped)

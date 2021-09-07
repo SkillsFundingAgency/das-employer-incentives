@@ -4,7 +4,6 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.Reference = "ZPROG001";
 
             _testPriceEpisodeDto = _testTrainingDto.PriceEpisodes.First();
+            _testPriceEpisodeDto.AcademicYear = _nextPendingPaymentDue.CollectionPeriod.AcademicYear.ToString();
             _testPriceEpisodeDto.StartDate = _startTime;
             _testPriceEpisodeDto.EndDate = _dueDate.AddDays(10);
 
@@ -81,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Then_is_true_when_there_is_a_matching_record()
         {
             //Arrange            
-
+            
             //Act
             var hasDataLock = _sut.HasProviderDataLocks(_incentive);
 
