@@ -69,8 +69,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
 
             var period = calendar
-                    .Where(d => d.CensusDate >= date)
-                    .OrderBy(d => d.CensusDate)
+                    .Where(d => d.EIScheduledOpenDateUTC <= date)
+                    .OrderByDescending(d => d.EIScheduledOpenDateUTC)
                     .FirstOrDefault();
 
             return period;

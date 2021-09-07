@@ -27,11 +27,6 @@ Scenario: Incentive application updated after earnings calculated
 	When the earnings calculation against the apprenticeship incentive completes
 	Then the incentive application is updated to record that the earnings have been calculated
 
-Scenario: Apprenticeship incentive submitted within 21 days of first payment due date
-	Given an apprenticeship incentive exists with a payment due within the delay period
-	When the apprenticeship incentive earnings are calculated
-	Then the first pending payment is due at the end of the delay period
-
 Scenario: Incentive application is submitted for withdrawn apprenticeship
 	Given an existing withdrawn incentive
 	And an employer is re-applying for apprenticeship incentive
