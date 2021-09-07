@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
@@ -38,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             _payments = Generate(incentiveType, breaksInLearning, submissionDate);
         }
         
-        public static Incentive Create(
+        public static async Task<Incentive> Create(
             ApprenticeshipIncentive incentive)
         {
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, incentive.BreakInLearnings, incentive.SubmissionDate);
