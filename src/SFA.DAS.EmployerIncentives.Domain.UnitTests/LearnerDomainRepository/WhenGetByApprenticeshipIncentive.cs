@@ -59,7 +59,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             incentiveModel.PendingPaymentModels = payments;
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.ApplicationApprenticeshipId, incentiveModel);
-            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
             var learner = _fixture.Create<LearnerModel>();
             _learnerDataRepositoryMock.Setup(r => r.GetByApprenticeshipIncentiveId(incentive.Id)).ReturnsAsync(learner);
@@ -87,7 +86,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
             payments[1].DueDate = DateTime.Parse("01/10/2020", new CultureInfo("en-GB"));
             incentiveModel.PendingPaymentModels = payments;
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.ApplicationApprenticeshipId, incentiveModel);
-            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
 
             _learnerDataRepositoryMock.Setup(r => r.GetByApprenticeshipIncentiveId(incentive.Id)).ReturnsAsync((LearnerModel)null);
 
