@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
 
             //Assert
             result.EligibilityStartDate.Should().Be(new DateTime(2021, 4, 1));
-            result.EligibilityEndDate.Should().Be(new DateTime(2021, 11, 30));
+            result.EligibilityEndDate.Should().Be(new DateTime(2022, 03, 31));
         }
     }
 }
