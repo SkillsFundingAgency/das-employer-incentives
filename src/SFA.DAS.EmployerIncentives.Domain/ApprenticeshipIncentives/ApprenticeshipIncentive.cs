@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             var collectionCalendar = await collectionCalendarService.Get();
 
-            var incentive = Incentive.Create(this);
+            var incentive = await Incentive.Create(this);
             if (!incentive.IsEligible)
             {
                 ClawbackAllPayments(collectionCalendar.GetActivePeriod().CollectionPeriod);
