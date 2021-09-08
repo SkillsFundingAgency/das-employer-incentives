@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
@@ -22,6 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
         public abstract bool IsEligible { get; }
         public abstract List<PaymentProfile> PaymentProfiles { get; }
+        public abstract List<EligibilityPeriod> EligibilityPeriods { get; }
 
         protected abstract int DelayPeriod { get; }
 
@@ -43,6 +46,36 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             ApprenticeshipIncentive incentive)
         {
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, incentive.BreakInLearnings, incentive.SubmissionDate);
+        }
+
+        public bool IsNewAgreementRequired(int signedAgreementVersion)
+        {
+            if (!IsEligible)
+            {
+                return true;
+            }
+            var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= StartDate && x.EndDate >= StartDate);
+            return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
+        }
+
+        public static bool IsNewAgreementRequired(IncentiveApplicationDto application)
+        {
+            foreach (var apprenticeship in application.Apprenticeships)
+            {
+                var incentive = Create(apprenticeship);
+
+                if (incentive.IsNewAgreementRequired(application.LegalEntity.SignedAgreementVersion ?? 0))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static Incentive Create(IncentiveApplicationApprenticeshipDto application)
+        {
+            return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>());
         }
 
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
