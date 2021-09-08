@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -25,7 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
 
-        private List<IncentivePaymentProfile> _paymentProfiles;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private CollectionCalendar _collectionCalendar;
         private Apprenticeship _apprenticehip;
@@ -48,9 +46,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionPeriods = new List<CollectionCalendarPeriod>()
             {
                 new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(1).AddDays(1), false, false),
-                new CollectionCalendarPeriod(new CollectionPeriod(2, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(2).AddDays(1), false, false),
-                new CollectionCalendarPeriod(new CollectionPeriod(3, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(2).Month, (short)_collectionPeriod.AddMonths(2).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(3).AddDays(1), false, false),
             };
+            for (var i = 1; i <= 12; i++)
+            {
+                _collectionPeriods.Add(new CollectionCalendarPeriod(new CollectionPeriod((byte)i, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(i).Month, (short)_collectionPeriod.AddMonths(i).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(i + 1).AddDays(1), false, false)
+                );
+            }
 
             _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
 
@@ -107,8 +108,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.CollectionPeriod.PeriodNumber.Should().Be(3);
             firstPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 3).CollectionPeriod.AcademicYear);
             firstPayment.Amount.Should().Be(1500);
-            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(3);
-            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 3).CollectionPeriod.AcademicYear);
+            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(12);
+            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 12).CollectionPeriod.AcademicYear);
             secondPayment.Amount.Should().Be(1500);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
@@ -141,8 +142,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.CollectionPeriod.PeriodNumber.Should().Be(3);
             firstPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 3).CollectionPeriod.AcademicYear);
             firstPayment.Amount.Should().Be(1500);
-            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(3);
-            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 3).CollectionPeriod.AcademicYear);
+            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(12);
+            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 12).CollectionPeriod.AcademicYear);
             secondPayment.Amount.Should().Be(1500);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
@@ -265,7 +266,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
         }
 
-        [Test]
+        [Test, Ignore("Earnings for Phase 2 applications do not differ for different age ranges so this test is invalid")]
         public async Task Then_earnings_with_sent_payments_are_clawed_back_when_the_earning_amount_has_changed()
         {
             // arrange
@@ -290,7 +291,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
         }
 
-        [Test]
+        [Test, Ignore("A change of date of birth does not trigger a clawback and new payment for Phase 2 applications")]
         public async Task Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_earning_amount_has_changed()
         {
             // arrange
@@ -487,6 +488,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             var submissionDate = _sutModel.StartDate.AddDays(20);
             _sutModel.SubmittedDate = submissionDate;
+            _sutModel.StartDate = _sutModel.StartDate.AddMonths(-4);
             var expectedDueDate = submissionDate.AddDays(21);
 
             // Act
