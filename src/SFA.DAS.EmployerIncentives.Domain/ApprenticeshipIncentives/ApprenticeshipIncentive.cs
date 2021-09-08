@@ -37,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
+        public DateTime SubmissionDate => Model.SubmittedDate.Value;
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
