@@ -14,7 +14,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string NServiceBusLicense { get; set; }
         public string UseLearningEndpointStorageDirectory { get; set; }        
         public virtual int MinimumAgreementVersion { get; set; }
-        public List<IncentivePaymentProfile> IncentivePaymentProfiles { get; set; }
         public string ApiBaseUrl { get; set; }
         public string Identifier { get; set; }
         public string EmployerIncentivesWebBaseUrl { get; set; }

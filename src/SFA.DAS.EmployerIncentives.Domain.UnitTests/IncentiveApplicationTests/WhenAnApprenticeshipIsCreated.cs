@@ -37,9 +37,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         [TestCase("2021-04-01 00:00:00", true)]
         [TestCase("2021-04-01 23:59:59", true)]
         [TestCase("2021-04-01", true)]
-        [TestCase("2021-09-30", true)]
-        [TestCase("2021-09-30 23:59:59", true)]
-        [TestCase("2021-10-01", false)]
+        [TestCase("2021-11-30", true)]
+        [TestCase("2021-11-30 23:59:59", true)]
+        [TestCase("2021-12-01", false)]
 
         public void Then_the_has_eligible_employer_start_is_set_correctly_based_on_the_employer_start_date(DateTime? employerStartDate, bool isEligible)
         {   
