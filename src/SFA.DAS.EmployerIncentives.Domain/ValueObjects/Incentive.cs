@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public static Incentive Create(IncentiveApplicationApprenticeshipDto application)
         {
-            return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>());
+            return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>(), DateTime.UtcNow);
         }
 
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
