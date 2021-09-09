@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
 {
-    public class ComplianceWithdrawalCommand : WithdrawalCommand
+    public class ComplianceWithdrawalCommand : WithdrawalCommand, IPeriodEndIncompatible
     {  
         public ComplianceWithdrawalCommand(            
             long accountLegalEntityId,
@@ -18,5 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
                   serviceRequestCreated)
         {
         }
+
+        public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
     }
 }
