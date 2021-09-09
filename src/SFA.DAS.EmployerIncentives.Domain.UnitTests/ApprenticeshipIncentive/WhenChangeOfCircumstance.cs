@@ -124,6 +124,41 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
         }
 
+        [TestCase(Phase.Phase1, 3, "2020-08-01", 4)]
+        [TestCase(Phase.Phase1, 3, "2021-01-31", 4)]
+        [TestCase(Phase.Phase1, 4, "2021-02-01", 5)]
+        [TestCase(Phase.Phase1, 4, "2021-05-01", 5)]
+        [TestCase(Phase.Phase1, 5, "2020-08-01", 5)]
+        [TestCase(Phase.Phase1, 5, "2021-01-31", 5)]
+        [TestCase(Phase.Phase1, 5, "2021-06-01", 5)]
+        [TestCase(Phase.Phase2, 5, "2021-06-01", 6)]
+        [TestCase(Phase.Phase2, 5, "2021-09-30", 6)]
+        [TestCase(Phase.Phase2, 6, "2021-10-01", 7)]
+        [TestCase(Phase.Phase2, 6, "2022-01-31", 7)]
+        [TestCase(Phase.Phase2, 7, "2021-10-01", 7)]
+        [TestCase(Phase.Phase2, 7, "2022-01-31", 7)]
+        public async Task Then_minimum_agreement_version_is_set_when_the_start_date_changes(Phase phase, int agreementVersion, string startDate, int expectedMinimumVersion)
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetStartDate(DateTime.Parse(startDate));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            var learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            learner.SetSubmissionData(submissionData);
+            _sutModel.MinimumAgreementVersion = new AgreementVersion(agreementVersion);
+            _sutModel.Phase = new IncentivePhase(phase);
+            _sut = Sut(_sutModel);
+
+            //Act
+            await _sut.SetChangeOfCircumstances(learner, _mockCollectionCalendarService.Object);
+
+            //Assert
+            _sut.MinimumAgreementVersion.MinimumRequiredVersion.Should().Be(expectedMinimumVersion);
+
+        }
+
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
