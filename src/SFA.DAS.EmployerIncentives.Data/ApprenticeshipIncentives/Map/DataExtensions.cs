@@ -253,7 +253,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
                 CreatedDate = model.CreatedDate,
-                SuccessfulLearnerMatch = model.SuccessfulLearnerMatch,
+                SuccessfulLearnerMatch = model.SuccessfulLearnerMatchExecution,
                 LearningPeriods = model.LearningPeriods.Map(),
                 DaysInLearnings = model.DaysInLearnings.Map(),
                 SubmissionData = new SubmissionData()
@@ -311,7 +311,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             learner.RawJSON = model.SubmissionData.RawJson;
             learner.LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped;
             learner.LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed;
-            learner.SuccessfulLearnerMatch = model.SuccessfulLearnerMatch;
+            learner.SuccessfulLearnerMatchExecution = model.SuccessfulLearnerMatch;
             return learner;
         }
 
