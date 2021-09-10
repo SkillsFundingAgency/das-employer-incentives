@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             _fixture = new Fixture();
 
-            _collectionPeriod = new DateTime(2021, 10, 1);
+            _collectionPeriod = new DateTime(2021, 08, 01);
             _plannedStartDate = _collectionPeriod.AddDays(5);
 
             _firstPaymentDaysAfterApprenticeshipStart = 89;

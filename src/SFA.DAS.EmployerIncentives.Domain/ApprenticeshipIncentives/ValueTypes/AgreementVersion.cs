@@ -18,13 +18,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public static AgreementVersion Create(Phase phase, DateTime startDate)
         {
             int minimumAgreementVersion;
+
             if (phase == Phase.Phase1)
             {
                 minimumAgreementVersion = Phase1Incentive.MinimumAgreementVersion(startDate);
             }
-            else
+            else if (phase == Phase.Phase2)
             {
                 minimumAgreementVersion = Phase2Incentive.MinimumAgreementVersion(startDate);
+            }
+            else
+            {
+                minimumAgreementVersion = Phase3Incentive.MinimumAgreementVersion(startDate);
             }
 
             return new AgreementVersion(minimumAgreementVersion);

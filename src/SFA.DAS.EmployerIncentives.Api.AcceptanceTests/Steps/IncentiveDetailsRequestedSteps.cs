@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _incentiveResponse.Should().NotBeNull();
             _incentiveResponse.EligibilityStartDate.Should().Be(Phase2Incentive.EligibilityStartDate);
-            _incentiveResponse.EligibilityEndDate.Should().Be(Phase2Incentive.EligibilityEndDate);
+            _incentiveResponse.EligibilityEndDate.Should().Be(Phase3Incentive.EligibilityEndDate);
         }
     }
 }
