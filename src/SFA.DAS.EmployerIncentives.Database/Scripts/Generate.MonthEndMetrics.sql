@@ -49,7 +49,9 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
   WHERE [DateClawbackSent] is  null
 
   -- Validations (Current period) (Paste into cell A3 on tab [YTD Validation])
-  ;with PendingPaymentValidations as (
+;with LatestPeriod as (
+  select top 1 PeriodNumber, PaymentYear from [BusinessGetMonthEndRuntimes] order by [LastValidation] desc)
+,PendingPaymentValidations as (
  select PendingPaymentId [PendingPaymentId], 
    max(iif(step='HasIlrSubmission',1,0)) as HasIlrSubmission,
    max(iif(step='HasLearningRecord',1,0)) as HasLearningRecord,
@@ -61,13 +63,12 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
    max(iif(step='HasSignedMinVersion',1,0)) as HasSignedMinVersion,
    max(iif(step='LearnerMatchSuccessful',1,0)) as LearnerMatchSuccessful,
    Result,
-   PeriodNumber, 
-   PaymentYear
+   ppvr.PeriodNumber, 
+   ppvr.PaymentYear
  from [incentives].[PendingPaymentValidationResult] ppvr
- where ppvr.PeriodNumber = (select max(PeriodNumber) from [BusinessGetMonthEndRuntimes])
- and  ppvr.PaymentYear = (select max(PaymentYear) from [BusinessGetMonthEndRuntimes])
+ inner join LatestPeriod on ppvr.PeriodNumber = LatestPeriod.PeriodNumber and ppvr.PaymentYear = LatestPeriod.PaymentYear
  and result = 1 
- group by PendingPaymentId, result, PeriodNumber, PaymentYear
+ group by PendingPaymentId, result, ppvr.PeriodNumber, ppvr.PaymentYear
 )
 select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Validation}) CountOfPayments], 
   HasLearningRecord,
