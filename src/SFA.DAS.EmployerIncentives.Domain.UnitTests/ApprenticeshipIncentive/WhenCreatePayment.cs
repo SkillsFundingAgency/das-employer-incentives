@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // arrange
             var apprenticeship = new Apprenticeship(_fixture.Create<long>(), _fixture.Create<string>(),
-                _fixture.Create<string>(), dob, _fixture.Create<long>(), employerType, _fixture.Create<string>(), _fixture.Create<DateTime>());
+                _fixture.Create<string>(), dob, _fixture.Create<long>(), employerType, _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<Provider>());
 
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x=>x.StartDate, plannedStartDate)
