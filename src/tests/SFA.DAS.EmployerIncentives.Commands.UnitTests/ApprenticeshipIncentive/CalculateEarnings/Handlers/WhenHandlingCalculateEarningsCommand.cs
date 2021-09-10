@@ -68,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
                         _fixture.Create<string>(),
-                        _fixture.Create<DateTime>()
+                        _fixture.Create<DateTime>(),
+                        _fixture.Create<Provider>()
                         ),
                     today,
                     _fixture.Create<DateTime>(),
@@ -76,8 +77,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     new AgreementVersion(_fixture.Create<int>()),
                     new IncentivePhase(Phase.Phase1));
             
-            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
             _fixture.Register(() => incentive);
 
             _sut = new CalculateEarningsCommandHandler(

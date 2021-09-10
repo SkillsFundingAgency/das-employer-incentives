@@ -59,7 +59,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                             _fixture.Create<long>(),
                             ApprenticeshipEmployerType.Levy,
                             _fixture.Create<string>(),
-                            _fixture.Create<DateTime>()
+                            _fixture.Create<DateTime>(),
+                            _fixture.Create<Provider>()
                         ))
                 .With(p => p.StartDate, DateTime.Today)
                 .With(p => p.Status, Enums.IncentiveStatus.Active)
@@ -68,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(p => p.MinimumAgreementVersion, new AgreementVersion(_fixture.Create<int>()))
                 .With(p => p.PendingPaymentModels, new List<PendingPaymentModel>())
                 .Create();
-            _incentiveModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+            
             _incentiveModel.HasPossibleChangeOfCircumstances = true;
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(_incentiveModel.Id, _incentiveModel);
             _fixture.Register(() => incentive);

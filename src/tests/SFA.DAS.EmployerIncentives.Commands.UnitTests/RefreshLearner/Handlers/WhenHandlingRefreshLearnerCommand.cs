@@ -51,8 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLogger = new Mock<ILogger<RefreshLearnerCommandHandler>>();
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             _incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(p => p.Apprenticeship, apprenticeship)
                 .Create();
@@ -338,8 +337,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var pendingPaymentModel = _fixture.Create<PendingPaymentModel>();
             pendingPaymentModel.PaymentMadeDate = null;
 
@@ -409,8 +407,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .Create();
@@ -523,7 +520,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
 
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
@@ -612,8 +608,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .Create();
@@ -690,8 +685,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Stopped)
@@ -769,8 +763,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
