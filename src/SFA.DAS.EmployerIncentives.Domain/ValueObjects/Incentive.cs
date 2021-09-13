@@ -145,6 +145,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             {
                 return new Phase2Incentive(dateOfBirth, startDate, incentiveType, breaksInLearning, submissionDate);
             }
+            else if (phase == Phase.Phase3)
+            {
+                return new Phase3Incentive(dateOfBirth, startDate, incentiveType, breaksInLearning, submissionDate);
+            }
 
             return null; // wouldn't get here
         }
