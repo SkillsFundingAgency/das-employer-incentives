@@ -2,7 +2,6 @@
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
@@ -13,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.SetSuccessfulLearnerMatchCommand.Handlers
 {
@@ -44,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
                         _fixture.Create<string>(),
-                        _fixture.Create<DateTime>()
+                        _fixture.Create<DateTime>(),
+                        _fixture.Create<Provider>()
                     ))
                 .With(p => p.StartDate, DateTime.Today)
                 .With(p => p.Status, Enums.IncentiveStatus.Active)

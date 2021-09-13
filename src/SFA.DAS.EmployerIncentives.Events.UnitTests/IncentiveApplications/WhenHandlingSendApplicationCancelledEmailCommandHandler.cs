@@ -11,6 +11,8 @@ using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
 {
@@ -55,11 +57,9 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             _configuration = new ApplicationSettings { EmployerIncentivesWebBaseUrl = baseUrl };
             _applicationSettings.Setup(x => x.Value).Returns(_configuration);
 
-
             var expectedUrl = $"{baseUrl}/{hashedAccountId}/payments/{hashedAccountLegalEntityId}/payment-applications";
 
-            _sut = new EmployerWithdrawnNotificationHandler(_commandPublisher.Object, _emailSettings.Object,
-                _hashingService.Object, _applicationSettings.Object);
+            _sut = new EmployerWithdrawnNotificationHandler(_commandPublisher.Object, _emailSettings.Object, _hashingService.Object, _applicationSettings.Object);
 
             // Act
             await _sut.Handle(command);
@@ -72,6 +72,22 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
                 x.Tokens["organisation name"] == command.LegalEntity &&
                 x.Tokens["uln"] == command.Model.ULN.ToString()
             ), It.IsAny<CancellationToken>()), Times.Once());
+        }
+
+        [Test]
+        public async Task Then_an_email_is_not_sent_when_no_email_address_is_provided()
+        {
+
+            // Arrange
+            var command = new EmployerWithdrawn(_fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<string>(), (string)null, _fixture.Create<ApprenticeshipModel>(), _fixture.Create<ServiceRequest>());
+
+            _sut = new EmployerWithdrawnNotificationHandler(_commandPublisher.Object, _emailSettings.Object, _hashingService.Object, _applicationSettings.Object);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _commandPublisher.Verify(cp => cp.Publish(It.IsAny<SendEmailCommand>(), It.IsAny<CancellationToken>()), Times.Never());
         }
     }
 }
