@@ -26,3 +26,19 @@ Scenario: Incentive Application is submitted but an internal error occurs
 	Given an employer has entered incentive claim application details
 	When the application is submitted and the system errors
 	Then the application changes are not saved	
+
+Scenario: Incentive Application is submitted for Phase 2 employment start dates
+	Given an employer has entered incentive claim application details with employment start dates for Phase 2
+	When the application is submitted
+	Then the application apprentice phases are set to Phase2
+
+Scenario: Incentive Application is submitted for Phase 3 employment start dates
+	Given an employer has entered incentive claim application details with employment start dates for Phase 3
+	When the application is submitted
+	Then the application apprentice phases are set to Phase3
+
+Scenario: Incentive Application is submitted for Phase 2 and Phase 3 employment start dates
+	Given an employer has entered incentive claim application details with employment start dates for Phase 2 and Phase 3
+	When the application is submitted
+	Then the application apprentice phases are set to Phase2 or Phase3 based on the employment start dates
+
