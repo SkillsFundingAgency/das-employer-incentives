@@ -161,7 +161,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
         [TestCase("2021-03-31", false)]
         [TestCase("2021-04-01", true)]
         [TestCase("2021-09-30", true)]
-        [TestCase("2021-10-01", false)]
         public void Then_the_employment_eligibililty_for_a_phase_2_application_is_set_based_on_the_employement_start_date(DateTime? startDate, bool eligibility)
         {
             // Arrange
@@ -175,7 +174,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
         }
 
         [TestCase(null, false)]
-        [TestCase("2021-09-30", false)]
         [TestCase("2021-10-01", true)]
         [TestCase("2022-01-31", true)]
         [TestCase("2022-02-01", false)]
@@ -194,7 +192,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
         [TestCase("2021-04-01", Phase.Phase2)]
         [TestCase("2021-09-30", Phase.Phase2)]
         [TestCase("2021-10-01", Phase.Phase3)]
-        [TestCase("2022-03-01", Phase.Phase3)]
+        [TestCase("2022-01-31", Phase.Phase3)]
         public void Then_the_apprenticeship_phase_is_set_based_on_the_employment_start_date(DateTime startDate, Phase phase)
         {
             // Arrange
