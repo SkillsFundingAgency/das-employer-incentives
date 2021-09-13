@@ -11,15 +11,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
+        private readonly IIncentivePaymentProfilesService _incentivePaymentProfilesService;
 
         public LearnerChangeOfCircumstanceCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository, 
             ILearnerDomainRepository learnerDomainRepository,
-            ICollectionCalendarService collectionCalendarService)
+            ICollectionCalendarService collectionCalendarService,
+            IIncentivePaymentProfilesService incentivePaymentProfilesService)
         {
             _domainRepository = domainRepository;
             _learnerDomainRepository = learnerDomainRepository;
             _collectionCalendarService = collectionCalendarService;
+            _incentivePaymentProfilesService = incentivePaymentProfilesService;
         }
 
         public async Task Handle(LearnerChangeOfCircumstanceCommand command, CancellationToken cancellationToken = default)
@@ -33,7 +36,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
-            await incentive.SetChangeOfCircumstances(learner, _collectionCalendarService);
+            if(learner.HasFoundSubmission)
+            {
+                var collectionCalendar = await _collectionCalendarService.Get();
+                var paymentProfiles = await _incentivePaymentProfilesService.Get();
+
+                if (learner.HasStartDate)
+                {
+                    incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, paymentProfiles, collectionCalendar);
+                }
+
+                incentive.SetLearningStoppedChangeOfCircumstance(learner.StoppedStatus, paymentProfiles, collectionCalendar);
+            }
+
+            incentive.SetHasPossibleChangeOfCircumstances(false);
 
             await _domainRepository.Save(incentive);
         }

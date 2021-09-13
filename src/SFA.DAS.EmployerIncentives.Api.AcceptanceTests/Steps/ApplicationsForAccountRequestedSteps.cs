@@ -78,8 +78,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private async Task SetupApprenticeshipIncentive()
         {
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            await dbConnection.InsertAsync(_account);
-            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertAsync(_account, false);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive, false);
             _apprenticeshipIncentive.PendingPayments = _apprenticeshipIncentive.PendingPayments.Take(2).ToList();
             _apprenticeshipIncentive.PendingPayments.First().EarningType = EarningType.FirstPayment;
             _apprenticeshipIncentive.PendingPayments.First().DueDate = new DateTime(2020, 1, 12);

@@ -113,6 +113,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetSuccessfulLearnerMatch(bool succeeded) => Model.SuccessfulLearnerMatch = succeeded;
 
+        public bool HasFoundSubmission => Model.SubmissionData.SubmissionFound;
+
+        public bool HasStartDate => Model.SubmissionData.SubmissionFound && SubmissionData.LearningData.StartDate.HasValue;
+        
+        public DateTime? StartDate => Model.SubmissionData.LearningData.StartDate;
+        public LearningStoppedStatus StoppedStatus => Model.SubmissionData.LearningData.StoppedStatus;
+
         private Learner(LearnerModel model, bool isNew = false) : base(model.Id, model, isNew)
         {
         }

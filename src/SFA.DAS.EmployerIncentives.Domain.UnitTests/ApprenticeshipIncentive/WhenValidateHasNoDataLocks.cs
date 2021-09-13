@@ -39,8 +39,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     })
                 .Create();
 
-            _sutModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
             _learner = Learner.New(
                 Guid.NewGuid(),
                 _sutModel.Id,
