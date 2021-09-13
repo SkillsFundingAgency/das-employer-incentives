@@ -4,6 +4,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplicationFactoryTests
 {
@@ -160,8 +161,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
         [TestCase("2021-03-31", false)]
         [TestCase("2021-04-01", true)]
         [TestCase("2021-11-30", true)]
-        [TestCase("2021-12-01", false)]
-        public void Then_the_employment_eligibililty_is_set_based_on_the_employement_start_date(DateTime? startDate, bool eligibility)
+        [TestCase("2021-12-01", true)]
+        [TestCase("2022-04-01", false)]
+        public void Then_the_employment_eligibility_is_set_based_on_the_employment_start_date(DateTime? startDate, bool eligibility)
         {
             // Arrange
 
@@ -171,6 +173,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
 
             // Assert
             apprenticeship.HasEligibleEmploymentStartDate.Should().Be(eligibility);
+        }
+
+        [TestCase("2021-04-01", Phase.Phase2)]
+        [TestCase("2021-09-30", Phase.Phase2)]
+        [TestCase("2021-10-01", Phase.Phase3)]
+        [TestCase("2022-03-01", Phase.Phase3)]
+        public void Then_the_apprenticeship_phase_is_set_based_on_the_employment_start_date(DateTime startDate, Phase phase)
+        {
+            // Arrange
+
+            // Act
+            var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), _fixture.Create<string>(), startDate);
+
+            // Assert
+            apprenticeship.Phase.Should().Be(phase);
         }
     }
 }

@@ -66,9 +66,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 throw new InvalidPhaseException();
             }
 
-            if (apprenticeship.EmploymentStartDate.HasValue &&
-                (apprenticeship.EmploymentStartDate.Value.Date >= EmployerEligibilityStartDate.Date) &&
-                (apprenticeship.EmploymentStartDate.Value.Date <= EmployerEligibilityEndDate.Date))
+            return EmployerStartDateIsEligible(apprenticeship.EmploymentStartDate);
+        }
+
+        public static bool EmployerStartDateIsEligible(DateTime? employmentStartDate)
+        {
+            if (employmentStartDate.HasValue &&
+                (employmentStartDate.Value.Date >= EmployerEligibilityStartDate.Date) &&
+                (employmentStartDate.Value.Date <= EmployerEligibilityEndDate.Date))
             {
                 return true;
             }

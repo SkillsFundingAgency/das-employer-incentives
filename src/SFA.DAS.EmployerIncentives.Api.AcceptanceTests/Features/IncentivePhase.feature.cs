@@ -101,8 +101,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         [NUnit.Framework.TestCaseAttribute("2021-04-01", "2021-05-31", "Phase2", null)]
         [NUnit.Framework.TestCaseAttribute("2021-04-01", "2021-06-01", "Phase2", null)]
         [NUnit.Framework.TestCaseAttribute("2021-04-01", "2021-11-30", "Phase2", null)]
-        [NUnit.Framework.TestCaseAttribute("2021-11-30", "2021-11-30", "Phase2", null)]
-        [NUnit.Framework.TestCaseAttribute("2021-11-30", "2021-12-01", "Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("2021-11-30", "2021-11-30", "Phase3", null)]
+        [NUnit.Framework.TestCaseAttribute("2021-11-30", "2021-12-01", "Phase3", null)]
         public virtual void IncentiveApplicationIsSubmitted(string startDate, string submissionDate, string phase, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;

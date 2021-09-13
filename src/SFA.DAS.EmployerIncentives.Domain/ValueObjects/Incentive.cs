@@ -84,8 +84,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             {
                 return Phase1Incentive.EmployerStartDateIsEligible(apprenticeship);
             }
-
-            return Phase2Incentive.EmployerStartDateIsEligible(apprenticeship);
+            else if(apprenticeship.Phase == Phase.Phase2)
+            {
+                return Phase2Incentive.EmployerStartDateIsEligible(apprenticeship);
+            }
+            return Phase3Incentive.EmployerStartDateIsEligible(apprenticeship);
         }
 
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
