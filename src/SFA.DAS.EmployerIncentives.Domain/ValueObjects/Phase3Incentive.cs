@@ -20,9 +20,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         }
 
         public static DateTime EligibilityStartDate = new DateTime(2021, 10, 01);
-        public static DateTime EligibilityEndDate = new DateTime(2022, 01, 31);
+        public static DateTime EligibilityEndDate = new DateTime(2022, 03, 31);
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 10, 01);
-        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2022, 03, 31);
+        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2022, 01, 31);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
         protected override int DelayPeriod => 21;
         public override List<PaymentProfile> PaymentProfiles =>
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         
         private static List<EligibilityPeriod> _eligibilityPeriods = new List<EligibilityPeriod>
         {
-            new EligibilityPeriod(new DateTime(2021, 10, 1), new DateTime(2022, 1, 31), 7)
+            new EligibilityPeriod(new DateTime(2021, 10, 1), new DateTime(2022, 3, 31), 7)
         };
         public override List<EligibilityPeriod> EligibilityPeriods => _eligibilityPeriods;
 

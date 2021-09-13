@@ -178,7 +178,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
         [TestCase("2021-04-01", Phase.Phase2)]
         [TestCase("2021-09-30", Phase.Phase2)]
         [TestCase("2021-10-01", Phase.Phase3)]
-        [TestCase("2022-03-01", Phase.Phase3)]
+        [TestCase("2022-01-31", Phase.Phase3)]
         public void Then_the_apprenticeship_phase_is_set_based_on_the_employment_start_date(DateTime startDate, Phase phase)
         {
             // Arrange

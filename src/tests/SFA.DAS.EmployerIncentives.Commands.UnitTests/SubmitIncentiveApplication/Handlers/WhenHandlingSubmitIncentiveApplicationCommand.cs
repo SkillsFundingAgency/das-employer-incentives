@@ -121,16 +121,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
 
-        [TestCase("2021-03-31", true)]
-        [TestCase("2021-04-01", false)]
-        [TestCase("2021-11-30", false)]
-        [TestCase("2021-12-01", true)]
-        public async Task Then_application_with_ineligible_employment_start_date_is_removed(DateTime employmentStartdate, bool isRemoved)
+        [TestCase("2021-03-31", Phase.Phase2, true)]
+        [TestCase("2021-04-01", Phase.Phase2, false)]
+        [TestCase("2021-09-30", Phase.Phase2, false)]
+        [TestCase("2021-10-01", Phase.Phase3, false)]
+        [TestCase("2022-02-01", Phase.Phase3, true)]
+        public async Task Then_application_with_ineligible_employment_start_date_is_removed(DateTime employmentStartdate, Phase phase, bool isRemoved)
         {
             //Arrange
             var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
                 _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
-                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), employmentStartdate, Phase.Phase2);
+                ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), employmentStartdate, phase);
 
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             incentiveApplication.SetApprenticeships(new List<Apprenticeship> { apprentice });
