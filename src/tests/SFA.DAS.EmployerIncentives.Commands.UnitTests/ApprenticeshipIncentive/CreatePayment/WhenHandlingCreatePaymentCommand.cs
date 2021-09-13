@@ -117,16 +117,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
                         _fixture.Create<string>(),
-                        _fixture.Create<DateTime>()
+                        _fixture.Create<DateTime>(),
+                        _fixture.Create<Provider>()
                     ),
                     today,
                     _fixture.Create<DateTime>(),
                     _fixture.Create<string>(),
                     new AgreementVersion(_fixture.Create<int>()),
                     new IncentivePhase(Phase.Phase1));
-
-            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
             var collectionPeriods = new List<CollectionCalendarPeriod>()

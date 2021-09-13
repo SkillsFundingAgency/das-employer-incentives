@@ -44,8 +44,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     })                
                 .Create();
 
-            _sutModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
             _learnerModel = _fixture
                 .Build<LearnerModel>()
                 .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod, 90) })

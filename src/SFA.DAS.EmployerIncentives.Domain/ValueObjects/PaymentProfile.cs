@@ -13,9 +13,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             IncentiveType = incentiveType;
         }
 
-        public int DaysAfterApprenticeshipStart { get; set; }
-        public decimal AmountPayable { get; set; }
-        public IncentiveType IncentiveType { get; set; }        
+        public int DaysAfterApprenticeshipStart { get; private set; }
+        public decimal AmountPayable { get; private set; }
+        public IncentiveType IncentiveType { get; private set; }        
 
         protected override IEnumerable<object> GetAtomicValues()
         {
