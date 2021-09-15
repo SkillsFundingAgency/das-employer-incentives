@@ -23,18 +23,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     [Scope(Feature = "StartDateChangedWithLearningStoppedCoC")]
     public class StartDateChangedWithLearningStoppedCoCSteps
     {
-        private readonly TestContext _testContext;
+        private readonly TestContext _context;
         private readonly Account _accountModel;
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _firstPendingPayment;
         private readonly PendingPayment _secondPendingPayment;
         private readonly DateTime _plannedStartDate;
-        private readonly DateTime _periodEndDate;
 
-        public StartDateChangedWithLearningStoppedCoCSteps(TestContext testContext)
-        {            
-            _testContext = testContext;
+        public StartDateChangedWithLearningStoppedCoCSteps(TestContext context)
+        {
+            _context = context;
             _fixture = new Fixture();
 
             _plannedStartDate = new DateTime(2020, 8, 1);
@@ -67,23 +66,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Without(p => p.PaymentMadeDate)
                 .Create();
 
-            _periodEndDate = GetPastEndDate(DateTime.Today.AddDays(-10));
         }
 
         [Given(@"an apprenticeship incentive exists")]
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            await using (var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
                 await dbConnection.InsertWithEnumAsStringAsync(_firstPendingPayment);
                 await dbConnection.InsertWithEnumAsStringAsync(_secondPendingPayment);                
             }
+
+            await _context.SetActiveCollectionCalendarPeriod(2122, 1);
         }
 
         [Given(@"the learner data identifies the learner as having stopped CoC and a StartDate CoC")]
-        public void GivenTheLearnerDataIdentifiesTheLearnerAsHavingStoppedCocAndAStartdDateCoc()
+        public void GivenTheLearnerDataIdentifiesTheLearnerAsHavingStoppedCocAndAStartDateCoc()
         {
             //
         }
@@ -195,7 +195,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"both recalculated first and second earnings are deleted")]
         public void ThenBothRecalculatedFirstAndSecondEarningsAreDeleted()
         {
-            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
             pendingPayments.Count().Should().Be(0);
@@ -204,7 +204,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"retain the first earnings")]
         public void ThenTheFirstEarning()
         {
-            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
             pendingPayments.Count(e => e.EarningType == EarningType.FirstPayment).Should().Be(1);
@@ -213,7 +213,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"retain the second earnings")]
         public void ThenTheSecondEarning()
         {
-            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
             pendingPayments.Count(e => e.EarningType == EarningType.SecondPayment).Should().Be(1);            
@@ -222,7 +222,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"the second earning is deleted")]
         public void ThenTheSecondEarningIsDeleted()
         {
-            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
             pendingPayments.Count(e => e.EarningType == EarningType.SecondPayment).Should().Be(0);
@@ -230,7 +230,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private void SetupMockLearnerMatchResponse(LearnerSubmissionDto learnerMatchApiData)
         {
-            _testContext.LearnerMatchApi.MockServer
+            _context.LearnerMatchApi.MockServer
                 .Given(
                     Request
                         .Create()
@@ -245,7 +245,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private DateTime GetPastEndDate(DateTime endDate)
         {
-            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            using var dbConnection = new SqlConnection(_context.SqlDatabase.DatabaseInfo.ConnectionString);
             var academicYears = dbConnection.GetAll<AcademicYear>();
 
             if (academicYears.Any(x => x.EndDate == endDate))
@@ -258,7 +258,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private async Task StartLearnerMatching()
         {
-            await _testContext.TestFunction.Start(
+            await _context.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "LearnerMatchingOrchestrator_Start",
                     nameof(LearnerMatchingOrchestrator),
