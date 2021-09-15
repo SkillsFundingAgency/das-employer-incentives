@@ -44,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Build<IncentiveApplicationApprenticeship>()
                 .With(a => a.IncentiveApplicationId, _application.Id)
                 .With(a => a.WithdrawnByEmployer, false)
+                .With(a => a.WithdrawnByCompliance, false)
                 .Create();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
