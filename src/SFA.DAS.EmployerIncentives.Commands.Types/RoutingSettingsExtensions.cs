@@ -18,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
             routingSettings.RouteToEndpoint(typeof(AddEmployerVendorIdCommand), QueueNames.AddEmployerVendorId);
             routingSettings.RouteToEndpoint(typeof(WithdrawCommand), QueueNames.ApprenticeshipIncentivesWithdraw);
             routingSettings.RouteToEndpoint(typeof(EmployerWithdrawalCommand), QueueNames.EmployerWithdrawal);
+            routingSettings.RouteToEndpoint(typeof(ComplianceWithdrawalCommand), QueueNames.ComplianceWithdrawal);
             routingSettings.RouteToEndpoint(typeof(UpdateVendorRegistrationCaseStatusForAccountCommand), QueueNames.UpdateVendorRegistrationCaseStatus);
         }
     }
