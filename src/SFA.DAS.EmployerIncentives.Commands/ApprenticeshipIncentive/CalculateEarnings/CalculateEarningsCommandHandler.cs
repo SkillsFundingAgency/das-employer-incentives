@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
 
-            await incentive.CalculateEarnings(_collectionCalendarService);
+            incentive.CalculateEarnings(await _collectionCalendarService.Get());
 
             await _domainRepository.Save(incentive);
         }

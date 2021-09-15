@@ -8,9 +8,9 @@ using Apprenticeship = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.A
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
-    public class Phase2Incentive : Incentive
+    public class Phase3Incentive : Incentive
     {
-        public Phase2Incentive(
+        public Phase3Incentive(
             DateTime dateOfBirth,
             DateTime startDate,
             IncentiveType incentiveType,
@@ -19,10 +19,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
         }
 
-        public static DateTime EligibilityStartDate = new DateTime(2021, 4, 1);
-        public static DateTime EligibilityEndDate = new DateTime(2021, 09, 30);
-        private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
-        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 11, 30);
+        public static DateTime EligibilityStartDate = new DateTime(2021, 10, 01);
+        public static DateTime EligibilityEndDate = new DateTime(2022, 01, 31);
+        private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 10, 01);
+        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2022, 03, 31);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
         protected override int? DelayPeriod => 21;
         public override List<PaymentProfile> PaymentProfiles =>
@@ -34,11 +34,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 1500)
             };
 
-        public static int MinimumAgreementVersion() => 6;
-
         private static List<EligibilityPeriod> _eligibilityPeriods = new List<EligibilityPeriod>
         {
-            new EligibilityPeriod(new DateTime(2021, 4, 1), new DateTime(2021, 9, 30), 6)
+            new EligibilityPeriod(new DateTime(2021, 10, 1), new DateTime(2022, 1, 31), 7)
         };
         public override List<EligibilityPeriod> EligibilityPeriods => _eligibilityPeriods;
 
@@ -50,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public new static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
         {
-            if (apprenticeship.Phase != Phase.Phase2)
+            if (apprenticeship.Phase != Phase.Phase3)
             {
                 throw new InvalidPhaseException();
             }

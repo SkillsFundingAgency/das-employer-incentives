@@ -13,6 +13,7 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private ApprenticeshipIncentiveModel _incentiveModel;
         private Learner _learner;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private List<IncentivePaymentProfile> _paymentProfiles;
 
         [SetUp]
         public void Arrange()
@@ -59,7 +61,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                             _fixture.Create<long>(),
                             ApprenticeshipEmployerType.Levy,
                             _fixture.Create<string>(),
-                            _fixture.Create<DateTime>()
+                            _fixture.Create<DateTime>(),
+                            _fixture.Create<Provider>()
                         ))
                 .With(p => p.StartDate, DateTime.Today)
                 .With(p => p.Status, Enums.IncentiveStatus.Active)
@@ -68,12 +71,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(p => p.MinimumAgreementVersion, new AgreementVersion(_fixture.Create<int>()))
                 .With(p => p.PendingPaymentModels, new List<PendingPaymentModel>())
                 .Create();
-            _incentiveModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
+            
             _incentiveModel.HasPossibleChangeOfCircumstances = true;
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(_incentiveModel.Id, _incentiveModel);
             _fixture.Register(() => incentive);
 
-            _sut = new LearnerChangeOfCircumstanceCommandHandler(_mockIncentiveDomainRepository.Object, _mockLearnerDomainRepository.Object, _mockCollectionCalendarService.Object);
+            _sut = new LearnerChangeOfCircumstanceCommandHandler(
+                _mockIncentiveDomainRepository.Object, 
+                _mockLearnerDomainRepository.Object, 
+                _mockCollectionCalendarService.Object);
 
             _incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _learner = new LearnerFactory().GetExisting(
@@ -121,6 +127,45 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             @event.ApprenticeshipIncentiveId.Should().Be(_incentive.Id);
             @event.NewStartDate.Should().Be(newStartDate);
             @event.PreviousStartDate.Should().Be(previousStartDate);
+        }
+
+        [Test]
+        public async Task Then_the_earnings_are_calculated_when_the_start_date_has_changed()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            var newStartDate = new DateTime(2021, 3, 30);
+            _learner.SubmissionData.LearningData.SetStartDate(newStartDate);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var @event = _incentive.FlushEvents().Single(e => e is EarningsCalculated) as EarningsCalculated;
+            @event.ApprenticeshipIncentiveId.Should().Be(_incentive.Id);
+            @event.AccountId.Should().Be(_incentiveModel.Account.Id);
+            @event.ApprenticeshipId.Should().Be(_incentiveModel.Apprenticeship.Id);
+            @event.ApplicationApprenticeshipId.Should().Be(_incentiveModel.ApplicationApprenticeshipId);
+        }
+
+        [Test]
+        public async Task Then_the_earnings_are_not_alculated_when_the_start_date_has_not_changed()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            _learner.SubmissionData.SetSubmissionDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            var newStartDate = _incentive.StartDate;
+            _learner.SubmissionData.LearningData.SetStartDate(newStartDate);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var @eventCount = _incentive.FlushEvents().Count(e => e is EarningsCalculated);
+            @eventCount.Should().Be(0);
         }
 
         [Test]
