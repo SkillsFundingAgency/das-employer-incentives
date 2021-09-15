@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -53,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.StartDate, today.AddDays(1))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
+                .With(p => p.Status, IncentiveStatus.Active)
                 .Create();            
         }
 
@@ -102,7 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 {
                     _response = await EmployerIncentiveApi.Post(url,withdrawApplicationRequest, cancellationToken);
                 },
-                (context) => HasExpectedWithdrawEvents(context)
+                (context) => HasExpectedEmployerWithdrawEvents(context)
                 );
         }
 
@@ -123,13 +125,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 {
                     _response = await EmployerIncentiveApi.Post(url, withdrawApplicationRequest, cancellationToken);
                 },
-                (context) => HasExpectedWithdrawEvents(context)
+                (context) => HasExpectedComplianceWithdrawEvents(context)
             );
         }
 
-        private bool HasExpectedWithdrawEvents(TestContext testContext)
+        private bool HasExpectedEmployerWithdrawEvents(TestContext testContext)
         {   
             var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.Withdrawals.EmployerWithdrawalCommand);
+            return processedCommands == 1;
+        }
+
+        private bool HasExpectedComplianceWithdrawEvents(TestContext testContext)
+        {
+            var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.Withdrawals.ComplianceWithdrawalCommand);
             return processedCommands == 1;
         }
 
