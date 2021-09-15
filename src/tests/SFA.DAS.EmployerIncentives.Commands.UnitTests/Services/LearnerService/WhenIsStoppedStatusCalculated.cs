@@ -69,6 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                 new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(12, 2021), 7, 2021, new DateTime(2021, 07, 01), _censusDate, true, false)
             };
             _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(_academicYears, _collectionPeriods);
+            _sut.AcademicYear = _academicYears.First().AcademicYearId;
         }
 
         [Test]
@@ -143,6 +144,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             isStoppedStatus.LearningStopped.Should().BeFalse();
             isStoppedStatus.DateStopped.HasValue.Should().BeFalse();
             isStoppedStatus.DateResumed.Value.Should().Be(_testPriceEpisodeDto.StartDate);
+        }
+
+        [Test]
+        public void Then_isStopped_is_true_is_returned_when_the_latest_price_episode_end_date_is_the_end_of_the_academic_year_but_the_submission_is_for_the_next_academic_year()
+        {
+            //Arrange    
+            _testPriceEpisodeDto.EndDate = _academicYears.First().EndDate;
+            _sut.AcademicYear = _academicYears.First(ac => ac.AcademicYearId != _academicYears.First().AcademicYearId).AcademicYearId; // next academic year
+            _sut.IlrSubmissionWindowPeriod = 1;
+
+            // Act
+            var isStoppedStatus = _sut.IsStopped(_incentive, _collectionCalendar);
+
+            //Assert
+            isStoppedStatus.LearningStopped.Should().BeTrue();
+            isStoppedStatus.DateStopped.HasValue.Should().BeTrue();
+            isStoppedStatus.DateStopped.Value.Should().Be(_testPriceEpisodeDto.EndDate.Value.AddDays(1));
         }
 
         [Test]

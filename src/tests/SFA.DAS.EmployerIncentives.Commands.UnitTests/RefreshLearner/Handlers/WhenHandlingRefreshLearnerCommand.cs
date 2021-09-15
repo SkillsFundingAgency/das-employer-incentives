@@ -360,6 +360,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -426,6 +427,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -627,6 +629,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -636,6 +639,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -648,6 +652,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             .Create(),
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -705,6 +710,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -714,6 +720,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -726,6 +733,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             .Create(),
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -783,6 +791,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
