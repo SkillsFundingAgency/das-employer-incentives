@@ -105,6 +105,27 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 );
         }
 
+        [When(@"a compliance withdrawal is requested")]
+        public async Task WhenAComplianceWithdrawalIsRequested()
+        {
+            var withdrawApplicationRequest = _fixture
+                .Build<WithdrawApplicationRequest>()
+                .With(r => r.WithdrawalType, WithdrawalType.Compliance)
+                .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
+                .With(r => r.ULN, _apprenticeshipIncentive.ULN)
+                .Create();
+
+            var url = $"withdrawals";
+
+            await _testContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Post(url, withdrawApplicationRequest, cancellationToken);
+                },
+                (context) => HasExpectedWithdrawEvents(context)
+            );
+        }
+
         private bool HasExpectedWithdrawEvents(TestContext testContext)
         {   
             var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.Withdrawals.EmployerWithdrawalCommand);
@@ -146,6 +167,25 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             delayedWithdrawCommands.Count().Should().Be(1);            
             ((Commands.Types.Withdrawals.EmployerWithdrawalCommand)delayedWithdrawCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
+        }
+
+        [Then(@"the compliance withdrawal is deferred")]
+        public void ThenTheComplianceWithdrawalIsDeferred()
+        {
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var apprenticeApplications = dbConnection.GetAll<IncentiveApplicationApprenticeship>().Where(x => x.Id == _applicationApprenticeship.Id);
+
+                apprenticeApplications.Count().Should().Be(1);
+
+                apprenticeApplications.Single().WithdrawnByCompliance.Should().BeFalse();
+            }
+
+            var delayedWithdrawCommands = _testContext.CommandsPublished
+                .Where(c => c.IsDelayed && c.Command is Commands.Types.Withdrawals.ComplianceWithdrawalCommand);
+
+            delayedWithdrawCommands.Count().Should().Be(1);
+            ((Commands.Types.Withdrawals.ComplianceWithdrawalCommand)delayedWithdrawCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
         }
     }
 }
