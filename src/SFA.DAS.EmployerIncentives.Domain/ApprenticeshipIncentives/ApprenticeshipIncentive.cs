@@ -64,16 +64,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ApprenticeshipIncentive(id, model);
         }
 
-        public async Task CalculateEarnings(ICollectionCalendarService collectionCalendarService)
+        public void CalculateEarnings(CollectionCalendar collectionCalendar)
         {
-            if(Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
+            if (Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
             {
                 return;
             }
 
-            var collectionCalendar = await collectionCalendarService.Get();
-
-            var incentive = await Incentive.Create(this);
+            var incentive = Incentive.Create(this);
             if (!incentive.IsEligible)
             {
                 ClawbackAllPayments(collectionCalendar.GetActivePeriod().CollectionPeriod);
@@ -256,44 +254,28 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.StartDate = startDate;
         }
 
-        public async Task SetChangeOfCircumstances(Learner learner, ICollectionCalendarService collectionCalendarService)
-        {
-            if (Id != learner.ApprenticeshipIncentiveId)
-            {
-                throw new InvalidOperationException();
-            }
-
-            if (learner.SubmissionData.SubmissionFound)
-            {
-                if (learner.SubmissionData.LearningData.StartDate.HasValue)
-                {
-                    SetStartDateChangeOfCircumstance(learner.SubmissionData.LearningData.StartDate.Value);
-                }
-
-                await SetLearningStoppedChangeOfCircumstance(learner.SubmissionData.LearningData.StoppedStatus, collectionCalendarService);                
-            }
-
-            SetHasPossibleChangeOfCircumstances(false);
-        }
-
         public void SetHasPossibleChangeOfCircumstances(bool hasPossibleChangeOfCircumstances)
         {
             Model.HasPossibleChangeOfCircumstances = hasPossibleChangeOfCircumstances;
         }
 
-        private void SetStartDateChangeOfCircumstance(DateTime startDate)
+        public void SetStartDateChangeOfCircumstance(
+            DateTime startDate,
+            CollectionCalendar collectionCalendar)
         {
             var previousStartDate = Model.StartDate;
             SetStartDate(startDate);
             if (previousStartDate != Model.StartDate)
             {
+                CalculateEarnings(collectionCalendar);
+
                 AddEvent(new StartDateChanged(
                     Model.Id,
                     previousStartDate,
                     Model.StartDate,
                     Model));
 
-                SetMinimumAgreementVersion(startDate);
+                SetMinimumAgreementVersion(startDate);                
             }
         }
 
@@ -341,13 +323,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        private async Task SetLearningStoppedChangeOfCircumstance(LearningStoppedStatus learningStoppedStatus, ICollectionCalendarService collectionCalendarService)
+        public void SetLearningStoppedChangeOfCircumstance(
+            LearningStoppedStatus learningStoppedStatus,
+            CollectionCalendar collectionCalendar)
         {
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {
                 Model.Status = IncentiveStatus.Stopped;
                 StartBreakInLearning(learningStoppedStatus.DateStopped.Value);
-                await RemoveEarningsAfterStopDate(learningStoppedStatus.DateStopped.Value, collectionCalendarService);
+                RemoveEarningsAfterStopDate(learningStoppedStatus.DateStopped.Value, collectionCalendar);
                 AddEvent(new LearningStopped(
                     Model.Id,
                     learningStoppedStatus.DateStopped.Value));
@@ -356,18 +340,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 Model.Status = IncentiveStatus.Active;
                 StopBreakInLearning(learningStoppedStatus);
-
+                                
                 if (learningStoppedStatus.DateResumed.HasValue)
+                {
+                    CalculateEarnings(collectionCalendar);
+
                     AddEvent(new LearningResumed(
                         Model.Id,
                         learningStoppedStatus.DateResumed.Value));
+                }
             }
         }
 
-        private async Task RemoveEarningsAfterStopDate(DateTime dateStopped, ICollectionCalendarService collectionCalendarService)
+        private void RemoveEarningsAfterStopDate(
+            DateTime dateStopped,
+            CollectionCalendar collectionCalendar)
         {
-            var collectionCalendar = await collectionCalendarService.Get();
-
             RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate >= dateStopped));
             ClawbackPayments(PendingPayments.Where(x => x.DueDate >= dateStopped), collectionCalendar.GetActivePeriod().CollectionPeriod);
         }

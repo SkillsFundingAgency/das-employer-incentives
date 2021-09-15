@@ -39,8 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             StartDate = startDate;
             _payments = Generate(incentiveType, breaksInLearning, submissionDate);
         }
-        
-        public static async Task<Incentive> Create(
+
+        public static Incentive Create(
             ApprenticeshipIncentive incentive)
         {
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, incentive.BreakInLearnings, incentive.SubmissionDate);

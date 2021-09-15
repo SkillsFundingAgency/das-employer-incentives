@@ -38,9 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                         _fixture.Build<PendingPaymentModel>().With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create()
                     })
                 .Create();
-
-            _sutModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             _learner = Learner.New(
                 Guid.NewGuid(),
                 _sutModel.Id,

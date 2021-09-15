@@ -14,8 +14,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public long UniqueLearnerNumber { get; }
         public Provider Provider { get; private set; }
         public ApprenticeshipEmployerType EmployerType { get; }
-        public string CourseName { get; set; }
-        public DateTime? EmploymentStartDate { get; set; }
+        public string CourseName { get; private set; }
+        public DateTime? EmploymentStartDate { get; private set; }
 
         public Apprenticeship(
             long id, 
@@ -25,7 +25,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             long uniqueLearnerNumber,
             ApprenticeshipEmployerType employerType,
             string courseName,
-            DateTime? employmentStartDate)
+            DateTime? employmentStartDate,
+            Provider provider)
         {
             if (id <= 0) throw new ArgumentException("Apprenticeship Id must be greater than 0", nameof(id));
             if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("FirstName must be set", nameof(firstName));
@@ -40,13 +41,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             EmployerType = employerType;
             CourseName = courseName;
             EmploymentStartDate = employmentStartDate;
-        }
-
-        public void SetProvider(Provider provider)
-        {
             Provider = provider;
         }
-      
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return Id;

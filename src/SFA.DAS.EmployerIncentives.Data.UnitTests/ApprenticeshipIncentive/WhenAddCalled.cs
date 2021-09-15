@@ -43,9 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var testIncentive = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
                 .Create();
-
-            testIncentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             // Act
             await _sut.Add(testIncentive);
 
