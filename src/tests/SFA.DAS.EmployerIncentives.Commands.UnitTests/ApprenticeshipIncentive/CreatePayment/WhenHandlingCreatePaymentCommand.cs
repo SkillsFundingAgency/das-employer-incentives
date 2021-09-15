@@ -12,7 +12,6 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using LegalEntity = SFA.DAS.EmployerIncentives.Domain.Accounts.LegalEntity;
@@ -23,7 +22,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     {
         private CreatePaymentCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
-        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private Domain.ValueObjects.CollectionPeriod _firstCollectionPeriod;
@@ -58,7 +56,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _firstCollectionPeriod = _collectionPeriods.First().CollectionPeriod;
 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
-            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
 
             _incentive = await ApprenticeshipIncentiveCreator();
 
@@ -119,7 +116,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<long>(),
                         ApprenticeshipEmployerType.Levy,
                         _fixture.Create<string>(),
-                        _fixture.Create<DateTime>()
+                        _fixture.Create<DateTime>(),
+                        _fixture.Create<Provider>()
                     ),
                     today,
                     _fixture.Create<DateTime>(),
@@ -128,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     new IncentivePhase(Phase.Phase1));
 
             incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+			
             var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
                 new CollectionCalendarPeriod(
@@ -141,9 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     false)
             };
 
-            _mockCollectionCalendarService.Setup(m => m.Get()).ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), collectionPeriods));
-
-            await incentive.CalculateEarnings(_mockCollectionCalendarService.Object);
+            incentive.CalculateEarnings(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), collectionPeriods));
 
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();
