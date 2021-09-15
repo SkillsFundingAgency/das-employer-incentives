@@ -19,3 +19,9 @@ Scenario: Withdrawal request is deferred when payment process in progress.
 	And the active collection period is currently in progress
 	When an employer withdrawal is requested
 	Then the employer withdrawal is deferred
+
+Scenario: Compliance withdrawal request is deferred when payment process in progress.
+	Given an apprenticeship incentive exists
+	And the active collection period is currently in progress
+	When a compliance withdrawal is requested
+	Then the compliance withdrawal is deferred
