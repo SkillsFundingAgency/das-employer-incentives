@@ -267,7 +267,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test, Ignore("Earnings for Phase 2 applications do not differ for different age ranges so this test is invalid")]
-        public void Task Then_earnings_with_sent_payments_are_clawed_back_when_the_earning_amount_has_changed()
+        public void Then_earnings_with_sent_payments_are_clawed_back_when_the_earning_amount_has_changed()
         {
             // arrange
             _sut.CalculateEarnings(_collectionCalendar);
@@ -294,7 +294,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test, Ignore("A change of date of birth does not trigger a clawback and new payment for Phase 2 applications")]
-        public void Task Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_earning_amount_has_changed()
+        public void Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_earning_amount_has_changed()
         {
             // arrange
             _sut.CalculateEarnings(_collectionCalendar);

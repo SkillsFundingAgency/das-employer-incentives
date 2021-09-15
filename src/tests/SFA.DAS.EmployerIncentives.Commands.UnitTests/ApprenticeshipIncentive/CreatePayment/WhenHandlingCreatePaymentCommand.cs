@@ -125,8 +125,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     new AgreementVersion(_fixture.Create<int>()),
                     new IncentivePhase(Phase.Phase1));
 
-            incentive.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-			
             var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
                 new CollectionCalendarPeriod(

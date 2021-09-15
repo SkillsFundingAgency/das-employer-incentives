@@ -80,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
         [TestCaseSource(nameof(GenerateEarningsTestCases))]
 
-        public async Task Then_the_payment_due_date_considers_breaks_in_learning(GenerateEarningsTestCase @case)
+        public void Then_the_payment_due_date_considers_breaks_in_learning(GenerateEarningsTestCase @case)
         {
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(StartDate)
@@ -92,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive);
+            var result = Incentive.Create(apprenticeshipIncentive);
 
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();
@@ -118,7 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
         [TestCase(25, 750,  750)]
         [TestCase(24, 1000, 1000)]
-        public async Task Then_the_the_payment_amounts_and_earning_type_is_set_regardless_of_breaks_in_learning(int age, decimal expectedAmount1, decimal expectedAmount2)
+        public void Then_the_the_payment_amounts_and_earning_type_is_set_regardless_of_breaks_in_learning(int age, decimal expectedAmount1, decimal expectedAmount2)
         {
             var date = new DateTime(2020, 10, 1);
             const int breakInLearning = 10;
@@ -137,7 +137,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive);
+            var result = Incentive.Create(apprenticeshipIncentive);
 
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();

@@ -261,14 +261,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetStartDateChangeOfCircumstance(
             DateTime startDate,
-            IEnumerable<IncentivePaymentProfile> paymentProfiles,
             CollectionCalendar collectionCalendar)
         {
             var previousStartDate = Model.StartDate;
             SetStartDate(startDate);
             if (previousStartDate != Model.StartDate)
             {
-                CalculateEarnings(paymentProfiles, collectionCalendar);
+                CalculateEarnings(collectionCalendar);
 
                 AddEvent(new StartDateChanged(
                     Model.Id,
@@ -326,7 +325,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetLearningStoppedChangeOfCircumstance(
             LearningStoppedStatus learningStoppedStatus,
-            IEnumerable<IncentivePaymentProfile> paymentProfiles,
             CollectionCalendar collectionCalendar)
         {
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
@@ -345,7 +343,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                                 
                 if (learningStoppedStatus.DateResumed.HasValue)
                 {
-                    CalculateEarnings(paymentProfiles, collectionCalendar);
+                    CalculateEarnings(collectionCalendar);
 
                     AddEvent(new LearningResumed(
                         Model.Id,

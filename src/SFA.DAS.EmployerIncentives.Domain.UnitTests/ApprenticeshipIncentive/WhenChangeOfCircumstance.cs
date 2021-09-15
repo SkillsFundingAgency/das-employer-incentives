@@ -21,8 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private Fixture _fixture;
         private Learner _learner;
         private CollectionCalendar _collectionCalendar;
-        private IEnumerable<IncentivePaymentProfile> _paymentProfiles;
-
+        
         [SetUp]
         public void Arrange()
         {
@@ -34,8 +33,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             };
 
             _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), collectionPeriods);
-            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.Status, IncentiveStatus.Active).Create();
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>().With(x => x.DueDate, new DateTime(2021, 1, 1)).With(x => x.ClawedBack, false).With(x => x.PaymentMadeDate, (DateTime?)null).Create());
@@ -60,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
 
             //Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _paymentProfiles, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -90,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
 
             //Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _paymentProfiles, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -120,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PaymentModels.Last().PaidDate = DateTime.Now;
 
             //Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _paymentProfiles, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(2);
