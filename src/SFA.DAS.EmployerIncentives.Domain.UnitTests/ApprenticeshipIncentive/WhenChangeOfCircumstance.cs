@@ -6,10 +6,10 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -124,6 +124,34 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PendingPaymentModels.First().ClawedBack.Should().BeFalse();
             _sutModel.PendingPaymentModels.Last().ClawedBack.Should().BeTrue();
             _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
+        }
+
+        [TestCase(Phase.Phase1, 3, "2020-08-01", 4)]
+        [TestCase(Phase.Phase1, 3, "2021-01-31", 4)]
+        [TestCase(Phase.Phase1, 4, "2021-02-01", 5)]
+        [TestCase(Phase.Phase1, 4, "2021-05-01", 5)]
+        [TestCase(Phase.Phase1, 5, "2020-08-01", 5)]
+        [TestCase(Phase.Phase1, 5, "2021-01-31", 5)]
+        [TestCase(Phase.Phase1, 5, "2021-06-01", 5)]
+        [TestCase(Phase.Phase2, 5, "2021-06-01", 6)]
+        [TestCase(Phase.Phase2, 5, "2021-09-30", 6)]
+        [TestCase(Phase.Phase3, 6, "2021-10-01", 7)]
+        [TestCase(Phase.Phase3, 6, "2022-01-31", 7)]
+        [TestCase(Phase.Phase3, 7, "2021-10-01", 7)]
+        [TestCase(Phase.Phase3, 7, "2022-01-31", 7)]
+        public async Task Then_minimum_agreement_version_is_set_when_the_start_date_changes(Phase phase, int agreementVersion, DateTime startDate, int expectedMinimumVersion)
+        {
+            // Arrange
+            _sutModel.MinimumAgreementVersion = new AgreementVersion(agreementVersion);
+            _sutModel.Phase = new IncentivePhase(phase);
+            _sut = Sut(_sutModel);
+
+            //Act
+            _sut.SetStartDateChangeOfCircumstance(startDate, _collectionCalendar);
+
+            //Assert
+            _sut.MinimumAgreementVersion.MinimumRequiredVersion.Should().Be(expectedMinimumVersion);
+
         }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
