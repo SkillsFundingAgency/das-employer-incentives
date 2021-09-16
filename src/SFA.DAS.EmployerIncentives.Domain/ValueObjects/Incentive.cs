@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public abstract bool IsEligible { get; }
         public abstract List<PaymentProfile> PaymentProfiles { get; }
         public abstract List<EligibilityPeriod> EligibilityPeriods { get; }
-
+        protected abstract bool IsNewAgreementRequired(int signedAgreementVersion, DateTime employmentStartDate);
         protected abstract int? DelayPeriod { get; }
 
         protected Incentive(
@@ -63,6 +63,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 var incentive = Create(apprenticeship);
 
                 if (incentive.IsNewAgreementRequired(application.LegalEntity.SignedAgreementVersion ?? 0))
+                {
+                    return true;
+                }
+
+                if (apprenticeship.EmploymentStartDate.HasValue &&
+                    incentive.IsNewAgreementRequired(application.LegalEntity.SignedAgreementVersion ?? 0, apprenticeship.EmploymentStartDate.Value))
                 {
                     return true;
                 }

@@ -25,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
         protected override int? DelayPeriod => 21;
+        protected override bool IsNewAgreementRequired(int signedAgreementVersion, DateTime employmentStartDate) => false;
         public override List<PaymentProfile> PaymentProfiles =>
             new List<PaymentProfile>
             {
