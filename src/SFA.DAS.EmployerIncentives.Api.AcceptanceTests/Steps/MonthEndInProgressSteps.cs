@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -44,6 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Build<IncentiveApplicationApprenticeship>()
                 .With(a => a.IncentiveApplicationId, _application.Id)
                 .With(a => a.WithdrawnByEmployer, false)
+                .With(a => a.WithdrawnByCompliance, false)
                 .Create();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -52,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.StartDate, today.AddDays(1))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
+                .With(p => p.Status, IncentiveStatus.Active)
                 .Create();            
         }
 
@@ -101,13 +104,40 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 {
                     _response = await EmployerIncentiveApi.Post(url,withdrawApplicationRequest, cancellationToken);
                 },
-                (context) => HasExpectedWithdrawEvents(context)
+                (context) => HasExpectedEmployerWithdrawEvents(context)
                 );
         }
 
-        private bool HasExpectedWithdrawEvents(TestContext testContext)
+        [When(@"a compliance withdrawal is requested")]
+        public async Task WhenAComplianceWithdrawalIsRequested()
+        {
+            var withdrawApplicationRequest = _fixture
+                .Build<WithdrawApplicationRequest>()
+                .With(r => r.WithdrawalType, WithdrawalType.Compliance)
+                .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
+                .With(r => r.ULN, _apprenticeshipIncentive.ULN)
+                .Create();
+
+            var url = $"withdrawals";
+
+            await _testContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Post(url, withdrawApplicationRequest, cancellationToken);
+                },
+                (context) => HasExpectedComplianceWithdrawEvents(context)
+            );
+        }
+
+        private bool HasExpectedEmployerWithdrawEvents(TestContext testContext)
         {   
             var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.Withdrawals.EmployerWithdrawalCommand);
+            return processedCommands == 1;
+        }
+
+        private bool HasExpectedComplianceWithdrawEvents(TestContext testContext)
+        {
+            var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.Withdrawals.ComplianceWithdrawalCommand);
             return processedCommands == 1;
         }
 
@@ -146,6 +176,25 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             delayedWithdrawCommands.Count().Should().Be(1);            
             ((Commands.Types.Withdrawals.EmployerWithdrawalCommand)delayedWithdrawCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
+        }
+
+        [Then(@"the compliance withdrawal is deferred")]
+        public void ThenTheComplianceWithdrawalIsDeferred()
+        {
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var apprenticeApplications = dbConnection.GetAll<IncentiveApplicationApprenticeship>().Where(x => x.Id == _applicationApprenticeship.Id);
+
+                apprenticeApplications.Count().Should().Be(1);
+
+                apprenticeApplications.Single().WithdrawnByCompliance.Should().BeFalse();
+            }
+
+            var delayedWithdrawCommands = _testContext.CommandsPublished
+                .Where(c => c.IsDelayed && c.Command is Commands.Types.Withdrawals.ComplianceWithdrawalCommand);
+
+            delayedWithdrawCommands.Count().Should().Be(1);
+            ((Commands.Types.Withdrawals.ComplianceWithdrawalCommand)delayedWithdrawCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
         }
     }
 }
