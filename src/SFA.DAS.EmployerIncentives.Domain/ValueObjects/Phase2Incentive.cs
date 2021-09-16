@@ -48,11 +48,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return applicablePeriod?.MinimumAgreementVersion ?? _eligibilityPeriods.First().MinimumAgreementVersion;
         }
 
-        public new static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
+        public new static bool StartDatesAreEligible(Apprenticeship apprenticeship)
         {
             if (apprenticeship.Phase != Phase.Phase2)
             {
                 throw new InvalidPhaseException();
+            }
+
+            if (apprenticeship.PlannedStartDate.Date < EligibilityStartDate || apprenticeship.PlannedStartDate.Date > EligibilityEndDate)
+            {
+                return false;
             }
 
             if (apprenticeship.EmploymentStartDate.HasValue &&

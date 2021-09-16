@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
         public bool WithdrawnByCompliance => Model.WithdrawnByCompliance;
         public string CourseName => Model.CourseName;
-        public bool HasEligibleEmploymentStartDate => Model.HasEligibleEmploymentStartDate;
+        public bool StartDatesAreEligible => Model.StartDatesAreEligible;
         public DateTime? EmploymentStartDate => Model.EmploymentStartDate;
         public Phase Phase => Model.Phase;
 
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 Phase = phase
             };
 
-            Model.HasEligibleEmploymentStartDate = Incentive.EmployerStartDateIsEligible(this);
+            Model.StartDatesAreEligible = Incentive.StartDatesAreEligible(this);
         }
 
         public void SetEarningsCalculated(bool isCalculated = true)
@@ -80,6 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public void SetPlannedStartDate(DateTime plannedStartDate)
         {
             Model.PlannedStartDate = plannedStartDate;
+            Model.StartDatesAreEligible = Incentive.StartDatesAreEligible(this);
         }           
 
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)

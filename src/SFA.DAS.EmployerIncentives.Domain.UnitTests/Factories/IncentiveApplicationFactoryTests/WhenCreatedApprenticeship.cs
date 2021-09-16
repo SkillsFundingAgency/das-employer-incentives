@@ -157,36 +157,40 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.IncentiveApplica
             apprenticeship.GetModel().EmploymentStartDate.Should().Be(startDate);
         }
 
-        [TestCase(null, false)]
-        [TestCase("2021-03-31", false)]
-        [TestCase("2021-04-01", true)]
-        [TestCase("2021-09-30", true)]
-        public void Then_the_employment_eligibililty_for_a_phase_2_application_is_set_based_on_the_employement_start_date(DateTime? startDate, bool eligibility)
+        [TestCase(null, "2021-04-01", false)]
+        [TestCase("2021-03-31", "2021-04-01", false)]
+        [TestCase("2021-04-01", "2021-03-31", false)]
+        [TestCase("2021-04-01", "2021-04-01", true)]
+        [TestCase("2021-09-30", "2021-04-01", true)]
+        [TestCase("2021-09-30", "2021-12-01", false)]
+        public void Then_StartDatesAreEligible_for_a_phase_2_application_is_set_based_on_the_employment_start_date_and_commitment_start_date(DateTime? employmentStartDate, DateTime commitmentStartDate, bool eligibility)
         {
             // Arrange
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), _fixture.Create<string>(), startDate);
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), commitmentStartDate, _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), _fixture.Create<string>(), employmentStartDate);
 
             // Assert
-            apprenticeship.HasEligibleEmploymentStartDate.Should().Be(eligibility);
+            apprenticeship.StartDatesAreEligible.Should().Be(eligibility);
         }
 
-        [TestCase(null, false)]
-        [TestCase("2021-10-01", true)]
-        [TestCase("2022-01-31", true)]
-        [TestCase("2022-02-01", false)]
-        public void Then_the_employment_eligibililty_for_a_phase_3_application_is_set_based_on_the_employement_start_date(DateTime? startDate, bool eligibility)
+        [TestCase(null, "2021-10-01", false)]
+        [TestCase("2021-10-01", "2021-09-30", false)]
+        [TestCase("2021-10-01", "2021-10-01", true)]
+        [TestCase("2022-01-31", "2021-10-01", true)]
+        [TestCase("2022-02-01", "2021-10-01", false)]
+        [TestCase("2022-01-31", "2021-04-01", false)]
+        public void Then_StartDatesAreEligible_for_a_phase_3_application_is_set_based_on_the_employment_start_date_and_commitment_start_date(DateTime? employmentStartDate, DateTime commitmentStartDate, bool eligibility)
         {
             // Arrange
 
             // Act
             var apprenticeship = _sut.CreateApprenticeship(_fixture.Create<long>(), _fixture.Create<string>(), _fixture.Create<string>(),
-                _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(), _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), _fixture.Create<string>(), startDate);
+                _fixture.Create<DateTime>(), _fixture.Create<long>(), commitmentStartDate, _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<long>(), _fixture.Create<string>(), employmentStartDate);
 
             // Assert
-            apprenticeship.HasEligibleEmploymentStartDate.Should().Be(eligibility);
+            apprenticeship.StartDatesAreEligible.Should().Be(eligibility);
         }
 
         [TestCase("2021-04-01", Phase.Phase2)]

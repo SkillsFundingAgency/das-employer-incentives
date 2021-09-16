@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private static List<ApprenticeshipModel> FilterEligibleApprenticeships(ICollection<ApprenticeshipModel> apprenticeshipModels)
         {
-            return new List<ApprenticeshipModel>(apprenticeshipModels.Where(a => a.HasEligibleEmploymentStartDate));
+            return new List<ApprenticeshipModel>(apprenticeshipModels.Where(a => a.StartDatesAreEligible));
         }
 
         private static List<Apprenticeship> Map(ICollection<ApprenticeshipModel> apprenticeshipModels)
