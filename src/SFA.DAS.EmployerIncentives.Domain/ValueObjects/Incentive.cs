@@ -78,6 +78,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public static bool StartDatesAreEligible(Apprenticeship apprenticeship)
         {
+            if (apprenticeship.Phase == Phase.NotSet)
+            {
+                return false;
+            }
+
             if (apprenticeship.Phase == Phase.Phase1)
             {
                 return Phase1Incentive.StartDatesAreEligible(apprenticeship);

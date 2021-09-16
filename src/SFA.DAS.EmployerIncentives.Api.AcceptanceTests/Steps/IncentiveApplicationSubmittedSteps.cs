@@ -122,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var apprenticeships = new List<IncentiveApplicationApprenticeshipDto>
             {
                 _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 5, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 09, 30)).Create(),
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 7, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create()
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 10, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create()
             };
 
             _createRequest.Apprenticeships = apprenticeships;
