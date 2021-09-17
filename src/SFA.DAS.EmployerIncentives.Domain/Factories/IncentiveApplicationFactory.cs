@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Factories
         public Apprenticeship CreateApprenticeship(long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, string courseName, DateTime? employmentStartDate)
         {
             var phase = Phase.Phase2;
-            if (Phase3Incentive.EmployerStartDateIsEligible(employmentStartDate))
+            if (Phase3Incentive.EmploymentStartDateIsEligible(employmentStartDate))
             {
                 phase = Phase.Phase3;
             }

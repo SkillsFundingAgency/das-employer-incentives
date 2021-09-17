@@ -121,19 +121,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
 
-        [TestCase("2021-03-31", true, Phase.Phase2)]
-        [TestCase("2021-04-01", false, Phase.Phase2)]
-        [TestCase("2021-09-30", false, Phase.Phase2)]
-        [TestCase("2021-10-01", true, Phase.Phase2)]
-        [TestCase("2021-09-30", true, Phase.Phase3)]
-        [TestCase("2021-10-01", false, Phase.Phase3)]
-        [TestCase("2022-01-31", false, Phase.Phase3)]
-        [TestCase("2022-02-01", true, Phase.Phase3)]
-        public async Task Then_application_with_ineligible_employment_start_date_is_removed(DateTime employmentStartdate, bool isRemoved, Phase phase)
+        [TestCase("2021-03-31", "2021-04-01", true, Phase.Phase2)]
+        [TestCase("2021-04-01", "2021-04-01", false, Phase.Phase2)]
+        [TestCase("2021-09-30", "2021-04-01", false, Phase.Phase2)]
+        [TestCase("2021-10-01", "2021-04-01", true, Phase.Phase2)]
+        [TestCase("2021-09-30", "2021-10-01", true, Phase.Phase3)]
+        [TestCase("2021-10-01", "2021-10-01",false, Phase.Phase3)]
+        [TestCase("2022-01-31", "2021-10-01", false, Phase.Phase3)]
+        [TestCase("2022-02-01", "2021-10-01", true, Phase.Phase3)]
+        public async Task Then_application_with_ineligible_employment_start_date_is_removed(DateTime employmentStartdate, DateTime commitmentStartDate, bool isRemoved, Phase phase)
         {
             //Arrange
             var apprentice = new Apprenticeship(Guid.NewGuid(), _fixture.Create<long>(), _fixture.Create<string>(),
-                _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), _fixture.Create<DateTime>(),
+                _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<long>(), commitmentStartDate,
                 ApprenticeshipEmployerType.NonLevy, _fixture.Create<long>(), _fixture.Create<string>(), employmentStartdate, phase);
 
             var incentiveApplication = _fixture.Create<IncentiveApplication>();

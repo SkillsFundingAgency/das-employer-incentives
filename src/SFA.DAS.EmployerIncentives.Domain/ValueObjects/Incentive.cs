@@ -76,17 +76,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>(), DateTime.UtcNow);
         }
 
-        public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
+        public static bool StartDatesAreEligible(Apprenticeship apprenticeship)
         {
+            if (apprenticeship.Phase == Phase.NotSet)
+            {
+                return false;
+            }
+
             if (apprenticeship.Phase == Phase.Phase1)
             {
-                return Phase1Incentive.EmployerStartDateIsEligible(apprenticeship);
+                return Phase1Incentive.StartDatesAreEligible(apprenticeship);
             }
             else if(apprenticeship.Phase == Phase.Phase2)
             {
-                return Phase2Incentive.EmployerStartDateIsEligible(apprenticeship);
+                return Phase2Incentive.StartDatesAreEligible(apprenticeship);
             }
-            return Phase3Incentive.EmployerStartDateIsEligible(apprenticeship);
+            return Phase3Incentive.StartDatesAreEligible(apprenticeship);
         }
 
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)

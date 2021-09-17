@@ -154,7 +154,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
                 EmploymentStartDate = x.EmploymentStartDate,
-                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                StartDatesAreEligible = x.StartDatesAreEligible,
                 Phase = x.Phase                
             }).ToList();
         }
@@ -194,7 +194,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
                 EmploymentStartDate = x.EmploymentStartDate,
-                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                StartDatesAreEligible = x.StartDatesAreEligible,
                 Phase = x.Phase
             }).ToList();
         }
