@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         private static List<EligibilityPeriod> _eligibilityPeriods = new List<EligibilityPeriod>
         {
-            new EligibilityPeriod(new DateTime(2021, 4, 1), new DateTime(2021, 9, 30), 6)
+            new EligibilityPeriod(new DateTime(2021, 4, 1), new DateTime(2021, 11, 30), 6)
         };
         public override List<EligibilityPeriod> EligibilityPeriods => _eligibilityPeriods;
 
