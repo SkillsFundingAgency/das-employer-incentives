@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _fixture.Build<IncentiveApplicationApprenticeshipDto>()
                     .With(dto => dto.Phase, Phase.Phase3)
                     .With(dto => dto.PlannedStartDate, new DateTime(2021, 10, 2))
-                    .With(dto => dto.HasEligibleEmploymentStartDate, true)
+                    .With(dto => dto.StartDatesAreEligible, true)
                     .Without(dto => dto.EmploymentStartDate)
                     .Create()
             };
@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 _fixture.Build<IncentiveApplicationApprenticeshipDto>()
                     .With(dto => dto.Phase, Phase.Phase3)
                     .With(dto => dto.PlannedStartDate, new DateTime(2021, 10, 2))
-                    .With(dto => dto.HasEligibleEmploymentStartDate, true)
+                    .With(dto => dto.StartDatesAreEligible, true)
                     .With(dto => dto.EmploymentStartDate, DateTime.Parse(date))
                     .Create()
             };

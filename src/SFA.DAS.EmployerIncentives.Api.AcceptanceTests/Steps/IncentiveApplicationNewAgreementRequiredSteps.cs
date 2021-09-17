@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(a => a.WithdrawnByCompliance, false)
                 .With(a => a.WithdrawnByEmployer, false)
                 .With(a => a.EarningsCalculated, false)
-                .With(a => a.HasEligibleEmploymentStartDate, true)
+                .With(a => a.StartDatesAreEligible, true)
                 .Without(a => a.Phase)
                 .With(a => a.PlannedStartDate, new DateTime(2021, 9, 1))
                 .Without(a => a.EmploymentStartDate)
