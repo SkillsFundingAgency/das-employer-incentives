@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
-using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Apprenticeship = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Apprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -46,11 +44,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, incentive.BreakInLearnings, incentive.SubmissionDate);
         }
 
+        public static Incentive Create(IncentiveApplicationApprenticeshipDto application)
+        {
+            return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>(), DateTime.UtcNow);
+        }
+
         public bool IsNewAgreementRequired(int signedAgreementVersion)
         {
             if (!IsEligible)
             {
-                return true;
+                return false;
             }
             var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= StartDate && x.EndDate >= StartDate);
             return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
@@ -71,11 +74,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return false;
         }
 
-        public static Incentive Create(IncentiveApplicationApprenticeshipDto application)
-        {
-            return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>(), DateTime.UtcNow);
-        }
-
         public static bool StartDatesAreEligible(Apprenticeship apprenticeship)
         {
             if (apprenticeship.Phase == Phase.NotSet)
@@ -91,6 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             {
                 return Phase2Incentive.StartDatesAreEligible(apprenticeship);
             }
+
             return Phase3Incentive.StartDatesAreEligible(apprenticeship);
         }
 
@@ -98,6 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             return dateOfBirth.AgeOnThisDay(startDate);
         }
+
         protected List<Payment> Generate(IncentiveType incentiveType, IReadOnlyCollection<BreakInLearning> breaksInLearning, DateTime submissionDate)
         {
             var paymentProfiles = PaymentProfiles.Where(x => x.IncentiveType == incentiveType).ToList();
