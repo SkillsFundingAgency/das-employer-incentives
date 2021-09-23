@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             if (!IsEligible)
             {
-                return true;
+                return false;
             }
             var applicablePeriod = EligibilityPeriods.Single(x => x.StartDate <= StartDate && x.EndDate >= StartDate);
             return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
