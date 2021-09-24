@@ -10,51 +10,52 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
     public class CommandHandlerWithLogging<T> : ICommandHandler<T> where T : ICommand
     {
         private readonly ICommandHandler<T> _handler;
-        private readonly ILogger<T> _log;
+        private readonly ILoggerFactory _logfactory;
 
         public CommandHandlerWithLogging(
-            ICommandHandler<T> handler,         
-            ILogger<T> log)
+            ICommandHandler<T> handler,
+            ILoggerFactory logfactory)
         {
             _handler = handler;
-            _log = log;
+            _logfactory = logfactory;
         }
 
         public async Task Handle(T command, CancellationToken cancellationToken = default)
         {
+            var log = _logfactory.CreateLogger<T>();
             var domainLog = (command is ILogWriter) ? (command as ILogWriter).Log : new Log();
 
             try
             {
                 if (domainLog.OnProcessing == null)
                 {
-                    _log.LogInformation($"Start handle '{typeof(T)}' command");
+                    log.LogInformation($"Start handle '{typeof(T)}' command");
                 }
                 else
                 {
-                    _log.LogInformation($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
+                    log.LogInformation($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
                 }
 
                 await _handler.Handle(command, cancellationToken);
 
                 if (domainLog.OnProcessed == null)
                 {
-                    _log.LogInformation($"End handle '{typeof(T)}' command");
+                    log.LogInformation($"End handle '{typeof(T)}' command");
                 }
                 else
                 {
-                    _log.LogInformation($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
+                    log.LogInformation($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
                 }
             }
             catch(Exception ex)
             {
                 if (domainLog.OnError == null)
                 {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' command");
+                    log.LogError(ex, $"Error handling '{typeof(T)}' command");
                 }
                 else
                 {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
+                    log.LogError(ex, $"Error handling '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
                 }
 
                 throw;

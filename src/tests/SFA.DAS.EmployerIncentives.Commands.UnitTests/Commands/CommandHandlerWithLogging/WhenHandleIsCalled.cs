@@ -16,6 +16,8 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
         private CommandHandlerWithLogging<TestCommand> _sut;
         private Mock<ICommandHandler<TestCommand>> _mockHandler;
         private Mock<ILogger<TestCommand>> _mockLogger;
+        private ILoggerFactory _loggerFactory;
+        private Mock<ILoggerProvider> _mockLoggerProvider;
         private Fixture _fixture;
 
         public class TestCommand : ICommand{}
@@ -27,7 +29,13 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             _mockHandler = new Mock<ICommandHandler<TestCommand>>();
             _mockLogger = new Mock<ILogger<TestCommand>>();
 
-            _sut = new CommandHandlerWithLogging<TestCommand>(_mockHandler.Object, _mockLogger.Object);
+            _mockLoggerProvider = new Mock<ILoggerProvider>();
+            _mockLoggerProvider.Setup(m => m.CreateLogger(It.IsAny<string>())).Returns(_mockLogger.Object);
+            
+            _loggerFactory = new LoggerFactory();
+            _loggerFactory.AddProvider(_mockLoggerProvider.Object);
+
+            _sut = new CommandHandlerWithLogging<TestCommand>(_mockHandler.Object, _loggerFactory);
         }
 
         [Test]
