@@ -75,6 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
                 .Create();
             _apprenticehip = _sutModel.Apprenticeship;
+            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, DateTime.Now.AddYears(-20), _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate, _apprenticehip.Provider);
             _sutModel.StartDate = _plannedStartDate;
             _sutModel.SubmittedDate = _plannedStartDate.AddDays(-30);
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
@@ -296,7 +297,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionPeriods.Add(new CollectionCalendarPeriod(new CollectionPeriod(4, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(3).Month, (short)_collectionPeriod.AddMonths(3).Year, _collectionPeriod.AddMonths(3).AddDays(1), _fixture.Create<DateTime>(), true, false));
 
             // act
-            var apprenticeshipDob = DateTime.Now.AddYears(-26);
+            var apprenticeshipDob = _plannedStartDate.AddYears(-26);
             _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate, _apprenticehip.Provider);
             _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
 
@@ -324,7 +325,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionPeriods.Add(activePeriod);
 
             // act
-            var apprenticeshipDob = DateTime.Now.AddYears(-26);
+            var apprenticeshipDob = _plannedStartDate.AddYears(-26);
             _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate, _apprenticehip.Provider);
             _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
 
