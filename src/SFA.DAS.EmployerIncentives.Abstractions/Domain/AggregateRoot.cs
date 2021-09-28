@@ -17,6 +17,19 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Domain
             }
         }
 
+        protected bool Contains<T>() where T : IDomainEvent
+        {
+            foreach(var domainEvent in _events)
+            {
+                if(domainEvent is T)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public IEnumerable<IDomainEvent> FlushEvents()
         {
             lock (_events)

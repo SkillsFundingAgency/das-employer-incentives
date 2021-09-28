@@ -12,3 +12,8 @@ Post-Deployment Script Template
 :r .\Scripts\Data.CollectionCalendar.sql
 :r .\Scripts\Update.ApprenticeshipIncentives.sql
 :r .\Scripts\Update.SetPhaseForApplications.sql
+
+/* TODO: remove this script and update Learner.sql once the release has deployed to PROD.
+   The DACPAC deployment will not allow a column rename when the table is populated.
+ */
+:r .\Scripts\Rename.SuccessfulLearnerMatch.sql
