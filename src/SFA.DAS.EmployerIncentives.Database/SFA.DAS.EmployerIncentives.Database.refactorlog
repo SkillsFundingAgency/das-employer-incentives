@@ -98,4 +98,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="bdbc61af-1761-4c9e-a8d4-0e99fbd12b4d" ChangeDateTime="09/29/2021 08:22:05">
+    <Property Name="ElementName" Value="[incentives].[Learner].[SuccessfulLearnerMatch]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[incentives].[Learner]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SuccessfulLearnerMatchExecution" />
+  </Operation>
 </Operations>
