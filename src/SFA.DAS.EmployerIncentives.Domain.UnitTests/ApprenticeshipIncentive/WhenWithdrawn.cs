@@ -2,11 +2,10 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
-using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -14,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
-        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private CollectionCalendar _collectionCalendar;
         private Fixture _fixture;
 
         [SetUp]
@@ -33,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(a => a.PaymentModels, new List<PaymentModel>())
                 .Create();
 
-            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
+            _collectionCalendar = new CollectionCalendar(_fixture.CreateMany<AcademicYear>(), _fixture.CreateMany<CollectionCalendarPeriod>());
 
             _sut = Sut(_sutModel);
         }
@@ -44,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange            
 
             // act
-            _sut.Withdraw(WithdrawnBy.Compliance, _mockCollectionCalendarService.Object);
+            _sut.Withdraw(WithdrawnBy.Compliance, _collectionCalendar);
 
             // assert            
             _sut.Status.Should().Be(IncentiveStatus.Withdrawn);

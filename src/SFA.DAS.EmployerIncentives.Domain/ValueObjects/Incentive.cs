@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Apprenticeship = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Apprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -46,15 +44,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             IEnumerable<IncentivePaymentProfile> paymentProfiles)
         {
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings, incentive.SubmissionDate);
-        }
-
-        public static async Task<Incentive> Create(
-            ApprenticeshipIncentive incentive,            
-            IIncentivePaymentProfilesService incentivePaymentProfilesService)
-        {
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
-
-            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings, incentive.SubmissionDate);            
         }
 
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)

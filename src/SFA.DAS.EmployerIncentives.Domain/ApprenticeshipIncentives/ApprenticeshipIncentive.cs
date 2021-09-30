@@ -208,14 +208,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEvent(new PaymentsCalculationRequired(Model));
         }
         
-        public async Task Withdraw(WithdrawnBy withdrawnBy, ICollectionCalendarService collectionCalendarService)
+        public void Withdraw(WithdrawnBy withdrawnBy, CollectionCalendar collectionCalendar)
         {
             Model.Status = IncentiveStatus.Withdrawn;
             Model.WithdrawnBy = withdrawnBy;
             if (HasPaidEarnings)
             {
-                var calendarService = await collectionCalendarService.Get();
-                ClawbackAllPayments(calendarService.GetActivePeriod().CollectionPeriod);
+                ClawbackAllPayments(collectionCalendar.GetActivePeriod().CollectionPeriod);
                 Model.PausePayments = false;
             }
             else
@@ -413,7 +412,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private void AddPayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod, PendingPayment pendingPayment, DateTime paymentDate)
         {
             var subnominalCode = DetermineSubnominalCode();
-            var account = Model.Account;
 
             var payment = Payment.New(
                 Guid.NewGuid(),
