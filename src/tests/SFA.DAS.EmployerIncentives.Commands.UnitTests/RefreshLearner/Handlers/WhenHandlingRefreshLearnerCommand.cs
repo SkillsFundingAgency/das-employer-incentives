@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
@@ -30,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
-        private LearnerSubmissionDto _learnerSubmissionDto;
+        private LearnerServiceResponse _learnerServiceResponse;
         private Domain.ApprenticeshipIncentives.ApprenticeshipIncentive _apprenticeshipIncentive;
         private ApprenticeshipIncentiveModel _incentiveModel;
         private Learner _learner;
@@ -63,11 +64,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
                 .ReturnsAsync(_apprenticeshipIncentive);
 
-            _learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
+            _learnerServiceResponse = _fixture.Create<LearnerServiceResponse>();
 
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(_learnerSubmissionDto);
+                .ReturnsAsync(_learnerServiceResponse);
 
             _mockApprenticeshipIncentiveDomainRepository
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
@@ -109,7 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             await _sut.Handle(command);
 
             // Assert
-            _mockLearnerDomainRepository.Verify(m => m.Save(It.IsAny<Learner>()), Times.Once);
+            _mockLearnerDomainRepository.Verify(m => m.Save(It.IsAny<Learner>()), Times.Exactly(2));
         }
 
         [Test]
@@ -122,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             await _sut.Handle(command);
 
             // Assert
-            _mockLearnerDomainRepository.Verify(m => m.Save(_learner), Times.Once);
+            _mockLearnerDomainRepository.Verify(m => m.Save(_learner), Times.Exactly(2));
         }
 
         [Test]
@@ -131,9 +132,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Arrange
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
+            var learnerResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = null
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(null as LearnerSubmissionDto);
+                .ReturnsAsync(learnerResponse);
 
             //Act
             await _sut.Handle(command);
@@ -149,11 +155,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         {
             //Arrange
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
-            var learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
+            var learnerServiceResponse = _fixture.Create<LearnerServiceResponse>();
 
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -161,7 +167,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.SubmissionFound)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -169,11 +175,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         {
             //Arrange
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
-            var learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
+            var learnerServiceResponse = _fixture.Create<LearnerServiceResponse>();
 
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -181,7 +187,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => !l.SubmissionData.LearningData.LearningFound)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -213,9 +219,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             })
                         .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             _censusDate = _testStartDate.AddDays(5);
 
@@ -225,7 +237,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.LearningData.LearningFound)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -240,9 +252,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         .With(l => l.IlrSubmissionDate, testDate)
                         .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -250,7 +268,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.SubmissionDate == testDate)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -284,9 +302,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                     )
                 .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             _censusDate = _testStartDate.AddDays(5);
 
@@ -296,7 +320,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.LearningData.StartDate == _testStartDate)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -317,9 +341,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -327,7 +357,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.LearningData.IsInlearning == null)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -387,9 +417,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -397,7 +433,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.LearningData.IsInlearning == true)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -449,9 +485,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -459,7 +501,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.GetModel().LearningPeriods.Count == 1)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -468,10 +510,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Arrange
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
             var learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
+            var learnerServiceResponse = new LearnerServiceResponse { LearnerSubmissionDto = learnerSubmissionDto };
 
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -500,9 +543,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -510,7 +559,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => !l.SubmissionData.LearningData.StoppedStatus.LearningStopped)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -577,9 +626,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             _collectionPeriods = new List<CollectionCalendarPeriod>
             {
@@ -598,7 +653,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 It.Is<Learner>(l => l.SubmissionData.LearningData.StoppedStatus.LearningStopped &&
                 l.SubmissionData.LearningData.StoppedStatus.DateStopped == _academicYear.EndDate.AddDays(-1) &&
                 !l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -663,9 +718,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -675,7 +736,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 It.Is<Learner>(l => !l.SubmissionData.LearningData.StoppedStatus.LearningStopped &&
                 !l.SubmissionData.LearningData.StoppedStatus.DateStopped.HasValue &&
                 l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
        
         [Test]
@@ -741,9 +802,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -753,7 +820,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 It.Is<Learner>(l => !l.SubmissionData.LearningData.StoppedStatus.LearningStopped &&
                 l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue &&
                 !l.SubmissionData.LearningData.StoppedStatus.DateStopped.HasValue)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
 
         [Test]
@@ -808,9 +875,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
+            var learnerServiceResponse = new LearnerServiceResponse 
+            {
+                LearnerSubmissionDto = learnerSubmissionDto,
+                RawJson = JsonConvert.SerializeObject(learnerSubmissionDto)
+            };
+
             _mockLearnerService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
-                .ReturnsAsync(learnerSubmissionDto);
+                .ReturnsAsync(learnerServiceResponse);
 
             //Act
             await _sut.Handle(command);
@@ -818,7 +891,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.GetModel().LearningPeriods.Single().EndDate == _academicYear.EndDate)
-                ), Times.Once);
+                ), Times.Exactly(2));
         }
     }
 }

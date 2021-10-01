@@ -10,6 +10,8 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
 using System;
 using System.Threading.Tasks;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
 {
@@ -17,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
     {
         private LearnerService _sut;
         private TestHttpClient _httpClient;
+        private Mock<ILogger<LearnerService>> _logger;
         private Uri _baseAddress;
         private Learner _learner;
         private readonly string _version = "1.0";
@@ -28,10 +31,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _fixture = new Fixture();
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
-
+            _logger = new Mock<ILogger<LearnerService>>();
             _learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
 
-            _sut = new LearnerService(_httpClient, _version);
+            _sut = new LearnerService(_httpClient, _version, _logger.Object);
         }
 
         [Test]
@@ -63,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _httpClient.VerifyGetAsAsync($"api/v{_version}/{_learner.Ukprn}/{_learner.UniqueLearnerNumber}?", Times.Once());
             response.Should().NotBeNull();
             response.RawJson.Should().Be(JsonConvert.SerializeObject(learnerSubmissionDto));
-            response.Ukprn.Should().Be(_learner.Ukprn);
+            response.LearnerSubmissionDto.Ukprn.Should().Be(_learner.Ukprn);
         }
     }
 }

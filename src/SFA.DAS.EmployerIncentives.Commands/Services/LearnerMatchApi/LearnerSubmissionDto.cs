@@ -11,8 +11,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         public string AcademicYear { get; set; }
         public long Ukprn { get; set; }
         public long Uln { get; set; }
-        public string RawJson { get; set; }
-
         public ICollection<TrainingDto> Training { get; set; }
     }
 }

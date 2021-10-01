@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
@@ -42,12 +43,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber);
 
             SubmissionData submissionData = new SubmissionData();
-            var learnerData = await _learnerService.Get(learner);
+            var learnerResponse = await _learnerService.Get(learner);
+            var learnerData = learnerResponse?.LearnerSubmissionDto;
 
             _logger.LogInformation("End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN}",
                 learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber);
 
             var collectionCalendar = await _collectionCalendarService.Get();
+
+            if (!String.IsNullOrWhiteSpace(learnerResponse?.RawJson))
+            {
+                await StoreRawJson(learner, learnerResponse.RawJson);
+            }
 
             if (learnerData != null)
             {
@@ -68,14 +75,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
                     submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive, collectionCalendar));
                 }
-                submissionData.SetRawJson(learnerData.RawJson);
+                submissionData.SetRawJson(learnerResponse.RawJson);
             }
 
             if (submissionData.HasChangeOfCircumstances(learner.SubmissionData))
             {
                 incentive.SetHasPossibleChangeOfCircumstances(true);
             }
-
             learner.SetSubmissionData(submissionData);
             incentive.LearnerRefreshCompleted();
 
@@ -89,6 +95,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             await _learnerDomainRepository.Save(learner);
             await _incentiveDomainRepository.Save(incentive);
+        }
+
+        private async Task StoreRawJson(Learner learner, string rawJson)
+        {
+            var submissionData = learner.SubmissionData;
+            submissionData.SetRawJson(rawJson);
+            learner.SetSubmissionData(submissionData);
+
+            await _learnerDomainRepository.Save(learner);
         }
 
         private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
