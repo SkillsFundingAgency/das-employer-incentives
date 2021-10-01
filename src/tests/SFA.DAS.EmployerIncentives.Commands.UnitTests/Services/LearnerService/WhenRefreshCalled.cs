@@ -68,5 +68,24 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             response.RawJson.Should().Be(JsonConvert.SerializeObject(learnerSubmissionDto));
             response.LearnerSubmissionDto.Ukprn.Should().Be(_learner.Ukprn);
         }
+
+
+        [Test]
+        public async Task Then_the_learner_raw_json_is_populated_if_cannot_be_deserialized()
+        {
+            //Arrange
+            var invalidJsonObject = _fixture.CreateMany<PriceEpisodeDto>(5);
+
+            _httpClient.SetUpGetAsAsync(invalidJsonObject, System.Net.HttpStatusCode.OK);
+
+            //Act
+            var response = await _sut.Get(_learner);
+
+            //Assert
+            _httpClient.VerifyGetAsAsync($"api/v{_version}/{_learner.Ukprn}/{_learner.UniqueLearnerNumber}?", Times.Once());
+            response.Should().NotBeNull();
+            response.RawJson.Should().Be(JsonConvert.SerializeObject(invalidJsonObject));
+            response.LearnerSubmissionDto.Should().BeNull();
+        }
     }
 }
