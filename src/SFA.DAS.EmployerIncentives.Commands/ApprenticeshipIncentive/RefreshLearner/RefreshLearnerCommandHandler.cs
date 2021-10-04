@@ -76,13 +76,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive, collectionCalendar));
                 }
                 submissionData.SetRawJson(learnerResponse.RawJson);
+                learner.SetSubmissionData(submissionData);
             }
 
             if (submissionData.HasChangeOfCircumstances(learner.SubmissionData))
             {
                 incentive.SetHasPossibleChangeOfCircumstances(true);
             }
-            learner.SetSubmissionData(submissionData);
             incentive.LearnerRefreshCompleted();
 
             learner.SetLearningPeriods(learnerData.LearningPeriods(incentive, collectionCalendar));

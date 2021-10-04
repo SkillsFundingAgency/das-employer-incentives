@@ -13,6 +13,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using TechTalk.SpecFlow;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -31,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Learner _learner2;
         private readonly DateTime _startDate;
         private readonly byte _periodNumber;
-
+        private string _invalidLearnerApiData;
         public LearnerMatchFailedSteps(TestContext testContext)
         {
             _testContext = testContext;
@@ -124,8 +125,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await dbConnection.InsertAsync(_learner2);
         }
 
-        [Given(@"the learner match process has been triggered")]
-        public void GivenTheLearnerMatchProcessHasBeenTriggered()
+        [Given(@"an exception occurs for a learner")]
+        public void WhenAnExceptionOccursForALearner()
         {
             SetupMockLearnerMatchErrorResponse(_apprenticeshipIncentive1.UKPRN.Value, _apprenticeshipIncentive1.ULN);
 
@@ -167,8 +168,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             SetupMockLearnerMatchResponse(learner2Data);
         }
 
-        [When(@"an exception occurs for a learner")]
-        public async Task WhenAnExceptionOccursForALearner()
+        [When(@"the learner match process has been triggered")]
+        public async Task GivenTheLearnerMatchProcessHasBeenTriggered()
         {
             await StartLearnerMatching();
         }
@@ -195,6 +196,32 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var learner = dbConnection.GetAll<Learner>().Single(l => l.ApprenticeshipIncentiveId == _apprenticeshipIncentive2.Id);
             learner.SuccessfulLearnerMatchExecution.Should().BeTrue();
+        }
+
+        [Given(@"an invalid JSON response is returned for a learner")]
+        public void WhenAnInvalidJSONResponseIsReturnedForALearner()
+        {
+            _invalidLearnerApiData = JsonConvert.SerializeObject(_fixture.CreateMany<PeriodDto>(10));
+
+            _testContext.LearnerMatchApi.MockServer
+                .Given(
+                    Request
+                        .Create()
+                        .WithPath($"/api/v1.0/{_apprenticeshipIncentive1.UKPRN.Value}/{_apprenticeshipIncentive1.ULN}")
+                        .UsingGet()
+                )
+                .RespondWith(Response.Create()
+                    .WithStatusCode(HttpStatusCode.OK)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(_invalidLearnerApiData));
+        }
+
+        [Then(@"the JSON response is recorded for the failed learner match")]
+        public void ThenTheJSONResponseIsRecordedForTheFailedLearnerMatch()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var learner = dbConnection.GetAll<Learner>().Single(l => l.ApprenticeshipIncentiveId == _apprenticeshipIncentive1.Id);
+            learner.RawJSON.Should().Be(_invalidLearnerApiData);
         }
 
         private void SetupMockLearnerMatchResponse(LearnerSubmissionDto learnerMatchApiData)
