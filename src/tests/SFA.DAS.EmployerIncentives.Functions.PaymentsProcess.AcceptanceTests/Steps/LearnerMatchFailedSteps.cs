@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
                 .With(p => p.StartDate, _startDate)
+                .With(p => p.SubmittedDate, _startDate.AddDays(-30))
                 .With(p => p.RefreshedLearnerForEarnings, true)
                 .With(p => p.PausePayments, false)
                 .With(p => p.Status, IncentiveStatus.Active)
@@ -60,6 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
                 .With(p => p.StartDate, _startDate)
+                .With(p => p.SubmittedDate, _startDate.AddDays(-30))
                 .With(p => p.RefreshedLearnerForEarnings, true)
                 .With(p => p.PausePayments, false)
                 .With(p => p.Status, IncentiveStatus.Active)
@@ -76,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive1.Id)
                 .With(s => s.HasDataLock, false)
                 .With(s => s.SubmissionFound, true)
-                .With(s => s.SuccessfulLearnerMatch, true)
+                .With(s => s.SuccessfulLearnerMatchExecution, true)
                 .With(s => s.InLearning, true)
                 .With(s => s.LearningFound, true)
                 .Without(s => s.LearningStoppedDate)
@@ -97,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.ApprenticeshipIncentiveId, _apprenticeshipIncentive2.Id)
                 .With(s => s.HasDataLock, false)
                 .With(s => s.SubmissionFound, true)
-                .With(s => s.SuccessfulLearnerMatch, true)
+                .With(s => s.SuccessfulLearnerMatchExecution, true)
                 .With(s => s.InLearning, true)
                 .With(s => s.LearningFound, true)
                 .Without(s => s.LearningStoppedDate)
@@ -176,7 +178,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var learner = dbConnection.GetAll<Learner>().Single(l => l.ApprenticeshipIncentiveId == _apprenticeshipIncentive1.Id);
-            learner.SuccessfulLearnerMatch.Should().BeFalse();
+            learner.SuccessfulLearnerMatchExecution.Should().BeFalse();
         }
         
         [Then(@"the learner match process is continued for all remaining learners")]
@@ -192,7 +194,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var learner = dbConnection.GetAll<Learner>().Single(l => l.ApprenticeshipIncentiveId == _apprenticeshipIncentive2.Id);
-            learner.SuccessfulLearnerMatch.Should().BeTrue();
+            learner.SuccessfulLearnerMatchExecution.Should().BeTrue();
         }
 
         private void SetupMockLearnerMatchResponse(LearnerSubmissionDto learnerMatchApiData)

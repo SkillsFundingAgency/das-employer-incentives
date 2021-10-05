@@ -15,13 +15,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
     public static class DapperExtensions
     {
-        public static Task<int> InsertAsync<T>(this IDbConnection connection, T entityToInsert, bool enumAsString = false, IDbTransaction transaction = null, int? commandTimeout = null, ISqlAdapter sqlAdapter = null) where T : class
+        public static Task<int> InsertAsync<T>(this IDbConnection connection, T entityToInsert, bool withEnumAsString = false, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return enumAsString ? InsertWithEnumAsStringAsync(connection, entityToInsert) : SqlMapperExtensions.InsertAsync(connection, entityToInsert, transaction, commandTimeout, sqlAdapter);
-        }
+            if(!withEnumAsString)
+            {
+                return connection.InsertAsync(entityToInsert, transaction, commandTimeout);
+            }
 
-        private static Task<int> InsertWithEnumAsStringAsync<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        {
             var propertyValuesMap = new Dictionary<string, object>();
 
             var columns = new StringBuilder();

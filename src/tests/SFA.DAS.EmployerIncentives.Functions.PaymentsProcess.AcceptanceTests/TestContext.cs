@@ -56,11 +56,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
                 currentActivePeriod.Active = false;
                 await dbConnection.UpdateAsync(currentActivePeriod);
             }
-            var period = calendar.Single(x => x.CalendarYear == collectionPeriod.Year && x.PeriodNumber == collectionPeriod.Period);
+            var period = calendar.Single(x => x.AcademicYear == collectionPeriod.Year.ToString() && x.PeriodNumber == collectionPeriod.Period);
             period.Active = true;
 
             await dbConnection.UpdateAsync(period);
             ActivePeriod = period;
+        }
+
+        internal async Task SetActiveCollectionCalendarPeriod(short year, byte number)
+        {
+            await SetActiveCollectionCalendarPeriod(new CollectionPeriod {Year = year, Period = number});
         }
 
         public async Task<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod> GetCollectionCalendarPeriod(DateTime date)
@@ -69,8 +74,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
 
             var period = calendar
-                    .Where(d => d.EIScheduledOpenDateUTC <= date)
-                    .OrderByDescending(d => d.EIScheduledOpenDateUTC)
+                    .Where(d => d.CensusDate >= date)
+                    .OrderBy(d => d.CensusDate)
                     .FirstOrDefault();
 
             return period;

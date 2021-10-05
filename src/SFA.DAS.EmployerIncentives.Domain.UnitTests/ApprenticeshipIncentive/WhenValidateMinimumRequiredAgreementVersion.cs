@@ -53,8 +53,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     })                
                 .Create();
 
-            _sutModel.Apprenticeship.SetProvider(_fixture.Create<Provider>());
-
             _sut = Sut(_sutModel);
         }
 
