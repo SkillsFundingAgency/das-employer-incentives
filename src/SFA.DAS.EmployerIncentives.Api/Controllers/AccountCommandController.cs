@@ -9,8 +9,6 @@ using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
-using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
