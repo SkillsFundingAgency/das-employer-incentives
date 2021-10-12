@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -22,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
+        private const decimal TotalIncentiveAmount = 3000m;
 
         public IncentiveApplicationQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
@@ -32,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         {
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
-                .Select(MapToIncentiveApplicationDto()).SingleOrDefaultAsync(predicate);
+                .Select(MapToIncentiveApplicationDto()).FirstOrDefaultAsync(predicate);
         }
 
         public Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
@@ -69,15 +71,14 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 ApprenticeshipId = apprenticeship.ApprenticeshipId,
                 FirstName = apprenticeship.FirstName,
                 LastName = apprenticeship.LastName,
-                TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
                 Uln = apprenticeship.ULN,
                 PlannedStartDate = apprenticeship.PlannedStartDate,
                 DateOfBirth = apprenticeship.DateOfBirth,
                 EmploymentStartDate = apprenticeship.EmploymentStartDate,                
                 Phase = apprenticeship.Phase,
+                TotalIncentiveAmount = TotalIncentiveAmount,
                 HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
             };
         }
-     
     }
 }

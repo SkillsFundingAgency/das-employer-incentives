@@ -9,7 +9,6 @@
 	[ULN] BIGINT NOT NULL,
 	[PlannedStartDate] DATETIME2 NOT NULL,
 	[ApprenticeshipEmployerTypeOnApproval] INT NOT NULL,
-	[TotalIncentiveAmount] MONEY NOT NULL, 
     [UKPRN] BIGINT NULL, 
 	[EarningsCalculated] [bit] NOT NULL  DEFAULT 0,
 	[WithdrawnByEmployer] BIT NOT NULL DEFAULT 0,

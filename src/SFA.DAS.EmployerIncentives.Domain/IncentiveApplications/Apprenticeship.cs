@@ -9,8 +9,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 {
     public class Apprenticeship : Entity<Guid, ApprenticeshipModel>
     {
-        private const decimal EmployerIncentivesTotalPaymentAmount = 3000;
-
         public long ApprenticeshipId => Model.ApprenticeshipId;
         public string FirstName => Model.FirstName;
         public string LastName => Model.LastName;
@@ -18,7 +16,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public long ULN => Model.ULN;
         public DateTime PlannedStartDate => Model.PlannedStartDate;
         public ApprenticeshipEmployerType ApprenticeshipEmployerTypeOnApproval => Model.ApprenticeshipEmployerTypeOnApproval;
-        public decimal TotalIncentiveAmount => Model.TotalIncentiveAmount;
         public long? UKPRN => Model.UKPRN;
         public bool EarningsCalculated => Model.EarningsCalculated;
         public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
@@ -45,7 +42,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 ULN = uln,
                 PlannedStartDate = plannedStartDate,
                 ApprenticeshipEmployerTypeOnApproval = apprenticeshipEmployerTypeOnApproval,
-                TotalIncentiveAmount = EmployerIncentivesTotalPaymentAmount,
                 UKPRN = ukprn,
                 CourseName = courseName,
                 EmploymentStartDate = employmentStartDate                

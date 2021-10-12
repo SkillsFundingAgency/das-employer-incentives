@@ -10,7 +10,6 @@
 	@uln BIGINT,
 	@plannedStartDate DATETIME2,
 	@apprenticeshipEmployerTypeOnApproval INT,
-	@totalIncentiveAmount MONEY, 
     @ukprn BIGINT, 
 	@courseName NVARCHAR(126),
 	@phase NVARCHAR(50)
@@ -30,9 +29,9 @@ BEGIN
 		(@applicationId, @accountId, @accountLegalEntityId, GETDATE(), 'Submitted', GETDATE(), @submittedByEmail, @submittedByName)
 
 	INSERT INTO dbo.IncentiveApplicationApprenticeship
-		(Id, IncentiveApplicationId, ApprenticeshipId, FirstName, LastName, DateOfBirth, ULN, PlannedStartDate, ApprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount, UKPRN, EarningsCalculated, WithdrawnByEmployer, WithdrawnByCompliance, CourseName, EmploymentStartDate, Phase, HasEligibleEmploymentStartDate)
+		(Id, IncentiveApplicationId, ApprenticeshipId, FirstName, LastName, DateOfBirth, ULN, PlannedStartDate, ApprenticeshipEmployerTypeOnApproval, UKPRN, EarningsCalculated, WithdrawnByEmployer, WithdrawnByCompliance, CourseName, EmploymentStartDate, Phase, HasEligibleEmploymentStartDate)
 	VALUES
-		(NEWID(), @applicationId, @apprenticeshipId, @firstName, @LastName, @dateOfBirth, @uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount, @ukprn, 0, 0, 0, @courseName, @plannedStartDate, @phase, 1)
+		(NEWID(), @applicationId, @apprenticeshipId, @firstName, @LastName, @dateOfBirth, @uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @ukprn, 0, 0, 0, @courseName, @plannedStartDate, @phase, 1)
 
 	COMMIT TRAN
 END
