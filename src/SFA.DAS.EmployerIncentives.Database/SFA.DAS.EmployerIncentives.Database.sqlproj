@@ -106,7 +106,7 @@
     <Build Include="Tables\ApprenticeshipBreakInLearning.sql" />
     <Build Include="StoredProcedures\CreateRetrospectiveApplication.sql" />
     <Build Include="Tables\AcademicYear.sql" />
-    <Build Include="Scripts\Remove.TotalIncentiveAmount.sql" />
+    <None Include="Scripts\Remove.TotalIncentiveAmount.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
