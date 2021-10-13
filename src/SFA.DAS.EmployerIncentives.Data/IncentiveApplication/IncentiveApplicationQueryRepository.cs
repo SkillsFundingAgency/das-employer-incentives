@@ -6,10 +6,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Data.Map;
-using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -23,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
-        private const decimal TotalIncentiveAmount = 3000m;
+        private const decimal EmployerIncentivesTotalEarnings = 3000m;
 
         public IncentiveApplicationQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
@@ -76,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 DateOfBirth = apprenticeship.DateOfBirth,
                 EmploymentStartDate = apprenticeship.EmploymentStartDate,                
                 Phase = apprenticeship.Phase,
-                TotalIncentiveAmount = TotalIncentiveAmount,
+                TotalIncentiveAmount = EmployerIncentivesTotalEarnings,
                 HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
             };
         }
