@@ -4,6 +4,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.Account;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities;
@@ -34,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Queries
                         .WithTransientLifetime();
                 })
                 .AddTransient<IUlnValidationService, UlnValidationService>()
+                .AddTransient<IIncentiveApplicationQueryRepository, IncentiveApplicationQueryRepository>()
                 .AddQueryHandlerDecorators()
                 .AddScoped<IQueryDispatcher, QueryDispatcher>()
                 .AddScoped<INewApprenticeIncentiveEligibilityService, NewApprenticeIncentiveEligibilityService>()

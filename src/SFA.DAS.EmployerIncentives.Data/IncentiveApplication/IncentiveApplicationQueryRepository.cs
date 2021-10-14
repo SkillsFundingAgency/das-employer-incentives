@@ -6,11 +6,13 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
-    public class IncentiveApplicationQueryRepository : IQueryRepository<IncentiveApplicationDto>
+    public class IncentiveApplicationQueryRepository : IIncentiveApplicationQueryRepository
     {
         private class JoinedObject
         {
@@ -20,28 +22,32 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
-        private const decimal EmployerIncentivesTotalEarnings = 3000m;
+        private static List<IncentivePaymentProfile> _incentivePaymentProfiles;
 
         public IncentiveApplicationQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
             _lazyContext = context;
         }
 
-        public Task<IncentiveApplicationDto> Get(Expression<Func<IncentiveApplicationDto, bool>> predicate)
+        public Task<IncentiveApplicationDto> Get(List<IncentivePaymentProfile> incentivePaymentProfiles, Expression<Func<IncentiveApplicationDto, bool>> predicate)
         {
+            _incentivePaymentProfiles = incentivePaymentProfiles;
+
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).FirstOrDefaultAsync(predicate);
         }
 
-        public Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
+        public Task<List<IncentiveApplicationDto>> GetList(List<IncentivePaymentProfile> incentivePaymentProfiles, Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
         {
+            _incentivePaymentProfiles = incentivePaymentProfiles;
+
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).Where(predicate).ToListAsync();
         }
 
-        private Expression<Func<JoinedObject, IncentiveApplicationDto>> MapToIncentiveApplicationDto()
+        private static Expression<Func<JoinedObject, IncentiveApplicationDto>> MapToIncentiveApplicationDto()
         {
             return x => new IncentiveApplicationDto
             {
@@ -62,6 +68,17 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(Models.IncentiveApplicationApprenticeship apprenticeship)
         {
+            var phase = apprenticeship.Phase;
+            if (phase == Phase.NotSet)
+            {
+                phase = Phase.Phase2;
+            }
+            var ageOfApprentice = apprenticeship.DateOfBirth.AgeOnThisDay(apprenticeship.PlannedStartDate);
+            var incentiveType = ageOfApprentice >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
+
+            var apprenticeshipPaymentProfiles = _incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
+            var totalEarnings = apprenticeshipPaymentProfiles.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).Sum(profile => profile.AmountPayable);
+
             return new IncentiveApplicationApprenticeshipDto
             {
                 Id = apprenticeship.Id,
@@ -73,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 DateOfBirth = apprenticeship.DateOfBirth,
                 EmploymentStartDate = apprenticeship.EmploymentStartDate,                
                 Phase = apprenticeship.Phase,
-                TotalIncentiveAmount = EmployerIncentivesTotalEarnings,
+                TotalIncentiveAmount = totalEarnings,
                 HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
             };
         }

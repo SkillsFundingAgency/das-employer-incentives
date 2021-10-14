@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRepository
 {
@@ -15,7 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<IncentiveApplicationDto> _sut;
+        private IIncentiveApplicationQueryRepository _sut;
+        private List<IncentivePaymentProfile> _paymentProfiles;
 
         [SetUp]
         public void Arrange()
@@ -26,6 +30,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
 
+            _paymentProfiles = new List<IncentivePaymentProfile>
+            {
+                new IncentivePaymentProfile(IncentivePhase.Create(), _fixture.CreateMany<PaymentProfile>(2).ToList())
+            };
+            
             _sut = new IncentiveApplication.IncentiveApplicationQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
@@ -44,13 +53,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var applicationId = Guid.NewGuid();
 
             allApplications[1].Id = applicationId;
+            foreach(var apprentice in allApplications[1].Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
 
             _context.Accounts.Add(account);
             _context.Applications.AddRange(allApplications);
             _context.SaveChanges();
 
             // Act
-            var actual = await _sut.Get(x => x.Id == applicationId);
+            var actual = await _sut.Get(_paymentProfiles, x => x.Id == applicationId);
 
             //Assert
             actual.Should().BeEquivalentTo(allApplications[1], opts => opts.ExcludingMissingMembers());
@@ -68,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             _context.SaveChanges();
 
             // Act
-            var actual = await _sut.Get(x => x.Id == applicationId);
+            var actual = await _sut.Get(_paymentProfiles, x => x.Id == applicationId);
 
             //Assert
             actual.Should().BeNull();
@@ -86,13 +99,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var application = _fixture.Create<Models.IncentiveApplication>();            
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
 
             // Act
-            var actual = await _sut.Get(x => x.Id == applicationId);
+            var actual = await _sut.Get(_paymentProfiles, x => x.Id == applicationId);
 
             //Assert
             actual.BankDetailsRequired.Should().BeFalse();
@@ -113,13 +129,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var application = _fixture.Create<Models.IncentiveApplication>();
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
 
             // Act
-            var actual = await _sut.Get(x => x.Id == applicationId);
+            var actual = await _sut.Get(_paymentProfiles, x => x.Id == applicationId);
 
             //Assert
             actual.BankDetailsRequired.Should().BeTrue();
@@ -140,13 +159,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
 
             // Act
-            var actual = await _sut.Get(x => x.Id == applicationId);
+            var actual = await _sut.Get(_paymentProfiles, x => x.Id == applicationId);
 
             //Assert
             actual.BankDetailsRequired.Should().BeTrue();
@@ -168,13 +190,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
 
             // Act
-            var actual = await _sut.Get(x => x.Id == applicationId);
+            var actual = await _sut.Get(_paymentProfiles, x => x.Id == applicationId);
 
             //Assert
             actual.BankDetailsRequired.Should().BeTrue();
@@ -193,13 +218,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
 
             // Act
-            var actual = await _sut.Get(x => x.Id == applicationId);
+            var actual = await _sut.Get(_paymentProfiles, x => x.Id == applicationId);
 
             //Assert
             actual.BankDetailsRequired.Should().BeFalse();

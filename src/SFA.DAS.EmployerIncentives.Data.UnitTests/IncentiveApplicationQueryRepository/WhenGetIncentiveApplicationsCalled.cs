@@ -7,7 +7,10 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRepository
 {
@@ -15,7 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<IncentiveApplicationDto> _sut;
+        private IIncentiveApplicationQueryRepository _sut;
+        private List<IncentivePaymentProfile> _paymentProfiles;
 
         [SetUp]
         public void Arrange()
@@ -25,6 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
+
+            _paymentProfiles = new List<IncentivePaymentProfile>
+            {
+                new IncentivePaymentProfile(IncentivePhase.Create(), _fixture.CreateMany<PaymentProfile>(2).ToList())
+            };
 
             _sut = new IncentiveApplication.IncentiveApplicationQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
@@ -45,13 +54,21 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             allApplications[0].AccountId = accountId;
             allApplications[3].AccountId = accountId;
+            foreach (var apprentice in allApplications[0].Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
+            foreach (var apprentice in allApplications[3].Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
 
             _context.Accounts.Add(account);
             _context.Applications.AddRange(allApplications);
             _context.SaveChanges();
 
             // Act
-            var actual = (await _sut.GetList(x => x.AccountId == accountId)).ToArray();
+            var actual = (await _sut.GetList(_paymentProfiles, x => x.AccountId == accountId)).ToArray();
 
             //Assert
             actual.All(x => x.AccountId == accountId).Should().BeTrue();
@@ -70,10 +87,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Apprenticeships = new List<Models.IncentiveApplicationApprenticeship>()
             {
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "ZFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).Create(),
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 1).Create(),
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).Create(),
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ZLast").With(a => a.ULN, 9).Create()
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "ZFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).With(a => a.Phase, Phase.Phase2).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 1).With(a => a.Phase, Phase.Phase2).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).With(a => a.Phase, Phase.Phase2).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ZLast").With(a => a.ULN, 9).With(a => a.Phase, Phase.Phase2).Create()
             };
 
             _context.Accounts.Add(account);
@@ -81,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             _context.SaveChanges();
 
             // Act
-            var actual = (await _sut.GetList(x => x.AccountId == account.Id)).Single();
+            var actual = (await _sut.GetList(_paymentProfiles, x => x.AccountId == account.Id)).Single();
 
             //Assert
             actual.Apprenticeships.Count().Should().Be(4);
