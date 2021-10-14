@@ -54,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             
             _incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(p => p.Apprenticeship, apprenticeship)
+                .With(x => x.HasPossibleChangeOfCircumstances, false)
                 .Create();
 
             _apprenticeshipIncentiveId = _incentiveModel.Id;
@@ -142,6 +143,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => !l.SubmissionData.SubmissionFound)
                 ), Times.Once);
+
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.HasPossibleChangeOfCircumstances == false)));
         }
 
         [Test]
@@ -182,6 +185,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => !l.SubmissionData.LearningData.LearningFound)
                 ), Times.Once);
+
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.HasPossibleChangeOfCircumstances == false)));
         }
 
         [Test]
@@ -297,6 +302,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.LearningData.StartDate == _testStartDate)
                 ), Times.Once);
+
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.HasPossibleChangeOfCircumstances == true)));
         }
 
         [Test]
@@ -328,6 +335,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLearnerDomainRepository.Verify(m => m.Save(
                 It.Is<Learner>(l => l.SubmissionData.LearningData.IsInlearning == null)
                 ), Times.Once);
+
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.HasPossibleChangeOfCircumstances == false)));
         }
 
         [Test]
@@ -601,6 +610,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 l.SubmissionData.LearningData.StoppedStatus.DateStopped == _academicYear.EndDate.AddDays(-1) &&
                 !l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue)
                 ), Times.Once);
+
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.HasPossibleChangeOfCircumstances == true)));
         }
 
         [Test]
@@ -762,6 +773,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 l.SubmissionData.LearningData.StoppedStatus.DateResumed.HasValue &&
                 !l.SubmissionData.LearningData.StoppedStatus.DateStopped.HasValue)
                 ), Times.Once);
+
+            _mockApprenticeshipIncentiveDomainRepository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(a => a.HasPossibleChangeOfCircumstances == true)));
         }
 
         [Test]
