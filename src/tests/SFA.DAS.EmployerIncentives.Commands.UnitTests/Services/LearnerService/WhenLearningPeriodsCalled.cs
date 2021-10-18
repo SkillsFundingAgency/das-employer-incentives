@@ -118,7 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
-        public void Then_gaps_of_28_days_or_less_are_not_considered()
+        public void Then_gap_of_28_days_or_less_are_not_considered_as_breaks()
         {
             //Arrange  
             var periods = new List<PeriodDto> {new PeriodDto {ApprenticeshipId = _apprenticeshipId}};
@@ -130,6 +130,53 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                 .Create();
             _sut.Training.First().PriceEpisodes.Add(episode);
 
+            //Act
+            var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
+
+            //Assert
+            learningPeriods.Count().Should().Be(2);
+        }
+
+        [Test]
+        public void Then_gaps_of_28_days_or_less_are_not_considered_as_breaks()
+        {
+            //Arrange  
+            var periods = new List<PeriodDto> { new PeriodDto { ApprenticeshipId = _apprenticeshipId } };
+            var episode1 = _fixture.Build<PriceEpisodeDto>()
+                .With(x => x.StartDate, _testPriceEpisode1Dto.StartDate.AddDays(-100))
+                .With(x => x.EndDate, _testPriceEpisode1Dto.StartDate.AddDays(-28))
+                .With(x => x.AcademicYear, _testPriceEpisode3Dto.AcademicYear)
+                .With(x => x.Periods, periods)
+                .Create();
+            _sut.Training.First().PriceEpisodes.Add(episode1);
+
+            var episode2 = _fixture.Build<PriceEpisodeDto>()
+                .With(x => x.StartDate, _testPriceEpisode3Dto.EndDate.Value.AddDays(28))
+                .With(x => x.AcademicYear, _testPriceEpisode3Dto.AcademicYear)
+                .With(x => x.Periods, periods)
+                .Without(x => x.EndDate)
+                .Create();
+            _sut.Training.First().PriceEpisodes.Add(episode2);
+
+            //Act
+            var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
+
+            //Assert
+            learningPeriods.Count().Should().Be(2);
+        }
+
+        [Test]
+        public void Then_overlapping_periods_are_merged()
+        {
+            //Arrange  
+            var periods = new List<PeriodDto> { new PeriodDto { ApprenticeshipId = _apprenticeshipId } };
+            var episode = _fixture.Build<PriceEpisodeDto>()
+                .With(x => x.StartDate, _testPriceEpisode1Dto.StartDate.AddDays(30))
+                .With(x => x.EndDate, _testPriceEpisode1Dto.StartDate.AddDays(-30))
+                .With(x => x.Periods, periods)
+                .Create();
+            _sut.Training.First().PriceEpisodes.Add(episode);
+   
             //Act
             var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
 
