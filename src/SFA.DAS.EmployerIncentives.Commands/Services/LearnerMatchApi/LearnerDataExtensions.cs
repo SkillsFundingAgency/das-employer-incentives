@@ -188,18 +188,40 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
-            if(learnerData == null)
-            {
-                return new List<LearningPeriod>();
-            }
+            if (learnerData == null) return new List<LearningPeriod>();
 
-            return
+            var periods = 
               (from tr in learnerData.Training
                where tr.Reference == PROGRAM_REFERENCE
                from pe in tr.PriceEpisodes
                from p in pe.Periods
                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-               select new LearningPeriod(pe.StartDate, pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate(pe.AcademicYear))).Distinct();
+               select new LearningPeriod(pe.StartDate, pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate(pe.AcademicYear)))
+              .Distinct()
+              .OrderBy(p => p.StartDate)
+              .ToList();
+
+            MergeLearningPeriods(periods);
+            
+            return periods;
+        }
+
+        private static void MergeLearningPeriods(IList<LearningPeriod> periods)
+        {
+            for (var i = 0; i < periods.Count() - 1; i++)
+            {
+                if (periods[i].EndDate.HasValue == false) continue;
+
+                var gap = (periods[i + 1].StartDate - periods[i].EndDate.Value).Days;
+                if (gap <= 28)
+                {
+                    periods.Add(new LearningPeriod(periods[i].StartDate, periods[i+1].EndDate));
+                    periods.RemoveAt(i);
+                    periods.RemoveAt(i + 1);
+
+                    MergeLearningPeriods(periods.OrderBy(p => p.StartDate).ToList());
+                }
+            }
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)
