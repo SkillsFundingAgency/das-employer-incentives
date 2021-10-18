@@ -325,6 +325,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
+        public void UpdateBreaksInLearning(Learner learner)
+        {
+            // todo
+            Model.BreakInLearnings.Clear();
+
+            for (int i = 0; i < learner.LearningPeriods.Count; i++)
+            {
+                // if 
+                //Model.BreakInLearnings.Add();
+            }
+            
+        }
+
         public void SetLearningStoppedChangeOfCircumstance(
             LearningStoppedStatus learningStoppedStatus,
             IEnumerable<IncentivePaymentProfile> paymentProfiles,

@@ -6,7 +6,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class LearningPeriod : ValueObject
     {
-        public LearningPeriod(DateTime startDate, DateTime? endDate)
+        public LearningPeriod(DateTime startDate, DateTime? endDate = null)
         {
             StartDate = startDate;
             EndDate = endDate;
