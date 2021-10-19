@@ -8,13 +8,11 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using PaymentsResumed = SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events.PaymentsResumed;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
@@ -294,36 +292,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Model));
             }
         }
-        private void StartBreakInLearning(DateTime startDate)
-        {
-            if(Model.BreakInLearnings.Any(b => b.StartDate == startDate.Date))
-            {
-                return;
-            }
-
-            Model.BreakInLearnings.Add(new BreakInLearning(startDate));
-        }
-
-        private void StopBreakInLearning(LearningStoppedStatus status)
-        {
-            var stopDate = status.DateResumed.Value.AddDays(-1);
-            if (Model.BreakInLearnings.Any(b => b.EndDate == stopDate.Date) || Model.BreakInLearnings.Count == 0)
-            {
-                return;
-            }
-
-            var activeBreak = Model.BreakInLearnings.Single(b => !b.EndDate.HasValue);
-            if (stopDate.Date <= activeBreak.StartDate) // EI-1195
-            {
-                Model.BreakInLearnings.Remove(activeBreak);
-                status.Undo();
-                AddEvent(new BreakInLearningDeleted(Model.Id));
-            }
-            else
-            {
-                Model.BreakInLearnings.Single(b => !b.EndDate.HasValue).SetEndDate(stopDate);
-            }
-        }
 
         public void UpdateBreaksInLearning(Learner learner)
         {
@@ -349,7 +317,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {
                 Model.Status = IncentiveStatus.Stopped;
-                StartBreakInLearning(learningStoppedStatus.DateStopped.Value);
                 RemoveEarningsAfterStopDate(learningStoppedStatus.DateStopped.Value, collectionCalendar);
                 AddEvent(new LearningStopped(
                     Model.Id,
@@ -358,7 +325,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped && learningStoppedStatus.DateResumed != null)
             {
                 Model.Status = IncentiveStatus.Active;
-                StopBreakInLearning(learningStoppedStatus);
+                learningStoppedStatus.Undo();
+                AddEvent(new BreakInLearningDeleted(Model.Id));
                                 
                 if (learningStoppedStatus.DateResumed.HasValue)
                 {
