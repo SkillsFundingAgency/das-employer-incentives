@@ -136,7 +136,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count.Should().Be(2);
             learningPeriods.Last().StartDate.Should().Be(_testPriceEpisode3Dto.StartDate);
-            learningPeriods.Last().EndDate.Should().BeNull();
+            learningPeriods.Last().EndDate.Should().Be(_collectionCalendar.GetAcademicYearEndDate(episode.AcademicYear).Date);
         }
 
         [Test]
