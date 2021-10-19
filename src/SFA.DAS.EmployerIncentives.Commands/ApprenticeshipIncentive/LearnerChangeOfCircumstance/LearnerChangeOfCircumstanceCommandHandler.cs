@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
-            incentive.UpdateBreaksInLearning(learner);
+            incentive.SetBreaksInLearning(learner);
 
             if (learner.HasFoundSubmission)
             {

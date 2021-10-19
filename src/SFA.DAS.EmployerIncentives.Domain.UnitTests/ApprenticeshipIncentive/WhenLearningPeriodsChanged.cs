@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.UpdateBreaksInLearning(_learner);
+            _sut.SetBreaksInLearning(_learner);
 
             // Assert
             _sut.BreakInLearnings.Should().BeEquivalentTo(expected);
@@ -108,7 +108,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.UpdateBreaksInLearning(_learner);
+            _sut.SetBreaksInLearning(_learner);
 
             // Assert
             _sut.BreakInLearnings.Should().NotBeEquivalentTo(expected);

@@ -134,7 +134,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
 
             //Assert
-            learningPeriods.Count().Should().Be(2);
+            learningPeriods.Count.Should().Be(2);
+            learningPeriods.Last().StartDate.Should().Be(_testPriceEpisode3Dto.StartDate);
+            learningPeriods.Last().EndDate.Should().BeNull();
         }
 
         [Test]
@@ -162,7 +164,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
 
             //Assert
-            learningPeriods.Count().Should().Be(2);
+            learningPeriods.Count.Should().Be(2);
         }
 
         [Test]
