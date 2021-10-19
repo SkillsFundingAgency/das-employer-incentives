@@ -1,14 +1,14 @@
-﻿using System.Linq;
+﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
-using System.Net;
-using System.Threading.Tasks;
-using AutoFixture;
-using Dapper;
 using Microsoft.Data.SqlClient;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using TechTalk.SpecFlow;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -16,34 +16,41 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "LegalEntityAgreementSigned")]
     public class LegalEntityAgreementSignedSteps : StepsBase
     {
-        private readonly TestContext _testContext;
-        private readonly Account _testAccountTable;
+        private readonly Account _account;
         private HttpResponseMessage _response;
-        private readonly int _agreementVersion = 5;
+        private const int AgreementVersion = 5;
 
         public LegalEntityAgreementSignedSteps(TestContext testContext) : base(testContext)
         {
-            _testContext = testContext;
-            var fixture = new Fixture();
-            _testAccountTable = _testContext.TestData.GetOrCreate(null, () => 
-                fixture
-                .Build<Account>()
-                .With(x => x.SignedAgreementVersion, (int?)null)
-                .Create());            
+            _account = Fixture.Build<Account>()
+                .Without(x => x.SignedAgreementVersion)
+                .Without(x => x.VrfCaseId)
+                .Without(x => x.VrfCaseStatus)
+                .Without(x => x.VrfCaseStatusLastUpdatedDateTime)
+                .Without(x => x.VrfVendorId)
+                .Create();
+        }
+
+        [Given(@"the legal entity is already available in Employer Incentives")]
+        public async Task GivenTheLegalEntityIsAlreadyAvailableInEmployerIncentives()
+        {
+            await DataAccess.SetupAccount(_account);
         }
 
         [Given(@"the legal entity is already available in Employer Incentives with a signed version")]
-        public Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
+        public async Task GivenTheLegalEntityIsAlreadyAvailableInEmployerIncentivesWithASignedVersion()
         {
-            _testAccountTable.SignedAgreementVersion = _agreementVersion - 1;
-            return DataAccess.SetupAccount(_testAccountTable);
+            _account.SignedAgreementVersion = AgreementVersion - 1;
+            await DataAccess.SetupAccount(_account);
         }
 
         [When(@"the legal agreement is signed")]
         public async Task TheLegalAgreementIsSigned()
         {
-            var url = $"/accounts/{_testAccountTable.Id}/legalEntities/{_testAccountTable.AccountLegalEntityId}";
-            _response = await EmployerIncentiveApi.Patch(url, new SignAgreementRequest { AgreementVersion = _agreementVersion });
+            var url = $"/accounts/{_account.Id}/legalEntities/{_account.AccountLegalEntityId}";
+            var request = Fixture.Build<SignAgreementRequest>()
+                .With(r => r.AgreementVersion, AgreementVersion).Create();
+            _response = await EmployerIncentiveApi.Patch(url, request);
         }
 
         [Then(@"the employer can apply for incentives")]
@@ -51,14 +58,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
-                    new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var accounts = await dbConnection.GetAllAsync<Account>();
+            var account = accounts.Single(a =>
+                a.Id == _account.Id && a.AccountLegalEntityId == _account.AccountLegalEntityId);
 
-                account.Should().HaveCount(1);
-                account.Single().SignedAgreementVersion.Should().Be(_agreementVersion);
-            }
+            account.SignedAgreementVersion.Should().Be(AgreementVersion);
         }
+
     }
 }

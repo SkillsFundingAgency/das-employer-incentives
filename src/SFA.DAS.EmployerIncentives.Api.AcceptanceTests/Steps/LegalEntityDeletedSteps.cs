@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using AutoFixture;
 using FluentAssertions;
+using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AutoFixture;
-using Newtonsoft.Json;
-using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -17,22 +16,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "LegalEntityDeleted")]
     public class LegalEntityDeletedSteps : StepsBase
     {
-        private readonly TestContext _testContext;
-        private readonly Account _testAccountTable;
+        private readonly Account _account;
         private HttpResponseMessage _response;
-        private Fixture _fixture;
 
         public LegalEntityDeletedSteps(TestContext testContext) : base(testContext)
         {
-            _testContext = testContext;
-            _testAccountTable = _testContext.TestData.GetOrCreate<Account>();
-            _fixture = new Fixture();
+            _account = TestContext.TestData.GetOrCreate<Account>();
         }
 
-        [When(@"a legal entity is removed from an account")]
-        public async Task WhenALegalEntityIsRemovedFromAnAccount()
+        [When(@"the legal entity is removed from an account")]
+        public async Task WhenTheLegalEntityIsRemovedFromAnAccount()
         {
-            _response = await EmployerIncentiveApi.Delete($"/accounts/{_testAccountTable.Id}/legalEntities/{_testAccountTable.AccountLegalEntityId}");
+            _response = await EmployerIncentiveApi.Delete($"/accounts/{_account.Id}/legalEntities/{_account.AccountLegalEntityId}");
 
             _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }     
@@ -40,15 +35,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"a legal entity has submitted one or more applications")]
         public async Task GivenALegalEntityHasSubmittedOneOrMoreApplications()
         {
-            var createApplicationRequest = _fixture.Create<CreateIncentiveApplicationRequest>();
-            createApplicationRequest.AccountId = _testAccountTable.Id;
-            createApplicationRequest.AccountLegalEntityId = _testAccountTable.AccountLegalEntityId;
+            var createApplicationRequest = Fixture.Create<CreateIncentiveApplicationRequest>();
+            createApplicationRequest.AccountId = _account.Id;
+            createApplicationRequest.AccountLegalEntityId = _account.AccountLegalEntityId;
 
             _response = await EmployerIncentiveApi.Post("/applications", createApplicationRequest);
             var applicationId = _response.Headers.Location.ToString().Substring("/applications/".Length);
 
-            var submitApplicationRequest = _fixture.Create<SubmitIncentiveApplicationRequest>();
-            submitApplicationRequest.AccountId = _testAccountTable.Id;
+            var submitApplicationRequest = Fixture.Create<SubmitIncentiveApplicationRequest>();
+            submitApplicationRequest.AccountId = _account.Id;
             submitApplicationRequest.IncentiveApplicationId = new Guid(applicationId);
 
             _response = await EmployerIncentiveApi.Patch($"/applications/{applicationId}", submitApplicationRequest);
@@ -57,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the applications for that legal entity should be withdrawn")]
         public async Task ThenTheApplicationsForTheLegalEntityShouldBeWithdrawn()
         {
-            _response = await EmployerIncentiveApi.Client.GetAsync($"/accounts/{_testAccountTable.Id}/legalentity/{_testAccountTable.AccountLegalEntityId}/applications");
+            _response = await EmployerIncentiveApi.Client.GetAsync($"/accounts/{_account.Id}/legalentity/{_account.AccountLegalEntityId}/applications");
             var json = await _response.Content.ReadAsStringAsync();
             var getApplicationsResponse = JsonConvert.DeserializeObject<GetApplicationsResponse>(json);
             getApplicationsResponse.ApprenticeApplications.Should().BeEmpty();
