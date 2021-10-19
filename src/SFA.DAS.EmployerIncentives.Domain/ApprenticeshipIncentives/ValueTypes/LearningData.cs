@@ -44,9 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             StoppedStatus = LearningFound ? stoppedStatus : null;
         }
 
-        public void SetLearningPeriodsChanged()
+        public void SetLearningPeriodsChanged(bool hasChanged = true)
         {
-            LearningPeriodsChanged = true;
+            LearningPeriodsChanged = hasChanged;
         }
 
         protected override IEnumerable<object> GetAtomicValues()

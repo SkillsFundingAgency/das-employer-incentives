@@ -9,12 +9,11 @@ using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
     [TestFixture]
-    public class WhenLerningPeriodsChanged
+    public class WhenLearningPeriodsChanged
     {
         private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
@@ -51,19 +50,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_breaks_in_learning_are_updated()
         {
             // Arrange
-            IList<BreakInLearning> expected = new List<BreakInLearning>()
+            var expected = new List<BreakInLearning>()
             {
                 new BreakInLearning(new DateTime(2021, 4, 1)).SetEndDate(new DateTime(2021, 6, 9)),
                 new BreakInLearning(new DateTime(2021, 8, 26)).SetEndDate(new DateTime(2021, 10, 1)),
             };
 
             var learningData = new LearningData(true);
-            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.PendingPaymentModels.Last().DueDate.AddDays(-1)));
+            learningData.SetLearningPeriodsChanged(true);
+
             var submissionData = new SubmissionData();
             submissionData.SetSubmissionDate(DateTime.Now);
             submissionData.SetLearningData(learningData);
             _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
-            IEnumerable<LearningPeriod> periods = new List<LearningPeriod>
+            _learner.SetSubmissionData(submissionData);
+
+            var periods = new List<LearningPeriod>
             {
                 new LearningPeriod(new DateTime(2021, 1, 3), new DateTime(2021, 3, 31)),
                 new LearningPeriod(new DateTime(2021, 6, 10), new DateTime(2021, 8, 25)),
@@ -76,6 +78,40 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Assert
             _sut.BreakInLearnings.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void Then_breaks_in_learning_are_not_updated_if_learning_periods_have_not_changed()
+        {
+            // Arrange
+            var expected = new List<BreakInLearning>()
+            {
+                new BreakInLearning(new DateTime(2021, 4, 1)).SetEndDate(new DateTime(2021, 6, 9)),
+                new BreakInLearning(new DateTime(2021, 8, 26)).SetEndDate(new DateTime(2021, 10, 1)),
+            };
+
+            var learningData = new LearningData(true);
+            learningData.SetLearningPeriodsChanged(false);
+
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+           
+            var periods = new List<LearningPeriod>
+            {
+                new LearningPeriod(new DateTime(2021, 1, 3), new DateTime(2021, 3, 31)),
+                new LearningPeriod(new DateTime(2021, 6, 10), new DateTime(2021, 8, 25)),
+                new LearningPeriod(new DateTime(2021, 10, 2)),
+            };
+            _learner.SetLearningPeriods(periods);
+
+            // Act
+            _sut.UpdateBreaksInLearning(_learner);
+
+            // Assert
+            _sut.BreakInLearnings.Should().NotBeEquivalentTo(expected);
         }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)

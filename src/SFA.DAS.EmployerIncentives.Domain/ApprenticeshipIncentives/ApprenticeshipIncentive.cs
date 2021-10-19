@@ -327,6 +327,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void UpdateBreaksInLearning(Learner learner)
         {
+            if (!learner.SubmissionData.LearningData.LearningPeriodsChanged) return;
+            
             var periods = learner.LearningPeriods.ToList();
 
             Model.BreakInLearnings.Clear();

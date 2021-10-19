@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             submissionData.LearningData.SetStartDate(_fixture.Create<DateTime>());
             submissionData.LearningData.SetIsInLearning(true);
             submissionData.LearningData.SetIsStopped(new LearningStoppedStatus(true, _fixture.Create<DateTime>()));
+            submissionData.LearningData.SetLearningPeriodsChanged();
 
             var testLearner = 
                 _fixture.Build<LearnerModel>()
@@ -75,6 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             storedLearner.RawJSON.Should().Be(testLearner.SubmissionData.RawJson);
             storedLearner.LearningStoppedDate.Should().Be(testLearner.SubmissionData.LearningData.StoppedStatus.DateStopped);
             storedLearner.LearningResumedDate.Should().BeNull();
+            storedLearner.LearningPeriodsChanged.Should().Be(testLearner.SubmissionData.LearningData.LearningPeriodsChanged);
         }
     }
 }

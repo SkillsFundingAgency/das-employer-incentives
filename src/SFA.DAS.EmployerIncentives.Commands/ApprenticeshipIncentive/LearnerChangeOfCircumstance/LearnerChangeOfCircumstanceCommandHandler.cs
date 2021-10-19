@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             incentive.UpdateBreaksInLearning(learner);
 
-            if(learner.HasFoundSubmission)
+            if (learner.HasFoundSubmission)
             {
                 var collectionCalendar = await _collectionCalendarService.Get();
                 var paymentProfiles = await _incentivePaymentProfilesService.Get();

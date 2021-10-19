@@ -317,7 +317,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                _fixture.Build<LearnerModel>()
                .With(x => x.SubmissionData, submissionData)
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
-               .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                .Create());
 
             _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
@@ -347,7 +346,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _learner = new LearnerFactory().GetExisting(
                _fixture.Build<LearnerModel>()
                .With(x => x.SubmissionData, submissionData)
-               .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                .Create());
 
@@ -380,7 +378,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                _fixture.Build<LearnerModel>()
                .With(x => x.SubmissionData, submissionData)
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
-               .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
                .Create());
 
             _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
@@ -390,6 +387,44 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _incentive.FlushEvents().Count(e => e is LearningStopped).Should().Be(0);
+        }
+
+        [Test]
+        public async Task Then_BreaksInLearning_should_be_updated()
+        {
+            //Arrange
+            _incentiveModel.Status = IncentiveStatus.Active;
+
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+
+            var learningData = new LearningData(true);
+            learningData.SetLearningPeriodsChanged(true);
+            var submissionData = _fixture.Create<SubmissionData>();
+            submissionData.SetSubmissionDate(DateTime.Today);
+            submissionData.SetLearningData(learningData);
+
+            var periods = new[]
+            {
+                new LearningPeriod(new DateTime(2021, 1, 3), new DateTime(2021, 3, 31)),
+                new LearningPeriod(new DateTime(2021, 10, 3), new DateTime(2021, 12, 31))
+            };
+
+            _learner = new LearnerFactory().GetExisting(
+                _fixture.Build<LearnerModel>()
+                    .With(x => x.SubmissionData, submissionData)
+                    .With(x => x.LearningPeriods, periods)
+                    .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
+                    .Create());
+
+            _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _incentive.BreakInLearnings.Count.Should().Be(1);
+            _incentive.BreakInLearnings.First().StartDate.Should().Be(new DateTime(2021, 4, 1));
+            _incentive.BreakInLearnings.First().EndDate.Should().Be(new DateTime(2021, 10, 2));
         }
     }
 }

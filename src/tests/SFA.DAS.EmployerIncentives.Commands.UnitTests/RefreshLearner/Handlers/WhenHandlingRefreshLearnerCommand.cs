@@ -893,7 +893,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             //Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(
-                It.Is<Learner>(l => l.GetModel().SubmissionData.LearningData.LearningPeriodsChanged)
+                It.Is<Learner>(l => l.GetModel().SubmissionData.LearningData.LearningPeriodsChanged == true)
                 ), Times.Once);
         }
 
