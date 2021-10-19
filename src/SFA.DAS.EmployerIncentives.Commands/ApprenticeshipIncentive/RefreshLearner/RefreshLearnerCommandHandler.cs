@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
@@ -59,7 +60,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 submissionData.SetSubmissionDate(learnerData.IlrSubmissionDate);
 
                 var learningFoundStatus = learnerData.LearningFound(incentive);
-                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound, learningFoundStatus.NotFoundReason));
+                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound,
+                    learningFoundStatus.NotFoundReason));
 
                 if (learningFoundStatus.LearningFound)
                 {
@@ -68,6 +70,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetIsInLearning(learnerData.IsInLearning(incentive));
                     submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive, collectionCalendar));
                 }
+
+                var learningPeriods = learnerData.LearningPeriods(incentive, collectionCalendar);
+                if (LearningPeriodsChanged(learner.LearningPeriods, learningPeriods))
+                {
+                    learner.SetLearningPeriods(learningPeriods);
+                    submissionData.LearningData.SetLearningPeriodsChanged();
+                }
+
                 submissionData.SetRawJson(learnerData.RawJson);
             }
 
@@ -79,7 +89,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             learner.SetSubmissionData(submissionData);
             incentive.LearnerRefreshCompleted();
 
-            learner.SetLearningPeriods(learnerData.LearningPeriods(incentive, collectionCalendar));
             
             if (!learner.SubmissionData.LearningData.LearningFound)
             {
@@ -89,6 +98,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             await _learnerDomainRepository.Save(learner);
             await _incentiveDomainRepository.Save(incentive);
+        }
+
+        private static bool LearningPeriodsChanged(IEnumerable<LearningPeriod> periods1, IEnumerable<LearningPeriod> periods2)
+        {
+            return !periods1.OrderBy(p => p.StartDate).SequenceEqual(periods2.OrderBy(p => p.StartDate));
         }
 
         private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)

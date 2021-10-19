@@ -6,13 +6,15 @@ using System.Collections.Generic;
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class LearningData : ValueObject, ILogWriter
-    {        
-        public bool LearningFound { get; private set; }
-        public string NotFoundReason { get; private set; }
+    {
+        public bool LearningFound { get; }
+        public string NotFoundReason { get;}
         public bool? HasDataLock { get; private set; }
         public bool? IsInlearning { get; private set; }
         public DateTime? StartDate { get; private set; }
-        public int? DaysinLearning { get; private set; }
+        public int? DaysinLearning { get; }
+        public bool LearningPeriodsChanged { get; private set; }
+
         public LearningStoppedStatus StoppedStatus { get; private set; }
         
         public LearningData(bool isFound, string notFoundReason = "")
@@ -42,6 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             StoppedStatus = LearningFound ? stoppedStatus : null;
         }
 
+        public void SetLearningPeriodsChanged()
+        {
+            LearningPeriodsChanged = true;
+        }
+
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return NotFoundReason;
@@ -50,6 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
             yield return StartDate;
             yield return DaysinLearning;
             yield return StoppedStatus;
+            yield return LearningPeriodsChanged;
         }
 
         public Log Log
@@ -59,9 +67,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 
                 return new Log
                 {
-                    OnProcessed = () => $"Learning data : LearningFound : {LearningFound}, StartDate : {StartDate}, HasDataLock : {HasDataLock}, IsInlearning : {IsInlearning}, DaysinLearning : {DaysinLearning}, StoppedStatus : {StoppedStatus} "
+                    OnProcessed = () => $"Learning data : LearningFound : {LearningFound}, StartDate : {StartDate}, HasDataLock : {HasDataLock}, IsInlearning : {IsInlearning}, DaysinLearning : {DaysinLearning}, StoppedStatus : {StoppedStatus}, LearningPeriodsChanged : {LearningPeriodsChanged} "
                 };
             }
         }
+
     }
 }

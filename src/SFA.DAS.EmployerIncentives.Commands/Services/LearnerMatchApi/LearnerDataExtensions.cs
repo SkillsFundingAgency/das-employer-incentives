@@ -186,7 +186,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return episode.ApprenticeshipId == null;
         }
 
-        public static IEnumerable<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
+        public static IList<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
             if (learnerData == null) return new List<LearningPeriod>();
 

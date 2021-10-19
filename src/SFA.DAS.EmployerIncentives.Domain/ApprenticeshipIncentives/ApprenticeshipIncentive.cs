@@ -327,15 +327,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void UpdateBreaksInLearning(Learner learner)
         {
-            // todo
+            var periods = learner.LearningPeriods.ToList();
+
             Model.BreakInLearnings.Clear();
 
-            for (int i = 0; i < learner.LearningPeriods.Count; i++)
+            for (var i = 0; i < periods.Count - 1; i++)
             {
-                // if 
-                //Model.BreakInLearnings.Add();
+                var start = periods[i].EndDate.Value.AddDays(1);
+                var end = periods[i + 1].StartDate.AddDays(-1);
+                Model.BreakInLearnings.Add(new BreakInLearning(start).SetEndDate(end));
             }
-            
         }
 
         public void SetLearningStoppedChangeOfCircumstance(
