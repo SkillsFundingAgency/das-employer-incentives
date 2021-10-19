@@ -126,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
                 .With(x => x.StartDate, _testPriceEpisode3Dto.EndDate.Value.AddDays(28))
                 .With(x => x.AcademicYear, _testPriceEpisode3Dto.AcademicYear)
                 .With(x => x.Periods, periods)
-                .Without(x => x.EndDate)
+                .With(x => x.EndDate, _testPriceEpisode3Dto.EndDate.Value.AddDays(38))
                 .Create();
             _sut.Training.First().PriceEpisodes.Add(episode);
 
@@ -136,35 +136,56 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count.Should().Be(2);
             learningPeriods.Last().StartDate.Should().Be(_testPriceEpisode3Dto.StartDate);
-            learningPeriods.Last().EndDate.Should().Be(_collectionCalendar.GetAcademicYearEndDate(episode.AcademicYear).Date);
+            learningPeriods.Last().EndDate.Should().Be(episode.EndDate);
         }
 
         [Test]
-        public void Then_gaps_of_28_days_or_less_are_not_considered_as_breaks()
+        public void Then_multiple_gaps_of_28_days_or_less_are_not_considered_as_breaks()
         {
-            //Arrange  
+            //Arrange
             var periods = new List<PeriodDto> { new PeriodDto { ApprenticeshipId = _apprenticeshipId } };
+
             var episode1 = _fixture.Build<PriceEpisodeDto>()
-                .With(x => x.StartDate, _testPriceEpisode1Dto.StartDate.AddDays(-100))
-                .With(x => x.EndDate, _testPriceEpisode1Dto.StartDate.AddDays(-28))
-                .With(x => x.AcademicYear, _testPriceEpisode3Dto.AcademicYear)
+                .With(x => x.AcademicYear, "2021")
+                .With(x => x.StartDate, new DateTime(2020, 9, 1))
+                .With(x => x.EndDate, new DateTime(2020, 12, 10))
                 .With(x => x.Periods, periods)
                 .Create();
-            _sut.Training.First().PriceEpisodes.Add(episode1);
 
             var episode2 = _fixture.Build<PriceEpisodeDto>()
-                .With(x => x.StartDate, _testPriceEpisode3Dto.EndDate.Value.AddDays(28))
-                .With(x => x.AcademicYear, _testPriceEpisode3Dto.AcademicYear)
-                .With(x => x.Periods, periods)
-                .Without(x => x.EndDate)
+                .With(pe => pe.AcademicYear, "2021")
+                .With(pe => pe.StartDate, episode1.EndDate.Value.AddDays(28))
+                .With(pe => pe.EndDate, new DateTime(2021, 3, 1))
+                .With(pe => pe.Periods, periods)
                 .Create();
+
+            var episode3 = _fixture.Build<PriceEpisodeDto>()
+                .With(pe => pe.AcademicYear, "2021")
+                .With(pe => pe.StartDate, episode2.EndDate.Value.AddDays(20))
+                .With(pe => pe.EndDate, new DateTime(2021, 6, 1))
+                .With(pe => pe.Periods, periods)
+                .Create();
+
+            var episode4 = _fixture.Build<PriceEpisodeDto>()
+                .With(pe => pe.AcademicYear, "2021")
+                .With(pe => pe.StartDate, episode3.EndDate.Value.AddDays(10))
+                .With(pe => pe.EndDate, new DateTime(2021, 7, 31))
+                .With(x => x.Periods, periods)
+                .Create();
+            
+            _sut.Training.First().PriceEpisodes.Clear();
+            _sut.Training.First().PriceEpisodes.Add(episode1);
             _sut.Training.First().PriceEpisodes.Add(episode2);
+            _sut.Training.First().PriceEpisodes.Add(episode3);
+            _sut.Training.First().PriceEpisodes.Add(episode4);
 
             //Act
             var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
 
             //Assert
-            learningPeriods.Count.Should().Be(2);
+            learningPeriods.Count.Should().Be(1);
+            learningPeriods.First().StartDate.Should().Be(episode1.StartDate);
+            learningPeriods.First().EndDate.Should().Be(episode4.EndDate);
         }
 
         [Test]

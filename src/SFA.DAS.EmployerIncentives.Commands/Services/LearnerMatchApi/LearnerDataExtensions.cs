@@ -216,8 +216,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 if (gap <= 28)
                 {
                     periods.Add(new LearningPeriod(periods[i].StartDate, periods[i+1].EndDate));
-                    periods.RemoveAt(i);
-                    periods.RemoveAt(i + 1);
+                    periods.Remove(periods[i]);
+                    periods.Remove(periods[i + 1]);
 
                     MergeLearningPeriods(periods.OrderBy(p => p.StartDate).ToList());
                 }
