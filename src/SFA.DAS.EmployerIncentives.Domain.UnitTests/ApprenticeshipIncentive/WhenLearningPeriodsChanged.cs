@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true, false),
             };
 
-            _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), collectionPeriods);
+            _collectionCalendar = new CollectionCalendar(new List<AcademicYear> { new AcademicYear("2021", new DateTime(2021, 7, 31)) }, collectionPeriods);
             _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.Status, IncentiveStatus.Active).Create();
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
             _sutModel.Phase = new IncentivePhase(Phase.Phase2);
             _sutModel.StartDate = new DateTime(2021, 7, 1);
-            _sut = Sut(_sutModel);
+            _sut = ApprenticeshipIncentive.Get(_sutModel.Id, _sutModel);
 
             var learningData = new LearningData(true);
             learningData.SetLearningPeriodsChanged(true);
@@ -136,9 +136,29 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.FlushEvents().Any(e => e is EarningsCalculated).Should().BeFalse();
         }
 
-        private static ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
-        {
-            return ApprenticeshipIncentive.Get(model.Id, model);
-        }
+        //[Test]
+        //public void Then_a_break_in_learning_is_created_if_learning_stopped()
+        //{
+        //    // Arrange
+        //    var yearEndDate = _collectionCalendar.GetAcademicYearEndDate("2021");
+        //    var periods = new List<LearningPeriod>
+        //    {
+        //        new LearningPeriod(new DateTime(2021, 1, 3), yearEndDate.AddMonths(-1)),
+        //    };
+        //    _learner.SetLearningPeriods(periods);
+
+        //    var expected = new List<BreakInLearning>
+        //    {
+        //        new BreakInLearning(yearEndDate.AddMonths(-1).AddDays(1))
+        //    };
+        //    _sut.GetModel().BreakInLearnings = expected;
+
+
+        //    // Act
+        //    _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _paymentProfiles, _collectionCalendar);
+
+        //    // Assert
+        //    _sut.BreakInLearnings.Should().BeEquivalentTo(expected);
+        //}
     }
 }

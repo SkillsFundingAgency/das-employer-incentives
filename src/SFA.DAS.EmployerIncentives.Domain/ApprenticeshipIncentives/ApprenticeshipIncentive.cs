@@ -310,6 +310,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             CalculateEarnings(paymentProfiles, collectionCalendar);
         }
 
+        private void StartBreakInLearning(DateTime startDate)
+        {
+            if (Model.BreakInLearnings.Any(b => b.StartDate == startDate.Date && !b.EndDate.HasValue)) return;
+            Model.BreakInLearnings.Add(new BreakInLearning(startDate));
+        }
+
         public void SetLearningStoppedChangeOfCircumstance(
             LearningStoppedStatus learningStoppedStatus,
             IEnumerable<IncentivePaymentProfile> paymentProfiles,
@@ -318,25 +324,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {
                 Model.Status = IncentiveStatus.Stopped;
+                StartBreakInLearning(learningStoppedStatus.DateStopped.Value);
                 RemoveEarningsAfterStopDate(learningStoppedStatus.DateStopped.Value, collectionCalendar);
                 AddEvent(new LearningStopped(
                     Model.Id,
                     learningStoppedStatus.DateStopped.Value));
             }
-            else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped && learningStoppedStatus.DateResumed != null)
+            else if (Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped &&
+                     learningStoppedStatus.DateResumed != null)
             {
                 Model.Status = IncentiveStatus.Active;
-                learningStoppedStatus.Undo();
                 AddEvent(new BreakInLearningDeleted(Model.Id));
-                                
-                if (learningStoppedStatus.DateResumed.HasValue)
-                {
-                    CalculateEarnings(paymentProfiles, collectionCalendar);
-
-                    AddEvent(new LearningResumed(
-                        Model.Id,
-                        learningStoppedStatus.DateResumed.Value));
-                }
+                CalculateEarnings(paymentProfiles, collectionCalendar);
+                AddEvent(new LearningResumed(
+                    Model.Id,
+                    learningStoppedStatus.DateResumed.Value));
             }
         }
 
