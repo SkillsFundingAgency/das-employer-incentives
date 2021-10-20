@@ -201,27 +201,41 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
               .OrderBy(p => p.StartDate)
               .ToList();
 
-            MergeLearningPeriods(periods);
-            
-            return periods;
+            return MergeLearningPeriods(periods);
         }
 
-        private static void MergeLearningPeriods(IList<LearningPeriod> periods)
+        private static IList<LearningPeriod> MergeLearningPeriods(IList<LearningPeriod> periods)
         {
-            for (var i = 0; i < periods.Count() - 1; i++)
+            for (var i = 0; i < periods.Count-1; i++)
             {
                 if (periods[i].EndDate.HasValue == false) continue;
 
                 var gap = (periods[i + 1].StartDate - periods[i].EndDate.Value).Days;
                 if (gap <= 28)
                 {
-                    periods.Add(new LearningPeriod(periods[i].StartDate, periods[i+1].EndDate));
-                    periods.Remove(periods[i]);
-                    periods.Remove(periods[i + 1]);
+                    var start = MinDate(periods[i].StartDate, periods[i+1].StartDate);
+                    var end = MaxDate(periods[i].EndDate, periods[i + 1].EndDate);
+                    periods.Add(new LearningPeriod(start, end));
+                    periods.RemoveAt(i);
+                    periods.RemoveAt(i);
 
-                    MergeLearningPeriods(periods.OrderBy(p => p.StartDate).ToList());
+                    i = -1; // restart
                 }
             }
+
+            return periods;
+        }
+
+        private static DateTime MinDate(DateTime a, DateTime b)
+        {
+            return new DateTime(Math.Min(a.Ticks, b.Ticks));
+        }
+
+        private static DateTime? MaxDate(DateTime? a, DateTime? b)
+        {
+            if (!a.HasValue || !b.HasValue) return null;
+
+            return new DateTime(Math.Max(a.Value.Ticks, b.Value.Ticks));
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)
