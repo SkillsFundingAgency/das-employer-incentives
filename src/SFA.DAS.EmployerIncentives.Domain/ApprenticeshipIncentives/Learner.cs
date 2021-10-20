@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;
         public SubmissionData SubmissionData => Model.SubmissionData;
         public bool SuccessfulLearnerMatch => Model.SuccessfulLearnerMatch;
-        public IOrderedEnumerable<LearningPeriod> LearningPeriods => Model.LearningPeriods.OrderBy(l => l.StartDate);
+        public IReadOnlyCollection<LearningPeriod> LearningPeriods => Model.LearningPeriods.OrderBy(l => l.StartDate).ToList().AsReadOnly();
 
         internal static Learner New(
             Guid id,

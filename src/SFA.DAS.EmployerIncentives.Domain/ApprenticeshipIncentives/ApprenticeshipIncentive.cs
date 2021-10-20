@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IncentiveStatus Status => Model.Status;
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
-        public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
+        public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.OrderBy(b => b.StartDate).ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
         public DateTime SubmissionDate => Model.SubmittedDate.Value;
@@ -293,20 +293,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        public void SetBreaksInLearning(Learner learner)
+        public void SetBreaksInLearning(IList<LearningPeriod> periods, IEnumerable<IncentivePaymentProfile> paymentProfiles, CollectionCalendar collectionCalendar)
         {
-            if (!learner.SubmissionData.LearningData.LearningPeriodsChanged) return; // don't need?
-            
-            var periods = learner.LearningPeriods.ToList();
-
-            Model.BreakInLearnings.Clear();
-
+            var breaks = new List<BreakInLearning>();
             for (var i = 0; i < periods.Count - 1; i++)
             {
+                if (!periods[i].EndDate.HasValue) continue;
                 var start = periods[i].EndDate.Value.AddDays(1);
                 var end = periods[i + 1].StartDate.AddDays(-1);
-                Model.BreakInLearnings.Add(new BreakInLearning(start).SetEndDate(end));
+                breaks.Add(new BreakInLearning(start).SetEndDate(end));
             }
+
+            if (breaks.SequenceEqual(BreakInLearnings)) return;
+
+            Model.BreakInLearnings = breaks;
+            CalculateEarnings(paymentProfiles, collectionCalendar);
         }
 
         public void SetLearningStoppedChangeOfCircumstance(

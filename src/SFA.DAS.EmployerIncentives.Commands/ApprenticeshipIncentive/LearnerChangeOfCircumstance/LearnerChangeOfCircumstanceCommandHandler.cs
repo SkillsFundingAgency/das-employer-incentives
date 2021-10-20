@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System.Linq;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading;
@@ -35,13 +36,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
             }
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
+            var collectionCalendar = await _collectionCalendarService.Get();
+            var paymentProfiles = (await _incentivePaymentProfilesService.Get()).ToList();
 
-            incentive.SetBreaksInLearning(learner);
+            incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), paymentProfiles, collectionCalendar);
 
             if (learner.HasFoundSubmission)
             {
-                var collectionCalendar = await _collectionCalendarService.Get();
-                var paymentProfiles = await _incentivePaymentProfilesService.Get();
 
                 if (learner.HasStartDate)
                 {
