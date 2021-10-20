@@ -75,6 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .ReturnsAsync(_apprenticeshipIncentive);
 
             _learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+            _learner.GetModel().LearningPeriods.Clear();
 
             _mockLearnerDomainRepository
                 .Setup(m => m.GetOrCreate(_apprenticeshipIncentive))
