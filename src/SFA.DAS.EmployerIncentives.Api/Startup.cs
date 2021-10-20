@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api
         {
             services.AddNLog();
             services.AddControllers();
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
             services.AddHealthChecks();
             services.AddSwaggerGen();
 
