@@ -68,8 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             var expected = new List<BreakInLearning>()
             {
-                new BreakInLearning(new DateTime(2021, 4, 1)).SetEndDate(new DateTime(2021, 6, 9)),
-                new BreakInLearning(new DateTime(2021, 8, 26)).SetEndDate(new DateTime(2021, 10, 1)),
+                new BreakInLearning(new DateTime(2021, 4, 1)).SetEndDate(new DateTime(2021, 6, 10)),
+                new BreakInLearning(new DateTime(2021, 8, 26)).SetEndDate(new DateTime(2021, 10, 2)),
             };
 
             var periods = new List<LearningPeriod>
@@ -116,8 +116,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             var expected = new List<BreakInLearning>
             {
-                new BreakInLearning(new DateTime(2021, 8, 26)).SetEndDate(new DateTime(2021, 10, 1)),
-                new BreakInLearning(new DateTime(2021, 4, 1)).SetEndDate(new DateTime(2021, 6, 9)),
+                new BreakInLearning(new DateTime(2021, 8, 26)).SetEndDate(new DateTime(2021, 10, 2)),
+                new BreakInLearning(new DateTime(2021, 4, 1)).SetEndDate(new DateTime(2021, 6, 10)),
             };
             _sut.GetModel().BreakInLearnings = expected;
 
@@ -135,30 +135,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Assert
             _sut.FlushEvents().Any(e => e is EarningsCalculated).Should().BeFalse();
         }
-
-        //[Test]
-        //public void Then_a_break_in_learning_is_created_if_learning_stopped()
-        //{
-        //    // Arrange
-        //    var yearEndDate = _collectionCalendar.GetAcademicYearEndDate("2021");
-        //    var periods = new List<LearningPeriod>
-        //    {
-        //        new LearningPeriod(new DateTime(2021, 1, 3), yearEndDate.AddMonths(-1)),
-        //    };
-        //    _learner.SetLearningPeriods(periods);
-
-        //    var expected = new List<BreakInLearning>
-        //    {
-        //        new BreakInLearning(yearEndDate.AddMonths(-1).AddDays(1))
-        //    };
-        //    _sut.GetModel().BreakInLearnings = expected;
-
-
-        //    // Act
-        //    _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _paymentProfiles, _collectionCalendar);
-
-        //    // Assert
-        //    _sut.BreakInLearnings.Should().BeEquivalentTo(expected);
-        //}
     }
 }
