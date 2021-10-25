@@ -52,6 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.Learner
             var testLearner = 
                 _fixture.Build<LearnerModel>()
                 .With(l => l.SubmissionData, submissionData)
+                .Without(l => l.LearningPeriods)
                 .Create();
             
             // Act

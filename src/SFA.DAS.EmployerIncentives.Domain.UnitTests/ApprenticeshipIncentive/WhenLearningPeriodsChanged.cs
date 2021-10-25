@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             {
                 new LearningPeriod(new DateTime(2021, 1, 3), new DateTime(2021, 3, 31)),
                 new LearningPeriod(new DateTime(2021, 6, 10), new DateTime(2021, 8, 25)),
-                new LearningPeriod(new DateTime(2021, 10, 2)),
+                new LearningPeriod(new DateTime(2021, 10, 2), new DateTime(2021, 12, 31)),
             };
             _learner.SetLearningPeriods(periods);
 
@@ -95,7 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             {
                 new LearningPeriod(new DateTime(2021, 1, 3), new DateTime(2021, 3, 31)),
                 new LearningPeriod(new DateTime(2021, 6, 10), new DateTime(2021, 8, 25)),
-                new LearningPeriod(new DateTime(2021, 10, 2)),
+                new LearningPeriod(new DateTime(2021, 10, 2), new DateTime(2021, 12, 31)),
             };
             _learner.SetLearningPeriods(periods);
 
@@ -125,7 +125,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             {
                 new LearningPeriod(new DateTime(2021, 1, 3), new DateTime(2021, 3, 31)),
                 new LearningPeriod(new DateTime(2021, 6, 10), new DateTime(2021, 8, 25)),
-                new LearningPeriod(new DateTime(2021, 10, 2)),
+                new LearningPeriod(new DateTime(2021, 10, 2), new DateTime(2021, 12, 31)),
             };
             _learner.SetLearningPeriods(periods);
 

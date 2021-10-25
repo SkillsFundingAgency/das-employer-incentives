@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         [SetUp]
         public void Arrange()
         {
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
             _sut = new ApprenticeshipIncentives.LearnerDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
@@ -40,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             var testLearner =
                 _fixture.Build<LearnerModel>()
                 .With(l => l.SubmissionData, submissionData)
+                .Without(l => l.LearningPeriods)
                 .Create();
 
             // Act

@@ -125,6 +125,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(m => m.UniqueLearnerNumber, incentive.Apprenticeship.UniqueLearnerNumber)
                 .With(m => m.SubmissionData, submissionData)
                 .With(m => m.DaysInLearnings, new List<DaysInLearning>() { _daysInLearning })
+                .Without(l => l.LearningPeriods)
                 .Create();
 
             _learner = new LearnerFactory().GetExisting(_learnerModel);

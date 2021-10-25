@@ -208,9 +208,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         {
             for (var i = 0; i < periods.Count-1; i++)
             {
-                if (periods[i].EndDate.HasValue == false) continue;
-
-                var gap = (periods[i + 1].StartDate - periods[i].EndDate.Value).Days;
+                var gap = (periods[i + 1].StartDate - periods[i].EndDate).Days;
                 if (gap <= 28)
                 {
                     var start = MinDate(periods[i].StartDate, periods[i+1].StartDate);
@@ -231,11 +229,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return new DateTime(Math.Min(a.Ticks, b.Ticks));
         }
 
-        private static DateTime? MaxDate(DateTime? a, DateTime? b)
+        private static DateTime MaxDate(DateTime a, DateTime b)
         {
-            if (!a.HasValue || !b.HasValue) return null;
-
-            return new DateTime(Math.Max(a.Value.Ticks, b.Value.Ticks));
+            return new DateTime(Math.Max(a.Ticks, b.Ticks));
         }
 
         private static IEnumerable<PeriodDto> PaymentsForApprenticeship(this LearnerSubmissionDto data, long apprenticeshipId)
