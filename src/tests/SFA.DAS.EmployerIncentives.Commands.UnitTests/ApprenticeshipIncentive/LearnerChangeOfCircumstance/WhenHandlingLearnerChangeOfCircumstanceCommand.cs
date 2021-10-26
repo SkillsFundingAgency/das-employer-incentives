@@ -427,7 +427,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             _incentive.BreakInLearnings.Count.Should().Be(1);
             _incentive.BreakInLearnings.First().StartDate.Should().Be(new DateTime(2021, 4, 1));
-            _incentive.BreakInLearnings.First().EndDate.Should().Be(new DateTime(2021, 10, 3));
+            _incentive.BreakInLearnings.First().EndDate.Should().Be(new DateTime(2021, 10, 2));
         }
 
     }
