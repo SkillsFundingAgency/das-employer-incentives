@@ -48,6 +48,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
         internal static ApprenticeshipIncentiveModel Map(this ApprenticeshipIncentive entity, IEnumerable<CollectionCalendarPeriod> collectionPeriods)
         {
+            Provider provider = null;
+            if (entity.UKPRN.HasValue)
+            {
+                provider = new Provider(entity.UKPRN.Value);
+            }
+
             var apprenticeship = new Apprenticeship(
                      entity.ApprenticeshipId,
                      entity.FirstName,
@@ -56,14 +62,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                      entity.ULN,
                      entity.EmployerType,
                      entity.CourseName,
-                     entity.EmploymentStartDate
+                     entity.EmploymentStartDate,
+                     provider
                      );
-
-            if (entity.UKPRN.HasValue)
-            {
-                apprenticeship.SetProvider(new Provider(entity.UKPRN.Value));
-            }
-
+            
             return new ApprenticeshipIncentiveModel
             {
                 Id = entity.Id,
@@ -253,7 +255,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
                 CreatedDate = model.CreatedDate,
-                SuccessfulLearnerMatch = model.SuccessfulLearnerMatch,
+                SuccessfulLearnerMatch = model.SuccessfulLearnerMatchExecution,
                 LearningPeriods = model.LearningPeriods.Map(),
                 DaysInLearnings = model.DaysInLearnings.Map(),
                 SubmissionData = new SubmissionData()
@@ -311,7 +313,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             learner.RawJSON = model.SubmissionData.RawJson;
             learner.LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped;
             learner.LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed;
-            learner.SuccessfulLearnerMatch = model.SuccessfulLearnerMatch;
+            learner.SuccessfulLearnerMatchExecution = model.SuccessfulLearnerMatch;
             return learner;
         }
 

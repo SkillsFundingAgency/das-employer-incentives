@@ -13,6 +13,7 @@
         public const string AddEmployerVendorId = "SFA.DAS.EmployerIncentives.AddEmployerVendorId";
         public const string ApprenticeshipIncentivesWithdraw = "SFA.DAS.EmployerIncentives.Withdraw";
         public const string EmployerWithdrawal = "SFA.DAS.EmployerIncentives.EmployerWithdrawal";
+        public const string ComplianceWithdrawal = "SFA.DAS.EmployerIncentives.ComplianceWithdrawal";
 
         public const string UpdateVendorRegistrationCaseStatus = "SFA.DAS.EmployerIncentives.UpdateVrfStatus";
     }

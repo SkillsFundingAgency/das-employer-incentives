@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     _validatePaymentData.ApprenticeshipIncentiveModel.MinimumAgreementVersion = _validatePaymentData.AccountModel.SignedAgreementVersion + 1;
                     break;
                 case ValidationStep.LearnerMatchSuccessful:
-                    _validatePaymentData.LearnerModel.SuccessfulLearnerMatch = false;
+                    _validatePaymentData.LearnerModel.SuccessfulLearnerMatchExecution = false;
                     break;
             }
 

@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
         [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
         [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
-        public async Task Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
+        public void Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);
 
@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
+            var result = Incentive.Create(apprenticeshipIncentive, _incentivePaymentProfiles);
 
             result.IsEligible.Should().BeTrue();            
             var payments = result.Payments.ToList();
@@ -69,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [Test]
-        public async Task And_Date_Is_Before_August_Then_the_application_is_not_eligible()
+        public void And_Date_Is_Before_August_Then_the_application_is_not_eligible()
         {
             var date = new DateTime(2020, 07, 31);
 
@@ -82,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
+            var result = Incentive.Create(apprenticeshipIncentive, _incentivePaymentProfiles);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         }
 
         [Test]
-        public async Task And_Date_Is_After_May_Then_the_application_is_not_eligible()
+        public void And_Date_Is_After_May_Then_the_application_is_not_eligible()
         {
             var date = new DateTime(2021, 06, 1);
 
@@ -103,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = await Incentive.Create(apprenticeshipIncentive, _mockIncentivePaymentProfileService.Object);
+            var result = Incentive.Create(apprenticeshipIncentive, _incentivePaymentProfiles);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();

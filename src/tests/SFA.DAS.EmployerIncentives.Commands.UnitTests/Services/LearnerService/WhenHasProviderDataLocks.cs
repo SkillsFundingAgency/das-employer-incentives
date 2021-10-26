@@ -65,6 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testTrainingDto.Reference = "ZPROG001";
 
             _testPriceEpisodeDto = _testTrainingDto.PriceEpisodes.First();
+            _testPriceEpisodeDto.AcademicYear = _nextPendingPaymentDue.CollectionPeriod.AcademicYear.ToString();
             _testPriceEpisodeDto.StartDate = _startTime;
             _testPriceEpisodeDto.EndDate = _dueDate.AddDays(10);
 
@@ -73,8 +74,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.ApprenticeshipId = _incentive.Apprenticeship.Id;
             _testPeriodDto.IsPayable = false;
             _testPeriodDto.Period = _periodNumber;
-
-            _sut.AcademicYear = _nextPendingPaymentDue.CollectionPeriod.AcademicYear;
         }
 
 
@@ -221,38 +220,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             //Assert
             hasDataLock.Should().BeFalse();
-        }
-
-        [Test]
-        public void Then_is_false_when_period_is_not_payable_for_a_different_academic_year()
-        {
-            //Arrange
-            _nextPendingPaymentDue.CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(1, 2021);
-            _sut.AcademicYear = 2122;
-            _testPeriodDto.Period = 1;
-            _testPeriodDto.IsPayable = false;
-
-            //Act
-            var hasDataLock = _sut.HasProviderDataLocks(_incentive);
-
-            //Assert
-            hasDataLock.Should().BeFalse();
-        }
-
-        [Test]
-        public void Then_is_true_when_period_is_not_payable_for_the_same_academic_year()
-        {
-            //Arrange
-            _nextPendingPaymentDue.CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(1, 2021);
-            _sut.AcademicYear = _nextPendingPaymentDue.CollectionPeriod.AcademicYear;
-            _testPeriodDto.Period = _nextPendingPaymentDue.CollectionPeriod.PeriodNumber;
-            _testPeriodDto.IsPayable = false;
-
-            //Act
-            var hasDataLock = _sut.HasProviderDataLocks(_incentive);
-
-            //Assert
-            hasDataLock.Should().BeTrue();
         }
     }
 }

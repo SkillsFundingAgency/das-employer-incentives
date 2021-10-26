@@ -24,7 +24,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
         public async Task Then_the_command_is_invalid_when_the_accountId_has_a_default_value()
         {
             //Arrange
-            var command = new SignLegalEntityAgreementCommand(default, _fixture.Create<long>(), _fixture.Create<int>());
+            var command = new SignLegalEntityAgreementCommand(
+                default, 
+                _fixture.Create<long>(), 
+                _fixture.Create<int>(),
+                _fixture.Create<string>(),
+                _fixture.Create<long>()
+            );
 
             //Act
             var result = await _sut.Validate(command);
@@ -37,7 +43,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
         public async Task Then_the_command_is_invalid_when_the_accountLegalEntityId_has_a_default_value()
         {
             //Arrange
-            var command = new SignLegalEntityAgreementCommand(_fixture.Create<long>(), default, _fixture.Create<int>());
+            var command = new SignLegalEntityAgreementCommand(
+                _fixture.Create<long>(),
+                default,
+                _fixture.Create<int>(),
+                _fixture.Create<string>(),
+                _fixture.Create<long>()
+            );
 
             //Act
             var result = await _sut.Validate(command);
@@ -50,7 +62,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
         public async Task Then_the_command_is_invalid_when_the_agreementVersion_has_a_default_value()
         {
             //Arrange
-            var command = new SignLegalEntityAgreementCommand(_fixture.Create<long>(), _fixture.Create<long>(), default);
+            var command = new SignLegalEntityAgreementCommand(
+                _fixture.Create<long>(),
+                _fixture.Create<long>(),
+                default,
+                _fixture.Create<string>(),
+                _fixture.Create<long>()
+            );
 
             //Act
             var result = await _sut.Validate(command);
@@ -58,5 +76,44 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SignLegalEntityAgreement
             //Assert
             result.ValidationDictionary.Count.Should().Be(1);
         }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_the_legalEntityName_has_a_default_value()
+        {
+            //Arrange
+            var command = new SignLegalEntityAgreementCommand(
+                _fixture.Create<long>(),
+                _fixture.Create<long>(),
+                _fixture.Create<int>(),
+                null,
+                _fixture.Create<long>()
+            );
+
+            //Act
+            var result = await _sut.Validate(command);
+
+            //Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_invalid_when_the_legalEntityId_has_a_default_value()
+        {
+            //Arrange
+            var command = new SignLegalEntityAgreementCommand(
+                _fixture.Create<long>(),
+                _fixture.Create<long>(),
+                _fixture.Create<int>(),
+                _fixture.Create<string>(),
+                default
+            );
+
+            //Act
+            var result = await _sut.Validate(command);
+
+            //Assert
+            result.ValidationDictionary.Count.Should().Be(1);
+        }
+
     }
 }

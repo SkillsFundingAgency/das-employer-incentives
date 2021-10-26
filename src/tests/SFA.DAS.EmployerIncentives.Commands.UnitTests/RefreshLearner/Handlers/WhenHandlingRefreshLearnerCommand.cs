@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Mock<ILearnerService> _mockLearnerService;
         private Mock<ILogger<RefreshLearnerCommandHandler>> _mockLogger;
         private Mock<ICollectionCalendarService> _collectionCalendarService;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
         private LearnerSubmissionDto _learnerSubmissionDto;
@@ -42,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         {
             _fixture = new Fixture();
             _testStartDate = new DateTime(2021,01,01);
-            _censusDate = _testStartDate.AddDays(5);
+            _censusDate = _testStartDate.AddDays(95);
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
@@ -50,8 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _mockLogger = new Mock<ILogger<RefreshLearnerCommandHandler>>();
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             _incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(p => p.Apprenticeship, apprenticeship)
                 .Create();
@@ -82,9 +82,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _collectionCalendarService = new Mock<ICollectionCalendarService>();
             _academicYear = new AcademicYear("2021", new DateTime(2021, 07, 31));
 
+            _collectionPeriods = new List<CollectionCalendarPeriod>
+            {
+                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(9, 2021), 4, 2021, new DateTime(2021,4,1), _censusDate, true, false)
+            };
+
             _collectionCalendarService
                 .Setup(m => m.Get())
-                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear> { _academicYear }, new List<CollectionCalendarPeriod>()));
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear> { _academicYear }, _collectionPeriods));
 
             _sut = new RefreshLearnerCommandHandler(
                 _mockLogger.Object,
@@ -332,8 +337,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var pendingPaymentModel = _fixture.Create<PendingPaymentModel>();
             pendingPaymentModel.PaymentMadeDate = null;
 
@@ -356,6 +360,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -403,8 +408,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .Create();
@@ -423,6 +427,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -517,7 +522,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
 
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
@@ -579,6 +583,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
+            _collectionPeriods = new List<CollectionCalendarPeriod>
+            {
+                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(12, 2021), 7, 2021, new DateTime(2021,7,1), new DateTime(2021, 7, 31), true, false)
+            };
+
+            _collectionCalendarService
+                .Setup(m => m.Get())
+                .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear> { _academicYear }, _collectionPeriods));
+
             //Act
             await _sut.Handle(command);
 
@@ -597,8 +610,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .Create();
@@ -617,6 +629,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -626,6 +639,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -638,6 +652,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             .Create(),
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -675,8 +690,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Stopped)
@@ -696,6 +710,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
@@ -705,6 +720,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -717,6 +733,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             .Create(),
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
                                         _fixture
@@ -754,8 +771,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
-            apprenticeship.SetProvider(_fixture.Create<Provider>());
-
+            
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
@@ -775,6 +791,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var learnerSubmissionDto = _fixture
                .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
                .With(l => l.Training, new List<TrainingDto> {
                     _fixture.Create<TrainingDto>(),
                     _fixture
