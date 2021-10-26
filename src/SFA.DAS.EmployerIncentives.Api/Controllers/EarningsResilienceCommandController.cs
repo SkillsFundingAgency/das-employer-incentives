@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
             
             await SendCommandsAsync(new List<ICommand>() {
+                    new IncompleteEarningsCalculationCheckCommand(),
                     new EarningsResilienceApplicationsCheckCommand(),
                     new EarningsResilienceIncentivesCheckCommand()
                 });

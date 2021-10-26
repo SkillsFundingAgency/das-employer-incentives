@@ -24,15 +24,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
         private Mock<IIncentiveApplicationDomainRepository> _applicationRepository;
         private Fixture _fixture;
         private Mock<IDomainEventDispatcher> _domainEventDispatcher;
-        private Mock<ICommandPublisher> _commandPublisher;
 
         [SetUp]
         public void Arrange()
         {
             _applicationRepository = new Mock<IIncentiveApplicationDomainRepository>();
             _domainEventDispatcher = new Mock<IDomainEventDispatcher>();
-            _commandPublisher = new Mock<ICommandPublisher>();
-            _sut = new EarningsResilienceApplicationsCheckCommandHandler(_applicationRepository.Object, _domainEventDispatcher.Object, _commandPublisher.Object);
+            _sut = new EarningsResilienceApplicationsCheckCommandHandler(_applicationRepository.Object, _domainEventDispatcher.Object);
             _fixture = new Fixture();
         }
 
@@ -53,7 +51,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
 
             //Assert
             _domainEventDispatcher.Verify(x => x.Send<Submitted>(It.Is<Submitted>(x => x.Model == applications[0].GetModel()), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[0].Apprenticeships[0].Id), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -73,9 +70,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
 
             //Assert
             _domainEventDispatcher.Verify(x => x.Send<Submitted>(It.Is<Submitted>(x => x.Model == applications[0].GetModel()), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[0].Apprenticeships[0].Id), It.IsAny<CancellationToken>()), Times.Once); 
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[0].Apprenticeships[1].Id), It.IsAny<CancellationToken>()), Times.Once); 
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[0].Apprenticeships[2].Id), It.IsAny<CancellationToken>()), Times.Once); 
         }
         
         [Test]
@@ -102,13 +96,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             //Assert
             _domainEventDispatcher.Verify(x => x.Send<Submitted>(It.Is<Submitted>(x => x.Model == applications[0].GetModel()), It.IsAny<CancellationToken>()), Times.Once);
             _domainEventDispatcher.Verify(x => x.Send<Submitted>(It.Is<Submitted>(x => x.Model == applications[1].GetModel()), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[0].Apprenticeships[0].Id), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[0].Apprenticeships[1].Id), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[0].Apprenticeships[2].Id), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[1].Apprenticeships[0].Id), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[1].Apprenticeships[1].Id), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[1].Apprenticeships[2].Id), It.IsAny<CancellationToken>()), Times.Once);
-            _commandPublisher.Verify(x => x.Publish<CompleteEarningsCalculationCommand>(It.Is<CompleteEarningsCalculationCommand>(x => x.IncentiveApplicationApprenticeshipId == applications[1].Apprenticeships[3].Id), It.IsAny<CancellationToken>()), Times.Once);
         }
 
     }
