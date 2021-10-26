@@ -402,7 +402,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
             breakInLearning.StartDate.Should().Be(_stoppedDate.AddDays(1));
-            breakInLearning.EndDate.Should().Be(_resumedDate.AddDays(-1));
+            breakInLearning.EndDate.Should().Be(_resumedDate);
         }
 
         [Then(@"the learner data resumed date is stored")]
