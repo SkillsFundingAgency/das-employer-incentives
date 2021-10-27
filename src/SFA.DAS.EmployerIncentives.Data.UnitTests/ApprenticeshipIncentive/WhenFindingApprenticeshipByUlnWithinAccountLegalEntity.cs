@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         [SetUp]
         public async Task Arrange()
         {
-            _fixture = new Fixture();
+            _fixture = new Fixture();           
             _uln = _fixture.Create<long>();
             _accountLegalEntityId = _fixture.Create<long>();
 

@@ -103,10 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 where p.ApprenticeshipId == incentive.Apprenticeship.Id
                 select new
                 {
-                    p.ApprenticeshipId,
                     pe.StartDate,
-                    pe.EndDate,
-                    p.Period
                 }).ToArray();
 
             var isInLearning = false;

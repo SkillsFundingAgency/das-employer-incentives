@@ -265,7 +265,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
-            pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment && !p.ClawedBack).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(89).AddDays(_breakInLearning -  2));
+            pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment && !p.ClawedBack).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(89).AddDays(_breakInLearning - 2));
             pendingPayments.Single(p => p.EarningType == EarningType.SecondPayment).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(364).AddDays(_breakInLearning - 2));
         }
 
