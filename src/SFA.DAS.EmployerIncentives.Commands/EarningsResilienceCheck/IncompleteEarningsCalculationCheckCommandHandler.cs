@@ -9,13 +9,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
     public class IncompleteEarningsCalculationCheckCommandHandler : ICommandHandler<IncompleteEarningsCalculationCheckCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _applicationDomainRepository;
-        private readonly ICommandPublisher _commandPublisher;
+        private readonly ICommandDispatcher _commandDispatcher;
 
         public IncompleteEarningsCalculationCheckCommandHandler(IIncentiveApplicationDomainRepository applicationDomainRepository,
-                                                                ICommandPublisher commandPublisher)
+            ICommandDispatcher commandDispatcher)
         {
             _applicationDomainRepository = applicationDomainRepository;
-            _commandPublisher = commandPublisher;
+            _commandDispatcher = commandDispatcher;
         }
 
         public async Task Handle(IncompleteEarningsCalculationCheckCommand command,  CancellationToken cancellationToken = default(CancellationToken))
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
                 {
                     var updateCommand = new UpdateIncompleteEarningsCalculationCommand(application.AccountId,
                         apprenticeship.Id, apprenticeship.ApprenticeshipId);
-                    tasks.Add(_commandPublisher.Publish(updateCommand));
+                    tasks.Add(_commandDispatcher.Send(updateCommand));
                 }
             }
 

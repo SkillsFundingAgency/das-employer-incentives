@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -11,12 +10,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
     public class UpdateIncompleteEarningsCalculationCommandHandler : ICommandHandler<UpdateIncompleteEarningsCalculationCommand>
     {
         private IApprenticeshipIncentiveDomainRepository _domainRepository;
-        private ICommandPublisher _commandPublisher;
+        private ICommandDispatcher _commandDispatcher;
 
-        public UpdateIncompleteEarningsCalculationCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, ICommandPublisher commandPublisher)
+        public UpdateIncompleteEarningsCalculationCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, ICommandDispatcher commandPublisher)
         {
             _domainRepository = domainRepository;
-            _commandPublisher = commandPublisher;
+            _commandDispatcher = commandPublisher;
         }
 
         public async Task Handle(UpdateIncompleteEarningsCalculationCommand command, CancellationToken cancellationToken = default(CancellationToken))
@@ -27,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
                 var completeEarningCalculationCommand = new CompleteEarningsCalculationCommand(command.AccountId,
                     command.IncentiveApplicationApprenticeshipId, command.ApprenticeshipId, incentive.Id);
 
-                await _commandPublisher.Publish(completeEarningCalculationCommand);
+                await _commandDispatcher.Send(completeEarningCalculationCommand);
             }
         }
     }
