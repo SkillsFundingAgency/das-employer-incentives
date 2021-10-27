@@ -116,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             var expected = new List<BreakInLearning>
             {
-                new BreakInLearning(new DateTime(2021, 8, 26)).SetEndDate(new DateTime(2021, 10, 1)),
+                BreakInLearning.Create(new DateTime(2021, 8, 26), new DateTime(2021, 10, 1)),
                 BreakInLearning.Create(new DateTime(2021, 4, 1), new DateTime(2021, 6, 9)),
             };
             _sut.GetModel().BreakInLearnings = expected;
