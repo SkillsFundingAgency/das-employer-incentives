@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Arrange()
         {
             _fixture = new Fixture();
-
+            
             _collectionPeriod = new DateTime(2021, 10, 1);
             _plannedStartDate = _collectionPeriod.AddDays(5);
 

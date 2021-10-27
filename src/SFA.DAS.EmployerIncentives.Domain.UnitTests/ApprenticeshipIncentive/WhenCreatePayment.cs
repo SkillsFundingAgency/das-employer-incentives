@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Arrange()
         {
             _fixture = new Fixture();
+          
             _collectionPeriod = _fixture.Create<CollectionPeriod>();
         
             _fixture.Customize<PendingPaymentValidationResultModel>(x => 

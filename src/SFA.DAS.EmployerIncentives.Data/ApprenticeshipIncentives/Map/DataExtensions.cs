@@ -360,7 +360,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             var newBreakInLearning = new BreakInLearning(model.StartDate);
             if (model.EndDate.HasValue)
             {
-                newBreakInLearning.SetEndDate(model.EndDate.Value);
+                newBreakInLearning = BreakInLearning.Create(model.StartDate, model.EndDate.Value);
             }
 
             return newBreakInLearning;
