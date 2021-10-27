@@ -104,6 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 select new
                 {
                     pe.StartDate,
+                    pe.EndDate
                 }).ToArray();
 
             var isInLearning = false;
