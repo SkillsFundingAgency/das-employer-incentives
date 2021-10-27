@@ -174,7 +174,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             breaksInLearning.Count.Should().Be(1);
             breaksInLearning.Single().StartDate.Should().Be(_breakStart);
-            breaksInLearning.Single().EndDate.Should().Be(_breakEnd);
+            breaksInLearning.Single().EndDate.Should().Be(_breakEnd.AddDays(-1));
         }
 
         [Then(@"no Break in Learning is recorded")]

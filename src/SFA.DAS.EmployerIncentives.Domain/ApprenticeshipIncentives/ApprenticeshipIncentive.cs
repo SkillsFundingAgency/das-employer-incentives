@@ -300,7 +300,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 if (!periods[i].EndDate.HasValue) continue;
                 var start = periods[i].EndDate.Value.AddDays(1);
-                var end = periods[i + 1].StartDate;
+                var end = periods[i + 1].StartDate.AddDays(-1);
                 breaks.Add(BreakInLearning.Create(start, end));
             }
 
