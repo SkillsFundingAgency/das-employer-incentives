@@ -71,15 +71,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                     submissionData.LearningData.SetIsStopped(learnerData.IsStopped(incentive, collectionCalendar));
                 }
 
-                var learningPeriods = learnerData.LearningPeriods(incentive, collectionCalendar);
-                if (LearningPeriodsChanged(learner.LearningPeriods, learningPeriods))
-                {
-                    learner.SetLearningPeriods(learningPeriods);
-                    submissionData.LearningData.SetLearningPeriodsChanged();
-                }
-
                 submissionData.SetRawJson(learnerData.RawJson);
             }
+
+            ProcessLearningPeriods(learnerData, incentive, collectionCalendar, learner, submissionData);
 
             if (submissionData.HasChangeOfCircumstances(learner.SubmissionData))
             {
@@ -97,6 +92,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             await _learnerDomainRepository.Save(learner);
             await _incentiveDomainRepository.Save(incentive);
+        }
+
+        private static void ProcessLearningPeriods(LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive,
+            Domain.ValueObjects.CollectionCalendar collectionCalendar, Learner learner, SubmissionData submissionData)
+        {
+            var learningPeriods = learnerData.LearningPeriods(incentive, collectionCalendar);
+            if (!LearningPeriodsChanged(learner.LearningPeriods, learningPeriods)) return;
+            learner.SetLearningPeriods(learningPeriods);
+            submissionData.LearningData.SetLearningPeriodsChanged();
         }
 
         private static bool LearningPeriodsChanged(IEnumerable<LearningPeriod> periods1, IEnumerable<LearningPeriod> periods2)
