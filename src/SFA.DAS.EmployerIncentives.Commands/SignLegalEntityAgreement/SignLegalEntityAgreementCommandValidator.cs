@@ -11,17 +11,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement
 
             if (item.AccountId == default)
             {
-                result.AddError("AccountId", "Is not set");
+                result.AddIsNotSetError("AccountId");
             }
 
             if (item.AccountLegalEntityId == default)
             {
-                result.AddError("AccountLegalEntityId", "Is not set");
+                result.AddIsNotSetError("AccountLegalEntityId");
             }
 
             if (item.AgreementVersion == default)
             {
-                result.AddError("AgreementVersion", "Is not set");
+                result.AddIsNotSetError("AgreementVersion");
+            }
+
+            if (item.LegalEntityId == default)
+            {
+                result.AddIsNotSetError("LegalEntityId");
+            }
+
+            if (item.LegalEntityName == default)
+            {
+                result.AddIsNotSetError("LegalEntityName");
             }
 
             return Task.FromResult(result);

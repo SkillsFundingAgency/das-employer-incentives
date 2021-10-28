@@ -1,6 +1,5 @@
-﻿using System;
-using AutoFixture;
-using Dapper;
+﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
@@ -13,40 +12,30 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Binding]
     public class LegalEntitySteps : StepsBase
     {
-        private readonly TestContext _testContext;
-        private readonly Account _testAccountTable;
+        private readonly Account _account;
 
         public LegalEntitySteps(TestContext testContext) : base(testContext)
         {
-            _testContext = testContext;
             var fixture = new Fixture();
-            _testAccountTable = _testContext.TestData.GetOrCreate<Account>(null,
+            _account = TestContext.TestData.GetOrCreate(null,
                 () => fixture.Build<Account>()
-                    .With(x => x.SignedAgreementVersion, (int?)null)
-                    .With(x => x.VrfCaseId, (string)null)
-                    .With(x => x.VrfCaseStatus, (string)null)
-                    .With(x => x.VrfCaseStatusLastUpdatedDateTime, (DateTime?)null)
-                    .With(x => x.VrfVendorId, (string)null).Create());
+                    .Without(x => x.SignedAgreementVersion)
+                    .Without(x => x.VrfCaseId)
+                    .Without(x => x.VrfCaseStatus)
+                    .Without(x => x.VrfCaseStatusLastUpdatedDateTime)
+                    .Without(x => x.VrfVendorId).Create());
         }
 
-        [Given(@"a legal entity is not available in employer incentives")]
-        [Given(@"the legal entity is in not Employer Incentives")]
-        public async Task GivenIHaveALegalEntityThatIsNotInTheDatabase()
+        [Given(@"the legal entity is in not available in Employer Incentives")]
+        public void GivenTheLegalEntityIsInNotAvailableInEmployerIncentives()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
-                    new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
-
-                account.Should().BeNullOrEmpty();
-            }
+            // intentionally blank
         }
 
         [Given(@"a legal entity that is in employer incentives")]
-        [Given(@"the legal entity is already available in Employer Incentives")]
         public Task GivenIHaveALegalEntityThatIsAlreadyInTheDatabase()
         {
-            return DataAccess.SetupAccount(_testAccountTable);
+            return DataAccess.SetupAccount(_account);
         }
 
         [Then(@"the legal entity should no longer be available in employer incentives")]
@@ -54,29 +43,23 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the legal entity should not be available in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldNotBeAvailableInTheDatabase()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
-                    new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
-
-                account.Should().HaveCount(0);
-            }
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var accounts = await dbConnection.GetAllAsync<Account>();
+            accounts.Any(a => a.Id == _account.Id && a.AccountLegalEntityId == _account.AccountLegalEntityId)
+                .Should().BeFalse();
         }
 
         [Then(@"the legal entity should be available in Employer Incentives")]
         [Then(@"the legal entity should still be available in Employer Incentives")]
         public async Task ThenTheLegalEntityShouldBeAvailableInTheDatabase()
         {
-            //var account = DataAccess.GetAccountByLegalEntityId()
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                var account = await dbConnection.QueryAsync<Account>("SELECT * FROM Accounts WHERE Id = @Id AND AccountLegalEntityId = @AccountLegalEntityId",
-                    new { _testAccountTable.Id, _testAccountTable.AccountLegalEntityId });
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var accounts = await dbConnection.GetAllAsync<Account>();
+            var account = accounts.Single(a => a.Id == _account.Id && a.AccountLegalEntityId == _account.AccountLegalEntityId);
 
-                account.Should().HaveCount(1);
-                account.Single().Should().BeEquivalentTo(_testAccountTable, opts => opts.Excluding(x => x.HashedLegalEntityId));
-                account.Single().HashedLegalEntityId.Should().NotBeNullOrEmpty();
-            }
+            account.Should().BeEquivalentTo(_account,
+                opts => opts.Excluding(x => x.HashedLegalEntityId).Excluding(x => x.VrfCaseStatusLastUpdatedDateTime));
+            account.HashedLegalEntityId.Should().NotBeNullOrEmpty();
         }
     }
 }
