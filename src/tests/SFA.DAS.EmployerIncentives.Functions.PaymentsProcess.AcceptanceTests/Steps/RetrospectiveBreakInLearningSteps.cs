@@ -109,6 +109,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _pendingPayment.PaymentYear = short.Parse(academicYear);
             _pendingPayment.PeriodNumber = byte.Parse(period);
             _pendingPayment.DueDate = _apprenticeshipIncentive.StartDate.AddDays(89);
+            _pendingPayment.PaymentMadeDate = _pendingPayment.DueDate;
 
             _payment.Amount = _pendingPayment.Amount;
             _payment.CalculatedDate = DateTime.Now;
@@ -127,6 +128,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var startDate = _pendingPayment.DueDate.AddDays(-2).Date;
             var endDate = startDate.AddDays(days).Date;
             SetupBreakInLearning(startDate, endDate);
+        }
+
+        [Given(@"Learner data is updated with a (.*) day Break in Learning before the first payment due date starting (.*)")]
+        public void GivenABreakInLearningBeforeTheFirstPayment(int days, DateTime startDate)
+        {
+            var endDate = startDate.Date.AddDays(days).Date;
+            SetupBreakInLearning(startDate.Date, endDate);
         }
 
         [Given(@"Learner data is updated with a (.*) day Break in Learning after the first payment due date")]
@@ -266,6 +274,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             pp.PaymentMadeDate.Should().BeNull();
             pp.PeriodNumber.Should().Be(period);
             pp.PaymentYear.Should().Be(year);
+        }
+
+        [Then(@"the paid earning of £(.*) is marked as requiring a clawback in Period R(.*) (.*)")]
+        public async Task ThenAClawbackIsRecorded(int amount, byte period, short year)
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var clawbacks = dbConnection.GetAll<ClawbackPayment>()
+                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList();
+
+            clawbacks.Count.Should().Be(1);
+            var clawback = clawbacks.Single();
+            clawback.Amount.Should().Be(amount * -1);
+            clawback.CollectionPeriod.Should().Be(period);
+            clawback.CollectionPeriodYear.Should().Be(year);
         }
 
         private void SetupMockLearnerMatchResponse(LearnerSubmissionDto learnerMatchApiData)
