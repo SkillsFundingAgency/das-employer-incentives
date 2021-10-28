@@ -223,7 +223,7 @@ this.ScenarioInitialize(scenarioInfo);
                 this.ScenarioStart();
 #line 26
     testRunner.Given("an existing Phase2 apprenticeship incentive with learning starting on 30-Apr-2021" +
-                        " and ending on 31-Aug-2021", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+                        " and ending on 31-Aug-2022", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 27
     testRunner.And("a payment of £1500 is not sent in Period R12 2021", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -338,7 +338,7 @@ this.ScenarioInitialize(scenarioInfo);
                 this.ScenarioStart();
 #line 45
     testRunner.Given("an existing Phase2 apprenticeship incentive with learning starting on 30-Apr-2021" +
-                        " and ending on 31-Aug-2021", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+                        " and ending on 31-Aug-2022", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 46
     testRunner.And("a payment of £1500 is sent in Period R12 2021", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

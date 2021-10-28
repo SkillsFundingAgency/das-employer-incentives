@@ -81,7 +81,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _initialStartDate = startDate.Date;
             _incentiveEndDate = endDate.Date;
-            _apprenticeshipIncentive.StartDate = startDate;            
+            _apprenticeshipIncentive.StartDate = startDate;
+            _apprenticeshipIncentive.SubmittedDate = startDate.AddDays(-1);
             _apprenticeshipIncentive.Phase = Enum.Parse<Phase>(phaseText);
             
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
@@ -167,7 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                         })
                                         .Create(),
                                     _fixture.Build<PriceEpisodeDto>()
-                                        .With(x => x.AcademicYear, _pendingPayment.PaymentYear.ToString())
+                                        .With(x => x.AcademicYear,  _pendingPayment.PeriodNumber.Value == 12 ? NextAcademicYear(_pendingPayment.PaymentYear.Value).ToString() : _pendingPayment.PaymentYear.ToString())
                                         .With(pe => pe.StartDate, _breakEnd)
                                         .With(pe => pe.EndDate, _incentiveEndDate)
                                         .With(pe => pe.Periods, new List<PeriodDto>()
@@ -212,9 +213,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var breaksInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>()
                 .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList();
 
-            breaksInLearning.Count.Should().Be(1);
-            breaksInLearning.Single().StartDate.Should().Be(_breakStart);
-            breaksInLearning.Single().EndDate.Should().Be(_breakEnd.AddDays(-1));
+            breaksInLearning.Count(b => b.EndDate != null).Should().Be(1);
+            breaksInLearning.Single(b => b.EndDate != null).StartDate.Should().Be(_breakStart);
+            breaksInLearning.Single(b => b.EndDate != null).EndDate.Should().Be(_breakEnd.AddDays(-1));
         }
 
         [Then(@"no Break in Learning is recorded")]
@@ -296,6 +297,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         }
                     }
                 ));
+        }
+
+        private short NextAcademicYear(short academicYear)
+        {
+            return short.Parse( 
+                (int.Parse(academicYear.ToString().Substring(0, 2)) + 1).ToString() +
+                (int.Parse(academicYear.ToString().Substring(2, 2)) + 1).ToString()
+                );
         }
     }
 }
