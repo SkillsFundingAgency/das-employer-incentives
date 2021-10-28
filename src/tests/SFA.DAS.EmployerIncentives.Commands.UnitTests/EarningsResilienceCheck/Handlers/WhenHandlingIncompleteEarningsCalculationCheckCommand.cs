@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             await _sut.Handle(new IncompleteEarningsCalculationCheckCommand());
 
             // Assert
-            _commandDispatcher.Verify(x => x.Send(It.IsAny<ValidateIncompleteEarningsCalculationCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+            _commandDispatcher.Verify(x => x.Send(It.IsAny<ValidateIncompleteEarningsCalculationCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

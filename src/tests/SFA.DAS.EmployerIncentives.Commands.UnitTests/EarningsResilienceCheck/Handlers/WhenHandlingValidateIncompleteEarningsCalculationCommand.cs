@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,12 +9,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.Handlers
 {
@@ -48,13 +42,24 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.
             };
             var incentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(Guid.NewGuid(), model);
 
-            _incentiveRepository.Setup(x => x.FindByApprenticeshipId(validateEarningsCommand.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
-        
+            foreach(var earningsValidation in validateEarningsCommand.EarningsCalculationValidations)
+            {
+                _incentiveRepository.Setup(x => x.FindByApprenticeshipId(earningsValidation.IncentiveApplicationApprenticeshipId)).ReturnsAsync(incentive);
+            }
+
             // Act
             await _sut.Handle(validateEarningsCommand);
 
             // Assert
-            _commandDispatcher.Verify(x => x.Send(It.Is<CompleteEarningsCalculationCommand>(y => y.IncentiveApplicationApprenticeshipId == validateEarningsCommand.IncentiveApplicationApprenticeshipId), It.IsAny<CancellationToken>()), Times.Once);
+            foreach (var earningsValidation in validateEarningsCommand.EarningsCalculationValidations)
+            {
+                _commandDispatcher.Verify(
+                    x => x.Send(
+                        It.Is<CompleteEarningsCalculationCommand>(y =>
+                            y.IncentiveApplicationApprenticeshipId ==
+                            earningsValidation.IncentiveApplicationApprenticeshipId),
+                        It.IsAny<CancellationToken>()), Times.Once);
+            }
         }
     }
 }

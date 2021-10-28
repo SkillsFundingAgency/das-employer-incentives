@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -21,18 +22,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
         public async Task Handle(IncompleteEarningsCalculationCheckCommand command,  CancellationToken cancellationToken = default(CancellationToken))
         {
             var applications = await _applicationDomainRepository.FindIncentiveApplicationsWithoutEarningsCalculations();
-            var tasks = new List<Task>();
+
+            var earningsCalculationValidations = new List<EarningsCalculationValidation>();
             foreach (var application in applications)
             {
                 foreach(var apprenticeship in application.Apprenticeships)
                 {
-                    var updateCommand = new ValidateIncompleteEarningsCalculationCommand(application.AccountId,
-                        apprenticeship.Id, apprenticeship.ApprenticeshipId);
-                    tasks.Add(_commandDispatcher.Send(updateCommand));
+                    earningsCalculationValidations.Add(new EarningsCalculationValidation(application.AccountId, apprenticeship.ApprenticeshipId, apprenticeship.Id));
                 }
             }
 
-            await Task.WhenAll(tasks);
+            await _commandDispatcher.Send(new ValidateIncompleteEarningsCalculationCommand(earningsCalculationValidations));
         }
     }
 

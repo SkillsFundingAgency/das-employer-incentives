@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Amqp.Serialization;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
@@ -20,14 +22,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
 
         public async Task Handle(ValidateIncompleteEarningsCalculationCommand command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var incentive = await _domainRepository.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId);
-            if (incentive != null && incentive.PendingPayments.Any())
+            var tasks = new List<Task>();
+            foreach(var earningsValidation in command.EarningsCalculationValidations)
             {
-                var completeEarningCalculationCommand = new CompleteEarningsCalculationCommand(command.AccountId,
-                    command.IncentiveApplicationApprenticeshipId, command.ApprenticeshipId, incentive.Id);
+                var incentive = await _domainRepository.FindByApprenticeshipId(earningsValidation.IncentiveApplicationApprenticeshipId);
+                if (incentive != null && incentive.PendingPayments.Any())
+                {
+                    var completeEarningCalculationCommand = new CompleteEarningsCalculationCommand(earningsValidation.AccountId,
+                        earningsValidation.IncentiveApplicationApprenticeshipId, earningsValidation.ApprenticeshipId, incentive.Id);
 
-                await _commandDispatcher.Send(completeEarningCalculationCommand);
+                    tasks.Add(_commandDispatcher.Send(completeEarningCalculationCommand));
+                }
             }
+
+            await Task.WhenAll(tasks);
         }
     }
 }

@@ -1,45 +1,14 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.Logging;
-using SFA.DAS.EmployerIncentives.Domain.Accounts;
-using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
 {
-    public class ValidateIncompleteEarningsCalculationCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class ValidateIncompleteEarningsCalculationCommand : DomainCommand
     {
-        public long AccountId { get; private set; }
-        public Guid IncentiveApplicationApprenticeshipId { get; private set; }
-        public long ApprenticeshipId { get; private set; }
-
-        public string LockId
+        public IEnumerable<EarningsCalculationValidation> EarningsCalculationValidations { get; private set; }
+        public ValidateIncompleteEarningsCalculationCommand(IEnumerable<EarningsCalculationValidation> earningsCalculationValidation)
         {
-            get => $"{nameof(Account)}_{AccountId}";
-        }
-
-        public ValidateIncompleteEarningsCalculationCommand(
-            long accountId,
-            Guid incentiveApplicationApprenticeshipId,
-            long apprenticeshipId)
-        {
-            AccountId = accountId;
-            IncentiveApplicationApprenticeshipId = incentiveApplicationApprenticeshipId;
-            ApprenticeshipId = apprenticeshipId;
-        }
-
-        [Newtonsoft.Json.JsonIgnore]
-        public Log Log
-        {
-            get
-            {
-                var message =
-                    $"ApprenticeshipIncentives UpdateIncompleteEarningsCalculationCommand for AccountId {AccountId}, IncentiveApplicationApprenticeshipId {IncentiveApplicationApprenticeshipId}, and ApprenticeshipId {ApprenticeshipId}";
-                return new Log
-                {
-                    OnProcessing = () => message,
-                    OnError = () => message
-                };
-            }
+            EarningsCalculationValidations = earningsCalculationValidation;
         }
     }
 }
