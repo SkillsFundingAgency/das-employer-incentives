@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                     new EarningsResilienceApplicationsCheckCommand(),
                     new EarningsResilienceIncentivesCheckCommand()
                 });
-
+            
             return Ok();
         }
 

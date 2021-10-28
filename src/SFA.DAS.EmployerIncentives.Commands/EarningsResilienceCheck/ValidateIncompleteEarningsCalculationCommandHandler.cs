@@ -7,21 +7,21 @@ using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 
 namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
 {
-    public class UpdateIncompleteEarningsCalculationCommandHandler : ICommandHandler<UpdateIncompleteEarningsCalculationCommand>
+    public class ValidateIncompleteEarningsCalculationCommandHandler : ICommandHandler<ValidateIncompleteEarningsCalculationCommand>
     {
         private IApprenticeshipIncentiveDomainRepository _domainRepository;
         private ICommandDispatcher _commandDispatcher;
 
-        public UpdateIncompleteEarningsCalculationCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, ICommandDispatcher commandPublisher)
+        public ValidateIncompleteEarningsCalculationCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, ICommandDispatcher commandPublisher)
         {
             _domainRepository = domainRepository;
             _commandDispatcher = commandPublisher;
         }
 
-        public async Task Handle(UpdateIncompleteEarningsCalculationCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task Handle(ValidateIncompleteEarningsCalculationCommand command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var incentive = await _domainRepository.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId);
-            if (incentive.PendingPayments.Any())
+            if (incentive != null && incentive.PendingPayments.Any())
             {
                 var completeEarningCalculationCommand = new CompleteEarningsCalculationCommand(command.AccountId,
                     command.IncentiveApplicationApprenticeshipId, command.ApprenticeshipId, incentive.Id);

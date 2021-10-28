@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
             {
                 foreach(var apprenticeship in application.Apprenticeships)
                 {
-                    var updateCommand = new UpdateIncompleteEarningsCalculationCommand(application.AccountId,
+                    var updateCommand = new ValidateIncompleteEarningsCalculationCommand(application.AccountId,
                         apprenticeship.Id, apprenticeship.ApprenticeshipId);
                     tasks.Add(_commandDispatcher.Send(updateCommand));
                 }

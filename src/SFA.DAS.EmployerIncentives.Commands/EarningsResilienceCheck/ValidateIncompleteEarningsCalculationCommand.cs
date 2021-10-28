@@ -6,7 +6,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
 {
-    public class UpdateIncompleteEarningsCalculationCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class ValidateIncompleteEarningsCalculationCommand : DomainCommand, ILockIdentifier, ILogWriter
     {
         public long AccountId { get; private set; }
         public Guid IncentiveApplicationApprenticeshipId { get; private set; }
@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck
             get => $"{nameof(Account)}_{AccountId}";
         }
 
-        public UpdateIncompleteEarningsCalculationCommand(
+        public ValidateIncompleteEarningsCalculationCommand(
             long accountId,
             Guid incentiveApplicationApprenticeshipId,
             long apprenticeshipId)
