@@ -31,9 +31,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private LearnerSubmissionDto _resumedLearnerMatchApiData;
         private readonly PendingPayment _pendingPayment;
+        private readonly Payment _payment;
 
         private DateTime _breakStart;
         private DateTime _breakEnd;
+        private DateTime _incentiveEndDate;        
 
         protected RetrospectiveBreakInLearningSteps(TestContext context)
         {
@@ -48,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.HasPossibleChangeOfCircumstances, false)
                 .With(p => p.RefreshedLearnerForEarnings, true)
                 .With(p => p.PausePayments, false)
-                .With(p => p.Status, IncentiveStatus.Stopped)
+                .With(p => p.Status, IncentiveStatus.Active)
                 .With(p => p.BreakInLearnings, new List<ApprenticeshipBreakInLearning>())
                 .With(p => p.Phase, Phase.Phase1)
                 .Create();
@@ -56,46 +58,84 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _pendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.AccountId, _accountModel.Id)
                 .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                .With(p => p.DueDate, new DateTime(2021, 02, 27))
                 .With(p => p.ClawedBack, false)
                 .With(p => p.EarningType, EarningType.FirstPayment)
-                .With(p => p.PaymentYear, (short)2021)
-                .With(p => p.PeriodNumber, (byte)7)
-                .With(p => p.Amount, 1000)
                 .Without(p => p.PaymentMadeDate)
+                .Create();
+
+            _payment = _fixture.Build<Payment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.AccountLegalEntityId, _accountModel.AccountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)                
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.Amount, _pendingPayment.Amount)
+                .With(p => p.PaymentPeriod, _pendingPayment.PeriodNumber)
+                .With(p => p.PaymentYear, _pendingPayment.PaymentYear)
+                .Without(p => p.CalculatedDate)
+                .Without(p => p.PaidDate)                
                 .Create();
         }
 
-        [Given(@"an existing apprenticeship incentive with learning starting on (.*) and ending on (.*)")]
-        public async Task GivenAnExistingApprenticeshipIncentiveWithLearningStartingIn_Oct(DateTime startDate, DateTime endDate)
+        [Given(@"an existing (.*) apprenticeship incentive with learning starting on (.*) and ending on (.*)")]
+        public async Task GivenAnExistingApprenticeshipIncentiveWithLearningStartingIn_Oct(string phaseText, DateTime startDate, DateTime endDate)
         {
-            _initialStartDate = startDate;
-            _apprenticeshipIncentive.StartDate = startDate;
-
+            _initialStartDate = startDate.Date;
+            _incentiveEndDate = endDate.Date;
+            _apprenticeshipIncentive.StartDate = startDate;            
+            _apprenticeshipIncentive.Phase = Enum.Parse<Phase>(phaseText);
+            
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_accountModel);
-            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);            
+        }
+                
+        [Given(@"a payment of £(.*) is not sent in Period R(.*) (.*)")]
+        public async Task GivenAPaymentIsNotSent(string payment, string period, string academicYear)
+        {
+            _pendingPayment.Amount = int.Parse(payment);
+            _pendingPayment.PaymentYear = short.Parse(academicYear);
+            _pendingPayment.PeriodNumber = byte.Parse(period);
+            _pendingPayment.DueDate = _apprenticeshipIncentive.StartDate.AddDays(89);
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_pendingPayment);
         }
 
-        [Given(@"a payment of £1000 is not sent in Period R07 2021")]
-        public void GivenAPaymentIsNotSent()
+        [Given(@"a payment of £(.*) is sent in Period R(.*) (.*)")]
+        public async Task GivenAPaymentIsSent(string payment, string period, string academicYear)
         {
-            // blank
+            _pendingPayment.Amount = int.Parse(payment);
+            _pendingPayment.PaymentYear = short.Parse(academicYear);
+            _pendingPayment.PeriodNumber = byte.Parse(period);
+            _pendingPayment.DueDate = _apprenticeshipIncentive.StartDate.AddDays(89);
+
+            _payment.Amount = _pendingPayment.Amount;
+            _payment.CalculatedDate = DateTime.Now;
+            _payment.PaidDate = _pendingPayment.DueDate;
+            _payment.PaymentPeriod = _pendingPayment.PeriodNumber.Value;
+            _payment.PaymentYear = _pendingPayment.PaymentYear.Value;
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_pendingPayment);
+            await dbConnection.InsertAsync(_payment);
         }
 
-        [Given(@"Learner data is updated with a Break in Learning of 28 days before the first payment due date")]
-        public void GivenABreakInLearningBeforeTheFirstPayment()
+        [Given(@"Learner data is updated with a (.*) day Break in Learning before the first payment due date")]
+        public void GivenABreakInLearningBeforeTheFirstPayment(int days)
         {
-            SetupBreakInLearning(DateTime.Parse("2021-02-25T00:00:00"), DateTime.Parse("2021-03-25T00:00:00"));
+            var startDate = _pendingPayment.DueDate.AddDays(-2).Date;
+            var endDate = startDate.AddDays(days).Date;
+            SetupBreakInLearning(startDate, endDate);
         }
 
-        [Given(@"Learner data is updated with a Break in Learning of less than 28 days before the first payment due date")]
-        public void GivenAShortBreakInLearningBeforeTheFirstPayment()
+        [Given(@"Learner data is updated with a (.*) day Break in Learning after the first payment due date")]
+        public void GivenABreakInLearningAfterTheFirstPayment(int days)
         {
-            SetupBreakInLearning(DateTime.Parse("2021-02-28T00:00:00"), DateTime.Parse("2021-03-27T00:00:00"));
+            var startDate = _pendingPayment.DueDate.AddDays(2).Date;
+            var endDate = startDate.AddDays(days).Date;
+            SetupBreakInLearning(startDate, endDate);
         }
-
+        
         private void SetupBreakInLearning(DateTime start, DateTime end)
         {
             _breakStart = start;
@@ -105,7 +145,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.Uln, _apprenticeshipIncentive.ULN)
-                .With(s => s.AcademicYear, "2021")
+                .With(s => s.AcademicYear, _pendingPayment.PaymentYear.ToString())
                 .With(l => l.Training, new List<TrainingDto>
                     {
                         _fixture
@@ -114,7 +154,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>()
                                 {
                                     _fixture.Build<PriceEpisodeDto>()
-                                        .With(x => x.AcademicYear, "2021")
+                                        .With(x => x.AcademicYear, _pendingPayment.PaymentYear.ToString())
                                         .With(pe => pe.StartDate, _initialStartDate)
                                         .With(pe => pe.EndDate, _breakStart.AddDays(-1))
                                         .With(pe => pe.Periods, new List<PeriodDto>()
@@ -122,20 +162,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                             _fixture.Build<PeriodDto>()
                                                 .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
                                                 .With(period => period.IsPayable, true)
-                                                .With(period => period.Period, 7)
+                                                .With(period => period.Period, _pendingPayment.PeriodNumber)
                                                 .Create()
                                         })
                                         .Create(),
                                     _fixture.Build<PriceEpisodeDto>()
-                                        .With(x => x.AcademicYear, "2021")
+                                        .With(x => x.AcademicYear, _pendingPayment.PaymentYear.ToString())
                                         .With(pe => pe.StartDate, _breakEnd)
-                                        .With(pe => pe.EndDate, new DateTime(2021, 7, 31))
+                                        .With(pe => pe.EndDate, _incentiveEndDate)
                                         .With(pe => pe.Periods, new List<PeriodDto>()
                                         {
                                             _fixture.Build<PeriodDto>()
                                                 .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
                                                 .With(period => period.IsPayable, true)
-                                                .With(period => period.Period, 8)
+                                                .With(period => period.Period, _pendingPayment.PeriodNumber.Value == 12 ? 1 : (_pendingPayment.PeriodNumber.Value + 1))
                                                 .Create()
                                         })
 
@@ -199,24 +239,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             AssertPendingPayment(amount, period, year, EarningType.SecondPayment);
         }
 
-        [Then(@"the pending payments are not changed")]
-        public void ThenThePendingPaymentsAreNotChanged()
+        [Then(@"the first pending payment is not changed")]
+        public void ThenTheFirstPendingPaymentIsNotChanged()
         {
-            AssertPendingPayment(1000, 7, 2021, EarningType.FirstPayment);
-            AssertPendingPayment(1000, 4, 2122, EarningType.SecondPayment);
+            AssertPendingPayment(_pendingPayment.Amount , _pendingPayment.PeriodNumber.Value, _pendingPayment.PaymentYear.Value, EarningType.FirstPayment);
         }
 
-        [Then(@"the Learner is In Learning")]
-        public async Task ThenTheLearnerIsInLearning()
+        [Then(@"the second pending payment is not created")]
+        public void ThenTheSecondPendingPaymentIsNotCreated()
         {
-            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var learner = dbConnection.GetAll<Learner>()
-                .Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
-            
-            learner.InLearning.Should().BeTrue();
+            _newEarnings.Count(x =>
+                x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+                && x.EarningType == EarningType.SecondPayment
+                && !x.ClawedBack).Should().Be(0);
         }
 
-        private void AssertPendingPayment(int amount, byte period, short year, EarningType earningType)
+        private void AssertPendingPayment(decimal amount, byte period, short year, EarningType earningType)
         {
             var pp = _newEarnings.Single(x =>
                 x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
