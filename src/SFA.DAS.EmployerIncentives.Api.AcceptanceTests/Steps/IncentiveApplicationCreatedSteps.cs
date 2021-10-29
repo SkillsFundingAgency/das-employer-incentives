@@ -10,7 +10,6 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using TechTalk.SpecFlow;
 using System.Net.Http;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -40,16 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"They have selected the apprenticeships for the application within the (.*) eligibility window")]
         public async Task WhenTheyHaveSelectedTheApprenticeshipsForTheApplication(string phase)
         {
-            DateTime employmentStartDate;
-            if (phase == "Phase2")
-            {
-                employmentStartDate = new DateTime(2021, 09, 30);
-            }
-            else
-            {
-                employmentStartDate = new DateTime(2021, 10, 10);
-            }
-
+            var employmentStartDate = new DateTime(2021, 10, 10);
+            
             foreach (var apprentice in _request.Apprenticeships)
             {
                 apprentice.EmploymentStartDate = employmentStartDate;

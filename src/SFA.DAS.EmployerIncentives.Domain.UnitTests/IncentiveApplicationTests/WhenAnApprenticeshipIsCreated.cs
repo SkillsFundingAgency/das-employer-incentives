@@ -34,10 +34,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 
         [TestCase(null, "2021-10-01", false)]
         [TestCase("2021-03-31", "2021-04-01", false)]
-        [TestCase("2021-04-01 00:00:00", "2021-04-01", true)]
-        [TestCase("2021-04-01 23:59:59", "2021-04-01", true)]
-        [TestCase("2021-04-01", "2021-04-01", true)]
-        [TestCase("2021-11-30", "2021-10-01",true)]
+        [TestCase("2021-04-01 00:00:00", "2021-04-01", false)]
+        [TestCase("2021-04-01 23:59:59", "2021-04-01", false)]
+        [TestCase("2021-04-01", "2021-04-01", false)]
+        [TestCase("2021-11-30", "2021-10-01", true)]
         [TestCase("2022-01-31 23:59:59", "2021-10-01", true)]
         [TestCase("2022-02-01", "2021-10-01", false)]
 
