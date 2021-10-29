@@ -42,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         public void Arrange()
         {
             _fixture = new Fixture();
-            _testStartDate = new DateTime(2021,01,01);
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
+            _testStartDate = new DateTime(2021, 01, 01);
             _censusDate = _testStartDate.AddDays(95);
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
@@ -447,6 +448,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
+                            .With(pe => pe.StartDate, new DateTime(2020, 10, 1))
+                            .Without(pe => pe.EndDate)
                             .With(x => x.AcademicYear, "2021")
                             .With(pe => pe.Periods,
                                     new List<PeriodDto>{
@@ -823,7 +826,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                         .Create()
                                     })
                             .With(pe => pe.AcademicYear, "2021")
-                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
+                            .With(pe => pe.StartDate, DateTime.Today.AddMonths(-20))
                             .With(pe => pe.EndDate, (DateTime?)null)
                             .Create()
                             }).Create(),
@@ -890,7 +893,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                                         .Create()
                                     })
                             .With(pe => pe.AcademicYear, "2021")
-                            .With(pe => pe.StartDate, DateTime.Today.AddDays(-20))
+                            .With(pe => pe.StartDate, DateTime.Today.AddMonths(-20))
                             .With(pe => pe.EndDate, (DateTime?)null)
                             .Create()
                             }).Create(),
@@ -947,8 +950,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var periods = new List<LearningPeriod> // change order because it cannot be guaranteed when stored
             {
-                new LearningPeriod(episode2.StartDate, episode2.EndDate),
-                new LearningPeriod(episode1.StartDate, episode1.EndDate)
+                new LearningPeriod(episode2.StartDate, episode2.EndDate.Value),
+                new LearningPeriod(episode1.StartDate, episode1.EndDate.Value)
             };
 
             var learner = new LearnerFactory().GetExisting(_fixture.Build<LearnerModel>()

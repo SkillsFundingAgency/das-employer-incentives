@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learnerModel = _fixture
                 .Build<LearnerModel>()
                 .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod, 90) })
+                .Without(l => l.LearningPeriods)
                 .Create();
 
             _learner = Learner.Get(_learnerModel);                

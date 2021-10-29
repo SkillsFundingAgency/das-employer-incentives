@@ -136,9 +136,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count.Should().Be(2);
             learningPeriods.First().StartDate.Should().Be(_testPriceEpisode1Dto.StartDate);
-            learningPeriods.First().EndDate.Should().Be(_testPriceEpisode1Dto.EndDate);
+            learningPeriods.First().EndDate.Should().Be(_testPriceEpisode1Dto.EndDate.Value);
             learningPeriods.Last().StartDate.Should().Be(_testPriceEpisode2Dto.StartDate);
-            learningPeriods.Last().EndDate.Should().Be(episode.EndDate);
+            learningPeriods.Last().EndDate.Should().Be(episode.EndDate.Value);
         }
 
         [Test]
@@ -188,7 +188,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count.Should().Be(1);
             learningPeriods.First().StartDate.Should().Be(episode1.StartDate);
-            learningPeriods.First().EndDate.Should().Be(episode4.EndDate);
+            learningPeriods.First().EndDate.Should().Be(episode4.EndDate.Value);
         }
 
         [Test]
@@ -221,7 +221,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count.Should().Be(1);
             learningPeriods.First().StartDate.Should().Be(episode1.StartDate);
-            learningPeriods.First().EndDate.Should().Be(episode2.EndDate);
+            learningPeriods.First().EndDate.Should().Be(episode2.EndDate.Value);
         }
 
         [Test]
@@ -254,7 +254,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count.Should().Be(1);
             learningPeriods.First().StartDate.Should().Be(episode1.StartDate);
-            learningPeriods.First().EndDate.Should().Be(episode1.EndDate);
+            learningPeriods.First().EndDate.Should().Be(episode1.EndDate.Value);
         }
     }
 }

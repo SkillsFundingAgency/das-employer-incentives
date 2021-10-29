@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 _fixture.Build<LearnerModel>()
                 .With(x => x.SubmissionData, _fixture.Create<SubmissionData>())
                 .With(x=> x.ApprenticeshipIncentiveId, _incentive.Id)
-                .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1))})
+                .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1), new DateTime(2021, 7, 31))})
                 .Create());
             _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(incentive)).ReturnsAsync(_learner);
         }
@@ -318,7 +318,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                _fixture.Build<LearnerModel>()
                .With(x => x.SubmissionData, submissionData)
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
-               .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1)) })
+               .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1), new DateTime(2021, 7, 31)) })
                .Create());
 
             _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
@@ -349,7 +349,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                _fixture.Build<LearnerModel>()
                .With(x => x.SubmissionData, submissionData)
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
-               .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1)) })
+               .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1),new DateTime(2021, 7, 31)) })
                .Create());
 
             _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);
@@ -381,7 +381,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                _fixture.Build<LearnerModel>()
                .With(x => x.SubmissionData, submissionData)
                .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
-               .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1)) })
+               .With(x => x.LearningPeriods, new[] { new LearningPeriod(new DateTime(2021, 4, 1), new DateTime(2021, 7, 31)) })
                .Create());
 
             _mockLearnerDomainRepository.Setup(m => m.GetOrCreate(_incentive)).ReturnsAsync(_learner);

@@ -85,20 +85,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             int days = 0;
             foreach (var learningPeriod in Model.LearningPeriods)
             {
-                if(!learningPeriod.EndDate.HasValue)
+                if (learningPeriod.EndDate.Date < censusDate)
                 {
-                    days += censusDate.Subtract(learningPeriod.StartDate.Date).Days + 1;
+                    days += learningPeriod.EndDate.Date.Subtract(learningPeriod.StartDate.Date).Days + 1;
                 }
                 else
                 {
-                    if (learningPeriod.EndDate.Value.Date < censusDate)
-                    {
-                        days += learningPeriod.EndDate.Value.Date.Subtract(learningPeriod.StartDate.Date).Days + 1;
-                    }
-                    else
-                    {
-                        days += censusDate.Subtract(learningPeriod.StartDate.Date).Days + 1;
-                    }
+                    days += censusDate.Subtract(learningPeriod.StartDate.Date).Days + 1;
                 }
             }
 

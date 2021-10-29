@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.ApprenticeshipIncentives
             var @event = _fixture.Create<BreakInLearningDeleted>();
             var learner = _fixture.Build<LearnerModel>()
                 .With(x => x.ApprenticeshipIncentiveId, @event.ApprenticeshipIncentiveId)
+                .Without(l => l.LearningPeriods)
                 .Create();
             _mockDataRepository.Setup(x => x.GetByApprenticeshipIncentiveId(@event.ApprenticeshipIncentiveId))
                 .ReturnsAsync(learner);
