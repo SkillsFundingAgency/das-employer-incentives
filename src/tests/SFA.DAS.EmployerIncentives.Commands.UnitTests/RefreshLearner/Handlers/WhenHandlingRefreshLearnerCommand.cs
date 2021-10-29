@@ -340,6 +340,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             
             var pendingPaymentModel = _fixture.Create<PendingPaymentModel>();
             pendingPaymentModel.PaymentMadeDate = null;
+            pendingPaymentModel.CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(5, 2021);
 
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
@@ -370,7 +371,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         new List<PriceEpisodeDto>{
                             _fixture
                             .Build<PriceEpisodeDto>()
-                            .With(x => x.AcademicYear, "2021")
+                            .With(x => x.AcademicYear, pendingPaymentModel.CollectionPeriod.AcademicYear.ToString())
                             .With(pe => pe.EndDate, DateTime.Today.AddDays(-2))
                             .With(pe => pe.StartDate, pendingPaymentModel.DueDate.AddDays(-1))
                             .With(pe => pe.EndDate, pendingPaymentModel.DueDate.AddDays(1))
