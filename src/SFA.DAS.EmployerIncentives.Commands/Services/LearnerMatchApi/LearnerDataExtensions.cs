@@ -95,34 +95,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             var nextPayment = incentive.NextDuePayment;
             if (nextPayment == null) return false;
 
-            var matchedRecords =
-               (from tr in learnerData.Training
-                where tr.Reference == PROGRAM_REFERENCE
-                from pe in tr.PriceEpisodes
-                from p in pe.Periods
-                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-                select new
-                {
-                    p.ApprenticeshipId,
-                    pe.StartDate,
-                    pe.EndDate,
-                    p.Period
-                }).ToArray();
-
-            var isInLearning = false;
-            if (matchedRecords.Any())
-            {
-                foreach (var matchedRecord in matchedRecords)
-                {
-                    var endDate = matchedRecord.EndDate ?? nextPayment.DueDate;
-                    if (nextPayment.DueDate >= matchedRecord.StartDate &&
-                        nextPayment.DueDate <= endDate)
-                    {
-                        isInLearning = true;
-                        break;
-                    }
-                }
-            }
+            var isInLearning = learnerData
+                .PaymentsForApprenticeshipInAcademicYear(incentive.Apprenticeship.Id, nextPayment.CollectionPeriod.AcademicYear)
+                .Any(p => p.Period == nextPayment.CollectionPeriod?.PeriodNumber);
 
             return isInLearning;
         }
@@ -215,6 +190,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
                 .SelectMany(t => t.PriceEpisodes.Where(pe => pe.StartDate <= paymentDueDate
                 && (pe.EndDate >= paymentDueDate || pe.EndDate == null)))
+                .SelectMany(e => e.Periods)
+                .Where(p => p.ApprenticeshipId == apprenticeshipId);
+        }
+
+        private static IEnumerable<PeriodDto> PaymentsForApprenticeshipInAcademicYear(this LearnerSubmissionDto data, long apprenticeshipId, short academicYear)
+        {
+            return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
+                .SelectMany(t => t.PriceEpisodes.Where(pe => pe.AcademicYear == academicYear.ToString()))
                 .SelectMany(e => e.Periods)
                 .Where(p => p.ApprenticeshipId == apprenticeshipId);
         }
