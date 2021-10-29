@@ -18,5 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string ApiBaseUrl { get; set; }
         public string Identifier { get; set; }
         public string EmployerIncentivesWebBaseUrl { get; set; }
+        public string LogLevel { get; set; }
     }
 }
