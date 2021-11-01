@@ -77,85 +77,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.IsPayable = true;
         }
 
-
-        [Test]
-        public void Then_true_is_returned_when_there_is_a_matching_period()
-        {
-            //Arrange    
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeTrue();
-        }
-
-        [Test]
-        public void Then_true_is_returned_when_there_is_a_matching_period_with_a_null_end_date()
-        {
-            //Arrange    
-            _testPriceEpisodeDto.EndDate = null;
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeTrue();
-        }
-
-        [Test]
-        public void Then_false_is_returned_when_there_are_no_matching_periods()
-        {
-            //Arrange    
-            _testTrainingDto.Reference = _fixture.Create<string>();
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeFalse();
-        }
-
-        [Test]
-        public void Then_false_is_returned_when_the_due_date_is_before_a_matching_period()
-        {
-            //Arrange    
-            _testPriceEpisodeDto.StartDate = _pendingPayment.DueDate.AddDays(1);            
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeFalse();
-        }
-
-        [Test]
-        public void Then_false_is_returned_when_the_apprenticeship_id_does_not_have_a_matching_period()
-        {
-            //Arrange    
-            _testPeriodDto.ApprenticeshipId = _fixture.Create<long>();
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeFalse();
-        }
-
-        [Test]
-        public void Then_false_is_returned_when_the_due_date_is_after_a_matching_period()
-        {
-            //Arrange    
-            _testPriceEpisodeDto.EndDate = _pendingPayment.DueDate.AddSeconds(-1);
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeFalse();
-        }
-
-
         [Test]
         public void Then_false_is_returned_when_the_pending_payment_is_null()
         {
@@ -169,6 +90,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             //Assert
             isInLearning.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_true_is_returned_when_the_pending_payment_is_not_null()
+        {
+            //Arrange    
+            
+            //Act
+            var isInLearning = _sut.IsInLearning(_incentive);
+
+            //Assert
+            isInLearning.Should().BeTrue();
         }
     }
 }
