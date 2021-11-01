@@ -4,6 +4,7 @@
     {
         StartDate = 1,
         LearningStopped = 2,
-        LearningResumed = 3
+        LearningResumed = 3,
+        BreakInLearningDel = 4
     }
 }
