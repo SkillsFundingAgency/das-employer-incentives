@@ -83,23 +83,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         public static bool IsInLearning(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
-            // 1. For a given payment due date check whether due date falls in between 
-            // the start and end date of a price episode that contains a period with 
-            // a matching apprenticeship ID OR where there is no end date for the 
-            // price episode with a matching apprenticeship ID, the payment due date 
-            // is after the price episode start date
-            // 2. If a price episode meeting criteria in step 1 is found, set InLearning
-            // to True ELSE set InLearning to False
-
             if (incentive == null) return false;
             var nextPayment = incentive.NextDuePayment;
             if (nextPayment == null) return false;
 
-            var isInLearning = learnerData
-                .PaymentsForApprenticeshipInAcademicYear(incentive.Apprenticeship.Id, nextPayment.CollectionPeriod.AcademicYear)
-                .Any(p => p.Period == nextPayment.CollectionPeriod?.PeriodNumber);
-
-            return isInLearning;
+            return true;
         }
 
         public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData,
@@ -225,13 +213,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 .SelectMany(e => e.Periods)
                 .Where(p => p.ApprenticeshipId == apprenticeshipId);
         }
-
-        private static IEnumerable<PeriodDto> PaymentsForApprenticeshipInAcademicYear(this LearnerSubmissionDto data, long apprenticeshipId, short academicYear)
-        {
-            return data.Training.Where(t => t.Reference == PROGRAM_REFERENCE)
-                .SelectMany(t => t.PriceEpisodes.Where(pe => pe.AcademicYear == academicYear.ToString()))
-                .SelectMany(e => e.Periods)
-                .Where(p => p.ApprenticeshipId == apprenticeshipId);
-        }
+       
     }
 }

@@ -80,58 +80,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _testPeriodDto.IsPayable = true;
         }
 
-
-        [Test]
-        public void Then_true_is_returned_when_there_is_a_matching_period()
-        {
-            //Arrange    
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeTrue();
-        }
-
-        [Test]
-        public void Then_false_is_returned_when_there_are_no_matching_aim()
-        {
-            //Arrange    
-            _testTrainingDto.Reference = _fixture.Create<string>();
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeFalse();
-        }
-
-        [Test]
-        public void Then_false_is_returned_when_the_apprenticeship_id_does_not_have_a_matching_period()
-        {
-            //Arrange    
-            _testPeriodDto.Period = 5;
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeFalse();
-        }
-
-        [Test]
-        public void Then_false_is_returned_when_the_apprenticeship_id_does_not_have_a_matching_period_in_the_same_academic_year()
-        {
-            //Arrange    
-            _testPriceEpisodeDto.AcademicYear = "2020";
-
-            //Act
-            var isInLearning = _sut.IsInLearning(_incentive);
-
-            //Assert
-            isInLearning.Should().BeFalse();
-        }
-        
         [Test]
         public void Then_false_is_returned_when_the_pending_payment_is_null()
         {
@@ -145,6 +93,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             //Assert
             isInLearning.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_true_is_returned_when_the_pending_payment_is_not_null()
+        {
+            //Arrange    
+            
+            //Act
+            var isInLearning = _sut.IsInLearning(_incentive);
+
+            //Assert
+            isInLearning.Should().BeTrue();
         }
     }
 }
