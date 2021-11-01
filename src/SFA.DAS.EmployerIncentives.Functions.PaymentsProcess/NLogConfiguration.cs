@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class NLogConfiguration
     {
-        public void ConfigureNLog()
+        public void ConfigureNLog(string minimumLogLevel)
         {
             var appName = "das-employer-incentives-functions-payments-process";
             var env = Environment.GetEnvironmentVariable("EnvironmentName");
@@ -19,18 +19,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             if (string.IsNullOrEmpty(env) || env.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
             {
-                AddLocalTarget(config, appName);
+                AddLocalTarget(config, appName, LogLevel.FromString(minimumLogLevel));
             }
             else
             {
-                AddRedisTarget(config, appName);
-                AddAppInsights(config);
+                AddRedisTarget(config, appName, LogLevel.FromString(minimumLogLevel));
+                AddAppInsights(config, LogLevel.FromString(minimumLogLevel));
             }
 
             LogManager.Configuration = config;
         }
 
-        private static void AddLocalTarget(LoggingConfiguration config, string appName)
+        private static void AddLocalTarget(LoggingConfiguration config, string appName, LogLevel minimumLogLevel)
         {
             InternalLogger.LogFile = Path.Combine(Directory.GetCurrentDirectory(), $"logs\\nlog-internal.{appName}.log");
             var fileTarget = new FileTarget("Disk")
@@ -40,10 +40,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             };
             config.AddTarget(fileTarget);
 
-            config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "Disk");
+            config.AddRule(minimumLogLevel, LogLevel.Fatal, "Disk");
         }
 
-        private static void AddRedisTarget(LoggingConfiguration config, string appName)
+        private static void AddRedisTarget(LoggingConfiguration config, string appName, LogLevel minimumLogLevel)
         {
             var target = new RedisTarget
             {
@@ -56,10 +56,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             };
 
             config.AddTarget(target);
-            config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "RedisLog");
+            config.AddRule(minimumLogLevel, LogLevel.Fatal, "RedisLog");
         }
 
-        private static void AddAppInsights(LoggingConfiguration config)
+        private static void AddAppInsights(LoggingConfiguration config, LogLevel minimumLogLevel)
         {
             var target = new ApplicationInsightsTarget
             {
@@ -67,9 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             };
 
             config.AddTarget(target);
-            config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "AppInsightsLog");
+            config.AddRule(minimumLogLevel, LogLevel.Fatal, "AppInsightsLog");
         }
-
-        private static LogLevel GetMinLogLevel() => LogLevel.FromString("Info");
     }
 }
