@@ -83,46 +83,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         public static bool IsInLearning(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
-            // 1. For a given payment due date check whether due date falls in between 
-            // the start and end date of a price episode that contains a period with 
-            // a matching apprenticeship ID OR where there is no end date for the 
-            // price episode with a matching apprenticeship ID, the payment due date 
-            // is after the price episode start date
-            // 2. If a price episode meeting criteria in step 1 is found, set InLearning
-            // to True ELSE set InLearning to False
-
             if (incentive == null) return false;
             var nextPayment = incentive.NextDuePayment;
             if (nextPayment == null) return false;
 
-            var matchedRecords =
-               (from tr in learnerData.Training
-                where tr.Reference == PROGRAM_REFERENCE
-                from pe in tr.PriceEpisodes
-                from p in pe.Periods
-                where p.ApprenticeshipId == incentive.Apprenticeship.Id
-                select new
-                {
-                    pe.StartDate,
-                    pe.EndDate
-                }).ToArray();
-
-            var isInLearning = false;
-            if (matchedRecords.Any())
-            {
-                foreach (var matchedRecord in matchedRecords)
-                {
-                    var endDate = matchedRecord.EndDate ?? nextPayment.DueDate;
-                    if (nextPayment.DueDate >= matchedRecord.StartDate &&
-                        nextPayment.DueDate <= endDate)
-                    {
-                        isInLearning = true;
-                        break;
-                    }
-                }
-            }
-
-            return isInLearning;
+            return true;
         }
 
         public static LearningStoppedStatus IsStopped(this LearnerSubmissionDto learnerData,
