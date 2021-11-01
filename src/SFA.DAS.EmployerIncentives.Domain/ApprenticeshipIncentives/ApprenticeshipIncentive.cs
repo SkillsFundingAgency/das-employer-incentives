@@ -648,6 +648,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
         }
-
     }
 }

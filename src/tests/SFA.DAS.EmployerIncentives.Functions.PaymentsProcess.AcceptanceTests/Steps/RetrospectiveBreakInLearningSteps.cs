@@ -263,6 +263,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 && !x.ClawedBack).Should().Be(0);
         }
 
+        [Then(@"the Learner is In Learning")]
+        public async Task ThenTheLearnerIsInLearning()
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var learner = dbConnection.GetAll<Learner>()
+                .Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
+
+            learner.InLearning.Should().BeTrue();
+        }
+
         private void AssertPendingPayment(decimal amount, byte period, short year, EarningType earningType)
         {
             var pp = _newEarnings.Single(x =>
