@@ -29,10 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity
             var legalEntity = account.GetLegalEntity(command.AccountLegalEntityId);
             if (account.GetLegalEntity(command.AccountLegalEntityId) != null)
             {
-                if(!string.IsNullOrEmpty(legalEntity.HashedLegalEntityId))
-                    return; // already created
-            
                 legalEntity.SetHashedLegalEntityId(_hashingService.HashValue(command.LegalEntityId));
+                legalEntity.SetLegalEntityName(command.Name);
             }
             else
             {
