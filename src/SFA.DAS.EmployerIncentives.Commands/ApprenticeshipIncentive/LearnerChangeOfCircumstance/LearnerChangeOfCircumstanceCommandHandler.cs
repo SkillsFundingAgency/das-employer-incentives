@@ -43,7 +43,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             if (learner.HasFoundSubmission)
             {
-
                 if (learner.HasStartDate)
                 {
                     incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, paymentProfiles, collectionCalendar);
