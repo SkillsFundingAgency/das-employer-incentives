@@ -35,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(_context.TestDirectory.FullName, ".learningtransport") },
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ApplicationSettings:NServiceBusEndpointName", _context.InstanceId },
+                    { "ApplicationSettings:LogLevel", "Info" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
         }
