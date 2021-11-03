@@ -47,22 +47,6 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.UpsertLegalEntity.Han
         }
 
         [Test]
-        public async Task Then_the_the_account_is_not_persisted_to_the_domain_repository_if_it_already_exists()
-        {
-            //Arrange
-            var command = _fixture.Create<UpsertLegalEntityCommand>();
-            _mockDomainRespository
-                .Setup(m => m.Find(command.AccountId))
-                .ReturnsAsync(Account.Create(new AccountModel { Id = command.AccountId, LegalEntityModels = new Collection<LegalEntityModel> { new LegalEntityModel { Id = command.LegalEntityId, AccountLegalEntityId = command.AccountLegalEntityId, HashedLegalEntityId = "ABC123" } } }));
-
-            //Act
-            await _sut.Handle(command);
-
-            //Assert
-            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId)), Times.Never);
-        }
-
-        [Test]
         public async Task Then_an_existing_legal_entity_without_a_hashed_id_is_persisted_to_the_domain_repository()
         {
             //Arrange
@@ -79,6 +63,23 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.UpsertLegalEntity.Han
 
             //Assert
             _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId && i.LegalEntities.Single(x => x.Id == command.LegalEntityId).HashedLegalEntityId == expectedHash)), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_legal_entity_name_is_persisted_to_the_domain_repository()
+        {
+            //Arrange
+            var command = _fixture.Create<UpsertLegalEntityCommand>();
+            
+            _mockDomainRespository
+                .Setup(m => m.Find(command.AccountId))
+                .ReturnsAsync(Account.Create(new AccountModel { Id = command.AccountId, LegalEntityModels = new Collection<LegalEntityModel> { new LegalEntityModel { Id = command.LegalEntityId, AccountLegalEntityId = command.AccountLegalEntityId, HashedLegalEntityId = _fixture.Create<string>(), Name = _fixture.Create<string>() } } }));
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockDomainRespository.Verify(m => m.Save(It.Is<Account>(i => i.Id == command.AccountId && i.LegalEntities.Single(x => x.Id == command.LegalEntityId).Name == command.Name)), Times.Once);
         }
     }
 }
