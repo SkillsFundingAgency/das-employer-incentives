@@ -9,7 +9,7 @@
 	[SubmissionDate] DATETIME2 NULL,
 	[LearningFound] BIT NULL,
 	[HasDataLock] BIT NULL,
-	[LearningPeriodsChanged] BIT NULL,
+	[LearningPeriodsChanged] BIT NOT NULL DEFAULT(0),
 	[StartDate] DATETIME2 NULL,
 	[InLearning] BIT NULL,
 	[LearningStoppedDate] DATETIME2 NULL,
