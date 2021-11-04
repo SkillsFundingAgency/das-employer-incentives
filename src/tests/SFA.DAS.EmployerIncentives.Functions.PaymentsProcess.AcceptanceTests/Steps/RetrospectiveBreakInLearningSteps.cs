@@ -29,7 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Fixture _fixture;
         private readonly Account _accountModel;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
-        private LearnerSubmissionDto _resumedLearnerMatchApiData;
         private readonly PendingPayment _pendingPayment;
         private readonly Payment _payment;
 
@@ -41,7 +40,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _testContext = context;
             _fixture = new Fixture();
-            _accountModel = _fixture.Create<Account>();
+            _accountModel = _fixture.Build<Account>()                
+                .With(a => a.SignedAgreementVersion, Domain.ValueObjects.Phase2Incentive.MinimumAgreementVersion())
+                .Create();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
                 .With(p => p.DateOfBirth, DateTime.Now.AddYears(-24)) // under 25
@@ -53,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.Status, IncentiveStatus.Active)
                 .With(p => p.BreakInLearnings, new List<ApprenticeshipBreakInLearning>())
                 .With(p => p.Phase, Phase.Phase1)
+                .With(p => p.MinimumAgreementVersion, Domain.ValueObjects.Phase2Incentive.MinimumAgreementVersion())
                 .Create();
 
             _pendingPayment = _fixture.Build<PendingPayment>()
@@ -97,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _pendingPayment.PaymentYear = short.Parse(academicYear);
             _pendingPayment.PeriodNumber = byte.Parse(period);
             _pendingPayment.DueDate = _apprenticeshipIncentive.StartDate.AddDays(89);
-
+            
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_pendingPayment);
         }
@@ -120,6 +122,44 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_pendingPayment);
             await dbConnection.InsertAsync(_payment);
+        }
+
+        [Given(@"Learner data is updated with learning starting on (.*) and ending on (.*)")]
+        public void GivenLearningIsUpdatedWithNoBreakInLearning(DateTime learningStartDate, DateTime learningEndDate)
+        {
+            var learnerMatchApiData = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
+                .With(s => s.AcademicYear, _pendingPayment.PaymentYear.ToString())
+                .With(l => l.Training, new List<TrainingDto>
+                    {
+                        _fixture
+                            .Build<TrainingDto>()
+                            .With(p => p.Reference, "ZPROG001")
+                            .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>()
+                                {
+                                    _fixture.Build<PriceEpisodeDto>()
+                                        .With(x => x.AcademicYear, _pendingPayment.PaymentYear.ToString())
+                                        .With(pe => pe.StartDate, learningStartDate)
+                                        .With(pe => pe.EndDate, learningEndDate)
+                                        .With(pe => pe.Periods, new List<PeriodDto>()
+                                        {
+                                            _fixture.Build<PeriodDto>()
+                                                .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                                                .With(period => period.IsPayable, true)
+                                                .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                                .Create()
+                                        })
+                                        .Create()                                    
+                                }
+                            )
+                            .Create()
+                    }
+                )
+                .Create();
+
+            SetupMockLearnerMatchResponse(learnerMatchApiData);
         }
 
         [Given(@"Learner data is updated with a (.*) day Break in Learning before the first payment due date")]
@@ -150,7 +190,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _breakStart = start;
             _breakEnd = end;
 
-            _resumedLearnerMatchApiData = _fixture
+            var learnerMatchApiData = _fixture
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.Uln, _apprenticeshipIncentive.ULN)
@@ -196,9 +236,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 )
                 .Create();
 
-            SetupMockLearnerMatchResponse(_resumedLearnerMatchApiData);
+            SetupMockLearnerMatchResponse(learnerMatchApiData);
         }
 
+        [Given(@"the Learner Match is run in Period R(.*) (.*)")]
         [When(@"the Learner Match is run in Period R(.*) (.*)")]
         public async Task WhenTheLearnerMatchIsRunInPeriodR(byte period, short year)
         {
@@ -206,7 +247,73 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await StartLearnerMatching();
         }
 
+        [Given(@"the Payment Run occurs")]
+        public async Task ThePaymentProcessIsRun()
+        {
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "IncentivePaymentOrchestrator_HttpStart",
+                    nameof(IncentivePaymentOrchestrator),
+                    new Dictionary<string, object>
+                    {
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator/{_testContext.ActivePeriod.AcademicYear}/{_testContext.ActivePeriod.PeriodNumber}"
+                        },
+                        ["collectionPeriodYear"] = _testContext.ActivePeriod.AcademicYear,
+                        ["collectionPeriodNumber"] = _testContext.ActivePeriod.PeriodNumber
+                    },
+                    expectedCustomStatus: "WaitingForPaymentApproval"
+                ));
+
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+            var orchestratorStartResponse = await _testContext.TestFunction.GetOrchestratorStartResponse();
+            var status = await _testContext.TestFunction.GetStatus(orchestratorStartResponse.Id);
+            status.CustomStatus.ToObject<string>().Should().Be("WaitingForPaymentApproval");
+
+            await ApprovePayments(orchestratorStartResponse.Id);
+
+            status = await _testContext.TestFunction.GetStatus(orchestratorStartResponse.Id);
+            status.CustomStatus.ToObject<string>().Should().Be("PaymentProcessingCompleted");
+
+            await ThenTheBreakInLearningIsRecorded();
+        }
+
+        private async Task ApprovePayments(string orchestratorInstanceId)
+        {
+            _testContext.PaymentsApi.MockServer
+               .Given(
+                   Request
+                       .Create()
+                       .WithPath($"/payments/requests")
+                       .WithHeader("Content-Type", "application/payments-data")
+                       .WithParam("api-version", "2020-10-01")
+                       .UsingPost()
+               )
+               .RespondWith(Response.Create()
+                   .WithStatusCode(HttpStatusCode.Accepted)
+                   .WithHeader("Content-Type", "application/json"));
+
+            await _testContext.TestFunction.Start(
+                new OrchestrationStarterInfo(
+                    "PaymentApproval_HttpStart",
+                    nameof(IncentivePaymentOrchestrator),
+                    new Dictionary<string, object>
+                    {
+                        ["req"] = new DummyHttpRequest
+                        {
+                            Path = $"/api/orchestrators/approvePayments/{orchestratorInstanceId}"
+                        },
+                        ["instanceId"] = orchestratorInstanceId
+                    }
+                ));
+
+            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
         [When(@"the earnings are recalculated")]
+        [Then(@"the earnings are recalculated")]
         public void WhenTheEarningsAreRecalculated()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
@@ -224,6 +331,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             breaksInLearning.Count(b => b.EndDate != null).Should().Be(1);
             breaksInLearning.Single(b => b.EndDate != null).StartDate.Should().Be(_breakStart);
             breaksInLearning.Single(b => b.EndDate != null).EndDate.Should().Be(_breakEnd.AddDays(-1));
+        }
+
+        [Then(@"the Break in Learning is removed")]
+        public async Task ThenTheBreakInLearningIsRemoved()
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var breaksInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>()
+                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList();
+
+            breaksInLearning.Count.Should().Be(0);
         }
 
         [Then(@"no Break in Learning is recorded")]
@@ -246,6 +363,31 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void ThenANewSecondPendingPaymentOfIsCreated(int amount, byte period, short year)
         {
             AssertPendingPayment(amount, period, year, EarningType.SecondPayment);
+        }
+
+        [Given(@"the first pending payment of £(.*) is paid in Period R(.*) (.*)")]
+        public void ThenANewFirstPendingPaymentOfIsPaid(int amount, byte period, short year)
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var pendingPayments = dbConnection.GetAll<PendingPayment>()
+                .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList();
+            var payments = dbConnection.GetAll<Payment>()
+               .Where(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ToList();
+
+            var pp = pendingPayments.Single(x =>
+               x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+               && x.EarningType ==  EarningType.FirstPayment
+               && !x.ClawedBack);
+
+            pp.Amount.Should().Be(amount);
+            pp.PaymentMadeDate.Should().NotBeNull();
+
+            var p = payments.Single(x =>
+               x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id
+               && x.PendingPaymentId == pp.Id);
+
+            p.PaymentPeriod.Should().Be(period);
+            p.PaymentYear.Should().Be(year);
         }
 
         [Then(@"the first pending payment is not changed")]
@@ -302,6 +444,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         private void SetupMockLearnerMatchResponse(LearnerSubmissionDto learnerMatchApiData)
         {
+            _testContext.LearnerMatchApi.MockServer.Reset();
+
             _testContext.LearnerMatchApi.MockServer
                 .Given(
                     Request
