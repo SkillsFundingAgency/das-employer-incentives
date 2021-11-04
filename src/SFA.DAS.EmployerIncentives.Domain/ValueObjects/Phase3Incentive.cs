@@ -40,6 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         };
         public override List<EligibilityPeriod> EligibilityPeriods => _eligibilityPeriods;
 
+        public static int MinimumAgreementVersion() => 7;
+
         public static int MinimumAgreementVersion(DateTime startDate)
         {
             var applicablePeriod = _eligibilityPeriods.SingleOrDefault(x => x.StartDate <= startDate && x.EndDate >= startDate);
