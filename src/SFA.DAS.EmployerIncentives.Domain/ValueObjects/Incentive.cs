@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         protected abstract int DelayPeriod { get; }
 
-        protected abstract DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate);
+        protected abstract DateTime CalculateMinimumDueDate(PaymentProfile paymentProfile, DateTime submissionDate);
 
         protected Incentive(
             DateTime dateOfBirth, 
@@ -71,8 +71,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                var paymentDueDate = CalculateDueDate(paymentProfile, submissionDate);
-                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning));
+                var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+                var minimumDueDate = CalculateMinimumDueDate(paymentProfile, submissionDate);
+                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning, minimumDueDate));
                 paymentIndex++;
             }
 
