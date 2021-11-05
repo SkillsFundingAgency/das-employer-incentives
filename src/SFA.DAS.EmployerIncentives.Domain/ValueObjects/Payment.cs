@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         public DateTime PaymentDate { get; }
         public EarningType EarningType { get; }
 
-        public Payment(decimal amount, DateTime paymentDate, EarningType earningType, IEnumerable<BreakInLearning> breaksInLearning)
+        public Payment(decimal amount, DateTime paymentDate, EarningType earningType, IEnumerable<BreakInLearning> breaksInLearning, DateTime minimumDueDate)
         {
             if (amount <= 0) throw new ArgumentException("Amount must be greater than 0", nameof(amount));
 
@@ -26,6 +26,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 {
                     PaymentDate = PaymentDate.AddDays(breakInLearning.Days);
                 }
+            }
+
+            if (PaymentDate < minimumDueDate)
+            {
+                PaymentDate = minimumDueDate;
             }
         }
 

@@ -537,6 +537,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
         }
 
+        [Test]
+        public async Task Then_a_break_in_learning_is_not_added_when_the_first_earning_is_due_within_the_delay_period()
+        {
+            // Arrange
+            var submissionDate = _sutModel.StartDate.AddDays(20);
+            _sutModel.SubmittedDate = submissionDate;
+            var expectedDueDate = submissionDate.AddDays(21);
+            _sutModel.BreakInLearnings.Add(BreakInLearning.Create(_sutModel.StartDate.AddDays(1), _sutModel.StartDate.AddDays(2)));
+
+            // Act
+            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+
+            // Assert
+            _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
+        }
+
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
