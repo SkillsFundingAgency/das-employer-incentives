@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         [TestCase(3,false)]
         [TestCase(4,false)]
         [TestCase(5,false)]
-        [TestCase(6,true)]
+        [TestCase(6,false)]
         [TestCase(7,true)]
         public async Task Then_has_signed_agreement_version_is_set(int? signedAgreementVersion, bool expected)
         {
