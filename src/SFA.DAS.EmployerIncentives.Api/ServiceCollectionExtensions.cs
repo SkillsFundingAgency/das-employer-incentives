@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 
@@ -6,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddNLog(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddNLog(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             var nLogConfiguration = new NLogConfiguration();
 
@@ -21,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                 });
                 options.AddConsole();
 
-                nLogConfiguration.ConfigureNLog();
+                nLogConfiguration.ConfigureNLog(configuration["ApplicationSettings:LogLevel"]);
             });
 
             return serviceCollection;
