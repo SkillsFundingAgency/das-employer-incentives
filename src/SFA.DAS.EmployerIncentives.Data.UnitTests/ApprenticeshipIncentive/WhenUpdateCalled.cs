@@ -60,9 +60,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
             expected.ClawbackPaymentModels = clawbackPayments;
 
-            var breakInLearnings = _fixture.CreateMany<BreakInLearning>().ToList();
-            expected.BreakInLearnings = breakInLearnings;
-
             // Act
             await _sut.Update(expected);
             await _dbContext.SaveChangesAsync();
