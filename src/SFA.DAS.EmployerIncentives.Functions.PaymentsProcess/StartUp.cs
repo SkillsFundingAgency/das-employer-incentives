@@ -16,14 +16,9 @@ using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 using System;
 using System.Data.Common;
 using System.IO;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
-using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.NServiceBus.Services;
-using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Services;
-using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -32,7 +27,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddNLog();
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
 
@@ -63,6 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.Configure<MatchedLearnerApi>(config.GetSection("MatchedLearnerApi"));
             builder.Services.Configure<BusinessCentralApiClient>(config.GetSection("BusinessCentralApi"));
 
+            builder.Services.AddNLog(config);
             builder.Services.AddUnitOfWork();
 
             // Required for the sql unit of work

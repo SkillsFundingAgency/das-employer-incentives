@@ -8,15 +8,15 @@ Feature: LegalEntityDeleted
 
 Scenario: A legal entity has been removed from an account
 	Given a legal entity that is in employer incentives
-	When a legal entity is removed from an account
+	When the legal entity is removed from an account
 	Then the legal entity should no longer be available in employer incentives
 
 Scenario: A legal entity that has is not available  in employer incentives
-	Given a legal entity is not available in employer incentives
-	When a legal entity is removed from an account
+	Given the legal entity is in not available in Employer Incentives
+	When the legal entity is removed from an account
 	Then the legal entity is still not available in employer incentives
 
 Scenario: A legal entity with applications has been removed from an account
 	Given a legal entity has submitted one or more applications
-	When a legal entity is removed from an account
+	When the legal entity is removed from an account
 	Then the applications for that legal entity should be withdrawn
