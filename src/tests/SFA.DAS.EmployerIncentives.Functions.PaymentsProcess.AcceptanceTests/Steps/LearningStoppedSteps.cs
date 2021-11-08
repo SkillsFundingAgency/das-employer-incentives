@@ -203,6 +203,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(b => b.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(b => b.StartDate, _plannedStartDate.AddDays(_breakInLearning * -1))
                 .With(b => b.EndDate, (DateTime?)null)
+                .With(b => b.CreatedDate, DateTime.Today)
+                .Without(b => b.UpdatedDate)
                 .Create();
 
             _resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData = _fixture
@@ -392,6 +394,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             breakInLearning.Single().StartDate.Should().Be(_periodEndDate.AddDays(1));
             breakInLearning.Single().EndDate.Should().Be(null);
+            breakInLearning.Single().CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            breakInLearning.Single().UpdatedDate.Should().BeNull();
+
         }
 
         [Then(@"the learner resume break in learning is stored")]
@@ -403,6 +408,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             breakInLearning.StartDate.Should().Be(_stoppedDate.AddDays(1));
             breakInLearning.EndDate.Should().Be(_resumedDate.AddDays(-1));
+            breakInLearning.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            breakInLearning.UpdatedDate.Should().BeNull();
         }
 
         [Then(@"the learner data resumed date is stored")]

@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CollectionPeriod = SFA.DAS.EmployerIncentives.Domain.ValueObjects.CollectionCalendarPeriod;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -59,6 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var clawbackPayments = _fixture.Build<ClawbackPaymentModel>().With(
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
             expected.ClawbackPaymentModels = clawbackPayments;
+
+            var breakInLearnings = _fixture.CreateMany<BreakInLearning>().ToList();
+            expected.BreakInLearnings = breakInLearnings;
 
             // Act
             await _sut.Update(expected);
