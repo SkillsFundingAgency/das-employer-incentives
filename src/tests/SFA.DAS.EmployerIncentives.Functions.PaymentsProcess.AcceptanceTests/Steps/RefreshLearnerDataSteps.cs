@@ -398,8 +398,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var createdLearner = dbConnection.GetAll<Learner>().Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
             var createdDaysInLearning = dbConnection.GetAll<ApprenticeshipDaysInLearning>().Single(d => d.LearnerId == createdLearner.Id);
 
-            var firstEpisodeStartDate = DateTime.Parse("2020-01-01T00:00:00");
-            var expectedDaysInLearning = (int)(_testContext.ActivePeriod.CensusDate - firstEpisodeStartDate).TotalDays + 1; // breaks of 28 days and under are omitted
+            var firstEpisodeDaysInLearning = (int)(DateTime.Parse("2020-07-30T00:00:00") - DateTime.Parse("2020-01-01T00:00:00")).TotalDays + 1;
+            var secondEpisodeDaysInLearning = (int)(_testContext.ActivePeriod.CensusDate - DateTime.Parse("2020-08-10T00:00:00")).TotalDays + 1;
+            var expectedDaysInLearning = firstEpisodeDaysInLearning + secondEpisodeDaysInLearning;
 
             createdDaysInLearning.CollectionPeriodYear.Should().Be(Convert.ToInt16(_testContext.ActivePeriod.AcademicYear));
             createdDaysInLearning.CollectionPeriodNumber.Should().Be(_testContext.ActivePeriod.PeriodNumber);

@@ -172,7 +172,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
             for (var i = 0; i < periods.Count-1; i++)
             {
                 var gap = (periods[i + 1].StartDate - periods[i].EndDate).Days;
-                if (gap <= 28)
+                if (gap <= 1)
                 {
                     var start = MinDate(periods[i].StartDate, periods[i+1].StartDate);
                     var end = MaxDate(periods[i].EndDate, periods[i + 1].EndDate);
