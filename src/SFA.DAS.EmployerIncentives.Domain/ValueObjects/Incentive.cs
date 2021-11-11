@@ -15,9 +15,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         protected readonly DateTime StartDate;
-        private readonly List<Payment> _payments;
+        private readonly IEnumerable<PaymentProfile> _paymentProfiles;
+        private readonly IReadOnlyCollection<BreakInLearning> _breaksInLearning;
+        private readonly DateTime _submissionDate;
         public static readonly List<EarningType> EarningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
-        public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
+        public IReadOnlyCollection<Payment> Payments => Generate(_paymentProfiles, _breaksInLearning, _submissionDate).AsReadOnly();
         public abstract bool IsEligible { get; }
 
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
@@ -36,7 +38,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             _dateOfBirth = dateOfBirth;
             StartDate = startDate;
-            _payments = Generate(paymentProfiles, breaksInLearning, submissionDate);
+            _paymentProfiles = paymentProfiles;
+            _breaksInLearning = breaksInLearning;
+            _submissionDate = submissionDate;
         }
 
         public static Incentive Create(
@@ -58,7 +62,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return false;
         }
 
-        public static List<PaymentProfile> GetPaymentProfiles(Phase phase, DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
+        public int MinimumDaysInLearning(EarningType earningType)
+        {
+            var paymentProfile = _paymentProfiles.ElementAt(EarningTypes.IndexOf(earningType));
+            return paymentProfile.DaysAfterApprenticeshipStart;
+        }
+
+        private static List<PaymentProfile> GetPaymentProfiles(Phase phase, DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
         {
             var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
 

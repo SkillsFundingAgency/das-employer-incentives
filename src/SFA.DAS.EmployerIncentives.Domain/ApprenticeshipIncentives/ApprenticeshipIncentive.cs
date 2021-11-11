@@ -562,10 +562,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var hasEnoughDaysInLearning = false;
             if (matchedLearner != null)
             {
-                var paymentProfiles = Incentive.GetPaymentProfiles(Model.Phase.Identifier, Model.Apprenticeship.DateOfBirth, Model.StartDate, incentivePaymentProfiles);
-                var paymentProfile = paymentProfiles[Incentive.EarningTypes.IndexOf(pendingPayment.EarningType)];
-
-                hasEnoughDaysInLearning = matchedLearner.GetDaysInLearning(collectionPeriod) > paymentProfile.DaysAfterApprenticeshipStart;
+                var incentive = Incentive.Create(this, incentivePaymentProfiles);
+                hasEnoughDaysInLearning = matchedLearner.GetDaysInLearning(collectionPeriod) > incentive.MinimumDaysInLearning(pendingPayment.EarningType);
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasDaysInLearning, hasEnoughDaysInLearning));
