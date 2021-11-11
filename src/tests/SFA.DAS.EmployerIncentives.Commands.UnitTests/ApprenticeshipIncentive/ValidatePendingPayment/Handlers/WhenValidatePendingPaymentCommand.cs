@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.ValidatePendingPayment.Handlers
 {
@@ -27,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionCalendarPeriods;
+        private Mock<IIncentivePaymentProfilesService> _mockPaymentProfileService;
         private string _vrfVendorId;
         private Account _account;
         private LearnerModel _learnerModel;
@@ -46,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
+            _mockPaymentProfileService = new Mock<IIncentivePaymentProfilesService>();
 
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
@@ -97,6 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(m => m.PendingPaymentModels, pendingPayments)
                 .With(m => m.PausePayments, false)
                 .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
+                .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
                 .Create();
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
@@ -134,11 +139,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
 
+            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
+            _mockPaymentProfileService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
+
             _sut = new ValidatePendingPaymentCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
                 _mockCollectionCalendarService.Object,
-                _mockLearnerDomainRepository.Object);
+                _mockLearnerDomainRepository.Object,
+                _mockPaymentProfileService.Object);
         }
 
         [Test]
