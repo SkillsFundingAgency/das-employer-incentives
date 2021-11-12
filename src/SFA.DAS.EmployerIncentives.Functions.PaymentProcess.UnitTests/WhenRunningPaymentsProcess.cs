@@ -125,12 +125,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             // assert
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("SendPaymentsForAccountLegalEntityOrchestrator", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
 
             foreach (var entity in _payableLegalEntities)
             {
-                _mockOrchestrationContext.Verify(x => x.CallActivityAsync(
-                    "SendPaymentRequestsForAccountLegalEntity",
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                    "SendPaymentsForAccountLegalEntityOrchestrator",
                     It.Is<AccountLegalEntityCollectionPeriod>(input =>
                         input.AccountLegalEntityId == entity.AccountLegalEntityId &&
                         input.AccountId == entity.AccountId &&
@@ -196,12 +196,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             // assert
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendClawbacksForAccountLegalEntity", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("SendClawbacksForAccountLegalEntityOrchestrator", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
 
             foreach (var entity in clawbackLegalEntities)
             {
-                _mockOrchestrationContext.Verify(x => x.CallActivityAsync(
-                    "SendClawbacksForAccountLegalEntity",
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                    "SendClawbacksForAccountLegalEntityOrchestrator",
                     It.Is<AccountLegalEntityCollectionPeriod>(input =>
                         input.AccountLegalEntityId == entity.AccountLegalEntityId &&
                         input.AccountId == entity.AccountId &&

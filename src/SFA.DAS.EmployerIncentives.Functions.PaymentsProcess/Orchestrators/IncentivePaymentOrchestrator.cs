@@ -66,6 +66,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected", collectionPeriod);
                 return;
             }
+            context.SetCustomStatus("SendingClawbacks");
+            var sendClawbackTasks = new List<Task>();
+            foreach (var legalEntity in clawbackLegalEntities)
+            {
+                var sendClawbackTask = context.CallSubOrchestratorAsync(nameof(SendClawbacksForAccountLegalEntityOrchestrator), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+                sendClawbackTasks.Add(sendClawbackTask);
+            }
+            await Task.WhenAll(sendClawbackTasks);
+            context.SetCustomStatus("ClawbacksSent");
 
             context.SetCustomStatus("SendingPayments");
             _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been approved", collectionPeriod);
@@ -73,21 +82,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var sendPaymentTasks = new List<Task>();
             foreach (var legalEntity in payableLegalEntities)
             {
-                var sendPaymentTask = context.CallActivityAsync(nameof(SendPaymentRequestsForAccountLegalEntity), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+                var sendPaymentTask = context.CallSubOrchestratorAsync(nameof(SendPaymentsForAccountLegalEntityOrchestrator), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
                 sendPaymentTasks.Add(sendPaymentTask);
             }
             await Task.WhenAll(sendPaymentTasks);
             context.SetCustomStatus("PaymentsSent");
-
-            context.SetCustomStatus("SendingClawbacks");
-            var sendClawbackTasks = new List<Task>();
-            foreach (var legalEntity in clawbackLegalEntities)
-            {
-                var sendClawbackTask = context.CallActivityAsync(nameof(SendClawbacksForAccountLegalEntity), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
-                sendClawbackTasks.Add(sendClawbackTask);
-            }
-            await Task.WhenAll(sendClawbackTasks);
-            context.SetCustomStatus("ClawbacksSent");
 
             context.SetCustomStatus("CompletingPaymentProcessing");
             await context.CallActivityAsync(nameof(CompletePaymentProcess), new CompletePaymentProcessInput { CompletionDateTime = DateTime.UtcNow, CollectionPeriod = collectionPeriod });
