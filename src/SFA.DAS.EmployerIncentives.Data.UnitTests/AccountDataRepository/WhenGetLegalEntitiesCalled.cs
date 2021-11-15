@@ -82,5 +82,26 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             // Assert
             actual.IsAgreementSigned.Should().Be(expected);
         }
+
+        [TestCase(null, true)]
+        [TestCase("", true)]
+        [TestCase(" ", true)]
+        [TestCase("Requested", false)]
+        [TestCase("Case request completed", false)]
+        public async Task Then_bank_details_required_is_set(string vrfCaseStatus, bool expected)
+        {
+            // Arrange
+            var account = _fixture.Create<Models.Account>();
+            account.VrfCaseStatus = vrfCaseStatus;
+
+            await _context.Accounts.AddAsync(account);
+            await _context.SaveChangesAsync();
+
+            // Act
+            var actual = (await _sut.GetList(x => x.AccountId == account.Id)).Single();
+
+            // Assert
+            actual.BankDetailsRequired.Should().Be(expected);
+        }
     }
 }

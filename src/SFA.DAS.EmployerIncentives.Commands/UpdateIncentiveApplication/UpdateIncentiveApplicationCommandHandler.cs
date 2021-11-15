@@ -21,6 +21,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
         public async Task Handle(UpdateIncentiveApplicationCommand command, CancellationToken cancellationToken = default)
         {
             var application = await _domainRepository.Find(command.IncentiveApplicationId);
+            if(application.Status != Enums.IncentiveApplicationStatus.InProgress)
+            {
+                return;
+            }
+
             application.SetApprenticeships(command.Apprenticeships.ToEntities(_domainFactory));
 
             await _domainRepository.Save(application);
