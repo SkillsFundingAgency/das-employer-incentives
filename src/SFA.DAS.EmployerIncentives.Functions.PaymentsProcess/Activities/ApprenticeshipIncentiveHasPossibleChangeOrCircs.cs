@@ -22,9 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         [FunctionName(nameof(ApprenticeshipIncentiveHasPossibleChangeOrCircs))]
         public async Task<bool> Get([ActivityTrigger] Guid apprenticeshipIncentiveId)
         {
-            _logger.LogInformation("Checking whether apprenticeship incentive has possible change of circs {apprenticeshipIncentiveId}", apprenticeshipIncentiveId);
+            _logger.LogDebug("Checking whether apprenticeship incentive has possible change of circs {apprenticeshipIncentiveId}", apprenticeshipIncentiveId);
             var hasPossibleChangeOfCircs = (await _queryDispatcher.Send<ApprenticeshipIncentiveHasPossibleChangeOrCircsRequest, ApprenticeshipIncentiveHasPossibleChangeOrCircsResponse>(new ApprenticeshipIncentiveHasPossibleChangeOrCircsRequest(apprenticeshipIncentiveId))).HasPossibleChangeOfCircumstances;
-            _logger.LogInformation("Apprenticeship incentive {apprenticeshipIncentiveId} has possible change of circs = {hasPossibleChangeOfCircs}", apprenticeshipIncentiveId, hasPossibleChangeOfCircs);
+            _logger.LogDebug("Apprenticeship incentive {apprenticeshipIncentiveId} has possible change of circs = {hasPossibleChangeOfCircs}", apprenticeshipIncentiveId, hasPossibleChangeOfCircs);
             return hasPossibleChangeOfCircs;
         }
     }

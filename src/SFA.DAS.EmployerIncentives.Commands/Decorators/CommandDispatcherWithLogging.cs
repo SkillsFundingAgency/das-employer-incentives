@@ -30,22 +30,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
             {
                 if (domainLog.OnProcessing == null)
                 {
-                    log.LogInformation($"Start dispatch  '{typeof(T)}' command");
+                    log.LogDebug($"Start dispatch  '{typeof(T)}' command");
                 }
                 else
                 {
-                    log.LogInformation($"Start dispatch '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
+                    log.LogDebug($"Start dispatch '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
                 }
 
                 await _dispatcher.Send(command, cancellationToken);
 
                 if (domainLog.OnProcessed == null)
                 {
-                    log.LogInformation($"End dispatch '{typeof(T)}' command");
+                    log.LogDebug($"End dispatch '{typeof(T)}' command");
                 }
                 else
                 {
-                    log.LogInformation($"End dispatch '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
+                    log.LogDebug($"End dispatch '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
                 }
             }
             catch (Exception ex)

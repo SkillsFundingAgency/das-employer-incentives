@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         [FunctionName(nameof(GetActiveCollectionPeriod))]
         public async Task<CollectionPeriod> Get([ActivityTrigger] object input)
         {
-            _logger.LogInformation("Getting active collection period");
+            _logger.LogDebug("Getting active collection period");
             var activePeriodDto = (await _queryDispatcher.Send<GetActiveCollectionPeriodRequest, GetActiveCollectionPeriodResponse>(new GetActiveCollectionPeriodRequest())).CollectionPeriod;
             var activePeriod = new CollectionPeriod() { Period = activePeriodDto.CollectionPeriodNumber, Year = activePeriodDto.CollectionYear, IsInProgress = activePeriodDto.IsInProgress };
             _logger.LogInformation($"Active collection period number : {activePeriod.Period}, CollectionYear : {activePeriod.Year}");

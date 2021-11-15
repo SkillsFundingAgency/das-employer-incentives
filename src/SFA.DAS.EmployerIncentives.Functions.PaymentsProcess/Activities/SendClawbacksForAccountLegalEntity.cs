@@ -24,9 +24,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         {
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
-            _logger.LogInformation("[SendClawbacksForAccountLegalEntity] Publish SendClawbackRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
+            _logger.LogDebug("[SendClawbacksForAccountLegalEntity] Publish SendClawbackRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
             await _commandDispatcher.Send(new SendClawbacksCommand(accountLegalEntityId, DateTime.UtcNow));
-            _logger.LogInformation("[SendClawbacksForAccountLegalEntity] Published SendClawbacksCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
+            _logger.LogDebug("[SendClawbacksForAccountLegalEntity] Published SendClawbacksCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
             return true;
         }
     }

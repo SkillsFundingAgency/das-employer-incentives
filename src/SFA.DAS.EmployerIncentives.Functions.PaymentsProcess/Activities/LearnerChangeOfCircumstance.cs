@@ -21,9 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         [FunctionName(nameof(LearnerChangeOfCircumstanceActivity))]
         public async Task Update([ActivityTrigger] LearnerChangeOfCircumstanceInput input)
         {
-            _logger.LogInformation("Calling Learner Change of Circumstance for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
+            _logger.LogDebug("Calling Learner Change of Circumstance for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
             await _commandDispatcher.Send(new LearnerChangeOfCircumstanceCommand(input.ApprenticeshipIncentiveId));
-            _logger.LogInformation("Called Learner Change of Circumstance for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
+            _logger.LogDebug("Called Learner Change of Circumstance for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
         }
     }
 }

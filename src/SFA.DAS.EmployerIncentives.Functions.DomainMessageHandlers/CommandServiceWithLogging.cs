@@ -24,11 +24,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
 
             try
             {
-                log.LogInformation($"Start dispatch  '{typeof(T)}' domain command");
+                log.LogDebug($"Start dispatch  '{typeof(T)}' domain command");
 
                 await _commandService.Dispatch(command);
 
-                log.LogInformation($"End dispatch '{typeof(T)}' domain command");
+                log.LogDebug($"End dispatch '{typeof(T)}' domain command");
             }
             catch (Exception ex)
             {

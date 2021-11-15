@@ -29,11 +29,11 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
             {
                 if (domainLog.OnProcessing == null)
                 {
-                    _log.LogInformation($"Start handle '{typeof(T)}' event");
+                    _log.LogDebug($"Start handle '{typeof(T)}' event");
                 }
                 else
                 {
-                    _log.LogInformation($"Start handle '{typeof(T)}' event : {domainLog.OnProcessing.Invoke()}");
+                    _log.LogDebug($"Start handle '{typeof(T)}' event : {domainLog.OnProcessing.Invoke()}");
                 }
 
                 await _handler.Handle(@event, cancellationToken);
@@ -41,11 +41,11 @@ namespace SFA.DAS.EmployerIncentives.Events.Decorators
 
                 if (domainLog.OnProcessed == null)
                 {
-                    _log.LogInformation($"End handle '{typeof(T)}' event");
+                    _log.LogDebug($"End handle '{typeof(T)}' event");
                 }
                 else
                 {
-                    _log.LogInformation($"End handle '{typeof(T)}' event : {domainLog.OnProcessed.Invoke()}");
+                    _log.LogDebug($"End handle '{typeof(T)}' event : {domainLog.OnProcessed.Invoke()}");
                 }
             }
             catch (Exception ex)

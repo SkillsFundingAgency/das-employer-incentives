@@ -28,22 +28,22 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
             {
                 if (domainLog.OnProcessing == null)
                 {
-                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
+                    _log.LogDebug($"Start handle '{typeof(TQuery)}' query");
                 }
                 else
                 {
-                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query : {domainLog.OnProcessing.Invoke()}");
+                    _log.LogDebug($"Start handle '{typeof(TQuery)}' query : {domainLog.OnProcessing.Invoke()}");
                 }
 
                 var result = await _handler.Handle(query, cancellationToken);
 
                 if (domainLog.OnProcessed == null)
                 {
-                    _log.LogInformation($"End handle '{typeof(TQuery)}' query");
+                    _log.LogDebug($"End handle '{typeof(TQuery)}' query");
                 }
                 else
                 {
-                    _log.LogInformation($"End handle '{typeof(TQuery)}' query : {domainLog.OnProcessed.Invoke()}");
+                    _log.LogDebug($"End handle '{typeof(TQuery)}' query : {domainLog.OnProcessed.Invoke()}");
                 }
                 return result;
             }

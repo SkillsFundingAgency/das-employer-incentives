@@ -21,9 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         [FunctionName(nameof(CalculateEarningsActivity))]
         public async Task Update([ActivityTrigger] CalculateEarningsInput input)
         {
-            _logger.LogInformation("Calculating Earnings for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
+            _logger.LogDebug("Calculating Earnings for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
             await _commandDispatcher.Send(new CalculateEarningsCommand(input.ApprenticeshipIncentiveId));
-            _logger.LogInformation("Calculated Earnings for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
+            _logger.LogDebug("Calculated Earnings for apprenticeship incentive id {apprenticeshipIncentiveId}, uln {uln}", input.ApprenticeshipIncentiveId, input.Uln);
         }
     }
 }

@@ -24,9 +24,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         {
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
-            _logger.LogInformation("[SendPaymentRequestsForAccountLegalEntity] Publish SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
+            _logger.LogDebug("[SendPaymentRequestsForAccountLegalEntity] Publish SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
             await _commandDispatcher.Send(new SendPaymentRequestsCommand(accountLegalEntityId, DateTime.UtcNow));
-            _logger.LogInformation("[SendPaymentRequestsForAccountLegalEntity] Published SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
+            _logger.LogDebug("[SendPaymentRequestsForAccountLegalEntity] Published SendPaymentRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
             return true;
         }
     }

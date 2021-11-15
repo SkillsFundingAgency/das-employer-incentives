@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.QueryHandlerWithLogging
             await _sut.Handle(query);
 
             // Assert
-            _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"Start handle '{typeof(TestQuery)}' query");
+            _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"Start handle '{typeof(TestQuery)}' query");
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.QueryHandlerWithLogging
             await _sut.Handle(query);
 
             // Assert
-            _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"End handle '{typeof(TestQuery)}' query");
+            _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"End handle '{typeof(TestQuery)}' query");
         }
 
         [Test]

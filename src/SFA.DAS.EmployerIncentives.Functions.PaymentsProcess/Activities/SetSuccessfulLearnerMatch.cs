@@ -21,9 +21,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         [FunctionName(nameof(SetSuccessfulLearnerMatch))]
         public async Task Set([ActivityTrigger] SetSuccessfulLearnerMatchInput input)
         {
-            _logger.LogInformation("Setting SuccessfulLearnerMatch for apprenticeship incentive id {apprenticeshipIncentiveId}, ULN {uln}, Succeeded: {succeeded}", input.ApprenticeshipIncentiveId, input.Uln, input.Succeeded);
+            _logger.LogDebug("Setting SuccessfulLearnerMatch for apprenticeship incentive id {apprenticeshipIncentiveId}, ULN {uln}, Succeeded: {succeeded}", input.ApprenticeshipIncentiveId, input.Uln, input.Succeeded);
             await _commandDispatcher.Send(new SetSuccessfulLearnerMatchCommand(input.ApprenticeshipIncentiveId, input.Uln, input.Succeeded));
-            _logger.LogInformation("Set SuccessfulLearnerMatch for apprenticeship incentive id {apprenticeshipIncentiveId}, ULN {uln}, Succeeded: {succeeded}", input.ApprenticeshipIncentiveId, input.Uln, input.Succeeded);
+            _logger.LogDebug("Set SuccessfulLearnerMatch for apprenticeship incentive id {apprenticeshipIncentiveId}, ULN {uln}, Succeeded: {succeeded}", input.ApprenticeshipIncentiveId, input.Uln, input.Succeeded);
         }
     }
 }

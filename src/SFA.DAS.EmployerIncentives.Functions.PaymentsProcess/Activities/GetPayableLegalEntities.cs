@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         [FunctionName(nameof(GetPayableLegalEntities))]
         public async Task<List<PayableLegalEntityDto>> Get([ActivityTrigger]CollectionPeriod collectionPeriod)
         {
-            _logger.LogInformation("Getting payable legal entities for collection period {collectionPeriod}.", collectionPeriod);
+            _logger.LogDebug("Getting payable legal entities for collection period {collectionPeriod}.", collectionPeriod);
 			var legalEntities = await _queryDispatcher.Send<GetPayableLegalEntitiesRequest, GetPayableLegalEntitiesResponse>(new GetPayableLegalEntitiesRequest(collectionPeriod.Year, collectionPeriod.Period));
             var payableLegalEntitiesCount = legalEntities.PayableLegalEntities.Count;
             _logger.LogInformation("{payableLegalEntitiesCount} payable legal entities returned for collection period {collectionPeriod}.", payableLegalEntitiesCount, collectionPeriod);

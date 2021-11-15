@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         [FunctionName(nameof(SetActivePeriodToInProgress))]
         public async Task Update([ActivityTrigger] object input)
         {
-            _logger.LogInformation("Setting active collection period to in progress");
+            _logger.LogDebug("Setting active collection period to in progress");
             await _commandDispatcher.Send(new SetActivePeriodToInProgressCommand());
             _logger.LogInformation("Active collection period set to in progress");
         }
