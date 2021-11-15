@@ -52,6 +52,15 @@
                             "ApprenticeshipEmployerType": 1,
                             "TransferSenderAccountId": 0,
                             "DataLockFailures": null
+                        },
+                        {
+                            "Period": 4,
+                            "IsPayable": true,
+                            "AccountId": 5115,
+                            "ApprenticeshipId": 511526,
+                            "ApprenticeshipEmployerType": 1,
+                            "TransferSenderAccountId": 0,
+                            "DataLockFailures": null
                         }
                     ]
                 }

@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         [SetUp]
         public void Arrange()
         {
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
             _sut = new ApprenticeshipIncentives.LearnerDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
@@ -35,10 +36,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             submissionData.SetLearningData(new LearningData(true));
             submissionData.LearningData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
+            submissionData.LearningData.SetLearningPeriodsChanged();
 
             var testLearner =
                 _fixture.Build<LearnerModel>()
                 .With(l => l.SubmissionData, submissionData)
+                .Without(l => l.LearningPeriods)
                 .Create();
 
             // Act
@@ -61,6 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             result.SubmissionData.LearningData.StartDate.Should().BeNull();
             result.SubmissionData.LearningData.IsInlearning.Should().BeNull();
             result.SubmissionData.LearningData.StoppedStatus.LearningStopped.Should().BeFalse();
+            result.SubmissionData.LearningData.LearningPeriodsChanged.Should().BeTrue();
             result.SubmissionData.RawJson.Should().Be(testLearner.SubmissionData.RawJson);
         }
 

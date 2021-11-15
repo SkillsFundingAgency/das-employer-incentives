@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LearningPeriod = SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes.LearningPeriod;
@@ -21,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         [SetUp]
         public void Arrange()
         {
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
@@ -38,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         {
             // Arrange
             var existingLearner =
-                _fixture.Build<ApprenticeshipIncentives.Models.Learner>()
+                _fixture.Build<ApprenticeshipIncentives.Models.Learner>().Without(l => l.LearningPeriods)
                 .Create();
             _dbContext.Learners.Add(existingLearner);
             await _dbContext.SaveChangesAsync();
@@ -56,6 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
                 _fixture.Build<LearnerModel>()
                 .With(l => l.Id, existingLearner.Id)
                 .With(l => l.SubmissionData, submissionData)
+                .Without(l => l.LearningPeriods)
                 .Create();
 
             // Act
@@ -90,9 +93,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             await _dbContext.AddAsync(existingLearner);
             await _dbContext.SaveChangesAsync();
 
+            var learningPeriods  = new List<LearningPeriod>() {
+                new LearningPeriod(new DateTime(2021,1,2),new DateTime(2021,2,2)),
+                new LearningPeriod(new DateTime(2021,3,2),new DateTime(2021,4,2)),
+                new LearningPeriod(new DateTime(2021,5,2),new DateTime(2021,6,2)),
+            };
+
             var testLearner =
                 _fixture.Build<LearnerModel>()
                 .With(l => l.Id, existingLearner.Id)
+                .With(l => l.LearningPeriods, learningPeriods)
                 .Create();
 
             var lp = existingLearner.LearningPeriods.First();
@@ -120,6 +130,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             var testLearner =
                 _fixture.Build<LearnerModel>()
                     .With(l => l.Id, existingLearner.Id)
+                    .Without(l => l.LearningPeriods)
                     .Create();
 
             var d = existingLearner.DaysInLearnings.First();
