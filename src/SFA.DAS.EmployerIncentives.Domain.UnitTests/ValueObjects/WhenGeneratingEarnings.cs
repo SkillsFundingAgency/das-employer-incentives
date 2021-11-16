@@ -23,40 +23,40 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
             new List<BreakInLearning>
             {
                 BreakInLearning.Create(StartDate.AddDays(1), StartDate.AddDays(15))
-            },90+14, 365+14);
+            },89+14, 364+14);
 
         private static readonly GenerateEarningsTestCase two_breaks_before_first_payment = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
                 BreakInLearning.Create(StartDate.AddDays(1), StartDate.AddDays(15)),
                 BreakInLearning.Create(StartDate.AddDays(1), StartDate.AddDays(7))
-            }, 90 + 14 + 6, 365 + 14 + 6);
+            }, 89 + 14 + 6, 364 + 14 + 6);
 
         private static readonly GenerateEarningsTestCase one_break_after_first_payment_before_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
                 BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
-            }, 90, 365 + 9);
+            }, 89, 364 + 9);
 
         private static readonly GenerateEarningsTestCase two_breaks_after_first_payment_before_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
                 BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
                 BreakInLearning.Create(StartDate.AddDays(200), StartDate.AddDays(300)),
-            },90, 365 + 9 + 100);
+            }, 89, 364 + 9 + 100);
 
         private static readonly GenerateEarningsTestCase one_break_after_second_payment = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
                 BreakInLearning.Create(StartDate.AddDays(366), StartDate.AddDays(400))
-            }, 90, 365);
+            }, 89, 364);
 
         private static readonly GenerateEarningsTestCase one_break_after_first_payment_one_after_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
                 BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
                 BreakInLearning.Create(StartDate.AddDays(400), StartDate.AddDays(444)),
-            }, 90, 365 + 9);
+            }, 89, 364 + 9);
 
         private static readonly GenerateEarningsTestCase two_breaks_after_first_payment_one_after_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
@@ -64,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                 BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
                 BreakInLearning.Create(StartDate.AddDays(222), StartDate.AddDays(333)),
                 BreakInLearning.Create(StartDate.AddDays(600), StartDate.AddDays(700)),
-            }, 90, 365 + 9 + 111);
+            }, 89, 364 + 9 + 111);
 
         private static readonly GenerateEarningsTestCase[] GenerateEarningsTestCases =
         {
