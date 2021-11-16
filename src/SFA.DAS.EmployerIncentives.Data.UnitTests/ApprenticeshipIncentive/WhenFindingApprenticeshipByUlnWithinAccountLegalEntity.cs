@@ -2,14 +2,13 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -18,14 +17,13 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
         private Fixture _fixture;
         private EmployerIncentivesDbContext _dbContext;
-        private ApprenticeshipIncentiveModel _testIncentive;
         private long _uln;
         private long _accountLegalEntityId;
 
         [SetUp]
         public async Task Arrange()
         {
-            _fixture = new Fixture();
+            _fixture = new Fixture();           
             _uln = _fixture.Create<long>();
             _accountLegalEntityId = _fixture.Create<long>();
 
@@ -35,7 +33,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
             await AddApprenticeshipIncentiveModel(_accountLegalEntityId, _uln);
-            await AddApprenticeshipIncentiveModel(_accountLegalEntityId, _uln + 1);
             await AddApprenticeshipIncentiveModel(_accountLegalEntityId+1, _uln);
         }
 

@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerDomainRepository
         public void Arrange()
         {
             _fixture = new Fixture();
-
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
             _learnerDataRepositoryMock = new Mock<ILearnerDataRepository>();
             _learnerFactoryMock = new Mock<ILearnerFactory>();
             _domainEventDispatcherMock = new Mock<IDomainEventDispatcher>();

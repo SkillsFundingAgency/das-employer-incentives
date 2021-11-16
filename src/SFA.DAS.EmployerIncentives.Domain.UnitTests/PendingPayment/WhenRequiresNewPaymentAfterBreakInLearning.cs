@@ -51,8 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_is_false_when_due_date_is_on_start_date_of_a_resumed_break_from_learning()
         {
             // arrange            
-            var breakInLearning = new BreakInLearning(_sutModel.DueDate);
-            breakInLearning.SetEndDate(_sutModel.DueDate.AddDays(10));
+            var breakInLearning = BreakInLearning.Create(_sutModel.DueDate, _sutModel.DueDate.AddDays(10));
             var breakInLearnings = new List<BreakInLearning>()
             {
                 breakInLearning
@@ -69,8 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_is_false_when_due_date_is_before_start_date_of_a_resumed_break_from_learning()
         {
             // arrange            
-            var breakInLearning = new BreakInLearning(_sutModel.DueDate.AddDays(1));
-            breakInLearning.SetEndDate(_sutModel.DueDate.AddDays(10));
+            var breakInLearning = BreakInLearning.Create(_sutModel.DueDate.AddDays(1), _sutModel.DueDate.AddDays(10));
             var breakInLearnings = new List<BreakInLearning>()
             {
                 breakInLearning

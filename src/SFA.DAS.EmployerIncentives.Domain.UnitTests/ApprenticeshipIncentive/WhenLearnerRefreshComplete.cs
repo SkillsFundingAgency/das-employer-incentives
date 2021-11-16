@@ -2,6 +2,8 @@
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -16,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Arrange()
         {
             _fixture = new Fixture();
-
+            
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.RefreshedLearnerForEarnings, false).Create();
             
             _sut = Sut(_sutModel);

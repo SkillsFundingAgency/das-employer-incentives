@@ -169,10 +169,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
                 if (existingBreakInLearning != null)
                 {
+                    breakInLearning.CreatedDate = existingBreakInLearning.CreatedDate;
+
                     _dbContext.Entry(existingBreakInLearning).CurrentValues.SetValues(breakInLearning);
+                    if (_dbContext.Entry(existingBreakInLearning).State == EntityState.Modified)
+                    {
+                        existingBreakInLearning.UpdatedDate = DateTime.Now;
+                    }
                 }
                 else
                 {
+                    breakInLearning.CreatedDate = DateTime.Now;
                     _dbContext.BreakInLearnings.Add(breakInLearning);
                 }
             }

@@ -48,48 +48,48 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         private static readonly GenerateEarningsTestCase one_break_before_first_payment = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
-                new BreakInLearning(StartDate.AddDays(1)).SetEndDate(StartDate.AddDays(15))
+                BreakInLearning.Create(StartDate.AddDays(1), StartDate.AddDays(15))
             },90+14, 365+14);
 
         private static readonly GenerateEarningsTestCase two_breaks_before_first_payment = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
-                new BreakInLearning(StartDate.AddDays(1)).SetEndDate(StartDate.AddDays(15)),
-                new BreakInLearning(StartDate.AddDays(1)).SetEndDate(StartDate.AddDays(7))
+                BreakInLearning.Create(StartDate.AddDays(1), StartDate.AddDays(15)),
+                BreakInLearning.Create(StartDate.AddDays(1), StartDate.AddDays(7))
             }, 90 + 14 + 6, 365 + 14 + 6);
 
         private static readonly GenerateEarningsTestCase one_break_after_first_payment_before_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
-                new BreakInLearning(StartDate.AddDays(91)).SetEndDate(StartDate.AddDays(100)),
+                BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
             }, 90, 365 + 9);
 
         private static readonly GenerateEarningsTestCase two_breaks_after_first_payment_before_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
-                new BreakInLearning(StartDate.AddDays(91)).SetEndDate(StartDate.AddDays(100)),
-                new BreakInLearning(StartDate.AddDays(200)).SetEndDate(StartDate.AddDays(300)),
+                BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
+                BreakInLearning.Create(StartDate.AddDays(200), StartDate.AddDays(300)),
             },90, 365 + 9 + 100);
 
         private static readonly GenerateEarningsTestCase one_break_after_second_payment = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
-                new BreakInLearning(StartDate.AddDays(366)).SetEndDate(StartDate.AddDays(400))
+                BreakInLearning.Create(StartDate.AddDays(366), StartDate.AddDays(400))
             }, 90, 365);
 
         private static readonly GenerateEarningsTestCase one_break_after_first_payment_one_after_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
-                new BreakInLearning(StartDate.AddDays(91)).SetEndDate(StartDate.AddDays(100)),
-                new BreakInLearning(StartDate.AddDays(400)).SetEndDate(StartDate.AddDays(444)),
+                BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
+                BreakInLearning.Create(StartDate.AddDays(400), StartDate.AddDays(444)),
             }, 90, 365 + 9);
 
         private static readonly GenerateEarningsTestCase two_breaks_after_first_payment_one_after_second = new GenerateEarningsTestCase(
             new List<BreakInLearning>
             {
-                new BreakInLearning(StartDate.AddDays(91)).SetEndDate(StartDate.AddDays(100)),
-                new BreakInLearning(StartDate.AddDays(222)).SetEndDate(StartDate.AddDays(333)),
-                new BreakInLearning(StartDate.AddDays(600)).SetEndDate(StartDate.AddDays(700)),
+                BreakInLearning.Create(StartDate.AddDays(91), StartDate.AddDays(100)),
+                BreakInLearning.Create(StartDate.AddDays(222), StartDate.AddDays(333)),
+                BreakInLearning.Create(StartDate.AddDays(600), StartDate.AddDays(700)),
             }, 90, 365 + 9 + 111);
 
         private static readonly GenerateEarningsTestCase[] GenerateEarningsTestCases =
@@ -151,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             var breaks = new List<BreakInLearning>
             {
-                new BreakInLearning(date).SetEndDate(date.AddDays(breakInLearning))
+                BreakInLearning.Create(date, date.AddDays(breakInLearning))
             };
             var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
                 .WithStartDate(date)

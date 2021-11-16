@@ -36,10 +36,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             submissionData.LearningData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
 
+            var periods = new[]
+            {
+            new LearningPeriod(new DateTime(2020, 9, 1),new DateTime(2021, 6, 30)),
+            new LearningPeriod(new DateTime(2021, 8, 1),new DateTime(2022, 7, 31)),
+            };
+
             var testLearner =
-                _fixture.Build<LearnerModel>()
-                .With(l => l.SubmissionData, submissionData)
-                .Create();
+            _fixture.Build<LearnerModel>()
+            .With(l => l.LearningPeriods, periods)
+            .With(l => l.SubmissionData, submissionData)
+            .Create();
 
             // Act
             await _sut.Add(testLearner);
@@ -66,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         [Test(Description = "This test is required to validate data persisted in a format prior to changes made for EI-632/636 can be reloaded")]
         public async Task Then_the_learner_is_retrieved_when_learning_found_is_null()
         {
-            var testLearner = _fixture.Create<ApprenticeshipIncentives.Models.Learner>();
+            var testLearner = _fixture.Build<ApprenticeshipIncentives.Models.Learner>().Without(l=>l.LearningPeriods).Create();
             testLearner.SubmissionFound = false;
             testLearner.SubmissionDate = null;
             testLearner.LearningFound = null;
