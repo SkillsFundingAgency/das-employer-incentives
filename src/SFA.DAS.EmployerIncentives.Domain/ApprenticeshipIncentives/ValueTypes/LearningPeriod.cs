@@ -6,14 +6,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
     public class LearningPeriod : ValueObject
     {
-        public LearningPeriod(DateTime startDate, DateTime? endDate)
+        public LearningPeriod(DateTime startDate, DateTime endDate)
         {
-            StartDate = startDate;
-            EndDate = endDate;
+            if (startDate > endDate)
+            {
+                throw new ArgumentException("End date of learning period can't be before the start date");
+            }
+
+            else
+            {
+                StartDate = startDate;
+                EndDate = endDate;
+            }
         }
 
         public DateTime StartDate { get; }
-        public DateTime? EndDate { get; }
+        public DateTime EndDate { get; }
 
         protected override IEnumerable<object> GetAtomicValues()
         {

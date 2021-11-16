@@ -17,14 +17,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         protected readonly DateTime StartDate;
-        private readonly List<Payment> _payments;
-        private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
-        public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
+        private readonly IEnumerable<PaymentProfile> _paymentProfiles;
+        private readonly IReadOnlyCollection<BreakInLearning> _breaksInLearning;
+        private readonly DateTime _submissionDate;
+        public static readonly List<EarningType> EarningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
+        public IReadOnlyCollection<Payment> Payments => Generate(_paymentProfiles, _breaksInLearning, _submissionDate).AsReadOnly();
         public abstract bool IsEligible { get; }
         public abstract List<PaymentProfile> PaymentProfiles { get; }
         public abstract List<EligibilityPeriod> EligibilityPeriods { get; }
 
+        private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
+        private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2021, 09, 30);
+
         protected abstract int? DelayPeriod { get; }
+
+        protected abstract DateTime CalculateMinimumDueDate(PaymentProfile paymentProfile, DateTime submissionDate);
 
         protected Incentive(
             DateTime dateOfBirth, 
@@ -35,7 +42,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             _dateOfBirth = dateOfBirth;
             StartDate = startDate;
-            _payments = Generate(incentiveType, breaksInLearning, submissionDate);
+            _paymentProfiles = paymentProfiles;
+            _breaksInLearning = breaksInLearning;
+            _submissionDate = submissionDate;
         }
 
         public static Incentive Create(
@@ -91,6 +100,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
 
             return Phase3Incentive.StartDatesAreEligible(apprenticeship);
+		}
+
+        public int MinimumDaysInLearning(EarningType earningType)
+        {
+            var paymentProfile = _paymentProfiles.ElementAt(EarningTypes.IndexOf(earningType));
+            return paymentProfile.DaysAfterApprenticeshipStart;
+        }
+
+        private static List<PaymentProfile> GetPaymentProfiles(Phase phase, DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
+        {
+            var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
+
+            if (incentivePaymentProfile?.PaymentProfiles == null)
+            {
+                throw new MissingPaymentProfileException($"Incentive Payment profile not found for IncentivePhase {phase}");
+            }
+
+            var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
+
+            var paymentProfiles = incentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).ToList();
+
+            if (!paymentProfiles.Any())
+            {
+                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
+            }
+
+            return paymentProfiles;
         }
 
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
@@ -112,8 +148,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                var paymentDueDate = CalculateDueDate(paymentProfile, submissionDate);
-                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning));
+                var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+                var minimumDueDate = CalculateMinimumDueDate(paymentProfile, submissionDate);
+                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, EarningTypes[paymentIndex], breaksInLearning, minimumDueDate));
                 paymentIndex++;
             }
 
@@ -159,7 +196,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             DateTime submissionDate)
         {
 
-            var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
+            var paymentProfiles = GetPaymentProfiles(phase, dateOfBirth, startDate, incentivePaymentProfiles);
 
             if (phase == Phase.Phase1)
             {

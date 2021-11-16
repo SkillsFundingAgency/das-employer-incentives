@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Arrange()
         {
             _fixture = new Fixture();
-
+            
             var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
                 new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true, false),

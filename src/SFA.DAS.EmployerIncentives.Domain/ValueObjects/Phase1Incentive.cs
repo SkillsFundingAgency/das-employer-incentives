@@ -32,6 +32,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
                 new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, daysAfterApprenticeshipStart: 364, amountPayable: 750)
             };
 
+        protected override DateTime CalculateMinimumDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
+        {
+            return StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+        }
+
         public override List<EligibilityPeriod> EligibilityPeriods => _eligibilityPeriods;
         private static List<EligibilityPeriod> _eligibilityPeriods = new List<EligibilityPeriod>
         {

@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid LearnerId { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
         public DateTime? CreatedDate { get; set; }
     }
 }

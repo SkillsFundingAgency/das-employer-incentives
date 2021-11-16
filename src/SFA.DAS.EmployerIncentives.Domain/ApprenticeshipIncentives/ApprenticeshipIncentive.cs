@@ -8,13 +8,11 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using PaymentsResumed = SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events.PaymentsResumed;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
@@ -34,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IncentiveStatus Status => Model.Status;
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
         private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
-        public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.ToList().AsReadOnly();
+        public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.OrderBy(b => b.StartDate).ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
         public DateTime SubmissionDate => Model.SubmittedDate.Value;
@@ -129,11 +127,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             RemoveUnpaidPaymentIfExists(existingPendingPayment);
             if (!existingPendingPayment.EquivalentTo(pendingPayment))
             {
-                if(!existingPendingPayment.RequiresNewPaymentAfterBreakInLearning(Model.BreakInLearnings))
-                {
-                    return;
-                }
-
                 var existingPendingPaymentModel = existingPendingPayment.GetModel();
                 if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
                 {
@@ -291,35 +284,28 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 Model));
             }
         }
-        private void StartBreakInLearning(DateTime startDate)
+
+        public void SetBreaksInLearning(IList<LearningPeriod> periods, IEnumerable<IncentivePaymentProfile> paymentProfiles, CollectionCalendar collectionCalendar)
         {
-            if(Model.BreakInLearnings.Any(b => b.StartDate == startDate.Date))
+            var breaks = new List<BreakInLearning>();
+            for (var i = 0; i < periods.Count - 1; i++)
             {
-                return;
+                var start = periods[i].EndDate.AddDays(1);
+                var end = periods[i + 1].StartDate.AddDays(-1);
+
+                breaks.Add(BreakInLearning.Create(start, end));
             }
 
-            Model.BreakInLearnings.Add(new BreakInLearning(startDate));
+            if (breaks.SequenceEqual(BreakInLearnings)) return;
+
+            Model.BreakInLearnings = breaks;
+            CalculateEarnings(paymentProfiles, collectionCalendar);
         }
 
-        private void StopBreakInLearning(LearningStoppedStatus status)
+        private void StartBreakInLearning(DateTime startDate)
         {
-            var stopDate = status.DateResumed.Value.AddDays(-1);
-            if (Model.BreakInLearnings.Any(b => b.EndDate == stopDate.Date) || Model.BreakInLearnings.Count == 0)
-            {
-                return;
-            }
-
-            var activeBreak = Model.BreakInLearnings.Single(b => !b.EndDate.HasValue);
-            if (stopDate.Date <= activeBreak.StartDate) // EI-1195
-            {
-                Model.BreakInLearnings.Remove(activeBreak);
-                status.Undo();
-                AddEvent(new BreakInLearningDeleted(Model.Id));
-            }
-            else
-            {
-                Model.BreakInLearnings.Single(b => !b.EndDate.HasValue).SetEndDate(stopDate);
-            }
+            if (Model.BreakInLearnings.Any(b => b.StartDate == startDate.Date && !b.EndDate.HasValue)) return;
+            Model.BreakInLearnings.Add(new BreakInLearning(startDate));
         }
 
         public void SetLearningStoppedChangeOfCircumstance(
@@ -335,19 +321,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.Id,
                     learningStoppedStatus.DateStopped.Value));
             }
-            else if(Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped && learningStoppedStatus.DateResumed != null)
+            else if (Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped &&
+                     learningStoppedStatus.DateResumed != null)
             {
                 Model.Status = IncentiveStatus.Active;
-                StopBreakInLearning(learningStoppedStatus);
-                                
-                if (learningStoppedStatus.DateResumed.HasValue)
-                {
-                    CalculateEarnings(collectionCalendar);
 
-                    AddEvent(new LearningResumed(
-                        Model.Id,
-                        learningStoppedStatus.DateResumed.Value));
-                }
+                AddEvent(new BreakInLearningDeleted(Model.Id));
+                CalculateEarnings(collectionCalendar);
+                AddEvent(new LearningResumed(
+                    Model.Id,
+                    learningStoppedStatus.DateResumed.Value));
             }
         }
 
@@ -569,14 +552,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.RefreshedLearnerForEarnings = true;
         }
 
-        public void ValidateDaysInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod)
+        public void ValidateDaysInLearning(Guid pendingPaymentId, Learner matchedLearner, CollectionPeriod collectionPeriod, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
             var hasEnoughDaysInLearning = false;
             if (matchedLearner != null)
             {
-                hasEnoughDaysInLearning = StartDate.Date.AddDays(matchedLearner.GetDaysInLearning(collectionPeriod)) >= pendingPayment.DueDate.Date;
+                var incentive = Incentive.Create(this, incentivePaymentProfiles);
+                hasEnoughDaysInLearning = matchedLearner.GetDaysInLearning(collectionPeriod) > incentive.MinimumDaysInLearning(pendingPayment.EarningType);
             }
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasDaysInLearning, hasEnoughDaysInLearning));
@@ -644,7 +628,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return next?.Map();
         }
 
-        public void ValidateLearningData(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
+        public void ValidateLearningData(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
         {
             ValidateLearnerMatchSuccessful(pendingPaymentId, learner, collectionPeriod);
             if (!learner.SuccessfulLearnerMatch) return;
@@ -655,8 +639,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateHasLearningRecord(pendingPaymentId, learner, collectionPeriod);
             ValidateIsInLearning(pendingPaymentId, learner, collectionPeriod);
             ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
-            ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod);
+            ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod, incentivePaymentProfiles);
         }
-
     }
 }
