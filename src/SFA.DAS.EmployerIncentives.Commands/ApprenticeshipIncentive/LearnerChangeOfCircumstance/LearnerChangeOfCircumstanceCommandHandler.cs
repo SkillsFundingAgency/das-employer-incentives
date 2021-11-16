@@ -34,14 +34,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
             var collectionCalendar = await _collectionCalendarService.Get();
-            var paymentProfiles = (await _incentivePaymentProfilesService.Get()).ToList();
-
-            incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), paymentProfiles, collectionCalendar);
+            incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), collectionCalendar);
 
             if (learner.HasFoundSubmission)
             {
-				var collectionCalendar = await _collectionCalendarService.Get();
-                if (learner.HasStartDate)
+				if (learner.HasStartDate)
                 {
                     incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, collectionCalendar);
                 }

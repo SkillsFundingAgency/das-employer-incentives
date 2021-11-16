@@ -7,7 +7,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +21,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private Fixture _fixture;
         private Learner _learner;
         private CollectionCalendar _collectionCalendar;
-        private IEnumerable<IncentivePaymentProfile> _paymentProfiles;
 
         [SetUp]
         public void Arrange()
@@ -35,8 +33,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             };
 
             _collectionCalendar = new CollectionCalendar(new List<AcademicYear> { new AcademicYear("2021", new DateTime(2021, 7, 31)) }, collectionPeriods);
-            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.Status, IncentiveStatus.Active).Create();
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>
             {
@@ -81,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _paymentProfiles, _collectionCalendar);
+            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar);
 
             // Assert
             _sut.BreakInLearnings.Should().BeEquivalentTo(expected);
@@ -100,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _paymentProfiles, _collectionCalendar);
+            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar);
 
             // Assert
             var @event = _sut.FlushEvents().Single(e => e is EarningsCalculated) as EarningsCalculated;
@@ -130,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _paymentProfiles, _collectionCalendar);
+            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar);
 
             // Assert
             _sut.FlushEvents().Any(e => e is EarningsCalculated).Should().BeFalse();

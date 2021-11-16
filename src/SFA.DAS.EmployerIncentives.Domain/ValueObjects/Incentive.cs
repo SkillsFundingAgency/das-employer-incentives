@@ -17,11 +17,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         protected readonly DateTime StartDate;
-        private readonly IEnumerable<PaymentProfile> _paymentProfiles;
+        private readonly IncentiveType _incentiveType;
         private readonly IReadOnlyCollection<BreakInLearning> _breaksInLearning;
         private readonly DateTime _submissionDate;
         public static readonly List<EarningType> EarningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
-        public IReadOnlyCollection<Payment> Payments => Generate(_paymentProfiles, _breaksInLearning, _submissionDate).AsReadOnly();
+        public IReadOnlyCollection<Payment> Payments => Generate(_incentiveType, _breaksInLearning, _submissionDate).AsReadOnly();
         public abstract bool IsEligible { get; }
         public abstract List<PaymentProfile> PaymentProfiles { get; }
         public abstract List<EligibilityPeriod> EligibilityPeriods { get; }
@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             _dateOfBirth = dateOfBirth;
             StartDate = startDate;
-            _paymentProfiles = paymentProfiles;
+            _incentiveType = incentiveType;
             _breaksInLearning = breaksInLearning;
             _submissionDate = submissionDate;
         }
@@ -104,31 +104,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         public int MinimumDaysInLearning(EarningType earningType)
         {
-            var paymentProfile = _paymentProfiles.ElementAt(EarningTypes.IndexOf(earningType));
+            var paymentProfile = PaymentProfiles.ElementAt(EarningTypes.IndexOf(earningType));
             return paymentProfile.DaysAfterApprenticeshipStart;
         }
-
-        private static List<PaymentProfile> GetPaymentProfiles(Phase phase, DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
-        {
-            var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
-
-            if (incentivePaymentProfile?.PaymentProfiles == null)
-            {
-                throw new MissingPaymentProfileException($"Incentive Payment profile not found for IncentivePhase {phase}");
-            }
-
-            var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
-
-            var paymentProfiles = incentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).ToList();
-
-            if (!paymentProfiles.Any())
-            {
-                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
-            }
-
-            return paymentProfiles;
-        }
-
+        
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
         {
             return dateOfBirth.AgeOnThisDay(startDate);
@@ -157,24 +136,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return payments;
         }
 
-        private DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
-        {
-            if (DelayPeriod == null)
-            {
-                return StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
-            }
-
-            var minimumDueDate = submissionDate.Date.AddDays(DelayPeriod.Value);
-
-            var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
-            if (paymentDueDate < minimumDueDate)
-            {
-                paymentDueDate = minimumDueDate;
-            }
-
-            return paymentDueDate;
-        }
-
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return _dateOfBirth;
@@ -196,7 +157,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             DateTime submissionDate)
         {
 
-            var paymentProfiles = GetPaymentProfiles(phase, dateOfBirth, startDate, incentivePaymentProfiles);
+            var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
 
             if (phase == Phase.Phase1)
             {

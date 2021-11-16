@@ -25,6 +25,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private static readonly DateTime EmployerEligibilityEndDate = new DateTime(2022, 01, 31);
         public override bool IsEligible => StartDate >= EligibilityStartDate && StartDate <= EligibilityEndDate;
         protected override int? DelayPeriod => 21;
+        
+        protected override DateTime CalculateMinimumDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
+        {
+            var minimumDueDate = submissionDate.Date.AddDays(DelayPeriod.Value);
+
+            var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+            if (paymentDueDate < minimumDueDate)
+            {
+                paymentDueDate = minimumDueDate;
+            }
+
+            return paymentDueDate;
+        }
+
         public override List<PaymentProfile> PaymentProfiles =>
             new List<PaymentProfile>
             {
