@@ -38,6 +38,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly DateTime _plannedStartDate;
         private readonly DateTime _periodEndDate;
         private readonly int _breakInLearning;
+        private readonly DateTime _resumedDate;
+        private readonly DateTime _stoppedDate;
 
         public LearningStoppedSteps(TestContext testContext)
         {
@@ -45,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _fixture = new Fixture();
 
             _plannedStartDate = new DateTime(2020, 8, 1);
-            _breakInLearning = 15;
+            _breakInLearning = 29;
             _accountModel = _fixture.Create<Account>();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
@@ -111,28 +113,51 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 )
                 .Create();
 
+            _resumedDate = _plannedStartDate.AddDays(100).AddDays(_breakInLearning);
+            _stoppedDate = _plannedStartDate.AddDays(100);
+
             _resumedLearnerMatchApiData = _fixture
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.Uln, _apprenticeshipIncentive.ULN)
                 .With(s => s.AcademicYear, "2021")
-                .With(l => l.Training, new List<TrainingDto> {
-                    _fixture
-                        .Build<TrainingDto>()
-                        .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>().With(x => x.AcademicYear,"2021")
-                            .With(pe => pe.Periods, new List<PeriodDto>(){
-                                _fixture.Build<PeriodDto>()
-                                    .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
-                                    .With(period => period.IsPayable, true)
-                                    .With(period => period.Period, _pendingPayment.PeriodNumber)
-                                    .Create()
-                            })
-                            .With(pe => pe.StartDate, _plannedStartDate)
-                            .With(pe => pe.EndDate, DateTime.Today.AddDays(10))
-                            .Create() }
-                        )
-                        .Create()}
+                .With(l => l.Training, new List<TrainingDto>
+                    {
+                        _fixture
+                            .Build<TrainingDto>()
+                            .With(p => p.Reference, "ZPROG001")
+                            .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>()
+                                {
+                                    _fixture.Build<PriceEpisodeDto>().With(x => x.AcademicYear, "2021")
+                                        .With(pe => pe.Periods, new List<PeriodDto>()
+                                        {
+                                            _fixture.Build<PeriodDto>()
+                                                .With(period => period.ApprenticeshipId,
+                                                    _apprenticeshipIncentive.ApprenticeshipId)
+                                                .With(period => period.IsPayable, true)
+                                                .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                                .Create()
+                                        })
+                                        .With(pe => pe.StartDate, _plannedStartDate)
+                                        .With(pe => pe.EndDate, _stoppedDate)
+                                        .Create(),
+                                    _fixture.Build<PriceEpisodeDto>().With(x => x.AcademicYear, "2021")
+                                        .With(pe => pe.Periods, new List<PeriodDto>()
+                                        {
+                                            _fixture.Build<PeriodDto>()
+                                                .With(period => period.ApprenticeshipId,
+                                                    _apprenticeshipIncentive.ApprenticeshipId)
+                                                .With(period => period.IsPayable, true)
+                                                .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                                .Create()
+                                        })
+                                        .With(pe => pe.StartDate, _resumedDate)
+                                        .Without(pe => pe.EndDate)
+                                        .Create()
+                                }
+                            )
+                            .Create()
+                    }
                 )
                 .Create();
 
@@ -178,6 +203,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(b => b.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(b => b.StartDate, _plannedStartDate.AddDays(_breakInLearning * -1))
                 .With(b => b.EndDate, (DateTime?)null)
+                .With(b => b.CreatedDate, DateTime.Today)
+                .Without(b => b.UpdatedDate)
                 .Create();
 
             _resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData = _fixture
@@ -367,18 +394,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             breakInLearning.Single().StartDate.Should().Be(_periodEndDate.AddDays(1));
             breakInLearning.Single().EndDate.Should().Be(null);
+            breakInLearning.Single().CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            breakInLearning.Single().UpdatedDate.Should().BeNull();
+
         }
 
         [Then(@"the learner resume break in learning is stored")]
         public void ThenTheLearnerResumeBreakInLearningIsStored()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var breakInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>();
+            var breakInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>()
+                .Single(x => x.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id);
 
-            var temp = breakInLearning.Single();
-            breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            breakInLearning.Single().StartDate.Should().Be(_plannedStartDate.AddDays(_breakInLearning * -1));
-            breakInLearning.Single().EndDate.Should().Be(_plannedStartDate.AddDays(-1));
+            breakInLearning.StartDate.Should().Be(_stoppedDate.AddDays(1));
+            breakInLearning.EndDate.Should().Be(_resumedDate.AddDays(-1));
+            breakInLearning.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            breakInLearning.UpdatedDate.Should().BeNull();
         }
 
         [Then(@"the learner data resumed date is stored")]
@@ -387,7 +418,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var learner = dbConnection.GetAll<Learner>();
 
-            learner.Single().LearningResumedDate.Should().Be(_plannedStartDate);
+            learner.Single().LearningResumedDate.Should().Be(_resumedDate);
             learner.Single().LearningStoppedDate.Should().Be(null);
         }
 
@@ -398,7 +429,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             var learner = dbConnection.GetAll<Learner>();
 
             learner.Single().LearningStoppedDate.Should().BeNull();
-            //learner.Single().LearningResumedDate.Should().BeNull();
         }
 
         [Then(@"the incentive is updated to active")]
@@ -430,7 +460,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             change.PreviousValue.Should().Be(string.Empty);
-            change.NewValue.Should().Be(_plannedStartDate.ToString("yyyy-MM-dd"));
+            change.NewValue.Should().Be(_resumedDate.ToString("yyyy-MM-dd"));
             change.ChangedDate.Should().Be(DateTime.Today);
         }
 
