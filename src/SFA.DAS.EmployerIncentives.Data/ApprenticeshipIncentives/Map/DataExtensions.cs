@@ -285,6 +285,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     learner.SubmissionData.LearningData.SetIsStopped(new LearningStoppedStatus(false, model.LearningResumedDate.Value));
                 }
 
+                learner.SubmissionData.LearningData.SetLearningPeriodsChanged(model.LearningPeriodsChanged);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
@@ -301,19 +302,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Ukprn = model.Ukprn,
                 ULN = model.UniqueLearnerNumber,
                 LearningPeriods = model.LearningPeriods.Map(model.Id),
-                DaysInLearnings = model.DaysInLearnings.Map(model.Id)
+                DaysInLearnings = model.DaysInLearnings.Map(model.Id),
+                SubmissionFound = model.SubmissionData.SubmissionFound,
+                LearningFound = model.SubmissionData.LearningData.LearningFound,
+                SubmissionDate = model.SubmissionData.SubmissionDate,
+                StartDate = model.SubmissionData.LearningData.StartDate,
+                HasDataLock = model.SubmissionData.LearningData.HasDataLock,
+                InLearning = model.SubmissionData.LearningData.IsInlearning,
+                RawJSON = model.SubmissionData.RawJson,
+                LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped,
+                LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed,
+                SuccessfulLearnerMatchExecution = model.SuccessfulLearnerMatch,
+                LearningPeriodsChanged = model.SubmissionData.LearningData.LearningPeriodsChanged
             };
 
-            learner.SubmissionFound = model.SubmissionData.SubmissionFound;
-            learner.LearningFound = model.SubmissionData.LearningData.LearningFound;
-            learner.SubmissionDate = model.SubmissionData.SubmissionDate;
-            learner.StartDate = model.SubmissionData.LearningData.StartDate;
-            learner.HasDataLock = model.SubmissionData.LearningData.HasDataLock;
-            learner.InLearning = model.SubmissionData.LearningData.IsInlearning;
-            learner.RawJSON = model.SubmissionData.RawJson;
-            learner.LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped;
-            learner.LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed;
-            learner.SuccessfulLearnerMatchExecution = model.SuccessfulLearnerMatch;
             return learner;
         }
 
@@ -358,7 +360,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             var newBreakInLearning = new BreakInLearning(model.StartDate);
             if (model.EndDate.HasValue)
             {
-                newBreakInLearning.SetEndDate(model.EndDate.Value);
+                newBreakInLearning = BreakInLearning.Create(model.StartDate, model.EndDate.Value);
             }
 
             return newBreakInLearning;

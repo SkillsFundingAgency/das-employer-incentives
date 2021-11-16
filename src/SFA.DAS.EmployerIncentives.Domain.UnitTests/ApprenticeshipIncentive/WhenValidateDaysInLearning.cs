@@ -8,6 +8,8 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -20,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private LearnerModel _learnerModel;
         private short _collectionYear;
         private Fixture _fixture;
+        private List<IncentivePaymentProfile> _paymentProfiles;
 
         [SetUp]
         public void Arrange()
@@ -36,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel = _fixture
                 .Build<ApprenticeshipIncentiveModel>()
                 .With(a => a.StartDate, startDate)
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
                 .With(a => a.PendingPaymentModels, new List<PendingPaymentModel>() 
                     {
                         _fixture.Build<PendingPaymentModel>()
@@ -47,9 +51,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learnerModel = _fixture
                 .Build<LearnerModel>()
                 .With(l => l.DaysInLearnings, new List<DaysInLearning>() { new DaysInLearning(_collectionPeriod, 90) })
+                .Without(l => l.LearningPeriods)
                 .Create();
 
-            _learner = Learner.Get(_learnerModel);                
+            _learner = Learner.Get(_learnerModel);
+
+            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
             _sut = Sut(_sutModel);
         }
@@ -61,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var pendingPayment = _sut.PendingPayments.First();
 
             // act
-            _sut.ValidateDaysInLearning(pendingPayment.Id, null, _collectionPeriod);
+            _sut.ValidateDaysInLearning(pendingPayment.Id, null, _collectionPeriod, _paymentProfiles);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
@@ -87,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner = Learner.Get(_learnerModel);
 
             // act
-            _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
+            _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod, _paymentProfiles);
 
             // assert            
             pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);

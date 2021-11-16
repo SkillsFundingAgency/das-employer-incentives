@@ -65,7 +65,7 @@ Scenario: Request to refresh learner data for a new Apprenticeship Incentive wit
 
 Scenario: Request to refresh learner data for an Apprenticeship Incentive where learner data no longer exists
 	Given an apprenticeship incentive exists and has previously been refreshed
-	And the aprenticeship incentive does not have a corresponding learner match record
+	And the apprenticeship incentive does not have a corresponding learner match record
 	When the learner data is refreshed for the apprenticeship incentive
 	Then the apprenticeship incentive learner data is updated for the application with default submission data
 	

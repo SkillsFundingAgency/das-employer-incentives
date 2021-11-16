@@ -8,7 +8,6 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using CollectionPeriod = SFA.DAS.EmployerIncentives.Domain.ValueObjects.CollectionCalendarPeriod;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {

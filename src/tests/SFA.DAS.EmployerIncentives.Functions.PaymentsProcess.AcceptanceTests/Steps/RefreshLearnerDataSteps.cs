@@ -120,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await GivenAnApprenticeshipIncentiveExists();
         }
 
-        [Given(@"the aprenticeship incentive does not have a corresponding learner match record")]
+        [Given(@"the apprenticeship incentive does not have a corresponding learner match record")]
         public void GivenTheApprenticeshipIncentiveDoesNotHaveACorrespondingLearnerMatchRecord()
         {
             _testContext.LearnerMatchApi.MockServer
