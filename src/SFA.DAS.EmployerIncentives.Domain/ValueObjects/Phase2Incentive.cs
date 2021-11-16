@@ -50,7 +50,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         }
 
         public new static bool StartDatesAreEligible(Apprenticeship apprenticeship)
-        protected override DateTime CalculateMinimumDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
         {
             if (apprenticeship.Phase != Phase.Phase2)
             {
@@ -70,6 +69,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
 
             return false;
+        }
+
+        protected override DateTime CalculateMinimumDueDate(PaymentProfile paymentProfile, DateTime submissionDate)
+        {
+
         }
     }
 }
