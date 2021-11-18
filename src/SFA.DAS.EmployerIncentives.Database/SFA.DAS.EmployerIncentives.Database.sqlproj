@@ -122,7 +122,4 @@
     <None Include="Scripts\Generate.MonthEndMetrics.sql" />
     <None Include="Scripts\Metrics Template.xlsx" />
   </ItemGroup>
-  <ItemGroup>
-    <PreDeploy Include="Scripts\AddLearningPeriodsChangedToLearner.sql" />
-  </ItemGroup>
 </Project>
