@@ -10,12 +10,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
     public class CalculateDaysInLearning
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly ILogger<CalculateDaysInLearning> _logger;
-
-        public CalculateDaysInLearning(ICommandDispatcher commandDispatcher, ILogger<CalculateDaysInLearning> logger)
+        
+        public CalculateDaysInLearning(ICommandDispatcher commandDispatcher)
         {
             _commandDispatcher = commandDispatcher;
-            _logger = logger;
         }
 
         [FunctionName(nameof(CalculateDaysInLearning))]
