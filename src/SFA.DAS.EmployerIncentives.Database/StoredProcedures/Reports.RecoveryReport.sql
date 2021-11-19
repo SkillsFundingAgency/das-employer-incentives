@@ -32,8 +32,7 @@ AS
 		@vendorsSQL NVARCHAR(MAX) = '',
 		@SQL NVARCHAR(MAX) = '',
 		@QUERY NVARCHAR(MAX) = ''
-		
-	--SET @periodIdStart = (SELECT TOP 1 ID FROM [incentives].[CollectionCalendar] WHERE CensusDate >= GETDATE() ORDER BY ID) 
+			
 	SET @periodIdStart = (SELECT ID FROM [incentives].[CollectionCalendar] WHERE Active = 1) 
 	SET @3MonthPeriodId = @periodIdStart + 2
 	SET @12MonthPeriodId = @periodIdStart + 11
