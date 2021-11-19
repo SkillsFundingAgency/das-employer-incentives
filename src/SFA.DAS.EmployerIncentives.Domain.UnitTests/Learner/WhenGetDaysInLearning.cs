@@ -21,9 +21,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
         public void Arrange()
         {
             _fixture = new Fixture();
-
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
             _sutModel = _fixture
                 .Build<LearnerModel>()
+                .Without(l => l.LearningPeriods)
                 .Create();
 
             _collectionPeriod = _fixture.Create<CollectionPeriod>();
