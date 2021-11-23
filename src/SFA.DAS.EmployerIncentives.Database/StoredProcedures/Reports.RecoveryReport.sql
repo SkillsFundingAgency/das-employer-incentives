@@ -87,6 +87,7 @@ AS
 		AND pp.PaymentYear = cb.AcademicYear
 		AND pp.PeriodNumber = cb.PeriodNumber
 		AND pp.ClawedBack = 0
+		AND pp.PaymentMadeDate IS NULL
 
 		LEFT OUTER JOIN
 		(
