@@ -1,8 +1,8 @@
 ﻿namespace SFA.DAS.EmployerIncentives.Abstractions.Logging
 {
-    public interface ILogWriter
+    public interface IResponseLogWriter
     {
         [System.Text.Json.Serialization.JsonIgnore]
-        public Log Log { get; }
+        public ResponseLog Log { get; }
     }
 }

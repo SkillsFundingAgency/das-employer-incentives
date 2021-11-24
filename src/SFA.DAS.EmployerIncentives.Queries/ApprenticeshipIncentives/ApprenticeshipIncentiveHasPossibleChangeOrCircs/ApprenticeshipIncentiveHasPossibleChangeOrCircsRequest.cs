@@ -4,7 +4,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.ApprenticeshipIncentiveHasPossibleChangeOrCircs
 {
-    public class ApprenticeshipIncentiveHasPossibleChangeOrCircsRequest : IQuery, ILogWriter
+    public class ApprenticeshipIncentiveHasPossibleChangeOrCircsRequest : IQuery, IRequestLogWriterWithArgs
     {
         public ApprenticeshipIncentiveHasPossibleChangeOrCircsRequest(Guid apprenticeshipIncentiveId)
         {
@@ -12,15 +12,17 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.Apprentice
         }
 
         public Guid ApprenticeshipIncentiveId { get; }
-        public Log Log
+
+        [Newtonsoft.Json.JsonIgnore]
+        public RequestLogWithArgs Log
         {
             get
             {
-                var message = $"Apprenticeship Incentive Has Possible Change of Circumstances Query for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}";
-                return new Log
+                var message = "Checking whether apprenticeship incentive has possible change of circs {apprenticeshipIncentiveId}";
+                return new RequestLogWithArgs
                 {
-                    OnProcessing = () => message,
-                    OnError = () => message
+                    OnProcessing = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId }),
+                    OnError = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId })
                 };
             }
         }

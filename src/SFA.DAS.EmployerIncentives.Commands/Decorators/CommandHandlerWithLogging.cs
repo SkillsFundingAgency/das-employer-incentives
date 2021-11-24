@@ -26,36 +26,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 
             try
             {
-                if (domainLog.OnProcessing == null)
-                {
-                    _log.LogDebug($"Start handle '{typeof(T)}' command");
-                }
-                else
-                {
-                    _log.LogDebug($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
-                }
+                _log.LogDebug($"Start handle command '{typeof(T)}' : {domainLog.OnProcessing.Invoke()}");
 
                 await _handler.Handle(command, cancellationToken);
 
-                if (domainLog.OnProcessed == null)
-                {
-                    _log.LogDebug($"End handle '{typeof(T)}' command");
-                }
-                else
-                {
-                    _log.LogDebug($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
-                }
+                _log.LogDebug($"End handle command '{typeof(T)}' : {domainLog.OnProcessed.Invoke()}");
             }
             catch(Exception ex)
             {
-                if (domainLog.OnError == null)
-                {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' command");
-                }
-                else
-                {
-                    _log.LogError(ex, $"Error handling '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
-                }
+                _log.LogError(ex, $"Error handling command '{typeof(T)}' : {domainLog.OnError.Invoke()}");
 
                 throw;
             }
