@@ -23,9 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         [FunctionName(nameof(CompletePaymentProcess))]
         public async Task Complete([ActivityTrigger] CompletePaymentProcessInput input)
         {
-            _logger.LogInformation("Completing payment process");
             await _commandDispatcher.Send(new CompleteCommand(input.CompletionDateTime, new Domain.ValueObjects.CollectionPeriod(input.CollectionPeriod.Period, input.CollectionPeriod.Year)));
-            _logger.LogInformation("Payment process completed for collection period {collectionPeriod}", input.CollectionPeriod);
         }
     }
 }

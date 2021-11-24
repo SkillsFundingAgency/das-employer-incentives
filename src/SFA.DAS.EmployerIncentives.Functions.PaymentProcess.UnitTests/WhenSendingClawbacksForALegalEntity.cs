@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -25,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             
-            _sut = new SendClawbacksForAccountLegalEntity(_mockCommandDispatcher.Object, Mock.Of<ILogger<SendClawbacksForAccountLegalEntity>>());
+            _sut = new SendClawbacksForAccountLegalEntity(_mockCommandDispatcher.Object);
         }
 
         [Test]

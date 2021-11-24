@@ -40,7 +40,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             };
             config.AddTarget(fileTarget);
 
-            config.AddRule(minimumLogLevel, LogLevel.Fatal, "Disk");
+            var eiFileTarget = new FileTarget("EI_Disk")
+            {
+                FileName = Path.Combine(Directory.GetCurrentDirectory(), $"logs\\{appName}.${{shortdate}}-EI.log"),
+                Layout = fileTarget.Layout
+            };
+            config.AddTarget(eiFileTarget);
+
+            var consoleTarget = new ColoredConsoleTarget("Console")
+            {
+                Layout = fileTarget.Layout
+            };
+            config.AddTarget(consoleTarget);
+
+            var debuggerTarget = new DebuggerTarget("Debugger")
+            {
+                Layout = consoleTarget.Layout
+            };
+            config.AddTarget(debuggerTarget);
+
+            config.AddRule(minimumLogLevel, LogLevel.Fatal, "Disk", "*");
+            config.AddRule(minimumLogLevel, LogLevel.Fatal, "EI_Disk", "SFA.DAS.*");
+            config.AddRule(minimumLogLevel, LogLevel.Fatal, "Console", "SFA.DAS.*");
+            config.AddRule(minimumLogLevel, LogLevel.Fatal, "Debugger", "SFA.DAS.*");
         }
 
         private static void AddRedisTarget(LoggingConfiguration config, string appName, LogLevel minimumLogLevel)

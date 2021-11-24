@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         [FunctionName(nameof(CreatePayment))]
         public async Task Create([ActivityTrigger] CreatePaymentInput input)
         {
-            await _commandDispatcher.Send(new CreatePaymentCommand(input.ApprenticeshipIncentiveId, input.PendingPaymentId, input.CollectionPeriod.Year, input.CollectionPeriod.Period));
+            await _commandDispatcher.Send(new CreatePaymentCommand(input.ApprenticeshipIncentiveId, input.PendingPaymentId, new Domain.ValueObjects.CollectionPeriod(input.CollectionPeriod.Period, input.CollectionPeriod.Year)));
         }
     }
 }

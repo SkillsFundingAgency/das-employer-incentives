@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
 
                     var processed = responseLog.OnProcessed.Invoke();
 
-                    _log.LogDebug($"End handle query '{typeof(TQuery)}'; Request : {processing.Item1}; Response :- {processed.Item1}", processing.Item2.Concat(processed.Item2).ToArray());
+                    _log.LogDebug($"End handle query '{typeof(TQuery)}'; Request : {processing.Item1}; Response : {processed.Item1}", processing.Item2.Concat(processed.Item2).ToArray());
 
                     return result;
                 }

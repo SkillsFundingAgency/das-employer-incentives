@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess
 {
-    public class CompleteCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class CompleteCommand : DomainCommand, ILockIdentifier, ILogWriterWithArgs
     {
         public DateTime CompletionDateTime { get; }
         public Domain.ValueObjects.CollectionPeriod CollectionPeriod { get; }
@@ -19,15 +19,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
         }
 
         [Newtonsoft.Json.JsonIgnore]
-        public Log Log
+        public LogWithArgs Log
         {
             get
             {
-                var message = $"Payment Process CompleteCommand for period {CollectionPeriod.PeriodNumber} and year {CollectionPeriod.AcademicYear} and date {CompletionDateTime}";
-                return new Log
+                return new LogWithArgs
                 {
-                    OnProcessing = () => message,
-                    OnError = () => message
+                    OnProcessing = () => new Tuple<string, object[]>("Completing payment process", new object[] { }),
+                    OnProcessed = () => new Tuple<string, object[]>("Payment process completed for collection period {collectionPeriod}", new object[] { CollectionPeriod }),
+                    OnError = () => new Tuple<string, object[]>("Completing payment process", new object[] { })
                 };
             }
         }

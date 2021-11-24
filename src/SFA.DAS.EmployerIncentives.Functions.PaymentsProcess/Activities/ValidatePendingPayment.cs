@@ -11,20 +11,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class ValidatePendingPayment
     {
-        private readonly ICommandDispatcher _commandDispatcher;
-        private readonly ILogger<ValidatePendingPayment> _logger;
+        private readonly ICommandDispatcher _commandDispatcher;        
 
-        public ValidatePendingPayment(ICommandDispatcher commandDispatcher, ILogger<ValidatePendingPayment> logger)
+        public ValidatePendingPayment(ICommandDispatcher commandDispatcher)
         {
             _commandDispatcher = commandDispatcher;
-            _logger = logger;
         }
 
         [FunctionName(nameof(ValidatePendingPayment))]
         public async Task Validate([ActivityTrigger] ValidatePendingPaymentData payment)
         {
-            _logger.LogDebug("Validating Pending Payment [PendingPaymentId={pendingPaymentId}], [collection period={year}/{period}], [ApprenticeshipIncentiveId={apprenticeshipIncentiveId}]",
-               payment.PendingPaymentId, payment.Year, payment.Period, payment.ApprenticeshipIncentiveId);
             try
             {
                 await _commandDispatcher.Send(new ValidatePendingPaymentCommand(payment.ApprenticeshipIncentiveId,

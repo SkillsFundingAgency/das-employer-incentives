@@ -1,6 +1,5 @@
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -16,7 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
     {
         private ValidatePendingPayment _sut;
         private Mock<ICommandDispatcher> _commandDispatcherMock;
-        private Mock<ILogger<ValidatePendingPayment>> _loggerMock;
         private ValidatePendingPaymentData _payment;
 
         [SetUp]
@@ -25,10 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             var fixture = new Fixture();
 
             _commandDispatcherMock = new Mock<ICommandDispatcher>();
-            _loggerMock = new Mock<ILogger<ValidatePendingPayment>>();
             _payment = fixture.Create<ValidatePendingPaymentData>();
 
-            _sut = new ValidatePendingPayment(_commandDispatcherMock.Object, _loggerMock.Object);
+            _sut = new ValidatePendingPayment(_commandDispatcherMock.Object);
            
         }
 
