@@ -29,12 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Api
                 {
                     configFile = "nlog.local.config";
                 }
-                serviceCollection.AddLogging(logBuilder =>
-                {
-                    logBuilder.AddFilter("SFA.DAS", LogLevel.Information); // this is because all logging is filtered out by default
-                    var rootDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), ".."));
-                    logBuilder.AddNLog(Directory.GetFiles(rootDirectory, configFile, SearchOption.AllDirectories)[0]);
-                });
+                var rootDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), ".."));
+                options.AddNLog(Directory.GetFiles(rootDirectory, configFile, SearchOption.AllDirectories)[0]);
             });
 
             return serviceCollection;
