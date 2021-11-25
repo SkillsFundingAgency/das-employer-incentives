@@ -287,7 +287,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     learner.SubmissionData.LearningData.SetIsStopped(new LearningStoppedStatus(false, model.LearningResumedDate.Value));
                 }
 
-                learner.SubmissionData.LearningData.SetLearningPeriodsChanged(model.LearningPeriodsChanged);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
@@ -315,7 +314,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped,
                 LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed,
                 SuccessfulLearnerMatchExecution = model.SuccessfulLearnerMatch,
-                LearningPeriodsChanged = model.SubmissionData.LearningData.LearningPeriodsChanged
             };
 
             return learner;
