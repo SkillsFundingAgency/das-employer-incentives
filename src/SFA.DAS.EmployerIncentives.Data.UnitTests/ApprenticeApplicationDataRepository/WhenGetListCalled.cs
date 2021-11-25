@@ -1244,7 +1244,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             result.Length.Should().Be(1);
             result[0].FirstClawbackStatus.Should().NotBeNull();
             result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
-            result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
+            result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackCreated);
             result[0].FirstClawbackStatus.OriginalPaymentDate.Should().Be(payment.PaidDate.Value);
         }
 
@@ -1331,12 +1331,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             result.Length.Should().Be(1);
             result[0].SecondClawbackStatus.Should().NotBeNull();
             result[0].SecondClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
-            result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackSent.Value);
+            result[0].SecondClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackCreated);
             result[0].SecondClawbackStatus.OriginalPaymentDate.Should().Be(payments[1].PaidDate.Value);
         }
 
         [Test]
-        public async Task Then_clawback_date_is_not_populated_if_first_payment_clawed_back_but_not_set()
+        public async Task Then_clawback_date_is_set_if_first_payment_clawed_back_but_not_sent()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(1).ToArray();
@@ -1400,7 +1400,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.PaymentId, payments[0].Id)
                 .With(p => p.PendingPaymentId, pendingPayments[0].Id)
-                .With(p => p.DateClawbackSent, nullClawbackDate)
+                .With(p => p.DateClawbackSent, nullClawbackDate)                
                 .Create();
 
             incentive.PendingPayments = pendingPayments;
@@ -1420,7 +1420,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             result.Length.Should().Be(1);
             result[0].FirstClawbackStatus.Should().NotBeNull();
             result[0].FirstClawbackStatus.ClawbackAmount.Should().Be(clawback.Amount);
-            result[0].FirstClawbackStatus.ClawbackDate.Should().BeNull();
+            result[0].FirstClawbackStatus.ClawbackDate.Should().Be(clawback.DateClawbackCreated);
             result[0].FirstClawbackStatus.OriginalPaymentDate.Should().Be(payments[0].PaidDate.Value);
         }
 
