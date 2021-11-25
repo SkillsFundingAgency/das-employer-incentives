@@ -134,5 +134,34 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedPayment.PendingPaymentId.Should().Be(testPayment.PendingPaymentId);
             storedPayment.SubnominalCode.Should().Be(testPayment.SubnominalCode);
         }
+
+        [Test]
+        public async Task Then_the_employment_checks_are_added_to_the_data_store()
+        {
+            var testEmploymentCheck = _fixture.Create<EmploymentCheckModel>();
+            
+            // Arrange
+            var testApprenticeshipIncentive = _fixture
+                .Build<ApprenticeshipIncentiveModel>()
+                .With(f => f.Id, testEmploymentCheck.ApprenticeshipIncentiveId)
+                .With(f => f.EmploymentCheckModels, new List<EmploymentCheckModel> { testEmploymentCheck })
+                .Create();
+
+            // Act
+            await _sut.Add(testApprenticeshipIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Assert
+            var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();
+            _ = storedIncentive.EmploymentChecks.Count.Should().Be(1);
+            var storedEmploymentCheck = storedIncentive.EmploymentChecks.Single();
+            storedEmploymentCheck.Id.Should().Be(testEmploymentCheck.Id);
+            storedEmploymentCheck.ApprenticeshipIncentiveId.Should().Be(testEmploymentCheck.ApprenticeshipIncentiveId);
+            storedEmploymentCheck.CheckType.Should().Be(testEmploymentCheck.CheckType);
+            storedEmploymentCheck.CorrelationId.Should().Be(testEmploymentCheck.CorrelationId);
+            storedEmploymentCheck.MaximumDate.Should().Be(testEmploymentCheck.MaximumDate);
+            storedEmploymentCheck.MinimumDate.Should().Be(testEmploymentCheck.MinimumDate);
+            storedEmploymentCheck.Result.Should().Be(testEmploymentCheck.Result);
+        }
     }
 }

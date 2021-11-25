@@ -11,6 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid Id { get; set; }
         public Guid ApprenticeshipIncentiveId { get; set; }
+        [Column(TypeName = "nvarchar(50)")]
         public EmploymentCheckType CheckType { get; set; }
         public DateTime MinimumDate { get; set; }
         public DateTime MaximumDate { get; set; }

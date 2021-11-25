@@ -33,7 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<ClawbackPayment> ClawbackPayments { get; set; }
         public virtual DbSet<ChangeOfCircumstance> ChangeOfCircumstances { get; set; }
         public virtual DbSet<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
-        
+        public virtual DbSet<EmploymentCheck> EmploymentChecks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
