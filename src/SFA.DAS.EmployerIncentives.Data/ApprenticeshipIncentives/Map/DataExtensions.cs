@@ -42,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 BreakInLearnings = model.BreakInLearnings.Map(model.Id),
                 MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
                 Phase = model.Phase.Identifier,
-                WithdrawnBy = model.WithdrawnBy
+                WithdrawnBy = model.WithdrawnBy,
+                EmploymentChecks = model.EmploymentCheckModels.Map()
             };
         }
 
@@ -85,7 +86,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 BreakInLearnings = entity.BreakInLearnings.Map(),                
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase),
-                WithdrawnBy = entity.WithdrawnBy
+                WithdrawnBy = entity.WithdrawnBy,
+                EmploymentCheckModels = entity.EmploymentChecks.Map()
             };
         }
 
@@ -425,6 +427,38 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 NewValue = model.NewValue,
                 ChangedDate = model.ChangedDate
             };
+        }
+
+        private static ICollection<EmploymentCheck> Map(this ICollection<EmploymentCheckModel> models)
+        {
+            return models.Select(x => new EmploymentCheck
+            {
+                Id = x.Id,
+                MaximumDate = x.MaximumDate,
+                MinimumDate = x.MinimumDate,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                CheckType = x.CheckType,
+                CorrelationId = x.CorrelationId,
+                CreatedDateTime = x.CreatedDateTime,
+                Result = x.Result,
+                ResultDateTime = x.ResultDateTime
+            }).ToList();
+        }
+
+        private static ICollection<EmploymentCheckModel> Map(this ICollection<EmploymentCheck> models)
+        {
+            return models.Select(x => new EmploymentCheckModel
+            {
+                Id = x.Id,
+                MaximumDate = x.MaximumDate,
+                MinimumDate = x.MinimumDate,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                CheckType = x.CheckType,
+                CorrelationId = x.CorrelationId,
+                CreatedDateTime = x.CreatedDateTime,
+                Result = x.Result,
+                ResultDateTime = x.ResultDateTime
+            }).ToList();
         }
 
         internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)

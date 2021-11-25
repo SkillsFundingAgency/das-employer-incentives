@@ -82,6 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -143,6 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -193,6 +195,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -240,6 +243,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -288,6 +292,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -336,6 +341,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -383,6 +389,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -432,6 +439,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -490,6 +498,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -549,6 +558,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
 
             pendingPayments[0].DueDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 4);
@@ -597,6 +607,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
 
             pendingPayments[0].DueDate = _collectionPeriods.Single(p => p.CollectionPeriod.PeriodNumber == 1).OpenDate.AddDays(-1);
@@ -647,6 +658,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -703,6 +715,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -751,6 +764,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -898,6 +912,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -952,6 +967,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].EarningType = EarningType.FirstPayment;
             pendingPayments[1].EarningType = EarningType.SecondPayment;
@@ -1009,6 +1025,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.EarningType, EarningType.FirstPayment)
+                .With(p => p.ClawedBack, false)
                 .Create());
             }
 
@@ -1021,6 +1038,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.EarningType, EarningType.SecondPayment)
+                .With(p => p.ClawedBack, false)
                 .Create());
             }
 
@@ -1079,6 +1097,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.EarningType, EarningType.FirstPayment)
+                .With(p => p.ClawedBack, false)
                 .Create());
             }
 
@@ -1137,6 +1156,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                 .With(p => p.EarningType, EarningType.FirstPayment)
+                .With(p => p.ClawedBack, false)
                 .Create());
             }
 
@@ -1206,6 +1226,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                     .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                     .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                     .With(p => p.EarningType, EarningType.SecondPayment)
+                    .With(p => p.ClawedBack, false)
                     .Create()
             };
 
@@ -1277,6 +1298,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                     .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                     .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                     .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.ClawedBack, false)
                     .Create(),
                 _fixture
                     .Build<PendingPayment>()
@@ -1380,6 +1402,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                     .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                     .With(p => p.ApprenticeshipIncentiveId, incentive.Id)
                     .With(p => p.EarningType, EarningType.SecondPayment)
+                    .With(p => p.ClawedBack, false)
                     .Create()
             };
 
@@ -1451,6 +1474,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;
@@ -1615,6 +1639,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.AccountLegalEntityId, accountLegalEntityId)
                 .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
                 .CreateMany(2).ToList();
             pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
             pendingPayments[0].EarningType = EarningType.FirstPayment;

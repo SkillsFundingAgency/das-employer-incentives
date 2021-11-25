@@ -122,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             }
 
             var savedEmploymentChecks = _dbContext.EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
-            savedEmploymentChecks.Should().BeEquivalentTo(employmentChecks);
+            savedEmploymentChecks.Should().BeEquivalentTo(employmentChecks, opts => opts.Excluding(x => x.CreatedDateTime).Excluding(x => x.ResultDateTime));
         }
 
         [Test]

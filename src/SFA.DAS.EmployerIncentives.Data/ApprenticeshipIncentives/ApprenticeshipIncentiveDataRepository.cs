@@ -120,6 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             RemoveDeletedPayments(updatedIncentive, existingIncentive);
             RemoveDeletedPendingPayments(updatedIncentive, existingIncentive);
             RemoveDeletedBreaksInLearning(updatedIncentive, existingIncentive);
+            RemoveDeletedEmploymentChecks(updatedIncentive, existingIncentive);
 
             foreach (var pendingPayment in updatedIncentive.PendingPayments)
             {
@@ -181,6 +182,25 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 {
                     breakInLearning.CreatedDate = DateTime.Now;
                     _dbContext.BreakInLearnings.Add(breakInLearning);
+                }
+            }
+
+            foreach (var employmentCheck in updatedIncentive.EmploymentChecks)
+            {
+                var existingEmploymentCheck = existingIncentive.EmploymentChecks.SingleOrDefault(p => p.Id == employmentCheck.Id);
+
+                if (existingEmploymentCheck != null)
+                {
+                    _dbContext.Entry(existingEmploymentCheck).CurrentValues.SetValues(employmentCheck);
+                    if (_dbContext.Entry(existingEmploymentCheck).State == EntityState.Modified)
+                    {
+                        existingEmploymentCheck.ResultDateTime = DateTime.Now;
+                    }
+                }
+                else
+                {
+                    employmentCheck.CreatedDateTime = DateTime.Now;
+                    _dbContext.EmploymentChecks.Add(employmentCheck);
                 }
             }
         }
@@ -257,6 +277,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (!updatedPendingPayment.ValidationResults.Any(c => c.Id == existingValidationResult.Id))
                 {
                     _dbContext.PendingPaymentValidationResults.Remove(existingValidationResult);
+                }
+            }
+        }
+
+        private void RemoveDeletedEmploymentChecks(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingEmploymentCheck in existingIncentive.EmploymentChecks)
+            {
+                if (!updatedIncentive.EmploymentChecks.Any(c => c.Id == existingEmploymentCheck.Id))
+                {
+                    _dbContext.EmploymentChecks.Remove(existingEmploymentCheck);
                 }
             }
         }
