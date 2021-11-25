@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess;
 using System.Threading.Tasks;
@@ -10,14 +9,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
     public class CompletePaymentProcess
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly ILogger<CompletePaymentProcess> _logger;
 
         public CompletePaymentProcess(
-            ICommandDispatcher commandDispatcher, 
-            ILogger<CompletePaymentProcess> logger)
+            ICommandDispatcher commandDispatcher)
         {
             _commandDispatcher = commandDispatcher;
-            _logger = logger;
         }
 
         [FunctionName(nameof(CompletePaymentProcess))]
