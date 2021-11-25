@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -53,10 +52,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
             else
             {
-                if (submissionData.LearningData != null && submissionData.LearningData.LearningFound)
-                {
-                    AddEvent(new LearningFound(ApprenticeshipIncentiveId));
-                }
                 Model.SubmissionData = submissionData;
             }
         }

@@ -52,10 +52,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
 
             if (learnerData != null)
             {
+                if (LearnerAndEarningsHaveNotChanged(learnerData, learner, incentive))
+                {
+                    return;
+                }
+
                 submissionData.SetSubmissionDate(learnerData.IlrSubmissionDate);
 
                 var learningFoundStatus = learnerData.LearningFound(incentive);
-                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound, learningFoundStatus.NotFoundReason));
+                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound,
+                    learningFoundStatus.NotFoundReason));
 
                 if (learningFoundStatus.LearningFound)
                 {
@@ -100,6 +106,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         private static bool LearningPeriodsChanged(IEnumerable<LearningPeriod> periods1, IEnumerable<LearningPeriod> periods2)
         {
             return !periods1.OrderBy(p => p.StartDate).SequenceEqual(periods2.OrderBy(p => p.StartDate));
+        }
+
+        private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        {
+            //Commented out temporarily until the learner match api returns the correct date when an R13 is submitted after R01.
+            //return learnerData.IlrSubmissionDate == learner.SubmissionData?.SubmissionDate && incentive.RefreshedLearnerForEarnings;
+            return false;
         }
     }
 }
