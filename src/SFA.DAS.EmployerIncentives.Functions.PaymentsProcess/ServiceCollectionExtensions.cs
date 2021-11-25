@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             serviceCollection.AddLogging((options) =>
             {
-                options.AddFilter("SFA.DAS", LogLevel.Information); // this is because all logging is filtered out by default
+                options.AddFilter("SFA.DAS", LogLevel.Debug); // this is because all logging is filtered out by default
                 options.SetMinimumLevel(LogLevel.Trace);
                 options.SetMinimumLevel(LogLevel.Trace);
                 options.AddNLog(new NLogProviderOptions
