@@ -20,6 +20,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             public IncentiveApplication IncentiveApplicationModel { get; }
             public List<IncentiveApplicationApprenticeship> IncentiveApplicationApprenticeshipModels { get; }
             public ApprenticeshipIncentive ApprenticeshipIncentiveModel { get; }
+
+            public List<EmploymentCheck> EmploymentChecks { get; set; }
             public PendingPayment PendingPaymentModel1 { get; }
             public PendingPayment PendingPaymentModel2 { get; }
             public PendingPayment PendingPaymentModel3 { get; }
@@ -63,7 +65,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.PausePayments, false)
                     .With(p => p.MinimumAgreementVersion, AccountModel.SignedAgreementVersion)
                     .With(p => p.Phase, Phase.Phase2)
+                    .With(p => p.EmploymentChecks, EmploymentChecks)
                     .Create();
+
+                EmploymentChecks = new List<EmploymentCheck>
+                {
+                    _fixture.Build<EmploymentCheck>()
+                        .With(x => x.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, true)
+                        .Create(),
+                    _fixture.Build<EmploymentCheck>()
+                        .With(x => x.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                        .With(x => x.Result, false)
+                        .Create()
+                };
 
                 PendingPaymentModel1 = _fixture.Build<PendingPayment>()
                     .With(p => p.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
@@ -127,6 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await connection.InsertAsync(IncentiveApplicationModel);
                 await connection.InsertAsync(IncentiveApplicationApprenticeshipModels);
                 await connection.InsertAsync(ApprenticeshipIncentiveModel);
+                await connection.InsertAsync(EmploymentChecks);
                 await connection.InsertAsync(PendingPaymentModel1);
                 await connection.InsertAsync(PendingPaymentModel2);
                 await connection.InsertAsync(PendingPaymentModel3);

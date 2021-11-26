@@ -80,6 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.Payments)
                 .Include(x => x.ClawbackPayments)
                 .Include(x => x.BreakInLearnings)
+                .Include(x => x.EmploymentChecks)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }

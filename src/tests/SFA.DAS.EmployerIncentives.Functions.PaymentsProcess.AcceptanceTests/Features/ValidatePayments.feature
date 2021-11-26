@@ -47,13 +47,15 @@ Scenario: When at least one validation check fails
 
 
 Examples:
-	| ValidationStep         |
-	| HasBankDetails         |
-	| IsInLearning           |
-	| HasLearningRecord      |
-	| HasNoDataLocks         |
-	| HasIlrSubmission       |
-	| HasDaysInLearning      |
-	| PaymentsNotPaused      |
-	| HasSignedMinVersion    |
-	| LearnerMatchSuccessful |
+	| ValidationStep                    |
+	| HasBankDetails                    |
+	| IsInLearning                      |
+	| HasLearningRecord                 |
+	| HasNoDataLocks                    |
+	| HasIlrSubmission                  |
+	| HasDaysInLearning                 |
+	| PaymentsNotPaused                 |
+	| HasSignedMinVersion               |
+	| LearnerMatchSuccessful            |
+	| EmployedAtStartOfApprenticeship   |
+	| EmployedBeforeSchemeStarted       |
