@@ -158,7 +158,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                where tr.Reference == PROGRAM_REFERENCE
                from pe in tr.PriceEpisodes
                from p in pe.Periods
-               where p.ApprenticeshipId == incentive.Apprenticeship.Id
+               where p.ApprenticeshipId == incentive.Apprenticeship.Id && (pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate(pe.AcademicYear)) >= pe.StartDate
                select new LearningPeriod(pe.StartDate, pe.EndDate ?? collectionCalendar.GetAcademicYearEndDate(pe.AcademicYear)))
               .Distinct()
               .OrderBy(p => p.StartDate)
