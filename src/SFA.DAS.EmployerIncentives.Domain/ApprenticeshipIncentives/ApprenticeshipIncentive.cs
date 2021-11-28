@@ -36,7 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
         public DateTime SubmissionDate => Model.SubmittedDate.Value;
-
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
             return new ApprenticeshipIncentive(
@@ -643,6 +642,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateIsInLearning(pendingPaymentId, learner, collectionPeriod);
             ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod, incentivePaymentProfiles);
+        }
+
+        public void UpdateEmploymentCheck(EmploymentCheckResult checkResult)
+        {
+            var employmentCheck = Model.EmploymentCheckModels.SingleOrDefault(c => c.CorrelationId == checkResult.CorrelationId);
+            if (employmentCheck == null)
+            {
+                return; // ignore superseded results
+            }
+
+            employmentCheck.Result = false;
+            employmentCheck.ResultDateTime = checkResult.DateChecked;
+
+            if (checkResult.Result == EmploymentCheckResultType.Employed)
+            {
+                employmentCheck.Result = true;                
+            }
         }
     }
 }

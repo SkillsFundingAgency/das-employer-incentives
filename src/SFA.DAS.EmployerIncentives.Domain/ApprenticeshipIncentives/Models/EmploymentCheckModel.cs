@@ -1,9 +1,10 @@
 ﻿using System;
+using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
 {
-    public class EmploymentCheckModel
+    public class EmploymentCheckModel : IEntityModel<Guid>
     {
         public Guid Id { get; set; }
         public Guid ApprenticeshipIncentiveId { get; set; }

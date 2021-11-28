@@ -72,6 +72,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
         }
 
+        public async Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByEmploymentCheckId(Guid correlationId)
+        {
+            var employmentCheck = await _dbContext.EmploymentChecks.SingleOrDefaultAsync(c => c.CorrelationId == correlationId);
+            if(employmentCheck == null)
+            {
+                return null;
+            }
+
+            return await Get(employmentCheck.ApprenticeshipIncentiveId);
+        }
+
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
         {
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
@@ -80,6 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.Payments)
                 .Include(x => x.ClawbackPayments)
                 .Include(x => x.BreakInLearnings)
+                .Include(x => x.EmploymentChecks)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
@@ -191,11 +203,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
                 if (existingEmploymentCheck != null)
                 {
-                    _dbContext.Entry(existingEmploymentCheck).CurrentValues.SetValues(employmentCheck);
-                    if (_dbContext.Entry(existingEmploymentCheck).State == EntityState.Modified)
-                    {
-                        existingEmploymentCheck.ResultDateTime = DateTime.Now;
-                    }
+                    _dbContext.Entry(existingEmploymentCheck).CurrentValues.SetValues(employmentCheck);                    
                 }
                 else
                 {
@@ -290,6 +298,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     _dbContext.EmploymentChecks.Remove(existingEmploymentCheck);
                 }
             }
-        }
+        }       
     }
 }
