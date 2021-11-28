@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     new UpdateEmploymentCheckRequest
                     {
                         CorrelationId = _correlationId,
-                        Result = checkResultType,
+                        Result = checkResultType.ToString(),
                         DateChecked = DateTime.Today
                     });
 

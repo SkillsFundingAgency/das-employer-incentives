@@ -2,6 +2,8 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Enums;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -20,11 +22,23 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             await SendCommandAsync(
                 new UpdateEmploymentCheckCommand(
                     updateRequest.CorrelationId,
-                    updateRequest.Result,
+                    Map(updateRequest.Result),
                     updateRequest.DateChecked)
                 );
 
             return Ok($"/employmentchecks/{updateRequest.CorrelationId}");
+        }
+
+        private EmploymentCheckResultType Map(string result)
+        {
+            return result.ToLower() switch
+            {
+                "employed" => EmploymentCheckResultType.Employed,
+                "notemployed" => EmploymentCheckResultType.NotEmployed,
+                "hmrcunknown" => EmploymentCheckResultType.HMRCUnknown,
+                "noninofound" => EmploymentCheckResultType.NoNINOFound,
+                _ => EmploymentCheckResultType.NoAccountFound,
+            };
         }
     }
 }
