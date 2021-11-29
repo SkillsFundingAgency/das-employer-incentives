@@ -980,5 +980,77 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 It.Is<Learner>(l => l.HasPossibleChangeOfCircumstances == false)
                 ), Times.Once);
         }
+
+        [Test]
+        public async Task Then_employment_checks_are_created_when_in_learning()
+        {
+            //Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            var apprenticeship = _fixture.Create<Apprenticeship>();
+
+            var pendingPaymentModel = _fixture.Create<PendingPaymentModel>();
+            pendingPaymentModel.PaymentMadeDate = null;
+            pendingPaymentModel.CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(5, 2021);
+
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+               .With(p => p.Apprenticeship, apprenticeship)
+               .With(p => p.PendingPaymentModels, new List<PendingPaymentModel> { pendingPaymentModel })
+               .Create();
+
+            _mockApprenticeshipIncentiveDomainRepository
+                .Setup(m => m.Find(_apprenticeshipIncentiveId))
+                .ReturnsAsync(new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.ApplicationApprenticeshipId, apprenticeshipIncentiveModel));
+
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveFactory().GetExisting(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(apprenticeshipIncentive))
+                .ReturnsAsync(learner);
+
+            var learnerSubmissionDto = _fixture
+               .Build<LearnerSubmissionDto>()
+               .With(l => l.AcademicYear, "2021")
+               .With(l => l.Training, new List<TrainingDto> {
+                    _fixture.Create<TrainingDto>(),
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(t => t.PriceEpisodes,
+                        new List<PriceEpisodeDto>{
+                            _fixture
+                            .Build<PriceEpisodeDto>()
+                            .With(x => x.AcademicYear, pendingPaymentModel.CollectionPeriod.AcademicYear.ToString())
+                            .With(pe => pe.EndDate, DateTime.Today.AddDays(-2))
+                            .With(pe => pe.StartDate, pendingPaymentModel.DueDate.AddDays(-1))
+                            .With(pe => pe.EndDate, pendingPaymentModel.DueDate.AddDays(1))
+                            .With(pe => pe.Periods,
+                                    new List<PeriodDto>{
+                                        _fixture
+                                        .Build<PeriodDto>()
+                                        .With(p => p.Period, pendingPaymentModel.CollectionPeriod.PeriodNumber)
+                                        .With(p => p.ApprenticeshipId, apprenticeshipIncentive.Apprenticeship.Id)
+                                        .Create()
+                                    })
+                            .Create()
+                            }).Create(),
+                        _fixture.Create<TrainingDto>()
+                   })
+               .Create();
+
+            _mockLearnerService
+                .Setup(m => m.Get(It.IsAny<Learner>()))
+                .ReturnsAsync(learnerSubmissionDto);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockApprenticeshipIncentiveDomainRepository.Verify(m => m.Save(
+                It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(l => l.EmploymentChecks.Count == 2)
+                ), Times.Once);
+        }
     }
 }
