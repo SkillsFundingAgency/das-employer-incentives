@@ -502,19 +502,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
-            var employedAtStartOfApprenticeshipCheck = EmploymentChecks.FirstOrDefault(x =>
-                x.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship);
+            ValidateEmployedAtStartOfApprenticeship(collectionPeriod, pendingPayment);
 
-            var employedAtStartOfApprenticeshipResult = employedAtStartOfApprenticeshipCheck?.Result != null && employedAtStartOfApprenticeshipCheck.Result.Value;
-            
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.EmployedAtStartOfApprenticeship, employedAtStartOfApprenticeshipResult));
+            ValidateNotEmployedBeforeSchemeStartDate(collectionPeriod, pendingPayment);
+        }
 
+        private void ValidateNotEmployedBeforeSchemeStartDate(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
+        {
             var employedBeforeSchemeStartedCheck = EmploymentChecks.FirstOrDefault(x =>
                 x.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted);
 
-            var employedBeforeSchemeStartedResult = employedBeforeSchemeStartedCheck?.Result != null && !employedBeforeSchemeStartedCheck.Result.Value;
+            var employedBeforeSchemeStartedResult = employedBeforeSchemeStartedCheck?.Result != null &&
+                                                    !employedBeforeSchemeStartedCheck.Result.Value;
 
-            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.EmployedBeforeSchemeStarted, employedBeforeSchemeStartedResult));
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod,
+                ValidationStep.EmployedBeforeSchemeStarted, employedBeforeSchemeStartedResult));
+        }
+
+        private void ValidateEmployedAtStartOfApprenticeship(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
+        {
+            var employedAtStartOfApprenticeshipCheck = EmploymentChecks.FirstOrDefault(x =>
+                x.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship);
+
+            var employedAtStartOfApprenticeshipResult = employedAtStartOfApprenticeshipCheck?.Result != null &&
+                                                        employedAtStartOfApprenticeshipCheck.Result.Value;
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod,
+                ValidationStep.EmployedAtStartOfApprenticeship, employedAtStartOfApprenticeshipResult));
         }
 
         private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
