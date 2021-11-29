@@ -29,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             
             incentive.SetHasPossibleChangeOfCircumstances(learner.HasPossibleChangeOfCircumstances);
             incentive.LearnerRefreshCompleted();
+            incentive.RequestEmploymentChecks(learner.SubmissionData.LearningData.IsInlearning);
 
             await _incentiveDomainRepository.Save(incentive);
         }

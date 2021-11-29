@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -12,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 {
     public class WhenUpdateEmploymentCheck
     {
-        private ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Fixture _fixture;
 
@@ -116,9 +115,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.GetModel().EmploymentCheckModels.Single().ResultDateTime.Should().Be(DateTime.Today);
         }
 
-        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }

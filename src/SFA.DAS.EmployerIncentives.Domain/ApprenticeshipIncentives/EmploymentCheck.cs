@@ -6,14 +6,17 @@ using System;
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
     public class EmploymentCheck : Entity<Guid, EmploymentCheckModel>
-    { 
-        internal static EmploymentCheck New(
-            Guid id,
+    {
+        public EmploymentCheckType CheckType => Model.CheckType;
+        public DateTime MinimumDate => Model.MinimumDate;
+        public DateTime MaximumDate => Model.MaximumDate;
+        public Guid? CorrelationId => Model.CorrelationId;
+
+        internal static EmploymentCheck New(Guid id,
             Guid apprenticeshipIncentiveId,
-            EmploymentCheckType checkType,
-            DateTime minimumDate,
-            DateTime maximumDate,
-            Guid correlationId)
+            EmploymentCheckType checkType, 
+            DateTime minimumDate, 
+            DateTime maximumDate)
         {
             return new EmploymentCheck(new EmploymentCheckModel
             {
@@ -22,10 +25,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 CheckType = checkType,
                 MinimumDate = minimumDate,
                 MaximumDate = maximumDate,
-                CorrelationId = correlationId,
                 CreatedDateTime = DateTime.Now
-            },            
-            true);
+            },
+                true);
+        }
+
+        public void SetCorrelationId(Guid correlationId)
+        {
+            Model.CorrelationId = correlationId;
         }
 
         internal static EmploymentCheck Get(EmploymentCheckModel model)
