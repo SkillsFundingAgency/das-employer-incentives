@@ -992,11 +992,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var pendingPaymentModel = _fixture.Create<PendingPaymentModel>();
             pendingPaymentModel.PaymentMadeDate = null;
             pendingPaymentModel.CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(5, 2021);
+            pendingPaymentModel.DueDate = new DateTime(2021, 09, 01);
 
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
-               .With(p => p.Apprenticeship, apprenticeship)
-               .With(p => p.PendingPaymentModels, new List<PendingPaymentModel> { pendingPaymentModel })
-               .Create();
+                .With(x => x.StartDate, new DateTime(2021, 06, 01))
+                .With(p => p.Apprenticeship, apprenticeship)
+                .With(p => p.PendingPaymentModels, new List<PendingPaymentModel> { pendingPaymentModel })
+                .Without(p => p.EmploymentCheckModels)
+                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
                 .Setup(m => m.Find(_apprenticeshipIncentiveId))
