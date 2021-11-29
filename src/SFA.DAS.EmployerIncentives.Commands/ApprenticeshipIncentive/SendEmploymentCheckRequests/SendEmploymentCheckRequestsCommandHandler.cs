@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
+using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploymentCheckRequests
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploy
             var apprenticeshipIncentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
             foreach (var employmentCheck in apprenticeshipIncentive.EmploymentChecks)
             {
-                var correlationId = await _employmentCheckService.RegisterEmploymentCheck(employmentCheck);
+                var correlationId = await _employmentCheckService.RegisterEmploymentCheck(employmentCheck, apprenticeshipIncentive);
                 employmentCheck.SetCorrelationId(correlationId);
             }
 

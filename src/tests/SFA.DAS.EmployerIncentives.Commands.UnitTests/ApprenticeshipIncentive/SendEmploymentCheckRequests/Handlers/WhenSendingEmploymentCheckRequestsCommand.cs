@@ -9,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploymentCheckRequests;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
+using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
@@ -46,16 +47,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockDomainRepository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(apprenticeshipIncentive);
             var firstCheckCorrelationId = Guid.NewGuid();
             var secondCheckCorrelationId = Guid.NewGuid();
-            _mockEmploymentCheckService.Setup(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(0))).ReturnsAsync(firstCheckCorrelationId);
-            _mockEmploymentCheckService.Setup(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(1))).ReturnsAsync(secondCheckCorrelationId);
+            _mockEmploymentCheckService.Setup(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(0), apprenticeshipIncentive)).ReturnsAsync(firstCheckCorrelationId);
+            _mockEmploymentCheckService.Setup(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(1), apprenticeshipIncentive)).ReturnsAsync(secondCheckCorrelationId);
 
             // Act
             await _sut.Handle(command);
 
             // Assert
-            _mockEmploymentCheckService.Verify(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(0)), Times.Once);
+            _mockEmploymentCheckService.Verify(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(0), apprenticeshipIncentive), Times.Once);
             apprenticeshipIncentive.EmploymentChecks.ElementAt(0).CorrelationId.Should().Be(firstCheckCorrelationId);
-            _mockEmploymentCheckService.Verify(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(1)), Times.Once);
+            _mockEmploymentCheckService.Verify(x => x.RegisterEmploymentCheck(apprenticeshipIncentive.EmploymentChecks.ElementAt(1), apprenticeshipIncentive), Times.Once);
             apprenticeshipIncentive.EmploymentChecks.ElementAt(1).CorrelationId.Should().Be(secondCheckCorrelationId);
             _mockDomainRepository.Verify(x => x.Save(apprenticeshipIncentive));
         }
