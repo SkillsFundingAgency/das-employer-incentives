@@ -4,19 +4,20 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
 {
-    public class LearningFound : IDomainEvent, ILogWriter
+    public class EmploymentChecksCreated : IDomainEvent, ILogWriter
     {
-        public LearningFound(Guid apprenticeshipIncentiveId)
+        public Guid ApprenticeshipIncentiveId { get; set; }
+        
+        public EmploymentChecksCreated(Guid apprenticeshipIncentiveId)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
         }
 
-        public Guid ApprenticeshipIncentiveId { get; set; }
         public Log Log
         {
             get
             {
-                var message = $"Learning found for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}";
+                var message = $"Employment Checks Created for Apprenticeship Incentive with ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} ";
                 return new Log
                 {
                     OnProcessing = () => message,

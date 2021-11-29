@@ -1,9 +1,9 @@
-﻿using System;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
 
-namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
+ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
     public class EmploymentCheck : Entity<Guid, EmploymentCheckModel>
     {
@@ -15,30 +15,20 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public bool? Result => Model.Result;
         public DateTime CreatedDateTime => Model.CreatedDateTime;
         public DateTime? ResultDateTime => Model.ResultDateTime;
-
-        internal static EmploymentCheck New(
-            Guid id,
+        
+        internal static EmploymentCheck New(Guid id,
             Guid apprenticeshipIncentiveId,
-            EmploymentCheckType checkType,
-            DateTime minimumDate,
-            DateTime maximumDate,
-            Guid correlationId,
-            bool? result,
-            DateTime createdDateTime,
-            DateTime? resultDateTime
-        )
+            EmploymentCheckType checkType, 
+            DateTime minimumDate, 
+            DateTime maximumDate)
         {
-            return new EmploymentCheck(new EmploymentCheckModel 
-            {
+            return new EmploymentCheck(new EmploymentCheckModel
+                {
                 Id = id,
                 ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                 CheckType = checkType,
                 MinimumDate = minimumDate,
-                MaximumDate = maximumDate,
-                CorrelationId = correlationId,
-                Result = result,
-                CreatedDateTime = createdDateTime,
-                ResultDateTime = resultDateTime
+                MaximumDate = maximumDate
             }, 
             true);
         }
@@ -51,6 +41,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         private EmploymentCheck(EmploymentCheckModel model, bool isNew = false) : base(model.Id, model, isNew)
         {
         }
-
     }
 }

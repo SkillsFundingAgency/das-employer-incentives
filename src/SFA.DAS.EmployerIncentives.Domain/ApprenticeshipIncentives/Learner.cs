@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
@@ -18,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;
         public SubmissionData SubmissionData => Model.SubmissionData;
         public bool SuccessfulLearnerMatch => Model.SuccessfulLearnerMatch;
+        public bool HasPossibleChangeOfCircumstances { get; private set; }
         public IReadOnlyCollection<LearningPeriod> LearningPeriods => Model.LearningPeriods.OrderBy(l => l.StartDate).ToList().AsReadOnly();
 
         internal static Learner New(
@@ -53,22 +53,28 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
             else
             {
-                if (submissionData.LearningData != null && submissionData.LearningData.LearningFound)
-                {
-                    AddEvent(new LearningFound(ApprenticeshipIncentiveId));
-                }
+                HasPossibleChangeOfCircumstances = submissionData.HasChangeOfCircumstances(Model.SubmissionData);
                 Model.SubmissionData = submissionData;
             }
         }
 
         public void SetLearningPeriods(IEnumerable<LearningPeriod> learningPeriods)
         {
+            if (!LearningPeriodsChanged(LearningPeriods, learningPeriods)) return;
+
             Model.LearningPeriods.Clear();
 
             foreach (var learningPeriod in learningPeriods)
             {   
                 Model.LearningPeriods.Add(learningPeriod);
             }
+
+            HasPossibleChangeOfCircumstances = true;
+        }
+
+        private static bool LearningPeriodsChanged(IEnumerable<LearningPeriod> periods1, IEnumerable<LearningPeriod> periods2)
+        {
+            return !periods1.OrderBy(p => p.StartDate).SequenceEqual(periods2.OrderBy(p => p.StartDate));
         }
 
         public int GetDaysInLearning(CollectionPeriod collectionPeriod)
