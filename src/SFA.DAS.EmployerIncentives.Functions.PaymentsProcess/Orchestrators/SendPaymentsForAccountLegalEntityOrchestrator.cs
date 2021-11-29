@@ -22,8 +22,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var accountLegalEntityCollectionPeriod = context.GetInput<AccountLegalEntityCollectionPeriod>();
 
             if (!context.IsReplaying) 
-                _logger.LogInformation("SendPaymentsForAccountLegalEntityOrchestrator started for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);   
-            
+                _logger.LogInformation("SendPaymentsForAccountLegalEntityOrchestrator started for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);
+
+            await context.CallActivityAsync(nameof(SendClawbacksForAccountLegalEntity), accountLegalEntityCollectionPeriod);
             await context.CallActivityAsync(nameof(SendPaymentRequestsForAccountLegalEntity), accountLegalEntityCollectionPeriod);
 
             if (!context.IsReplaying) 

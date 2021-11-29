@@ -116,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         }
 
         [Test]
-        public async Task Then_payments_are_sent_when_they_are_approved()
+        public async Task Then_payments_and_clawbacks_are_sent_when_they_are_approved()
         {
             // arrange
             _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(true);
@@ -181,35 +181,5 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             }            
         }
 
-        [Test]
-        public async Task Then_clawbacks_are_sent_when_they_are_approved()
-        {
-            // arrange
-            var clawbackLegalEntities = _fixture.CreateMany<ClawbackLegalEntityDto>(3).ToList();
-            _mockOrchestrationContext
-                .Setup(m => m.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), _collectionPeriod))
-                .ReturnsAsync(clawbackLegalEntities);
-
-            _mockOrchestrationContext.Setup(x => x.WaitForExternalEvent<bool>("PaymentsApproved")).ReturnsAsync(true);
-
-            // act
-            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
-
-            // assert
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("SendClawbacksForAccountLegalEntityOrchestrator", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
-
-            foreach (var entity in clawbackLegalEntities)
-            {
-                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
-                    "SendClawbacksForAccountLegalEntityOrchestrator",
-                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
-                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
-                        input.AccountId == entity.AccountId &&
-                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
-                        input.CollectionPeriod.Year == _collectionPeriod.Year)
-
-                ), Times.Once);
-            }
-        }
     }
 }
