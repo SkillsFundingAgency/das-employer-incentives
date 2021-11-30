@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public DateTime MinimumDate => Model.MinimumDate;
         public DateTime MaximumDate => Model.MaximumDate;
         public Guid? CorrelationId => Model.CorrelationId;
-
+ 
         internal static EmploymentCheck New(Guid id,
             Guid apprenticeshipIncentiveId,
             EmploymentCheckType checkType, 
@@ -24,7 +24,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                 CheckType = checkType,
                 MinimumDate = minimumDate,
-                MaximumDate = maximumDate
+                MaximumDate = maximumDate,
+                CreatedDateTime = DateTime.Now
             },
                 true);
         }
@@ -33,7 +34,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             Model.CorrelationId = correlationId;
         }
-
         internal static EmploymentCheck Get(EmploymentCheckModel model)
         {
             return new EmploymentCheck(model);

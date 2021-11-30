@@ -58,6 +58,7 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 using SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriodToInProgress;
 using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -184,6 +185,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<CompleteCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
                 ;
 
             return serviceCollection;

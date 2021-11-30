@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
