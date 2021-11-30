@@ -173,6 +173,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 {
                     breakInLearning.CreatedDate = existingBreakInLearning.CreatedDate;
                     _dbContext.Entry(existingBreakInLearning).CurrentValues.SetValues(breakInLearning);
+
+                    if (_dbContext.Entry(existingBreakInLearning).State == EntityState.Modified)
+                    {
+                        existingBreakInLearning.UpdatedDate = DateTime.Now;
+                    }
                 }
                 else
                 {
@@ -188,10 +193,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (existingEmploymentCheck != null)
                 {
                     _dbContext.Entry(existingEmploymentCheck).CurrentValues.SetValues(employmentCheck);
-                    if (_dbContext.Entry(existingEmploymentCheck).State == EntityState.Modified)
-                    {
-                        existingEmploymentCheck.ResultDateTime = DateTime.Now;
-                    }
                 }
                 else
                 {
