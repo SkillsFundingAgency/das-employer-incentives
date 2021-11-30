@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _fixture = new Fixture();
 
             _plannedStartDate = new DateTime(2020, 11, 10);
-            _breakInLearning = 15;
+            _breakInLearning = 31;
             _accountModel = _fixture.Create<Account>();
             _periodNumber = 1;
 
@@ -146,6 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.Uln, _apprenticeshipIncentive.ULN)
+                .With(s => s.AcademicYear, "2021")
                 .With(l => l.Training, new List<TrainingDto> {
                     _fixture
                         .Build<TrainingDto>()
@@ -264,7 +265,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
-            pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment && !p.ClawedBack).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(89).AddDays(_breakInLearning -  2));
+            pendingPayments.Single(p => p.EarningType == EarningType.FirstPayment && !p.ClawedBack).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(89).AddDays(_breakInLearning - 2));
             pendingPayments.Single(p => p.EarningType == EarningType.SecondPayment).DueDate.Should().Be(_apprenticeshipIncentive.StartDate.AddDays(364).AddDays(_breakInLearning - 2));
         }
 

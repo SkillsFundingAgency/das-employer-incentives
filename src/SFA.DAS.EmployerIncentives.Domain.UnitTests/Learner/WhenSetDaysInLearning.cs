@@ -26,12 +26,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
         public void Arrange()
         {
             _fixture = new Fixture();
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
+
             _startDate = DateTime.Now.Date;
             _censusDate = _startDate.AddDays(17);
 
             _collectionCalendarPeriod = new CollectionCalendarPeriod(new CollectionPeriod(1, (short)DateTime.Now.Year), (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddMonths(-2), _censusDate, true, false);
 
-            _learningPeriod3 = new LearningPeriod(_startDate, null);
+            _learningPeriod3 = new LearningPeriod(_startDate, new DateTime(2021, 12, 31));
             _learningPeriods = new List<LearningPeriod>()
             {
                 new LearningPeriod(_startDate.AddDays(-60), _startDate.AddDays(-60 + 15)),

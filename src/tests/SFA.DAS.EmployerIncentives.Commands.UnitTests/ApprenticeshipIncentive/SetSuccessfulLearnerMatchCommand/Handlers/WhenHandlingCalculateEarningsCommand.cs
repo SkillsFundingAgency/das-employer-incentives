@@ -30,6 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public void Arrange()
         {
             _fixture = new Fixture();
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
+
             _mockIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
 
@@ -64,6 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 _fixture.Build<LearnerModel>()
                     .With(x => x.SuccessfulLearnerMatch, !_succeeded)
                     .With(x => x.ApprenticeshipIncentiveId, _incentive.Id)
+                    .Without(l => l.LearningPeriods)
                     .Create());
 
             _mockIncentiveDomainRepository.Setup(x => x.Find(_incentive.Id)).ReturnsAsync(_incentive);

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
@@ -66,7 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 submissionData.SetSubmissionDate(learnerData.IlrSubmissionDate);
 
                 var learningFoundStatus = learnerData.LearningFound(incentive);
-                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound, learningFoundStatus.NotFoundReason));
+                submissionData.SetLearningData(new LearningData(learningFoundStatus.LearningFound,
+                    learningFoundStatus.NotFoundReason));
 
                 if (learningFoundStatus.LearningFound)
                 {
@@ -79,14 +81,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 learner.SetSubmissionData(submissionData);
             }
 
+            ProcessLearningPeriods(learnerData, incentive, collectionCalendar, learner, submissionData);
+
             if (submissionData.HasChangeOfCircumstances(learner.SubmissionData))
             {
                 incentive.SetHasPossibleChangeOfCircumstances(true);
             }
             incentive.LearnerRefreshCompleted();
 
-            learner.SetLearningPeriods(learnerData.LearningPeriods(incentive, collectionCalendar));
-            
             if (!learner.SubmissionData.LearningData.LearningFound)
             {
                 _logger.LogInformation("Matching ILR record not found for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN} with reason: {NotFoundReason}",
@@ -104,6 +106,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             learner.SetSubmissionData(submissionData);
 
             await _learnerDomainRepository.Save(learner);
+        }
+        
+        private static void ProcessLearningPeriods(LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive,
+            Domain.ValueObjects.CollectionCalendar collectionCalendar, Learner learner, SubmissionData submissionData)
+        {
+            var learningPeriods = learnerData.LearningPeriods(incentive, collectionCalendar);
+            if (!LearningPeriodsChanged(learner.LearningPeriods, learningPeriods)) return;
+            learner.SetLearningPeriods(learningPeriods);
+            submissionData.LearningData.SetLearningPeriodsChanged();
+        }
+
+        private static bool LearningPeriodsChanged(IEnumerable<LearningPeriod> periods1, IEnumerable<LearningPeriod> periods2)
+        {
+            return !periods1.OrderBy(p => p.StartDate).SequenceEqual(periods2.OrderBy(p => p.StartDate));
         }
 
         private bool LearnerAndEarningsHaveNotChanged(LearnerSubmissionDto learnerData, Learner learner, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)

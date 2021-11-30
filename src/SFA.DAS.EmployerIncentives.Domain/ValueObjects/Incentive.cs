@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Domain;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Apprenticeship = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Apprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -17,9 +15,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
     {
         private readonly DateTime _dateOfBirth;
         protected readonly DateTime StartDate;
-        private readonly List<Payment> _payments;
-        private readonly List<EarningType> _earningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
-        public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
+        private readonly IEnumerable<PaymentProfile> _paymentProfiles;
+        private readonly IReadOnlyCollection<BreakInLearning> _breaksInLearning;
+        private readonly DateTime _submissionDate;
+        public static readonly List<EarningType> EarningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
+        public IReadOnlyCollection<Payment> Payments => Generate(_paymentProfiles, _breaksInLearning, _submissionDate).AsReadOnly();
         public abstract bool IsEligible { get; }
 
         private static readonly DateTime EmployerEligibilityStartDate = new DateTime(2021, 04, 01);
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 
         protected abstract int DelayPeriod { get; }
 
-        protected abstract DateTime CalculateDueDate(PaymentProfile paymentProfile, DateTime submissionDate);
+        protected abstract DateTime CalculateMinimumDueDate(PaymentProfile paymentProfile, DateTime submissionDate);
 
         protected Incentive(
             DateTime dateOfBirth, 
@@ -38,7 +38,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         {
             _dateOfBirth = dateOfBirth;
             StartDate = startDate;
-            _payments = Generate(paymentProfiles, breaksInLearning, submissionDate);
+            _paymentProfiles = paymentProfiles;
+            _breaksInLearning = breaksInLearning;
+            _submissionDate = submissionDate;
         }
 
         public static Incentive Create(
@@ -46,15 +48,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             IEnumerable<IncentivePaymentProfile> paymentProfiles)
         {
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings, incentive.SubmissionDate);
-        }
-
-        public static async Task<Incentive> Create(
-            ApprenticeshipIncentive incentive,            
-            IIncentivePaymentProfilesService incentivePaymentProfilesService)
-        {
-            var paymentProfiles = await incentivePaymentProfilesService.Get();
-
-            return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, paymentProfiles, incentive.BreakInLearnings, incentive.SubmissionDate);            
         }
 
         public static bool EmployerStartDateIsEligible(Apprenticeship apprenticeship)
@@ -67,6 +60,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             }
 
             return false;
+        }
+
+        public int MinimumDaysInLearning(EarningType earningType)
+        {
+            var paymentProfile = _paymentProfiles.ElementAt(EarningTypes.IndexOf(earningType));
+            return paymentProfile.DaysAfterApprenticeshipStart;
+        }
+
+        private static List<PaymentProfile> GetPaymentProfiles(Phase phase, DateTime dateOfBirth, DateTime startDate, IEnumerable<IncentivePaymentProfile> incentivePaymentProfiles)
+        {
+            var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
+
+            if (incentivePaymentProfile?.PaymentProfiles == null)
+            {
+                throw new MissingPaymentProfileException($"Incentive Payment profile not found for IncentivePhase {phase}");
+            }
+
+            var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
+
+            var paymentProfiles = incentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).ToList();
+
+            if (!paymentProfiles.Any())
+            {
+                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
+            }
+
+            return paymentProfiles;
         }
 
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
@@ -82,8 +102,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             var paymentIndex = 0;
             foreach (var paymentProfile in paymentProfiles)
             {
-                var paymentDueDate = CalculateDueDate(paymentProfile, submissionDate);
-                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, _earningTypes[paymentIndex], breaksInLearning));
+                var paymentDueDate = StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart);
+                var minimumDueDate = CalculateMinimumDueDate(paymentProfile, submissionDate);
+                payments.Add(new Payment(paymentProfile.AmountPayable, paymentDueDate, EarningTypes[paymentIndex], breaksInLearning, minimumDueDate));
                 paymentIndex++;
             }
 
@@ -111,21 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             IReadOnlyCollection<BreakInLearning> breaksInLearning,
             DateTime submissionDate)
         {
-            var incentivePaymentProfile = incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
-
-            if (incentivePaymentProfile?.PaymentProfiles == null)
-            {
-                throw new MissingPaymentProfileException($"Incentive Payment profile not found for IncentivePhase {phase}");
-            }
-
-            var incentiveType = AgeAtStartOfCourse(dateOfBirth, startDate) >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
-
-            var paymentProfiles = incentivePaymentProfile.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).ToList();
-
-            if (!paymentProfiles.Any())
-            {
-                throw new MissingPaymentProfileException($"Payment profiles not found for IncentiveType {incentiveType}");
-            }
+            var paymentProfiles = GetPaymentProfiles(phase, dateOfBirth, startDate, incentivePaymentProfiles);
 
             if (phase == Phase.Phase1)
             {

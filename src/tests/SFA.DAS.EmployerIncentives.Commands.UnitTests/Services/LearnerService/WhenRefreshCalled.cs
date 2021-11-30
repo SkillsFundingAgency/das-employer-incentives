@@ -29,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public void Arrange()
         {
             _fixture = new Fixture();
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
             _logger = new Mock<ILogger<LearnerService>>();

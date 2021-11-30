@@ -63,6 +63,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             Model.HashedLegalEntityId = hashedId;
         }
 
+        public void SetLegalEntityName(string legalEntityName)
+        {
+            Model.Name = legalEntityName;
+        }
+
         internal void UpdateVendorRegistrationCaseStatus(VendorCase vendorCase)
         {
             Model.VrfCaseId = vendorCase.CaseId;

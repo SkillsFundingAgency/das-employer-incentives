@@ -30,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public ICollection<LearningPeriod> LearningPeriods { get; set; }
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<ApprenticeshipDaysInLearning> DaysInLearnings { get; set; }
+        public bool LearningPeriodsChanged { get; set; }
 
         public Learner()
         {

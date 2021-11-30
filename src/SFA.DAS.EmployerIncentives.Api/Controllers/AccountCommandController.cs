@@ -9,8 +9,6 @@ using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
-using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -38,7 +36,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpPatch("/accounts/{accountId}/legalEntities/{accountLegalEntityId}")]
         public async Task<IActionResult> SignAgreement([FromRoute] long accountId, [FromRoute] long accountLegalEntityId, [FromBody] SignAgreementRequest request)
         {
-            await SendCommandAsync(new SignLegalEntityAgreementCommand(accountId, accountLegalEntityId, request.AgreementVersion));
+            await SendCommandAsync(new SignLegalEntityAgreementCommand(
+                accountId,
+                accountLegalEntityId,
+                request.AgreementVersion,
+                request.LegalEntityName,
+                request.LegalEntityId
+                ));
             return NoContent();
         }
 

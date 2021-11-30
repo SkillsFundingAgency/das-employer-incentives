@@ -62,6 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(p => p.DateOfBirth, startDate.AddYears(-20))
                     .With(p => p.PausePayments, false)
                     .With(p => p.MinimumAgreementVersion, AccountModel.SignedAgreementVersion)
+                    .With(p => p.Phase, Phase.Phase2)
                     .Create();
 
                 PendingPaymentModel1 = _fixture.Build<PendingPayment>()

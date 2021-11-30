@@ -570,7 +570,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an apprenticeship incentive exists and has previously been refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 68
- testRunner.And("the aprenticeship incentive does not have a corresponding learner match record", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the apprenticeship incentive does not have a corresponding learner match record", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 69
  testRunner.When("the learner data is refreshed for the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

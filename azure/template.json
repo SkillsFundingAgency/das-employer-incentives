@@ -465,52 +465,60 @@
                     },
                     "functionAppAppSettings": {
                         "value": {
-                            "array": [
-                                {
-                                    "name": "ConfigurationStorageConnectionString",
-                                    "value": "[parameters('configurationStorageConnectionString')]"
-                                },
-                                {
-                                    "name": "ConfigNames",
-                                    "value": "[parameters('configNames')]"
-                                },
-                                {
-                                    "name": "EnvironmentName",
-                                    "value": "[parameters('environmentName')]"
-                                },
-                                {
-                                    "name": "Version",
-                                    "value": "[parameters('version')]"
-                                },
-                                {
-                                    "name": "AzureWebJobsStorage",
-                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
-                                },
-                                {
-                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "~3"
-                                },
-                                {
-                                    "name": "LoggingRedisConnectionString",
-                                    "value": "[parameters('loggingRedisConnectionString')]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                                    "value": "dotnet"
-                                },
-                                {
-                                    "name": "NServiceBusConnectionString",
-                                    "value": "[parameters('nServiceBusConnectionString')]"
-                                },
-                                {
-                                    "name": "NServiceBusLicense",
-                                    "value": "[parameters('nServiceBusLicense')]"
-                                }
-                            ]
+                          "array": [
+                            {
+                              "name": "ConfigurationStorageConnectionString",
+                              "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                              "name": "ConfigNames",
+                              "value": "[parameters('configNames')]"
+                            },
+                            {
+                              "name": "EnvironmentName",
+                              "value": "[parameters('environmentName')]"
+                            },
+                            {
+                              "name": "Version",
+                              "value": "[parameters('version')]"
+                            },
+                            {
+                              "name": "AzureWebJobsStorage",
+                              "value": "[parameters('sharedStorageAccountConnectionString')]"
+                            },
+                            {
+                              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                              "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                              "name": "FUNCTIONS_EXTENSION_VERSION",
+                              "value": "~3"
+                            },
+                            {
+                              "name": "LoggingRedisConnectionString",
+                              "value": "[parameters('loggingRedisConnectionString')]"
+                            },
+                            {
+                              "name": "FUNCTIONS_WORKER_RUNTIME",
+                              "value": "dotnet"
+                            },
+                            {
+                              "name": "NServiceBusConnectionString",
+                              "value": "[parameters('nServiceBusConnectionString')]"
+                            },
+                            {
+                              "name": "NServiceBusLicense",
+                              "value": "[parameters('nServiceBusLicense')]"
+                            },
+                            {
+                              "name": "WEBSITE_RUN_FROM_PACKAGE",
+                              "value": "1"
+                            },
+                            {
+                              "name": "AzureWebJobsFeatureFlags",
+                              "value": "EnableEnhancedScopes"
+                            }
+                          ]
                         }
                     }
                 }
@@ -693,6 +701,10 @@
                                 {
                                     "name": "FUNCTIONS_WORKER_RUNTIME",
                                     "value": "dotnet"
+                                },
+                                {
+                                    "name": "WEBSITE_RUN_FROM_PACKAGE",
+                                    "value": "1"
                                 }
                             ]
                         }

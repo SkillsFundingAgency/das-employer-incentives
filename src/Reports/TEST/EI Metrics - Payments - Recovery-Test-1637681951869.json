@@ -1,0 +1,167 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_MSSQL_- DAS-TEST-EMPINC-DB",
+      "label": "MSSQL - das-test-empinc-db",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "mssql",
+      "pluginName": "Microsoft SQL Server"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "8.0.5"
+    },
+    {
+      "type": "datasource",
+      "id": "mssql",
+      "name": "Microsoft SQL Server",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "${DS_MSSQL_- DAS-TEST-EMPINC-DB}",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Vendor ID"
+          }
+        ],
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "alias": "",
+          "format": "table",
+          "queryType": "randomWalk",
+          "rawSql": "exec [reports].[RecoveryReport]",
+          "refId": "A"
+        }
+      ],
+      "title": "EI recovery report",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Month": true,
+              "Year": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "EarningsAllFuture": "All future earnings",
+              "EarningsIn12Months": "Total earnings over next 12 months",
+              "EarningsMonth1": "Earnings [current month year + 1 month]",
+              "EarningsMonth10": "Earnings [current month year + 10 months]",
+              "EarningsMonth11": "Earnings [current month year + 11 months]",
+              "EarningsMonth12": "Earnings [current month year + 12 months]",
+              "EarningsMonth2": "Earnings [current month year + 2 months]",
+              "EarningsMonth3": "Earnings [current month year + 3 months]",
+              "EarningsMonth4": "Earnings [current month year + 4 months]",
+              "EarningsMonth5": "Earnings [current month year + 5 months]",
+              "EarningsMonth6": "Earnings [current month year + 6 months]",
+              "EarningsMonth7": "Earnings [current month year + 7 months]",
+              "EarningsMonth8": "Earnings [current month year + 8 months]",
+              "EarningsMonth9": "Earnings [current month year + 9 months]",
+              "EarningsNext3Months": "Total earnings over next 3 months",
+              "EarningsPaused": "Total earnings paused",
+              "LegalEntityName": "Legal Entity Name",
+              "Month": "",
+              "VrfVendorId": "Vendor ID",
+              "Year": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "EI Metrics - Payments - Recovery-Test",
+  "uid": "abuxRIt7k",
+  "version": 3
+}
