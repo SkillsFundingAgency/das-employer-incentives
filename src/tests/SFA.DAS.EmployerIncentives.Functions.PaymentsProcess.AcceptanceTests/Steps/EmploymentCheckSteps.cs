@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly Account _accountModel;
-        private readonly DateTime _plannedStartDate;
+        private DateTime _plannedStartDate;
         private readonly PendingPayment _pendingPayment;
         private readonly LearnerSubmissionDto _learnerMatchApiData;
 
@@ -86,7 +86,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Given(@"an apprenticeship incentive has been submitted in phase 1")]
-        public async Task GivenAnApprenticeshipIncentiveExists()
+        public async Task GivenAPhase1ApprenticeshipIncentiveExists()
+        {
+            await CreateIncentive();
+        }
+
+        [Given(@"an apprenticeship incentive has been submitted in phase 2")]
+        public async Task GivenAPhase2ApprenticeshipIncentiveExists()
+        {
+            _plannedStartDate = new DateTime(2021, 08, 01);
+            _apprenticeshipIncentive.StartDate = _plannedStartDate;
+            _apprenticeshipIncentive.Phase = Phase.Phase2;
+            await CreateIncentive();
+        }
+        private async Task CreateIncentive()
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
@@ -114,12 +127,24 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Then(@"a new employment check is requested to ensure the apprentice was not employed in the 6 months prior to phase 1 starting")]
-        public async Task ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreated()
+        public async Task ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreatedForPhase1()
+        {
+            VerifyEmployedPriorToPhaseCheck(new DateTime(2020, 08, 01).AddMonths(-6), new DateTime(2020, 07, 31));
+        }
+
+        [Then(@"a new employment check is requested to ensure the apprentice was not employed in the 6 months prior to phase 2 starting")]
+        public async Task ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreatedForPhase2()
+        {
+            VerifyEmployedPriorToPhaseCheck(new DateTime(2021, 4, 1).AddMonths(-6), new DateTime(2021, 3, 31));
+        }
+
+        private void VerifyEmployedPriorToPhaseCheck(DateTime minDate, DateTime maxDate)
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var employmentCheck = dbConnection.GetAll<EmploymentCheck>().Single(x => x.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted);
-            employmentCheck.MinimumDate.Should().Be(new DateTime(2020, 08, 01).AddMonths(-6));
-            employmentCheck.MaximumDate.Should().Be(new DateTime(2020, 07, 31));
+            var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
+                .Single(x => x.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted);
+            employmentCheck.MinimumDate.Should().Be(minDate);
+            employmentCheck.MaximumDate.Should().Be(maxDate);
             employmentCheck.Result.Should().BeNull();
         }
 
