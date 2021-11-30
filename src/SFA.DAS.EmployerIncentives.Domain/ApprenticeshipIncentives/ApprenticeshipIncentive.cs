@@ -687,6 +687,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.EmploymentCheckModels.Add(firstCheck.GetModel());
         }
 
+        public void RefreshLearnerMatch(Learner learner)
+        {
+            SetHasPossibleChangeOfCircumstances(learner.HasPossibleChangeOfCircumstances);
+            LearnerRefreshCompleted();
+            RequestEmploymentChecks(learner.SubmissionData.LearningData.IsInlearning);
+        }
+
         private DateTime GetPhaseStartDate()
         {
             if (Phase.Identifier == Enums.Phase.Phase1)
