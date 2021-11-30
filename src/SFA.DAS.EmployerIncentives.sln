@@ -71,6 +71,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Functions.TestHelpers", "SFA.DAS.EmployerIncentives.Functions.TestHelpers\SFA.DAS.EmployerIncentives.Functions.TestHelpers.csproj", "{B07C71D0-B6B2-44E8-8EBD-C5B46CAC2045}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{029DDE18-BCD5-4FCA-8C3D-4903F42FF38A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reports", "Reports", "{AE46BF8B-2ECD-4250-8398-AE3291353BDF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TEST", "TEST", "{1BBE41D6-1074-4EE3-A7DA-44C3F6765055}"
+	ProjectSection(SolutionItems) = preProject
+		Reports\TEST\EI Metrics - Payments - Recovery-Test-1637681951869.json = Reports\TEST\EI Metrics - Payments - Recovery-Test-1637681951869.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -224,6 +233,8 @@ Global
 		{440517E0-1AB6-4D96-9C4D-C5D57733FDF4} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 		{4C78336E-21B9-43FA-A151-4838C2BFB32C} = {19B5E22A-31B8-4F4A-B759-F82B368F81A9}
 		{B07C71D0-B6B2-44E8-8EBD-C5B46CAC2045} = {19B5E22A-31B8-4F4A-B759-F82B368F81A9}
+		{AE46BF8B-2ECD-4250-8398-AE3291353BDF} = {029DDE18-BCD5-4FCA-8C3D-4903F42FF38A}
+		{1BBE41D6-1074-4EE3-A7DA-44C3F6765055} = {AE46BF8B-2ECD-4250-8398-AE3291353BDF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3E3FB6-A534-4F3A-AC5E-BD27EF68874D}
