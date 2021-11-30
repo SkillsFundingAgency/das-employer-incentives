@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 {
-    public class LearnerService : ILearnerService
+    public class LearnerSubmissionService : ILearnerSubmissionService
     {
         private readonly HttpClient _client;
         private readonly string _serviceVersion;
 
-        public LearnerService(
+        public LearnerSubmissionService(
             HttpClient client,
             string serviceVersion)
         {

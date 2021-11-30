@@ -241,7 +241,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
         private static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<ILearnerService>(s =>
+            serviceCollection.AddTransient<ILearnerSubmissionService>(s =>
             {
                 var settings = s.GetService<IOptions<MatchedLearnerApi>>().Value;
 
@@ -263,7 +263,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new LearnerService(client, settings.Version);
+                return new LearnerSubmissionService(client, settings.Version);
             });
 
             return serviceCollection;

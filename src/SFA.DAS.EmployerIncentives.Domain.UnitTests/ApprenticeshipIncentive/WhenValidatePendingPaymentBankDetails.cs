@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     {
         private long _accountId;
         private long _accountLegalEntityId;
-        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private AccountModel _accountModel;
         private Account _account;
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 }
             };
             
-            _sut = ApprenticeshipIncentives.ApprenticeshipIncentive.Get(_sutModel.Id, _sutModel);
+            _sut = ApprenticeshipIncentive.Get(_sutModel.Id, _sutModel);
         }
 
         [Test]
