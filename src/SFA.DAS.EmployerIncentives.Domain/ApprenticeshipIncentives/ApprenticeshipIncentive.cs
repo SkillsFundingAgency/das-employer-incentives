@@ -551,7 +551,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
         }
 
-        public void LearnerRefreshCompleted()
+        private void LearnerRefreshCompleted()
         {
             Model.RefreshedLearnerForEarnings = true;
         }
@@ -646,7 +646,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod, incentivePaymentProfiles);
         }
 
-        public void RequestEmploymentChecks(bool? isInLearning)
+        private void RequestEmploymentChecks(bool? isInLearning)
         {
             if (EmploymentChecks.Any())
             {
@@ -687,11 +687,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.EmploymentCheckModels.Add(firstCheck.GetModel());
         }
 
-        public void RefreshLearnerMatch(Learner learner)
+        public void RefreshLearner(Learner learner)
         {
             SetHasPossibleChangeOfCircumstances(learner.HasPossibleChangeOfCircumstances);
             LearnerRefreshCompleted();
-            RequestEmploymentChecks(learner.SubmissionData.LearningData.IsInlearning);
+            RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
         }
 
         private DateTime GetPhaseStartDate()
