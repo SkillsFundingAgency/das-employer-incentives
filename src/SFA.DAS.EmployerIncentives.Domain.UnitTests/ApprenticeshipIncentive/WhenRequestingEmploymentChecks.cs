@@ -3,19 +3,20 @@ using System.Linq;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive
+namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
     [TestFixture]
     public class WhenRequestingEmploymentChecks
     {
         private Fixture _fixture;
         private ApprenticeshipIncentiveModel _sutModel;
-        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentive _sut;
 
         [SetUp]
         public void Arrange()
@@ -89,9 +90,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive
             _sut.EmploymentChecks.Count.Should().Be(0);
         }
         
-        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }
