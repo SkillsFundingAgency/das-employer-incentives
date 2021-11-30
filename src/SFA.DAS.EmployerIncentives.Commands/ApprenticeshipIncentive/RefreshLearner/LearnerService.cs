@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             _collectionCalendarService = collectionCalendarService;
         }
 
-        internal async Task<Learner> RefreshLearner(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        internal async Task<Learner> Refresh(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
             var learnerData = await _learnerSubmissionService.Get(learner);
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             var collectionCalendar = await _collectionCalendarService.Get();
 
             var submissionDataService = new SubmissionDataService();
-            learner.SetSubmissionData(submissionDataService.GetSubmissionData(learnerData, incentive, collectionCalendar));
+            learner.SetSubmissionData(submissionDataService.Get(learnerData, incentive, collectionCalendar));
             learner.SetLearningPeriods(learnerData.LearningPeriods(incentive, collectionCalendar));
 
             await _learnerDomainRepository.Save(learner);

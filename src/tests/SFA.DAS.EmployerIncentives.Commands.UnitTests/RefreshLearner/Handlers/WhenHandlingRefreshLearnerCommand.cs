@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private RefreshLearnerCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockApprenticeshipIncentiveDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
-        private Mock<ILearnerService> _mockLearnerService;
+        private Mock<ILearnerSubmissionService> _mockLearnerService;
         private Mock<ICollectionCalendarService> _collectionCalendarService;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
-            _mockLearnerService = new Mock<ILearnerService>();
+            _mockLearnerService = new Mock<ILearnerSubmissionService>();
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
             
