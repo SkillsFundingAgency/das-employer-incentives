@@ -6,15 +6,15 @@ using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
-    internal class LearnerMatchService
+    internal class LearnerService
     {
-        private readonly ILearnerService _learnerService;
+        private readonly ILearnerSubmissionService _learnerSubmissionService;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
 
-        internal LearnerMatchService(ILearnerService learnerService, ILearnerDomainRepository learnerDomainRepository, ICollectionCalendarService collectionCalendarService)
+        internal LearnerService(ILearnerSubmissionService learnerSubmissionService, ILearnerDomainRepository learnerDomainRepository, ICollectionCalendarService collectionCalendarService)
         {
-            _learnerService = learnerService;
+            _learnerSubmissionService = learnerSubmissionService;
             _learnerDomainRepository = learnerDomainRepository;
             _collectionCalendarService = collectionCalendarService;
         }
@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         internal async Task<Learner> RefreshLearner(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
-            var learnerData = await _learnerService.Get(learner);
+            var learnerData = await _learnerSubmissionService.Get(learner);
 
             var collectionCalendar = await _collectionCalendarService.Get();
 
