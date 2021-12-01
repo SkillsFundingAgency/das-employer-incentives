@@ -271,7 +271,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.StartDate,
                     Model));
 
-                SetMinimumAgreementVersion(startDate);                
+                SetMinimumAgreementVersion(startDate);  
+                AddEmploymentChecks();
             }
         }
 
@@ -696,6 +697,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private void AddEmploymentChecks()
         {
+            Model.EmploymentCheckModels.Clear();
             if (StartDate.AddDays(42) > DateTime.Now)
             {
                 return;
