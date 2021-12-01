@@ -10,24 +10,24 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
     public class RefreshLearnerCommandHandler : ICommandHandler<RefreshLearnerCommand>
     {
         private readonly IApprenticeshipIncentiveDomainRepository _incentiveDomainRepository;
-        private readonly LearnerMatchService _learnerMatchService;
+        private readonly LearnerService _learnerService;
 
         public RefreshLearnerCommandHandler(
             IApprenticeshipIncentiveDomainRepository incentiveDomainRepository,
-            ILearnerService learnerService,
+            ILearnerSubmissionService learnerSubmissionService,
             ILearnerDomainRepository learnerDomainRepository,
             ICollectionCalendarService collectionCalendarService)
         {
             _incentiveDomainRepository = incentiveDomainRepository;
-            _learnerMatchService = new LearnerMatchService(learnerService, learnerDomainRepository, collectionCalendarService);
+            _learnerService = new LearnerService(learnerSubmissionService, learnerDomainRepository, collectionCalendarService);
         }
 
         public async Task Handle(RefreshLearnerCommand command, CancellationToken cancellationToken = default)
         {
             var incentive = await _incentiveDomainRepository.Find(command.ApprenticeshipIncentiveId);
-            var learner = await _learnerMatchService.RefreshLearner(incentive);
+            var learner = await _learnerService.Refresh(incentive);
             
-            incentive.RefreshLearnerMatch(learner);
+            incentive.RefreshLearner(learner);
 
             await _incentiveDomainRepository.Save(incentive);
         }

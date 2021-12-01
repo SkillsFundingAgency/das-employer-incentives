@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     [TestFixture]
     public class WhenLearningPeriodsChanged
     {
-        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Fixture _fixture;
         private Learner _learner;
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
             _sutModel.Phase = new IncentivePhase(Phase.Phase2);
             _sutModel.StartDate = new DateTime(2021, 7, 1);
-            _sut = ApprenticeshipIncentives.ApprenticeshipIncentive.Get(_sutModel.Id, _sutModel);
+            _sut = ApprenticeshipIncentive.Get(_sutModel.Id, _sutModel);
 
             var learningData = new LearningData(true);
             learningData.SetStartDate(new DateTime(2021, 7, 1));

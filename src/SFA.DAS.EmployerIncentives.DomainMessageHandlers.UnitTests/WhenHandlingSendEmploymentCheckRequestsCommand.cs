@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests
 {
 
     [TestFixture]
-    public class WhenHandlingSendEmploymentCheckReqyestsCommand
+    public class WhenHandlingSendEmploymentCheckRequestsCommand
     {
         private HandleSendEmploymentCheckRequestsCommand _sut;
         private Mock<ICommandService> _mockCommandService;
