@@ -271,7 +271,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.StartDate,
                     Model));
 
-                SetMinimumAgreementVersion(startDate);                
+                SetMinimumAgreementVersion(startDate);  
+                AddEmploymentChecks();
             }
         }
 
@@ -679,6 +680,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod, incentivePaymentProfiles);
         }
 
+        public void UpdateEmploymentCheck(EmploymentCheckResult checkResult)
+        {
+            var employmentCheck = Model.EmploymentCheckModels.SingleOrDefault(c => c.CorrelationId == checkResult.CorrelationId);
+            if (employmentCheck == null)
+            {
+                return; // ignore superseded results
+            }
+
+            employmentCheck.Result = false;
+            employmentCheck.ResultDateTime = checkResult.DateChecked;
+
+            if (checkResult.Result == EmploymentCheckResultType.Employed)
+            {
+                employmentCheck.Result = true;                
+            }
+        }
+
         private void RequestEmploymentChecks(bool? isInLearning)
         {
             if (EmploymentChecks.Any())
@@ -696,6 +714,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private void AddEmploymentChecks()
         {
+            Model.EmploymentCheckModels.Clear();
             if (StartDate.AddDays(42) > DateTime.Now)
             {
                 return;
@@ -741,21 +760,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             throw new ArgumentException("Invalid phase!");
         }
         
-        public void UpdateEmploymentCheck(EmploymentCheckResult checkResult)
-        {
-            var employmentCheck = Model.EmploymentCheckModels.SingleOrDefault(c => c.CorrelationId == checkResult.CorrelationId);
-            if (employmentCheck == null)
-            {
-                return; // ignore superseded results
-            }
-
-            employmentCheck.Result = false;
-            employmentCheck.ResultDateTime = checkResult.DateChecked;
-
-            if (checkResult.Result == EmploymentCheckResultType.Employed)
-            {
-                employmentCheck.Result = true;                
-            }
-        }
     }
 }
