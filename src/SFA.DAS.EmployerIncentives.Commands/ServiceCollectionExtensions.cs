@@ -57,6 +57,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 using SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriodToInProgress;
+using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -67,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddHashingService()
-                .AddLearnerService();
+                .AddLearnerService()
+                .AddEmploymentCheckService();
 
             serviceCollection
                 .AddCommandHandlers(addDecorators: AddCommandHandlerDecorators)
@@ -181,6 +183,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SetSuccessfulLearnerMatchCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
                 ;
 
             return serviceCollection;
@@ -234,9 +237,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceCollection;
         }
 
-        public static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
+        private static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<ILearnerService>(s =>
+            serviceCollection.AddTransient<ILearnerSubmissionService>(s =>
             {
                 var settings = s.GetService<IOptions<MatchedLearnerApi>>().Value;
 
@@ -258,7 +261,37 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new LearnerService(client, settings.Version);
+                return new LearnerSubmissionService(client, settings.Version);
+            });
+
+            return serviceCollection;
+        }
+
+        private static IServiceCollection AddEmploymentCheckService(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IEmploymentCheckService>(s =>
+            {
+                var settings = s.GetService<IOptions<EmploymentCheckApi>>().Value;
+
+                var clientBuilder = new HttpClientBuilder()
+                    .WithDefaultHeaders()
+                    .WithLogging(s.GetService<ILoggerFactory>());
+
+                if (!string.IsNullOrEmpty(settings.Identifier))
+                {
+                    clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
+                }
+
+                var client = clientBuilder.Build();
+
+                if (!settings.ApiBaseUrl.EndsWith("/"))
+                {
+                    settings.ApiBaseUrl += "/";
+                }
+
+                client.BaseAddress = new Uri(settings.ApiBaseUrl);
+
+                return new EmploymentCheckService(client);
             });
 
             return serviceCollection;

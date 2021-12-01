@@ -16,5 +16,6 @@
         public const string ComplianceWithdrawal = "SFA.DAS.EmployerIncentives.ComplianceWithdrawal";
 
         public const string UpdateVendorRegistrationCaseStatus = "SFA.DAS.EmployerIncentives.UpdateVrfStatus";
+        public const string SendEmploymentCheckRequests = "SFA.DAS.EmployerIncentives.RequestEmploymentChecks";
     }
 }

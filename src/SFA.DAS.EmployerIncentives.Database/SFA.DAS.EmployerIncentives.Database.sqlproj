@@ -106,6 +106,7 @@
     <Build Include="Tables\ApprenticeshipBreakInLearning.sql" />
     <Build Include="StoredProcedures\CreateRetrospectiveApplication.sql" />
     <Build Include="Tables\AcademicYear.sql" />
+    <Build Include="Tables\EmploymentCheck.sql" />
     <Build Include="Schemas\Reports.sql" />
     <Build Include="StoredProcedures\Reports.RecoveryReport.sql" />
   </ItemGroup>

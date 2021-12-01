@@ -36,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
         public DateTime SubmissionDate => Model.SubmittedDate.Value;
+        public IReadOnlyCollection<EmploymentCheck> EmploymentChecks => Model.EmploymentCheckModels.Map().ToList().AsReadOnly();
 
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
@@ -550,7 +551,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
         }
 
-        public void LearnerRefreshCompleted()
+        private void LearnerRefreshCompleted()
         {
             Model.RefreshedLearnerForEarnings = true;
         }
@@ -643,6 +644,68 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateIsInLearning(pendingPaymentId, learner, collectionPeriod);
             ValidateHasNoDataLocks(pendingPaymentId, learner, collectionPeriod);
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod, incentivePaymentProfiles);
+        }
+
+        private void RequestEmploymentChecks(bool? isInLearning)
+        {
+            if (EmploymentChecks.Any())
+            {
+                return;
+            }
+
+            if (!isInLearning.HasValue || !isInLearning.Value)
+            {
+                return;
+            }
+
+            AddEmploymentChecks();
+        }
+
+        private void AddEmploymentChecks()
+        {
+            if (StartDate.AddDays(42) > DateTime.Now)
+            {
+                return;
+            }
+
+            AddEmploymentBeforeSchemeCheck();
+            AddEmployedAtStartOfApprenticeshipCheck();
+
+            AddEvent(new EmploymentChecksCreated(Id));
+        }
+
+        private void AddEmployedAtStartOfApprenticeshipCheck()
+        {
+            var secondCheck = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAtStartOfApprenticeship, StartDate, StartDate.AddDays(42));
+            Model.EmploymentCheckModels.Add(secondCheck.GetModel());
+        }
+
+        private void AddEmploymentBeforeSchemeCheck()
+        {
+            var phaseStartDate = GetPhaseStartDate();
+            var firstCheck = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedBeforeSchemeStarted, phaseStartDate.AddMonths(-6), phaseStartDate.AddDays(-1));
+            Model.EmploymentCheckModels.Add(firstCheck.GetModel());
+        }
+
+        public void RefreshLearner(Learner learner)
+        {
+            SetHasPossibleChangeOfCircumstances(learner.HasPossibleChangeOfCircumstances);
+            LearnerRefreshCompleted();
+            RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
+        }
+
+        private DateTime GetPhaseStartDate()
+        {
+            if (Phase.Identifier == Enums.Phase.Phase1)
+            {
+                return Phase1Incentive.EligibilityStartDate;
+            } 
+            if (Phase.Identifier == Enums.Phase.Phase2)
+            {
+                return Phase2Incentive.EligibilityStartDate;
+            }
+
+            throw new ArgumentException("Invalid phase!");
         }
     }
 }

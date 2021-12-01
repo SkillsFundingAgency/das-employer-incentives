@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public ICollection<BreakInLearning> BreakInLearnings { get; set; }
         public AgreementVersion MinimumAgreementVersion { get; set; }
         public IncentivePhase Phase { get; set; }
+        public ICollection<EmploymentCheckModel> EmploymentCheckModels { get; set; }
 
         public ApprenticeshipIncentiveModel()
         {
@@ -34,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
             PaymentModels = new List<PaymentModel>();
             ClawbackPaymentModels = new List<ClawbackPaymentModel>();
             BreakInLearnings = new List<BreakInLearning>();
+            EmploymentCheckModels = new List<EmploymentCheckModel>();
         }
     }
 }
