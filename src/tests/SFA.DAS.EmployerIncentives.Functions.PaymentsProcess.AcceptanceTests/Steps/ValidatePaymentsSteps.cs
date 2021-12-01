@@ -13,6 +13,9 @@ using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
 using System;
+using AutoFixture;
+using SFA.DAS.EmployerIncentives.Enums;
+using EmploymentCheck = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.EmploymentCheck;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -23,11 +26,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly TestContext _testContext;
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
+        private Fixture _fixture;
 
         private ValidatePaymentData _validatePaymentData;
 
         public ValidatePaymentsSteps(TestContext testContext)
         {
+            _fixture = new Fixture();
             _testContext = testContext;
         }
 
@@ -75,6 +80,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     break;
                 case ValidationStep.LearnerMatchSuccessful:
                     _validatePaymentData.LearnerModel.SuccessfulLearnerMatchExecution = false;
+                    break;
+                case ValidationStep.EmployedAtStartOfApprenticeship:
+                    _validatePaymentData.EmploymentChecks = new List<EmploymentCheck> 
+                    { 
+                        _fixture.Build<EmploymentCheck>()
+                            .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                            .With(x => x.Result, false)
+                            .With(x => x.ApprenticeshipIncentiveId, _validatePaymentData.ApprenticeshipIncentiveModel.Id)
+                            .Create()
+                    };
+                    break;
+                case ValidationStep.EmployedBeforeSchemeStarted:
+                    _validatePaymentData.EmploymentChecks = new List<EmploymentCheck>
+                    {
+                        _fixture.Build<EmploymentCheck>()
+                            .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                            .With(x => x.Result, true)
+                            .With(x => x.ApprenticeshipIncentiveId,
+                                _validatePaymentData.ApprenticeshipIncentiveModel.Id)
+                            .Create()
+                    };
                     break;
             }
 
