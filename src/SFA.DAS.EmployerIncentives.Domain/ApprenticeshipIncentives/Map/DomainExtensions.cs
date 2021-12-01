@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
 
         public static IEnumerable<EmploymentCheck> Map(this IEnumerable<EmploymentCheckModel> models)
         {
-            return models.Select(q => q.Map());
+            return models.Select(x => x.Map());
         }
 
         public static EmploymentCheck Map(this EmploymentCheckModel model)
