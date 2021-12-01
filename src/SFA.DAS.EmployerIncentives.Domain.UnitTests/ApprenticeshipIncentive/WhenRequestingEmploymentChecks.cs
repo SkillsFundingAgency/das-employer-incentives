@@ -3,24 +3,28 @@ using System.Linq;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive
+namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
     [TestFixture]
     public class WhenRequestingEmploymentChecks
     {
         private Fixture _fixture;
         private ApprenticeshipIncentiveModel _sutModel;
-        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentive _sut;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+            _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
 
             var startDate = DateTime.Now.AddDays(-42);
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.StartDate, startDate).Without(x => x.EmploymentCheckModels).Create();
@@ -36,7 +40,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.StartDate, startDate).With(x => x.Phase, incentivePhase).Without(x => x.EmploymentCheckModels).Create();
             _sut = Sut(_sutModel);
 
-            _sut.RequestEmploymentChecks(true);
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+            learner.SubmissionData.SetLearningData(new LearningData(true));
+            _sut.RefreshLearner(learner);
 
             _sut.EmploymentChecks.Count.Should().Be(2);
 
@@ -62,16 +68,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive
             _sut = Sut(_sutModel);
             var expectedEmploymentChecks = _sut.EmploymentChecks;
 
-            _sut.RequestEmploymentChecks(true);
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+            learner.SubmissionData.SetLearningData(new LearningData(true));
+            _sut.RefreshLearner(learner);
 
             _sut.EmploymentChecks.Count().Should().Be(expectedEmploymentChecks.Count);
         }
 
-        [TestCase(false)]
-        [TestCase(null)]
-        public void Then_employment_checks_are_not_added_when_not_in_learning(bool inLearning)
+        [Test]
+        public void Then_employment_checks_are_not_added_when_learning_not_found()
         {
-            _sut.RequestEmploymentChecks(inLearning);
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+            learner.SubmissionData.SetLearningData(new LearningData(false));
+            _sut.RefreshLearner(learner);
 
             _sut.EmploymentChecks.Count.Should().Be(0);
         }
@@ -84,14 +93,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentive
 
             _sut = Sut(_sutModel);
 
-            _sut.RequestEmploymentChecks(true);
+            var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
+            learner.SubmissionData.SetLearningData(new LearningData(true));
+            _sut.RefreshLearner(learner);
 
             _sut.EmploymentChecks.Count.Should().Be(0);
         }
         
-        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }

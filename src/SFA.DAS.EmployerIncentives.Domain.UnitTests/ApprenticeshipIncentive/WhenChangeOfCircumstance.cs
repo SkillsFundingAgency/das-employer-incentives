@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
     [TestFixture]
     public class WhenChangeOfCircumstance
     {
-        private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
+        private ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Fixture _fixture;
         private Learner _learner;
@@ -129,9 +129,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
         }
 
-        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
-            return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
+            return ApprenticeshipIncentive.Get(model.Id, model);
         }
     }
 }

@@ -11,11 +11,11 @@ using System;
         public EmploymentCheckType CheckType => Model.CheckType;
         public DateTime MinimumDate => Model.MinimumDate;
         public DateTime MaximumDate => Model.MaximumDate;
-        public Guid CorrelationId => Model.CorrelationId;
+        public Guid? CorrelationId => Model.CorrelationId;
         public bool? Result => Model.Result;
         public DateTime CreatedDateTime => Model.CreatedDateTime;
         public DateTime? ResultDateTime => Model.ResultDateTime;
-        
+
         internal static EmploymentCheck New(Guid id,
             Guid apprenticeshipIncentiveId,
             EmploymentCheckType checkType, 
@@ -31,6 +31,11 @@ using System;
                 MaximumDate = maximumDate
             }, 
             true);
+        }
+
+        public void SetCorrelationId(Guid correlationId)
+        {
+            Model.CorrelationId = correlationId;
         }
 
         internal static EmploymentCheck Get(EmploymentCheckModel model)
