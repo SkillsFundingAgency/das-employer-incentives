@@ -72,6 +72,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
         }
 
+        public async Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByEmploymentCheckId(Guid correlationId)
+        {
+            var employmentCheck = await _dbContext.EmploymentChecks.SingleOrDefaultAsync(c => c.CorrelationId == correlationId);
+            if(employmentCheck == null)
+            {
+                return null;
+            }
+
+            return await Get(employmentCheck.ApprenticeshipIncentiveId);
+        }
+
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
         {
             var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
@@ -287,6 +298,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     _dbContext.EmploymentChecks.Remove(existingEmploymentCheck);
                 }
             }
-        }
+        }       
     }
 }

@@ -12,5 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
         Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindIncentivesWithoutPendingPayments();
 
         Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId);
+
+        Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByEmploymentCheckId(Guid correlationId);
     }
 }

@@ -680,6 +680,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateDaysInLearning(pendingPaymentId, learner, collectionPeriod, incentivePaymentProfiles);
         }
 
+        public void UpdateEmploymentCheck(EmploymentCheckResult checkResult)
+        {
+            var employmentCheck = Model.EmploymentCheckModels.SingleOrDefault(c => c.CorrelationId == checkResult.CorrelationId);
+            if (employmentCheck == null)
+            {
+                return; // ignore superseded results
+            }
+
+            employmentCheck.Result = false;
+            employmentCheck.ResultDateTime = checkResult.DateChecked;
+
+            if (checkResult.Result == EmploymentCheckResultType.Employed)
+            {
+                employmentCheck.Result = true;                
+            }
+        }
+
         private void RequestEmploymentChecks(bool? isInLearning)
         {
             if (EmploymentChecks.Any())

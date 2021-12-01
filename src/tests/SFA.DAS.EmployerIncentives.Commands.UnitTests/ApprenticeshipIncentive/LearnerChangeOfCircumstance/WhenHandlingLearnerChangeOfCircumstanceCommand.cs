@@ -437,7 +437,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
             _learner.SubmissionData.SetSubmissionDate(new DateTime(2021, 8, 1));
             _learner.SubmissionData.SetLearningData(new LearningData(true));
-            _learner.SubmissionData.LearningData.SetStartDate(_fixture.Create<DateTime>());
+            _learner.SubmissionData.LearningData.SetStartDate(DateTime.Now.AddDays(-50));
 
             // Act
             await _sut.Handle(command);

@@ -47,6 +47,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
+        public async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByEmploymentCheckId(Guid correlationId)
+        {
+            var apprenticeshipIncentiveModel = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentiveByEmploymentCheckId(correlationId);
+
+            if(apprenticeshipIncentiveModel == null)
+            {
+                return null;
+            }
+
+            return _apprenticeshipIncentiveFactory.GetExisting(apprenticeshipIncentiveModel.Id, apprenticeshipIncentiveModel);
+        }
+
         public async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
         {
             var apprenticeships = await _apprenticeshipIncentiveDataRepository.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(uln, accountLegalEntityId);

@@ -15,9 +15,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     {
         private CompleteCommandHandler _sut;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionPeriods;
-        private Domain.ValueObjects.CollectionCalendarPeriod _firstCollectionPeriod;
-        private Domain.ValueObjects.CollectionCalendarPeriod _secondCollectionPeriod;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
+        private CollectionCalendarPeriod _firstCollectionPeriod;
+        private CollectionCalendarPeriod _secondCollectionPeriod;
         private DateTime _completionDate;
 
         [SetUp]
@@ -25,9 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             var today = new DateTime(2021, 1, 30);
 
-            _collectionPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
+            _collectionPeriods = new List<CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionCalendarPeriod(
+                new CollectionCalendarPeriod(
                     new Domain.ValueObjects.CollectionPeriod(1, (short)today.Year),
                     (byte)today.Month,
                     (short)today.Year,
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     today.AddDays(-1),
                     false,
                     false),
-                new Domain.ValueObjects.CollectionCalendarPeriod(
+                new CollectionCalendarPeriod(
                     new Domain.ValueObjects.CollectionPeriod(2, (short)today.AddMonths(1).Year),
                     (byte)today.AddMonths(1).Month,
                     (short)today.AddMonths(1).Year,
@@ -64,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             var command = new CompleteCommand(_completionDate, new Domain.ValueObjects.CollectionPeriod(_firstCollectionPeriod.CollectionPeriod.PeriodNumber, _firstCollectionPeriod.CalendarYear));
-            var savedPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>();
+            var savedPeriods = new List<CollectionCalendarPeriod>();
 
             _mockCollectionCalendarService.Setup(m => m.Save(It.IsAny<Domain.ValueObjects.CollectionCalendar>()))
                 .Callback<Domain.ValueObjects.CollectionCalendar>(c =>
@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             var command = new CompleteCommand(_completionDate, new Domain.ValueObjects.CollectionPeriod(_firstCollectionPeriod.CollectionPeriod.PeriodNumber, _firstCollectionPeriod.CalendarYear));
-            var savedPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>();
+            var savedPeriods = new List<CollectionCalendarPeriod>();
 
             _mockCollectionCalendarService.Setup(m => m.Save(It.IsAny<Domain.ValueObjects.CollectionCalendar>()))
                 .Callback<Domain.ValueObjects.CollectionCalendar>(c =>
