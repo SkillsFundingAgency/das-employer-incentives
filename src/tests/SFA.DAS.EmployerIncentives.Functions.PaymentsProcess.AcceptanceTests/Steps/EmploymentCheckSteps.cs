@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Account _accountModel;
         private DateTime _plannedStartDate;
         private readonly PendingPayment _pendingPayment;
-        private readonly LearnerSubmissionDto _learnerMatchApiData;
+        private LearnerSubmissionDto _learnerMatchApiData;
 
         public EmploymentCheckSteps(TestContext testContext)
         {
@@ -59,7 +59,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Without(p => p.PaymentMadeDate)
                 .Create();
 
-            _learnerMatchApiData = _fixture
+            _learnerMatchApiData = CreateLearnerMatchApiData();
+        }
+
+        private LearnerSubmissionDto CreateLearnerMatchApiData()
+        {
+            return _fixture
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
                 .With(s => s.Uln, _apprenticeshipIncentive.ULN)
@@ -97,6 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _plannedStartDate = new DateTime(2021, 08, 01);
             _apprenticeshipIncentive.StartDate = _plannedStartDate;
             _apprenticeshipIncentive.Phase = Phase.Phase2;
+            _learnerMatchApiData = CreateLearnerMatchApiData();
             await CreateIncentive();
         }
         private async Task CreateIncentive()
@@ -117,6 +123,34 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"6 weeks has elapsed since the start date of the apprenticeship")]
         public void GivenSixWeeksHasElapsedSinceTheStartDateOfTheApprenticeship()
         {
+        }
+
+        [Given(@"we have previously requested an employment check for the learner")]
+        public async Task GivenWeHavePreviouslyRequestedAnEmploymentCheckForTheLearner()
+        {
+            var employmentChecks = _fixture.Build<EmploymentCheck>().With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id).CreateMany();
+
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                foreach (var employmentCheck in employmentChecks)
+                {
+                    await dbConnection.InsertWithEnumAsStringAsync(employmentCheck);
+                }
+            }
+        }
+
+        [Given(@"the learner data is updated with new valid start date for phase 1")]
+        public async Task GivenTheLearnerIsUpdatedWithANewPhase1StartDate()
+        {
+            _plannedStartDate = new DateTime(2020, 9, 1);
+            _learnerMatchApiData = CreateLearnerMatchApiData();
+        }
+
+        [Given(@"the learner data is updated with new valid start date for phase 2")]
+        public async Task GivenTheLearnerIsUpdatedWithANewPhase2StartDate()
+        {
+            _plannedStartDate = new DateTime(2021, 9, 1);
+            _learnerMatchApiData = CreateLearnerMatchApiData();
         }
 
         [When(@"an ILR submission is received for that learner")]
