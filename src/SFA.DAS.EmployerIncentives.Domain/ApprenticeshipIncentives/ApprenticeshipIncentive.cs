@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
         public DateTime SubmissionDate => Model.SubmittedDate.Value;
         public IReadOnlyCollection<EmploymentCheck> EmploymentChecks => Model.EmploymentCheckModels.Map().ToList().AsReadOnly();
-
+        
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
             return new ApprenticeshipIncentive(
@@ -271,7 +271,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.StartDate,
                     Model));
 
-                SetMinimumAgreementVersion(startDate);                
+                SetMinimumAgreementVersion(startDate);  
+                AddEmploymentChecks();
             }
         }
 
@@ -497,6 +498,39 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasSignedMinVersion, isValid));
         }
 
+        public void ValidateEmploymentChecks(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
+        {
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            ValidateEmployedAtStartOfApprenticeship(collectionPeriod, pendingPayment);
+
+            ValidateNotEmployedBeforeSchemeStartDate(collectionPeriod, pendingPayment);
+        }
+
+        private void ValidateNotEmployedBeforeSchemeStartDate(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
+        {
+            var employedBeforeSchemeStartedCheck = EmploymentChecks.FirstOrDefault(x =>
+                x.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted);
+
+            var employedBeforeSchemeStartedResult = employedBeforeSchemeStartedCheck?.Result != null &&
+                                                    !employedBeforeSchemeStartedCheck.Result.Value;
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod,
+                ValidationStep.EmployedBeforeSchemeStarted, employedBeforeSchemeStartedResult));
+        }
+
+        private void ValidateEmployedAtStartOfApprenticeship(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
+        {
+            var employedAtStartOfApprenticeshipCheck = EmploymentChecks.FirstOrDefault(x =>
+                x.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship);
+
+            var employedAtStartOfApprenticeshipResult = employedAtStartOfApprenticeshipCheck?.Result != null &&
+                                                        employedAtStartOfApprenticeshipCheck.Result.Value;
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod,
+                ValidationStep.EmployedAtStartOfApprenticeship, employedAtStartOfApprenticeshipResult));
+        }
+
         private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
@@ -551,7 +585,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasNoDataLocks, !hasDataLock));
         }
 
-        public void LearnerRefreshCompleted()
+        private void LearnerRefreshCompleted()
         {
             Model.RefreshedLearnerForEarnings = true;
         }
@@ -663,7 +697,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        public void RequestEmploymentChecks(bool? isInLearning)
+        private void RequestEmploymentChecks(bool? isInLearning)
         {
             if (EmploymentChecks.Any())
             {
@@ -680,6 +714,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private void AddEmploymentChecks()
         {
+            Model.EmploymentCheckModels.Clear();
             if (StartDate.AddDays(42) > DateTime.Now)
             {
                 return;
@@ -702,6 +737,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             var phaseStartDate = GetPhaseStartDate();
             var firstCheck = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedBeforeSchemeStarted, phaseStartDate.AddMonths(-6), phaseStartDate.AddDays(-1));
             Model.EmploymentCheckModels.Add(firstCheck.GetModel());
+        }
+
+        public void RefreshLearner(Learner learner)
+        {
+            SetHasPossibleChangeOfCircumstances(learner.HasPossibleChangeOfCircumstances);
+            LearnerRefreshCompleted();
+            RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
         }
 
         private DateTime GetPhaseStartDate()

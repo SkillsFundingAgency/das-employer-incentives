@@ -3,14 +3,18 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
+ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
     public class EmploymentCheck : Entity<Guid, EmploymentCheckModel>
     {
+        public Guid ApprenticeshipIncentiveId => Model.ApprenticeshipIncentiveId;
         public EmploymentCheckType CheckType => Model.CheckType;
         public DateTime MinimumDate => Model.MinimumDate;
         public DateTime MaximumDate => Model.MaximumDate;
         public Guid? CorrelationId => Model.CorrelationId;
+        public bool? Result => Model.Result;
+        public DateTime CreatedDateTime => Model.CreatedDateTime;
+        public DateTime? ResultDateTime => Model.ResultDateTime;
 
         internal static EmploymentCheck New(Guid id,
             Guid apprenticeshipIncentiveId,
@@ -19,15 +23,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             DateTime maximumDate)
         {
             return new EmploymentCheck(new EmploymentCheckModel
-            {
+                {
                 Id = id,
                 ApprenticeshipIncentiveId = apprenticeshipIncentiveId,
                 CheckType = checkType,
                 MinimumDate = minimumDate,
-                MaximumDate = maximumDate,
-                CreatedDateTime = DateTime.Now
-            },
-                true);
+                MaximumDate = maximumDate
+            }, 
+            true);
         }
 
         public void SetCorrelationId(Guid correlationId)

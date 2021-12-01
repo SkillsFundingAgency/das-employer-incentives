@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 {
-    public interface ILearnerService
+    public interface ILearnerSubmissionService
     {
         Task<LearnerSubmissionDto> Get(Learner learner);
     }

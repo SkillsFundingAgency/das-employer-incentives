@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 {
     public class WhenRefreshCalled
     {
-        private LearnerService _sut;
+        private LearnerSubmissionService _sut;
         private TestHttpClient _httpClient;
         private Uri _baseAddress;
         private Learner _learner;
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
 
             _learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
 
-            _sut = new LearnerService(_httpClient, _version);
+            _sut = new LearnerSubmissionService(_httpClient, _version);
         }
 
         [Test]

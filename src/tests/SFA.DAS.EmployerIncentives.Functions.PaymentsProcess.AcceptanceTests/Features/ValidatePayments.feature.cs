@@ -287,6 +287,8 @@ this.ScenarioInitialize(scenarioInfo);
         [NUnit.Framework.TestCaseAttribute("PaymentsNotPaused", null)]
         [NUnit.Framework.TestCaseAttribute("HasSignedMinVersion", null)]
         [NUnit.Framework.TestCaseAttribute("LearnerMatchSuccessful", null)]
+        [NUnit.Framework.TestCaseAttribute("EmployedAtStartOfApprenticeship", null)]
+        [NUnit.Framework.TestCaseAttribute("EmployedBeforeSchemeStarted", null)]
         public virtual void WhenAtLeastOneValidationCheckFails(string validationStep, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;

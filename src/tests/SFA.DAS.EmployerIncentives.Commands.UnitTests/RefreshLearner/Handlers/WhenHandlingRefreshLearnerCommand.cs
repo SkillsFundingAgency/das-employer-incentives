@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
@@ -22,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private RefreshLearnerCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockApprenticeshipIncentiveDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
-        private Mock<ILearnerService> _mockLearnerService;
+        private Mock<ILearnerSubmissionService> _mockLearnerService;
         private Mock<ICollectionCalendarService> _collectionCalendarService;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
@@ -45,13 +46,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
-            _mockLearnerService = new Mock<ILearnerService>();
+            _mockLearnerService = new Mock<ILearnerSubmissionService>();
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
             
             _incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(p => p.Apprenticeship, apprenticeship)
                 .With(x => x.HasPossibleChangeOfCircumstances, false)
+                .With(p => p.RefreshedLearnerForEarnings, false)
                 .Create();
 
             _apprenticeshipIncentiveId = _incentiveModel.Id;
@@ -121,6 +123,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             // Assert
             _mockLearnerDomainRepository.Verify(m => m.Save(_learner), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_refreshed_learner_for_earnings_is_set()
+        {
+            // Arrange
+            var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _apprenticeshipIncentive.RefreshedLearnerForEarnings.Should().BeTrue();
         }
 
         [Test]
