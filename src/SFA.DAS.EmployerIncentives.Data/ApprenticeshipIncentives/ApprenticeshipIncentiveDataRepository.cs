@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<List<ApprenticeshipIncentiveModel>> FindIncentivesWithLearningFound()
         {
-            var apprenticeships = (from incentive in _dbContext.ApprenticeshipIncentives
+            var apprenticeships = (from incentive in _dbContext.ApprenticeshipIncentives.Include(x => x.EmploymentChecks)
                     join learner in _dbContext.Learners.Where(x => x.LearningFound.HasValue && x.LearningFound.Value) 
                         on incentive.Id equals learner.ApprenticeshipIncentiveId
                         select new {Incentive = incentive}

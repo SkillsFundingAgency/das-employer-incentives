@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
@@ -32,6 +33,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
 
             foreach(var incentive in incentivesWithLearning)
             {
+                if (!incentive.HasEmploymentChecks)
+                {
+                    incentive.AddEmploymentChecks();
+                    await _incentiveDomainRepository.Save(incentive);
+                }
+
                 await _commandPublisher.Publish(new SendEmploymentCheckRequestsCommand(incentive.Id));
             }
         }

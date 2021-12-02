@@ -37,7 +37,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
         public DateTime SubmissionDate => Model.SubmittedDate.Value;
         public IReadOnlyCollection<EmploymentCheck> EmploymentChecks => Model.EmploymentCheckModels.Map().ToList().AsReadOnly();
-        
+        public bool HasEmploymentChecks => Model.EmploymentCheckModels.Any();
+
         internal static ApprenticeshipIncentive New(Guid id, Guid applicationApprenticeshipId, Account account, Apprenticeship apprenticeship, DateTime plannedStartDate, DateTime submittedDate, string submittedByEmail, AgreementVersion agreementVersion, IncentivePhase phase)
         {
             return new ApprenticeshipIncentive(
@@ -497,7 +498,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasSignedMinVersion, isValid));
         }
-
+        
         public void ValidateEmploymentChecks(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
@@ -712,7 +713,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEmploymentChecks();
         }
 
-        private void AddEmploymentChecks()
+        public void AddEmploymentChecks()
         {
             Model.EmploymentCheckModels.Clear();
             if (StartDate.AddDays(42) > DateTime.Now)

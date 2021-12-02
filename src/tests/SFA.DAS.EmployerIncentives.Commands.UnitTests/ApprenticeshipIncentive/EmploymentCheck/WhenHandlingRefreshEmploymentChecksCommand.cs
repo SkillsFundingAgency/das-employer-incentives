@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -12,6 +13,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.EmploymentCheck
 {
@@ -47,6 +49,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             // Arrange
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.EmploymentCheckModels, _fixture.CreateMany<EmploymentCheckModel>(2).ToList())
+                .With(x => x.StartDate, new DateTime(2021, 10, 01))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
                 .Create();
             
             var incentives =
@@ -103,5 +108,61 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository.Verify(x => x.FindIncentivesWithLearningFound(), Times.Never);
             _mockCommandPublisher.Verify(x => x.Publish(It.IsAny<SendEmploymentCheckRequestsCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
+
+        [Test]
+        public async Task Then_the_employment_checks_are_created_if_they_do_not_exist_for_the_apprenticeship_incentive()
+        {
+            // Arrange
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>())
+                .With(x => x.StartDate, new DateTime(2021, 10, 01))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
+                .Create();
+
+            var incentives =
+                new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>
+                {
+                    Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(apprenticeshipIncentiveModel.Id,
+                        apprenticeshipIncentiveModel)
+                };
+
+            _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
+
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockCommandPublisher.Object, _mockCollectionCalendarService.Object);
+
+            // Act
+            await _sut.Handle(new RefreshEmploymentChecksCommand());
+
+            // Assert
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.HasEmploymentChecks)), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_the_employment_checks_are_not_created_if_the_start_date_is_less_than_weeks_from_todays_date()
+        {
+            // Arrange
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>())
+                .With(x => x.StartDate, DateTime.Now.AddDays(-41))
+                .Create();
+
+            var incentives =
+                new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>
+                {
+                    Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(apprenticeshipIncentiveModel.Id,
+                        apprenticeshipIncentiveModel)
+                };
+
+            _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
+
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockCommandPublisher.Object, _mockCollectionCalendarService.Object);
+
+            // Act
+            await _sut.Handle(new RefreshEmploymentChecksCommand());
+
+            // Assert
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.HasEmploymentChecks)), Times.Never);
+        }
+
     }
 }
