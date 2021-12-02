@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,14 +18,16 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EmploymentCheck
     {
         private EmploymentCheckController _sut;
         private Mock<ICommandDispatcher> _mockCommandDispatcher;
+        private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
 
         [SetUp]
         public void Setup()
         {
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
+            _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _fixture = new Fixture();
-            _sut = new EmploymentCheckController(_mockCommandDispatcher.Object);
+            _sut = new EmploymentCheckController(_mockCommandDispatcher.Object, _mockCollectionCalendarService.Object);
         }
 
         [Test]

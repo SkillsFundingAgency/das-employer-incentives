@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Enums;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -13,7 +14,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class EmploymentCheckController : ApiCommandControllerBase
     {
-        public EmploymentCheckController(ICommandDispatcher commandDispatcher) : base(commandDispatcher) { }
+        private readonly ICollectionCalendarService _collectionCalendarService;
+
+        public EmploymentCheckController(ICommandDispatcher commandDispatcher, ICollectionCalendarService collectionCalendarService) 
+            : base(commandDispatcher)
+        {
+            _collectionCalendarService = collectionCalendarService;
+        }
 
         [HttpPut("/employmentchecks/{correlationId}")]  
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -33,6 +40,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> Refresh()
         {
+            if (await ActivePeriodInProgress())
+            {
+                return Ok();
+            }
+
             await SendCommandAsync(new RefreshEmploymentChecksCommand());
 
             return Ok();
@@ -48,6 +60,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 "noninofound" => EmploymentCheckResultType.NoNINOFound,
                 _ => EmploymentCheckResultType.NoAccountFound,
             };
+        }
+
+        private async Task<bool> ActivePeriodInProgress()
+        {
+            var collectionCalendar = await _collectionCalendarService.Get();
+            var activePeriod = collectionCalendar.GetActivePeriod();
+            return activePeriod.PeriodEndInProgress;
         }
     }
 }

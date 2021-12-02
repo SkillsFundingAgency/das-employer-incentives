@@ -1,5 +1,7 @@
 ﻿@database
 @api
+@activeCalendarPeriod
+
 Feature: EmploymentCheckRefresh
 	In order to validate apprenticeship incentives
 	As the system
@@ -23,4 +25,8 @@ Scenario Outline: Employment check is not refreshed as no learning record found
 	When the employment checks are refreshed
 	Then a request is not made to refresh the employment checks for the incentive
 
-	
+Scenario Outline: Employment check is not refreshed when month end in progress
+	Given an apprenticeship incentive has been submitted
+	And the active period month end processing is in progress
+	When the employment checks are refreshed
+	Then a request is not made to refresh the employment checks for the incentive

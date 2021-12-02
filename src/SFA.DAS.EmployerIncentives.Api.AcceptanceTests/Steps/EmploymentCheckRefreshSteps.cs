@@ -5,6 +5,7 @@ using TechTalk.SpecFlow;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using System.Data.SqlClient;
 using System.Linq;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 
@@ -58,6 +59,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
 
         }
+
+        [Given(@"the active period month end processing is in progress")]
+        public async Task GivenTheActivePeriodMonthEndProcessingIsInProgress()
+        {
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            TestContext.ActivePeriod.PeriodEndInProgress = true;
+            await dbConnection.UpdateAsync(TestContext.ActivePeriod);
+        }
+
 
         [When(@"the employment checks are refreshed")]
         public async Task WhenTheEmploymentChecksAreRefreshed()
