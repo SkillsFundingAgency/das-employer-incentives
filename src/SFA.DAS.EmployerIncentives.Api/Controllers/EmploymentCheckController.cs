@@ -2,11 +2,9 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Enums;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -14,12 +12,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class EmploymentCheckController : ApiCommandControllerBase
     {
-        private readonly ICollectionCalendarService _collectionCalendarService;
 
-        public EmploymentCheckController(ICommandDispatcher commandDispatcher, ICollectionCalendarService collectionCalendarService) 
+        public EmploymentCheckController(ICommandDispatcher commandDispatcher) 
             : base(commandDispatcher)
         {
-            _collectionCalendarService = collectionCalendarService;
         }
 
         [HttpPut("/employmentchecks/{correlationId}")]  
@@ -40,11 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> Refresh()
         {
-            if (await ActivePeriodInProgress())
-            {
-                return Ok();
-            }
-
             await SendCommandAsync(new RefreshEmploymentChecksCommand());
 
             return Ok();
@@ -62,11 +53,5 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             };
         }
 
-        private async Task<bool> ActivePeriodInProgress()
-        {
-            var collectionCalendar = await _collectionCalendarService.Get();
-            var activePeriod = collectionCalendar.GetActivePeriod();
-            return activePeriod.PeriodEndInProgress;
-        }
     }
 }
