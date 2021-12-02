@@ -29,6 +29,15 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return Ok($"/employmentchecks/{updateRequest.CorrelationId}");
         }
 
+        [HttpPut("/employmentchecks/refresh")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Refresh()
+        {
+            await SendCommandAsync(new RefreshEmploymentChecksCommand());
+
+            return Ok();
+        }
+
         private EmploymentCheckResultType Map(string result)
         {
             return result.ToLower() switch

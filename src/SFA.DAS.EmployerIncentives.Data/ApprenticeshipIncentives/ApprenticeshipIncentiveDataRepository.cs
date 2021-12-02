@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -81,6 +82,19 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             }
 
             return await Get(employmentCheck.ApprenticeshipIncentiveId);
+        }
+
+        public async Task<List<ApprenticeshipIncentiveModel>> FindIncentivesWithLearningFound()
+        {
+            var apprenticeships = (from incentive in _dbContext.ApprenticeshipIncentives
+                    join learner in _dbContext.Learners.Where(x => x.LearningFound.HasValue && x.LearningFound.Value) 
+                        on incentive.Id equals learner.ApprenticeshipIncentiveId
+                        select new {Incentive = incentive}
+                );
+
+            var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
+
+            return apprenticeships.Select(x => x.Incentive.Map(collectionPeriods)).ToList();
         }
 
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
