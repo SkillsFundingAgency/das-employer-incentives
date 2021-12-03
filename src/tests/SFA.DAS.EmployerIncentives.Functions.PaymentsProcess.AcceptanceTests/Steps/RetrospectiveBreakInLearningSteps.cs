@@ -31,6 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
         private readonly Payment _payment;
+        private List<EmploymentCheck> _employmentChecks;
 
         private DateTime _breakStart;
         private DateTime _breakEnd;
@@ -76,6 +77,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Without(p => p.CalculatedDate)
                 .Without(p => p.PaidDate)                
                 .Create();
+
+            _employmentChecks = new List<EmploymentCheck>
+            {
+                _fixture.Build<EmploymentCheck>()
+                    .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                    .With(x => x.CreatedDateTime, DateTime.Now)
+                    .With(x => x.Result, true)
+                    .Create(),
+                _fixture.Build<EmploymentCheck>()
+                    .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                    .With(x => x.CreatedDateTime, DateTime.Now)
+                    .With(x => x.Result, false)
+                    .Create()
+            };
         }
 
         [Given(@"an existing (.*) apprenticeship incentive with learning starting on (.*) and ending on (.*)")]
@@ -89,7 +106,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             
             await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_accountModel);
-            await dbConnection.InsertAsync(_apprenticeshipIncentive);            
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertAsync(_employmentChecks);
         }
                 
         [Given(@"a payment of £(.*) is not sent in Period R(.*) (.*)")]
