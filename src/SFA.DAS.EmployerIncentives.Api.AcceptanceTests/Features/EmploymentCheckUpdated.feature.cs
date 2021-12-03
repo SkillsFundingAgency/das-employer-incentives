@@ -23,6 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.DescriptionAttribute("EmploymentChecks")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
+    [NUnit.Framework.CategoryAttribute("messageBus")]
+    [NUnit.Framework.CategoryAttribute("domainMessageHandlers")]
+    [NUnit.Framework.CategoryAttribute("activeCalendarPeriod")]
     public partial class EmploymentChecksFeature
     {
         
@@ -30,7 +33,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         private string[] _featureTags = new string[] {
                 "database",
-                "api"};
+                "api",
+                "messageBus",
+                "domainMessageHandlers",
+                "activeCalendarPeriod"};
         
 #line 1 "EmploymentCheckUpdated.feature"
 #line hidden
@@ -43,7 +49,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                     "able to confirm that the apprentice met the employment eligibility at the time o" +
                     "f application", ProgrammingLanguage.CSharp, new string[] {
                         "database",
-                        "api"});
+                        "api",
+                        "messageBus",
+                        "domainMessageHandlers",
+                        "activeCalendarPeriod"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -95,7 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             argumentsOfScenario.Add("checkResultType", checkResultType);
             argumentsOfScenario.Add("hasPassed", hasPassed);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check is updated", null, tagsOfScenario, argumentsOfScenario);
-#line 8
+#line 11
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -115,14 +124,98 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 12
  testRunner.Given("an apprenticeship incentive has submitted a new employment check", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 10
+#line 13
  testRunner.When(string.Format("the employment check result is returned with a result of {0}", checkResultType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 11
+#line 14
  testRunner.Then(string.Format("the apprenticeship incentive employment check result is updated to {0}", hasPassed), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employment check result procesing is delayed during month end processing")]
+        public virtual void EmploymentCheckResultProcesingIsDelayedDuringMonthEndProcessing()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check result procesing is delayed during month end processing", null, tagsOfScenario, argumentsOfScenario);
+#line 24
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 25
+ testRunner.Given("an apprenticeship incentive has submitted a new employment check", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 26
+ testRunner.When("the employment check result is returned during month end payment process is runni" +
+                        "ng", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 27
+ testRunner.Then("the apprenticeship incentive employment check result processing is delayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employment check result procesing is resumed after month end processing delay")]
+        public virtual void EmploymentCheckResultProcesingIsResumedAfterMonthEndProcessingDelay()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check result procesing is resumed after month end processing delay", null, tagsOfScenario, argumentsOfScenario);
+#line 29
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 30
+ testRunner.Given("an apprenticeship incentive has submitted a new employment check", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 31
+ testRunner.And("the employment check result processing has been delayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 32
+ testRunner.When("the employment check result processing resumes", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 33
+ testRunner.Then("the apprenticeship incentive employment check result is processed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
