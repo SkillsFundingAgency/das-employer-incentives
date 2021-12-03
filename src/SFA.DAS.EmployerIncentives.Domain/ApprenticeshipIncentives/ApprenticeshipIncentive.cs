@@ -714,7 +714,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private void AddEmploymentChecks()
         {
-            Model.EmploymentCheckModels.Clear();
+            foreach (var existingEmploymentCheck in Model.EmploymentCheckModels)
+            {
+                if (Model.EmploymentCheckModels.Remove(existingEmploymentCheck))
+                {
+                    AddEvent(new EmploymentCheckDeleted(existingEmploymentCheck));
+                }
+            }
+            
             if (StartDate.AddDays(42) > DateTime.Now)
             {
                 return;
