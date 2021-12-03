@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Dapper.Contrib.Extensions;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
@@ -72,8 +73,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the employment checks are refreshed")]
         public async Task WhenTheEmploymentChecksAreRefreshed()
         {
-            var url = $"employmentchecks/refresh";
-            var response = await EmployerIncentiveApi.Put(url, string.Empty);
+            var response = await EmployerIncentiveApi.Put(
+                    "/jobs",
+                   new JobRequest { Type = JobType.RefreshEmploymentChecks });
             response.EnsureSuccessStatusCode();
         }
 
