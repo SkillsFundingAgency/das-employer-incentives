@@ -43,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.CreatedDateTime, DateTime.Today.AddDays(-10))
                 .Without(p => p.Result)
                 .Without(p => p.ResultDateTime)
+                .Without(p => p.UpdatedDateTime)
                 .Create();
             
             _apprenticeshipIncentive.EmploymentChecks.Add(_employmentCheck);
@@ -75,9 +76,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var employmentChecks = await dbConnection.GetAllAsync<EmploymentCheck>();
 
             employmentChecks.Count().Should().Be(1);
-            employmentChecks.Count(c => c.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).Should().Be(1);
-            employmentChecks.Single(c => c.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).Result.Should().Be(hasPassed);
-            employmentChecks.Single(c => c.ApprenticeshipIncentiveId == _apprenticeshipIncentive.Id).ResultDateTime.Should().Be(DateTime.Today);
+
+            var employmentCheck = employmentChecks.Single();
+            employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            employmentCheck.Result.Should().Be(hasPassed);
+            employmentCheck.ResultDateTime.Should().Be(DateTime.Today);
+            employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
         }
     }
 }
