@@ -59,8 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 MinimumDate = DateTime.Now.AddDays(-30),
                 MaximumDate = DateTime.Now.AddDays(-10),
                 CreatedDateTime = DateTime.Today.AddDays(-5),
+                UpdatedDateTime = null,
                 Result = false,
-                ResultDateTime = DateTime.Today.AddDays(-5),
+                ResultDateTime = null
             };
 
             _apprenticeshipIncentiveModel.EmploymentCheckModels.Add(existingEmploymentCheck);
@@ -71,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             var savedEmploymentCheck = _incentive.GetModel().EmploymentCheckModels.Single(e=> e.CorrelationId == existingEmploymentCheck.CorrelationId);
             savedEmploymentCheck.Result.Should().BeTrue();
-            savedEmploymentCheck.ResultDateTime.Should().Be(DateTime.Today);
+            savedEmploymentCheck.ResultDateTime.Should().Be(DateTime.Today);            
 
             _mockIncentiveDomainRespository.Verify(m => m.Save(_incentive), Times.Once);
         }
@@ -102,6 +103,35 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var savedEmploymentCheck = _incentive.GetModel().EmploymentCheckModels.Single(e => e.CorrelationId == existingEmploymentCheck.CorrelationId);
             savedEmploymentCheck.Result.Should().BeFalse();
             savedEmploymentCheck.ResultDateTime.Should().Be(DateTime.Today.AddDays(-5));
+        }
+
+        [Test()]
+        public async Task Then_an_existing_employment_check_result_is_not_updated_for_an_earlier_ResultDateTime_for_the_same_correlation_id()
+        {
+            //Arrange
+            var existingResultDateTime = DateTime.Now.AddDays(-5);
+            var existingEmploymentCheck = new EmploymentCheckModel
+            {
+                Id = Guid.NewGuid(),
+                ApprenticeshipIncentiveId = _apprenticeshipIncentiveModel.Id,
+                CheckType = EmploymentCheckType.EmployedAtStartOfApprenticeship,
+                CorrelationId = _correlationId,
+                MinimumDate = DateTime.Now.AddDays(-30),
+                MaximumDate = DateTime.Now.AddDays(-10),
+                CreatedDateTime = DateTime.Today.AddDays(-5),
+                Result = false,
+                ResultDateTime = existingResultDateTime
+            };
+
+            _apprenticeshipIncentiveModel.EmploymentCheckModels.Add(existingEmploymentCheck);
+
+            // Act
+            await _sut.Handle(new UpdateEmploymentCheckCommand(existingEmploymentCheck.CorrelationId, EmploymentCheckResultType.Employed, existingResultDateTime.AddDays(-5).AddMinutes(-1)));
+
+            // Assert
+            var savedEmploymentCheck = _incentive.GetModel().EmploymentCheckModels.Single(e => e.CorrelationId == existingEmploymentCheck.CorrelationId);
+            savedEmploymentCheck.Result.Should().BeFalse();
+            savedEmploymentCheck.ResultDateTime.Should().Be(existingResultDateTime);
         }
     }
 }

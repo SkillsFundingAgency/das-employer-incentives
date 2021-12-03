@@ -8,6 +8,7 @@
 	[CorrelationId] UNIQUEIDENTIFIER NOT NULL,
 	[Result] BIT NULL,
 	[CreatedDateTime] DATETIME2 NOT NULL,
+	[UpdatedDateTime] DATETIME2 NULL,
 	[ResultDateTime] DATETIME2 NULL,
 	CONSTRAINT FK_EC_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id), 
 )
