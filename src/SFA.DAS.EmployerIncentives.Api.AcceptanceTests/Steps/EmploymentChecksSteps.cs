@@ -48,6 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.CreatedDateTime, DateTime.Today.AddDays(-10))
                 .Without(p => p.Result)
                 .Without(p => p.ResultDateTime)
+                .Without(p => p.UpdatedDateTime)
                 .Create();
             
             _apprenticeshipIncentive.EmploymentChecks.Add(_employmentCheck);
@@ -150,6 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             employmentCheck.Result.Should().BeNull();
             employmentCheck.ResultDateTime.Should().BeNull();
+            employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
         }
 
         [Then(@"the apprenticeship incentive employment check result is processed")]
