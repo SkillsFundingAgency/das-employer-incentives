@@ -146,8 +146,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IChangeOfCircumstancesDataRepository, ChangeOfCircumstancesDataRepository>();            
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
+            serviceCollection.AddScoped<IApprenticeshipIncentiveAuditRepository, ApprenticeshipIncentiveAuditRepository>();
             
-                    
 
             return serviceCollection;
         }
@@ -187,6 +187,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentChecksCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
                 ;
 
             return serviceCollection;

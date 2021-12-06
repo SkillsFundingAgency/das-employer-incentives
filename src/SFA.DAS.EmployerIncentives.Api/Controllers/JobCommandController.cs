@@ -32,6 +32,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             {
                 await SendCommandAsync(new RefreshEmploymentChecksCommand());
             }
+            else if (request.Type == JobType.RefreshEmploymentCheck)
+            {
+                var command = ParseJobRequestToRefreshEmploymentCheckCommand(request);
+                await SendCommandAsync(command);
+            }
             return NoContent();
         }
 
@@ -47,6 +52,17 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             int.TryParse(totalPagesRequest.ToString(), out int totalPages);
             var command = new RefreshLegalEntitiesCommand(accountLegalEntities, pageNumber, pageSize, totalPages);
             return command;
+        }
+
+        private static RefreshEmploymentCheckCommand ParseJobRequestToRefreshEmploymentCheckCommand(JobRequest request)
+        {
+            request.Data.TryGetValue("AccountLegalEntityId", out object accountLegalEntityIdRequest);
+            request.Data.TryGetValue("ULN", out object ulnRequest);
+            request.Data.TryGetValue("ServiceRequest", out object serviceRequestRequest);
+            long.TryParse(accountLegalEntityIdRequest.ToString(), out long accountLegalEntityId);
+            long.TryParse(ulnRequest.ToString(), out long uln);
+            var serviceRequest = JsonConvert.DeserializeObject<ServiceRequest>(serviceRequestRequest.ToString());
+            return new RefreshEmploymentCheckCommand(accountLegalEntityId, uln, serviceRequest.TaskId, serviceRequest.DecisionReference, serviceRequest.TaskCreatedDate);
         }
     }
 }
