@@ -43,6 +43,23 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeshipIncentive, false);
         }
 
+        [Given(@"an apprenticeship incentive has been submitted and subsequently withdrawn")]
+        public async Task GivenAnApprenticehipIncentiveHasBeenSubmittedAndSubsequentlyWithdrawn()
+        {
+            _account = TestContext.TestData.GetOrCreate<Account>();
+            _apprenticeshipIncentive = TestContext.TestData.GetOrCreate<ApprenticeshipIncentive>();
+            _apprenticeshipIncentive.AccountId = _account.Id;
+            _apprenticeshipIncentive.AccountLegalEntityId = _account.AccountLegalEntityId;
+            _apprenticeshipIncentive.StartDate = new DateTime(2021, 10, 01);
+            _apprenticeshipIncentive.Phase = Phase.Phase2;
+            _apprenticeshipIncentive.EmploymentChecks.Clear();
+            _apprenticeshipIncentive.Status = IncentiveStatus.Withdrawn;
+
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_account, false);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive, false);
+        }
+
         [Given(@"a learner match has been performed for the incentive with a learning found result of (.*)")]
         public async Task GivenALearnerMatchHasBeenPerformedForTheIncentive(bool learningFound)
         {

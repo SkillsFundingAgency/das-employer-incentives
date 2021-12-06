@@ -715,6 +715,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void AddEmploymentChecks()
         {
+            if (Status == IncentiveStatus.Withdrawn)
+            {
+                return;
+            }
+
             Model.EmploymentCheckModels.Clear();
             if (StartDate.AddDays(42) > DateTime.Now)
             {

@@ -30,3 +30,9 @@ Scenario Outline: Employment check is not refreshed when month end in progress
 	And the active period month end processing is in progress
 	When the employment checks are refreshed
 	Then a request is not made to refresh the employment checks for the incentive
+
+Scenario Outline: Employment check is not refreshed when incentive is withdrawn
+	Given an apprenticeship incentive has been submitted and subsequently withdrawn
+	And a learner match has been performed for the incentive with a learning found result of True
+	When the employment checks are refreshed
+	Then a request is not made to refresh the employment checks for the incentive

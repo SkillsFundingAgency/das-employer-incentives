@@ -125,34 +125,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.HasEmploymentChecks)), Times.Never);
         }
-
-        [Test]
-        public async Task Then_the_employment_checks_are_not_refreshed_if_the_incentive_is_withdrawn()
-        {
-            // Arrange
-            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
-                .With(x => x.EmploymentCheckModels, _fixture.CreateMany<EmploymentCheckModel>(2).ToList())
-                .With(x => x.StartDate, new DateTime(2021, 10, 01))
-                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
-                .With(x => x.Status, IncentiveStatus.Withdrawn)
-                .Create();
-
-            var incentives =
-                new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>
-                {
-                    Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(apprenticeshipIncentiveModel.Id,
-                        apprenticeshipIncentiveModel)
-                };
-
-            _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
-
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
-
-            // Act
-            await _sut.Handle(new RefreshEmploymentChecksCommand());
-
-            // Assert
-            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.Id == incentives[0].Id)), Times.Never);
-        }
     }
 }
