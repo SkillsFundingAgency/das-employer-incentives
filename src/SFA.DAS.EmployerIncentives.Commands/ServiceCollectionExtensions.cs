@@ -186,6 +186,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<RefreshEmploymentChecksCommand>), new NullValidator())
                 ;
 
             return serviceCollection;

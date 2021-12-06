@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -26,6 +27,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             {
                 var command = ParseJobRequestToRefreshCommand(request);
                 await SendCommandAsync(command);
+            }
+            else if (request.Type == JobType.RefreshEmploymentChecks)
+            {
+                await SendCommandAsync(new RefreshEmploymentChecksCommand());
             }
             return NoContent();
         }

@@ -4,7 +4,8 @@ namespace SFA.DAS.EmployerIncentives.Api.Types
 {
     public enum JobType
     {
-        RefreshLegalEntities = 1
+        RefreshLegalEntities = 1,
+        RefreshEmploymentChecks = 2
     }
 
     public class JobRequest

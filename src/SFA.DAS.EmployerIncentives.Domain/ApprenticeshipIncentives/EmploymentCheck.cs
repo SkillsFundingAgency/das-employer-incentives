@@ -36,7 +36,6 @@ using System;
         {
             Model.CorrelationId = correlationId;
         }
-
         internal static EmploymentCheck Get(EmploymentCheckModel model)
         {
             return new EmploymentCheck(model);
