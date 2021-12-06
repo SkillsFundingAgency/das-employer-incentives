@@ -132,6 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             employmentCheck.Result.Should().Be(hasPassed);
             employmentCheck.ResultDateTime.Should().Be(DateTime.Today);
+            employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
         }
 
         [Then(@"the apprenticeship incentive employment check result processing is delayed")]
@@ -151,7 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             employmentCheck.Result.Should().BeNull();
             employmentCheck.ResultDateTime.Should().BeNull();
-            employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            employmentCheck.UpdatedDateTime.Should().BeNull();
         }
 
         [Then(@"the apprenticeship incentive employment check result is processed")]
