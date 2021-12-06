@@ -11,7 +11,6 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentChec
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -52,13 +51,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockCommandPublisher.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());
 
             // Assert
-            _mockCommandPublisher.Verify(x => x.Publish(It.Is<SendEmploymentCheckRequestsCommand>(y => y.ApprenticeshipIncentiveId == incentives[0].Id), It.IsAny<CancellationToken>()), Times.Once);
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.Id == incentives[0].Id)), Times.Once);
         }
 
 
@@ -68,13 +67,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Arrange
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>());
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockCommandPublisher.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());
 
             // Assert
-            _mockCommandPublisher.Verify(x => x.Publish(It.IsAny<SendEmploymentCheckRequestsCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.IsAny<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>()), Times.Never);
         }
 
         [Test]
@@ -96,7 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockCommandPublisher.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());
@@ -123,7 +122,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockCommandPublisher.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());
