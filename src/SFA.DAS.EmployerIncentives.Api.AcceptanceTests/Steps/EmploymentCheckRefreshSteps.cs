@@ -1,4 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Data.Models;
+﻿using System;
+using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Threading.Tasks;
 using AutoFixture;
 using TechTalk.SpecFlow;
@@ -9,6 +10,7 @@ using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -32,6 +34,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeshipIncentive = TestContext.TestData.GetOrCreate<ApprenticeshipIncentive>();
             _apprenticeshipIncentive.AccountId = _account.Id;
             _apprenticeshipIncentive.AccountLegalEntityId = _account.AccountLegalEntityId;
+            _apprenticeshipIncentive.StartDate = new DateTime(2021, 10, 01);
+            _apprenticeshipIncentive.Phase = Phase.Phase2;
             _apprenticeshipIncentive.EmploymentChecks.Clear();
 
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
