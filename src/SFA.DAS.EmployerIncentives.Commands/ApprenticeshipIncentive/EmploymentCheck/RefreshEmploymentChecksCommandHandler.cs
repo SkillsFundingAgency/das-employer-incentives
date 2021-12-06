@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck
 {
@@ -19,8 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
 
             foreach(var incentive in incentivesWithLearning)
             {
-                incentive.AddEmploymentChecks();
-                await _incentiveDomainRepository.Save(incentive);
+                if (incentive.Status != IncentiveStatus.Withdrawn) 
+                {
+                    incentive.AddEmploymentChecks();
+                    await _incentiveDomainRepository.Save(incentive);
+                }
             }
         }
     }

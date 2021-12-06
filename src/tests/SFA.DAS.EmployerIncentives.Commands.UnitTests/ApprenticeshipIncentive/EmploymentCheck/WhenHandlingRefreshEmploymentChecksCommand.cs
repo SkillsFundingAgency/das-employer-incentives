@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -21,7 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     {
         private RefreshEmploymentChecksCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
-        private Mock<ICommandPublisher> _mockCommandPublisher;
         private Fixture _fixture;
 
         [SetUp]
@@ -29,7 +25,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             _fixture = new Fixture(); 
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
-            _mockCommandPublisher = new Mock<ICommandPublisher>(); 
         }
 
         [Test]
@@ -131,5 +126,33 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.HasEmploymentChecks)), Times.Never);
         }
 
+        [Test]
+        public async Task Then_the_employment_checks_are_not_refreshed_if_the_incentive_is_withdrawn()
+        {
+            // Arrange
+            var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.EmploymentCheckModels, _fixture.CreateMany<EmploymentCheckModel>(2).ToList())
+                .With(x => x.StartDate, new DateTime(2021, 10, 01))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
+                .With(x => x.Status, IncentiveStatus.Withdrawn)
+                .Create();
+
+            var incentives =
+                new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>
+                {
+                    Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(apprenticeshipIncentiveModel.Id,
+                        apprenticeshipIncentiveModel)
+                };
+
+            _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
+
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
+
+            // Act
+            await _sut.Handle(new RefreshEmploymentChecksCommand());
+
+            // Assert
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.Id == incentives[0].Id)), Times.Never);
+        }
     }
 }
