@@ -12,8 +12,7 @@ using System;
         public DateTime MinimumDate => Model.MinimumDate;
         public DateTime MaximumDate => Model.MaximumDate;
         public Guid? CorrelationId => Model.CorrelationId;
-        public bool? Result => Model.Result;
-        public DateTime CreatedDateTime => Model.CreatedDateTime;
+        public bool? Result => Model.Result;        
         public DateTime? ResultDateTime => Model.ResultDateTime;
 
         internal static EmploymentCheck New(Guid id,

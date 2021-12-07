@@ -689,6 +689,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return; // ignore superseded results
             }
 
+            if(employmentCheck.ResultDateTime.HasValue && employmentCheck.ResultDateTime > checkResult.DateChecked)
+            {
+                return; // ignore older changes
+            }
+
             employmentCheck.Result = false;
             employmentCheck.ResultDateTime = checkResult.DateChecked;
 

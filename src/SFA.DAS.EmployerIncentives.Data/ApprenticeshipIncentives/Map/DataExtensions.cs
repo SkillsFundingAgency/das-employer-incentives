@@ -438,6 +438,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CheckType = x.CheckType,
                 CorrelationId = x.CorrelationId,
                 CreatedDateTime = x.CreatedDateTime,
+                UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
@@ -454,6 +455,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CheckType = x.CheckType,
                 CorrelationId = x.CorrelationId,
                 CreatedDateTime = x.CreatedDateTime,
+                UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
                 ResultDateTime = x.ResultDateTime
             }).ToList();

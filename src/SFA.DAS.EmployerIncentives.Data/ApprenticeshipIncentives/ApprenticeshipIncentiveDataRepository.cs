@@ -218,6 +218,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (existingEmploymentCheck != null)
                 {
                     _dbContext.Entry(existingEmploymentCheck).CurrentValues.SetValues(employmentCheck);
+                    
+                    if (_dbContext.Entry(existingEmploymentCheck).State == EntityState.Modified)
+                    {
+                        existingEmploymentCheck.UpdatedDateTime = DateTime.Now;
+                    }                    
                 }
                 else
                 {
