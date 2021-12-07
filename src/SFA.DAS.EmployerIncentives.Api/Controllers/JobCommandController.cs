@@ -2,14 +2,12 @@
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
-using SFA.DAS.EmployerIncentives.Data.Models;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {

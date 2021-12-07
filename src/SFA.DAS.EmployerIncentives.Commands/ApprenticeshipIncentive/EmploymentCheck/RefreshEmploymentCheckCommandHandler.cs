@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
         {
             var incentive = await _incentiveDomainRepository.FindByUlnWithinAccountLegalEntity(command.ULN, command.AccountLegalEntityId);
 
-            if(incentive == null)
+            if (incentive == null)
             {
                 return;
             }

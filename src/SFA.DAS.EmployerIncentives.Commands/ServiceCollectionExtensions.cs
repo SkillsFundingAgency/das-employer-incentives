@@ -146,7 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IChangeOfCircumstancesDataRepository, ChangeOfCircumstancesDataRepository>();            
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
-            serviceCollection.AddScoped<IApprenticeshipIncentiveAuditRepository, ApprenticeshipIncentiveAuditRepository>();
+            serviceCollection.AddScoped<IEmploymentCheckAuditRepository, EmploymentCheckAuditRepository>();
             
 
             return serviceCollection;

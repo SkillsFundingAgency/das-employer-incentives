@@ -6,12 +6,12 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
-    public class ApprenticeshipIncentiveAuditRepository : IApprenticeshipIncentiveAuditRepository
+    public class EmploymentCheckAuditRepository : IEmploymentCheckAuditRepository
     {
         private readonly Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
-        public ApprenticeshipIncentiveAuditRepository(Lazy<EmployerIncentivesDbContext> dbContext)
+        public EmploymentCheckAuditRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
             _lazyContext = dbContext;
         }

@@ -10,10 +10,10 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
 {
     public class EmploymentChecksCreatedAuditHandler : IDomainEventHandler<EmploymentChecksCreated>
     {
-        private readonly IApprenticeshipIncentiveAuditRepository _auditRepository;
+        private readonly IEmploymentCheckAuditRepository _auditRepository;
 
         public EmploymentChecksCreatedAuditHandler(
-            IApprenticeshipIncentiveAuditRepository auditRepository)
+            IEmploymentCheckAuditRepository auditRepository)
         {
             _auditRepository = auditRepository;
         }
