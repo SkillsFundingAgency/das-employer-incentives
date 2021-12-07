@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
@@ -89,6 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             var apprenticeships = (from incentive in _dbContext.ApprenticeshipIncentives.Include(x => x.EmploymentChecks)
                     join learner in _dbContext.Learners.Where(x => x.LearningFound.HasValue && x.LearningFound.Value) 
                         on incentive.Id equals learner.ApprenticeshipIncentiveId
+                        where incentive.Status != IncentiveStatus.Withdrawn
                         select new {Incentive = incentive}
                 );
 

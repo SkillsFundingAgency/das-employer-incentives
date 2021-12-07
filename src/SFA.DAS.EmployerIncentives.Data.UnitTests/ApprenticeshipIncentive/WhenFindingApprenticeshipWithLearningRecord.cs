@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -19,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private long _accountLegalEntityId;
 
         [SetUp]
-        public async Task Arrange()
+        public void Arrange()
         {
             _fixture = new Fixture();
             _accountLegalEntityId = _fixture.Create<long>();
@@ -77,18 +78,35 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             incentives.Count.Should().Be(1);
         }
         
+        [Test]
+        public async Task Then_the_apprenticeship_incentive_is_not_returned_if_the_status_is_withdrawn()
+        {
+            // Arrange
+            await AddApprenticeshipIncentive(_accountLegalEntityId, _fixture.Create<long>(), true, true);
+            await AddApprenticeshipIncentive(_accountLegalEntityId, _fixture.Create<long>(), true, true, IncentiveStatus.Withdrawn);
+
+            // Act
+            var incentives = await _sut.FindIncentivesWithLearningFound();
+
+            // Assert
+            incentives.Should().NotBeNull();
+            incentives.Count.Should().Be(1);
+        }
+
         [TearDown]
         public void CleanUp()
         {
             _dbContext.Dispose();
         }
 
-        private async Task AddApprenticeshipIncentive(long accountLegalEntityId, long uln, bool hasLearningRecord, bool learningFound)
+        private async Task AddApprenticeshipIncentive(long accountLegalEntityId, long uln, bool hasLearningRecord, 
+                                                      bool learningFound, IncentiveStatus status = IncentiveStatus.Active)
         {
             var incentive = _fixture.Build<Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()
                 .With(x => x.AccountLegalEntityId, accountLegalEntityId)
                 .With(x => x.ULN, uln)
                 .With(x => x.BreakInLearnings, new List<ApprenticeshipBreakInLearning>())
+                .With(x => x.Status, status)
                 .Create();
             
             await _dbContext.AddAsync(incentive);

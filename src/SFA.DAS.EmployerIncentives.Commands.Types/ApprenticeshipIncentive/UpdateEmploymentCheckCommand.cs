@@ -14,6 +14,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.EmploymentCheck)}_{CorrelationId}"; }
         public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
 
+        public bool CancelCommand => false;
+
         public UpdateEmploymentCheckCommand(Guid correlationId, EmploymentCheckResultType result, DateTime dateChecked)
         {
             CorrelationId = correlationId;
