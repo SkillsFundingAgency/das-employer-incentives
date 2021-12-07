@@ -20,5 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals
         }
 
         public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
+        public bool CancelCommand => false;
     }
 }

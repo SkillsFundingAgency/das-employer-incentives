@@ -32,5 +32,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         }
 
         public TimeSpan CommandDelay => TimeSpan.FromHours(1);
+        public bool CancelCommand => false;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Enums;
 using System.Net;
@@ -12,7 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class EmploymentCheckController : ApiCommandControllerBase
     {
-        public EmploymentCheckController(ICommandDispatcher commandDispatcher) : base(commandDispatcher) { }
+
+        public EmploymentCheckController(ICommandDispatcher commandDispatcher) 
+            : base(commandDispatcher)
+        {
+        }
 
         [HttpPut("/employmentchecks/{correlationId}")]  
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -39,5 +44,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 _ => EmploymentCheckResultType.NoAccountFound,
             };
         }
+
     }
 }
