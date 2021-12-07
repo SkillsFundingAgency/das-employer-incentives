@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(new RefreshEmploymentChecksCommand());
 
             // Assert
-            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.HasEmploymentChecks)), Times.Once);
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.EmploymentChecks.Any())), Times.Once);
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(new RefreshEmploymentChecksCommand());
 
             // Assert
-            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.HasEmploymentChecks)), Times.Never);
+            _mockIncentiveDomainRespository.Verify(x => x.Save(It.Is<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>(y => y.EmploymentChecks.Any())), Times.Never);
         }
     }
 }
