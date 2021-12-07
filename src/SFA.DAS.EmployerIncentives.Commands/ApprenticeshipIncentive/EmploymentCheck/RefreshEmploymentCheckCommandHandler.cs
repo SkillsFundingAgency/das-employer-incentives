@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck
@@ -28,6 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
                     command.ServiceRequestTaskId, 
                     command.DecisionReference, 
                     command.ServiceRequestCreated));
+
+            await _incentiveDomainRepository.Save(incentive);
         }
     }
 

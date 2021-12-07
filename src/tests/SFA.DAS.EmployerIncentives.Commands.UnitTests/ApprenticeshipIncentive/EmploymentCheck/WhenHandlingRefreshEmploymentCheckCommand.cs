@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
@@ -66,6 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             createdEvent.ServiceRequest.TaskId.Should().Be(serviceRequest.TaskId);
             createdEvent.ServiceRequest.DecisionReference.Should().Be(serviceRequest.DecisionReference);
             createdEvent.ServiceRequest.Created.Should().Be(serviceRequest.Created);
+
+            _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Once);
         }
 
         [Test]
@@ -99,6 +102,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             var createdEvent = incentive.FlushEvents().SingleOrDefault() as EmploymentChecksCreated;
             createdEvent.Should().BeNull();
+
+            _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Never);
         }
     }
 }

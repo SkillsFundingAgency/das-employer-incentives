@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;

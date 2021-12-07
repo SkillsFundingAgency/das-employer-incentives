@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
         public TestLearnerMatchApi LearnerMatchApi { get; set; }
+        public TestEmploymentCheckApi EmploymentCheckApi { get; set; }
         public TestMessageBus MessageBus { get; set; }
         public TestDomainMessageHandlers DomainMessageHandlers { get; set; }
 

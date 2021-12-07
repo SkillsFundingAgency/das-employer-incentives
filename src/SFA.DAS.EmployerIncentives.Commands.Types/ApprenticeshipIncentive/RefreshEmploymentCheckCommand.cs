@@ -1,10 +1,9 @@
 ﻿using System;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
-using SFA.DAS.EmployerIncentives.Commands.Types;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck
+namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
     public class RefreshEmploymentCheckCommand : DomainCommand, ILockIdentifier, ILogWriter, IPeriodEndIncompatible
     {

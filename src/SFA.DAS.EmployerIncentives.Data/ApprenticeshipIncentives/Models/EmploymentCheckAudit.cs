@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
 {
-    [Dapper.Contrib.Extensions.Table("incentives.EmploymentCheckAudit")]
+    [Dapper.Contrib.Extensions.Table("audit.EmploymentCheckAudit")]
     [Table("EmploymentCheckAudit", Schema = "audit")]
     public partial class EmploymentCheckAudit
     {

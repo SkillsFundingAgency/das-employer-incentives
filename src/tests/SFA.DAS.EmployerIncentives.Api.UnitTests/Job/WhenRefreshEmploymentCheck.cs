@@ -7,7 +7,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
