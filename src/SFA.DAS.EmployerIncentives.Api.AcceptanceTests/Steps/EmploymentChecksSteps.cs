@@ -1,17 +1,19 @@
-﻿using FluentAssertions;
+﻿using AutoFixture;
+using Dapper.Contrib.Extensions;
+using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Enums;
+using System;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AutoFixture;
 using TechTalk.SpecFlow;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
-using System.Data.SqlClient;
-using System;
-using SFA.DAS.EmployerIncentives.Enums;
-using Dapper.Contrib.Extensions;
-using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -23,6 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private ApprenticeshipIncentive _apprenticeshipIncentive;
         private EmploymentCheck _employmentCheck;
         private Guid _correlationId;
+        private HttpResponseMessage _response;
+        private UpdateEmploymentCheckCommand _delayedCommand;
+
         public EmploymentChecksSteps(TestContext testContext) : base(testContext)
         {
         }
@@ -54,10 +59,40 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_employmentCheck, false);
         }
 
-        [When(@"the employment check result is returned with a result of (.*)")]
-        public async Task WhenAddedLegalEntityEventIsTriggered(EmploymentCheckResultType checkResultType)
+        [Given(@"the employment check result processing has been delayed")]
+        public void GivenTheEmploymentCheckResultProcessingHasBeenDelayed()
         {
-            var response = await EmployerIncentiveApi.Put(
+            _delayedCommand = new UpdateEmploymentCheckCommand(_correlationId, EmploymentCheckResultType.Employed, DateTime.Today);              
+        }
+
+        [When(@"the employment check result is returned during month end payment process is running")]
+        public async Task WhenEmploymentCheckResultIsReturnedDuringMonthEndPaymentProcessIsRunning()
+        {
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var calendar = await dbConnection.GetAllAsync<CollectionCalendarPeriod>();
+            var period = calendar.Single(x => x.Active);
+            period.PeriodEndInProgress = true;
+        
+            await dbConnection.UpdateAsync(period);
+
+            await WhenTheEmploymentCheckResultIsReturnedWithTheResult(EmploymentCheckResultType.Employed);
+        }
+
+        [When(@"the employment check result processing resumes")]
+        public async Task WhenEmploymentCheckResultProcessingResumes()
+        {
+            await TestContext.WaitFor<ICommand>(async (cancellationToken) =>
+                await TestContext.MessageBus.Send(_delayedCommand), numberOfOnProcessedEventsExpected: 1);
+        }
+
+        [When(@"the employment check result is returned with a result of (.*)")]
+        public async Task WhenTheEmploymentCheckResultIsReturnedWithTheResult(EmploymentCheckResultType checkResultType)
+        { 
+            await TestContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Put(
                     $"/employmentchecks/{_correlationId}",
                     new UpdateEmploymentCheckRequest
                     {
@@ -65,23 +100,65 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         Result = checkResultType.ToString(),
                         DateChecked = DateTime.Today
                     });
+                },
+                (context) => HasProcessedCommand(context),
+                assertOnError: false
+                );
 
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        private bool HasProcessedCommand(TestContext testContext)
+        {
+            return testContext.CommandsPublished.Count(c => c.IsProcessed &&
+                    c.IsDomainCommand &&
+                    c.Command is UpdateEmploymentCheckCommand) == 1;
         }
 
         [Then(@"the apprenticeship incentive employment check result is updated to (.*)")]
         public async Task ThenTheAprenticeshipIncentiveEmploymentCheckIsUpdatedTo(bool hasPassed)
         {
+            TestContext.CommandsPublished.Count(c => c.IsDelayed &&
+                   c.IsDomainCommand &&
+                   c.Command is UpdateEmploymentCheckCommand).Should().Be(0);
+
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var employmentChecks = await dbConnection.GetAllAsync<EmploymentCheck>();
 
             employmentChecks.Count().Should().Be(1);
-
             var employmentCheck = employmentChecks.Single();
+            
+            employmentCheck.CorrelationId.Should().Be(_correlationId);
             employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             employmentCheck.Result.Should().Be(hasPassed);
             employmentCheck.ResultDateTime.Should().Be(DateTime.Today);
             employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+        }
+
+        [Then(@"the apprenticeship incentive employment check result processing is delayed")]
+        public async Task ThenTheAprenticeshipIncentiveEmploymentCheckIsDelayed()
+        {
+            TestContext.CommandsPublished.Count(c => c.IsDelayed &&
+                   c.IsDomainCommand &&
+                   c.Command is UpdateEmploymentCheckCommand).Should().Be(1);
+
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentChecks = await dbConnection.GetAllAsync<EmploymentCheck>();
+
+            employmentChecks.Count().Should().Be(1);
+            var employmentCheck = employmentChecks.Single();
+
+            employmentCheck.CorrelationId.Should().Be(_correlationId);
+            employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            employmentCheck.Result.Should().BeNull();
+            employmentCheck.ResultDateTime.Should().BeNull();
+            employmentCheck.UpdatedDateTime.Should().BeNull();
+        }
+
+        [Then(@"the apprenticeship incentive employment check result is processed")]
+        public async Task ThenTheAprenticeshipIncentiveEmploymentCheckIsProcessed()
+        {
+            await ThenTheAprenticeshipIncentiveEmploymentCheckIsUpdatedTo(true);
         }
     }
 }
