@@ -21,6 +21,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploy
         public async Task Handle(SendEmploymentCheckRequestsCommand command, CancellationToken cancellationToken = default)
         {
             var apprenticeshipIncentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
+            if (apprenticeshipIncentive == null)
+            {
+                return;
+            }
+
             foreach (var employmentCheck in apprenticeshipIncentive.EmploymentChecks)
             {
                 var correlationId = await _employmentCheckService.RegisterEmploymentCheck(employmentCheck, apprenticeshipIncentive);

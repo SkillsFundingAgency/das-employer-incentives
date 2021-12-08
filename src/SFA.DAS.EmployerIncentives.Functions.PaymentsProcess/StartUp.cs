@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -10,21 +8,11 @@ using SFA.DAS.EmployerIncentives.Events;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
-using SFA.DAS.UnitOfWork.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
-using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 using System;
-using System.Data.Common;
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NServiceBus;
-using SFA.DAS.NServiceBus.Features.ClientOutbox.Data;
-using SFA.DAS.NServiceBus.Services;
-using SFA.DAS.NServiceBus.SqlServer.Features.ClientOutbox.Data;
-using SFA.DAS.NServiceBus.SqlServer.Features.ClientOutbox.StartupTasks;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
-using SFA.DAS.UnitOfWork.NServiceBus.Services;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -69,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
-            
+
             builder.Services.AddPersistenceServices();
             builder.Services.AddQueryServices();
             builder.Services.AddCommandServices();

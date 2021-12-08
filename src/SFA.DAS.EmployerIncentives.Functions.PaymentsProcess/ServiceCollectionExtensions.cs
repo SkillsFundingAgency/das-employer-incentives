@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NLog.Extensions.Logging;
 using NServiceBus;
-using NServiceBus.Container;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
@@ -16,8 +14,6 @@ using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using Microsoft.Extensions.Logging;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
-using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
-using SFA.DAS.NServiceBus.Hosting;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
@@ -49,8 +45,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             this IServiceCollection serviceCollection,
             IConfiguration configuration)
         {
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers");
-            endpointConfiguration.UseMessageConventions()
+            var webBuilder = serviceCollection.AddWebJobs(x => { });
+            webBuilder.AddExecutionContextBinding();
+
+            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
+                .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(false)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
