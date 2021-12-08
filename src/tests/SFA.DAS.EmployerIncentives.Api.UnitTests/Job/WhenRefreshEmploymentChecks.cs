@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             _sut = new JobCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<RefreshLegalEntitiesCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<RefreshEmploymentChecksCommand>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 

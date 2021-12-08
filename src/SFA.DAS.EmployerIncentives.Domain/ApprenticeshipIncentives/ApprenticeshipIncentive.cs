@@ -717,7 +717,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEmploymentChecks();
         }
 
-        public void AddEmploymentChecks()
+        public void AddEmploymentChecks(ServiceRequest serviceRequest = null)
         {
             if (Status == IncentiveStatus.Withdrawn)
             {
@@ -733,7 +733,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEmploymentBeforeSchemeCheck();
             AddEmployedAtStartOfApprenticeshipCheck();
 
-            AddEvent(new EmploymentChecksCreated(Id));
+            AddEvent(new EmploymentChecksCreated(Id, serviceRequest));
         }
 
         private void AddEmployedAtStartOfApprenticeshipCheck()
