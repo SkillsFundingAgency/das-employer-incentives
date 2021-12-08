@@ -206,5 +206,38 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             learningPeriods.First().StartDate.Should().Be(episode1.StartDate);
             learningPeriods.First().EndDate.Should().Be(episode1.EndDate.Value);
         }
+
+        [Test]
+        public void Then_price_episodes_with_an_end_date_before_the_start_date_are_ignored()
+        {
+            //Arrange  
+            var periods = new List<PeriodDto> { new PeriodDto { ApprenticeshipId = _apprenticeshipId } };
+
+            var episode1 = _fixture.Build<PriceEpisodeDto>()
+                .With(x => x.AcademicYear, "2021")
+                .With(x => x.StartDate, new DateTime(2020, 9, 1))
+                .With(x => x.EndDate, new DateTime(2020, 12, 10))
+                .With(x => x.Periods, periods)
+                .Create();
+
+            var episode2 = _fixture.Build<PriceEpisodeDto>()
+                .With(pe => pe.AcademicYear, "2021")
+                .With(pe => pe.StartDate, new DateTime(2021, 4, 1))
+                .With(pe => pe.EndDate, new DateTime(2021, 3, 1))
+                .With(pe => pe.Periods, periods)
+                .Create();
+
+            _sut.Training.First().PriceEpisodes.Clear();
+            _sut.Training.First().PriceEpisodes.Add(episode1);
+            _sut.Training.First().PriceEpisodes.Add(episode2);
+
+            //Act
+            var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
+
+            //Assert
+            learningPeriods.Count.Should().Be(1);
+            learningPeriods.First().StartDate.Should().Be(episode1.StartDate);
+            learningPeriods.First().EndDate.Should().Be(episode1.EndDate.Value);
+        }
     }
 }
