@@ -16,8 +16,14 @@ using SFA.DAS.UnitOfWork.SqlServer.DependencyResolution.Microsoft;
 using System;
 using System.Data.Common;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using NServiceBus;
+using SFA.DAS.NServiceBus.Features.ClientOutbox.Data;
 using SFA.DAS.NServiceBus.Services;
+using SFA.DAS.NServiceBus.SqlServer.Features.ClientOutbox.Data;
+using SFA.DAS.NServiceBus.SqlServer.Features.ClientOutbox.StartupTasks;
+using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Services;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -59,27 +65,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.Configure<EmploymentCheckApi>(config.GetSection("EmploymentCheckApi"));
 
             builder.Services.AddNLog(config);
-            builder.Services.AddUnitOfWork();
-
-            // Required for the sql unit of work
-            builder.Services.AddScoped<DbConnection>(p =>
-            {
-                var settings = p.GetService<IOptions<ApplicationSettings>>();
-                return new SqlConnection(settings.Value.DbConnectionString);
-            });
-
-            builder.Services.AddNServiceBus(config);
 
             builder.Services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
-                .AddSqlServerUnitOfWork();
-
-            builder.Services.TryAddScoped<IEventPublisher, EventPublisher>();
-
+                .AddNServiceBusClientUnitOfWork();
+            
             builder.Services.AddPersistenceServices();
             builder.Services.AddQueryServices();
             builder.Services.AddCommandServices();
             builder.Services.AddEventServices();
+
+            builder.Services.AddNServiceBus(config);
         }
     }
 }
