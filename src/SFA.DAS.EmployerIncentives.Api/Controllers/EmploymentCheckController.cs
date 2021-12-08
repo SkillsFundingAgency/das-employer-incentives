@@ -12,7 +12,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
     [ApiController]
     public class EmploymentCheckController : ApiCommandControllerBase
     {
-        public EmploymentCheckController(ICommandDispatcher commandDispatcher) : base(commandDispatcher) { }
+
+        public EmploymentCheckController(ICommandDispatcher commandDispatcher) 
+            : base(commandDispatcher)
+        {
+        }
 
         [HttpPut("/employmentchecks/{correlationId}")]  
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -39,5 +43,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 _ => EmploymentCheckResultType.NoAccountFound,
             };
         }
+
     }
 }
