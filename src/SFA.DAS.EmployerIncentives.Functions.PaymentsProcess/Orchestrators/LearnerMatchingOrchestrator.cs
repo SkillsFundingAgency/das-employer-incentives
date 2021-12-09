@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             var apprenticeshipIncentives = await context.CallActivityAsync<List<ApprenticeshipIncentiveOutput>>(nameof(GetAllApprenticeshipIncentives), null);
            
-            _logger.LogInformation("[LearnerMatchingOrchestrator] {count} apprenticeship incentives found", apprenticeshipIncentives.Count);
+            _logger.LogDebug("[LearnerMatchingOrchestrator] {count} apprenticeship incentives found", apprenticeshipIncentives.Count);
 
             var tasks = apprenticeshipIncentives.Select(incentive => context.CallSubOrchestratorAsync(nameof(LearnerMatchingApprenticeshipOrchestrator), incentive)).ToList();
             await Task.WhenAll(tasks);

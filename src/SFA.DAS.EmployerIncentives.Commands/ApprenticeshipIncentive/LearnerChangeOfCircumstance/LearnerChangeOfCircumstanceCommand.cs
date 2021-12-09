@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerChangeOfCircumstance
 {
-    public class LearnerChangeOfCircumstanceCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class LearnerChangeOfCircumstanceCommand : DomainCommand, ILockIdentifier, ILogWriterWithArgs
     {
         public Guid ApprenticeshipIncentiveId { get; }
 
@@ -17,15 +17,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
         }
 
         [Newtonsoft.Json.JsonIgnore]
-        public Log Log
+        public LogWithArgs Log
         {
             get
             {
-                var message = $"ApprenticeshipIncentive LearnerChangeOfCircumstanceCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}";
-                return new Log
+                var message = "ApprenticeshipIncentive LearnerChangeOfCircumstanceCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}";
+                return new LogWithArgs
                 {
-                    OnProcessing = () => message,
-                    OnError = () => message
+                    OnProcessing = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId }),
+                    OnProcessed = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId }),
+                    OnError = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId })
                 };
             }
         }

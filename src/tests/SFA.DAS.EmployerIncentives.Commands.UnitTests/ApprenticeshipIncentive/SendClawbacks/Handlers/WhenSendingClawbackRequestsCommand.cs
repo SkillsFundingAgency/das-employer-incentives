@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _clawbacksToSend = _fixture.CreateMany<PaymentDto>(5).ToList();
             _unsentClawbacks = _clawbacksToSend.TakeLast(5 - _paymentRequestsLimit).ToList();
 
-            _command = new SendClawbacksCommand(_fixture.Create<long>(), _fixture.Create<DateTime>());
+            _command = new SendClawbacksCommand(_fixture.Create<long>(), _fixture.Create<DateTime>(), new Domain.ValueObjects.CollectionPeriod(_fixture.Create<byte>(), _fixture.Create<short>()));
 
             _sut = new SendClawbacksCommandHandler(_mockPaymentDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
         }

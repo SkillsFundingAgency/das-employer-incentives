@@ -1,5 +1,4 @@
 using AutoFixture;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -23,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             
-            _sut = new LearnerChangeOfCircumstanceActivity(_mockCommandDispatcher.Object, Mock.Of<ILogger<LearnerChangeOfCircumstanceActivity>>());
+            _sut = new LearnerChangeOfCircumstanceActivity(_mockCommandDispatcher.Object);
         }
 
         [Test]

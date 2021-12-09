@@ -5,32 +5,31 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment
 {
-    public class CreatePaymentCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class CreatePaymentCommand : DomainCommand, ILockIdentifier, ILogWriterWithArgs
     {
         public Guid ApprenticeshipIncentiveId { get; }
         public Guid PendingPaymentId { get; }
-        public short CollectionYear { get; }
-        public byte CollectionPeriod { get; }
+        public Domain.ValueObjects.CollectionPeriod CollectionPeriod { get; }
         public string LockId { get => $"{nameof(ApprenticeshipIncentiveId)}_{ApprenticeshipIncentiveId}"; }
 
-        public CreatePaymentCommand(Guid apprenticeshipIncentiveId, Guid pendingPaymentId, short collectionYear, byte collectionPeriod)
+        public CreatePaymentCommand(Guid apprenticeshipIncentiveId, Guid pendingPaymentId, Domain.ValueObjects.CollectionPeriod collectionPeriod)
         {
             ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
             PendingPaymentId = pendingPaymentId;
-            CollectionYear = collectionYear;
             CollectionPeriod = collectionPeriod;
         }
 
         [Newtonsoft.Json.JsonIgnore]
-        public Log Log
+        public LogWithArgs Log
         {
             get
             {
-                var message = $"IncentiveApplications CreatePaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, PendingPaymentId {PendingPaymentId}, CollectionYear {CollectionYear} and CollectionPeriod {CollectionPeriod}";
-                return new Log
+                var message = "IncentiveApplications CreatePaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, PendingPaymentId {PendingPaymentId}, CollectionPeriod {CollectionPeriod}";
+                return new LogWithArgs
                 {
-                    OnProcessing = () => message,
-                    OnError = () => message
+                    OnProcessing = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId, PendingPaymentId, CollectionPeriod }),
+                    OnProcessed = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId, PendingPaymentId, CollectionPeriod }),
+                    OnError = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId, PendingPaymentId, CollectionPeriod })
                 };
             }
         }

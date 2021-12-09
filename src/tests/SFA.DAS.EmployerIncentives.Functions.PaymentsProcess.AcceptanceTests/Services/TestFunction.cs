@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                     { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
-                    { "ApplicationSettings:LogLevel", "Info" }
+                    { "ApplicationSettings:LogLevel", "DEBUG" }
             };
 
             _testContext = testContext;
@@ -105,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                            s.AddSingleton<IDistributedLockProvider, NullLockProvider>();
                            s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
-                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
+                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));                        
                        })
                        )
                     .ConfigureServices(s =>

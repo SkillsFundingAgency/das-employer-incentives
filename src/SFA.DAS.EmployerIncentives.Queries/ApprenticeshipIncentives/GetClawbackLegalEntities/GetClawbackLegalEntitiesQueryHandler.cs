@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetClawbac
 
         public async Task<GetClawbackLegalEntitiesResponse> Handle(GetClawbackLegalEntitiesRequest query, CancellationToken cancellationToken = default)
         {
-            var payableLegalEntities = await _queryRepository.GetClawbackLegalEntities(query.CollectionPeriodYear, query.CollectionPeriodMonth, query.IsSent);
+            var payableLegalEntities = await _queryRepository.GetClawbackLegalEntities(query.CollectionPeriod.AcademicYear, query.CollectionPeriod.PeriodNumber, query.IsSent);
 
             var response = new GetClawbackLegalEntitiesResponse(payableLegalEntities);
 

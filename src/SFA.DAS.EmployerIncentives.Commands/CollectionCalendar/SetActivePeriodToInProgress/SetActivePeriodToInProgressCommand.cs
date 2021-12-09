@@ -13,10 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriod
         {
             get
             {
-                var message = $"SetActivePeriodToInProgressCommand";
+                var message = "active collection period to in progress";
                 return new Log
                 {
-                    OnProcessing = () => message,
+                    OnProcessing = () => "Setting " +  message,
+                    OnProcessed = () => "Set " + message,
                     OnError = () => message
                 };
             }

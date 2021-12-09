@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 context.SetCustomStatus("LoggingUnsentClawbacks");
                 foreach (var legalEntity in clawbackLegalEntities)
                 {
-                    _logger.LogInformation($"Unsent clawback for AccountId : {legalEntity.AccountId}, AccountLegalEntityId : {legalEntity.AccountLegalEntityId}, Collection Year : {collectionPeriod.Year}, Period : {collectionPeriod.Period}");
+                    _logger.LogDebug($"Unsent clawback for AccountId : {legalEntity.AccountId}, AccountLegalEntityId : {legalEntity.AccountLegalEntityId}, Collection Year : {collectionPeriod.Year}, Period : {collectionPeriod.Period}");
                 }
             }
 
