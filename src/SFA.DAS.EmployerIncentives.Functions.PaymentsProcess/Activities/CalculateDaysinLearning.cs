@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
     public class CalculateDaysInLearning
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        
+
         public CalculateDaysInLearning(ICommandDispatcher commandDispatcher)
         {
             _commandDispatcher = commandDispatcher;

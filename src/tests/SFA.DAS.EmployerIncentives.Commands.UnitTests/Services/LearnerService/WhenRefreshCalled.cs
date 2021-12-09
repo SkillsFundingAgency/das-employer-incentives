@@ -10,8 +10,6 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
 using System;
 using System.Threading.Tasks;
-using Castle.Core.Logging;
-using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
 {
@@ -19,7 +17,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
     {
         private LearnerSubmissionService _sut;
         private TestHttpClient _httpClient;
-        private Mock<ILogger<LearnerService>> _logger;
         private Uri _baseAddress;
         private Learner _learner;
         private readonly string _version = "1.0";
@@ -32,7 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
-            _logger = new Mock<ILogger<LearnerService>>();
 
             _learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
 
