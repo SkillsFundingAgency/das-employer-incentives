@@ -74,7 +74,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddDomainCommandHandlerValidators()
                 .AddScoped<ICommandDispatcher, CommandDispatcher>()
                 .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()
-                .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
+                .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>()
+                .Decorate<ICommandDispatcher, CommandDispatcherWithLoggingArgs>();
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
@@ -161,7 +162,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             return serviceCollection;
         }
-
+             
         public static IServiceCollection AddDomainCommandHandlerValidators(this IServiceCollection serviceCollection)
         {
             serviceCollection
@@ -260,7 +261,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new LearnerService(client, settings.Version);
+                return new LearnerService(client, settings.Version, s.GetService<ILogger<LearnerService>>());
             });
 
             return serviceCollection;

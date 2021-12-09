@@ -2,7 +2,7 @@
 {
     public interface ILogWriter
     {
-        [System.Text.Json.Serialization.JsonIgnore]        
+        [System.Text.Json.Serialization.JsonIgnore]
         public Log Log { get; }
     }
 }

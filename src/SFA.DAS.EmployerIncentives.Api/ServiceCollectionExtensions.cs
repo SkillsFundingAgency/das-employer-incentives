@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
@@ -9,8 +12,6 @@ namespace SFA.DAS.EmployerIncentives.Api
     {
         public static IServiceCollection AddNLog(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            var nLogConfiguration = new NLogConfiguration();
-
             serviceCollection.AddLogging((options) =>
             {
                 options.AddFilter(typeof(Startup).Namespace, LogLevel.Information);
@@ -21,8 +22,15 @@ namespace SFA.DAS.EmployerIncentives.Api
                     CaptureMessageProperties = true
                 });
                 options.AddConsole();
-
-                nLogConfiguration.ConfigureNLog(configuration["ApplicationSettings:LogLevel"]);
+                
+                var env = Environment.GetEnvironmentVariable("EnvironmentName");
+                var configFile = "nlog.config";
+                if (string.IsNullOrEmpty(env) || env.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    configFile = "nlog.local.config";
+                }
+                var rootDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), ".."));
+                options.AddNLog(Directory.GetFiles(rootDirectory, configFile, SearchOption.AllDirectories)[0]);
             });
 
             return serviceCollection;

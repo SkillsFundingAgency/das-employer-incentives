@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var incentive = context.GetInput<ApprenticeshipIncentiveOutput>();
 
             if (!context.IsReplaying)
-                _logger.LogInformation("LearnerMatchingApprenticeshipOrchestrator Started for Apprenticeship: {incentive}", incentive);
+                _logger.LogDebug("LearnerMatchingApprenticeshipOrchestrator Started for Apprenticeship: {incentive}", incentive);
 
             await SetSuccessfulLearnerMatch(context, incentive, false);
 
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             await SetSuccessfulLearnerMatch(context, incentive, true);
 
             if (!context.IsReplaying)
-                _logger.LogInformation("LearnerMatchingApprenticeshipOrchestrator Completed for Apprenticeship: {incentive}", incentive);
+                _logger.LogDebug("LearnerMatchingApprenticeshipOrchestrator Completed for Apprenticeship: {incentive}", incentive);
         }
 
         private async Task SetSuccessfulLearnerMatch(IDurableOrchestrationContext context, ApprenticeshipIncentiveOutput incentive, bool succeeded)

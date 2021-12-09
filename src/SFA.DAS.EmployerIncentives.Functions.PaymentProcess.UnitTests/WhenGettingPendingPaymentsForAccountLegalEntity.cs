@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
@@ -35,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         It.IsAny<GetPendingPaymentsForAccountLegalEntityRequest>()))
                 .ReturnsAsync(new GetPendingPaymentsForAccountLegalEntityResponse(_pendingPayments));
 
-            _sut = new GetPendingPaymentsForAccountLegalEntity(_mockQueryDispatcher.Object, Mock.Of<ILogger<GetPendingPaymentsForAccountLegalEntity>>());
+            _sut = new GetPendingPaymentsForAccountLegalEntity(_mockQueryDispatcher.Object);
         }
 
         [Test]
@@ -47,8 +46,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                 x => x.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(
                     It.Is<GetPendingPaymentsForAccountLegalEntityRequest>(p =>
                         p.AccountLegalEntityId == _accountLegalEntityCollectionPeriod.AccountLegalEntityId &&
-                        p.PeriodNumber == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period &&
-                        p.PaymentYear == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)), Times.Once);
+                        p.CollectionPeriod.PeriodNumber == _accountLegalEntityCollectionPeriod.CollectionPeriod.Period &&
+                        p.CollectionPeriod.AcademicYear == _accountLegalEntityCollectionPeriod.CollectionPeriod.Year)), Times.Once);
         }
 
         [Test]

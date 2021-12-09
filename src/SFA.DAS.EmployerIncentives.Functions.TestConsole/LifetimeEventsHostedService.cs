@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
         private void OnStarted()
         {
-            _logger.LogInformation("OnStarted has been called.");
+            _logger.LogDebug("OnStarted has been called.");
 
             _console.Run().Wait();
 
@@ -46,14 +46,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestConsole
 
         private void OnStopping()
         {
-            _logger.LogInformation("OnStopping has been called.");
+            _logger.LogDebug("OnStopping has been called.");
 
             // Perform on-stopping activities here
         }
 
         private void OnStopped()
         {
-            _logger.LogInformation("OnStopped has been called.");
+            _logger.LogDebug("OnStopped has been called.");
 
             // Perform post-stopped activities here
         }

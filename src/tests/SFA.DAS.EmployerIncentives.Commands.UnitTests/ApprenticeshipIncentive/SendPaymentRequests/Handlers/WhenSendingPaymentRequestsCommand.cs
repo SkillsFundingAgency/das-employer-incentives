@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _paymentsToSend = _fixture.CreateMany<PaymentDto>(5).ToList();
             _unsentPayments = _paymentsToSend.TakeLast(5 - _paymentRequestsLimit).ToList();
 
-            _command = new SendPaymentRequestsCommand(_fixture.Create<long>(), _fixture.Create<DateTime>());
+            _command = new SendPaymentRequestsCommand(_fixture.Create<long>(), _fixture.Create<DateTime>(), new Domain.ValueObjects.CollectionPeriod(_fixture.Create<byte>(), _fixture.Create<short>()));
 
             _sut = new SendPaymentRequestsCommandHandler(_mockPaymentDataRepository.Object, _mockPayableLegalEntityQueryRepository.Object, _mockBusinessCentralFinancePaymentsService.Object);
         }

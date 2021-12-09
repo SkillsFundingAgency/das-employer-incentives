@@ -7,5 +7,12 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.Logging
         public Func<string> OnProcessing { get; set; }
         public Func<string> OnProcessed { get; set; }
         public Func<string> OnError { get; set; }
+
+        public Log()
+        {
+            OnProcessing = () => "";
+            OnProcessed = () => "";
+            OnError = () => "";
+        }
     }
 }
