@@ -17,5 +17,7 @@
 
         public const string UpdateVendorRegistrationCaseStatus = "SFA.DAS.EmployerIncentives.UpdateVrfStatus";
         public const string SendEmploymentCheckRequests = "SFA.DAS.EmployerIncentives.RequestEmploymentChecks";
+        public const string UpdateEmploymentCheck = "SFA.DAS.EmployerIncentives.UpdateEmploymentCheck";        
+        public const string RefreshEmploymentCheckCommand = "SFA.DAS.EmployerIncentives.RefreshEmploymentCheck";
     }
 }

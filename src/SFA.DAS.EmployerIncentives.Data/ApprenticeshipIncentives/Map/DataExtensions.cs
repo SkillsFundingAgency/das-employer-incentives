@@ -438,6 +438,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CheckType = x.CheckType,
                 CorrelationId = x.CorrelationId,
                 CreatedDateTime = x.CreatedDateTime,
+                UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
@@ -454,6 +455,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CheckType = x.CheckType,
                 CorrelationId = x.CorrelationId,
                 CreatedDateTime = x.CreatedDateTime,
+                UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
@@ -484,5 +486,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return null;
         }
 
+        internal static EmploymentCheckAudit Map(this EmploymentCheckRequestAudit entity)
+        {
+            return new EmploymentCheckAudit
+            {
+                Id = entity.Id,
+                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now
+            };
+        }
     }
 }

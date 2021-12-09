@@ -4,14 +4,17 @@ using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck
+namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
-    public class UpdateEmploymentCheckCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class UpdateEmploymentCheckCommand : DomainCommand, ILockIdentifier, ILogWriter, IPeriodEndIncompatible
     {
         public Guid CorrelationId { get; }
         public EmploymentCheckResultType Result { get; }
         public DateTime DateChecked { get; }
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.EmploymentCheck)}_{CorrelationId}"; }
+        public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
+
+        public bool CancelCommand => false;
 
         public UpdateEmploymentCheckCommand(Guid correlationId, EmploymentCheckResultType result, DateTime dateChecked)
         {

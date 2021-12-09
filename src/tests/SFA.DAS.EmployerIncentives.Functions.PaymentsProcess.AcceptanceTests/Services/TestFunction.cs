@@ -38,15 +38,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             HubName = hubName;
             _orchestrationData = new OrchestrationData();
 
+            _testContext = testContext;
+
             _appConfig = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                     { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
-                    { "ApplicationSettings:LogLevel", "Info" }
+                    { "ApplicationSettings:LogLevel", "Info" },
+                    { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
             };
-
-            _testContext = testContext;
 
             var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
             _host = new HostBuilder()

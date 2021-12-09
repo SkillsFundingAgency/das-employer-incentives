@@ -35,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<ChangeOfCircumstance> ChangeOfCircumstances { get; set; }
         public virtual DbSet<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
         public virtual DbSet<EmploymentCheck> EmploymentChecks { get; set; }
+        public virtual DbSet<EmploymentCheckAudit> EmploymentCheckAudits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

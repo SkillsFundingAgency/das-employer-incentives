@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NLog.Extensions.Logging;
 using NServiceBus;
-using NServiceBus.Container;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
@@ -15,6 +13,7 @@ using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using Microsoft.Extensions.Logging;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
@@ -52,11 +51,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
-                .UseOutbox(true)
+                .UseOutbox(false)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
-
-            endpointConfiguration.UseContainer<ServicesBuilder>((Action<ContainerCustomizations>)(c => c.ExistingServices(serviceCollection)));
             
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -76,11 +73,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 endpointConfiguration.License(configuration["ApplicationSettings:NServiceBusLicense"]);
             }
 
-            var endpoint = Endpoint.Start(endpointConfiguration);
-            Task.WhenAll(endpoint);
+            var endpointWithExternallyManagedServiceProvider = EndpointWithExternallyManagedServiceProvider.Create(endpointConfiguration, serviceCollection);
+            endpointWithExternallyManagedServiceProvider.Start(new UpdateableServiceProvider(serviceCollection));
+            serviceCollection.AddSingleton(p => endpointWithExternallyManagedServiceProvider.MessageSession.Value);
 
-            serviceCollection.AddSingleton(p => endpoint.Result)
-                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>());
             return serviceCollection;
         }
     }

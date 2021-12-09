@@ -81,6 +81,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
                     select _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive)).ToList();
         }
 
+        public async Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindIncentivesWithLearningFound()
+        {
+            var incentives = await _apprenticeshipIncentiveDataRepository.FindIncentivesWithLearningFound();
+            return (from incentive in incentives
+                select _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive)).ToList();
+        }
+
         public async Task Save(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive aggregate)
         {
             if (aggregate.IsNew)
