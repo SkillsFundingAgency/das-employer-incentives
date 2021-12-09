@@ -22,41 +22,27 @@ namespace SFA.DAS.EmployerIncentives.Queries.Decorators
 
         public async Task<TResult> Handle(TQuery query, CancellationToken cancellationToken = default)
         {
-            var domainLog = (query is ILogWriter) ? (query as ILogWriter).Log : new Log();
+            if (query is IRequestLogWriterWithArgs)
+            {
+                return await _handler.Handle(query, cancellationToken);
+            }
+            
+            var queryLog = (query is IRequestLogWriter) ? (query as IRequestLogWriter).Log : new RequestLog();
 
             try
             {
-                if (domainLog.OnProcessing == null)
-                {
-                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query");
-                }
-                else
-                {
-                    _log.LogInformation($"Start handle '{typeof(TQuery)}' query : {domainLog.OnProcessing.Invoke()}");
-                }
+                _log.LogDebug($"Start handle query '{typeof(TQuery)}' : {queryLog.OnProcessing.Invoke()}");
 
                 var result = await _handler.Handle(query, cancellationToken);
 
-                if (domainLog.OnProcessed == null)
-                {
-                    _log.LogInformation($"End handle '{typeof(TQuery)}' query");
-                }
-                else
-                {
-                    _log.LogInformation($"End handle '{typeof(TQuery)}' query : {domainLog.OnProcessed.Invoke()}");
-                }
+                var responseLog = (result is IResponseLogWriter) ? (result as IResponseLogWriter).Log : new ResponseLog();
+                _log.LogDebug($"End handle query '{typeof(TQuery)}' : {responseLog.OnProcessed.Invoke()}");
+
                 return result;
             }
             catch (Exception ex)
             {
-                if (domainLog.OnError == null)
-                {
-                    _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query");
-                }
-                else
-                {
-                    _log.LogError(ex, $"Error handling '{typeof(TQuery)}' query : {domainLog.OnError.Invoke()}");
-                }
+                _log.LogError(ex, $"Error handling query '{typeof(TQuery)}' : {queryLog.OnError.Invoke()}");
 
                 throw;
             }

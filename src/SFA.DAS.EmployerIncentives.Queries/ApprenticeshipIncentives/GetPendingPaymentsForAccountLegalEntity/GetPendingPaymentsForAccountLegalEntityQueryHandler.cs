@@ -8,7 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPending
 {
     public class GetPendingPaymentsForAccountLegalEntityQueryHandler : IQueryHandler<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>
     {
-        private IQueryRepository<PendingPaymentDto> _queryRepository;
+        private readonly IQueryRepository<PendingPaymentDto> _queryRepository;
 
         public GetPendingPaymentsForAccountLegalEntityQueryHandler(IQueryRepository<PendingPaymentDto> queryRepository)
         {
@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPending
             var pendingPayments = await _queryRepository.GetList(dto =>
                 dto.AccountLegalEntityId == query.AccountLegalEntityId && 
                 !dto.PaymentMadeDate.HasValue &&
-                (dto.PaymentYear < query.PaymentYear || (dto.PaymentYear == query.PaymentYear && dto.PeriodNumber <= query.PeriodNumber)));
+                (dto.PaymentYear < query.CollectionPeriod.AcademicYear || (dto.PaymentYear == query.CollectionPeriod.AcademicYear && dto.PeriodNumber <= query.CollectionPeriod.PeriodNumber)));
 
             return new GetPendingPaymentsForAccountLegalEntityResponse(pendingPayments);
         }

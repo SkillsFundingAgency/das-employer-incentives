@@ -493,8 +493,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             await _sut.Handle(command);
 
             //Assert
-            _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Start Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
-            _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber}");
             _mockLogger.VerifyLogContains(LogLevel.Information, Times.Once(), $"Matching ILR record not found for ApprenticeshipIncentiveId: {_learner.ApprenticeshipIncentiveId}, ApprenticeshipId: {_learner.ApprenticeshipId}, UKPRN: {_learner.Ukprn}, ULN: {_learner.UniqueLearnerNumber} with reason: {_learner.SubmissionData.LearningData.NotFoundReason}");
         }
 

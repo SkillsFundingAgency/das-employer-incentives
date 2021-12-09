@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawbacks;
 using System;
@@ -11,12 +10,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
     public class SendClawbacksForAccountLegalEntity
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly ILogger<SendClawbacksForAccountLegalEntity> _logger;
 
-        public SendClawbacksForAccountLegalEntity(ICommandDispatcher commandDispatcher, ILogger<SendClawbacksForAccountLegalEntity> logger)
+        public SendClawbacksForAccountLegalEntity(ICommandDispatcher commandDispatcher)
         {
             _commandDispatcher = commandDispatcher;
-            _logger = logger;
         }
 
         [FunctionName(nameof(SendClawbacksForAccountLegalEntity))]
@@ -24,9 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
         {
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
-            _logger.LogInformation("[SendClawbacksForAccountLegalEntity] Publish SendClawbackRequestsCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
-            await _commandDispatcher.Send(new SendClawbacksCommand(accountLegalEntityId, DateTime.UtcNow));
-            _logger.LogInformation("[SendClawbacksForAccountLegalEntity] Published SendClawbacksCommand for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
+            await _commandDispatcher.Send(new SendClawbacksCommand(accountLegalEntityId, DateTime.UtcNow, new Domain.ValueObjects.CollectionPeriod(collectionPeriod.Period, collectionPeriod.Year)));
             return true;
         }
     }

@@ -39,15 +39,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
             var incentive = await _incentiveDomainRepository.Find(command.ApprenticeshipIncentiveId);
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
 
-            _logger.LogInformation("Start Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN}",
-                learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber);
-
             var submissionData = new SubmissionData();
             var learnerData = await _learnerService.Get(learner);
-
-            _logger.LogInformation("End Learner data refresh from Learner match service for ApprenticeshipIncentiveId: {ApprenticeshipIncentiveId}, ApprenticeshipId: {ApprenticeshipId}, UKPRN: {UKPRN}, ULN: {ULN}",
-                learner.ApprenticeshipIncentiveId, learner.ApprenticeshipId, learner.Ukprn, learner.UniqueLearnerNumber);
-
+            
             var collectionCalendar = await _collectionCalendarService.Get();
 
             if (learnerData != null)
