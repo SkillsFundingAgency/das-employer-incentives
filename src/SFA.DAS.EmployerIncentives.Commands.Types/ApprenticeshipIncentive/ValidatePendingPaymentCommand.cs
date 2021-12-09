@@ -5,7 +5,7 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
-    public class ValidatePendingPaymentCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class ValidatePendingPaymentCommand : DomainCommand, ILockIdentifier, ILogWriterWithArgs
     {
         public Guid ApprenticeshipIncentiveId { get; }
         public Guid PendingPaymentId { get; }
@@ -27,15 +27,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
         }
 
         [Newtonsoft.Json.JsonIgnore]
-        public Log Log
+        public LogWithArgs Log
         {
             get
             {
-                var message = $"ApprenticeshipIncentive ValidatePendingPaymentCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} and PendingPaymentId {PendingPaymentId}";
-                return new Log
+                var message = "Pending Payment [PendingPaymentId={pendingPaymentId}], [collection period={year}/{period}], [ApprenticeshipIncentiveId={apprenticeshipIncentiveId}]";
+
+                return new LogWithArgs
                 {
-                    OnProcessing = () => message,
-                    OnError = () => message
+                    OnProcessing = () => new Tuple<string, object[]>("Validating " + message, new object[] { PendingPaymentId, CollectionYear, CollectionPeriod, ApprenticeshipIncentiveId }),
+                    OnProcessed = () => new Tuple<string, object[]>("Validated " + message, new object[] { PendingPaymentId, CollectionYear, CollectionPeriod, ApprenticeshipIncentiveId }),
+                    OnError = () => new Tuple<string, object[]>("Error validating " + message, new object[] { PendingPaymentId, CollectionYear, CollectionPeriod, ApprenticeshipIncentiveId })
                 };
             }
         }

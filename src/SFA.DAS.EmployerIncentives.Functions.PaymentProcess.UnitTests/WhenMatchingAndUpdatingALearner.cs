@@ -1,14 +1,12 @@
-using System.Threading;
-using System.Threading.Tasks;
 using AutoFixture;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
-using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -24,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             
-            _sut = new LearnerMatchAndUpdate(_mockCommandDispatcher.Object, Mock.Of<ILogger<LearnerMatchAndUpdate>>());
+            _sut = new LearnerMatchAndUpdate(_mockCommandDispatcher.Object);
         }
 
         [Test]

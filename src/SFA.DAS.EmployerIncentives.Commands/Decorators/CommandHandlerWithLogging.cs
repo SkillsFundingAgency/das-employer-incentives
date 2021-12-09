@@ -29,22 +29,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
             {
                 if (domainLog.OnProcessing == null)
                 {
-                    log.LogInformation($"Start handle '{typeof(T)}' command");
+                    log.LogDebug($"Start handle '{typeof(T)}' command");
                 }
                 else
                 {
-                    log.LogInformation($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
+                    log.LogDebug($"Start handle '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
                 }
 
                 await _handler.Handle(command, cancellationToken);
 
                 if (domainLog.OnProcessed == null)
                 {
-                    log.LogInformation($"End handle '{typeof(T)}' command");
+                    log.LogDebug($"End handle '{typeof(T)}' command");
                 }
                 else
                 {
-                    log.LogInformation($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
+                    log.LogDebug($"End handle '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
                 }
             }
             catch(Exception ex)

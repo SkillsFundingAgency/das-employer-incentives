@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                     context.Headers.TryGetValue("NServiceBus.MessageId", out string messageId);
                     context.Headers.TryGetValue("NServiceBus.CorrelationId", out string correlationId);
                     context.Headers.TryGetValue("NServiceBus.OriginatingEndpoint", out string originatingEndpoint);
-                    logger.LogInformation($"Received NServiceBusTriggerData Message of type '{(messageType != null ? messageType.Split(',')[0] : string.Empty)}' with messageId '{messageId}' and correlationId '{correlationId}' from endpoint '{originatingEndpoint}'");
+                    logger.LogDebug($"Received NServiceBusTriggerData Message of type '{(messageType != null ? messageType.Split(',')[0] : string.Empty)}' with messageId '{messageId}' and correlationId '{correlationId}' from endpoint '{originatingEndpoint}'");
 
                 },
                 OnMessageErrored = (ex, context) =>

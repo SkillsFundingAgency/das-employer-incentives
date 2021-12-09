@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
-    public class RefreshLearnerCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class RefreshLearnerCommand : DomainCommand, ILockIdentifier, ILogWriterWithArgs
     {
         public Guid ApprenticeshipIncentiveId { get; }
 
@@ -17,15 +17,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
         }
 
         [Newtonsoft.Json.JsonIgnore]
-        public Log Log
+        public LogWithArgs Log
         {
             get
             {
-                var message = $"ApprenticeshipIncentive RefreshLearnerCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}";
-                return new Log
+                var message = "Learner Match record for apprenticeship incentive id { apprenticeshipIncentiveId}";
+                return new LogWithArgs
                 {
-                    OnProcessing = () => message,
-                    OnError = () => message
+                    OnProcessing = () => new Tuple<string, object[]>("Creating " + message, new object[] { ApprenticeshipIncentiveId }),
+                    OnProcessed = () => new Tuple<string, object[]>("Created " + message, new object[] { ApprenticeshipIncentiveId }),
+                    OnError = () => new Tuple<string, object[]>("Created " + message, new object[] { ApprenticeshipIncentiveId })
                 };
             }
         }

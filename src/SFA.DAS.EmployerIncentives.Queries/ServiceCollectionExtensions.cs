@@ -48,7 +48,8 @@ namespace SFA.DAS.EmployerIncentives.Queries
         {
             serviceCollection
                 .Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerWithRetry<,>))
-                .Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerWithLogging<,>));
+                .Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerWithLogging<,>))
+                .Decorate(typeof(IQueryHandler<,>), typeof(QueryHandlerWithLoggingArgs<,>));
 
             return serviceCollection;
         }
