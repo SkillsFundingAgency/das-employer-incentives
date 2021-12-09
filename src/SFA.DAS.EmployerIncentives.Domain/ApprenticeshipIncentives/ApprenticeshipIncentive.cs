@@ -719,12 +719,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void AddEmploymentChecks(ServiceRequest serviceRequest = null)
         {
+            Model.EmploymentCheckModels.ToList()
+                .ForEach(ec => {
+                    if (Model.EmploymentCheckModels.Remove(ec))
+                    {
+                        AddEvent(new EmploymentCheckDeleted(ec));
+                    }
+                });
+
             if (Status == IncentiveStatus.Withdrawn)
             {
                 return;
             }
 
-            Model.EmploymentCheckModels.Clear();
             if (StartDate.AddDays(42) > DateTime.Now)
             {
                 return;

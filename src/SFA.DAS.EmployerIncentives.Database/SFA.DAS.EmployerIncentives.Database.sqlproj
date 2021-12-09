@@ -109,6 +109,7 @@
     <Build Include="Tables\EmploymentCheck.sql" />
     <Build Include="Schemas\Reports.sql" />
     <Build Include="StoredProcedures\Reports.RecoveryReport.sql" />
+    <Build Include="Tables\Archive.EmploymentCheck.sql" />
     <Build Include="Schemas\audit.sql" />
     <Build Include="Tables\Audit.EmploymentCheckAudit.sql" />
   </ItemGroup>

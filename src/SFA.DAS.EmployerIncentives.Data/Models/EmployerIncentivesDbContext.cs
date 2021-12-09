@@ -22,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<ApprenticeshipIncentives.Models.Archive.PendingPayment> ArchivedPendingPayments { get; set; }
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<ApprenticeshipIncentives.Models.Archive.Payment> ArchivedPayments { get; set; }
+        public virtual DbSet<ApprenticeshipIncentives.Models.Archive.EmploymentCheck> ArchivedEmploymentChecks { get; set; }
         public virtual DbSet<CollectionCalendarPeriod> CollectionPeriods { get; set; }
         public virtual DbSet<AcademicYear> AcademicYears { get; set; }
         public virtual DbSet<PendingPaymentValidationResult> PendingPaymentValidationResults { get; set; }
