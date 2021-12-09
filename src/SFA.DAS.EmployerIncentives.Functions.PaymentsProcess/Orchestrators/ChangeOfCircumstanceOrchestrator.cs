@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var learnerChangeOfCircumstanceInput = context.GetInput<LearnerChangeOfCircumstanceInput>();
 
             if (!context.IsReplaying)
-                _logger.LogInformation("Learner Change of Circumstances process started for apprenticeship Incentive {apprenticeshipIncentiveId}, ULN: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);
+                _logger.LogDebug("Learner Change of Circumstances process started for apprenticeship Incentive {apprenticeshipIncentiveId}, ULN: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);
 
             var hasPossibleChangeOfCircs = await context.CallActivityAsync<bool>(nameof(ApprenticeshipIncentiveHasPossibleChangeOrCircs), learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId);
 
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 await context.CallActivityWithRetryAsync(nameof(LearnerMatchAndUpdate), new RetryOptions(TimeSpan.FromSeconds(1), 3), new LearnerMatchInput { ApprenticeshipIncentiveId = learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId });
             }
 
-            _logger.LogInformation("Learner Change of Circumstances process completed for apprenticeship Incentive {apprenticeshipIncentiveId}, ULN: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);
+            _logger.LogDebug("Learner Change of Circumstances process completed for apprenticeship Incentive {apprenticeshipIncentiveId}, ULN: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);
         }
     }
 }

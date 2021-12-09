@@ -33,14 +33,13 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
             var data = _fixture.CreateMany<PayableLegalEntityDto>().ToList();
             var expected = new GetPayableLegalEntitiesResponse(data);
 
-            _repositoryMock.Setup(x => x.GetPayableLegalEntities(query.CollectionPeriodYear, query.CollectionPeriodMonth)).ReturnsAsync(data);
+            _repositoryMock.Setup(x => x.GetPayableLegalEntities(query.CollectionPeriod.AcademicYear, query.CollectionPeriod.PeriodNumber)).ReturnsAsync(data);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.Should().BeEquivalentTo(expected);
+            result.Should().BeEquivalentTo(expected, options => options.Excluding(o => o.Log));
         }
-
     }
 }
