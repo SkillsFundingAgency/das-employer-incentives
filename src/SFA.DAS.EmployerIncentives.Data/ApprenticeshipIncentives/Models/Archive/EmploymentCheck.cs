@@ -16,6 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Archiv
         public Guid CorrelationId { get; set; }
         public bool? Result { get; set; }
         public DateTime CreatedDateTime { get; set; }
+        public DateTime? UpdatedDateTime { get; set; }
         public DateTime? ResultDateTime { get; set; }
         public DateTime ArchiveDateUTC { get; set; }
     }

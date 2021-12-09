@@ -78,6 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 MaximumDate = model.MaximumDate,
                 Result = model.Result,
                 CreatedDateTime = model.CreatedDateTime,
+                UpdatedDateTime = model.UpdatedDateTime,
                 ResultDateTime = model.ResultDateTime,
                 ArchiveDateUTC = DateTime.UtcNow
             };

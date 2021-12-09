@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 ));
 
             // Assert
-            var createdEvent = incentive.FlushEvents().Single() as EmploymentChecksCreated;
+            var createdEvent = incentive.FlushEvents().OfType<EmploymentChecksCreated>().Single();
             createdEvent.Should().NotBeNull();
             createdEvent.ApprenticeshipIncentiveId.Should().Be(model.Id);
             createdEvent.ServiceRequest.TaskId.Should().Be(serviceRequest.TaskId);
