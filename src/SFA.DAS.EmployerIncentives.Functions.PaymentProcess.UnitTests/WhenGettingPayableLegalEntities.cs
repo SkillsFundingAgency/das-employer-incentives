@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayableLegalEntities;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -36,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         It.IsAny<GetPayableLegalEntitiesRequest>()))
                 .ReturnsAsync(new GetPayableLegalEntitiesResponse(_legalEntities));
 
-            _sut = new GetPayableLegalEntities(_mockQueryDispatcher.Object, Mock.Of<ILogger<GetPayableLegalEntities>>());
+            _sut = new GetPayableLegalEntities(_mockQueryDispatcher.Object);
         }
 
         [Test]
@@ -47,8 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockQueryDispatcher.Verify(
                 x => x.Send<GetPayableLegalEntitiesRequest, GetPayableLegalEntitiesResponse>(
                     It.Is<GetPayableLegalEntitiesRequest>(p =>
-                        p.CollectionPeriodMonth == _collectionPeriod.Period &&
-                        p.CollectionPeriodYear == _collectionPeriod.Year)), Times.Once);
+                        p.CollectionPeriod.PeriodNumber == _collectionPeriod.Period &&
+                        p.CollectionPeriod.AcademicYear == _collectionPeriod.Year)), Times.Once);
         }
 
         [Test]

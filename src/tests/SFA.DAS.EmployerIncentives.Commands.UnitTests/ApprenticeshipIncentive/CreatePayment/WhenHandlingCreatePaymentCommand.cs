@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             var command = new CreatePaymentCommand(_incentive.Id, _incentive.PendingPayments.First().Id,
-                _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
+                new Domain.ValueObjects.CollectionPeriod(_firstCollectionPeriod.PeriodNumber, _firstCollectionPeriod.AcademicYear));
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(_incentive);
 
@@ -83,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_payment_is_persisted()
         {
             //Arrange
-            var command = new CreatePaymentCommand(_incentive.Id, _incentive.PendingPayments.First().Id, _firstCollectionPeriod.AcademicYear, _firstCollectionPeriod.PeriodNumber);
+            var command = new CreatePaymentCommand(_incentive.Id, _incentive.PendingPayments.First().Id, new Domain.ValueObjects.CollectionPeriod(_firstCollectionPeriod.PeriodNumber, _firstCollectionPeriod.AcademicYear));
 
             _mockIncentiveDomainRespository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(_incentive);
 

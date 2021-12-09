@@ -23,41 +23,26 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 
         public async Task Send<T>(T command, CancellationToken cancellationToken = default) where T : ICommand
         {
+            if (command is ILogWriterWithArgs)
+            {
+                await _dispatcher.Send(command, cancellationToken);
+                return;
+            }
+
             var log = _logfactory.CreateLogger<T>();
             var domainLog = (command is ILogWriter) ? (command as ILogWriter).Log : new Log();
 
             try
             {
-                if (domainLog.OnProcessing == null)
-                {
-                    log.LogInformation($"Start dispatch  '{typeof(T)}' command");
-                }
-                else
-                {
-                    log.LogInformation($"Start dispatch '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
-                }
+                log.LogDebug($"Start dispatch '{typeof(T)}' command : {domainLog.OnProcessing.Invoke()}");
 
                 await _dispatcher.Send(command, cancellationToken);
 
-                if (domainLog.OnProcessed == null)
-                {
-                    log.LogInformation($"End dispatch '{typeof(T)}' command");
-                }
-                else
-                {
-                    log.LogInformation($"End dispatch '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
-                }
+                log.LogDebug($"End dispatch '{typeof(T)}' command : {domainLog.OnProcessed.Invoke()}");
             }
             catch (Exception ex)
             {
-                if (domainLog.OnError == null)
-                {
-                    log.LogError(ex, $"Error dispatching '{typeof(T)}' command");
-                }
-                else
-                {
-                    log.LogError(ex, $"Error dispatching '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
-                }
+                log.LogError(ex, $"Error dispatching '{typeof(T)}' command : {domainLog.OnError.Invoke()}");
 
                 throw;
             }

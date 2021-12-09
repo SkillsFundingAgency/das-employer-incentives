@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
@@ -23,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _fixture = new Fixture();
             _mockCommandDispatcher = new Mock<ICommandDispatcher>();
             
-            _sut = new CalculateEarningsActivity(_mockCommandDispatcher.Object, Mock.Of<ILogger<CalculateEarningsActivity>>());
+            _sut = new CalculateEarningsActivity(_mockCommandDispatcher.Object);
         }
 
         [Test]

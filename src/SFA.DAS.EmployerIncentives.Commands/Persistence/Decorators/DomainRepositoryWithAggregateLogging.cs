@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators
             if(entity is ILogger)
             {
                 var entityLog = (entity as ILogWriter).Log;
-                _log.LogInformation($"Retrieved entity '{typeof(T)}' {entityLog.OnProcessing?.Invoke()}");
+                _log.LogDebug($"Retrieved entity '{typeof(T)}' {entityLog.OnProcessing?.Invoke()}");
             }
 
             return entity;
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence.Decorators
 
                 try
                 {
-                    _log.LogInformation($"Saving '{typeof(T)}'  {entityLog.OnProcessed?.Invoke()}");
+                    _log.LogDebug($"Saving '{typeof(T)}'  {entityLog.OnProcessed?.Invoke()}");
 
                     await _domainRepository.Save(aggregate);
                 }

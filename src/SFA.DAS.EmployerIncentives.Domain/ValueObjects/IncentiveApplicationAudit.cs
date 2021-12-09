@@ -7,11 +7,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
 {
     public class IncentiveApplicationAudit : ValueObject
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; }
 
-        public Guid IncentiveApplicationApprenticeshipId { get; set; }
+        public Guid IncentiveApplicationApprenticeshipId { get; }
 
-        public IncentiveApplicationStatus Process { get; set; }
+        public IncentiveApplicationStatus Process { get; }
 
         public ServiceRequest ServiceRequest { get; }
         
