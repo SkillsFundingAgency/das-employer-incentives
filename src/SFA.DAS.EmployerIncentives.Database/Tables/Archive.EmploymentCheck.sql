@@ -8,6 +8,7 @@
 	[CorrelationId] UNIQUEIDENTIFIER NOT NULL,
 	[Result] BIT NULL,
 	[CreatedDateTime] DATETIME2 NOT NULL,
+	[UpdatedDateTime] DATETIME2 NULL,
 	[ResultDateTime] DATETIME2 NULL,
 	[ArchiveDateUTC] DATETIME2 NOT NULL
 )
