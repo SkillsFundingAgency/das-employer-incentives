@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPendingPaymentsForAccountLegalEntity;
@@ -12,13 +11,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class GetPendingPaymentsForAccountLegalEntity
     {
-        private readonly IQueryDispatcher _queryDispatcher;
-        private ILogger<GetPendingPaymentsForAccountLegalEntity> _logger;
+        private readonly IQueryDispatcher _queryDispatcher;        
 
-        public GetPendingPaymentsForAccountLegalEntity(IQueryDispatcher queryDispatcher, ILogger<GetPendingPaymentsForAccountLegalEntity> logger)
+        public GetPendingPaymentsForAccountLegalEntity(IQueryDispatcher queryDispatcher)
         {
             _queryDispatcher = queryDispatcher;
-            _logger = logger;
         }
 
         [FunctionName(nameof(GetPendingPaymentsForAccountLegalEntity))]
@@ -26,12 +23,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
-            _logger.LogInformation("Calculate Payments process started for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", accountLegalEntityId, collectionPeriod);
 
-            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, collectionPeriod.Year, collectionPeriod.Period);
+            var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, new Domain.ValueObjects.CollectionPeriod(collectionPeriod.Period, collectionPeriod.Year));
             var pendingPayments = await _queryDispatcher.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(request);
-            var pendingPaymentCount = pendingPayments.PendingPayments.Count;
-            _logger.LogInformation("{pendingPaymentCount} pending payments returned for account legal entity {accountLegalEntityId}, collection period {collectionPeriod}", pendingPaymentCount, accountLegalEntityId, collectionPeriod);
             return pendingPayments.PendingPayments.Select(x => new PendingPaymentActivityDto { PendingPaymentId = x.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId }).ToList();
         }
     }

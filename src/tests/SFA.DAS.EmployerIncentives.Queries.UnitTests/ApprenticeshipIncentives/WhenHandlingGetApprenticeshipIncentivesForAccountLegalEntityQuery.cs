@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
             var result = await _sut.Handle(query, CancellationToken.None);
 
             //Assert
-            result.Should().BeEquivalentTo(expected);
+            result.Should().BeEquivalentTo(expected, options => options.Excluding(o => o.Log));
         }
 
     }

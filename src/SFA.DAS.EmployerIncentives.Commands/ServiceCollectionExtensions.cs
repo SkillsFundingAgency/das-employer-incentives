@@ -77,7 +77,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddDomainCommandHandlerValidators()
                 .AddScoped<ICommandDispatcher, CommandDispatcher>()
                 .Decorate<IUnitOfWorkManager, UnitOfWorkManagerWithScope>()
-                .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>();
+                .Decorate<ICommandDispatcher, CommandDispatcherWithLogging>()
+                .Decorate<ICommandDispatcher, CommandDispatcherWithLoggingArgs>();
 
             serviceCollection
               .AddSingleton(c => new Policies(c.GetService<IOptions<PolicySettings>>()));
@@ -164,7 +165,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             return serviceCollection;
         }
-
+             
         public static IServiceCollection AddDomainCommandHandlerValidators(this IServiceCollection serviceCollection)
         {
             serviceCollection

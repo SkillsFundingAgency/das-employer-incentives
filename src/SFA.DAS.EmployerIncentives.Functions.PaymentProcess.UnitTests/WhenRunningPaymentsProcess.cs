@@ -177,7 +177,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             // assert
             foreach (var clawbackLegalEntity in clawbackLegalEntities)
             {
-                _mockLogger.VerifyLog(LogLevel.Information, Times.Once(), $"Unsent clawback for AccountId : {clawbackLegalEntity.AccountId}, AccountLegalEntityId : {clawbackLegalEntity.AccountLegalEntityId}, Collection Year : {_collectionPeriod.Year}, Period : {_collectionPeriod.Period}");
+                _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"Unsent clawback for AccountId : {clawbackLegalEntity.AccountId}, AccountLegalEntityId : {clawbackLegalEntity.AccountLegalEntityId}, Collection Year : {_collectionPeriod.Year}, Period : {_collectionPeriod.Period}");
             }            
         }
 

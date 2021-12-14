@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch
 {
-    public class SetSuccessfulLearnerMatchCommand : DomainCommand, ILockIdentifier, ILogWriter
+    public class SetSuccessfulLearnerMatchCommand : DomainCommand, ILockIdentifier, ILogWriterWithArgs
     {
         public Guid ApprenticeshipIncentiveId { get; }
         public long Uln { get; }
@@ -20,15 +20,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccess
         }
 
         [Newtonsoft.Json.JsonIgnore]
-        public Log Log
+        public LogWithArgs Log
         {
             get
             {
-                var message = $"ApprenticeshipIncentive SetSuccessfulLearnerMatchCommand for ApprenticeshipIncentiveId {ApprenticeshipIncentiveId}, ULN {Uln}, Succeeded {Succeeded} ";
-                return new Log
+                var message = "SuccessfulLearnerMatch for apprenticeship incentive id {apprenticeshipIncentiveId}, ULN {uln}, Succeeded: {succeeded}";
+
+                return new LogWithArgs
                 {
-                    OnProcessing = () => message,
-                    OnError = () => message
+                    OnProcessing = () => new Tuple<string, object[]>( "Setting " + message, new object[] { ApprenticeshipIncentiveId, Uln, Succeeded }),
+                    OnProcessed = () => new Tuple<string, object[]>("Set " + message, new object[] { ApprenticeshipIncentiveId, Uln, Succeeded }),
+                    OnError = () => new Tuple<string, object[]>("Error setting " + message, new object[] { ApprenticeshipIncentiveId, Uln, Succeeded })
                 };
             }
         }
