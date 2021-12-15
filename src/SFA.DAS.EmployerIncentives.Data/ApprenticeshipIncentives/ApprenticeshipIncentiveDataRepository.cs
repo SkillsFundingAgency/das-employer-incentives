@@ -56,6 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                .Include(x => x.Payments)
                .Include(x => x.ClawbackPayments)
                .Include(x => x.BreakInLearnings)
+               .Include(x => x.EmploymentChecks)
                .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
             if (apprenticeshipIncentive != null)
             {
@@ -66,7 +67,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
         {
-            var apprenticeships = await _dbContext.ApprenticeshipIncentives.Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
+            var apprenticeships = await _dbContext.ApprenticeshipIncentives
+                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
+                .Include(x => x.Payments)
+                .Include(x => x.ClawbackPayments)
+                .Include(x => x.BreakInLearnings)
+                .Include(x => x.EmploymentChecks)
+                .Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
             var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
 
             return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
