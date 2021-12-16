@@ -89,7 +89,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             TestContext.ActivePeriod.PeriodEndInProgress = true;
             await dbConnection.UpdateAsync(TestContext.ActivePeriod);
         }
-
+        
+        [Given(@"the employment checks feature toggle is set to (.*)")]
+        public void GivenTheEmploymentChecksFeatureToggleIsSet(bool featureToggle)
+        {
+            TestContext.ApplicationSettings.EmploymentCheckEnabled = featureToggle;
+        }
 
         [When(@"the employment checks are refreshed")]
         public async Task WhenTheEmploymentChecksAreRefreshed()

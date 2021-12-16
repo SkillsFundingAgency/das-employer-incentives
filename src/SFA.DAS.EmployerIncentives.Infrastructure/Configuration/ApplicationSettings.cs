@@ -19,5 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string Identifier { get; set; }
         public string EmployerIncentivesWebBaseUrl { get; set; }
         public string LogLevel { get; set; }
+        public bool EmploymentCheckEnabled { get; set; }
     }
 }
