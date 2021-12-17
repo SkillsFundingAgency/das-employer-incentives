@@ -37,10 +37,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockEmploymentCheckService = new Mock<IEmploymentCheckService>();
             _mockApplicationSettings = new Mock<IOptions<ApplicationSettings>>();
-            var configuration = new ApplicationSettings {EmploymentCheckEnabled = true};
-            _mockApplicationSettings.Setup(x => x.Value).Returns(configuration);
 
-            _sut = new SendEmploymentCheckRequestsCommandHandler(_mockDomainRepository.Object, _mockEmploymentCheckService.Object, _mockApplicationSettings.Object);
+            _sut = new SendEmploymentCheckRequestsCommandHandler(_mockDomainRepository.Object, _mockEmploymentCheckService.Object);
         }
 
         [Test]
@@ -80,10 +78,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var configuration = new ApplicationSettings { EmploymentCheckEnabled = false };
             _mockApplicationSettings.Setup(x => x.Value).Returns(configuration);
 
-            _sut = new SendEmploymentCheckRequestsCommandHandler(_mockDomainRepository.Object, _mockEmploymentCheckService.Object, _mockApplicationSettings.Object);
+            var handler = new SendEmploymentCheckRequestsCommandHandlerWithEmploymentCheckToggle(
+                new SendEmploymentCheckRequestsCommandHandler(_mockDomainRepository.Object, _mockEmploymentCheckService.Object),
+                _mockApplicationSettings.Object);
 
             // Act
-            await _sut.Handle(command);
+            await handler.Handle(command);
 
             // Assert
             _mockDomainRepository.Verify(x => x.Find(It.IsAny<Guid>()), Times.Never);

@@ -59,6 +59,7 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulL
 using SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriodToInProgress;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploymentCheckRequests;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -161,7 +162,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithPeriodEndDelay<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>))
+                .Decorate(typeof(ICommandHandler<SendEmploymentCheckRequestsCommand>), typeof(SendEmploymentCheckRequestsCommandHandlerWithEmploymentCheckToggle));
 
             return serviceCollection;
         }
