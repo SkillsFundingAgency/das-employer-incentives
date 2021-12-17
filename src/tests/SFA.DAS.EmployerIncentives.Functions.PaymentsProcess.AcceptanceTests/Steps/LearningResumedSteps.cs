@@ -233,6 +233,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             change.ChangedDate.Should().Be(DateTime.Today);
         }
 
+        [Then(@"the break in learning deleted change of circumstance is saved")]
+        public void ThenTheBreakInLearningDeletedChangeOfCircumstancesIsSaved()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var change = dbConnection.GetAll<ChangeOfCircumstance>().Single(coc => coc.ChangeType == ChangeOfCircumstanceType.BreakInLearningDel);
+
+            change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            change.PreviousValue.Should().Be(string.Empty);
+            change.NewValue.Should().Be(string.Empty);
+            change.ChangedDate.Should().Be(DateTime.Today);
+        }        
+
         [Then(@"the learner data resumed date is stored")]
         public void ThenTheLearnerDataResumedDateIsStored()
         {

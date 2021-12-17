@@ -10,6 +10,7 @@ Scenario: Calculate earnings when Learner data contains a learning resumed chang
 	When the incentive learner data is refreshed
 	Then the incentive is updated to active
 	And the resumed change of circumstance is saved
+	And the break in learning deleted change of circumstance is saved
 	And the learner data resumed date is stored
 	And the first payment due date is '<IsCalculated>' to include the break in learning
 
