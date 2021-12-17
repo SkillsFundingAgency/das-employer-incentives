@@ -11,8 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploy
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly IEmploymentCheckService _employmentCheckService;
-
-        public SendEmploymentCheckRequestsCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, IEmploymentCheckService employmentCheckService)
+        
+        public SendEmploymentCheckRequestsCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, 
+                                                         IEmploymentCheckService employmentCheckService)
         {
             _domainRepository = domainRepository;
             _employmentCheckService = employmentCheckService;
