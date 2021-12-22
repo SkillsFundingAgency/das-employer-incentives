@@ -77,6 +77,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         }
 
         [Test]
+        public void Then_an_empty_learning_period_is_returned_when_there_are_no_training_records_in_the_submission()
+        {
+            //Arrange              
+            _sut = new LearnerSubmissionDto()
+            {
+                Training = null
+            };
+
+            //Act
+            var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
+
+            //Assert
+            learningPeriods.Count().Should().Be(0);
+        }
+
+        [Test]
         public void Then_expected_periods_are_returned_when_there_are_price_episodes_with_periods_for_the_apprenticeship()
         {
             //Arrange              
