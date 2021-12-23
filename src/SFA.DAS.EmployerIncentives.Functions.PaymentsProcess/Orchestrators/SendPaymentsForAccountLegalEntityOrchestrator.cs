@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var accountLegalEntityCollectionPeriod = context.GetInput<AccountLegalEntityCollectionPeriod>();
 
             if (!context.IsReplaying) 
-                _logger.LogInformation("SendPaymentsForAccountLegalEntityOrchestrator started for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);
+                _logger.LogDebug("SendPaymentsForAccountLegalEntityOrchestrator started for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);
 
             var paymentTasks = new List<Task>
             {
@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             await Task.WhenAll(paymentTasks);
 
             if (!context.IsReplaying) 
-                _logger.LogInformation("SendPaymentsForAccountLegalEntityOrchestrator completed for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);
+                _logger.LogDebug("SendPaymentsForAccountLegalEntityOrchestrator completed for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);
         }
     }
 }
