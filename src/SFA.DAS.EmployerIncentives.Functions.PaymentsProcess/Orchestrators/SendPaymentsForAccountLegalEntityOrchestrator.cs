@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
@@ -24,8 +25,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             if (!context.IsReplaying) 
                 _logger.LogInformation("SendPaymentsForAccountLegalEntityOrchestrator started for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);
 
-            await context.CallActivityAsync(nameof(SendClawbacksForAccountLegalEntity), accountLegalEntityCollectionPeriod);
-            await context.CallActivityAsync(nameof(SendPaymentRequestsForAccountLegalEntity), accountLegalEntityCollectionPeriod);
+            var paymentTasks = new List<Task>
+            {
+                context.CallActivityAsync(nameof(SendClawbacksForAccountLegalEntity), accountLegalEntityCollectionPeriod),
+                context.CallActivityAsync(nameof(SendPaymentRequestsForAccountLegalEntity), accountLegalEntityCollectionPeriod)
+            };
+
+            await Task.WhenAll(paymentTasks);
 
             if (!context.IsReplaying) 
                 _logger.LogInformation("SendPaymentsForAccountLegalEntityOrchestrator completed for Account Legal Entity: {accountLegalEntityCollectionPeriod}", accountLegalEntityCollectionPeriod);
