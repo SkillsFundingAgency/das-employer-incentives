@@ -56,6 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                .Include(x => x.Payments)
                .Include(x => x.ClawbackPayments)
                .Include(x => x.BreakInLearnings)
+               .Include(x => x.EmploymentChecks)
                .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
             if (apprenticeshipIncentive != null)
             {
@@ -66,10 +67,41 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
         {
-            var apprenticeships = await _dbContext.ApprenticeshipIncentives.Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
+            var apprenticeships = await _dbContext.ApprenticeshipIncentives
+                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
+                .Include(x => x.Payments)
+                .Include(x => x.ClawbackPayments)
+                .Include(x => x.BreakInLearnings)
+                .Include(x => x.EmploymentChecks)
+                .Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
             var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
 
             return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
+        }
+
+        public async Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByEmploymentCheckId(Guid correlationId)
+        {
+            var employmentCheck = await _dbContext.EmploymentChecks.SingleOrDefaultAsync(c => c.CorrelationId == correlationId);
+            if(employmentCheck == null)
+            {
+                return null;
+            }
+
+            return await Get(employmentCheck.ApprenticeshipIncentiveId);
+        }
+
+        public async Task<List<ApprenticeshipIncentiveModel>> FindIncentivesWithLearningFound()
+        {
+            var apprenticeships = (from incentive in _dbContext.ApprenticeshipIncentives.Include(x => x.EmploymentChecks)
+                    join learner in _dbContext.Learners.Where(x => x.LearningFound.HasValue && x.LearningFound.Value) 
+                        on incentive.Id equals learner.ApprenticeshipIncentiveId
+                        where incentive.Status != IncentiveStatus.Withdrawn
+                        select new {Incentive = incentive}
+                );
+
+            var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
+
+            return apprenticeships.Select(x => x.Incentive.Map(collectionPeriods)).ToList();
         }
 
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
@@ -80,6 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.Payments)
                 .Include(x => x.ClawbackPayments)
                 .Include(x => x.BreakInLearnings)
+                .Include(x => x.EmploymentChecks)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
@@ -120,6 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             RemoveDeletedPayments(updatedIncentive, existingIncentive);
             RemoveDeletedPendingPayments(updatedIncentive, existingIncentive);
             RemoveDeletedBreaksInLearning(updatedIncentive, existingIncentive);
+            RemoveDeletedEmploymentChecks(updatedIncentive, existingIncentive);
 
             foreach (var pendingPayment in updatedIncentive.PendingPayments)
             {
@@ -170,8 +204,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 if (existingBreakInLearning != null)
                 {
                     breakInLearning.CreatedDate = existingBreakInLearning.CreatedDate;
-
                     _dbContext.Entry(existingBreakInLearning).CurrentValues.SetValues(breakInLearning);
+
                     if (_dbContext.Entry(existingBreakInLearning).State == EntityState.Modified)
                     {
                         existingBreakInLearning.UpdatedDate = DateTime.Now;
@@ -181,6 +215,26 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 {
                     breakInLearning.CreatedDate = DateTime.Now;
                     _dbContext.BreakInLearnings.Add(breakInLearning);
+                }
+            }
+
+            foreach (var employmentCheck in updatedIncentive.EmploymentChecks)
+            {
+                var existingEmploymentCheck = existingIncentive.EmploymentChecks.SingleOrDefault(p => p.Id == employmentCheck.Id);
+
+                if (existingEmploymentCheck != null)
+                {
+                    _dbContext.Entry(existingEmploymentCheck).CurrentValues.SetValues(employmentCheck);
+                    
+                    if (_dbContext.Entry(existingEmploymentCheck).State == EntityState.Modified)
+                    {
+                        existingEmploymentCheck.UpdatedDateTime = DateTime.Now;
+                    }                    
+                }
+                else
+                {
+                    employmentCheck.CreatedDateTime = DateTime.Now;
+                    _dbContext.EmploymentChecks.Add(employmentCheck);
                 }
             }
         }
@@ -260,5 +314,16 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 }
             }
         }
+
+        private void RemoveDeletedEmploymentChecks(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingEmploymentCheck in existingIncentive.EmploymentChecks)
+            {
+                if (!updatedIncentive.EmploymentChecks.Any(c => c.Id == existingEmploymentCheck.Id))
+                {
+                    _dbContext.EmploymentChecks.Remove(existingEmploymentCheck);
+                }
+            }
+        }       
     }
 }

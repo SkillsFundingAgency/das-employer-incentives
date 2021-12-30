@@ -11,7 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class GetPendingPaymentsForAccountLegalEntity
     {
-        private readonly IQueryDispatcher _queryDispatcher;
+        private readonly IQueryDispatcher _queryDispatcher;        
 
         public GetPendingPaymentsForAccountLegalEntity(IQueryDispatcher queryDispatcher)
         {
