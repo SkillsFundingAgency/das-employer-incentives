@@ -1985,6 +1985,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeFalse();
             application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeFalse();
