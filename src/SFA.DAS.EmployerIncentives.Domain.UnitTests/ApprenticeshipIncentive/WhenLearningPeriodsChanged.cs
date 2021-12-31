@@ -52,7 +52,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = ApprenticeshipIncentive.Get(_sutModel.Id, _sutModel);
 
             var learningData = new LearningData(true);
-            learningData.SetLearningPeriodsChanged(true);
             learningData.SetStartDate(new DateTime(2021, 7, 1));
 
             var submissionData = new SubmissionData();

@@ -65,5 +65,23 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ArchiveDateUTC = DateTime.UtcNow
             };
         }
+
+        internal static Models.Archive.EmploymentCheck Map(this EmploymentCheckModel model)
+        {
+            return new Models.Archive.EmploymentCheck
+            {
+                EmploymentCheckId = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                CheckType = model.CheckType.ToString(),
+                CorrelationId = model.CorrelationId,
+                MinimumDate = model.MinimumDate,
+                MaximumDate = model.MaximumDate,
+                Result = model.Result,
+                CreatedDateTime = model.CreatedDateTime,
+                UpdatedDateTime = model.UpdatedDateTime,
+                ResultDateTime = model.ResultDateTime,
+                ArchiveDateUTC = DateTime.UtcNow
+            };
+        }
     }
 }
