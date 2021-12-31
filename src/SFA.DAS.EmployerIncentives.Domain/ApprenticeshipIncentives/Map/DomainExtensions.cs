@@ -58,5 +58,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
         {
             return ClawbackPayment.Get(model);
         }
+
+        public static IEnumerable<EmploymentCheck> Map(this IEnumerable<EmploymentCheckModel> models)
+        {
+            return models.Select(x => x.Map());
+        }
+
+        public static EmploymentCheck Map(this EmploymentCheckModel model)
+        {
+            return EmploymentCheck.Get(model);
+        }
     }
 }

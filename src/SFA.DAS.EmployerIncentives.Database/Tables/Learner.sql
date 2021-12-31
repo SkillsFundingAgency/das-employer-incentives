@@ -16,8 +16,7 @@
 	[SuccessfulLearnerMatchExecution] BIT NOT NULL DEFAULT(1),
 	[RawJSON] NVARCHAR(MAX) NULL,
 	[CreatedDate] DATETIME2 NOT NULL,
-	[UpdatedDate] DATETIME2 NULL,
-	[LearningPeriodsChanged] BIT NOT NULL DEFAULT(0)
+	[UpdatedDate] DATETIME2 NULL
 )
 GO
 CREATE CLUSTERED INDEX IX_Learner_ApprenticeshipIncentiveId ON [incentives].Learner (ApprenticeshipIncentiveId)

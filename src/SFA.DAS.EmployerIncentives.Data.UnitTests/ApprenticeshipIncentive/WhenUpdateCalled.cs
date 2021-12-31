@@ -59,6 +59,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
             expected.ClawbackPaymentModels = clawbackPayments;
 
+            var employmentChecks = _fixture.Build<EmploymentCheckModel>().With(
+                x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
+            expected.EmploymentCheckModels = employmentChecks;
+
             // Act
             await _sut.Update(expected);
             await _dbContext.SaveChangesAsync();
@@ -116,6 +120,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 expectedClawbackPayment.CollectionPeriod.PeriodNumber.Should().Be(savedClawbackPayment.CollectionPeriod);
                 expectedClawbackPayment.CollectionPeriod.AcademicYear.Should().Be(savedClawbackPayment.CollectionPeriodYear);
             }
+
+            var savedEmploymentChecks = _dbContext.EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
+            savedEmploymentChecks.Should().BeEquivalentTo(employmentChecks, opts => opts.Excluding(x => x.CreatedDateTime).Excluding(x => x.ResultDateTime).Excluding(x => x.UpdatedDateTime));
         }
 
         [Test]
@@ -150,7 +157,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             var result = await _sut.Get(expected.Id);
             result.BreakInLearnings.Count.Should().Be(2);
         }
-
+        
         private async Task<ApprenticeshipIncentiveModel> SaveAndGetApprenticeshipIncentive()
         {
             var incentive = _fixture.Build<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>()

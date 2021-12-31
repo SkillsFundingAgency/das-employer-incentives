@@ -46,12 +46,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 s.Configure<ApplicationSettings>(a =>
                 {
-                    a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
-                    a.DistributedLockStorage = "UseDevelopmentStorage=true";
-                    a.AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY";
-                    a.Hashstring = "Test Hashstring";
-                    a.NServiceBusConnectionString = "UseLearningEndpoint=true";
-                    a.MinimumAgreementVersion = 4;
+                    a.DbConnectionString = _context.ApplicationSettings.DbConnectionString;
+                    a.DistributedLockStorage = _context.ApplicationSettings.DistributedLockStorage;
+                    a.AllowedHashstringCharacters = _context.ApplicationSettings.AllowedHashstringCharacters;
+                    a.Hashstring = _context.ApplicationSettings.Hashstring;
+                    a.NServiceBusConnectionString = _context.ApplicationSettings.NServiceBusConnectionString;
+                    a.MinimumAgreementVersion = _context.ApplicationSettings.MinimumAgreementVersion;
+                    a.EmploymentCheckEnabled = _context.ApplicationSettings.EmploymentCheckEnabled;
                 });
                 s.Configure<PolicySettings>(a =>
                 {
@@ -73,6 +74,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Configure<MatchedLearnerApi>(l =>
                 {
                     l.ApiBaseUrl = _context.LearnerMatchApi.BaseAddress;
+                    l.Identifier = "";
+                    l.Version = "1.0";
+                });
+                s.Configure<EmploymentCheckApi>(l =>
+                {
+                    l.ApiBaseUrl = _context.EmploymentCheckApi.BaseAddress;
                     l.Identifier = "";
                     l.Version = "1.0";
                 });

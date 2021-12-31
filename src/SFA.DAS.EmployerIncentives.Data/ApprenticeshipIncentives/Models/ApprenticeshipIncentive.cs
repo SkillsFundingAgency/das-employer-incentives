@@ -52,6 +52,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public Phase Phase { get; set; }
         [Column(TypeName = "nvarchar(50)")]
         public WithdrawnBy? WithdrawnBy { get; set; }
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<EmploymentCheck> EmploymentChecks { get; set; }
 
         public ApprenticeshipIncentive()
         {
@@ -59,6 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
             Payments = new List<Payment>();
             ClawbackPayments = new List<ClawbackPayment>();
             BreakInLearnings = new List<ApprenticeshipBreakInLearning>();
+            EmploymentChecks = new List<EmploymentCheck>();
         }
     }
 }
