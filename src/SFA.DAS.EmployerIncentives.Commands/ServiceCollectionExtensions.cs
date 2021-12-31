@@ -57,6 +57,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SetSuccessfulLearnerMatch;
 using SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriodToInProgress;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
+using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploymentCheckRequests;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -67,7 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection
                 .AddDistributedLockProvider()
                 .AddHashingService()
-                .AddLearnerService();
+                .AddLearnerService()
+                .AddEmploymentCheckService();
 
             serviceCollection
                 .AddCommandHandlers(addDecorators: AddCommandHandlerDecorators)
@@ -144,8 +148,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IChangeOfCircumstancesDataRepository, ChangeOfCircumstancesDataRepository>();            
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
+            serviceCollection.AddScoped<IEmploymentCheckAuditRepository, EmploymentCheckAuditRepository>();
             
-                    
 
             return serviceCollection;
         }
@@ -158,7 +162,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithRetry<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithPeriodEndDelay<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithValidator<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithLogging<>))
+                .Decorate(typeof(ICommandHandler<SendEmploymentCheckRequestsCommand>), typeof(SendEmploymentCheckRequestsCommandHandlerWithEmploymentCheckToggle));
 
             return serviceCollection;
         }
@@ -182,6 +187,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SetSuccessfulLearnerMatchCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
+                .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<RefreshEmploymentChecksCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
                 ;
 
             return serviceCollection;
@@ -235,9 +244,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceCollection;
         }
 
-        public static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
+        private static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<ILearnerService>(s =>
+            serviceCollection.AddTransient<ILearnerSubmissionService>(s =>
             {
                 var settings = s.GetService<IOptions<MatchedLearnerApi>>().Value;
 
@@ -259,7 +268,37 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new LearnerService(client, settings.Version, s.GetService<ILogger<LearnerService>>());
+                return new LearnerSubmissionService(client, settings.Version);
+            });
+
+            return serviceCollection;
+        }
+
+        private static IServiceCollection AddEmploymentCheckService(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<IEmploymentCheckService>(s =>
+            {
+                var settings = s.GetService<IOptions<EmploymentCheckApi>>().Value;
+
+                var clientBuilder = new HttpClientBuilder()
+                    .WithDefaultHeaders()
+                    .WithLogging(s.GetService<ILoggerFactory>());
+
+                if (!string.IsNullOrEmpty(settings.Identifier))
+                {
+                    clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
+                }
+
+                var client = clientBuilder.Build();
+
+                if (!settings.ApiBaseUrl.EndsWith("/"))
+                {
+                    settings.ApiBaseUrl += "/";
+                }
+
+                client.BaseAddress = new Uri(settings.ApiBaseUrl);
+
+                return new EmploymentCheckService(client);
             });
 
             return serviceCollection;

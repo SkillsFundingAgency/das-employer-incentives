@@ -1,22 +1,21 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog;
 using NLog.Extensions.Logging;
 using NServiceBus;
-using NServiceBus.Container;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
-using Microsoft.Extensions.Logging;
-using NLog;
+using System;
+using System.IO;
+using System.Reflection;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -34,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
             var rootDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), ".."));
             var configFilePath = Directory.GetFiles(rootDirectory, configFileName, SearchOption.AllDirectories)[0];
-            var logger = LogManager.Setup()
+            LogManager.Setup()
                 .SetupExtensions(e => e.AutoLoadAssemblies(false))
                 .LoadConfigurationFromFile(configFilePath, optional: false)
                 .LoadConfiguration(builder => builder.LogFactory.AutoShutdown = false)
@@ -69,8 +68,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 .UseOutbox(true)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
-
-            endpointConfiguration.UseContainer<ServicesBuilder>((Action<ContainerCustomizations>)(c => c.ExistingServices(serviceCollection)));
             
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -90,11 +87,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 endpointConfiguration.License(configuration["ApplicationSettings:NServiceBusLicense"]);
             }
 
-            var endpoint = Endpoint.Start(endpointConfiguration);
-            Task.WhenAll(endpoint);
+            var endpointWithExternallyManagedServiceProvider = EndpointWithExternallyManagedServiceProvider.Create(endpointConfiguration, serviceCollection);
+            endpointWithExternallyManagedServiceProvider.Start(new UpdateableServiceProvider(serviceCollection));
+            serviceCollection.AddSingleton(p => endpointWithExternallyManagedServiceProvider.MessageSession.Value);
 
-            serviceCollection.AddSingleton(p => endpoint.Result)
-                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>());
             return serviceCollection;
         }
     }

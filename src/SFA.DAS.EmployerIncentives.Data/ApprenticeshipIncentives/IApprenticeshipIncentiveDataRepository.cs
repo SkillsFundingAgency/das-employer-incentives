@@ -15,5 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId);
         Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentivesWithoutPendingPayments(bool includeStopped = false, bool includeWithdrawn = false);
         Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId);
+        Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByEmploymentCheckId(Guid correlationId);
+        Task<List<ApprenticeshipIncentiveModel>> FindIncentivesWithLearningFound();
     }
 }

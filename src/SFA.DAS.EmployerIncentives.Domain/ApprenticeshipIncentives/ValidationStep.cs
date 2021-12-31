@@ -11,5 +11,7 @@
         public const string PaymentsNotPaused = "PaymentsNotPaused";
         public const string HasSignedMinVersion = "HasSignedMinVersion";
         public const string LearnerMatchSuccessful = "LearnerMatchSuccessful";
+        public const string EmployedAtStartOfApprenticeship = "EmployedAtStartOfApprenticeship";
+        public const string EmployedBeforeSchemeStarted = "EmployedBeforeSchemeStarted";
     }
 }

@@ -102,6 +102,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(m => m.PausePayments, false)
                 .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
                 .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel> 
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, true)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                        .With(x => x.Result, false)
+                        .Create()
+                })
                 .Create();
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
@@ -299,7 +310,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 5)
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 7)
                 .PendingPaymentValidationResults.Single(x => x.Step == "HasIlrSubmission");
             validationResult.Result.Should().BeFalse();
         }
@@ -335,8 +346,120 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 4)
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 6)
                 .PendingPaymentValidationResults.Single(x => x.Step == "LearnerMatchSuccessful");
+            validationResult.Result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_a_failed_pendingPayment_validation_result_is_saved_when_learner_was_employed_prior_to_scheme_start_date()
+        {
+            // Arrange
+            var pendingPayment1 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, _account)
+                .With(m => m.DueDate, _payment1DueDate)
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayment2 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, _account)
+                .With(m => m.DueDate, _payment1DueDate.AddDays(2))
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
+
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(m => m.Account, _account)
+                .With(m => m.StartDate, _startDate)
+                .With(m => m.PendingPaymentModels, pendingPayments)
+                .With(m => m.PausePayments, false)
+                .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
+                .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                        .With(x => x.Result, true)
+                        .Create()
+                })
+                .Create();
+
+            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+            
+            _mockIncentiveDomainRespository
+                .Setup(m => m.Find(incentive.Id))
+                .ReturnsAsync(incentive);
+            
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(incentive))
+                .ReturnsAsync(_learner);
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
+                .PendingPaymentValidationResults.Single(x => x.Step == "EmployedBeforeSchemeStarted");
+            validationResult.Result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_a_failed_pendingPayment_validation_result_is_saved_when_learner_was_not_employed_on_or_after_scheme_start_date()
+        {
+            // Arrange
+            var pendingPayment1 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, _account)
+                .With(m => m.DueDate, _payment1DueDate)
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayment2 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, _account)
+                .With(m => m.DueDate, _payment1DueDate.AddDays(2))
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
+
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(m => m.Account, _account)
+                .With(m => m.StartDate, _startDate)
+                .With(m => m.PendingPaymentModels, pendingPayments)
+                .With(m => m.PausePayments, false)
+                .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
+                .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, false)
+                        .Create()
+                })
+                .Create();
+
+            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+
+            _mockIncentiveDomainRespository
+                .Setup(m => m.Find(incentive.Id))
+                .ReturnsAsync(incentive);
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(incentive))
+                .ReturnsAsync(_learner);
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
+                .PendingPaymentValidationResults.Single(x => x.Step == "EmployedAtStartOfApprenticeship");
             validationResult.Result.Should().BeFalse();
         }
 
