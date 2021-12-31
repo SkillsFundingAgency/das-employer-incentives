@@ -42,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 BreakInLearnings = model.BreakInLearnings.Map(model.Id),
                 MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
                 Phase = model.Phase.Identifier,
-                WithdrawnBy = model.WithdrawnBy
+                WithdrawnBy = model.WithdrawnBy,
+                EmploymentChecks = model.EmploymentCheckModels.Map()
             };
         }
 
@@ -85,7 +86,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 BreakInLearnings = entity.BreakInLearnings.Map(),                
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase),
-                WithdrawnBy = entity.WithdrawnBy
+                WithdrawnBy = entity.WithdrawnBy,
+                EmploymentCheckModels = entity.EmploymentChecks.Map()
             };
         }
 
@@ -285,7 +287,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                     learner.SubmissionData.LearningData.SetIsStopped(new LearningStoppedStatus(false, model.LearningResumedDate.Value));
                 }
 
-                learner.SubmissionData.LearningData.SetLearningPeriodsChanged(model.LearningPeriodsChanged);
                 learner.SubmissionData.SetRawJson(model.RawJSON);
             }
 
@@ -313,7 +314,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped,
                 LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed,
                 SuccessfulLearnerMatchExecution = model.SuccessfulLearnerMatch,
-                LearningPeriodsChanged = model.SubmissionData.LearningData.LearningPeriodsChanged
             };
 
             return learner;
@@ -427,6 +427,40 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
         }
 
+        private static ICollection<EmploymentCheck> Map(this ICollection<EmploymentCheckModel> models)
+        {
+            return models.Select(x => new EmploymentCheck
+            {
+                Id = x.Id,
+                MaximumDate = x.MaximumDate,
+                MinimumDate = x.MinimumDate,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                CheckType = x.CheckType,
+                CorrelationId = x.CorrelationId,
+                CreatedDateTime = x.CreatedDateTime,
+                UpdatedDateTime = x.UpdatedDateTime,
+                Result = x.Result,
+                ResultDateTime = x.ResultDateTime
+            }).ToList();
+        }
+
+        private static ICollection<EmploymentCheckModel> Map(this ICollection<EmploymentCheck> models)
+        {
+            return models.Select(x => new EmploymentCheckModel
+            {
+                Id = x.Id,
+                MaximumDate = x.MaximumDate,
+                MinimumDate = x.MinimumDate,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                CheckType = x.CheckType,
+                CorrelationId = x.CorrelationId,
+                CreatedDateTime = x.CreatedDateTime,
+                UpdatedDateTime = x.UpdatedDateTime,
+                Result = x.Result,
+                ResultDateTime = x.ResultDateTime
+            }).ToList();
+        }
+
         internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)
         {
             if (model != null)
@@ -452,5 +486,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             return null;
         }
 
+        internal static EmploymentCheckAudit Map(this EmploymentCheckRequestAudit entity)
+        {
+            return new EmploymentCheckAudit
+            {
+                Id = entity.Id,
+                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now
+            };
+        }
     }
 }

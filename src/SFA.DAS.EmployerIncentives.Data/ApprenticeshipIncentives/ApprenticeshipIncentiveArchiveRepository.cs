@@ -30,5 +30,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         {
             await _dbContext.AddAsync(paymentModel.Map());
         }
+
+        public async Task Archive(EmploymentCheckModel employmentCheckModel)
+        {
+            await _dbContext.AddAsync(employmentCheckModel.Map());
+        }
     }
 }

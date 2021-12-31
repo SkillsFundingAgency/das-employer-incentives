@@ -151,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         public static IList<LearningPeriod> LearningPeriods(this LearnerSubmissionDto learnerData, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive, Domain.ValueObjects.CollectionCalendar collectionCalendar)
         {
-            if (learnerData == null) return new List<LearningPeriod>();
+            if (learnerData == null || learnerData.Training == null) return new List<LearningPeriod>();
 
             var periods = 
               (from tr in learnerData.Training

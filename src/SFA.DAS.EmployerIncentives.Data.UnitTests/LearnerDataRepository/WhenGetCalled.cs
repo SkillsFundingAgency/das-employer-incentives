@@ -36,8 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             submissionData.SetLearningData(new LearningData(true));
             submissionData.LearningData.SetHasDataLock(true);
             submissionData.SetRawJson(_fixture.Create<string>());
-            submissionData.LearningData.SetLearningPeriodsChanged();
-
+            
             var testLearner =
                 _fixture.Build<LearnerModel>()
                 .With(l => l.SubmissionData, submissionData)
@@ -64,7 +63,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
             result.SubmissionData.LearningData.StartDate.Should().BeNull();
             result.SubmissionData.LearningData.IsInlearning.Should().BeNull();
             result.SubmissionData.LearningData.StoppedStatus.LearningStopped.Should().BeFalse();
-            result.SubmissionData.LearningData.LearningPeriodsChanged.Should().BeTrue();
             result.SubmissionData.RawJson.Should().Be(testLearner.SubmissionData.RawJson);
         }
 

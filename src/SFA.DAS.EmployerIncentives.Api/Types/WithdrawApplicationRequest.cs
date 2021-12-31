@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SFA.DAS.EmployerIncentives.Api.Types
+﻿namespace SFA.DAS.EmployerIncentives.Api.Types
 {
     public class WithdrawApplicationRequest
     {
@@ -10,12 +8,5 @@ namespace SFA.DAS.EmployerIncentives.Api.Types
         public ServiceRequest ServiceRequest { get; set; }
         public long AccountId { get; set; }
         public string EmailAddress { get; set; }
-    }
-
-    public class ServiceRequest
-    {
-        public string TaskId { get; set; }
-        public string DecisionReference { get; set; }
-        public DateTime? TaskCreatedDate { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
             _fixture = new Fixture();
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
 
-            _startDate = DateTime.Now.Date;
+            _startDate = new DateTime(2021, 11, 01);
             _censusDate = _startDate.AddDays(17);
 
             _collectionCalendarPeriod = new CollectionCalendarPeriod(new CollectionPeriod(1, (short)DateTime.Now.Year), (byte)DateTime.Now.Month, (short)DateTime.Now.Year, DateTime.Now.AddMonths(-2), _censusDate, true, false);

@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class ValidatePendingPayment
     {
-        private readonly ICommandDispatcher _commandDispatcher;        
+        private readonly ICommandDispatcher _commandDispatcher;
 
         public ValidatePendingPayment(ICommandDispatcher commandDispatcher)
         {

@@ -28,6 +28,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
             {
                 if (await ActivePeriodInProgress())
                 {
+                    if (delayable.CancelCommand)
+                    {
+                        return;
+                    }
                     await _scheduledCommandPublisher.Send(command, delayable.CommandDelay, cancellationToken);
                 }
                 else

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
-using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -8,6 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using Learner = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Learner;
+using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
+using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -45,9 +48,12 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
                                       from secondPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (secondPayment == null ? Guid.Empty : secondPayment.Id)).DefaultIfEmpty()
                                       from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
+                                      from firstEmploymentCheck in _dbContext.PendingPaymentValidationResults.Where(x => x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id && x.Step == ValidationStep.EmployedAtStartOfApprenticeship).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
+                                      from secondEmploymentCheck in _dbContext.PendingPaymentValidationResults.Where(x => x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id && x.Step == ValidationStep.EmployedBeforeSchemeStarted).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
                                       where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
                                       select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent, 
-                                                   firstClawback, firstClawbackPayment, secondClawback, secondClawbackPayment, secondPaymentSent };
+                                                   firstClawback, firstClawbackPayment, secondClawback, secondClawbackPayment, secondPaymentSent,
+                                                   firstEmploymentCheck, secondEmploymentCheck};
             
             var result = new List<ApprenticeApplicationDto>();
 
@@ -63,7 +69,6 @@ namespace SFA.DAS.EmployerIncentives.Data
                     ULN = data.incentive.ULN,
                     LegalEntityName = data.account.LegalEntityName,
                     SubmittedByEmail = data.incentive.SubmittedByEmail,
-
                     TotalIncentiveAmount = data.incentive.PendingPayments.Sum(x => x.Amount),
                     CourseName = data.incentive.CourseName,
                     FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
@@ -76,7 +81,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PausePayments = data.incentive.PausePayments,
                         PaymentSent = data.firstPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
-                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
+                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
+                        EmploymentCheckPassed = (data.firstEmploymentCheck != null && data.secondEmploymentCheck != null) && data.firstEmploymentCheck.Result && data.secondEmploymentCheck.Result
                     },
                     FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
                     {
@@ -94,7 +100,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PausePayments = data.incentive.PausePayments,
                         PaymentSent = data.secondPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
-                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion
+                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
+                        EmploymentCheckPassed = (data.firstEmploymentCheck != null && data.secondEmploymentCheck != null) && data.firstEmploymentCheck.Result && data.secondEmploymentCheck.Result
                     },
                     SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
                     {

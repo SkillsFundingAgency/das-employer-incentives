@@ -430,5 +430,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _incentive.BreakInLearnings.First().EndDate.Should().Be(new DateTime(2021, 10, 2));
         }
 
+        [Test]
+        public async Task Then_employment_checks_are_recreated()
+        {
+            //Arrange
+            var command = new LearnerChangeOfCircumstanceCommand(_incentive.Id);
+            _learner.SubmissionData.SetSubmissionDate(new DateTime(2021, 8, 1));
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetStartDate(DateTime.Now.AddDays(-50));
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            _incentive.EmploymentChecks.Count().Should().Be(2);
+            var employedAtStartCheck = _incentive.EmploymentChecks.Single(x => x.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship);
+            employedAtStartCheck.MinimumDate.Should().Be(_learner.SubmissionData.LearningData.StartDate.Value);
+            employedAtStartCheck.MaximumDate.Should().Be(_learner.SubmissionData.LearningData.StartDate.Value.AddDays(42));
+        }
     }
 }
