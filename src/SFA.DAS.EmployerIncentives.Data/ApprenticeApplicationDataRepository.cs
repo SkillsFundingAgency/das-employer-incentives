@@ -82,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSent = data.firstPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = (data.firstEmploymentCheck != null && data.secondEmploymentCheck != null) && data.firstEmploymentCheck.Result && data.secondEmploymentCheck.Result
+                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.secondEmploymentCheck)
                     },
                     FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
                     {
@@ -101,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSent = data.secondPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = (data.firstEmploymentCheck != null && data.secondEmploymentCheck != null) && data.firstEmploymentCheck.Result && data.secondEmploymentCheck.Result
+                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.secondEmploymentCheck)
                     },
                     SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
                     {
@@ -124,6 +124,16 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
 
             return result;
+        }
+
+        private static bool? EmploymentCheckResult(ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheck, ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheck)
+        {
+            if (firstEmploymentCheck == null || secondEmploymentCheck == null)
+            {
+                return null;
+            }
+
+            return firstEmploymentCheck.Result && secondEmploymentCheck.Result;
         }
 
         private static void SetStoppedStatus(ApprenticeApplicationDto model)

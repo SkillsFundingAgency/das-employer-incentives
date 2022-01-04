@@ -1756,8 +1756,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().Be(overallEmploymentCheckStatus);
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(overallEmploymentCheckStatus);
+            application.FirstPaymentStatus.EmploymentCheckPassed.Should().NotBeNull();
+            application.FirstPaymentStatus.EmploymentCheckPassed.Value.Should().Be(overallEmploymentCheckStatus);
+            application.SecondPaymentStatus.EmploymentCheckPassed.Should().NotBeNull();
+            application.SecondPaymentStatus.EmploymentCheckPassed.Value.Should().Be(overallEmploymentCheckStatus);
         }
 
         [Test]
@@ -1856,7 +1858,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         }
 
         [Test]
-        public async Task Then_the_employment_check_is_not_passed_if_there_are_no_payment_validation_results()
+        public async Task Then_the_employment_check_is_not_set_if_there_are_no_payment_validation_results()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -1909,12 +1911,12 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeFalse();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeFalse();
+            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
         }
 
         [Test]
-        public async Task Then_the_employment_check_is_not_passed_if_the_payment_validation_results_do_not_include_the_employment_checks()
+        public async Task Then_the_employment_check_is_not_set_if_the_payment_validation_results_do_not_include_the_employment_checks()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -1986,8 +1988,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
 
             // Assert
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeFalse();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeFalse();
+            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
         }
     }
 }
