@@ -74,6 +74,8 @@ SELECT
 	 MAX(IIF(ppv.step='HasBankDetails' and ppv.result=1,1,0)) as HasBankDetails,
 	 MAX(IIF(ppv.step='HasNoDataLocks' and ppv.result=1,1,0)) as HasNoDataLocks,
 	 MAX(IIF(ppv.step='PaymentsNotPaused' and ppv.result=1,1,0)) as PaymentsNotPaused,
+     MAX(IIF(ppv.step='EmployedAtStartOfApprenticeship' and ppv.result=1,1,0)) as EmployedAtStartOfApprenticeship,
+     MAX(IIF(ppv.step='EmployedBeforeSchemeStarted' and ppv.result=1,1,0)) as EmployedBeforeSchemeStarted,
 	 pp.amount,
 	 pp.PeriodNumber AS PaymentPeriod,
 	 pp.PaymentYear,
@@ -106,6 +108,8 @@ SELECT
 	IIF(HasBankDetails=0 AND HasNoDataLocks=0, 0, 1) AS HasBankDetailsAndHasNoDataLocks,
 	IIF(PaymentsNotPaused=0 AND HasNoDataLocks=0, 0, 1) AS PaymentsNotPausedAndHasNoDataLocks,
 	IIF(HasBankDetails=0 AND PaymentsNotPaused=0 AND HasNoDataLocks=0, 0, 1) AS HasBankDetailsAndPaymentsNotPausedAndHasNoDataLocks,
+    EmployedAtStartOfApprenticeship,
+    EmployedBeforeSchemeStarted,
 	Amount
 FROM
 	validationsFailures vf
