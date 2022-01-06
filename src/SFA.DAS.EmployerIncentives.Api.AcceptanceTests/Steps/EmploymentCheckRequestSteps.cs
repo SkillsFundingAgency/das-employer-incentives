@@ -11,9 +11,9 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Net.Http;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using System;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using WireMock.RequestBuilders;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -87,6 +87,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 _serviceRequest.TaskCreatedDate);
         }
 
+        [Given(@"the employment checks feature toggle is set to (.*)")]
+        public void GivenTheEmploymentChecksFeatureToggleIsSet(bool featureToggle)
+        {
+            TestContext.ApplicationSettings.EmploymentCheckEnabled = featureToggle;
+        }
+
         [When(@"the employment check refresh processing resumes")]
         public async Task WhenEmploymentCheckRefreshProcessingResumes()
         {
@@ -153,6 +159,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     c.IsPublished &&
                     c.Command is SendEmploymentCheckRequestsCommand)
                 .Should().Be(0);
+        }
+
+        [Then(@"a request is not made to the employment checks API")]
+        public void ThenARequestIsNotMadeToTheEmploymentChecksAPI()
+        {
+            var requests = TestContext
+                .EmploymentCheckApi
+                .MockServer
+                .FindLogEntries(
+                    Request
+                        .Create()
+                        .WithPath(u => u.StartsWith($"/employmentchecks"))
+                        .UsingPut());
+
+            requests.AsEnumerable().Count().Should().Be(0);
         }
 
         [Then(@"the request to refresh the employment checks for the incentive is delayed")]

@@ -11,7 +11,6 @@ using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using NServiceBus;
 using ICommand = SFA.DAS.EmployerIncentives.Abstractions.Commands.ICommand;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
@@ -52,12 +51,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 s.Configure<ApplicationSettings>(a =>
                 {
-                    a.DbConnectionString = _context.SqlDatabase.DatabaseInfo.ConnectionString;
-                    a.DistributedLockStorage = "UseDevelopmentStorage=true";
-                    a.AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY";
-                    a.Hashstring = "Test Hashstring";
-                    a.NServiceBusConnectionString = "UseLearningEndpoint=true";
-                    a.MinimumAgreementVersion = 4;
+                    a.DbConnectionString = _context.ApplicationSettings.DbConnectionString;
+                    a.DistributedLockStorage = _context.ApplicationSettings.DistributedLockStorage;
+                    a.AllowedHashstringCharacters = _context.ApplicationSettings.AllowedHashstringCharacters;
+                    a.Hashstring = _context.ApplicationSettings.Hashstring;
+                    a.NServiceBusConnectionString = _context.ApplicationSettings.NServiceBusConnectionString;
+                    a.MinimumAgreementVersion = _context.ApplicationSettings.MinimumAgreementVersion;
+                    a.EmploymentCheckEnabled = _context.ApplicationSettings.EmploymentCheckEnabled;
                     a.IncentivePaymentProfiles = _paymentProfiles;
                 });
                 s.Configure<PolicySettings>(a =>

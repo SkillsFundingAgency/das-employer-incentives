@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -29,6 +30,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public List<PublishedCommand> CommandsPublished { get; set; }
         public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
+
+        public ApplicationSettings ApplicationSettings { get; set; }
 
         public TestContext()
         {
