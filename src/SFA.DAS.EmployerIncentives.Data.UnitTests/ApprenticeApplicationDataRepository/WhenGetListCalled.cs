@@ -1755,6 +1755,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().NotBeNull();
             application.FirstPaymentStatus.EmploymentCheckPassed.Value.Should().Be(overallEmploymentCheckStatus);
@@ -1852,6 +1853,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
             application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
@@ -1910,6 +1912,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
             application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
@@ -1987,6 +1990,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
             // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
             application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
