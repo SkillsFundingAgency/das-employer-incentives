@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPost]
         [Route("bank-details-required")]
+        [Route("bankDetailsRequiredEmails")]
         public async Task SendBankDetailRequiredEmail([FromBody] SendBankDetailsEmailRequest request)
         {
             await SendCommandAsync(new SendBankDetailsRequiredEmailCommand(request.AccountId,
@@ -27,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPost]
         [Route("bank-details-reminder")]
+        [Route("bankDetailsReminderEmails")]
         public async Task SendBankDetailReminderEmail([FromBody] SendBankDetailsEmailRequest request)
         {
             await SendCommandAsync(new SendBankDetailsReminderEmailCommand(request.AccountId,
@@ -37,6 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPost]
         [Route("bank-details-repeat-reminders")]
+        [Route("bankDetailsRepeatReminderEmails")]
         public async Task SendBankDetailsRepeatReminderEmails([FromBody] BankDetailsRepeatReminderEmailsRequest request)
         {
             await SendCommandAsync(new AccountVrfCaseStatusRemindersCommand(request.ApplicationCutOffDate));

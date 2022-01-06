@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
             var accountId = _fixture.Create<long>();
-            var request = _fixture.Create<SignAgreementRequest>();
+            var request = _fixture.Create<SignedAgreement>();
 
             // Act
             await _sut.SignAgreement(accountId, accountLegalEntityId, request);
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
             var accountId = _fixture.Create<long>();
-            var request = _fixture.Create<SignAgreementRequest>();
+            var request = _fixture.Create<SignedAgreement>();
 
             // Act
             var actual = await _sut.SignAgreement(accountId, accountLegalEntityId, request) as NoContentResult;

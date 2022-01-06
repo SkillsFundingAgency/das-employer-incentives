@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _academicYear = new AcademicYear("2021", new DateTime(2021, 7, 31));
             _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear> { _academicYear }, new List<CollectionCalendarPeriod>());
         }
-
+        
         [Test]
         public void Then_an_empty_learning_period_is_returned_when_there_are_no_training_records_in_the_submission()
         {
@@ -91,6 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             //Assert
             learningPeriods.Count().Should().Be(0);
         }
+        
 
         [Test]
         public void Then_expected_periods_are_returned_when_there_are_price_episodes_with_periods_for_the_apprenticeship()

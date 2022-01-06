@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         public async Task Then_the_PausePaymentsCommand_is_dispatched()
         {
             // Arrange
-            var request = _fixture.Create<PausePaymentsRequest>();
+            var request = _fixture.Create<PausePayment>();
 
             // Act
             await _sut.PausePayments(request);
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         public async Task Then_an_ok_response_is_returned()
         {
             // Arrange
-            var request = _fixture.Create<PausePaymentsRequest>();
+            var request = _fixture.Create<PausePayment>();
 
             // Act
             var actual = await _sut.PausePayments(request) as OkObjectResult;
@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         public async Task Then_when_no_matching_record_a_not_found_response_is_returned()
         {
             // Arrange
-            var request = _fixture.Create<PausePaymentsRequest>();
+            var request = _fixture.Create<PausePayment>();
             _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new KeyNotFoundException(""));
 
@@ -87,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         public async Task Then_when_request_is_not_valid_a_bad_request_response_is_returned()
         {
             // Arrange
-            var request = _fixture.Create<PausePaymentsRequest>();
+            var request = _fixture.Create<PausePayment>();
             _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidRequestException());
 
@@ -102,7 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         public async Task Then_when_a_PausePaymentsException_is_thrown_a_bad_request_response_is_returned()
         {
             // Arrange
-            var request = _fixture.Create<PausePaymentsRequest>();
+            var request = _fixture.Create<PausePayment>();
             _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new PausePaymentsException(""));
 

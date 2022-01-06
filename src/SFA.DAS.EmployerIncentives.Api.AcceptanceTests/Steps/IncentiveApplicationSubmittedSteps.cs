@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly TestContext _testContext;
         private readonly Fixture _fixture;
         private readonly CreateIncentiveApplicationRequest _createRequest;
-        private readonly SubmitIncentiveApplicationRequest _submitRequest;
+        private readonly Submission _submitRequest;
         private HttpResponseMessage _response;
         private long _firstApprenticeshipId;
         private long _secondApprenticeshipId;
@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Build<CreateIncentiveApplicationRequest>()
                 .With(r => r.Apprenticeships, apprenticeships)
                 .Create();
-            _submitRequest = _fixture.Build<SubmitIncentiveApplicationRequest>().With(r => r.DateSubmitted, new DateTime(2021, 5, 31)).Create();
+            _submitRequest = _fixture.Build<Submission>().With(r => r.DateSubmitted, new DateTime(2021, 5, 31)).Create();
             _submitRequest.IncentiveApplicationId = _createRequest.IncentiveApplicationId;
             _submitRequest.AccountId = _createRequest.AccountId;
         }
@@ -69,8 +69,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the application is submitted")]
         public async Task WhenTheApplicationIsSubmitted()
         {
-            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
+            var url = $"applications/{_submitRequest.IncentiveApplicationId}/submissions";
+            _response = await EmployerIncentiveApi.Post(url, _submitRequest);
         }
 
         [When(@"the application is submitted and the system errors")]
@@ -119,8 +119,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var invalidApplicationId = _fixture.Create<Guid>();
             _submitRequest.IncentiveApplicationId = invalidApplicationId;
-            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            _response = await EmployerIncentiveApi.Patch(url, _submitRequest);
+            var url = $"applications/{_submitRequest.IncentiveApplicationId}/submissions";
+            _response = await EmployerIncentiveApi.Post(url, _submitRequest);
         }
 
         [Then(@"the application changes are not saved")]
@@ -172,8 +172,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var invalidAccountId = _fixture.Create<long>();
             _submitRequest.AccountId = invalidAccountId;
-            var url = $"applications/{_submitRequest.IncentiveApplicationId}";
-            _response =  await EmployerIncentiveApi.Patch(url, _submitRequest);
+            var url = $"applications/{_submitRequest.IncentiveApplicationId}/submissions";
+            _response =  await EmployerIncentiveApi.Post(url, _submitRequest);
         }
 
     }

@@ -142,7 +142,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"they submit the application")]
         public async Task WhenTheySubmitTheApplication()
         {
-            var submitRequest = _fixture.Build<SubmitIncentiveApplicationRequest>()
+            var submitRequest = _fixture.Build<Submission>()
                 .With(p => p.IncentiveApplicationId, _applicationModel.Id)
                 .With(p => p.AccountId, _applicationModel.AccountId)
                 .With(p => p.DateSubmitted, DateTime.Today)

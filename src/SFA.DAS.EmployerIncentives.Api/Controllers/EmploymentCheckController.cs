@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Enums;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -18,9 +19,17 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
         }
 
-        [HttpPut("/employmentchecks/{correlationId}")]  
+        [HttpPut("/employmentchecks/{correlationId}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
+        [Obsolete("Use employmentCheckResults endpoint instead")]
         public async Task<IActionResult> Update([FromBody] UpdateEmploymentCheckRequest updateRequest)
+        {
+            return await EmploymentCheckResults(updateRequest);
+        }
+
+        [HttpPost("/employmentCheckResults")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> EmploymentCheckResults([FromBody] UpdateEmploymentCheckRequest updateRequest)
         {
             await SendCommandAsync(
                 new UpdateEmploymentCheckCommand(

@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<string>();
-            var request = _fixture.Create<UpdateVendorRegistrationCaseStatusRequest>();
+            var request = _fixture.Create<ChangeOfVendorCase>();
 
             // Act
             await _sut.UpdateVendorRegistrationCaseStatus(accountLegalEntityId, request);
@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<string>();
-            var request = _fixture.Create<UpdateVendorRegistrationCaseStatusRequest>();
+            var request = _fixture.Create<ChangeOfVendorCase>();
 
             // Act
             var actual = await _sut.UpdateVendorRegistrationCaseStatus(accountLegalEntityId, request) as NoContentResult;

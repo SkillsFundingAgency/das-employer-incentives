@@ -47,10 +47,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the legal agreement is signed")]
         public async Task TheLegalAgreementIsSigned()
         {
-            var url = $"/accounts/{_account.Id}/legalEntities/{_account.AccountLegalEntityId}";
-            var request = Fixture.Build<SignAgreementRequest>()
-                .With(r => r.AgreementVersion, AgreementVersion).Create();
-            _response = await EmployerIncentiveApi.Patch(url, request);
+            var url = $"/signedAgreements";
+            var request = Fixture.Build<SignedAgreement>()
+                .With(r => r.AgreementVersion, AgreementVersion)
+                .With(r => r.AccountId, _account.Id)
+                .With(r => r.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .Create();
+            _response = await EmployerIncentiveApi.Post(url, request);
         }
 
         [Then(@"the employer can apply for incentives")]

@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly string _connectionString;
         private readonly IncentiveApplication _application;
         private readonly IncentiveApplicationApprenticeship _apprenticeship;
-        private PausePaymentsRequest _pausePaymentsRequest;
+        private PausePayment _pausePaymentsRequest;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private HttpResponseMessage _response;
 
@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the resume payments request is sent")]
         public async Task WhenTheResumePausedPaymentsRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Resume)
                 .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
                 .With(r => r.ULN, _apprenticeship.ULN)
@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"an invalid request is sent")]
         public async Task WhenAnInvalidRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Resume)
                 .With(r => r.AccountLegalEntityId, 0)
                 .With(r => r.ULN, 0)

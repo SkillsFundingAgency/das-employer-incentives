@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Api.Types
 {
-    public class UpdateVendorRegistrationCaseStatusRequest
+    public class ChangeOfVendorCase
     {
         public string HashedLegalEntityId { get; set; }
         public string Status { get; set; }

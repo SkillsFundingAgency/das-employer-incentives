@@ -1,9 +1,8 @@
-using System;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Api.Types
 {
-    public class PausePaymentsRequest
+    public class PausePayment
     {
         public long ULN { get; set; }
         public long AccountLegalEntityId { get; set; }

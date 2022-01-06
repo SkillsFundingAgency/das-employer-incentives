@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
@@ -22,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPost("")]
+        [HttpPost("/resilienceChecks")]
         public async Task<IActionResult> CheckApplications()
         {
             if (await ActivePeriodInProgress())

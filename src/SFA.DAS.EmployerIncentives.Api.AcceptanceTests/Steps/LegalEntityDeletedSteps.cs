@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _response = await EmployerIncentiveApi.Post("/applications", createApplicationRequest);
             var applicationId = _response.Headers.Location.ToString().Substring("/applications/".Length);
 
-            var submitApplicationRequest = Fixture.Create<SubmitIncentiveApplicationRequest>();
+            var submitApplicationRequest = Fixture.Create<Submission>();
             submitApplicationRequest.AccountId = _account.Id;
             submitApplicationRequest.IncentiveApplicationId = new Guid(applicationId);
 

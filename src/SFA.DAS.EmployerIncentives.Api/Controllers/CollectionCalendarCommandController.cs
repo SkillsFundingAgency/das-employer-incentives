@@ -16,12 +16,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPatch]
         [Route("")]
-        public async Task UpdateCollectionPeriod(UpdateCollectionPeriodRequest request)
+        public async Task UpdateCollectionPeriod(CollectionPeriod request)
         {
             await SendCommandAsync(new UpdateCollectionPeriodCommand(request.PeriodNumber, 
                                                                      request.AcademicYear,
                                                                      request.Active));
-        }
-    
+        }    
     }
 }

@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<string>();
-            var request = _fixture.Create<AddEmployerVendorIdRequest>();
+            var request = _fixture.Create<Vendors>();
 
             // Act
             await _sut.AddEmployerVendorId(accountLegalEntityId, request);
@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<string>();
-            var request = _fixture.Create<AddEmployerVendorIdRequest>();
+            var request = _fixture.Create<Vendors>();
 
             // Act
             var actual = await _sut.AddEmployerVendorId(accountLegalEntityId, request) as NoContentResult;
