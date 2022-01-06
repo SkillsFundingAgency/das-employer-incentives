@@ -1744,6 +1744,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
             incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
 
+            var additionalValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+                .Create();
+            var additionalValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, pendingPayments[1].Id)
+                .Create();
+
+            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(additionalValidationResult1);
+            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(additionalValidationResult2);
+
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
