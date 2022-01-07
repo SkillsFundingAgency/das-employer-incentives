@@ -14,6 +14,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
         [TestCase(Phase.Phase1, 2021, 2, 1, 5)]
         [TestCase(Phase.Phase1, 2021, 3, 31, 5)]
         [TestCase(Phase.Phase2, 2021, 6, 1, 6)]
+        [TestCase(Phase.Phase3, 2021, 10, 1, 7)]
+        [TestCase(Phase.Phase3, 2022, 1, 31, 7)]
 
         public void Then_the_minimum_agreement_version_is_set(Phase phase, int year, int month, int day, int minimumAgreementVersion)
         {

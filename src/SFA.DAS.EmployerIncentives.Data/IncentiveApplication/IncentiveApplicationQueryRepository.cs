@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 DateOfBirth = apprenticeship.DateOfBirth,
                 EmploymentStartDate = apprenticeship.EmploymentStartDate,                
                 Phase = apprenticeship.Phase,
-                HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
+                StartDatesAreEligible = apprenticeship.StartDatesAreEligible
             };
         }
      
