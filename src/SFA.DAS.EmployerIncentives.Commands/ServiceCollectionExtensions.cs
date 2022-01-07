@@ -87,8 +87,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<IIncentiveApplicationFactory, IncentiveApplicationFactory>();
             serviceCollection.AddScoped<IApprenticeshipIncentiveFactory, ApprenticeshipIncentiveFactory>();
             serviceCollection.AddScoped<ILearnerFactory, LearnerFactory>();
-
-            serviceCollection.AddSingleton<IIncentivePaymentProfilesService, IncentivePaymentProfilesService>();
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
             serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 

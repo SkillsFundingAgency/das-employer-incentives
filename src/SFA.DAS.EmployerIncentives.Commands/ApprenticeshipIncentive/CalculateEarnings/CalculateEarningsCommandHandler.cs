@@ -10,16 +10,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
     public class CalculateEarningsCommandHandler : ICommandHandler<CalculateEarningsCommand>
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
-        private readonly IIncentivePaymentProfilesService _incentivePaymentProfilesService;
         private readonly ICollectionCalendarService _collectionCalendarService;
 
         public CalculateEarningsCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository, 
-            IIncentivePaymentProfilesService incentivePaymentProfilesService,
             ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
-            _incentivePaymentProfilesService = incentivePaymentProfilesService;
             _collectionCalendarService = collectionCalendarService;
         }
 
@@ -27,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateE
         {
             var incentive = await _domainRepository.Find(command.ApprenticeshipIncentiveId);
 
-            incentive.CalculateEarnings(await _incentivePaymentProfilesService.Get(), await _collectionCalendarService.Get());
+            incentive.CalculateEarnings(await _collectionCalendarService.Get());
 
             await _domainRepository.Save(incentive);
         }

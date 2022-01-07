@@ -72,13 +72,13 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
         [TestCase(true, true, true, false)]
         [TestCase(true, true, false, false)]
         public async Task Then_a_CreateIncentiveCommand_is_published_for_eligible_apprenticeships(
-            bool withdrawnByEmployer, bool withdrawnByCompliance, bool hasEligibleEmploymentStartDate, bool accepted)
+            bool withdrawnByEmployer, bool withdrawnByCompliance, bool startDatesAreEligible, bool accepted)
         {
             //Arrange
             var apprenticeship = _fixture.Create<ApprenticeshipModel>();
             apprenticeship.WithdrawnByEmployer = withdrawnByEmployer;
             apprenticeship.WithdrawnByCompliance = withdrawnByCompliance;
-            apprenticeship.HasEligibleEmploymentStartDate = hasEligibleEmploymentStartDate;
+            apprenticeship.StartDatesAreEligible = startDatesAreEligible;
 
             var model = _fixture.Build<IncentiveApplicationModel>()
                 .With(x => x.ApprenticeshipModels,

@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.Extensions
             return @event.Model.ApprenticeshipModels.Where(apprenticeship =>
                 !apprenticeship.WithdrawnByEmployer &&
                 !apprenticeship.WithdrawnByCompliance && 
-                apprenticeship.HasEligibleEmploymentStartDate);
+                apprenticeship.StartDatesAreEligible);
         }
     }
 }

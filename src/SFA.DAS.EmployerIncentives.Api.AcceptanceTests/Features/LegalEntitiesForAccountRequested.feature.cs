@@ -111,10 +111,10 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an existing Employer Incentives account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 10
- testRunner.And("a legal entity who signed version 5 of the agreement", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("a legal entity who signed version 6 of the agreement", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 11
- testRunner.And("a legal entity who signed version 6 of the agreement", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("a legal entity who signed version 7 of the agreement", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 12
  testRunner.When("a client requests the legal entities for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
