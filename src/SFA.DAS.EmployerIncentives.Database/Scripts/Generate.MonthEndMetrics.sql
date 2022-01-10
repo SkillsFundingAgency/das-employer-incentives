@@ -9,12 +9,13 @@ USAGE: Run the script below and then copy and paste each of the result sets into
 
 
 
-declare @PERIOD int 
+declare @Period int 
+declare @AcademicYear int
 
-SELECT @PERIOD=periodnumber
+SELECT @Period=PeriodNumber, @AcademicYear=AcademicYear
   FROM [incentives].[CollectionCalendar]
   where active = 1
-Select @period as [(Paste into cell B1) Current_Period]
+Select @Period as [(Paste into cell B1) Current_Period]
 
 -- Payments made (Paste into cell A6) 
 SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*) as NumPayments,sum(p.[Amount]) as PaymentsAmount
@@ -27,7 +28,7 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
 (SELECT [PendingPaymentId],
       MIN(CAST(Result AS INT)) AS Passed
   FROM [incentives].[PendingPaymentValidationResult]
-  WHERE PeriodNumber = @PERIOD
+  WHERE PeriodNumber = @PERIOD AND PaymentYear = @AcademicYear
   GROUP BY PendingPaymentId) x
   INNER JOIN incentives.PendingPayment pp ON pp.Id = x.PendingPaymentId
   GROUP By Passed order by passed desc
