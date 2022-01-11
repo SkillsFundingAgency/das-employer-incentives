@@ -12,18 +12,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
-        private readonly IIncentivePaymentProfilesService _incentivePaymentProfilesService;
 
         public LearnerChangeOfCircumstanceCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository, 
             ILearnerDomainRepository learnerDomainRepository,
-            ICollectionCalendarService collectionCalendarService,
-            IIncentivePaymentProfilesService incentivePaymentProfilesService)
+            ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
             _learnerDomainRepository = learnerDomainRepository;
             _collectionCalendarService = collectionCalendarService;
-            _incentivePaymentProfilesService = incentivePaymentProfilesService;
         }
 
         public async Task Handle(LearnerChangeOfCircumstanceCommand command, CancellationToken cancellationToken = default)
@@ -37,18 +34,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
             var collectionCalendar = await _collectionCalendarService.Get();
-            var paymentProfiles = (await _incentivePaymentProfilesService.Get()).ToList();
-
-            incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), paymentProfiles, collectionCalendar);
+            incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), collectionCalendar);
 
             if (learner.HasFoundSubmission)
             {
-                if (learner.HasStartDate)
+				if (learner.HasStartDate)
                 {
-                    incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, paymentProfiles, collectionCalendar);
+                    incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, collectionCalendar);
                 }
 
-                incentive.SetLearningStoppedChangeOfCircumstance(learner.StoppedStatus, paymentProfiles, collectionCalendar);
+                incentive.SetLearningStoppedChangeOfCircumstance(learner.StoppedStatus, collectionCalendar);
             }
 
             incentive.SetHasPossibleChangeOfCircumstances(false);

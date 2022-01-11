@@ -30,7 +30,7 @@ BEGIN
 		(@applicationId, @accountId, @accountLegalEntityId, GETDATE(), 'Submitted', GETDATE(), @submittedByEmail, @submittedByName)
 
 	INSERT INTO dbo.IncentiveApplicationApprenticeship
-		(Id, IncentiveApplicationId, ApprenticeshipId, FirstName, LastName, DateOfBirth, ULN, PlannedStartDate, ApprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount, UKPRN, EarningsCalculated, WithdrawnByEmployer, WithdrawnByCompliance, CourseName, EmploymentStartDate, Phase, HasEligibleEmploymentStartDate)
+		(Id, IncentiveApplicationId, ApprenticeshipId, FirstName, LastName, DateOfBirth, ULN, PlannedStartDate, ApprenticeshipEmployerTypeOnApproval, TotalIncentiveAmount, UKPRN, EarningsCalculated, WithdrawnByEmployer, WithdrawnByCompliance, CourseName, EmploymentStartDate, Phase, StartDatesAreEligible)
 	VALUES
 		(NEWID(), @applicationId, @apprenticeshipId, @firstName, @LastName, @dateOfBirth, @uln, @plannedStartDate, @apprenticeshipEmployerTypeOnApproval, @totalIncentiveAmount, @ukprn, 0, 0, 0, @courseName, @plannedStartDate, @phase, 1)
 

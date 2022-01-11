@@ -43,7 +43,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Account
                 VrfVendorId = x.VrfVendorId,
                 VrfCaseStatus = x.VrfCaseStatus,
                 HashedLegalEntityId = x.HashedLegalEntityId,
-                IsAgreementSigned = x.SignedAgreementVersion.HasValue && x.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion(),
+                SignedAgreementVersion = x.SignedAgreementVersion,
+                IsAgreementSigned = x.SignedAgreementVersion.HasValue && x.SignedAgreementVersion >= Phase3Incentive.MinimumAgreementVersion(),
                 BankDetailsRequired = String.IsNullOrWhiteSpace(x.VrfCaseStatus)
             };
         }
