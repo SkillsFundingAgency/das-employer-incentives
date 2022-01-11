@@ -22,8 +22,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private readonly TestContext _testContext;
         private readonly Fixture _fixture;
-        private readonly CreateIncentiveApplicationRequest _createRequest;
-        private readonly SubmitIncentiveApplicationRequest _submitRequest;
+        private CreateIncentiveApplicationRequest _createRequest;
+        private SubmitIncentiveApplicationRequest _submitRequest;
         private HttpResponseMessage _response;
         private long _firstApprenticeshipId;
         private long _secondApprenticeshipId;
@@ -36,8 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _secondApprenticeshipId = _firstApprenticeshipId + 1;
             var apprenticeships = new List<IncentiveApplicationApprenticeshipDto>
             {
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 5, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 04, 01)).Create(),
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 7, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 06, 01)).Create()
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 10, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create(),
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 12, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 11, 01)).Create()
             };
 
             _createRequest = _fixture
@@ -52,6 +52,31 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"an employer has entered incentive claim application details")]
         public async Task GivenAnEmployerHasEnteredIncentiveClaimApplicationDetails()
         {
+            var url = $"applications";
+            _response = await EmployerIncentiveApi.Post(url, _createRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var application = await dbConnection.QueryAsync<IncentiveApplication>("SELECT * FROM IncentiveApplication WHERE Id = @IncentiveApplicationId",
+                    new { _submitRequest.IncentiveApplicationId });
+
+                application.Should().HaveCount(1);
+                application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
+            }
+        }
+
+        [Given(@"an employer has entered incentive claim application details with employment start dates for Phase 3")]
+        public async Task GivenAnEmployerHasEnteredIncentiveClaimApplicationDetailsForPhase3()
+        {
+            var apprenticeships = new List<IncentiveApplicationApprenticeshipDto>
+            {
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 10, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create(),
+                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2022, 1, 1)).With(p => p.EmploymentStartDate, new DateTime(2022, 01, 31)).Create()
+            };
+
+            _createRequest.Apprenticeships = apprenticeships;
+
             var url = $"applications";
             _response = await EmployerIncentiveApi.Post(url, _createRequest);
             _response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -98,8 +123,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     new { _submitRequest.IncentiveApplicationId });
 
                 apprenticeships.Count().Should().Be(2);
-                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase2);
-                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase2);
+                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase3);
+                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase3);
             }
 
             var publishedCommand = _testContext.CommandsPublished
@@ -112,6 +137,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             var cmd = publishedCommand.First() as CreateIncentiveCommand;
             cmd.AccountId.Should().Be(_submitRequest.AccountId);
+        }
+
+        [Then(@"the application apprentice phases are set to Phase3")]
+        public async Task ThenTheApplicationApprenticePhasesAreSetToPhase3()
+        {
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var apprenticeships = await dbConnection.QueryAsync<IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
+                    new { _submitRequest.IncentiveApplicationId });
+
+                apprenticeships.Count().Should().Be(2);
+                apprenticeships.Single(a => a.ApprenticeshipId == _firstApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase3);
+                apprenticeships.Single(a => a.ApprenticeshipId == _secondApprenticeshipId).Phase.Should().Be(Enums.Phase.Phase3);
+            }
         }
 
         [When(@"the invalid application id is submitted")]
@@ -167,8 +208,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
         }
 
-        [When(@"the invalid account id is submittted")]
-        public async Task WhenTheInvalidAccountIdIsSubmittted()
+        [When(@"the invalid account id is submitted")]
+        public async Task WhenTheInvalidAccountIdIsSubmitted()
         {
             var invalidAccountId = _fixture.Create<long>();
             _submitRequest.AccountId = invalidAccountId;

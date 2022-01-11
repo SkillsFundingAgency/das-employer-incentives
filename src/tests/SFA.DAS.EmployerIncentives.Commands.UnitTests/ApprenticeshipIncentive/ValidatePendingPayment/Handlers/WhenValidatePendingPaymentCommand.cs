@@ -29,7 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionCalendarPeriods;
-        private Mock<IIncentivePaymentProfilesService> _mockPaymentProfileService;
         private string _vrfVendorId;
         private Account _account;
         private LearnerModel _learnerModel;
@@ -49,8 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
-            _mockPaymentProfileService = new Mock<IIncentivePaymentProfilesService>();
-
+            
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
 
@@ -149,16 +147,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockLearnerDomainRepository
                 .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
-
-            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-            _mockPaymentProfileService.Setup(m => m.Get()).ReturnsAsync(paymentProfiles);
-
+            
             _sut = new ValidatePendingPaymentCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
                 _mockCollectionCalendarService.Object,
-                _mockLearnerDomainRepository.Object,
-                _mockPaymentProfileService.Object);
+                _mockLearnerDomainRepository.Object);
         }
 
         [Test]

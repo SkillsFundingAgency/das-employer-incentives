@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 HashedLegalEntityId = model.HashedLegalEntityId,
-                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion(),
+                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase3Incentive.MinimumAgreementVersion(),
                 BankDetailsRequired = MapBankDetailsRequired(model.VrfCaseStatus, model.VrfVendorId)
             };
         }
@@ -152,7 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
                 EmploymentStartDate = x.EmploymentStartDate,
-                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                StartDatesAreEligible = x.StartDatesAreEligible,
                 Phase = x.Phase                
             }).ToList();
         }
@@ -191,7 +191,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
                 EmploymentStartDate = x.EmploymentStartDate,
-                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                StartDatesAreEligible = x.StartDatesAreEligible,
                 Phase = x.Phase
             }).ToList();
         }

@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             var phase = apprenticeship.Phase;
             if (phase == Phase.NotSet)
             {
-                phase = Phase.Phase2;
+                phase = Phase.Phase3;
             }
             var ageOfApprentice = apprenticeship.DateOfBirth.AgeOnThisDay(apprenticeship.PlannedStartDate);
             var incentiveType = ageOfApprentice >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 EmploymentStartDate = apprenticeship.EmploymentStartDate,                
                 Phase = apprenticeship.Phase,
                 TotalIncentiveAmount = totalEarnings,
-                HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate
+                StartDatesAreEligible = apprenticeship.StartDatesAreEligible
             };
         }
     }

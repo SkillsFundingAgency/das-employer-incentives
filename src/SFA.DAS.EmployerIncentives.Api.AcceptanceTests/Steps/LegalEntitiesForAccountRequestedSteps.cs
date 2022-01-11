@@ -17,8 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private IEnumerable<LegalEntityDto> _getLegalEntitiesResponse;
         private long _accountId;
         private readonly Fixture _fixture;
-        private Account _accountWithSignedPhase2Agreement;
-        private Account _accountWithUnsignedPhase2Agreement;
+        private Account _accountWithSignedPhase3Agreement;
+        private Account _accountWithUnsignedPhase3Agreement;
 
         public LegalEntitiesForAccountRequestedSteps(TestContext testContext) : base(testContext)
         {
@@ -42,10 +42,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         
             await DataAccess.Insert(account);
 
-            if (signedAgreementVersion == 6)
-                _accountWithSignedPhase2Agreement = account;
+            if (signedAgreementVersion == 7)
+                _accountWithSignedPhase3Agreement = account;
             else
-                _accountWithUnsignedPhase2Agreement = account;
+                _accountWithUnsignedPhase3Agreement = account;
         }
 
 
@@ -65,18 +65,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public void ThenTheLegalEntitiesAreReturned()
         {
             _getLegalEntitiesResponse.Should().NotBeEmpty();
-            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithSignedPhase2Agreement.HashedLegalEntityId).AccountLegalEntityId.Should()
-                .Be(_accountWithSignedPhase2Agreement.AccountLegalEntityId);
-            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithUnsignedPhase2Agreement.HashedLegalEntityId).AccountLegalEntityId.Should()
-                .Be(_accountWithUnsignedPhase2Agreement.AccountLegalEntityId);
+            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithSignedPhase3Agreement.HashedLegalEntityId).AccountLegalEntityId.Should()
+                .Be(_accountWithSignedPhase3Agreement.AccountLegalEntityId);
+            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithUnsignedPhase3Agreement.HashedLegalEntityId).AccountLegalEntityId.Should()
+                .Be(_accountWithUnsignedPhase3Agreement.AccountLegalEntityId);
         }
 
         [Then(@"a property is set indicating whether the minimum required agreement version is signed")]
         public void ThenAPropertyIsSetIndicatingWhetherTheMinimumAgreementVersionIsSigned()
         {
-            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithSignedPhase2Agreement.HashedLegalEntityId).IsAgreementSigned.Should()
+            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithSignedPhase3Agreement.HashedLegalEntityId).IsAgreementSigned.Should()
                 .BeTrue();
-            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithUnsignedPhase2Agreement.HashedLegalEntityId).IsAgreementSigned.Should()
+            _getLegalEntitiesResponse.Single(x => x.HashedLegalEntityId == _accountWithUnsignedPhase3Agreement.HashedLegalEntityId).IsAgreementSigned.Should()
                 .BeFalse();
         }
     }
