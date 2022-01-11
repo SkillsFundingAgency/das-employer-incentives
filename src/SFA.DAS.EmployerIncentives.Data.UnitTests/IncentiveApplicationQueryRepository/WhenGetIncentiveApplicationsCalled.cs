@@ -19,7 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
         private IIncentiveApplicationQueryRepository _sut;
-        private List<IncentivePaymentProfile> _paymentProfiles;
 
         [SetUp]
         public void Arrange()
@@ -29,12 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
-
-            _paymentProfiles = new List<IncentivePaymentProfile>
-            {
-                new IncentivePaymentProfile(IncentivePhase.Create(), _fixture.CreateMany<PaymentProfile>(2).ToList())
-            };
-
+            
             _sut = new IncentiveApplication.IncentiveApplicationQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
@@ -68,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             _context.SaveChanges();
 
             // Act
-            var actual = (await _sut.GetList(_paymentProfiles, x => x.AccountId == accountId)).ToArray();
+            var actual = (await _sut.GetList(x => x.AccountId == accountId)).ToArray();
 
             //Assert
             actual.All(x => x.AccountId == accountId).Should().BeTrue();
@@ -98,7 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             _context.SaveChanges();
 
             // Act
-            var actual = (await _sut.GetList(_paymentProfiles, x => x.AccountId == account.Id)).Single();
+            var actual = (await _sut.GetList(x => x.AccountId == account.Id)).Single();
 
             //Assert
             actual.Apprenticeships.Count().Should().Be(4);

@@ -22,26 +22,21 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
-        private static List<IncentivePaymentProfile> _incentivePaymentProfiles;
 
         public IncentiveApplicationQueryRepository(Lazy<EmployerIncentivesDbContext> context)
         {
             _lazyContext = context;
         }
 
-        public Task<IncentiveApplicationDto> Get(List<IncentivePaymentProfile> incentivePaymentProfiles, Expression<Func<IncentiveApplicationDto, bool>> predicate)
+        public Task<IncentiveApplicationDto> Get(Expression<Func<IncentiveApplicationDto, bool>> predicate)
         {
-            _incentivePaymentProfiles = incentivePaymentProfiles;
-
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).FirstOrDefaultAsync(predicate);
         }
 
-        public Task<List<IncentiveApplicationDto>> GetList(List<IncentivePaymentProfile> incentivePaymentProfiles, Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
+        public Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
         {
-            _incentivePaymentProfiles = incentivePaymentProfiles;
-
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).Where(predicate).ToListAsync();
@@ -68,18 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(Models.IncentiveApplicationApprenticeship apprenticeship)
         {
-            var phase = apprenticeship.Phase;
-            if (phase == Phase.NotSet)
-            {
-                phase = Phase.Phase3;
-            }
-            var ageOfApprentice = apprenticeship.DateOfBirth.AgeOnThisDay(apprenticeship.PlannedStartDate);
-            var incentiveType = ageOfApprentice >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
-
-            var apprenticeshipPaymentProfiles = _incentivePaymentProfiles.FirstOrDefault(x => x.IncentivePhase.Identifier == phase);
-            var totalEarnings = apprenticeshipPaymentProfiles.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).Sum(profile => profile.AmountPayable);
-
-            return new IncentiveApplicationApprenticeshipDto
+            var apprenticeshipDto = new IncentiveApplicationApprenticeshipDto
             {
                 Id = apprenticeship.Id,
                 ApprenticeshipId = apprenticeship.ApprenticeshipId,
@@ -90,9 +74,17 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 DateOfBirth = apprenticeship.DateOfBirth,
                 EmploymentStartDate = apprenticeship.EmploymentStartDate,                
                 Phase = apprenticeship.Phase,
-                TotalIncentiveAmount = totalEarnings,
                 StartDatesAreEligible = apprenticeship.StartDatesAreEligible
             };
+
+            var ageOfApprentice = apprenticeship.DateOfBirth.AgeOnThisDay(apprenticeship.PlannedStartDate);
+            var incentiveType = ageOfApprentice >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
+            var incentive = Incentive.Create(apprenticeshipDto);
+            
+            apprenticeshipDto.TotalIncentiveAmount = incentive.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).Sum(profile => profile.AmountPayable);
+
+            return apprenticeshipDto;
+
         }
     }
 }
