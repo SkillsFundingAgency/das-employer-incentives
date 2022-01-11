@@ -4,6 +4,7 @@
     {
         NotSet,
         Phase1,
-        Phase2
+        Phase2,
+        Phase3
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Data.SqlClient;
 using System.Linq;
 using FluentAssertions;
 using System.Net;
@@ -35,15 +36,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             // 
         }
 
-        [When(@"They have selected the apprenticeships for the application")]
-        public async Task WhenTheyHaveSelectedTheApprenticeshipsForTheApplication()
+        [When(@"They have selected the apprenticeships for the application within the (.*) eligibility window")]
+        public async Task WhenTheyHaveSelectedTheApprenticeshipsForTheApplication(string phase)
         {
+            var employmentStartDate = new DateTime(2021, 10, 10);
+            
+            foreach (var apprentice in _request.Apprenticeships)
+            {
+                apprentice.EmploymentStartDate = employmentStartDate;
+            }
+
             var url = $"applications";
             _response = await EmployerIncentiveApi.Post(url, _request);
         }
 
-        [Then(@"the application is saved")]
-        public async Task ThenTheApplicationIsSaved()
+        [Then(@"the application is saved with the apprentices phases set to (.*)")]
+        public async Task ThenTheApplicationIsSaved(string phase)
         {
             _response.StatusCode.Should().Be(_expectedResult);
 
@@ -58,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 var apprenticeships = await dbConnection.QueryAsync<IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
                     new { _request.IncentiveApplicationId });
 
-                apprenticeships.ToList().ForEach(a => a.Phase.Should().Be(Enums.Phase.NotSet));
+                apprenticeships.ToList().ForEach(a => a.Phase.ToString().Should().Be(phase));
             }
 
         }

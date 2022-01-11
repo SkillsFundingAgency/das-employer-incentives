@@ -9,7 +9,6 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +22,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Fixture _fixture;
-
-        private List<IncentivePaymentProfile> _paymentProfiles;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private CollectionCalendar _collectionCalendar;
         private Apprenticeship _apprenticehip;
@@ -40,32 +37,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionPeriod = new DateTime(2020, 10, 1);
             _plannedStartDate = _collectionPeriod.AddDays(-5);
 
-            _firstPaymentDaysAfterApprenticeshipStart = 10;
-            _secondPaymentDaysAfterApprenticeshipStart = 50;
-
-            _paymentProfiles = new IncentivePaymentProfileListBuilder()
-                .WithIncentivePaymentProfiles(
-                    new List<IncentivePaymentProfile>()
-                    {
-                        new IncentivePaymentProfile(
-                            new IncentivePhase(Phase.Phase1),
-                            new List<PaymentProfile>
-                                {
-                                    new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, _firstPaymentDaysAfterApprenticeshipStart, 100),
-                                    new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, _secondPaymentDaysAfterApprenticeshipStart, 300),
-                                    new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, _firstPaymentDaysAfterApprenticeshipStart, 200),
-                                    new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, _secondPaymentDaysAfterApprenticeshipStart, 400)
-                                }
-                            )
-                    })
-                .Build();
-
+            _firstPaymentDaysAfterApprenticeshipStart = 89;
+            _secondPaymentDaysAfterApprenticeshipStart = 364;
+            
             _collectionPeriods = new List<CollectionCalendarPeriod>()
             {
                 new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(1).AddDays(1), false, false),
-                new CollectionCalendarPeriod(new CollectionPeriod(2, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(1).Month, (short)_collectionPeriod.AddMonths(1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(2).AddDays(1), false, false),
-                new CollectionCalendarPeriod(new CollectionPeriod(3, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(2).Month, (short)_collectionPeriod.AddMonths(2).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(3).AddDays(1), false, false)
             };
+            for(var i=1; i<=12; i++)
+            {
+                _collectionPeriods.Add(new CollectionCalendarPeriod(new CollectionPeriod((byte)i, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(i).Month, (short)_collectionPeriod.AddMonths(i).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(i+1).AddDays(1), false, false)
+                );
+            }
 
             _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
 
@@ -94,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _collectionPeriods.Add(new CollectionCalendarPeriod(new CollectionPeriod(4, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(3).Month, (short)_collectionPeriod.AddMonths(3).Year, _collectionPeriod.AddMonths(3).AddDays(1), _fixture.Create<DateTime>(), true, false));
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             _sut.PendingPayments.Should().BeEmpty();
@@ -106,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // arrange                        
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             _sut.PendingPayments.Count.Should().Be(2);
@@ -117,12 +100,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
             secondPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
-            firstPayment.CollectionPeriod.PeriodNumber.Should().Be(1);
-            firstPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 1).CollectionPeriod.AcademicYear);
-            firstPayment.Amount.Should().Be(100);
-            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(2);
-            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 2).CollectionPeriod.AcademicYear);
-            secondPayment.Amount.Should().Be(300);
+            firstPayment.CollectionPeriod.PeriodNumber.Should().Be(2);
+            firstPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 2).CollectionPeriod.AcademicYear);
+            firstPayment.Amount.Should().Be(1000);
+            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(11);
+            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 11).CollectionPeriod.AcademicYear);
+            secondPayment.Amount.Should().Be(1000);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
             firstPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
@@ -140,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.StartDate = _collectionPeriod.Date.AddDays(6);
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             _sut.PendingPayments.Count.Should().Be(2);
@@ -151,12 +134,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             firstPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart));
             secondPayment.DueDate.Should().Be(_sutModel.StartDate.AddDays(_secondPaymentDaysAfterApprenticeshipStart));
 
-            firstPayment.CollectionPeriod.PeriodNumber.Should().Be(1);
-            firstPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 1).CollectionPeriod.AcademicYear);
-            firstPayment.Amount.Should().Be(100);
-            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(2);
-            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 2).CollectionPeriod.AcademicYear);
-            secondPayment.Amount.Should().Be(300);
+            firstPayment.CollectionPeriod.PeriodNumber.Should().Be(3);
+            firstPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 3).CollectionPeriod.AcademicYear);
+            firstPayment.Amount.Should().Be(1000);
+            secondPayment.CollectionPeriod.PeriodNumber.Should().Be(12);
+            secondPayment.CollectionPeriod.AcademicYear.Should().Be(_collectionPeriods.Single(x => x.CollectionPeriod.PeriodNumber == 12).CollectionPeriod.AcademicYear);
+            secondPayment.Amount.Should().Be(1000);
 
             firstPayment.Account.Id.Should().Be(_sutModel.Account.Id);
             firstPayment.Account.AccountLegalEntityId.Should().Be(_sutModel.Account.AccountLegalEntityId);
@@ -168,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_an_EarningsCalculated_event_is_raised_after_the_earnings_are_calculated()
         {
             // arrange                        
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // act
             var events = _sut.FlushEvents();
@@ -189,7 +172,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.RefreshedLearnerForEarnings = true;
 
             // act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             _sut.RefreshedLearnerForEarnings.Should().BeFalse();
@@ -199,7 +182,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_earnings_with_sent_payments_are_clawed_back_when_the_collection_period_has_changed()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -214,7 +197,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             _sut.SetStartDate(_plannedStartDate.AddMonths(1));
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
@@ -225,7 +208,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_collection_period_is_changed()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -239,7 +222,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             _sut.SetStartDate(_plannedStartDate.AddMonths(1));
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             var clawback = _sutModel.ClawbackPaymentModels.Single();
@@ -256,7 +239,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_clawback_payment_is_not_created_when_one_already_exists_and_earnings_with_sent_payments_are_clawed_back_and_the_collection_period_is_changed()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -274,7 +257,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             _sut.SetStartDate(_plannedStartDate.AddMonths(1));
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
@@ -284,7 +267,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_earnings_with_sent_payments_are_clawed_back_when_the_earning_amount_has_changed()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -298,7 +281,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // act
             var apprenticeshipDob = _plannedStartDate.AddYears(-26);
             _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate, _apprenticehip.Provider);
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
@@ -309,7 +292,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_earning_amount_has_changed()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -326,7 +309,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // act
             var apprenticeshipDob = _plannedStartDate.AddYears(-26);
             _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate, _apprenticehip.Provider);
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             var clawback = _sutModel.ClawbackPaymentModels.Single();
@@ -343,7 +326,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_paid_earnings_are_clawed_back_if_the_apprenticeship_is_no_longer_eligible()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -358,7 +341,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             _sutModel.StartDate = Phase1Incentive.EligibilityStartDate.AddDays(-1);
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             pendingPayment.ClawedBack.Should().BeTrue();
@@ -369,7 +352,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_clawback_payment_is_created_when_paid_earnings_are_clawed_back_if_the_apprenticeship_is_no_longer_eligible()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -383,7 +366,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             _sutModel.StartDate = Phase2Incentive.EligibilityStartDate.AddDays(-1);
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             var clawback = _sutModel.ClawbackPaymentModels.Single();
@@ -400,7 +383,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_paid_earnings_are_not_clawed_back_when_the_new_earning_is_in_the_same_collection_period()
         {
             // arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
@@ -413,7 +396,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // act
             _sut.SetStartDate(_plannedStartDate.AddDays(1));
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // assert
             pendingPayment.ClawedBack.Should().BeFalse();
@@ -425,7 +408,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_earnings_with_unsent_payments_are_removed_when_the_earnings_change()
         {
             // Arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             _sutModel.PaymentModels = new List<PaymentModel>();
             _sutModel.PendingPaymentModels.ToList().ForEach(p => _sutModel.PaymentModels.Add(_fixture.Build<PaymentModel>().With(x => x.PendingPaymentId, p.Id).With(x => x.PaidDate, (DateTime?)null).Create()));
             var hashCodes = new List<int>();
@@ -433,7 +416,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Act
             _sut.SetStartDate(_plannedStartDate.AddMonths(1));
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.PendingPayments.Count.Should().Be(2);
@@ -445,13 +428,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_earnings_without_payments_are_removed_when_the_earnings_change()
         {
             // Arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             var hashCodes = new List<int>();
             _sut.PendingPayments.ToList().ForEach(p => hashCodes.Add(p.GetHashCode()));
 
             // Act
             _sut.SetStartDate(_plannedStartDate.AddMonths(1));
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.PendingPayments.Count.Should().Be(2);
@@ -462,12 +445,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_existing_earnings_are_kept_when_the_earnings_are_unchanged()
         {
             // Arrange
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
             var hashCodes = new List<int>();
             _sut.PendingPayments.ToList().ForEach(p => hashCodes.Add(p.GetHashCode()));
 
             // Act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.PendingPayments.Count.Should().Be(2);
@@ -479,10 +462,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // Arrange
             _sutModel.Status = IncentiveStatus.Stopped;
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.PendingPayments.Should().BeEmpty();
@@ -493,10 +476,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             // Arrange
             _sutModel.Status = IncentiveStatus.Withdrawn;
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.PendingPayments.Should().BeEmpty();
@@ -510,7 +493,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var expectedDueDate = _sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart);
 
             // Act
-            _sut.CalculateEarnings(_paymentProfiles, _collectionCalendar);
+            _sut.CalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);

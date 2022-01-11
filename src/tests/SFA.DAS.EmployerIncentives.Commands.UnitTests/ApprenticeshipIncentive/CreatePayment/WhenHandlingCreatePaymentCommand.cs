@@ -14,7 +14,6 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using LegalEntity = SFA.DAS.EmployerIncentives.Domain.Accounts.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.CreatePayment
@@ -125,8 +124,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     _fixture.Create<string>(),
                     new AgreementVersion(_fixture.Create<int>()),
                     new IncentivePhase(Phase.Phase1));
-            
-            var paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
 
             var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
@@ -140,8 +137,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     false)
             };
 
-            
-            incentive.CalculateEarnings(paymentProfiles, new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), collectionPeriods));
+            incentive.CalculateEarnings(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), collectionPeriods));
 
             var account = Domain.Accounts.Account.New(incentive.Account.Id);
             var legalEntityModel = _fixture.Build<LegalEntityModel>().With(x => x.AccountLegalEntityId, incentive.PendingPayments.First().Account.AccountLegalEntityId).With(x => x.VrfVendorId, "kjhdfhjksdfg").Create();

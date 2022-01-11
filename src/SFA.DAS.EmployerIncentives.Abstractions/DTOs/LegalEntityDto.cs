@@ -11,5 +11,6 @@
         public string HashedLegalEntityId { get; set; }
         public bool IsAgreementSigned { get; set; }
         public bool BankDetailsRequired { get; set; }
+        public int? SignedAgreementVersion { get; set; }
     }
 }
