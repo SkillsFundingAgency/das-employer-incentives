@@ -18,7 +18,7 @@ Scenario: Incentive Application is submitted with invalid application id
 
 Scenario: Incentive Application is submitted with invalid account id
 	Given an employer has entered incentive claim application details
-	When the invalid account id is submittted
+	When the invalid account id is submitted
 	Then the application status is not updated
 	And the service responds with an error
 
@@ -26,3 +26,9 @@ Scenario: Incentive Application is submitted but an internal error occurs
 	Given an employer has entered incentive claim application details
 	When the application is submitted and the system errors
 	Then the application changes are not saved	
+
+Scenario: Incentive Application is submitted for Phase 3 employment start dates
+	Given an employer has entered incentive claim application details with employment start dates for Phase 3
+	When the application is submitted
+	Then the application apprentice phases are set to Phase3
+

@@ -24,15 +24,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public bool WithdrawnByEmployer => Model.WithdrawnByEmployer;
         public bool WithdrawnByCompliance => Model.WithdrawnByCompliance;
         public string CourseName => Model.CourseName;
-        public bool HasEligibleEmploymentStartDate => Model.HasEligibleEmploymentStartDate;
+        public bool StartDatesAreEligible => Model.StartDatesAreEligible;
         public DateTime? EmploymentStartDate => Model.EmploymentStartDate;
+        public Phase Phase => Model.Phase;
 
         public static Apprenticeship Create(ApprenticeshipModel model)
         {
             return new Apprenticeship(model.Id, model, false);
         }
 
-        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, string courseName, DateTime? employmentStartDate)
+        internal Apprenticeship(Guid id, long apprenticeshipId, string firstName, string lastName, DateTime dateOfBirth, long uln, DateTime plannedStartDate, ApprenticeshipEmployerType apprenticeshipEmployerTypeOnApproval, long? ukprn, string courseName, DateTime? employmentStartDate, Phase phase)
         {
             IsNew = false;
             Model = new ApprenticeshipModel
@@ -48,10 +49,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 TotalIncentiveAmount = EmployerIncentivesTotalPaymentAmount,
                 UKPRN = ukprn,
                 CourseName = courseName,
-                EmploymentStartDate = employmentStartDate                
+                EmploymentStartDate = employmentStartDate,
+                Phase = phase
             };
 
-            Model.HasEligibleEmploymentStartDate = Incentive.EmployerStartDateIsEligible(this);
+            Model.StartDatesAreEligible = Incentive.StartDatesAreEligible(this);
         }
 
         public void SetEarningsCalculated(bool isCalculated = true)
@@ -78,6 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
         public void SetPlannedStartDate(DateTime plannedStartDate)
         {
             Model.PlannedStartDate = plannedStartDate;
+            Model.StartDatesAreEligible = Incentive.StartDatesAreEligible(this);
         }           
 
         private Apprenticeship(Guid id, ApprenticeshipModel model, bool isNew) : base(id, model, isNew)

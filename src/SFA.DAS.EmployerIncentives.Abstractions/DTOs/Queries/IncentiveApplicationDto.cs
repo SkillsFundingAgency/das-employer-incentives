@@ -12,6 +12,8 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public string SubmittedByEmail { get; set; }
         public string SubmittedByName { get; set; }
         public bool BankDetailsRequired { get; set; }
+        public bool NewAgreementRequired { get; set; }
+        public LegalEntityDto LegalEntity { get; set; }
         public IEnumerable<IncentiveApplicationApprenticeshipDto> Apprenticeships { get; set; }
     }
 }

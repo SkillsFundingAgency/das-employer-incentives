@@ -1,48 +1,22 @@
 ﻿using FluentAssertions;
-using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 {
     [TestFixture]
     public class WhenCreatingTheIncentive
     {
-        private Mock<IIncentivePaymentProfilesService> _mockIncentivePaymentProfileService;
-        private List<IncentivePaymentProfile> _incentivePaymentProfiles;
 
-        [SetUp]
-        public void SetUp()
-        {
-            _mockIncentivePaymentProfileService = new Mock<IIncentivePaymentProfilesService>();
-            _incentivePaymentProfiles = new IncentivePaymentProfileListBuilder()
-                .WithIncentivePaymentProfiles(new List<IncentivePaymentProfile>
-            {
-                 new IncentivePaymentProfile(
-                     new IncentivePhase(Phase.Phase1),
-                        new List<PaymentProfile>
-                            {
-                                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 90, 1200),
-                                new PaymentProfile(IncentiveType.UnderTwentyFiveIncentive, 365, 1200),
-                                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, 90, 1000),
-                                new PaymentProfile(IncentiveType.TwentyFiveOrOverIncentive, 365, 1000)
-                            })
-                })
-                .Build();
-
-            _mockIncentivePaymentProfileService.Setup(m => m.Get()).ReturnsAsync(_incentivePaymentProfiles);
-        }        
-
-        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1000, 90, 1000, 365)]
-        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1200, 90, 1200, 365)]
-        public void Then_the_properties_are_set_correctly(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
+        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 750, 89, 750, 364)]
+        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1000, 89, 1000, 364)]
+        public void Then_the_properties_are_set_correctly_for_phase1(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
         {
             var date = new DateTime(2020, 10, 1);
 
@@ -55,9 +29,37 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = Incentive.Create(apprenticeshipIncentive, _incentivePaymentProfiles);
+            var result = Incentive.Create(apprenticeshipIncentive);
 
-            result.IsEligible.Should().BeTrue();            
+            result.IsEligible.Should().BeTrue();
+            var payments = result.Payments.ToList();
+            payments.Count().Should().Be(2);
+            payments[0].Amount.Should().Be(expectedAmount1);
+            payments[0].PaymentDate.Should().Be(date.AddDays(expectedDays1));
+            payments[0].EarningType.Should().Be(EarningType.FirstPayment);
+            payments[1].Amount.Should().Be(expectedAmount2);
+            payments[1].PaymentDate.Should().Be(date.AddDays(expectedDays2));
+            payments[1].EarningType.Should().Be(EarningType.SecondPayment);
+        }
+
+        [TestCase(25, IncentiveType.TwentyFiveOrOverIncentive, 1500, 89, 1500, 364)]
+        [TestCase(24, IncentiveType.UnderTwentyFiveIncentive, 1500, 89, 1500, 364)]
+        public void Then_the_properties_are_set_correctly_for_phase2(int age, IncentiveType expectedIncentiveType, decimal expectedAmount1, int expectedDays1, decimal expectedAmount2, int expectedDays2)
+        {
+            var date = new DateTime(2021, 4, 1);
+
+            var apprenticeshipIncentive = new ApprenticeshipIncentiveBuilder()
+                .WithStartDate(date)
+                .WithIncentivePhase(new IncentivePhase(Phase.Phase2))
+                .WithApprenticeship(
+                    new ApprenticeshipBuilder()
+                        .WithDateOfBirth(date.AddYears(-1 * age))
+                        .Build())
+                .Build();
+
+            var result = Incentive.Create(apprenticeshipIncentive);
+
+            result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();
             payments.Count().Should().Be(2);
             payments[0].Amount.Should().Be(expectedAmount1);
@@ -82,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = Incentive.Create(apprenticeshipIncentive, _incentivePaymentProfiles);
+            var result = Incentive.Create(apprenticeshipIncentive);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
@@ -103,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
                         .Build())
                 .Build();
 
-            var result = Incentive.Create(apprenticeshipIncentive, _incentivePaymentProfiles);
+            var result = Incentive.Create(apprenticeshipIncentive);
 
             result.IsEligible.Should().BeFalse();
             var payments = result.Payments.ToList();
