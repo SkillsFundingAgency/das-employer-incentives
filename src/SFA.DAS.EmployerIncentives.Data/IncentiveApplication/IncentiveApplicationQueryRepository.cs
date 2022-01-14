@@ -76,12 +76,8 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 Phase = apprenticeship.Phase,
                 StartDatesAreEligible = apprenticeship.StartDatesAreEligible
             };
-
-            var ageOfApprentice = apprenticeship.DateOfBirth.AgeOnThisDay(apprenticeship.PlannedStartDate);
-            var incentiveType = ageOfApprentice >= 25 ? IncentiveType.TwentyFiveOrOverIncentive : IncentiveType.UnderTwentyFiveIncentive;
-            var incentive = Incentive.Create(apprenticeshipDto);
             
-            apprenticeshipDto.TotalIncentiveAmount = incentive.PaymentProfiles.Where(x => x.IncentiveType == incentiveType).Sum(profile => profile.AmountPayable);
+            apprenticeshipDto.TotalIncentiveAmount = Incentive.Create(apprenticeshipDto).GetTotalIncentiveAmount();
 
             return apprenticeshipDto;
 
