@@ -18,12 +18,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpPost("")]
         public async Task<IActionResult> CheckApplications()
         {
-            await SendCommandsAsync(new List<ICommand>() {
-                    new IncompleteEarningsCalculationCheckCommand(),
-                    new EarningsResilienceApplicationsCheckCommand(),
-                    new EarningsResilienceIncentivesCheckCommand()
-                });
-            
+            await SendCommandAsync(new IncompleteEarningsCalculationCheckCommand());
+            await SendCommandAsync(new EarningsResilienceApplicationsCheckCommand());
+            await SendCommandAsync(new EarningsResilienceIncentivesCheckCommand());
+
             return Ok();
         }
     }
