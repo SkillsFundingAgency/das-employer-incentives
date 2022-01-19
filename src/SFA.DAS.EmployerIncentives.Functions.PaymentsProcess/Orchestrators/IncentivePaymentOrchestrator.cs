@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncenti
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
@@ -30,20 +31,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             await context.CallActivityAsync(nameof(SetActivePeriodToInProgress), null);
 
             context.SetCustomStatus("GettingPayableLegalEntities");
-            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);            
+            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);
+            context.SetCustomStatus("GettingUnsentClawbackLegalEntities");
+            var clawbackLegalEntities = await context.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), collectionPeriod);
+            
+            var accountLegalEntitiesToProcess = payableLegalEntities.Select(payableLegalEntity => new AccountLegalEntityCollectionPeriod {AccountId = payableLegalEntity.AccountId, AccountLegalEntityId = payableLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod}).ToList();
+            accountLegalEntitiesToProcess.AddRange(clawbackLegalEntities.Select(clawbackLegalEntity => new AccountLegalEntityCollectionPeriod {AccountId = clawbackLegalEntity.AccountId, AccountLegalEntityId = clawbackLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod}));
 
             context.SetCustomStatus("CalculatingPayments");
             var calculatePaymentTasks = new List<Task>();
-            foreach (var legalEntity in payableLegalEntities)
+            foreach (var accountLegalEntityPaymentPeriod in accountLegalEntitiesToProcess)
             {
-                var calculatePaymentTask = context.CallSubOrchestratorAsync(nameof(CalculatePaymentsForAccountLegalEntityOrchestrator), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+                var calculatePaymentTask = context.CallSubOrchestratorAsync(nameof(CalculatePaymentsForAccountLegalEntityOrchestrator), accountLegalEntityPaymentPeriod);
                 calculatePaymentTasks.Add(calculatePaymentTask);
             }
 
             await Task.WhenAll(calculatePaymentTasks);
-
-            context.SetCustomStatus("GettingUnsentClawbackLegalEntities");
-            var clawbackLegalEntities = await context.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), collectionPeriod);
 
             if (!context.IsReplaying)
             {
