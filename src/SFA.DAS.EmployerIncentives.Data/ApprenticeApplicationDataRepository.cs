@@ -48,8 +48,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                                       from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
                                       from secondPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (secondPayment == null ? Guid.Empty : secondPayment.Id)).DefaultIfEmpty()
                                       from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
-                                      from firstEmploymentCheck in _dbContext.PendingPaymentValidationResults.Where(x => x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id && x.Step == ValidationStep.EmployedAtStartOfApprenticeship).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
-                                      from secondEmploymentCheck in _dbContext.PendingPaymentValidationResults.Where(x => x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id && x.Step == ValidationStep.EmployedBeforeSchemeStarted).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
+                                      from firstEmploymentCheck in _dbContext.PendingPaymentValidationResults.Where(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship && (x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id)).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
+                                      from secondEmploymentCheck in _dbContext.PendingPaymentValidationResults.Where(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted && (x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id)).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
                                       where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
                                       select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent, 
                                                    firstClawback, firstClawbackPayment, secondClawback, secondClawbackPayment, secondPaymentSent,
@@ -82,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSent = data.firstPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = (data.firstEmploymentCheck != null && data.secondEmploymentCheck != null) && data.firstEmploymentCheck.Result && data.secondEmploymentCheck.Result
+                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.secondEmploymentCheck)
                     },
                     FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
                     {
@@ -101,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSent = data.secondPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = (data.firstEmploymentCheck != null && data.secondEmploymentCheck != null) && data.firstEmploymentCheck.Result && data.secondEmploymentCheck.Result
+                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.secondEmploymentCheck)
                     },
                     SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
                     {
@@ -124,6 +124,16 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
 
             return result;
+        }
+
+        private static bool? EmploymentCheckResult(ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheck, ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheck)
+        {
+            if (firstEmploymentCheck == null || secondEmploymentCheck == null)
+            {
+                return null;
+            }
+
+            return firstEmploymentCheck.Result && secondEmploymentCheck.Result;
         }
 
         private static void SetStoppedStatus(ApprenticeApplicationDto model)
