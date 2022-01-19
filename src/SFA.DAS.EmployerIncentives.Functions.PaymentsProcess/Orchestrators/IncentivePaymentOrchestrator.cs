@@ -36,7 +36,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var clawbackLegalEntities = await context.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), collectionPeriod);
             
             var accountLegalEntitiesToProcess = payableLegalEntities.Select(payableLegalEntity => new AccountLegalEntityCollectionPeriod {AccountId = payableLegalEntity.AccountId, AccountLegalEntityId = payableLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod}).ToList();
-            accountLegalEntitiesToProcess.AddRange(clawbackLegalEntities.Select(clawbackLegalEntity => new AccountLegalEntityCollectionPeriod {AccountId = clawbackLegalEntity.AccountId, AccountLegalEntityId = clawbackLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod}));
+            foreach (var clawbackLegalEntity in clawbackLegalEntities.Where(clawbackLegalEntity => accountLegalEntitiesToProcess.FirstOrDefault(x => x.AccountId == clawbackLegalEntity.AccountId && x.AccountLegalEntityId == clawbackLegalEntity.AccountLegalEntityId) == null))
+            {
+                accountLegalEntitiesToProcess.Add(new AccountLegalEntityCollectionPeriod { AccountId = clawbackLegalEntity.AccountId, AccountLegalEntityId = clawbackLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
+            }
 
             context.SetCustomStatus("CalculatingPayments");
             var calculatePaymentTasks = new List<Task>();
