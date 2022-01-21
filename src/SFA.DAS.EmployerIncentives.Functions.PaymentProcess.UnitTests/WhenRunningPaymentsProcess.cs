@@ -116,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
                 "CalculatePaymentsForAccountLegalEntityOrchestrator",
                 It.IsAny<AccountLegalEntityCollectionPeriod>()
-            ), Times.Exactly(_payableLegalEntities.Count));
+            ), Times.Exactly(_payableLegalEntities.Count + _clawbackLegalEntities.Count - 1)); // Duplicated account id across lists
 
             _mockOrchestrationContext.Verify(x => x.WaitForExternalEvent<bool>("PaymentsApproved"), Times.Once);
         }
