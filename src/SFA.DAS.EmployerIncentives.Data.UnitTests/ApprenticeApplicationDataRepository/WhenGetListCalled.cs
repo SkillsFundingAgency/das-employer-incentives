@@ -13,6 +13,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.Services;
 using AcademicYear = SFA.DAS.EmployerIncentives.Domain.ValueObjects.AcademicYear;
 using ClawbackPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ClawbackPayment;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
@@ -1761,13 +1762,15 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(x => x.Result, secondEmploymentCheckValue)
                 .Create();
 
+            incentives[0].EmploymentChecks.Clear();
+            incentives[0].EmploymentChecks.Add(employmentCheck1);
+            incentives[0].EmploymentChecks.Add(employmentCheck2);
+
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
-            _context.EmploymentChecks.Add(employmentCheck1);
-            _context.EmploymentChecks.Add(employmentCheck2);
-
+            
             _context.SaveChanges();
 
             // Act
@@ -1873,13 +1876,15 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(x => x.Result, false)
                 .Create();
 
+            incentives[0].EmploymentChecks.Clear();
+            incentives[0].EmploymentChecks.Add(employmentCheck1);
+            incentives[0].EmploymentChecks.Add(employmentCheck2);
+
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
-            _context.EmploymentChecks.Add(employmentCheck1);
-            _context.EmploymentChecks.Add(employmentCheck2);
-
+            
             _context.SaveChanges();
 
             // Act
@@ -2088,6 +2093,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
             incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
 
+            incentives[0].EmploymentChecks.Clear();
+
             var additionalValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .Create();
@@ -2195,13 +2202,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
                 .Without(x => x.Result)
                 .Create();
+            incentives[0].EmploymentChecks.Clear();
+            incentives[0].EmploymentChecks.Add(employmentCheck1);
+            incentives[0].EmploymentChecks.Add(employmentCheck2);
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
-            _context.EmploymentChecks.Add(employmentCheck1);
-            _context.EmploymentChecks.Add(employmentCheck2);
 
             _context.SaveChanges();
 
