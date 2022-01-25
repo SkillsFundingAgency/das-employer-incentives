@@ -48,11 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         private ValidationOverrideStep Map(ValidationStep validationStep)
         {
-            return new ValidationOverrideStep()
-            {
-                 ValidationType = validationStep.ValidationType.ToString(),
-                 ExpiryDate = validationStep.ExpiryDate                
-            };
+            return new ValidationOverrideStep(validationStep.ValidationType.ToString(), validationStep.ExpiryDate);            
         }
     }
 }
