@@ -28,10 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ValidationOverride
 
             var serviceRequest = new ServiceRequest(command.ServiceRequestTaskId, command.DecisionReference, command.ServiceRequestCreated);
 
-            switch (command.ValidationSteps)
-            {
-             
-            }
+            
 
             await _incentiveDomainRepository.Save(incentive);
         }
@@ -47,9 +44,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.ValidationOverride
             //   and add the new ValidationOverrides to the incentive (and raise a Created event).
             // 5. Persist the changes 
 
-            await Task.CompletedTask;
-        }
-    }
-}
 
 
