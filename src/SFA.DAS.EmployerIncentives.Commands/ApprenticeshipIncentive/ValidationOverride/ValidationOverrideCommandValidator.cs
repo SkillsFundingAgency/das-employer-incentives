@@ -1,11 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.ValidationOverrides;
-using System.Threading.Tasks;
-using System.Linq;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ValidationOverride
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverride
 {
     public class ValidationOverrideCommandValidator : IValidator<ValidationOverrideCommand>
     {
@@ -49,15 +49,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ValidationOverride
         {
             switch(step.ValidationType)
             {
-                case ValidationStep.HasBankDetails:
-                case ValidationStep.IsInLearning:
-                case ValidationStep.HasLearningRecord:
-                case ValidationStep.HasNoDataLocks:
-                case ValidationStep.HasIlrSubmission:
                 case ValidationStep.HasDaysInLearning:
-                case ValidationStep.PaymentsNotPaused:
-                case ValidationStep.HasSignedMinVersion:
-                case ValidationStep.LearnerMatchSuccessful:
+                case ValidationStep.IsInLearning:
+                case ValidationStep.HasNoDataLocks:
                 case ValidationStep.EmployedAtStartOfApprenticeship:
                 case ValidationStep.EmployedBeforeSchemeStarted:
                     break;

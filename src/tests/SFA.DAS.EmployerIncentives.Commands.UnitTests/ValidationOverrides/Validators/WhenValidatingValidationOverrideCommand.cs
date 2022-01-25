@@ -103,17 +103,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ValidationOverrides.Vali
             result.ValidationDictionary.Count.Should().Be(1);
         }
 
-        [TestCase("HasBankDetails", true)]
-        [TestCase("IsInLearning", true)]
-        [TestCase("HasLearningRecord", true)]
-        [TestCase("HasNoDataLocks", true)]
-        [TestCase("HasIlrSubmission", true)]
         [TestCase("HasDaysInLearning", true)]
-        [TestCase("PaymentsNotPaused", true)]
-        [TestCase("HasSignedMinVersion", true)]
-        [TestCase("LearnerMatchSuccessful", true)]
-        [TestCase("EmployedAtStartOfApprenticeship", true)]
+        [TestCase("IsInLearning", true)]
+        [TestCase("HasNoDataLocks", true)]
         [TestCase("EmployedBeforeSchemeStarted", true)]
+        [TestCase("EmployedAtStartOfApprenticeship", true)]        
         [TestCase("Random", false)]
         public async Task Then_the_command_is_invalid_when_the_ValidationType_is_invalid(string validationType, bool isValid)
         {

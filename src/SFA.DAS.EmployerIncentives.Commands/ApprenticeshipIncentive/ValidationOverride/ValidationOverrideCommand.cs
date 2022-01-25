@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Collections.Generic;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ValidationOverrides
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides
 {
     public class ValidationOverrideCommand : ICommand, ILogWriter, IPeriodEndIncompatible
     {
