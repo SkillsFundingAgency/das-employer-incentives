@@ -760,6 +760,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
         }
 
+        public void AddValidationOverride(ValidationOverrideStep step, ServiceRequest serviceRequest)
+        {
+            // TODO :
+            // 1. Create ValidationOverrideModel
+            // 2. Add Model.ValidationOverrides collection to the incentive
+            // 3. Remove an existing matching override and raise deleted event
+            // 4. Add override to model and raise added event
+        }
+
         private DateTime GetPhaseStartDate()
         {
             if (Phase.Identifier == Enums.Phase.Phase1)
