@@ -9,6 +9,8 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
 using System;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceTests
@@ -53,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         public async Task Then_the_learner_submission_data_is_valid_when_the_learner_data_exists()
         {
             //Arrange
-            var learnerSubmissionDto = _fixture.Build<LearnerSubmissionDto>().With(l => l.Ukprn, _learner.Ukprn).Create();
+            var learnerSubmissionDto = _fixture.Build<LearnerSubmissionDto>().With(l => l.Uln, _learner.UniqueLearnerNumber).With(l => l.Ukprn, _learner.Ukprn).Create();
 
             _httpClient.SetUpGetAsAsync(learnerSubmissionDto, System.Net.HttpStatusCode.OK);
 
@@ -65,6 +67,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             response.Should().NotBeNull();
             response.RawJson.Should().Be(JsonConvert.SerializeObject(learnerSubmissionDto));
             response.Ukprn.Should().Be(_learner.Ukprn);
+        }
+
+        [Test]
+        public void Then_an_exception_is_thrown_when_learner_response_is_invalid()
+        {
+            _httpClient.SetUpGetAsAsync(new StringContent("{\"bad\": \"json\"}", Encoding.UTF8, "application/json"), System.Net.HttpStatusCode.OK);
+
+            Func<Task> action = async () => await _sut.Get(_learner);
+            action.Should().Throw<InvalidLearnerMatchResponseException>();
         }
     }
 }
