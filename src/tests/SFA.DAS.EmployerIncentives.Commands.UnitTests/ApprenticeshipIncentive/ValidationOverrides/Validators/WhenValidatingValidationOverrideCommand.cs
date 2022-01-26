@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ValidationOverrides.Validators
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.ValidationOverrides.Validators
 {
     public class WhenValidatingValidationOverrideCommand
     {
@@ -102,10 +102,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ValidationOverrides.Vali
             //Assert
             result.ValidationDictionary.Count.Should().Be(1);
         }
-
-        [TestCase("HasDaysInLearning", true)]
+                
+        [TestCase("HasBankDetails", true)]
         [TestCase("IsInLearning", true)]
+        [TestCase("HasLearningRecord", true)]
         [TestCase("HasNoDataLocks", true)]
+        [TestCase("HasIlrSubmission", true)]
+        [TestCase("HasDaysInLearning", true)]
+        [TestCase("PaymentsNotPaused", true)]
+        [TestCase("HasSignedMinVersion", true)]
+        [TestCase("LearnerMatchSuccessful", true)]
         [TestCase("EmployedBeforeSchemeStarted", true)]
         [TestCase("EmployedAtStartOfApprenticeship", true)]        
         [TestCase("Random", false)]

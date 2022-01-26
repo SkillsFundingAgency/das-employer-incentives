@@ -27,8 +27,5 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ValidationOverrides\Handlers\" />
-  </ItemGroup>
 
 </Project>
