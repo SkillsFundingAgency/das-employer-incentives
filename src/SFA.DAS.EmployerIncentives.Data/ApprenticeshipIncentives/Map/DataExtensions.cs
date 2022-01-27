@@ -498,5 +498,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateTime = DateTime.Now
             };
         }
+
+        internal static ValidationOverrideAudit Map(this ValidationOverrideStepAudit entity)
+        {
+            return new ValidationOverrideAudit
+            {
+                Id = entity.Id,
+                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                Step = entity.ValidationOverrideStep.ValidationType,
+                ExpiryDate = entity.ValidationOverrideStep.ExpiryDate,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now                
+            };
+        }
     }
 }
