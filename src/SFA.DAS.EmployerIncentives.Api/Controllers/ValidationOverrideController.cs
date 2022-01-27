@@ -3,6 +3,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,23 +21,31 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPost("/validation-overrides")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Add([FromBody] ValidationOverrideRequest request)
         {
             var commands = new List<ICommand>();
 
-            request.ValidationOverrides
-                .ToList()
-                .ForEach(v => commands.Add(
-                    new ValidationOverrideCommand(
-                        v.AccountLegalEntityId, 
-                        v.ULN, 
-                        v.ServiceRequest.TaskId, 
-                        v.ServiceRequest.DecisionReference, 
-                        v.ServiceRequest.TaskCreatedDate,
-                        Map(v.ValidationSteps))
-                    ));
+            try
+            {
+                request.ValidationOverrides
+                    .ToList()
+                    .ForEach(v => commands.Add(
+                        new ValidationOverrideCommand(
+                            v.AccountLegalEntityId,
+                            v.ULN,
+                            v.ServiceRequest.TaskId,
+                            v.ServiceRequest.DecisionReference,
+                            v.ServiceRequest.TaskCreatedDate,
+                            Map(v.ValidationSteps))
+                        ));
 
-            await SendCommandsAsync(commands);
+                await SendCommandsAsync(commands);
+            }
+            catch(Exception)
+            {
+                return BadRequest();
+            }            
 
             return Accepted();            
         } 

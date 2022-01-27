@@ -27,8 +27,13 @@ Examples:
     | EmployedBeforeSchemeStarted     |
     | EmployedAtStartOfApprenticeship |
 
-Scenario: A payment validation is not created when no matching apprenticeship incentive exists 
+Scenario Outline: A payment validation is not created when no matching apprenticeship incentive exists 
+    Given an apprenticeship incentive has a validation
+    When the validation override request is received for a non matching apprenticeship incentive
+    Then the validation override is not stored against the apprenticeship incentive
 
-Scenario: A payment validation is not created when the expiry date of the validation is in the past
-
-Scenario: A payment validation is not created when the validation type date of the validation is not valid
+Scenario: An existing validation override is replaced by a new one
+    Given an apprenticeship incentive has a validation override
+    When the validation override request is received
+    Then the validation override is stored against the apprenticeship incentive
+    And the exising validation override is archived
