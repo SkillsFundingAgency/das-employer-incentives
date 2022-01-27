@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverride
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides
 {
     public class ValidationOverrideCommandHandler : ICommandHandler<ValidationOverrideCommand>
     {

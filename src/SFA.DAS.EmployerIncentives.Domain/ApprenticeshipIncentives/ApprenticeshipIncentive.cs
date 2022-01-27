@@ -761,12 +761,44 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         }
 
         public void AddValidationOverride(ValidationOverrideStep step, ServiceRequest serviceRequest)
+        public void AddValidationOverride(ValidationOverrideStep validationOverrideStep, ServiceRequest serviceRequest)
         {
+            var validationOverride = ValidationOverride.New(Guid.NewGuid(), Model.Id, validationOverrideStep.ValidationType, validationOverrideStep.ExpiryDate);
+            var existingValidationOverride = Model.ValidationOverrideModels.SingleOrDefault(x => x.Step == validationOverrideStep.ValidationType);
+
+            if (existingValidationOverride != null)
+            {
+                Model.ValidationOverrideModels.Remove(existingValidationOverride);
+                Model.ValidationOverrideModels.Add(validationOverride.GetModel());
+                AddEvent(new ValidationOverrideCreated(validationOverride.Id, Model.Id, validationOverrideStep, serviceRequest));
+                AddEvent(new ValidationOverrideDeleted(validationOverride.Id, Model.Id, validationOverrideStep, serviceRequest));
+            }
+            else
+            {
+                Model.ValidationOverrideModels.Add(validationOverride.GetModel());
+                AddEvent(new ValidationOverrideCreated(validationOverride.Id, Model.Id, validationOverrideStep, serviceRequest));
+            }
+
+
+            //Model.ValidationOverrideModels.ToList()
+            //    .ForEach(vo =>
+            //    {
+            //        if (vo != null)
+            //        {
+            //            Model.ValidationOverrideModels.Remove(vo);
+            //            AddEvent(new ValidationOverrideDeleted(vo));
+            //        }
+
+            //        Model.ValidationOverrideModels.Add(vo);
+            //        AddEvent(new ValidationOverrideAdded(vo));
+            //    });
+            //if override exists, replace if steps are the same, if one doesnt exist add new
+
             // TODO :
             // 1. Create ValidationOverrideModel
             // 2. Add Model.ValidationOverrides collection to the incentive
             // 3. Remove an existing matching override and raise deleted event
-            // 4. Add override to model and raise added event
+            // 4. Add override to model and raise created event
         }
 
         private DateTime GetPhaseStartDate()

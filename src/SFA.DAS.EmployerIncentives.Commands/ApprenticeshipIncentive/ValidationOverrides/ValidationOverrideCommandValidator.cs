@@ -1,11 +1,10 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverride
+namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides
 {
     public class ValidationOverrideCommandValidator : IValidator<ValidationOverrideCommand>
     {
