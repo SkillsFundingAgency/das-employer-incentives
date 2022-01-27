@@ -32,7 +32,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
             {
 
                 var additionalMessage = ServiceRequest == null ? string.Empty : $", ServiceReqest {ServiceRequest.TaskId}";
-                var message = $"Validation override '{ValidationOverrideStep.ValidationType}' with Expiry date '{ValidationOverrideStep.ExpiryDate}' and '{ValidationOverrideId}' created for Apprenticeship Incentive with ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} {additionalMessage}";
                 return new Log
                 {
                     OnProcessing = () => message,

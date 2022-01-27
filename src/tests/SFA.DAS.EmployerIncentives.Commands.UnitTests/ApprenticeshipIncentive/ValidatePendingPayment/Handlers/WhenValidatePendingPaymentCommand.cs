@@ -11,13 +11,12 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.ValidatePendingPayment.Handlers
 {
@@ -28,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionCalendarPeriods;
+        private List<CollectionCalendarPeriod> _collectionCalendarPeriods;
         private string _vrfVendorId;
         private Account _account;
         private LearnerModel _learnerModel;
@@ -48,13 +47,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
-            
+
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
 
-            _collectionCalendarPeriods = new List<Domain.ValueObjects.CollectionCalendarPeriod>()
+            _collectionCalendarPeriods = new List<CollectionCalendarPeriod>()
             {
-                new Domain.ValueObjects.CollectionCalendarPeriod(
+                new CollectionCalendarPeriod(
                     new Domain.ValueObjects.CollectionPeriod(1, (short)DateTime.Now.Year),
                     (byte)DateTime.Now.Month,
                     (short)DateTime.Now.Year,
@@ -100,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .With(m => m.PausePayments, false)
                 .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
                 .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
-                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel> 
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel>
                 {
                     _fixture.Build<EmploymentCheckModel>()
                         .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
@@ -147,7 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockLearnerDomainRepository
                 .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
-            
+
             _sut = new ValidatePendingPaymentCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
@@ -315,7 +314,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _learner.SetSuccessfulLearnerMatch(false);
-            
+
             var pendingPayment = incentive.PendingPayments.First();
             var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
 
@@ -378,11 +377,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Create();
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
-            
+
             _mockIncentiveDomainRespository
                 .Setup(m => m.Find(incentive.Id))
                 .ReturnsAsync(incentive);
-            
+
             _mockLearnerDomainRepository
                 .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
@@ -456,6 +455,5 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .PendingPaymentValidationResults.Single(x => x.Step == "EmployedAtStartOfApprenticeship");
             validationResult.Result.Should().BeFalse();
         }
-
     }
 }
