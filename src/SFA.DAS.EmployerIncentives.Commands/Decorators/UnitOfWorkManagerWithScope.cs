@@ -16,7 +16,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 
         public async Task BeginAsync()
         {
-            await _unitOfWorkManager.BeginAsync();
+            if (counter == 0)
+            {
+                await _unitOfWorkManager.BeginAsync();
+            }
             counter++;
         }
 

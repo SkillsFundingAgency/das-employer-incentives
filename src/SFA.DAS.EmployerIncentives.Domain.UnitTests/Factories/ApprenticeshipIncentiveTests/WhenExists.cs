@@ -43,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.Factories.ApprenticeshipIn
                 .Excluding(x => x.BreakInLearnings)
                 .Excluding(x => x.Phase)
                 .Excluding(x => x.EmploymentCheckModels)
+                .Excluding(x => x.ValidationOverrideModels)
             );
         }
 

@@ -63,6 +63,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
             expected.EmploymentCheckModels = employmentChecks;
 
+            var validationOverrides = _fixture.Build<ValidationOverrideModel>().With(
+                x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
+            expected.ValidationOverrideModels = validationOverrides;
+
             // Act
             await _sut.Update(expected);
             await _dbContext.SaveChangesAsync();
@@ -123,6 +127,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             var savedEmploymentChecks = _dbContext.EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
             savedEmploymentChecks.Should().BeEquivalentTo(employmentChecks, opts => opts.Excluding(x => x.CreatedDateTime).Excluding(x => x.ResultDateTime).Excluding(x => x.UpdatedDateTime));
+
+            var savedValidationOverrides = _dbContext.ValidationOverrides.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
+            savedValidationOverrides.Should().BeEquivalentTo(validationOverrides, opts => opts.Excluding(x => x.CreatedDate));
         }
 
         [Test]

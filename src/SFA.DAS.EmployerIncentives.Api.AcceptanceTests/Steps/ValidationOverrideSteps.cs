@@ -29,11 +29,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
         private readonly PendingPaymentValidationResult _pendingPaymentValidationResult;
+        private readonly Data.ApprenticeshipIncentives.Models.ValidationOverride _validationOverride;
+        private readonly ValidationOverrideAudit _validationOverrideAudit;
+        private readonly DateTime _expiryDate;        
 
         public ValidationOverrideSteps(TestContext testContext) : base(testContext)
         {
             _account = TestContext.TestData.GetOrCreate<Account>();
             _application = Fixture.Create<IncentiveApplication>();
+            _expiryDate = DateTime.Today.AddDays(1);
 
             _applicationApprenticeship = Fixture
                 .Build<IncentiveApplicationApprenticeship>()
@@ -64,6 +68,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.PaymentYear, 2021)
                 .With(p => p.Result, false)
                 .Create();
+
+            _validationOverride = Fixture
+                .Build<Data.ApprenticeshipIncentives.Models.ValidationOverride>()
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.Step, ValidationType.IsInLearning.ToString())
+                .With(p => p.ExpiryDate, DateTime.Today.AddDays(5))
+                .With(p => p.CreatedDateTime, DateTime.Today.AddDays(-1))
+                .Create();
+
+            _validationOverrideAudit = Fixture
+                .Build<ValidationOverrideAudit>()
+                .With(p => p.Id, _validationOverride.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.Step, ValidationType.IsInLearning.ToString())
+                .With(p => p.ExpiryDate, DateTime.Today.AddDays(5))
+                .With(p => p.CreatedDateTime, DateTime.Today.AddDays(-1))
+                .Without(p => p.DeletedDateTime)
+                .Create();
         }
 
         [Given(@"an apprenticeship incentive has a validation")]
@@ -72,11 +94,32 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await GivenAnApprenticeshipIncentiveHasAValidationWithType(ValidationType.IsInLearning);
         }
 
+        [Given(@"an apprenticeship incentive has multiple validations")]
+        public async Task GivenAnApprenticeshipIncentivesHasMultipleValidations()
+        {
+            await GivenAnApprenticeshipIncentiveHasAValidationWithType(ValidationType.IsInLearning);
+
+            var pendingPaymentValidationResult = Fixture
+                .Build<PendingPaymentValidationResult>()
+                .With(p => p.PendingPaymentId, _pendingPayment.Id)
+                .With(p => p.Step, ValidationType.HasDaysInLearning.ToString())
+                .With(p => p.PeriodNumber, 1)
+                .With(p => p.PaymentYear, 2021)
+                .With(p => p.Result, false)
+                .Create();
+
+            using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(pendingPaymentValidationResult);
+        }
+
         [Given(@"an apprenticeship incentive has a validation override")]
         public async Task GivenAnApprenticeshipIncentiveHasAValidationOverride()
-        {
-            // todo create the validation override
+        {        
             await GivenAnApprenticeshipIncentiveHasAValidation();
+            
+            using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_validationOverride);
+            await dbConnection.InsertAsync(_validationOverrideAudit);            
         }
 
         [Given(@"an apprenticeship incentive has a (.*) validation")]
@@ -99,17 +142,62 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _validationOverrideRequest = Fixture
                 .Build<ValidationOverrideRequest>()
                 .With(p => p.ValidationOverrides,
-                new List<ValidationOverride>() {
-                    Fixture.Build<ValidationOverride>()
+                new List<Types.ValidationOverride>() {
+
+                    Fixture.Build<Types.ValidationOverride>()
                     .With(o => o.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                     .With(o => o.ULN, _apprenticeshipIncentive.ULN)
                     .With(o => o.ValidationSteps, new List<ValidationStep>(){
                         Fixture.Build<ValidationStep>()
                         .With(v => v.ValidationType, Enum.Parse<ValidationType>(_pendingPaymentValidationResult.Step))
-                        .With(v => v.ExpiryDate, DateTime.Today.AddDays(1))
+                        .With(v => v.ExpiryDate, _expiryDate)
                         .Create()
                     }.ToArray())
                     .Create()
+                }.ToArray())
+                .Create();
+
+            var url = $"validation-overrides";
+
+            await TestContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Post(url, _validationOverrideRequest, cancellationToken);
+                },
+                (context) => HasExpectedEvents(context)
+                );
+        }
+
+        [When(@"the multiple validation override request is received")]
+        public async Task WhenTheMultipleValidationOverrideRequestIsReceived()
+        {
+            _validationOverrideRequest = Fixture
+                .Build<ValidationOverrideRequest>()
+                .With(p => p.ValidationOverrides,
+                new List<Types.ValidationOverride>() {
+
+                    Fixture.Build<Types.ValidationOverride>()
+                    .With(o => o.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(o => o.ULN, _apprenticeshipIncentive.ULN)
+                    .With(o => o.ValidationSteps, new List<ValidationStep>(){
+                        Fixture.Build<ValidationStep>()
+                        .With(v => v.ValidationType, ValidationType.IsInLearning)
+                        .With(v => v.ExpiryDate, _expiryDate)
+                        .Create()
+                    }.ToArray())
+                    .Create(),
+
+                    Fixture.Build<Types.ValidationOverride>()
+                    .With(o => o.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(o => o.ULN, _apprenticeshipIncentive.ULN)
+                    .With(o => o.ValidationSteps, new List<ValidationStep>(){
+                        Fixture.Build<ValidationStep>()
+                        .With(v => v.ValidationType, ValidationType.HasLearningRecord)
+                        .With(v => v.ExpiryDate, _expiryDate)
+                        .Create()
+                    }.ToArray())
+                    .Create()
+
                 }.ToArray())
                 .Create();
 
@@ -130,13 +218,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _validationOverrideRequest = Fixture
                 .Build<ValidationOverrideRequest>()
                 .With(p => p.ValidationOverrides,
-                new List<ValidationOverride>() {
-                    Fixture.Build<ValidationOverride>()
+                new List<Types.ValidationOverride>() {
+                    Fixture.Build<Types.ValidationOverride>()
                     .With(o => o.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
                     .With(o => o.ValidationSteps, new List<ValidationStep>(){
                         Fixture.Build<ValidationStep>()
                         .With(v => v.ValidationType, Enum.Parse<ValidationType>(_pendingPaymentValidationResult.Step))
-                        .With(v => v.ExpiryDate, DateTime.Today.AddDays(1))
+                        .With(v => v.ExpiryDate, _expiryDate)
                         .Create()
                     }.ToArray())
                     .Create()
@@ -185,12 +273,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            // TODO: change to ValidationOverride and assert expiry date and service request fields etc..
-            var validationOverrides = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
-            validationOverrides.Should().HaveCount(1);
-            // archive should be 0
-            // audit should be 1
-            //validationOverrides.Single(a => a.Step == validationType.ToString());
+
+            var validationOverrides = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.ValidationOverride>();
+            var validationOverride = validationOverrides.Single(o => o.Step == validationType.ToString());
+            validationOverride.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            validationOverride.ExpiryDate.Should().Be(_expiryDate);
         }
 
         [Then(@"the validation override is stored against the apprenticeship incentive")]
@@ -204,20 +291,38 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            // TODO: change to ValidationOverride and assert expiry date and service request fields etc..
-            var validationOverrides = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
-            validationOverrides.Should().HaveCount(1); // TODO: should be 0
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);            
+            var validationOverrides = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.ValidationOverride>();
+            validationOverrides.Should().HaveCount(0);
         }
 
-        [Then(@"the exising validation override is archived")]
+        [Then(@"the existing validation override is archived")]
         public async Task ThenTheExistingValidationOverrideIsArchived()
         {
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            // TODO: change to ValidationOverrideArchive and assert expiry date and service request fields etc..
-            var validationOverrides = await dbConnection.GetAllAsync<PendingPaymentValidationResult>();
-            validationOverrides.Should().HaveCount(1); // TODO: should be 1
+
+            var audits = await dbConnection.GetAllAsync<ValidationOverrideAudit>();
+            audits.Should().HaveCount(2);
+
+            var deletedAudit = audits.Single(a => a.Id == _validationOverrideAudit.Id);
+            deletedAudit.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            deletedAudit.Step.Should().Be(_validationOverrideAudit.Step);
+            deletedAudit.ExpiryDate.Should().Be(_validationOverrideAudit.ExpiryDate);
+            deletedAudit.CreatedDateTime.Should().Be(_validationOverrideAudit.CreatedDateTime);
+            deletedAudit.DeletedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 2, 0));
+
+            var addedAudit = audits.Single(a => a.DeletedDateTime == null);
+            addedAudit.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            addedAudit.Step.Should().Be(_pendingPaymentValidationResult.Step);
+            addedAudit.ExpiryDate.Should().Be(_expiryDate);
+            addedAudit.CreatedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 2, 0));
         }
-        
+
+        [Then(@"the validation overrides are stored against the apprenticeship incentives")]
+        public async Task ThenTheValidationOverridesAreStoredAgainstTheApprenticeshipIncentives()
+        {
+            await ThenTheValidationOverrideIsStoredAgainstTheApprenticeshipIncentiveWithType(ValidationType.HasLearningRecord);
+            await ThenTheValidationOverrideIsStoredAgainstTheApprenticeshipIncentiveWithType(ValidationType.IsInLearning);
+        }
     }
 }

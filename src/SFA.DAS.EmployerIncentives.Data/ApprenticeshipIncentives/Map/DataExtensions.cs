@@ -43,7 +43,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
                 Phase = model.Phase.Identifier,
                 WithdrawnBy = model.WithdrawnBy,
-                EmploymentChecks = model.EmploymentCheckModels.Map()
+                EmploymentChecks = model.EmploymentCheckModels.Map(),
+                ValidationOverrides = model.ValidationOverrideModels.Map()
             };
         }
 
@@ -87,7 +88,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase),
                 WithdrawnBy = entity.WithdrawnBy,
-                EmploymentCheckModels = entity.EmploymentChecks.Map()
+                EmploymentCheckModels = entity.EmploymentChecks.Map(),
+                ValidationOverrideModels = entity.ValidationOverrides.Map()
             };
         }
 
@@ -461,30 +463,29 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             }).ToList();
         }
 
-        internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)
+        private static ICollection<ValidationOverrideModel> Map(this ICollection<ValidationOverride> models)
         {
-            if (model != null)
+            return models.Select(x => new ValidationOverrideModel
             {
-                var collectionCalendarPeriod = new Domain.ValueObjects.CollectionCalendarPeriod(
-                    new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, Convert.ToInt16(model.AcademicYear)),
-                    model.CalendarMonth,
-                    model.CalendarYear,
-                    model.EIScheduledOpenDateUTC,
-                    model.CensusDate,
-                    model.Active,
-                    model.PeriodEndInProgress);
-
-                if (model.MonthEndProcessingCompleteUTC.HasValue)
-                {
-                    collectionCalendarPeriod.SetMonthEndProcessingCompletedDate(model.MonthEndProcessingCompleteUTC.Value);
-                }
-
-                return collectionCalendarPeriod;
-
-            }
-
-            return null;
+                Id = x.Id,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                Step = x.Step,
+                ExpiryDate = x.ExpiryDate,
+                CreatedDate = x.CreatedDateTime
+            }).ToList();
         }
+
+        private static ICollection<ValidationOverride> Map(this ICollection<ValidationOverrideModel> models)
+        {
+            return models.Select(x => new ValidationOverride
+            {
+                Id = x.Id,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                Step = x.Step,
+                ExpiryDate = x.ExpiryDate,
+                CreatedDateTime = x.CreatedDate
+            }).ToList();
+        }     
 
         internal static EmploymentCheckAudit Map(this EmploymentCheckRequestAudit entity)
         {
@@ -512,6 +513,31 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 CreatedDateTime = DateTime.Now                
             };
+        }
+
+        internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)
+        {
+            if (model != null)
+            {
+                var collectionCalendarPeriod = new Domain.ValueObjects.CollectionCalendarPeriod(
+                    new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber, Convert.ToInt16(model.AcademicYear)),
+                    model.CalendarMonth,
+                    model.CalendarYear,
+                    model.EIScheduledOpenDateUTC,
+                    model.CensusDate,
+                    model.Active,
+                    model.PeriodEndInProgress);
+
+                if (model.MonthEndProcessingCompleteUTC.HasValue)
+                {
+                    collectionCalendarPeriod.SetMonthEndProcessingCompletedDate(model.MonthEndProcessingCompleteUTC.Value);
+                }
+
+                return collectionCalendarPeriod;
+
+            }
+
+            return null;
         }
     }
 }

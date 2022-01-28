@@ -1,4 +1,4 @@
-﻿CREATE TABLE [audit].[ValidationOverrideAudit]
+﻿CREATE TABLE [audit].[ValidationOverride]
 (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
 	[ApprenticeshipIncentiveId] UNIQUEIDENTIFIER NOT NULL,
@@ -9,6 +9,6 @@
 	[ServiceRequestCreatedDate] DATETIME2 NULL, 
 	[CreatedDateTime] DATETIME2 NOT NULL, 
 	[DeletedDateTime] DATETIME2 NULL,
-    CONSTRAINT FK_ValidationOverrideAudit_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id)
+    CONSTRAINT FK_AuditValidationOverride_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id)
 )
 GO

@@ -36,4 +36,9 @@ Scenario: An existing validation override is replaced by a new one
     Given an apprenticeship incentive has a validation override
     When the validation override request is received
     Then the validation override is stored against the apprenticeship incentive
-    And the exising validation override is archived
+    And the existing validation override is archived
+
+Scenario: Multiple validation override requests are handled
+    Given an apprenticeship incentive has multiple validations
+    When the multiple validation override request is received
+    Then the validation overrides are stored against the apprenticeship incentives

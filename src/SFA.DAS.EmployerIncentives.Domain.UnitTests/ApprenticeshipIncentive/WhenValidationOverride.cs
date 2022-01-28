@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
         }
         [Test]
-        public void No_existing_validationOverride_then_a_new_one_is_stored()
+        public void Then_a_new_ValidationOverride_is_added_when_it_does_not_already_exist()
         {
             // Arrange
             _sut = Sut(_sutModel);
@@ -39,21 +39,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Act
             _sut.AddValidationOverride(validationOverrideStep, serviceRequest);
+
             // Assert
             _sut.GetModel().ValidationOverrideModels.Single().ApprenticeshipIncentiveId.Should().Be(id);
             _sut.GetModel().ValidationOverrideModels.Single().Step.Should().Be(validationOverrideStep.ValidationType);
             _sut.GetModel().ValidationOverrideModels.Single().ExpiryDate.Should().Be(validationOverrideStep.ExpiryDate);
         }
+
         [Test]
-        public void Then_a_validationOverrideCreated_event_is_raised()
+        public void Then_a_validationOverrideCreated_event_is_raised_when_a_new_ValidationOverride_is_added()
         {
             // Arrange
             _sut = Sut(_sutModel);
             var id = _sut.Id;
             var validationOverrideStep = _fixture.Create<ValidationOverrideStep>();
             var serviceRequest = _fixture.Create<ServiceRequest>();
+
             // Act
             _sut.AddValidationOverride(validationOverrideStep, serviceRequest);
+
             // Assert
             var raisedEvent = _sut.FlushEvents().Single() as ValidationOverrideCreated;
             raisedEvent.ApprenticeshipIncentiveId.Should().Be(id);
@@ -61,30 +65,76 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             raisedEvent.ValidationOverrideStep.Should().Be(validationOverrideStep);
             raisedEvent.ServiceRequest.Should().Be(serviceRequest);
         }
+
         [Test]
-        public void Then_a_validationOverrideDeleted_event_is_raised()
+        public void Then_a_ValidationOverrideDeleted_event_is_raised_when_an_existing_ValidationOverride_is_replaced()
         {
             // Arrange
+            var existingOverride = _fixture
+                .Build<ValidationOverrideModel>()
+                .With(p => p.ApprenticeshipIncentiveId, _sutModel.Id)
+                .Create();
+
+            _sutModel.ValidationOverrideModels.Add(existingOverride);
+
             _sut = Sut(_sutModel);
-            var validationOverrideStep = _fixture.Create<ValidationOverrideStep>();
+
+            var validationOverrideStep = new ValidationOverrideStep(existingOverride.Step, _fixture.Create<DateTime>());
             var serviceRequest = _fixture.Create<ServiceRequest>();
+
             // Act
             _sut.AddValidationOverride(validationOverrideStep, serviceRequest);
+
             // Assert
-            _ = _sut.FlushEvents().Single() as ValidationOverrideDeleted;
+            var raisedEvent = _sut.FlushEvents().Single(e => e is ValidationOverrideDeleted) as ValidationOverrideDeleted;
+            raisedEvent.Should().NotBeNull();
+            raisedEvent.ValidationOverrideId.Should().Be(existingOverride.Id);
+            raisedEvent.ApprenticeshipIncentiveId.Should().Be(existingOverride.ApprenticeshipIncentiveId);
         }
 
         [Test]
-        public void When_there_is_existing_validation_override_it_is_replaced()
+        public void Then_a_ValidationOverrideCreated_event_is_raised_when_an_existing_ValidationOverride_is_replaced()
         {
             // Arrange
-            var existingOverride = _fixture.Build<ValidationOverrideModel>()
-                                                .Create();
+            var existingOverride = _fixture
+                .Build<ValidationOverrideModel>()
+                .With(p => p.ApprenticeshipIncentiveId, _sutModel.Id)
+                .Create();
+
             _sutModel.ValidationOverrideModels.Add(existingOverride);
+
+            _sut = Sut(_sutModel);
+
+            var validationOverrideStep = new ValidationOverrideStep(existingOverride.Step, _fixture.Create<DateTime>());
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+
+            // Act
+            _sut.AddValidationOverride(validationOverrideStep, serviceRequest);
+
+            // Assert
+            var raisedEvent = _sut.FlushEvents().Single(e => e is ValidationOverrideCreated) as ValidationOverrideCreated;
+            raisedEvent.Should().NotBeNull();
+            raisedEvent.ValidationOverrideId.Should().NotBe(existingOverride.Id);
+            raisedEvent.ApprenticeshipIncentiveId.Should().Be(existingOverride.ApprenticeshipIncentiveId);
+            raisedEvent.ValidationOverrideStep.Should().Be(validationOverrideStep);
+            raisedEvent.ServiceRequest.Should().Be(serviceRequest);
+        }
+
+        [Test]
+        public void Then_an_existing_validation_override_is_replaced_when_the_new_override_is_the_same_type()
+        {
+            // Arrange
+            var existingOverride = _fixture
+                .Build<ValidationOverrideModel>()
+                .With(p => p.ApprenticeshipIncentiveId, _sutModel.Id)
+                .Create();
+
+            _sutModel.ValidationOverrideModels.Add(existingOverride);
+
             _sut = Sut(_sutModel);
             var id = _sut.Id;
             var validationOverrideStep = new ValidationOverrideStep(existingOverride.Step, _fixture.Create<DateTime>());
-            var validationOverrideID = _sutModel.ValidationOverrideModels.Single().Id;
+            var validationOverrideId = _sutModel.ValidationOverrideModels.Single().Id;
             
             var serviceRequest = _fixture.Create<ServiceRequest>();
 
@@ -94,7 +144,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             //Assert
             var ValidationOverideModel = _sut.GetModel().ValidationOverrideModels.Single();
             ValidationOverideModel.Step.Should().Be(validationOverrideStep.ValidationType);
-            ValidationOverideModel.Id.Should().NotBe(validationOverrideID);
+            ValidationOverideModel.Id.Should().NotBe(validationOverrideId);
+            ValidationOverideModel.ApprenticeshipIncentiveId.Should().Be(id);
             ValidationOverideModel.ExpiryDate.Should().Be(validationOverrideStep.ExpiryDate);
 
         }
@@ -102,13 +153,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void When_existing_ValidationOverride_has_different_validation_type_to_new_validationOverride_both_are_stored()
         {
             // Arrange
-            var existingOverride = _fixture.Build<ValidationOverrideModel>()
-                                                .Create();
+            var existingOverride = _fixture
+                 .Build<ValidationOverrideModel>()
+                 .With(p => p.ApprenticeshipIncentiveId, _sutModel.Id)
+                 .Create();
+
             _sutModel.ValidationOverrideModels.Add(existingOverride);
+            
             _sut = Sut(_sutModel);
-            var id = _sut.Id;
             var validationOverrideStep = _fixture.Create<ValidationOverrideStep>();
-            var validationOverrideID = _sutModel.ValidationOverrideModels.Single().Id;
 
             var serviceRequest = _fixture.Create<ServiceRequest>();
 
@@ -116,10 +169,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.AddValidationOverride(validationOverrideStep, serviceRequest);
 
             //Assert
-            var ValidationOverideModel = _sut.GetModel().ValidationOverrideModels.FirstOrDefault();
-            ValidationOverideModel.Step.Should().Be(validationOverrideStep.ValidationType);
-            ValidationOverideModel.Id.Should().NotBe(validationOverrideID);
-            ValidationOverideModel.ExpiryDate.Should().Be(validationOverrideStep.ExpiryDate);
+            _sut.GetModel().ValidationOverrideModels.Count.Should().Be(2);
 
         }
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)

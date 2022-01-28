@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
         }
 
         public Task Handle(ValidationOverrideCreated @event, CancellationToken cancellationToken = default)
-        {
+        {            
             return _auditRepository.Add(new ValidationOverrideStepAudit(
                 @event.ValidationOverrideId,
                 @event.ApprenticeshipIncentiveId,

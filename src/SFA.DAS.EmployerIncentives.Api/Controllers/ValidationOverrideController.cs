@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
                 await SendCommandsAsync(commands);
             }
-            catch(Exception)
+            catch(Exception ex)
             {
                 return BadRequest();
             }            

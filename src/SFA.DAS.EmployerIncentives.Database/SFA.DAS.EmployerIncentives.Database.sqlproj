@@ -112,7 +112,8 @@
     <Build Include="Tables\Archive.EmploymentCheck.sql" />
     <Build Include="Schemas\audit.sql" />
     <Build Include="Tables\Audit.EmploymentCheckAudit.sql" />
-    <Build Include="Tables\Audit.ValidationOverrideAudit.sql" />
+    <Build Include="Tables\ValidationOverride.sql" />
+    <Build Include="Tables\Audit.ValidationOverride.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
