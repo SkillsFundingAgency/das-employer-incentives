@@ -759,8 +759,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             LearnerRefreshCompleted();
             RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
         }
-
-        public void AddValidationOverride(ValidationOverrideStep step, ServiceRequest serviceRequest)
+                
         public void AddValidationOverride(ValidationOverrideStep validationOverrideStep, ServiceRequest serviceRequest)
         {
             var validationOverride = ValidationOverride.New(Guid.NewGuid(), Model.Id, validationOverrideStep.ValidationType, validationOverrideStep.ExpiryDate);
