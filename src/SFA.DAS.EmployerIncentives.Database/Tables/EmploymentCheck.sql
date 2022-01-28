@@ -16,3 +16,8 @@ GO
 CREATE CLUSTERED INDEX IX_EmploymentCheck ON [incentives].[EmploymentCheck] (ApprenticeshipIncentiveId)
 GO
 CREATE INDEX IX_EmploymentCheck_CorrelationId ON [incentives].[EmploymentCheck] (CorrelationId)
+
+GO
+
+
+CREATE INDEX [IX_EmploymentCheck_CheckType] ON [incentives].[EmploymentCheck] ([CheckType])
