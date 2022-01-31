@@ -17,7 +17,6 @@ Examples:
     | validationType                  |
     | IsInLearning                    |
     | HasNoDataLocks                  |
-    | HasIlrSubmission                |
     | HasDaysInLearning               |
     | EmployedBeforeSchemeStarted     |
     | EmployedAtStartOfApprenticeship |

@@ -192,7 +192,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     .With(o => o.ULN, _apprenticeshipIncentive.ULN)
                     .With(o => o.ValidationSteps, new List<ValidationStep>(){
                         Fixture.Build<ValidationStep>()
-                        .With(v => v.ValidationType, ValidationType.HasLearningRecord)
+                        .With(v => v.ValidationType, ValidationType.HasNoDataLocks)
                         .With(v => v.ExpiryDate, _expiryDate)
                         .Create()
                     }.ToArray())
@@ -321,7 +321,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the validation overrides are stored against the apprenticeship incentives")]
         public async Task ThenTheValidationOverridesAreStoredAgainstTheApprenticeshipIncentives()
         {
-            await ThenTheValidationOverrideIsStoredAgainstTheApprenticeshipIncentiveWithType(ValidationType.HasLearningRecord);
+            await ThenTheValidationOverrideIsStoredAgainstTheApprenticeshipIncentiveWithType(ValidationType.HasNoDataLocks);
             await ThenTheValidationOverrideIsStoredAgainstTheApprenticeshipIncentiveWithType(ValidationType.IsInLearning);
         }
     }

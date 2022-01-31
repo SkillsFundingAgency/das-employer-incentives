@@ -91,15 +91,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("A payment validation override is created")]
-        [NUnit.Framework.TestCaseAttribute("HasBankDetails", null)]
         [NUnit.Framework.TestCaseAttribute("IsInLearning", null)]
-        [NUnit.Framework.TestCaseAttribute("HasLearningRecord", null)]
         [NUnit.Framework.TestCaseAttribute("HasNoDataLocks", null)]
-        [NUnit.Framework.TestCaseAttribute("HasIlrSubmission", null)]
         [NUnit.Framework.TestCaseAttribute("HasDaysInLearning", null)]
-        [NUnit.Framework.TestCaseAttribute("PaymentsNotPaused", null)]
-        [NUnit.Framework.TestCaseAttribute("HasSignedMinVersion", null)]
-        [NUnit.Framework.TestCaseAttribute("LearnerMatchSuccessful", null)]
         [NUnit.Framework.TestCaseAttribute("EmployedBeforeSchemeStarted", null)]
         [NUnit.Framework.TestCaseAttribute("EmployedAtStartOfApprenticeship", null)]
         public virtual void APaymentValidationOverrideIsCreated(string validationType, string[] exampleTags)
@@ -150,7 +144,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A payment validation is not created when no matching apprenticeship incentive exi" +
                     "sts", null, tagsOfScenario, argumentsOfScenario);
-#line 30
+#line 24
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -170,14 +164,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 31
+#line 25
     testRunner.Given("an apprenticeship incentive has a validation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 32
+#line 26
     testRunner.When("the validation override request is received for a non matching apprenticeship inc" +
                         "entive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 33
+#line 27
     testRunner.Then("the validation override is not stored against the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -191,6 +185,49 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("An existing validation override is replaced by a new one", null, tagsOfScenario, argumentsOfScenario);
+#line 29
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 30
+    testRunner.Given("an apprenticeship incentive has a validation override", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 31
+    testRunner.When("the validation override request is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 32
+    testRunner.Then("the validation override is stored against the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 33
+    testRunner.And("the existing validation override is archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Multiple validation override requests are handled")]
+        public virtual void MultipleValidationOverrideRequestsAreHandled()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Multiple validation override requests are handled", null, tagsOfScenario, argumentsOfScenario);
 #line 35
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -212,55 +249,12 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 36
-    testRunner.Given("an apprenticeship incentive has a validation override", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 37
-    testRunner.When("the validation override request is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 38
-    testRunner.Then("the validation override is stored against the apprenticeship incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 39
-    testRunner.And("the existing validation override is archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Multiple validation override requests are handled")]
-        public virtual void MultipleValidationOverrideRequestsAreHandled()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Multiple validation override requests are handled", null, tagsOfScenario, argumentsOfScenario);
-#line 41
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 42
     testRunner.Given("an apprenticeship incentive has multiple validations", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 43
+#line 37
     testRunner.When("the multiple validation override request is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 44
+#line 38
     testRunner.Then("the validation overrides are stored against the apprenticeship incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
