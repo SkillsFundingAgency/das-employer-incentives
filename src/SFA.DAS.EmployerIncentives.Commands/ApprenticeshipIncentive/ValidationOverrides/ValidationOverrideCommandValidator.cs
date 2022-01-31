@@ -48,15 +48,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Validation
         {
             switch(step.ValidationType)
             {
-                case ValidationStep.HasBankDetails:
                 case ValidationStep.IsInLearning:
-                case ValidationStep.HasLearningRecord:
                 case ValidationStep.HasNoDataLocks:
-                case ValidationStep.HasIlrSubmission:
                 case ValidationStep.HasDaysInLearning:
-                case ValidationStep.PaymentsNotPaused:
-                case ValidationStep.HasSignedMinVersion:
-                case ValidationStep.LearnerMatchSuccessful:
                 case ValidationStep.EmployedAtStartOfApprenticeship:
                 case ValidationStep.EmployedBeforeSchemeStarted:
                     break;

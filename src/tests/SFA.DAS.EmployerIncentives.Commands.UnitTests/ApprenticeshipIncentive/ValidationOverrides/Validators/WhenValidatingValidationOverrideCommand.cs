@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _serviceRequestCreated = _fixture.Create<DateTime>();
             _validationOverrideSteps = new List<ValidationOverrideStep>() 
                 {  
-                    new ValidationOverrideStep(ValidationStep.HasBankDetails.ToString(), DateTime.UtcNow.AddDays(1)),
+                    new ValidationOverrideStep(ValidationStep.IsInLearning.ToString(), DateTime.UtcNow.AddDays(1)),
                     new ValidationOverrideStep(ValidationStep.EmployedAtStartOfApprenticeship.ToString(), DateTime.UtcNow.AddDays(1)),
                 };
 
@@ -102,15 +102,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             result.ValidationDictionary.Count.Should().Be(1);
         }
                 
-        [TestCase("HasBankDetails", true)]
         [TestCase("IsInLearning", true)]
-        [TestCase("HasLearningRecord", true)]
         [TestCase("HasNoDataLocks", true)]
-        [TestCase("HasIlrSubmission", true)]
         [TestCase("HasDaysInLearning", true)]
-        [TestCase("PaymentsNotPaused", true)]
-        [TestCase("HasSignedMinVersion", true)]
-        [TestCase("LearnerMatchSuccessful", true)]
         [TestCase("EmployedBeforeSchemeStarted", true)]
         [TestCase("EmployedAtStartOfApprenticeship", true)]        
         [TestCase("Random", false)]
@@ -137,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             //Arrange
             _validationOverrideSteps = new List<ValidationOverrideStep>()
             {
-                new ValidationOverrideStep(ValidationStep.HasBankDetails.ToString(), DateTime.UtcNow.AddDays(-1))
+                new ValidationOverrideStep(ValidationStep.IsInLearning.ToString(), DateTime.UtcNow.AddDays(-1))
             };
 
             var command = ValidationOverrideCommand();

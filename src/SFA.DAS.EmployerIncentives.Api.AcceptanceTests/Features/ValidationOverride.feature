@@ -15,15 +15,10 @@ Scenario Outline: A payment validation override is created
 
 Examples:
     | validationType                  |
-    | HasBankDetails                  |
     | IsInLearning                    |
-    | HasLearningRecord               |
     | HasNoDataLocks                  |
     | HasIlrSubmission                |
     | HasDaysInLearning               |
-    | PaymentsNotPaused               |
-    | HasSignedMinVersion             |
-    | LearnerMatchSuccessful          |
     | EmployedBeforeSchemeStarted     |
     | EmployedAtStartOfApprenticeship |
 
