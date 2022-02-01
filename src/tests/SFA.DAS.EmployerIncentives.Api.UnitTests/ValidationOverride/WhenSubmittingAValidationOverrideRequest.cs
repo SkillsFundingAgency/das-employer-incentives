@@ -74,7 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ValidationOverride
 
         private ValidationOverrideStep Map(ValidationStep validationStep)
         {
-            return new ValidationOverrideStep(validationStep.ValidationType.ToString(), validationStep.ExpiryDate);
+            return new ValidationOverrideStep(validationStep.ValidationType.ToString(), validationStep.ExpiryDate, validationStep.Remove ?? false);
         }
 
         [Test]

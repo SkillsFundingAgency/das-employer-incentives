@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public async Task Then_the_ValidationOverride_flag_for_this_incentive_is_set_on()
         {
             // Arrange
-            var command = CreateValidationOverrideCommandWithActionPause();
+            var command = CreateValidationOverrideCommand();
             var apprenticeshipIncentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
 
             _mockDomainRepository
@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             _mockDomainRepository.Verify(x => x.Save(apprenticeshipIncentive), Times.Once);
         }
-        private ValidationOverrideCommand CreateValidationOverrideCommandWithActionPause()
+        private ValidationOverrideCommand CreateValidationOverrideCommand()
         {
             return new ValidationOverrideCommand(
                 _fixture.Create<long>(),
