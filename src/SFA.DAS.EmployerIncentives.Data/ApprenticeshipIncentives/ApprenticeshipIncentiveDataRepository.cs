@@ -57,6 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                .Include(x => x.ClawbackPayments)
                .Include(x => x.BreakInLearnings)
                .Include(x => x.EmploymentChecks)
+               .Include(x => x.ValidationOverrides)
                .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
             if (apprenticeshipIncentive != null)
             {
@@ -73,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.ClawbackPayments)
                 .Include(x => x.BreakInLearnings)
                 .Include(x => x.EmploymentChecks)
+                .Include(x => x.ValidationOverrides)
                 .Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
             var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
 
@@ -113,6 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.ClawbackPayments)
                 .Include(x => x.BreakInLearnings)
                 .Include(x => x.EmploymentChecks)
+                .Include(x => x.ValidationOverrides)
                 .FirstOrDefaultAsync(a => a.Id == id);
             return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
         }
@@ -154,6 +157,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             RemoveDeletedPendingPayments(updatedIncentive, existingIncentive);
             RemoveDeletedBreaksInLearning(updatedIncentive, existingIncentive);
             RemoveDeletedEmploymentChecks(updatedIncentive, existingIncentive);
+            RemoveDeletedValidationOverrides(updatedIncentive, existingIncentive);
 
             foreach (var pendingPayment in updatedIncentive.PendingPayments)
             {
@@ -235,6 +239,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 {
                     employmentCheck.CreatedDateTime = DateTime.Now;
                     _dbContext.EmploymentChecks.Add(employmentCheck);
+                }
+            }
+
+            foreach (var validationOverride in updatedIncentive.ValidationOverrides)
+            {
+                var existingValidationOverride = existingIncentive.ValidationOverrides.SingleOrDefault(p => p.Id == validationOverride.Id);
+
+                if (existingValidationOverride != null)
+                {
+                    _dbContext.Entry(existingValidationOverride).CurrentValues.SetValues(validationOverride);
+                }
+                else
+                {
+                    validationOverride.CreatedDateTime = DateTime.Now;
+                    _dbContext.ValidationOverrides.Add(validationOverride);
                 }
             }
         }
@@ -324,6 +343,17 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     _dbContext.EmploymentChecks.Remove(existingEmploymentCheck);
                 }
             }
-        }       
+        }
+
+        private void RemoveDeletedValidationOverrides(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
+        {
+            foreach (var existingValidationOverride in existingIncentive.ValidationOverrides)
+            {
+                if (!updatedIncentive.ValidationOverrides.Any(c => c.Id == existingValidationOverride.Id))
+                {
+                    _dbContext.ValidationOverrides.Remove(existingValidationOverride);
+                }
+            }
+        }
     }
 }

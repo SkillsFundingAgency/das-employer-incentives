@@ -759,6 +759,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             LearnerRefreshCompleted();
             RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
         }
+                
+        public void AddValidationOverride(ValidationOverrideStep validationOverrideStep, ServiceRequest serviceRequest)
+        {            
+            var existing = Model.ValidationOverrideModels.SingleOrDefault(x => x.Step == validationOverrideStep.ValidationType);
+
+            if (existing != null)
+            {
+                Model.ValidationOverrideModels.Remove(existing);
+                AddEvent(new ValidationOverrideDeleted(existing.Id, Model.Id, validationOverrideStep, serviceRequest));
+            }
+
+            var validationOverride = ValidationOverride.New(Guid.NewGuid(), Model.Id, validationOverrideStep.ValidationType, validationOverrideStep.ExpiryDate);
+            
+            Model.ValidationOverrideModels.Add(validationOverride.GetModel());
+            AddEvent(new ValidationOverrideCreated(validationOverride.Id, Model.Id, validationOverrideStep, serviceRequest));
+        }
 
         private DateTime GetPhaseStartDate()
         {
@@ -776,7 +792,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             throw new ArgumentException("Invalid phase!");
-        }
-        
+        }        
     }
 }

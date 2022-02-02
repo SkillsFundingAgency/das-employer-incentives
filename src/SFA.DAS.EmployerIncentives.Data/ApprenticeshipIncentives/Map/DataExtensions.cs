@@ -43,7 +43,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 MinimumAgreementVersion = model.MinimumAgreementVersion.MinimumRequiredVersion,
                 Phase = model.Phase.Identifier,
                 WithdrawnBy = model.WithdrawnBy,
-                EmploymentChecks = model.EmploymentCheckModels.Map()
+                EmploymentChecks = model.EmploymentCheckModels.Map(),
+                ValidationOverrides = model.ValidationOverrideModels.Map()
             };
         }
 
@@ -87,7 +88,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase),
                 WithdrawnBy = entity.WithdrawnBy,
-                EmploymentCheckModels = entity.EmploymentChecks.Map()
+                EmploymentCheckModels = entity.EmploymentChecks.Map(),
+                ValidationOverrideModels = entity.ValidationOverrides.Map()
             };
         }
 
@@ -461,6 +463,58 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             }).ToList();
         }
 
+        private static ICollection<ValidationOverrideModel> Map(this ICollection<ValidationOverride> models)
+        {
+            return models.Select(x => new ValidationOverrideModel
+            {
+                Id = x.Id,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                Step = x.Step,
+                ExpiryDate = x.ExpiryDate,
+                CreatedDate = x.CreatedDateTime
+            }).ToList();
+        }
+
+        private static ICollection<ValidationOverride> Map(this ICollection<ValidationOverrideModel> models)
+        {
+            return models.Select(x => new ValidationOverride
+            {
+                Id = x.Id,
+                ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId,
+                Step = x.Step,
+                ExpiryDate = x.ExpiryDate,
+                CreatedDateTime = x.CreatedDate
+            }).ToList();
+        }     
+
+        internal static EmploymentCheckAudit Map(this EmploymentCheckRequestAudit entity)
+        {
+            return new EmploymentCheckAudit
+            {
+                Id = entity.Id,
+                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now
+            };
+        }
+
+        internal static ValidationOverrideAudit Map(this ValidationOverrideStepAudit entity)
+        {
+            return new ValidationOverrideAudit
+            {
+                Id = entity.Id,
+                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                Step = entity.ValidationOverrideStep.ValidationType,
+                ExpiryDate = entity.ValidationOverrideStep.ExpiryDate,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                CreatedDateTime = DateTime.Now                
+            };
+        }
+
         internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)
         {
             if (model != null)
@@ -484,19 +538,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             }
 
             return null;
-        }
-
-        internal static EmploymentCheckAudit Map(this EmploymentCheckRequestAudit entity)
-        {
-            return new EmploymentCheckAudit
-            {
-                Id = entity.Id,
-                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
-                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
-                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
-                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                CreatedDateTime = DateTime.Now
-            };
         }
     }
 }
