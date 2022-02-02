@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using Learner = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Learner;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -36,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             var nextActivePeriod = calendar.GetNextPeriod(calendar.GetActivePeriod());
 
             var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
+            var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives.Include(x => x.ValidationOverrides)
                                       from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
                                       from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && !x.ClawedBack).DefaultIfEmpty()
                                       from firstPaymentClawedback in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && x.ClawedBack).DefaultIfEmpty()
@@ -80,6 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentAmount = PaymentAmount(data.firstPayment, data.firstPaymentSent),
                         HasDataLock = HasDataLock(data.learner),
                         InLearning = InLearning(data.learner),
+                        InLearning = IsInLearningOverride(data.incentive, data.learner, InLearning),
                         PausePayments = data.incentive.PausePayments,
                         PaymentSent = data.firstPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
@@ -207,6 +210,29 @@ namespace SFA.DAS.EmployerIncentives.Data
 
             return learner.InLearning.HasValue && learner.InLearning.Value;
         }
+
+        private static bool IsInLearningOverride(ApprenticeshipIncentives.Models.ApprenticeshipIncentive incentive,
+            Learner learner,
+            Func<Learner, bool> func)
+        {
+            var isInLearning = func.Invoke(learner);
+            var existing = incentive.ValidationOverrides.SingleOrDefault(x => x.Step == ValidationStep.IsInLearning);
+            if (existing != null)
+            {
+                isInLearning = true;
+            }
+            if (isInLearning == false)
+            {
+                //check for override
+                //if there is override, return true
+            }
+
+            if (existing.ExpiryDate > DateTime.UtcNow){
+                isInLearning = false;
+            }
+            return isInLearning;
+        }
+
         private static DateTime? PaymentDate(
             PendingPayment pendingPayment, 
             Payment payment,
