@@ -77,6 +77,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             }
         }
 
+        public void ReinstateApplication()
+        {
+            Model.WithdrawnByEmployer = false;
+            Model.WithdrawnByCompliance = false;
+        }
+
         public void SetPlannedStartDate(DateTime plannedStartDate)
         {
             Model.PlannedStartDate = plannedStartDate;

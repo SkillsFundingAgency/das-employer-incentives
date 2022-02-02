@@ -10,33 +10,32 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
     [ApiController]
     public class WithdrawalCommandController : ApiCommandControllerBase
-    {   
-
+    {
         public WithdrawalCommandController(
             ICommandDispatcher commandDispatcher) : base(commandDispatcher)
         {
         }
 
         [HttpPost("/withdrawals")]
-        [ProducesResponseType((int)HttpStatusCode.Accepted)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.Accepted)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> WithdrawalIncentiveApplication([FromBody] WithdrawApplicationRequest request)
-        {            
+        {
             if (request.WithdrawalType == WithdrawalType.Employer)
             {
                 await SendCommandAsync(
                     new EmployerWithdrawalCommand(
-                        request.AccountLegalEntityId, 
+                        request.AccountLegalEntityId,
                         request.ULN,
                         request.ServiceRequest.TaskId,
                         request.ServiceRequest.DecisionReference,
-                        request.ServiceRequest.TaskCreatedDate??DateTime.UtcNow,
+                        request.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow,
                         request.AccountId,
                         request.EmailAddress
-                        ));
+                    ));
                 return Accepted();
             }
-            else if(request.WithdrawalType == WithdrawalType.Compliance)
+            else if (request.WithdrawalType == WithdrawalType.Compliance)
             {
                 await SendCommandAsync(
                     new ComplianceWithdrawalCommand(
@@ -49,8 +48,21 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
             else
             {
-                return BadRequest(new { Error = "Invalid WithdrawalType of {request.WithdrawalType} passed in" });
+                return BadRequest(new {Error = "Invalid WithdrawalType of {request.WithdrawalType} passed in"});
             }
-        }       
+        }
+
+        [HttpPost("/withdrawals/reinstate")]
+        [ProducesResponseType((int) HttpStatusCode.Accepted)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ReinstateIncentiveApplication([FromBody] ReinstateApplicationRequest request)
+        {
+            await SendCommandAsync(
+                new ReinstateWithdrawalCommand(
+                    request.AccountLegalEntityId,
+                    request.ULN
+                ));
+            return Accepted();
+        }
     }
 }
