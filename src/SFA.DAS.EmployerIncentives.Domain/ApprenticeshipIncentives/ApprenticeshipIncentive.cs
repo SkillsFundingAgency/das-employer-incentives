@@ -215,6 +215,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
+        public void Reinstate(CollectionCalendar collectionCalendar)
+        {
+            Model.Status = IncentiveStatus.Active;
+            Model.WithdrawnBy = null;
+            CalculateEarnings(collectionCalendar);
+        }
+
         public void CreatePayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
@@ -777,6 +784,5 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             throw new ArgumentException("Invalid phase!");
         }
-        
     }
 }

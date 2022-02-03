@@ -11,16 +11,25 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Withdraw
     public class ReinstateApprenticeshipIncentiveCommandHandler : ICommandHandler<ReinstateApprenticeshipIncentiveCommand>
     {
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
-        
-        public ReinstateApprenticeshipIncentiveCommandHandler(
-            IApprenticeshipIncentiveDomainRepository domainRepository)
+        private readonly ICollectionCalendarService _collectionCalendarService;
+
+        public ReinstateApprenticeshipIncentiveCommandHandler(IApprenticeshipIncentiveDomainRepository domainRepository, ICollectionCalendarService collectionCalendarService)
         {
             _domainRepository = domainRepository;
+            _collectionCalendarService = collectionCalendarService;
         }
 
         public async Task Handle(ReinstateApprenticeshipIncentiveCommand command, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var incentive = await _domainRepository.FindByApprenticeshipId(command.IncentiveApplicationApprenticeshipId);
+            if (incentive == null)
+            {
+                return;
+            }
+
+            incentive.Reinstate(await _collectionCalendarService.Get());
+
+            await _domainRepository.Save(incentive);
         }
     }
 }
