@@ -23,11 +23,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             public List<EmploymentCheck> EmploymentChecks { get; set; }
             public PendingPayment PendingPaymentModel1 { get; }
-            public PendingPayment PendingPaymentModel2 { get; }
-            public PendingPayment PendingPaymentModel3 { get; }
+            public PendingPayment PendingPaymentModel2 { get; set; }
+            public PendingPayment PendingPaymentModel3 { get; set; }
             public Learner LearnerModel { get; }
             public ApprenticeshipDaysInLearning DaysInLearning { get; }
             public Payment Payment { get; private set; }
+            public ValidationOverride ValidationOverride { get; private set; }
+            public ValidationOverrideAudit ValidationOverrideAudit { get; private set; }            
             private ClawbackPayment ClawbackPayment { get; set; }
             private readonly TestContext _testContext;
             private readonly Fixture _fixture;
@@ -145,14 +147,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await connection.InsertAsync(IncentiveApplicationApprenticeshipModels);
                 await connection.InsertAsync(ApprenticeshipIncentiveModel);
                 await connection.InsertAsync(EmploymentChecks);
-                await connection.InsertAsync(PendingPaymentModel1);
-                await connection.InsertAsync(PendingPaymentModel2);
-                await connection.InsertAsync(PendingPaymentModel3);
+                if (PendingPaymentModel1 != default) await connection.InsertAsync(PendingPaymentModel1);
+                if (PendingPaymentModel2 != default) await connection.InsertAsync(PendingPaymentModel2);
+                if (PendingPaymentModel3 != default) await connection.InsertAsync(PendingPaymentModel3);
                 await connection.InsertAsync(LearnerModel);
                 await connection.InsertAsync(DaysInLearning);
 
                 if (Payment != default) await connection.InsertAsync(Payment);
                 if (ClawbackPayment != default) await connection.InsertAsync(ClawbackPayment);
+                if (ValidationOverride != default) await connection.InsertAsync(ValidationOverride);
+                if (ValidationOverrideAudit != default) await connection.InsertAsync(ValidationOverrideAudit);
             }
 
             internal void AddClawbackPayment(bool sent)
@@ -176,6 +180,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     .With(d => d.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
                     .With(d => d.CollectionPeriod, PendingPaymentModel2.PeriodNumber)
                     .With(d => d.CollectionPeriodYear, PendingPaymentModel2.PaymentYear)
+                    .Create();
+            }
+
+            internal void AddValidationOverride(Domain.ApprenticeshipIncentives.ValueTypes.ValidationOverrideStep validationOverrideStep)
+            {
+                ValidationOverride = _fixture.Build<ValidationOverride>()
+                    .With(d => d.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
+                    .With(d => d.Step, validationOverrideStep.ValidationType)
+                    .With(d => d.ExpiryDate, validationOverrideStep.ExpiryDate)
+                    .With(d => d.CreatedDateTime, DateTime.UtcNow)
+                    .Create();
+
+                ValidationOverrideAudit = _fixture.Build<ValidationOverrideAudit>()
+                    .With(d => d.Id, ValidationOverride.Id)
+                    .With(d => d.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
+                    .With(d => d.Step, ValidationOverride.Step)
+                    .With(d => d.ExpiryDate, ValidationOverride.ExpiryDate)
+                    .With(d => d.CreatedDateTime, ValidationOverride.CreatedDateTime)
+                    .Without(d => d.DeletedDateTime)
                     .Create();
             }
         }

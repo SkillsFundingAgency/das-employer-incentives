@@ -59,3 +59,9 @@ Examples:
 	| LearnerMatchSuccessful            |
 	| EmployedAtStartOfApprenticeship   |
 	| EmployedBeforeSchemeStarted       |
+
+Scenario: Expired validation overrides are removed
+	Given there are pending payments	
+	And an expired validation override exists
+	When the payment process is run
+	Then the expired validation override is removed
