@@ -761,14 +761,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         }
                 
         public void AddValidationOverride(ValidationOverrideStep validationOverrideStep, ServiceRequest serviceRequest)
-        {            
-            var existing = Model.ValidationOverrideModels.SingleOrDefault(x => x.Step == validationOverrideStep.ValidationType);
-
-            if (existing != null)
-            {
-                Model.ValidationOverrideModels.Remove(existing);
-                AddEvent(new ValidationOverrideDeleted(existing.Id, Model.Id, validationOverrideStep, serviceRequest));
-            }
+        {
+            RemoveValidationOverride(validationOverrideStep, serviceRequest);
 
             var validationOverride = ValidationOverride.New(Guid.NewGuid(), Model.Id, validationOverrideStep.ValidationType, validationOverrideStep.ExpiryDate);
             
@@ -776,6 +770,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEvent(new ValidationOverrideCreated(validationOverride.Id, Model.Id, validationOverrideStep, serviceRequest));
         }
 
+        public void RemoveValidationOverride(ValidationOverrideStep validationOverrideStep, ServiceRequest serviceRequest)
+        {
+            var existing = Model.ValidationOverrideModels.SingleOrDefault(x => x.Step == validationOverrideStep.ValidationType);
+
+            if (existing != null)
+            {
+                Model.ValidationOverrideModels.Remove(existing);
+                AddEvent(new ValidationOverrideDeleted(existing.Id, Model.Id, validationOverrideStep, serviceRequest));
+            }
+        }
+        
         private DateTime GetPhaseStartDate()
         {
             if (Phase.Identifier == Enums.Phase.Phase1)

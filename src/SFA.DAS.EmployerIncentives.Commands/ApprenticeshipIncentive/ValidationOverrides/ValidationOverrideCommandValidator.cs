@@ -22,16 +22,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Validation
                 result.AddIsNotSetError(nameof(item.ULN));
             }
 
-            if (item.ServiceRequestTaskId == default)
-            {
-                result.AddError("ServiceRequestTaskId", "Is not set");
-            }
-
-            if (string.IsNullOrWhiteSpace(item.DecisionReference))
-            {
-                result.AddError("DecisionReference", "Is not set");
-            }
-
             if (item.ValidationSteps == null)
             {
                 result.AddError("ValidationSteps", "Is not set");
@@ -59,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Validation
                     break;
             }
 
-            if (step.ExpiryDate.Date < System.DateTime.Today)
+            if ((!step.Remove) && (step.ExpiryDate.Date < System.DateTime.Today))
             {
                 result.AddError("ValidationOverrideStep.ExpiryDate", "Is before today's date");
             }

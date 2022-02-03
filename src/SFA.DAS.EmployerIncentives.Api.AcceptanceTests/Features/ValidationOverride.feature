@@ -12,6 +12,7 @@ Scenario Outline: A payment validation override is created
 	Given an apprenticeship incentive has a <validationType> validation
 	When the validation override request is received
 	Then the validation override <validationType> is stored against the apprenticeship incentive
+    Then the validation override <validationType> is audited
 
 Examples:
     | validationType                  |
@@ -30,9 +31,16 @@ Scenario: An existing validation override is replaced by a new one
     Given an apprenticeship incentive has a validation override
     When the validation override request is received
     Then the validation override is stored against the apprenticeship incentive
+    And the new validation override is audited
     And the existing validation override is archived
 
 Scenario: Multiple validation override requests are handled
     Given an apprenticeship incentive has multiple validations
     When the multiple validation override request is received
     Then the validation overrides are stored against the apprenticeship incentives
+
+Scenario: An existing validation override is removed
+    Given an apprenticeship incentive has a validation override
+    When the validation override request to remove is received
+    Then the validation override is removed from the apprenticeship incentive
+    And the existing validation override is archived

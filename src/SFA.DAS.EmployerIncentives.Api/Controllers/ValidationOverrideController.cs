@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                             v.ULN,
                             v.ServiceRequest.TaskId,
                             v.ServiceRequest.DecisionReference,
-                            v.ServiceRequest.TaskCreatedDate,
+                            v.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow.Date,
                             Map(v.ValidationSteps))
                         ));
 
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         private ValidationOverrideStep Map(ValidationStep validationStep)
         {
-            return new ValidationOverrideStep(validationStep.ValidationType.ToString(), validationStep.ExpiryDate);            
+            return new ValidationOverrideStep(validationStep.ValidationType.ToString(), validationStep.ExpiryDate, validationStep.Remove ?? false);            
         }
     }
 }

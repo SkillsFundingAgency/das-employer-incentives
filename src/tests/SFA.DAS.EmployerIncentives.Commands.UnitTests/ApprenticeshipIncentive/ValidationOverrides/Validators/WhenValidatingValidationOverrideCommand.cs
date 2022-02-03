@@ -72,36 +72,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             result.ValidationDictionary.Count.Should().Be(1);
         }
 
-        [Test]
-        public async Task Then_the_command_is_invalid_when_the_ServiceRequestId_has_a_default_value()
-        {
-            //Arrange
-            _serviceRequestTaskId = default;
-            var command = ValidationOverrideCommand();
-
-            //Act
-            var result = await _sut.Validate(command);
-
-            //Assert
-            result.ValidationDictionary.Count.Should().Be(1);
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public async Task Then_the_command_is_invalid_when_the_DecisionReference_has_an_empty_value(string decisionReference)
-        {
-            //Arrange
-            _decisionReference = decisionReference;
-            var command = ValidationOverrideCommand();
-
-            //Act
-            var result = await _sut.Validate(command);
-
-            //Assert
-            result.ValidationDictionary.Count.Should().Be(1);
-        }
-                
         [TestCase("IsInLearning", true)]
         [TestCase("HasNoDataLocks", true)]
         [TestCase("HasDaysInLearning", true)]
@@ -141,6 +111,24 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             //Assert
             result.ValidationDictionary.Count.Should().Be(1);
+        }
+
+        [Test]
+        public async Task Then_the_command_is_valid_when_the_ValidationOverrideStep_ExpiryDate_is_before_today_and_remove_is_true()
+        {
+            //Arrange
+            _validationOverrideSteps = new List<ValidationOverrideStep>()
+            {
+                new ValidationOverrideStep(ValidationStep.IsInLearning.ToString(), DateTime.UtcNow.AddDays(-1), true)
+            };
+
+            var command = ValidationOverrideCommand();
+
+            //Act
+            var result = await _sut.Validate(command);
+
+            //Assert
+            result.ValidationDictionary.Count.Should().Be(0);
         }
 
         [Test]

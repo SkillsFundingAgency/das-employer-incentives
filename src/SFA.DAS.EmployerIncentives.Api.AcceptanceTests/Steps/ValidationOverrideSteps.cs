@@ -151,6 +151,39 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         Fixture.Build<ValidationStep>()
                         .With(v => v.ValidationType, Enum.Parse<ValidationType>(_pendingPaymentValidationResult.Step))
                         .With(v => v.ExpiryDate, _expiryDate)
+                        .With(v => v.Remove, false)
+                        .Create()
+                    }.ToArray())
+                    .Create()
+                }.ToArray())
+                .Create();
+
+            var url = $"validation-overrides";
+
+            await TestContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Post(url, _validationOverrideRequest, cancellationToken);
+                },
+                (context) => HasExpectedEvents(context)
+                );
+        }
+
+        [When(@"the validation override request to remove is received")]
+        public async Task WhenTheValidationOverrideRequestToRemoveIsReceived()
+        {
+            _validationOverrideRequest = Fixture
+                .Build<ValidationOverrideRequest>()
+                .With(p => p.ValidationOverrides,
+                new List<Types.ValidationOverride>() {
+                    Fixture.Build<Types.ValidationOverride>()
+                    .With(o => o.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(o => o.ULN, _apprenticeshipIncentive.ULN)
+                    .With(o => o.ValidationSteps, new List<ValidationStep>(){
+                        Fixture.Build<ValidationStep>()
+                        .With(v => v.ValidationType, Enum.Parse<ValidationType>(_pendingPaymentValidationResult.Step))
+                        .With(v => v.ExpiryDate, _expiryDate)
+                        .With(v => v.Remove, true)
                         .Create()
                     }.ToArray())
                     .Create()
@@ -183,6 +216,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         Fixture.Build<ValidationStep>()
                         .With(v => v.ValidationType, ValidationType.IsInLearning)
                         .With(v => v.ExpiryDate, _expiryDate)
+                        .With(v => v.Remove, false)
                         .Create()
                     }.ToArray())
                     .Create(),
@@ -194,6 +228,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         Fixture.Build<ValidationStep>()
                         .With(v => v.ValidationType, ValidationType.HasNoDataLocks)
                         .With(v => v.ExpiryDate, _expiryDate)
+                        .With(v => v.Remove, false)
                         .Create()
                     }.ToArray())
                     .Create()
@@ -225,6 +260,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         Fixture.Build<ValidationStep>()
                         .With(v => v.ValidationType, Enum.Parse<ValidationType>(_pendingPaymentValidationResult.Step))
                         .With(v => v.ExpiryDate, _expiryDate)
+                        .With(v => v.Remove, false)
                         .Create()
                     }.ToArray())
                     .Create()
@@ -286,6 +322,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await ThenTheValidationOverrideIsStoredAgainstTheApprenticeshipIncentiveWithType(ValidationType.IsInLearning);
         }
 
+        [Then(@"the validation override is removed from the apprenticeship incentive")]
+        public async Task ThenTheValidationOverrideIsRemovedFromTheApprenticeshipIncentive()
+        {
+            _response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var validationOverrides = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.ValidationOverride>();
+            validationOverrides.Count(o => o.Step == ValidationType.IsInLearning.ToString()).Should().Be(0);
+        }
+
         [Then(@"the validation override (.*) is not stored against the apprenticeship incentive")]
         public async Task ThenTheValidationOverrideIsNotStoredAgainstTheApprenticeshipIncentiveWithType(ValidationType validationType)
         {
@@ -293,29 +340,50 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);            
             var validationOverrides = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.ValidationOverride>();
-            validationOverrides.Should().HaveCount(0);
+            validationOverrides.Where(o => o.Step == validationType.ToString()).Should().HaveCount(0);
+        }
+
+        [Then(@"the new validation override is audited")]
+        public async Task ThenTheNewValidationOverrideIsAudited()
+        {
+            await ThenTheNewValidationOverrideIsAudited(ValidationType.IsInLearning);
+        }
+
+        [Then(@"the validation override (.*) is audited")]
+        public async Task ThenTheNewValidationOverrideIsAudited(ValidationType validationType)
+        {
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var audits = await dbConnection.GetAllAsync<ValidationOverrideAudit>();
+            audits.Where(a => a.DeletedDateTime == null && a.Step == validationType.ToString()).Should().HaveCount(1);
+
+            var addedAudit = audits.Single(a => a.DeletedDateTime == null && a.Step == validationType.ToString());
+            addedAudit.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            addedAudit.Step.Should().Be(_pendingPaymentValidationResult.Step);
+            addedAudit.ExpiryDate.Should().Be(_expiryDate);
+            addedAudit.CreatedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 2, 0));
         }
 
         [Then(@"the existing validation override is archived")]
         public async Task ThenTheExistingValidationOverrideIsArchived()
         {
+            await ThenTheExistingValidationOverrideIsArchived(ValidationType.IsInLearning);
+        }
+
+        [Then(@"the existing validation override (.*) is archived")]
+        public async Task ThenTheExistingValidationOverrideIsArchived(ValidationType validationType)
+        {
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
 
             var audits = await dbConnection.GetAllAsync<ValidationOverrideAudit>();
-            audits.Should().HaveCount(2);
+            audits.Where(a => a.Id == _validationOverrideAudit.Id && a.Step == validationType.ToString()).Should().HaveCount(1);
 
-            var deletedAudit = audits.Single(a => a.Id == _validationOverrideAudit.Id);
+            var deletedAudit = audits.Single(a => a.Id == _validationOverrideAudit.Id && a.Step == validationType.ToString());
             deletedAudit.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             deletedAudit.Step.Should().Be(_validationOverrideAudit.Step);
             deletedAudit.ExpiryDate.Should().Be(_validationOverrideAudit.ExpiryDate);
             deletedAudit.CreatedDateTime.Should().Be(_validationOverrideAudit.CreatedDateTime);
             deletedAudit.DeletedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 2, 0));
-
-            var addedAudit = audits.Single(a => a.DeletedDateTime == null);
-            addedAudit.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            addedAudit.Step.Should().Be(_pendingPaymentValidationResult.Step);
-            addedAudit.ExpiryDate.Should().Be(_expiryDate);
-            addedAudit.CreatedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 2, 0));
         }
 
         [Then(@"the validation overrides are stored against the apprenticeship incentives")]
