@@ -23,8 +23,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             public List<EmploymentCheck> EmploymentChecks { get; set; }
             public PendingPayment PendingPaymentModel1 { get; }
-            public PendingPayment PendingPaymentModel2 { get; set; }
-            public PendingPayment PendingPaymentModel3 { get; set; }
+            public PendingPayment PendingPaymentModel2 { get; }
+            public PendingPayment PendingPaymentModel3 { get; }
             public Learner LearnerModel { get; }
             public ApprenticeshipDaysInLearning DaysInLearning { get; }
             public Payment Payment { get; private set; }
@@ -147,9 +147,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await connection.InsertAsync(IncentiveApplicationApprenticeshipModels);
                 await connection.InsertAsync(ApprenticeshipIncentiveModel);
                 await connection.InsertAsync(EmploymentChecks);
-                if (PendingPaymentModel1 != default) await connection.InsertAsync(PendingPaymentModel1);
-                if (PendingPaymentModel2 != default) await connection.InsertAsync(PendingPaymentModel2);
-                if (PendingPaymentModel3 != default) await connection.InsertAsync(PendingPaymentModel3);
+                await connection.InsertAsync(PendingPaymentModel1);
+                await connection.InsertAsync(PendingPaymentModel2);
+                await connection.InsertAsync(PendingPaymentModel3);
                 await connection.InsertAsync(LearnerModel);
                 await connection.InsertAsync(DaysInLearning);
 
