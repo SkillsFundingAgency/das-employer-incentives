@@ -94,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
                 Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
 
-                s.AddTransient<IDistributedLockProvider, TestDistributedLockProvider>();
+                s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));                
                 s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _commandMessageHook));
