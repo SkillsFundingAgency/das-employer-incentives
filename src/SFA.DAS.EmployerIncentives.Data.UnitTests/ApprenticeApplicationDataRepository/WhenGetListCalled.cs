@@ -5,6 +5,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -19,6 +21,7 @@ using ClawbackPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
+using ValidationOverride = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ValidationOverride;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRepository
 {
@@ -2221,6 +2224,53 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
             application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        }
+        [Test]
+        public async Task When_IsInLearning_called_return_true_if_there_is_override_when_not_expired()
+        {   
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+            var validDate = _fixture.Create<DateTime>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var existingOverride = _fixture
+                .Build<ValidationOverride>()
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.Step, ValidationStep.IsInLearning)
+                .Without(p => p.ExpiryDate)
+                .Create();
+
+            existingOverride.ExpiryDate = validDate;
+
+            var validationOverrides = _fixture
+                .Build<ValidationOverride>()
+                .CreateMany(5).ToList();
+
+            validationOverrides.Add(existingOverride);
+
+            incentives[0].ValidationOverrides = validationOverrides;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ValidationOverrides.AddRange(validationOverrides);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.InLearning.Should().BeTrue();
         }
     }
 }
