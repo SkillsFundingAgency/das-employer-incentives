@@ -86,6 +86,56 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
         }
 
         [Test]
+        public async Task Then_applications_not_withdrawn_by_compliance_are_not_reinstated()
+        {
+            //Arrange            
+            var command = _fixture.Create<ReinstateWithdrawalCommand>();
+
+            var apprenticeshipModel = _fixture
+                .Build<ApprenticeshipModel>()
+                .With(a => a.ULN, command.ULN)
+                .With(a => a.WithdrawnByCompliance, false)
+                .With(a => a.WithdrawnByEmployer, true)
+                .Create();
+
+            var incentiveApplicationModel = _fixture
+                .Build<IncentiveApplicationModel>()
+                .With(i => i.ApprenticeshipModels,
+                    new List<ApprenticeshipModel> {
+                        _fixture.Create<ApprenticeshipModel>(),
+                        apprenticeshipModel,
+                        _fixture.Create<ApprenticeshipModel>(),
+                    })
+                .Create();
+
+            var testApplication = new IncentiveApplicationFactory().GetExisting(incentiveApplicationModel.Id, incentiveApplicationModel);
+
+            var applications = new List<IncentiveApplication>()
+            {
+                _fixture.Create<IncentiveApplication>(),
+                testApplication,
+                _fixture.Create<IncentiveApplication>()
+            };
+
+            _mockDomainRepository
+                .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
+                .ReturnsAsync(applications);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockDomainRepository
+                .Verify(m => m.Save(It.Is<IncentiveApplication>(a =>
+                 a.Id == testApplication.Id &&
+                 a.Apprenticeships.Count(a =>
+                    a.ULN == command.ULN &&
+                    !a.WithdrawnByCompliance &&
+                    a.WithdrawnByEmployer) == 1)),
+                 Times.Once);
+        }
+
+        [Test]
         public void Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
         {
             //Arrange            

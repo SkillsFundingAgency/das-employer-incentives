@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            incentive.PendingPayments.Count.Should().Be(2)
+            incentive.PendingPayments.Count.Should().Be(2);
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         _fixture.Create<DateTime>(),
                         _fixture.Create<Provider>()
                     ),
-                    DateTime.Today,
+                    new DateTime(2021, 01, 01),
                     _fixture.Create<DateTime>(),
                     _fixture.Create<string>(),
                     new AgreementVersion(_fixture.Create<int>()),

@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
             {
                 foreach(var apprenticeship in application.Apprenticeships)
                 {
-                    if(apprenticeship.ULN == command.ULN)
+                    if(apprenticeship.ULN == command.ULN && apprenticeship.WithdrawnByCompliance)
                     {
                         application.ReinstateWithdrawal(apprenticeship);
                     }
