@@ -133,7 +133,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 return null;
             }
 
-            return firstEmploymentCheck.ValidationResult && secondEmploymentCheck.ValidationResult;
+            return firstEmploymentCheck.Result && secondEmploymentCheck.Result;
         }
 
         private static void SetStoppedStatus(ApprenticeApplicationDto model)

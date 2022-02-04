@@ -98,19 +98,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
                 x.PendingPaymentId == expected.PendingPaymentModels.First().Id);
-            savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
-                .Excluding(x => x.CollectionPeriod)
-            );
 
             _dbContext.PendingPayments.Count().Should().Be(expected.PendingPaymentModels.Count);
             _dbContext.Payments.Count().Should().Be(expected.PaymentModels.Count);
 
             foreach (var result in savedValidationResults)
             {
-                result.PeriodNumber.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
-                result.PaymentYear.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
+                result.Step.Should().Be(validationResults.Single(x => x.Id == result.Id).Step);
+                result.OverrideResult.Should().Be(validationResults.Single(x => x.Id == result.Id).OverrideResult);                
+                result.Result.Should().Be(validationResults.Single(x => x.Id == result.Id).ValidationResult);
+                result.PeriodNumber.Should().Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
+                result.PaymentYear.Should().Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
                 result.CreatedDateUtc.Should().BeCloseTo(validationResults.Single(x => x.Id == result.Id).CreatedDateUtc, TimeSpan.FromMinutes(1));
             }
 

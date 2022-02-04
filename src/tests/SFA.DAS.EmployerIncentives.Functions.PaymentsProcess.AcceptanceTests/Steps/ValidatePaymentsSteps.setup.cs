@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             public ApprenticeshipDaysInLearning DaysInLearning { get; }
             public Payment Payment { get; private set; }
             public ValidationOverride ValidationOverride { get; private set; }
-            public ValidationOverrideAudit ValidationOverrideAudit { get; private set; }            
+            public ValidationOverrideAudit ValidationOverrideAudit { get; private set; }
             private ClawbackPayment ClawbackPayment { get; set; }
             private readonly TestContext _testContext;
             private readonly Fixture _fixture;
