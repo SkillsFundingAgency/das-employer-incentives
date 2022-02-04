@@ -59,3 +59,20 @@ Examples:
 	| LearnerMatchSuccessful            |
 	| EmployedAtStartOfApprenticeship   |
 	| EmployedBeforeSchemeStarted       |
+
+Scenario: When at least one validation check fails
+	Given there are pending payments
+	And the '<ValidationStep>' will pass
+	And there is a validation override for '<ValidationStep>'
+	When the payment process is run
+	Then the '<ValidationStep>' will have a failed validation result
+	And no payment records are created
+	And pending payments are not marked as paid
+
+Examples:
+	| ValidationStep                    |
+	| IsInLearning                      |
+	| HasNoDataLocks                    |
+	| HasDaysInLearning                 |
+	| EmployedAtStartOfApprenticeship   |
+	| EmployedBeforeSchemeStarted       |

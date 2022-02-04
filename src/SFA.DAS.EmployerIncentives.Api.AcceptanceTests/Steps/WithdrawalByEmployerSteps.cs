@@ -396,7 +396,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             archivedValidationResult.PaymentYear.Should().Be(_pendingPaymentValidationResult.PaymentYear);
             archivedValidationResult.PeriodNumber.Should().Be(_pendingPaymentValidationResult.PeriodNumber);
             archivedValidationResult.Step.Should().Be(_pendingPaymentValidationResult.Step);
-            archivedValidationResult.Result.Should().Be(_pendingPaymentValidationResult.Result);
+            archivedValidationResult.Result.Should().Be(_pendingPaymentValidationResult.ValidationResult);
         }
 
         [Then(@"the pending payments are archived")]
@@ -447,7 +447,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             archivedValidationResult.PaymentYear.Should().Be(_pendingPaymentValidationResult.PaymentYear);
             archivedValidationResult.PeriodNumber.Should().Be(_pendingPaymentValidationResult.PeriodNumber);
             archivedValidationResult.Step.Should().Be(_pendingPaymentValidationResult.Step);
-            archivedValidationResult.Result.Should().Be(_pendingPaymentValidationResult.Result);
+            archivedValidationResult.Result.Should().Be(_pendingPaymentValidationResult.ValidationResult);
         }
 
         [Then(@"an error is returned")]

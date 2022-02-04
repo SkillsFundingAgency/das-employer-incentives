@@ -1728,13 +1728,13 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             learners[0].InLearning = false;
 
             var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, firstEmploymentCheckStatus)
+                .With(x => x.ValidationResult, firstEmploymentCheckStatus)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
                 .Create();
 
             var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, secondEmploymentCheckStatus)
+                .With(x => x.ValidationResult, secondEmploymentCheckStatus)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
                 .Create();
@@ -1816,28 +1816,28 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             learners[0].InLearning = false;
 
             var firstPaymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
+                .With(x => x.ValidationResult, false)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
                 .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
                 .Create();
 
             var secondPaymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
+                .With(x => x.ValidationResult, false)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
                 .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
                 .Create();
 
             var firstPaymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, true)
+                .With(x => x.ValidationResult, true)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
                 .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 02))
                 .Create();
 
             var secondPaymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, true)
+                .With(x => x.ValidationResult, true)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
                 .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 02))
@@ -1971,14 +1971,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             learners[0].InLearning = false;
 
             var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
+                .With(x => x.ValidationResult, false)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.HasBankDetails)
                 .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
                 .Create();
 
             var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
+                .With(x => x.ValidationResult, false)
                 .With(x => x.PendingPaymentId, pendingPayments[0].Id)
                 .With(x => x.Step, ValidationStep.HasLearningRecord)
                 .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))

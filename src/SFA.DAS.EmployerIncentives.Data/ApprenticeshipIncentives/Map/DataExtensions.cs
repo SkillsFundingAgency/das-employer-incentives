@@ -122,7 +122,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateUtc = x.CreatedDateUtc,
                 PeriodNumber = x.CollectionPeriod.PeriodNumber,
                 PaymentYear = x.CollectionPeriod.AcademicYear,
-                Result = x.Result,
+                ValidationResult = x.ValidationResult,
+                OverrideResult = x.OverrideResult,
                 Step = x.Step,
                 PendingPaymentId = paymentId
             }).ToList();
@@ -152,7 +153,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             {
                 Id = x.Id,
                 CollectionPeriod = collectionPeriods.SingleOrDefault(p => Convert.ToInt16(p.AcademicYear) == x.PaymentYear && p.PeriodNumber == x.PeriodNumber).Map(),
-                Result = x.Result,
+                ValidationResult = x.ValidationResult,
+                OverrideResult = x.OverrideResult ?? false,
                 Step = x.Step,
                 CreatedDateUtc = x.CreatedDateUtc
             }).ToList();

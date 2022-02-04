@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.Step, ValidationType.HasDaysInLearning.ToString())
                 .With(p => p.PeriodNumber, 1)
                 .With(p => p.PaymentYear, 2021)
-                .With(p => p.Result, false)
+                .With(p => p.ValidationResult, false)
                 .Create();
 
             _validationOverride = Fixture
@@ -105,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.Step, ValidationType.HasDaysInLearning.ToString())
                 .With(p => p.PeriodNumber, 1)
                 .With(p => p.PaymentYear, 2021)
-                .With(p => p.Result, false)
+                .With(p => p.ValidationResult, false)
                 .Create();
 
             using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Archive
@@ -13,6 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Archiv
         public Guid PendingPaymentId { get; set; }
         public string Step { get; set; }
         public bool Result { get; set; }
+        public bool? OverrideResult { get; set; }        
         public byte PeriodNumber { get; set; }
         public short PaymentYear { get; set; }
         public DateTime CreatedDateUtc { get; set; }        

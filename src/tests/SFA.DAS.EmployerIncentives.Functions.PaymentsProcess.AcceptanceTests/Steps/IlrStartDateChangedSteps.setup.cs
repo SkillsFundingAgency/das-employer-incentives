@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.PeriodNumber, _paymentPeriod.Number)
                 .With(p => p.PaymentYear, _paymentPeriod.Year)
                 .With(p => p.Step, "HasBankDetails")
-                .With(p => p.Result, true)
+                .With(p => p.ValidationResult, true)
                 .Create();
 
             _learnerMatchApiData = _fixture

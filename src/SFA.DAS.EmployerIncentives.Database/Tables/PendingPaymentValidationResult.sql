@@ -4,6 +4,7 @@
 	[PendingPaymentId] UNIQUEIDENTIFIER NOT NULL,
     [Step] NVARCHAR(50) NOT NULL, 
     [Result] BIT NOT NULL,
+	[OverrideResult] BIT NULL,
     [PeriodNumber] TINYINT NOT NULL, 
     [PaymentYear] SMALLINT NOT NULL, 
     [CreatedDateUTC] DATETIME2 NOT NULL

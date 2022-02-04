@@ -105,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
 
             await _validatePaymentData.Create();
-        }
+        }                
 
         [When(@"the payment process is run")]
         public async Task WhenThePaymentProcessIsRun()
@@ -139,7 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
             results.Should().HaveCount(2);
-            results.All(r => !r.Result).Should().BeTrue($"{step} validation step should have failed");
+            results.All(r => !r.ValidationResult).Should().BeTrue($"{step} validation step should have failed");
             results.All(r => r.CreatedDateUtc == DateTime.Today).Should().BeTrue();
         }
 
@@ -149,7 +149,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
             results.Should().NotBeEmpty();
-            results.All(r => r.Result).Should().BeTrue();
+            results.All(r => r.ValidationResult).Should().BeTrue();
         }
 
         [Then(@"payment records are created")]

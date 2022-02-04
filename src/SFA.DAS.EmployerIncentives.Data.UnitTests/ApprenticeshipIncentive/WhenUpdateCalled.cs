@@ -209,8 +209,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
         private void AddUpdateAndRemovePendingPaymentsAndValidationResults(ApprenticeshipIncentiveModel expected)
         {
-            expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().Result
-                = !expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().Result;
+            expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().ValidationResult
+                = !expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().ValidationResult;
             expected.PendingPaymentModels.First().Amount -= 250;
             expected.PaymentModels.First().Amount -= 250;
             var newPendingPayment = _fixture.Build<PendingPaymentModel>()

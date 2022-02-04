@@ -16,6 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
         public string ValidationType { get; }
         public DateTime ExpiryDate { get; }
         public bool Remove { get; }
+        public bool HasExpired => ExpiryDate.Date <= DateTime.Today;
 
         protected override IEnumerable<object> GetAtomicValues()
         {
