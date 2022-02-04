@@ -60,6 +60,12 @@ Examples:
 	| EmployedAtStartOfApprenticeship   |
 	| EmployedBeforeSchemeStarted       |
 
+Scenario: Expired validation overrides are removed
+	Given there are pending payments	
+	And an expired validation override exists
+	When the payment process is run
+	Then the expired validation override is removed
+
 Scenario: When at least one validation check fails
 	Given there are pending payments
 	And the '<ValidationStep>' will pass

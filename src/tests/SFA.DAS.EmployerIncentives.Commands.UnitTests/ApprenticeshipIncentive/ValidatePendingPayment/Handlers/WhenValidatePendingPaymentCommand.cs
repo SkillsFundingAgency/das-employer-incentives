@@ -35,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private DaysInLearning _daysInLearning;
         private DateTime _startDate;
         private DateTime _payment1DueDate;
+        private ApprenticeshipIncentiveModel _model;
 
         private Fixture _fixture;
 
@@ -92,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
 
-            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+            _model = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(m => m.Account, _account)
                 .With(m => m.StartDate, _startDate)
                 .With(m => m.PendingPaymentModels, pendingPayments)
@@ -110,9 +111,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         .With(x => x.Result, false)
                         .Create()
                 })
+                .Without(m => m.ValidationOverrideModels)
                 .Create();
 
-            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(_model.Id, _model);
 
             _fixture.Register(() => incentive);
 
@@ -454,6 +456,31 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
                 .PendingPaymentValidationResults.Single(x => x.Step == "EmployedAtStartOfApprenticeship");
             validationResult.Result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_an_expired_validation_override_is_removed()
+        {
+            //Arrange
+            var expiredValidationOverride = _fixture
+                  .Build<ValidationOverrideModel>()
+                  .With(p => p.ApprenticeshipIncentiveId, _model.Id)
+                  .With(p => p.ExpiryDate, DateTime.UtcNow.AddDays(-1))
+                  .Create();
+
+            _model.ValidationOverrideModels.Add(expiredValidationOverride);
+            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            incentive.GetModel().ValidationOverrideModels.Count.Should().Be(0);
         }
     }
 }

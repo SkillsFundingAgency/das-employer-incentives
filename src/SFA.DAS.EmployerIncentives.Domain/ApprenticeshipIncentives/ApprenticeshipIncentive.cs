@@ -448,7 +448,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             return pendingPayment;
         }
-
+        
         public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {
             if (Account.Id != account.Id)
@@ -809,7 +809,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 AddEvent(new ValidationOverrideDeleted(existing.Id, Model.Id, validationOverrideStep, serviceRequest));
             }
         }
-        
+
+        public void ExpireValidationOverrides(DateTime expireFrom)
+        {
+            Model.ValidationOverrideModels.ToList()
+                .ForEach(vo =>
+                {
+                    if ((vo.ExpiryDate.Date <= expireFrom.Date) && Model.ValidationOverrideModels.Remove(vo))
+                    {
+                        AddEvent(new ValidationOverrideDeleted(vo.Id, Model.Id, new ValidationOverrideStep(vo.Step, vo.ExpiryDate), null));
+                    }
+                });
+        }
+
         private DateTime GetPhaseStartDate()
         {
             if (Phase.Identifier == Enums.Phase.Phase1)

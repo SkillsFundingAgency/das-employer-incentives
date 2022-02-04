@@ -12,10 +12,12 @@ using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
+using ValidationOverride = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ValidationOverride;
 using System;
 using AutoFixture;
 using SFA.DAS.EmployerIncentives.Enums;
 using EmploymentCheck = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.EmploymentCheck;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -152,6 +154,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             results.All(r => r.ValidationResult).Should().BeTrue();
         }
 
+        [Then(@"the expired validation override is removed")]
+        public async Task ThenTheExpiredValidationOverrideIsRemoved()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<ValidationOverride>().Result.ToList();
+            results.Should().BeEmpty();
+        }
+
         [Then(@"payment records are created")]
         public async Task AndPaymentRecordIsCreated()
         {
@@ -248,6 +258,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task GivenThereArePaymentsWithSentClawbacks()
         {
             _validatePaymentData.AddClawbackPayment(true);
+            await _validatePaymentData.Create();
+        }
+
+        [Given(@"an expired validation override exists")]
+        public async Task GivenAnExpiredValidationOverrideExists()
+        {
+            _validatePaymentData.AddValidationOverride(new ValidationOverrideStep(ValidationStep.IsInLearning.ToString(), DateTime.Now.AddDays(-1)) );
             await _validatePaymentData.Create();
         }
     }
