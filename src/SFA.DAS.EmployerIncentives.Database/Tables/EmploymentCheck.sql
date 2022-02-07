@@ -13,6 +13,11 @@
 	CONSTRAINT FK_EC_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id), 
 )
 GO
-CREATE CLUSTERED INDEX IX_EmploymentCheck ON [incentives].[EmploymentCheck] (ApprenticeshipIncentiveId)
+CREATE INDEX IX_EmploymentCheck ON [incentives].[EmploymentCheck] ([ApprenticeshipIncentiveId]) 
+INCLUDE (CheckType)
 GO
 CREATE INDEX IX_EmploymentCheck_CorrelationId ON [incentives].[EmploymentCheck] (CorrelationId)
+GO
+
+CREATE CLUSTERED INDEX [IX_EmploymentCheck_CreatedDateTime] ON [incentives].[EmploymentCheck] ([CreatedDateTime])
+GO

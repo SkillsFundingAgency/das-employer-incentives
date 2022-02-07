@@ -31,6 +31,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
             var jsonString = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<LearnerSubmissionDto>(jsonString);
+
+            if (data.Uln != learner.UniqueLearnerNumber)
+            {
+                throw new InvalidLearnerMatchResponseException(jsonString);
+            }
+
             data.RawJson = jsonString;
 
             return data;
