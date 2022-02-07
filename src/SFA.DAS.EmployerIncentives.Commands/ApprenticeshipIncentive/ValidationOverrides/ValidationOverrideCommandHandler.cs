@@ -28,7 +28,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Validation
 
             var serviceRequest = new ServiceRequest(command.ServiceRequestTaskId, command.DecisionReference, command.ServiceRequestCreated);
 
-            command.ValidationSteps.ToList().ForEach(s => incentive.AddValidationOverride(s, serviceRequest));
+            command.ValidationSteps.ToList().ForEach(s =>
+            {
+                if (s.Remove)
+                {
+                    incentive.RemoveValidationOverride(s, serviceRequest);
+                }
+                else
+                {
+                    incentive.AddValidationOverride(s, serviceRequest);
+                }
+            });
 
             await _incentiveDomainRepository.Save(incentive);
         }

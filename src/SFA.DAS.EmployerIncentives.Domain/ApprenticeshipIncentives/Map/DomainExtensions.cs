@@ -68,5 +68,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
         {
             return EmploymentCheck.Get(model);
         }
+
+        public static IEnumerable<ValidationOverride> Map(this IEnumerable<ValidationOverrideModel> models)
+        {
+            return models.Select(x => x.Map());
+        }
+
+        public static ValidationOverride Map(this ValidationOverrideModel model)
+        {
+            return ValidationOverride.Get(model);
+        }
     }
 }

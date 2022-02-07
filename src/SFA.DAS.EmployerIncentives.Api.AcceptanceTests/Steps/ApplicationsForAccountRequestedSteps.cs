@@ -88,6 +88,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             foreach (var pendingPayment in _apprenticeshipIncentive.PendingPayments)
             {
+                pendingPayment.AccountId = _apprenticeshipIncentive.AccountId;
+                pendingPayment.AccountLegalEntityId = _apprenticeshipIncentive.AccountLegalEntityId;
+                pendingPayment.ClawedBack = false;
                 pendingPayment.DueDate = pendingPayment.DueDate.Date;
                 pendingPayment.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
                 await dbConnection.InsertAsync(pendingPayment, true);

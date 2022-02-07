@@ -6,5 +6,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Types
     {
         public ValidationType ValidationType { get; set; }
         public DateTime ExpiryDate { get; set; }
+        public bool? Remove { get; set; }
     }
 }

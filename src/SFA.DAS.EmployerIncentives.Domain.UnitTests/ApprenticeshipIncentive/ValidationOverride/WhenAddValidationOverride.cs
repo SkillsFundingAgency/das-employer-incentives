@@ -9,9 +9,9 @@ using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
+namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests.ValidationOverrideTests
 {
-    internal class WhenValidationOverride
+    internal class WhenAddValidationOverride
     {
         private Fixture _fixture;
         private ApprenticeshipIncentive _sut;
@@ -172,6 +172,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.GetModel().ValidationOverrideModels.Count.Should().Be(2);
 
         }
+
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);

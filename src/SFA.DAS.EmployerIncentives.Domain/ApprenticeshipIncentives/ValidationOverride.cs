@@ -1,14 +1,14 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 {
     public class ValidationOverride : Entity<Guid, ValidationOverrideModel>
-    {
+    {        
+        public string Step => Model.Step;
+        public DateTime ExpiryDate => Model.ExpiryDate;
+
         internal static ValidationOverride New(
             Guid id,
             Guid apprenticeshipIncentiveId,
