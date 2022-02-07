@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
         }
 
-        [HttpPost("/withdrawals/reinstate")]
+        [HttpPost("/withdrawal-reinstatements")]
         [ProducesResponseType((int) HttpStatusCode.Accepted)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> ReinstateIncentiveApplication([FromBody] ReinstateApplicationRequest request)

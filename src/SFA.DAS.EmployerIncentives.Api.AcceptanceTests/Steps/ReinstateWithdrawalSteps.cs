@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(r => r.ULN, _apprenticeship.ULN)
                 .Create();
 
-            var url = $"withdrawals/reinstate";
+            var url = $"withdrawal-reinstatements";
 
             await _testContext.WaitFor(
                 async (cancellationToken) =>
