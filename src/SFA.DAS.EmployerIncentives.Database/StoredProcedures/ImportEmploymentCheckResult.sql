@@ -14,7 +14,7 @@ AS
 		IF EXISTS(SELECT TOP 1 * FROM incentives.EmploymentCheck WHERE ApprenticeshipIncentiveId = @apprenticeshipIncentiveId AND CheckType = @checkType)
 		BEGIN
 			UPDATE incentives.EmploymentCheck SET CorrelationId = NEWID(), Result = @result, ResultDateTime = GETDATE()
-			WHERE ApprenticeshipIncentiveId = @apprenticeshipIncentiveId
+			WHERE ApprenticeshipIncentiveId = @apprenticeshipIncentiveId AND CheckType = @checkType
 		END
 		ELSE
 		BEGIN
