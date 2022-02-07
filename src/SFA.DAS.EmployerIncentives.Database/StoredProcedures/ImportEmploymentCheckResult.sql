@@ -9,7 +9,7 @@ AS
 
 	IF EXISTS(SELECT TOP 1 * FROM incentives.ApprenticeshipIncentive WHERE ULN = @uln AND Status != 'Withdrawn')
 	BEGIN
-		SET @apprenticeshipIncentiveId = (SELECT Id FROM incentives.ApprenticeshipIncentive WHERE ULN = @uln AND Status != 'Withdrawn')
+		SET @apprenticeshipIncentiveId = (SELECT TOP 1 Id FROM incentives.ApprenticeshipIncentive WHERE ULN = @uln AND Status != 'Withdrawn')
 
 		IF EXISTS(SELECT TOP 1 * FROM incentives.EmploymentCheck WHERE ApprenticeshipIncentiveId = @apprenticeshipIncentiveId AND CheckType = @checkType)
 		BEGIN
