@@ -36,7 +36,6 @@ namespace SFA.DAS.EmployerIncentives.Data
             var calendar = await _collectionCalendarService.Get();
             var nextActivePeriod = calendar.GetNextPeriod(calendar.GetActivePeriod());
 
-            var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
             var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives.Include(x => x.ValidationOverrides)
                                       from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
                                       from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && !x.ClawedBack).DefaultIfEmpty()
@@ -80,8 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentDate = PaymentDate(data.firstPayment, data.firstPaymentSent, nextActivePeriod),
                         LearnerMatchFound = LearnerMatchFound(data.learner),
                         PaymentAmount = PaymentAmount(data.firstPayment, data.firstPaymentSent),
-                        HasDataLock = HasDataLock(data.learner),
-                        InLearning = InLearning(data.learner),
+                        HasDataLock = HasNoDataLockOverride(data.incentive, data.learner, HasDataLock),
                         InLearning = IsInLearningOverride(data.incentive, data.learner, InLearning),
                         PausePayments = data.incentive.PausePayments,
                         PaymentSent = data.firstPaymentSent != null,
@@ -100,8 +98,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentDate = PaymentDate(data.secondPayment, data.secondPaymentSent, nextActivePeriod),
                         LearnerMatchFound = LearnerMatchFound(data.learner),
                         PaymentAmount = data.secondPayment.Amount,
-                        HasDataLock = HasDataLock(data.learner),
-                        InLearning = InLearning(data.learner),
+                        HasDataLock = HasNoDataLockOverride(data.incentive, data.learner, HasDataLock),
+                        InLearning = IsInLearningOverride(data.incentive, data.learner, InLearning),
                         PausePayments = data.incentive.PausePayments,
                         PaymentSent = data.secondPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
@@ -201,6 +199,32 @@ namespace SFA.DAS.EmployerIncentives.Data
             return learner.HasDataLock.HasValue && learner.HasDataLock.Value;
         }
 
+        private static bool HasNoDataLockOverride(ApprenticeshipIncentives.Models.ApprenticeshipIncentive incentive,
+            Learner learner,
+            Func<Learner, bool> func)
+        {
+            var hasNoDataLock = func.Invoke(learner);
+            var existing = incentive.ValidationOverrides.SingleOrDefault(x => x.Step == ValidationStep.HasNoDataLocks);
+            if (existing != null)
+            {
+                hasNoDataLock = true;
+            }
+            if (hasNoDataLock == false)
+            {
+                //check for override
+                //if there is override, return true
+            }
+
+            if (existing != null)
+            {
+                if (existing.ExpiryDate.Date > DateTime.UtcNow.Date)
+                {
+                    hasNoDataLock = false;
+                }
+            }
+            return hasNoDataLock;
+        }
+
         private static bool InLearning(Learner learner)
         {
             if (learner == null)
@@ -227,8 +251,11 @@ namespace SFA.DAS.EmployerIncentives.Data
                 //if there is override, return true
             }
 
-            if (existing.ExpiryDate > DateTime.UtcNow){
-                isInLearning = false;
+            if (existing != null){
+                if (existing.ExpiryDate.Date > DateTime.UtcNow.Date)
+                {
+                    isInLearning = false;
+                }
             }
             return isInLearning;
         }
