@@ -148,6 +148,24 @@ namespace SFA.DAS.EmployerIncentives.Data
             return firstEmploymentCheckValidation.Result && secondEmploymentCheckValidation.Result;
         }
 
+        private static bool firstEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation)
+        {
+            if (firstEmploymentCheckValidation.OverrideResult == true)
+            {
+                firstEmploymentCheckValidation.Result = true;
+            }
+            return firstEmploymentCheckValidation.Result;
+        }
+
+        private static bool secondEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
+        {
+            if (secondEmploymentCheckValidation.OverrideResult == true)
+            {
+                secondEmploymentCheckValidation.Result = true;
+            }
+            return secondEmploymentCheckValidation.Result;
+        }
+
         private static void SetStoppedStatus(ApprenticeApplicationDto model)
         {
             var paymentStatus = new PaymentStatusDto { PaymentIsStopped = true };
@@ -209,15 +227,9 @@ namespace SFA.DAS.EmployerIncentives.Data
             {
                 hasNoDataLock = true;
             }
-            if (hasNoDataLock == false)
-            {
-                //check for override
-                //if there is override, return true
-            }
-
             if (existing != null)
             {
-                if (existing.ExpiryDate.Date > DateTime.UtcNow.Date)
+                if (existing.ExpiryDate.Date < DateTime.UtcNow.Date)
                 {
                     hasNoDataLock = false;
                 }
@@ -245,14 +257,8 @@ namespace SFA.DAS.EmployerIncentives.Data
             {
                 isInLearning = true;
             }
-            if (isInLearning == false)
-            {
-                //check for override
-                //if there is override, return true
-            }
-
             if (existing != null){
-                if (existing.ExpiryDate.Date > DateTime.UtcNow.Date)
+                if (existing.ExpiryDate.Date < DateTime.UtcNow.Date)
                 {
                     isInLearning = false;
                 }
