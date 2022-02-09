@@ -465,60 +465,60 @@
                     },
                     "functionAppAppSettings": {
                         "value": {
-                          "array": [
-                            {
-                              "name": "ConfigurationStorageConnectionString",
-                              "value": "[parameters('configurationStorageConnectionString')]"
-                            },
-                            {
-                              "name": "ConfigNames",
-                              "value": "[parameters('configNames')]"
-                            },
-                            {
-                              "name": "EnvironmentName",
-                              "value": "[parameters('environmentName')]"
-                            },
-                            {
-                              "name": "Version",
-                              "value": "[parameters('version')]"
-                            },
-                            {
-                              "name": "AzureWebJobsStorage",
-                              "value": "[parameters('sharedStorageAccountConnectionString')]"
-                            },
-                            {
-                              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                              "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
-                            },
-                            {
-                              "name": "FUNCTIONS_EXTENSION_VERSION",
-                              "value": "~3"
-                            },
-                            {
-                              "name": "LoggingRedisConnectionString",
-                              "value": "[parameters('loggingRedisConnectionString')]"
-                            },
-                            {
-                              "name": "FUNCTIONS_WORKER_RUNTIME",
-                              "value": "dotnet"
-                            },
-                            {
-                              "name": "NServiceBusConnectionString",
-                              "value": "[parameters('nServiceBusConnectionString')]"
-                            },
-                            {
-                              "name": "NServiceBusLicense",
-                              "value": "[parameters('nServiceBusLicense')]"
-                            },
-                            {
-                              "name": "WEBSITE_RUN_FROM_PACKAGE",
-                              "value": "1"
-                            },
-                            {
-                              "name": "AzureWebJobsFeatureFlags",
-                              "value": "EnableEnhancedScopes"
-                            }
-                          ]
+                            "array": [
+                                {
+                                    "name": "ConfigurationStorageConnectionString",
+                                    "value": "[parameters('configurationStorageConnectionString')]"
+                                },
+                                {
+                                    "name": "ConfigNames",
+                                    "value": "[parameters('configNames')]"
+                                },
+                                {
+                                    "name": "EnvironmentName",
+                                    "value": "[parameters('environmentName')]"
+                                },
+                                {
+                                    "name": "Version",
+                                    "value": "[parameters('version')]"
+                                },
+                                {
+                                    "name": "AzureWebJobsStorage",
+                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
+                                },
+                                {
+                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                    "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                                    "value": "~3"
+                                },
+                                {
+                                    "name": "LoggingRedisConnectionString",
+                                    "value": "[parameters('loggingRedisConnectionString')]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet"
+                                },
+                                {
+                                    "name": "NServiceBusConnectionString",
+                                    "value": "[parameters('nServiceBusConnectionString')]"
+                                },
+                                {
+                                    "name": "NServiceBusLicense",
+                                    "value": "[parameters('nServiceBusLicense')]"
+                                },
+                                {
+                                    "name": "WEBSITE_RUN_FROM_PACKAGE",
+                                    "value": "1"
+                                },
+                                {
+                                    "name": "AzureWebJobsFeatureFlags",
+                                    "value": "EnableEnhancedScopes"
+                                }
+                            ]
                         }
                     }
                 }
@@ -582,6 +582,27 @@
                     },
                     "delegations": {
                         "value": "[parameters('subnetDelegations')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2021-04-01",
+            "name": "payment-process-function-sql-firewall-rule",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'), 'sql-server-firewall-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "serverName": {
+                        "value": "[parameters('sharedSQLServerName')]"
+                    },
+                    "subnetResourceIdList": {
+                        "value": "[createArray(reference('payment-process-function-subnet').outputs.SubnetResourceId.value)]"
                     }
                 }
             }
@@ -678,11 +699,11 @@
                                     "name": "AzureWebJobsStorage",
                                     "value": "[parameters('sharedStorageAccountConnectionString')]"
                                 },
-                                                            {
+                                {
                                     "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                                     "value": "[parameters('sharedStorageAccountConnectionString')]"
                                 },
-                                                            {
+                                {
                                     "name": "WEBSITE_CONTENTSHARE",
                                     "value": "[variables('paymentProcessFunctionAppName')]"
                                 },
