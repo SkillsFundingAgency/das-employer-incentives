@@ -104,7 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSent = data.secondPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.firstEmploymentCheckValidation, data.secondEmploymentCheck, data.secondEmploymentCheckValidation)
+                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.firstEmploymentCheckValidation, data.secondEmploymentCheck, data.secondEmploymentCheckValidation) | (FirstEmploymentCheckValidationOverride(data.firstEmploymentCheckValidation) & SecondEmploymentCheckValidationOverride(data.secondEmploymentCheckValidation))
                     },
                     SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
                     {
@@ -148,8 +148,13 @@ namespace SFA.DAS.EmployerIncentives.Data
             return firstEmploymentCheckValidation.Result && secondEmploymentCheckValidation.Result;
         }
 
-        private static bool firstEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation)
+        private static bool? FirstEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation)
         {
+            if (firstEmploymentCheckValidation == null)
+            {
+                return null;
+            }
+
             if (firstEmploymentCheckValidation.OverrideResult == true)
             {
                 firstEmploymentCheckValidation.Result = true;
@@ -157,8 +162,12 @@ namespace SFA.DAS.EmployerIncentives.Data
             return firstEmploymentCheckValidation.Result;
         }
 
-        private static bool secondEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
+        private static bool? SecondEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
         {
+            if (secondEmploymentCheckValidation == null)
+            {
+                return null;
+            }
             if (secondEmploymentCheckValidation.OverrideResult == true)
             {
                 secondEmploymentCheckValidation.Result = true;

@@ -2421,19 +2421,18 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
             pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            var validationOverrides = _fixture
-                .Build<ValidationOverride>()
+            var pendingPaymentOverride = _fixture
+                .Build<PendingPaymentValidationResult>()
                 .CreateMany(5).ToList();
 
             var existingOverride = _fixture
-                    .Build<ValidationOverride>()
-                    .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                    .With(p => p.Step, ValidationStep.HasNoDataLocks)
-                    .With(p => p.ExpiryDate, DateTime.UtcNow.Date)
+                    .Build<PendingPaymentValidationResult>()
+                    .With(p => p.Id, incentives[0].Id)
+                    .With(p => p.OverrideResult, true)
                     .Create();
-            validationOverrides.Add(existingOverride);
 
             incentives[0].PendingPayments = pendingPayments;
+            pendingPaymentOverride.Add(existingOverride);
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
@@ -2449,6 +2448,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().Be(true);
         }
+        [Test]
         public async Task When_EmploymentCheckResult_called_should_return_true_for_second_payment_if_there_is_an_override()
         {
             // Arrange
@@ -2495,11 +2495,6 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             validationOverrides.Add(existingOverride);
 
             incentives[0].PendingPayments = pendingPayments;
-
-            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
-            learners[0].ULN = incentives[0].ULN;
-            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
-            //learners[0]. = false;
 
             _context.Accounts.AddRange(allAccounts);
             _context.ApprenticeshipIncentives.AddRange(incentives);
