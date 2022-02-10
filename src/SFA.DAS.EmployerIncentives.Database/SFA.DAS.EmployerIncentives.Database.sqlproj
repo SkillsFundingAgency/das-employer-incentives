@@ -113,6 +113,7 @@
     <Build Include="Tables\Archive.EmploymentCheck.sql" />
     <Build Include="Schemas\audit.sql" />
     <Build Include="Tables\Audit.EmploymentCheckAudit.sql" />
+    <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
