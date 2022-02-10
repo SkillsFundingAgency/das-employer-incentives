@@ -85,7 +85,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSent = data.firstPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.firstEmploymentCheckValidation, data.secondEmploymentCheck, data.secondEmploymentCheckValidation)
+                        EmploymentCheckPassed = EmploymentCheckResult(EmployedAtStartOfApprenticeship(data.firstEmploymentCheck, data.firstEmploymentCheckValidation),
+                                                                     EmployedBeforeSchemeStarted(data.secondEmploymentCheck, data.secondEmploymentCheckValidation))
                     },
                     FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
                     {
@@ -104,7 +105,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         PaymentSent = data.secondPaymentSent != null,
                         PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.firstEmploymentCheckValidation, data.secondEmploymentCheck, data.secondEmploymentCheckValidation) | (FirstEmploymentCheckValidationOverride(data.firstEmploymentCheckValidation) & SecondEmploymentCheckValidationOverride(data.secondEmploymentCheckValidation))
+                        EmploymentCheckPassed = EmploymentCheckResult(EmployedAtStartOfApprenticeship(data.firstEmploymentCheck, data.firstEmploymentCheckValidation),
+                                                                     EmployedBeforeSchemeStarted(data.secondEmploymentCheck, data.secondEmploymentCheckValidation) | EmploymentCheckResult(EmployedAtStartOfApprenticeshipOverride(data.incentive, data.firstEmploymentCheckValidation), EmployedBeforeSchemeStartedOverride(data.incentive, data.secondEmploymentCheckValidation)))
                     },
                     SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
                     {
@@ -129,48 +131,64 @@ namespace SFA.DAS.EmployerIncentives.Data
             return result;
         }
 
-        private static bool? EmploymentCheckResult(ApprenticeshipIncentives.Models.EmploymentCheck firstEmploymentCheck,
-                                                   ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation,
-                                                   ApprenticeshipIncentives.Models.EmploymentCheck secondEmploymentCheck,
-                                                   ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
+        private static bool? EmploymentCheckResult(bool? firstEmploymentCheck, bool? secondEmploymentCheck)
+        {
+
+            if (firstEmploymentCheck == null || secondEmploymentCheck == null)
+            {
+                return null;
+            }
+
+            return firstEmploymentCheck.Value && secondEmploymentCheck.Value;
+        }
+
+        private static bool? EmployedAtStartOfApprenticeship(ApprenticeshipIncentives.Models.EmploymentCheck firstEmploymentCheck,
+                                                   ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation)
         {
             if (firstEmploymentCheck == null
-                || secondEmploymentCheck == null 
                 || firstEmploymentCheck.Result == null
+                || firstEmploymentCheckValidation == null
+                )
+            {
+                return null;
+            }
+
+            return firstEmploymentCheckValidation.Result;
+        }
+        private static bool? EmployedAtStartOfApprenticeshipOverride(ApprenticeshipIncentives.Models.ApprenticeshipIncentive incentive,
+                                                                     ApprenticeshipIncentives.Models.EmploymentCheck firstEmploymentCheck,
+                                                                     ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation)
+        {
+            var employedAtStartOfApprenticeship = EmployedAtStartOfApprenticeship(firstEmploymentCheck, firstEmploymentCheckValidation);
+            if (incentive.ValidationOverrides.Any(x => x.Step == ValidationStep.HasNoDataLocks
+                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static bool? EmployedBeforeSchemeStarted(ApprenticeshipIncentives.Models.EmploymentCheck secondEmploymentCheck,
+                                                   ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
+        {
+            if (secondEmploymentCheck == null
                 || secondEmploymentCheck.Result == null
-                || firstEmploymentCheckValidation == null 
                 || secondEmploymentCheckValidation == null
                 )
             {
                 return null;
             }
 
-            return firstEmploymentCheckValidation.Result && secondEmploymentCheckValidation.Result;
+            return secondEmploymentCheckValidation.Result;
         }
 
-        private static bool? FirstEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation)
+        private static bool? EmployedBeforeSchemeStartedOverride(ApprenticeshipIncentives.Models.ApprenticeshipIncentive incentive,
+                                                                     ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
         {
-            if (firstEmploymentCheckValidation == null)
+            if (incentive.ValidationOverrides.Any(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted
+                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
             {
-                return null;
-            }
-
-            if (firstEmploymentCheckValidation.OverrideResult == true)
-            {
-                firstEmploymentCheckValidation.Result = true;
-            }
-            return firstEmploymentCheckValidation.Result;
-        }
-
-        private static bool? SecondEmploymentCheckValidationOverride(ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
-        {
-            if (secondEmploymentCheckValidation == null)
-            {
-                return null;
-            }
-            if (secondEmploymentCheckValidation.OverrideResult == true)
-            {
-                secondEmploymentCheckValidation.Result = true;
+                return true;
             }
             return secondEmploymentCheckValidation.Result;
         }
@@ -231,18 +249,12 @@ namespace SFA.DAS.EmployerIncentives.Data
             Func<Learner, bool> func)
         {
             var hasNoDataLock = func.Invoke(learner);
-            var existing = incentive.ValidationOverrides.SingleOrDefault(x => x.Step == ValidationStep.HasNoDataLocks);
-            if (existing != null)
+            if (incentive.ValidationOverrides.Any(x => x.Step == ValidationStep.HasNoDataLocks
+                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
             {
-                hasNoDataLock = true;
+                return true;
             }
-            if (existing != null)
-            {
-                if (existing.ExpiryDate.Date < DateTime.UtcNow.Date)
-                {
-                    hasNoDataLock = false;
-                }
-            }
+
             return hasNoDataLock;
         }
 
@@ -261,17 +273,12 @@ namespace SFA.DAS.EmployerIncentives.Data
             Func<Learner, bool> func)
         {
             var isInLearning = func.Invoke(learner);
-            var existing = incentive.ValidationOverrides.SingleOrDefault(x => x.Step == ValidationStep.IsInLearning);
-            if (existing != null)
+            if (incentive.ValidationOverrides.Any(x => x.Step == ValidationStep.IsInLearning 
+                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
             {
-                isInLearning = true;
+                return true;
             }
-            if (existing != null){
-                if (existing.ExpiryDate.Date < DateTime.UtcNow.Date)
-                {
-                    isInLearning = false;
-                }
-            }
+
             return isInLearning;
         }
 
