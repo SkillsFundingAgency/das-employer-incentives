@@ -7,7 +7,10 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRepository
 {
@@ -15,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<IncentiveApplicationDto> _sut;
+        private IIncentiveApplicationQueryRepository _sut;
 
         [SetUp]
         public void Arrange()
@@ -25,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
-
+            
             _sut = new IncentiveApplication.IncentiveApplicationQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
@@ -45,6 +48,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             allApplications[0].AccountId = accountId;
             allApplications[3].AccountId = accountId;
+            foreach (var apprentice in allApplications[0].Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
+            foreach (var apprentice in allApplications[3].Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
 
             _context.Accounts.Add(account);
             _context.Applications.AddRange(allApplications);
@@ -70,10 +81,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Apprenticeships = new List<Models.IncentiveApplicationApprenticeship>()
             {
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "ZFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).Create(),
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 1).Create(),
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).Create(),
-                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ZLast").With(a => a.ULN, 9).Create()
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "ZFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).With(a => a.Phase, Phase.Phase2).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 1).With(a => a.Phase, Phase.Phase2).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ALast").With(a => a.ULN, 9).With(a => a.Phase, Phase.Phase2).Create(),
+                _fixture.Build<Models.IncentiveApplicationApprenticeship>().With(a => a.FirstName, "AFirst").With(a => a.LastName, "ZLast").With(a => a.ULN, 9).With(a => a.Phase, Phase.Phase2).Create()
             };
 
             _context.Accounts.Add(account);
