@@ -106,12 +106,14 @@
     <Build Include="Tables\ApprenticeshipBreakInLearning.sql" />
     <Build Include="StoredProcedures\CreateRetrospectiveApplication.sql" />
     <Build Include="Tables\AcademicYear.sql" />
+    <None Include="Scripts\Remove.TotalIncentiveAmount.sql" />
     <Build Include="Tables\EmploymentCheck.sql" />
     <Build Include="Schemas\Reports.sql" />
     <Build Include="StoredProcedures\Reports.RecoveryReport.sql" />
     <Build Include="Tables\Archive.EmploymentCheck.sql" />
     <Build Include="Schemas\audit.sql" />
     <Build Include="Tables\Audit.EmploymentCheckAudit.sql" />
+    <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
@@ -129,6 +131,6 @@
     <None Include="Scripts\Metrics Template.xlsx" />
   </ItemGroup>
   <ItemGroup>
-    <PreDeploy Include="Scripts\Rename.HasEligibleEmploymentStartDate.sql" />
+    <PreDeploy Include="Script.PreDeployment1.sql" />
   </ItemGroup>
 </Project>
