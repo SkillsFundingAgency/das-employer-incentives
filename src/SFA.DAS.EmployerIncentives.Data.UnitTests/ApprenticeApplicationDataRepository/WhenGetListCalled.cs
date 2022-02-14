@@ -2229,6 +2229,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         [TestCase(false, true, false)]
         [TestCase(true, true, true)]
         public async Task When_IsInLearning_called_should_return_true_if_IsInLearning_is_true_or_false_and_there_is_an_override(bool inLearning, bool hasExpired, bool expectation)
+        public async Task Then_IsInLearning_called_and_should_return_true_if_IsInLearning_is_true_or_false_and_there_is_an_override(bool inLearning, bool hasExpired, bool expectation)
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -2300,6 +2301,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         [TestCase(true, true, true)]
         [TestCase(false, true, false)]
         public async Task When_HasDataLock_is_called_return_false_if_there_is_override(bool hasDataLock, bool hasExpired, bool expectation)
+        public async Task Then_HasDataLock_is_called_and_returns_false_if_there_is_override(bool hasDataLock, bool hasExpired, bool expectation)
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -2367,6 +2369,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         }
         [Test]
         public async Task When_EmploymentCheckResult_called_should_return_true_if_there_is_an_override_for_EmployedBeforeSchemeStarted()
+        public async Task Then_EmploymentCheckResult_called_and_should_return_true_if_there_is_an_override_for_EmployedBeforeSchemeStarted()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
@@ -2447,6 +2450,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         }
         [Test]
         public async Task When_EmploymentCheckResult_called_should_return_true_if_there_is_an_override_for_EmployedAtStartOfApprenticeship()
+        public async Task Then_EmploymentCheckResult_called_and_should_return_true_if_there_is_an_override_for_EmployedAtStartOfApprenticeship()
         {
             // Arrange
             var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
