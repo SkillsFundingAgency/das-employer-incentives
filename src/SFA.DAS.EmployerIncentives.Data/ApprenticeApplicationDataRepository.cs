@@ -167,8 +167,8 @@ namespace SFA.DAS.EmployerIncentives.Data
         
         private static DateTime? PaymentDate(
             DateTime? pendingPaymentDate,
-            DateTime? paymentCalculatedDate,
             DateTime? paymentSentDate,
+            DateTime? paymentCalculatedDate,
             Domain.ValueObjects.CollectionCalendarPeriod nextActivePeriod)
         {
 
