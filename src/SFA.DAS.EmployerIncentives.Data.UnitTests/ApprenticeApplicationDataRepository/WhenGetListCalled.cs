@@ -5,6 +5,8 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -12,13 +14,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Domain.Services;
 using AcademicYear = SFA.DAS.EmployerIncentives.Domain.ValueObjects.AcademicYear;
 using ClawbackPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ClawbackPayment;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
+using ValidationOverride = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ValidationOverride;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRepository
 {
@@ -1438,7 +1439,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
                 .With(p => p.AccountId, accountId)
                 .With(p => p.PaymentId, payments[0].Id)
                 .With(p => p.PendingPaymentId, pendingPayments[0].Id)
-                .With(p => p.DateClawbackSent, nullClawbackDate)                
+                .With(p => p.DateClawbackSent, nullClawbackDate)
                 .Create();
 
             incentive.PendingPayments = pendingPayments;
@@ -1688,8 +1689,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         [TestCase(false, true, false, false, false)]
         [TestCase(false, false, false, true, false)]
         public async Task Then_the_employment_check_status_reflects_whether_the_payment_validation_results_indicate_a_pass(
-            bool firstEmploymentCheckStatus, 
-            bool secondEmploymentCheckStatus, 
+            bool firstEmploymentCheckStatus,
+            bool secondEmploymentCheckStatus,
             bool firstEmploymentCheckValue,
             bool secondEmploymentCheckValue,
             bool overallEmploymentCheckStatus)
@@ -1770,7 +1771,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
-            
+
             _context.SaveChanges();
 
             // Act
@@ -1884,7 +1885,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             _context.ApprenticeshipIncentives.AddRange(incentives);
             _context.ApplicationApprenticeships.AddRange(allApprenticeships);
             _context.Learners.AddRange(learners);
-            
+
             _context.SaveChanges();
 
             // Act
@@ -2222,5 +2223,311 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
             application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
             application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
         }
+
+        [TestCase(false, false, true)]
+        [TestCase(true, false, true)]
+        [TestCase(false, true, false)]
+        [TestCase(true, true, true)]
+        public async Task Then_IsInLearning_called_and_should_return_true_if_IsInLearning_is_true_or_false_and_there_is_an_override(bool inLearning, bool hasExpired, bool expectation)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+            incentives[0].PausePayments = false;
+            incentives[0].MinimumAgreementVersion = allAccounts[0].SignedAgreementVersion;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
+                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].InLearning = inLearning;
+
+            _context.Learners.AddRange(learners);
+
+            var validationOverrides = _fixture
+                .Build<ValidationOverride>()
+                .CreateMany(5).ToList();
+
+            var existingOverride = _fixture
+                     .Build<ValidationOverride>()
+                     .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                     .With(p => p.Step, ValidationStep.IsInLearning)
+                     .With(p => p.ExpiryDate, hasExpired ? DateTime.UtcNow.Date : DateTime.UtcNow.AddDays(1).Date)
+                     .Create();
+            validationOverrides.Add(existingOverride);
+
+            incentives[0].PendingPayments = pendingPayments;
+            incentives[0].ValidationOverrides = validationOverrides;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ValidationOverrides.AddRange(validationOverrides);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.InLearning.Should().Be(expectation);
+            application.SecondPaymentStatus.InLearning.Should().Be(expectation);
+        }
+
+        [TestCase(true, false, false)]
+        [TestCase(false, false, false)]
+        [TestCase(true, true, true)]
+        [TestCase(false, true, false)]
+        public async Task Then_HasDataLock_is_called_and_returns_false_if_there_is_override(bool hasDataLock, bool hasExpired, bool expectation)
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+            incentives[0].PausePayments = false;
+            incentives[0].MinimumAgreementVersion = allAccounts[0].SignedAgreementVersion;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
+                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+            learners[0].ULN = incentives[0].ULN;
+            learners[0].HasDataLock = hasDataLock;
+
+            _context.Learners.AddRange(learners);
+
+            var validationOverrides = _fixture
+                .Build<ValidationOverride>()
+                .CreateMany(5).ToList();
+
+            var existingOverride = _fixture
+                    .Build<ValidationOverride>()
+                    .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                    .With(p => p.Step, ValidationStep.HasNoDataLocks)
+                    .With(p => p.ExpiryDate, hasExpired ? DateTime.UtcNow.Date : DateTime.UtcNow.AddDays(1).Date)
+                    .Create();
+            validationOverrides.Add(existingOverride);
+
+            incentives[0].PendingPayments = pendingPayments;
+            incentives[0].ValidationOverrides = validationOverrides;            
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ValidationOverrides.AddRange(validationOverrides);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.HasDataLock.Should().Be(expectation);
+            application.SecondPaymentStatus.HasDataLock.Should().Be(expectation);
+        }
+        [Test]
+        public async Task Then_EmploymentCheckResult_called_and_should_return_true_if_there_is_an_override_for_EmployedBeforeSchemeStarted()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();            
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+            incentives[0].PausePayments = false;
+            incentives[0].MinimumAgreementVersion = allAccounts[0].SignedAgreementVersion;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
+                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+               .With(x => x.Result, true)
+               .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+               .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+               .Create();
+
+            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
+            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
+
+            var employmentCheck1 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                .With(x => x.Result, true)
+                .Create();
+
+            incentives[0].EmploymentChecks.Clear();
+            incentives[0].EmploymentChecks.Add(employmentCheck1);
+
+            var validationOverrides = _fixture
+                .Build<ValidationOverride>()
+                .CreateMany(5).ToList();
+
+            var existingOverride = _fixture
+                    .Build<ValidationOverride>()
+                    .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                    .With(p => p.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                    .With(p => p.ExpiryDate, DateTime.UtcNow.AddDays(1).Date)
+                    .Create();
+            validationOverrides.Add(existingOverride);
+
+            incentives[0].PendingPayments = pendingPayments;
+            incentives[0].ValidationOverrides = validationOverrides;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ValidationOverrides.AddRange(validationOverrides);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.FirstPaymentStatus.EmploymentCheckPassed.Should().Be(true);
+            application.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(true);
+        }
+        [Test]
+        public async Task Then_EmploymentCheckResult_called_and_should_return_true_if_there_is_an_override_for_EmployedAtStartOfApprenticeship()
+        {
+            // Arrange
+            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+            var accountId = _fixture.Create<long>();
+            var accountLegalEntityId = _fixture.Create<long>();
+
+            allAccounts[0].Id = accountId;
+            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+            incentives[0].AccountId = accountId;
+            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+
+            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+
+            var pendingPayments = _fixture
+                .Build<PendingPayment>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(p => p.ClawedBack, false)
+                .CreateMany(2).ToList();
+            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+            pendingPayments[0].EarningType = EarningType.FirstPayment;
+            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+            pendingPayments[1].EarningType = EarningType.SecondPayment;
+
+            incentives[0].PendingPayments = pendingPayments;
+
+            var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.Result, true)
+                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                .Create();
+
+            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
+            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
+
+            var employmentCheck2 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                .With(x => x.Result, true)
+                .Create();
+
+            incentives[0].EmploymentChecks.Clear();
+            incentives[0].EmploymentChecks.Add(employmentCheck2);
+
+            var validationOverrides = _fixture
+                .Build<ValidationOverride>()
+                .CreateMany(5).ToList();
+
+            var existingOverride = _fixture
+                    .Build<ValidationOverride>()
+                    .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+                    .With(p => p.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+                    .With(p => p.ExpiryDate, DateTime.UtcNow.Date.AddDays(1))
+                    .Create();
+            validationOverrides.Add(existingOverride);
+
+            incentives[0].PendingPayments = pendingPayments;
+            incentives[0].ValidationOverrides = validationOverrides;
+
+            _context.Accounts.AddRange(allAccounts);
+            _context.ApprenticeshipIncentives.AddRange(incentives);
+            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+
+            _context.SaveChanges();
+
+            // Act
+            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+
+            // Assert
+            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+            application.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(true);
+        }
     }
 }
+   
