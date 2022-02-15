@@ -65,12 +65,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await SetupApprenticeshipIncentive();
         }
 
-        [When(@"there is no learner record for an apprenticeship")]
-        public void WhenThereIsNoLearnerRecordForAnApprenticeship()
-        {
-
-        }
-
         [When(@"there is a learner record with no learner match for an apprenticeship")]
         public async Task WhenThereIsALearnerRecordWithNoLearnerMatch()
         {
@@ -208,6 +202,109 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.Result, checkResult)
                 .Create();
             await SetupEmploymentCheck(employmentCheck);
+        }
+
+        [When(@"there are failed employment check payment validations for the apprenticeship")]
+        public async Task WhenEmploymentCheckPaymentValidationsHaveBeenPreviouslyRecorded()
+        {
+            var paymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+                .With(x => x.Result, false)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 01, 01))
+                .Create();
+
+            var paymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                .With(x => x.Result, false)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 01, 01))
+                .Create();
+
+            await SetupPaymentValidationResult(paymentValidationResult1);
+            await SetupPaymentValidationResult(paymentValidationResult2);
+        }
+
+        [When(@"new employment check results have been recorded")]
+        public async Task WhenNewEmploymentCheckResultsHaveBeenRecorded()
+        {
+            var employmentCheck1 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .With(x => x.Result, true)
+                .Create();
+            var employmentCheck2 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                .With(x => x.Result, false)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .Create();
+
+            await SetupEmploymentCheck(employmentCheck1);
+            await SetupEmploymentCheck(employmentCheck2);
+        }
+
+        [When(@"new employment check payment validations are recorded")]
+        public async Task WhenNewEmploymentCheckPaymentValidationsHaveBeenRecorded()
+        {
+            var paymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+                .With(x => x.Result, true)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 02, 02))
+                .Create();
+
+            var paymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                .With(x => x.Result, true)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 02, 02))
+                .Create();
+
+            await SetupPaymentValidationResult(paymentValidationResult1);
+            await SetupPaymentValidationResult(paymentValidationResult2);
+        }
+
+        [When(@"there are no employment check payment validations for the apprenticeship")]
+        public async Task WhenThereAreNoEmploymentCheckPaymentValidationsForTheApprenticeship()
+        {
+            var paymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.HasDaysInLearning)
+                .With(x => x.Result, true)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 02, 02))
+                .Create();
+
+            await SetupPaymentValidationResult(paymentValidationResult);
+        }
+
+        [When(@"there are employment check results for the apprenticeship with null values")]
+        public async Task WhenThereAreEmploymentCheckResultsWithNullValues()
+        {
+            var employmentCheck1 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .Without(x => x.Result)
+                .Create();
+            var employmentCheck2 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                .Without(x => x.Result)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .Create();
+
+            await SetupEmploymentCheck(employmentCheck1);
+            await SetupEmploymentCheck(employmentCheck2);
+        }
+
+        [When(@"there is no learner record for an apprenticeship")]
+        [When(@"there are no payment validations for the apprenticeship")]
+        [When(@"there are no employment check results for the apprenticeship")]
+        public void WhenNoDataInserted()
+        {
+
         }
 
         [When(@"a client requests the apprenticeships for the account")]
@@ -378,6 +475,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
             apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
             apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
+        }
+
+        [Then(@"the most recent employment check payment validation results are reflected in the payment statuses")]
+        public void ThenTheMostRecentEmploymentCheckPaymentValidationResultsAreReflectedInThePaymentStatuses()
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+        }
+
+        [Then(@"the employment check payment statuses are not set")]
+        public void ThenTheEmploymentCheckPaymentStatusesAreNotSet()
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
         }
 
         private async Task SetupApprenticeshipIncentive()

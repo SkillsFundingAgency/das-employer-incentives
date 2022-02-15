@@ -1683,544 +1683,544 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplicationDataRep
         //    application.SecondPaymentStatus.PaymentSent.Should().BeFalse();
         //}
 
-        [TestCase(true, true, true, false, true)]
-        [TestCase(true, false, true, true, false)]
-        [TestCase(false, true, false, false, false)]
-        [TestCase(false, false, false, true, false)]
-        public async Task Then_the_employment_check_status_reflects_whether_the_payment_validation_results_indicate_a_pass(
-            bool firstEmploymentCheckStatus, 
-            bool secondEmploymentCheckStatus, 
-            bool firstEmploymentCheckValue,
-            bool secondEmploymentCheckValue,
-            bool overallEmploymentCheckStatus)
-        {
-            // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
-            var accountId = _fixture.Create<long>();
-            var accountLegalEntityId = _fixture.Create<long>();
+        //[TestCase(true, true, true, false, true)]
+        //[TestCase(true, false, true, true, false)]
+        //[TestCase(false, true, false, false, false)]
+        //[TestCase(false, false, false, true, false)]
+        //public async Task Then_the_employment_check_status_reflects_whether_the_payment_validation_results_indicate_a_pass(
+        //    bool firstEmploymentCheckStatus, 
+        //    bool secondEmploymentCheckStatus, 
+        //    bool firstEmploymentCheckValue,
+        //    bool secondEmploymentCheckValue,
+        //    bool overallEmploymentCheckStatus)
+        //{
+        //    // Arrange
+        //    var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+        //    var accountId = _fixture.Create<long>();
+        //    var accountLegalEntityId = _fixture.Create<long>();
 
-            allAccounts[0].Id = accountId;
-            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+        //    allAccounts[0].Id = accountId;
+        //    allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
-            incentives[0].AccountId = accountId;
-            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+        //    var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+        //    incentives[0].AccountId = accountId;
+        //    incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+        //    var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+        //    allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
-            var pendingPayments = _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(p => p.ClawedBack, false)
-                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
-                .CreateMany(2).ToList();
-            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
-            pendingPayments[0].EarningType = EarningType.FirstPayment;
-            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
-            pendingPayments[1].EarningType = EarningType.SecondPayment;
+        //    var pendingPayments = _fixture
+        //        .Build<PendingPayment>()
+        //        .With(p => p.AccountId, accountId)
+        //        .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+        //        .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(p => p.ClawedBack, false)
+        //        .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+        //        .CreateMany(2).ToList();
+        //    pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[0].EarningType = EarningType.FirstPayment;
+        //    pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            incentives[0].PendingPayments = pendingPayments;
+        //    incentives[0].PendingPayments = pendingPayments;
 
-            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
-            learners[0].ULN = incentives[0].ULN;
-            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
-            learners[0].InLearning = false;
+        //    var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+        //    learners[0].ULN = incentives[0].ULN;
+        //    learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+        //    learners[0].InLearning = false;
 
-            var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, firstEmploymentCheckStatus)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
-                .Create();
+        //    var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, firstEmploymentCheckStatus)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+        //        .Create();
 
-            var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, secondEmploymentCheckStatus)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
-                .Create();
+        //    var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, secondEmploymentCheckStatus)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+        //        .Create();
 
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
 
-            var employmentCheck1 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
-                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
-                .With(x => x.Result, firstEmploymentCheckValue)
-                .Create();
+        //    var employmentCheck1 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+        //        .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+        //        .With(x => x.Result, firstEmploymentCheckValue)
+        //        .Create();
 
-            var employmentCheck2 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
-                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
-                .With(x => x.Result, secondEmploymentCheckValue)
-                .Create();
+        //    var employmentCheck2 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+        //        .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+        //        .With(x => x.Result, secondEmploymentCheckValue)
+        //        .Create();
 
-            incentives[0].EmploymentChecks.Clear();
-            incentives[0].EmploymentChecks.Add(employmentCheck1);
-            incentives[0].EmploymentChecks.Add(employmentCheck2);
+        //    incentives[0].EmploymentChecks.Clear();
+        //    incentives[0].EmploymentChecks.Add(employmentCheck1);
+        //    incentives[0].EmploymentChecks.Add(employmentCheck2);
 
-            _context.Accounts.AddRange(allAccounts);
-            _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
-            _context.Learners.AddRange(learners);
+        //    _context.Accounts.AddRange(allAccounts);
+        //    _context.ApprenticeshipIncentives.AddRange(incentives);
+        //    _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+        //    _context.Learners.AddRange(learners);
             
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            // Act
-            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+        //    // Act
+        //    var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
-            // Assert
-            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
-            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().NotBeNull();
-            application.FirstPaymentStatus.EmploymentCheckPassed.Value.Should().Be(overallEmploymentCheckStatus);
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().NotBeNull();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Value.Should().Be(overallEmploymentCheckStatus);
-        }
+        //    // Assert
+        //    result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+        //    var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+        //    application.FirstPaymentStatus.EmploymentCheckPassed.Should().NotBeNull();
+        //    application.FirstPaymentStatus.EmploymentCheckPassed.Value.Should().Be(overallEmploymentCheckStatus);
+        //    application.SecondPaymentStatus.EmploymentCheckPassed.Should().NotBeNull();
+        //    application.SecondPaymentStatus.EmploymentCheckPassed.Value.Should().Be(overallEmploymentCheckStatus);
+        //}
 
-        [Test]
-        public async Task Then_the_most_recent_employment_check_payment_validation_is_used_when_more_than_one_validation_has_been_performed()
-        {
-            // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
-            var accountId = _fixture.Create<long>();
-            var accountLegalEntityId = _fixture.Create<long>();
+        //[Test]
+        //public async Task Then_the_most_recent_employment_check_payment_validation_is_used_when_more_than_one_validation_has_been_performed()
+        //{
+        //    // Arrange
+        //    var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+        //    var accountId = _fixture.Create<long>();
+        //    var accountLegalEntityId = _fixture.Create<long>();
 
-            allAccounts[0].Id = accountId;
-            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+        //    allAccounts[0].Id = accountId;
+        //    allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
-            incentives[0].AccountId = accountId;
-            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+        //    var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+        //    incentives[0].AccountId = accountId;
+        //    incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+        //    var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+        //    allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
-            var pendingPayments = _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(p => p.ClawedBack, false)
-                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
-                .CreateMany(2).ToList();
-            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
-            pendingPayments[0].EarningType = EarningType.FirstPayment;
-            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
-            pendingPayments[1].EarningType = EarningType.SecondPayment;
+        //    var pendingPayments = _fixture
+        //        .Build<PendingPayment>()
+        //        .With(p => p.AccountId, accountId)
+        //        .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+        //        .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(p => p.ClawedBack, false)
+        //        .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+        //        .CreateMany(2).ToList();
+        //    pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[0].EarningType = EarningType.FirstPayment;
+        //    pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            incentives[0].PendingPayments = pendingPayments;
+        //    incentives[0].PendingPayments = pendingPayments;
 
-            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
-            learners[0].ULN = incentives[0].ULN;
-            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
-            learners[0].InLearning = false;
+        //    var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+        //    learners[0].ULN = incentives[0].ULN;
+        //    learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+        //    learners[0].InLearning = false;
 
-            var firstPaymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
-                .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
-                .Create();
+        //    var firstPaymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+        //        .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
+        //        .Create();
 
-            var secondPaymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
-                .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
-                .Create();
+        //    var secondPaymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+        //        .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
+        //        .Create();
 
-            var firstPaymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, true)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
-                .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 02))
-                .Create();
+        //    var firstPaymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, true)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+        //        .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 02))
+        //        .Create();
 
-            var secondPaymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, true)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
-                .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 02))
-                .Create();
+        //    var secondPaymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, true)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+        //        .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 02))
+        //        .Create();
 
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult1);
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult1);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult1);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult1);
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult2);
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult2);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult2);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult2);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult1);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult1);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult1);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult1);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult2);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult2);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult2);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult2);
 
-            var employmentCheck1 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
-                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
-                .With(x => x.Result, true)
-                .Create();
+        //    var employmentCheck1 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+        //        .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+        //        .With(x => x.Result, true)
+        //        .Create();
 
-            var employmentCheck2 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
-                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
-                .With(x => x.Result, false)
-                .Create();
+        //    var employmentCheck2 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+        //        .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+        //        .With(x => x.Result, false)
+        //        .Create();
 
-            incentives[0].EmploymentChecks.Clear();
-            incentives[0].EmploymentChecks.Add(employmentCheck1);
-            incentives[0].EmploymentChecks.Add(employmentCheck2);
+        //    incentives[0].EmploymentChecks.Clear();
+        //    incentives[0].EmploymentChecks.Add(employmentCheck1);
+        //    incentives[0].EmploymentChecks.Add(employmentCheck2);
 
-            _context.Accounts.AddRange(allAccounts);
-            _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
-            _context.Learners.AddRange(learners);
+        //    _context.Accounts.AddRange(allAccounts);
+        //    _context.ApprenticeshipIncentives.AddRange(incentives);
+        //    _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+        //    _context.Learners.AddRange(learners);
             
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            // Act
-            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+        //    // Act
+        //    var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
-            // Assert
-            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
-            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
-        }
+        //    // Assert
+        //    result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+        //    var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+        //    application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+        //    application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+        //}
 
-        [Test]
-        public async Task Then_the_employment_check_is_not_set_if_there_are_no_payment_validation_results()
-        {
-            // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
-            var accountId = _fixture.Create<long>();
-            var accountLegalEntityId = _fixture.Create<long>();
+        //[Test]
+        //public async Task Then_the_employment_check_is_not_set_if_there_are_no_payment_validation_results()
+        //{
+        //    // Arrange
+        //    var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+        //    var accountId = _fixture.Create<long>();
+        //    var accountLegalEntityId = _fixture.Create<long>();
 
-            allAccounts[0].Id = accountId;
-            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+        //    allAccounts[0].Id = accountId;
+        //    allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
-            incentives[0].AccountId = accountId;
-            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+        //    var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+        //    incentives[0].AccountId = accountId;
+        //    incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+        //    var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+        //    allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
-            var pendingPayments = _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(p => p.ClawedBack, false)
-                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
-                .CreateMany(2).ToList();
-            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
-            pendingPayments[0].EarningType = EarningType.FirstPayment;
-            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
-            pendingPayments[1].EarningType = EarningType.SecondPayment;
+        //    var pendingPayments = _fixture
+        //        .Build<PendingPayment>()
+        //        .With(p => p.AccountId, accountId)
+        //        .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+        //        .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(p => p.ClawedBack, false)
+        //        .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+        //        .CreateMany(2).ToList();
+        //    pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[0].EarningType = EarningType.FirstPayment;
+        //    pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            incentives[0].PendingPayments = pendingPayments;
+        //    incentives[0].PendingPayments = pendingPayments;
 
-            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
-            learners[0].ULN = incentives[0].ULN;
-            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
-            learners[0].InLearning = false;
+        //    var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+        //    learners[0].ULN = incentives[0].ULN;
+        //    learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+        //    learners[0].InLearning = false;
 
-            _context.Accounts.AddRange(allAccounts);
-            _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
-            _context.Learners.AddRange(learners);
+        //    _context.Accounts.AddRange(allAccounts);
+        //    _context.ApprenticeshipIncentives.AddRange(incentives);
+        //    _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+        //    _context.Learners.AddRange(learners);
 
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            // Act
-            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+        //    // Act
+        //    var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
-            // Assert
-            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
-            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-        }
+        //    // Assert
+        //    result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+        //    var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+        //    application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //    application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //}
 
-        [Test]
-        public async Task Then_the_employment_check_is_not_set_if_the_payment_validation_results_do_not_include_the_employment_checks()
-        {
-            // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
-            var accountId = _fixture.Create<long>();
-            var accountLegalEntityId = _fixture.Create<long>();
+        //[Test]
+        //public async Task Then_the_employment_check_is_not_set_if_the_payment_validation_results_do_not_include_the_employment_checks()
+        //{
+        //    // Arrange
+        //    var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+        //    var accountId = _fixture.Create<long>();
+        //    var accountLegalEntityId = _fixture.Create<long>();
 
-            allAccounts[0].Id = accountId;
-            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+        //    allAccounts[0].Id = accountId;
+        //    allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
-            incentives[0].AccountId = accountId;
-            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+        //    var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+        //    incentives[0].AccountId = accountId;
+        //    incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+        //    var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+        //    allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
-            var pendingPayments = _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(p => p.ClawedBack, false)
-                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
-                .CreateMany(2).ToList();
-            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
-            pendingPayments[0].EarningType = EarningType.FirstPayment;
-            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
-            pendingPayments[1].EarningType = EarningType.SecondPayment;
+        //    var pendingPayments = _fixture
+        //        .Build<PendingPayment>()
+        //        .With(p => p.AccountId, accountId)
+        //        .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+        //        .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(p => p.ClawedBack, false)
+        //        .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+        //        .CreateMany(2).ToList();
+        //    pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[0].EarningType = EarningType.FirstPayment;
+        //    pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            incentives[0].PendingPayments = pendingPayments;
+        //    incentives[0].PendingPayments = pendingPayments;
 
-            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
-            learners[0].ULN = incentives[0].ULN;
-            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
-            learners[0].InLearning = false;
+        //    var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+        //    learners[0].ULN = incentives[0].ULN;
+        //    learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+        //    learners[0].InLearning = false;
 
-            var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.HasBankDetails)
-                .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
-                .Create();
+        //    var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.HasBankDetails)
+        //        .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
+        //        .Create();
 
-            var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.HasLearningRecord)
-                .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
-                .Create();
+        //    var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.HasLearningRecord)
+        //        .With(x => x.CreatedDateUtc, new DateTime(2021, 12, 01))
+        //        .Create();
 
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
 
-            _context.Accounts.AddRange(allAccounts);
-            _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
-            _context.Learners.AddRange(learners);
+        //    _context.Accounts.AddRange(allAccounts);
+        //    _context.ApprenticeshipIncentives.AddRange(incentives);
+        //    _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+        //    _context.Learners.AddRange(learners);
 
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            // Act
-            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+        //    // Act
+        //    var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
-            // Assert
-            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
-            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-        }
+        //    // Assert
+        //    result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+        //    var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+        //    application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //    application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //}
 
-        [Test]
-        public async Task Then_the_employment_check_is_not_set_if_the_validation_result_is_false_and_no_employment_check_record_has_been_created()
-        {
-            // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
-            var accountId = _fixture.Create<long>();
-            var accountLegalEntityId = _fixture.Create<long>();
+        //[Test]
+        //public async Task Then_the_employment_check_is_not_set_if_the_validation_result_is_false_and_no_employment_check_record_has_been_created()
+        //{
+        //    // Arrange
+        //    var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+        //    var accountId = _fixture.Create<long>();
+        //    var accountLegalEntityId = _fixture.Create<long>();
 
-            allAccounts[0].Id = accountId;
-            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+        //    allAccounts[0].Id = accountId;
+        //    allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
-            incentives[0].AccountId = accountId;
-            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+        //    var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+        //    incentives[0].AccountId = accountId;
+        //    incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+        //    var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+        //    allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
-            var pendingPayments = _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(p => p.ClawedBack, false)
-                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
-                .CreateMany(2).ToList();
-            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
-            pendingPayments[0].EarningType = EarningType.FirstPayment;
-            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
-            pendingPayments[1].EarningType = EarningType.SecondPayment;
+        //    var pendingPayments = _fixture
+        //        .Build<PendingPayment>()
+        //        .With(p => p.AccountId, accountId)
+        //        .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+        //        .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(p => p.ClawedBack, false)
+        //        .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+        //        .CreateMany(2).ToList();
+        //    pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[0].EarningType = EarningType.FirstPayment;
+        //    pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            incentives[0].PendingPayments = pendingPayments;
+        //    incentives[0].PendingPayments = pendingPayments;
 
-            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
-            learners[0].ULN = incentives[0].ULN;
-            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
-            learners[0].InLearning = false;
+        //    var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+        //    learners[0].ULN = incentives[0].ULN;
+        //    learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+        //    learners[0].InLearning = false;
 
-            var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
-                .Create();
+        //    var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+        //        .Create();
 
-            var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
-                .Create();
+        //    var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+        //        .Create();
 
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
 
-            incentives[0].EmploymentChecks.Clear();
+        //    incentives[0].EmploymentChecks.Clear();
 
-            var additionalValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .Create();
-            var additionalValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.PendingPaymentId, pendingPayments[1].Id)
-                .Create();
+        //    var additionalValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .Create();
+        //    var additionalValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.PendingPaymentId, pendingPayments[1].Id)
+        //        .Create();
 
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(additionalValidationResult1);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(additionalValidationResult2);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(additionalValidationResult1);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(additionalValidationResult2);
 
-            _context.Accounts.AddRange(allAccounts);
-            _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
-            _context.Learners.AddRange(learners);
+        //    _context.Accounts.AddRange(allAccounts);
+        //    _context.ApprenticeshipIncentives.AddRange(incentives);
+        //    _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+        //    _context.Learners.AddRange(learners);
 
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            // Act
-            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+        //    // Act
+        //    var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
-            // Assert
-            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
-            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-        }
+        //    // Assert
+        //    result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+        //    var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+        //    application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //    application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //}
 
-        [Test]
-        public async Task Then_the_employment_check_is_not_set_if_the_validation_result_is_false_and_the_employment_check_record_result_is_null()
-        {
-            // Arrange
-            var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
-            var accountId = _fixture.Create<long>();
-            var accountLegalEntityId = _fixture.Create<long>();
+        //[Test]
+        //public async Task Then_the_employment_check_is_not_set_if_the_validation_result_is_false_and_the_employment_check_record_result_is_null()
+        //{
+        //    // Arrange
+        //    var allAccounts = _fixture.CreateMany<Models.Account>(10).ToArray();
+        //    var accountId = _fixture.Create<long>();
+        //    var accountLegalEntityId = _fixture.Create<long>();
 
-            allAccounts[0].Id = accountId;
-            allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
+        //    allAccounts[0].Id = accountId;
+        //    allAccounts[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
-            incentives[0].AccountId = accountId;
-            incentives[0].AccountLegalEntityId = accountLegalEntityId;
+        //    var incentives = _fixture.CreateMany<ApprenticeshipIncentives.Models.ApprenticeshipIncentive>(5).ToArray();
+        //    incentives[0].AccountId = accountId;
+        //    incentives[0].AccountLegalEntityId = accountLegalEntityId;
 
-            var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
-            allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
-            allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
+        //    var allApprenticeships = _fixture.CreateMany<Models.IncentiveApplicationApprenticeship>(10).ToArray();
+        //    allApprenticeships[1].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[2].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[3].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[4].IncentiveApplicationId = incentives[0].Id;
+        //    allApprenticeships[5].IncentiveApplicationId = incentives[0].Id;
 
-            var pendingPayments = _fixture
-                .Build<PendingPayment>()
-                .With(p => p.AccountId, accountId)
-                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
-                .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(p => p.ClawedBack, false)
-                .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
-                .CreateMany(2).ToList();
-            pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
-            pendingPayments[0].EarningType = EarningType.FirstPayment;
-            pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
-            pendingPayments[1].EarningType = EarningType.SecondPayment;
+        //    var pendingPayments = _fixture
+        //        .Build<PendingPayment>()
+        //        .With(p => p.AccountId, accountId)
+        //        .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+        //        .With(p => p.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(p => p.ClawedBack, false)
+        //        .With(p => p.ValidationResults, new List<PendingPaymentValidationResult>())
+        //        .CreateMany(2).ToList();
+        //    pendingPayments[0].DueDate = DateTime.Parse("04-01-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[0].EarningType = EarningType.FirstPayment;
+        //    pendingPayments[1].DueDate = DateTime.Parse("01-12-2020", new CultureInfo("en-GB"));
+        //    pendingPayments[1].EarningType = EarningType.SecondPayment;
 
-            incentives[0].PendingPayments = pendingPayments;
+        //    incentives[0].PendingPayments = pendingPayments;
 
-            var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
-            learners[0].ULN = incentives[0].ULN;
-            learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
-            learners[0].InLearning = false;
+        //    var learners = _fixture.CreateMany<ApprenticeshipIncentives.Models.Learner>(10).ToList();
+        //    learners[0].ULN = incentives[0].ULN;
+        //    learners[0].ApprenticeshipIncentiveId = incentives[0].Id;
+        //    learners[0].InLearning = false;
 
-            var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
-                .Create();
+        //    var firstPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+        //        .Create();
 
-            var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.Result, false)
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
-                .Create();
+        //    var secondPaymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.Result, false)
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+        //        .Create();
 
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(secondPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(firstPaymentValidationResult);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(secondPaymentValidationResult);
 
-            var additionalValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.PendingPaymentId, pendingPayments[0].Id)
-                .Create();
-            var additionalValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
-                .With(x => x.PendingPaymentId, pendingPayments[1].Id)
-                .Create();
+        //    var additionalValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.PendingPaymentId, pendingPayments[0].Id)
+        //        .Create();
+        //    var additionalValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+        //        .With(x => x.PendingPaymentId, pendingPayments[1].Id)
+        //        .Create();
 
-            incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(additionalValidationResult1);
-            incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(additionalValidationResult2);
+        //    incentives[0].PendingPayments.ToList()[0].ValidationResults.Add(additionalValidationResult1);
+        //    incentives[0].PendingPayments.ToList()[1].ValidationResults.Add(additionalValidationResult2);
 
-            var employmentCheck1 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
-                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
-                .Without(x => x.Result)
-                .Create();
+        //    var employmentCheck1 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+        //        .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+        //        .Without(x => x.Result)
+        //        .Create();
 
-            var employmentCheck2 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
-                .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
-                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
-                .Without(x => x.Result)
-                .Create();
-            incentives[0].EmploymentChecks.Clear();
-            incentives[0].EmploymentChecks.Add(employmentCheck1);
-            incentives[0].EmploymentChecks.Add(employmentCheck2);
+        //    var employmentCheck2 = _fixture.Build<ApprenticeshipIncentives.Models.EmploymentCheck>()
+        //        .With(x => x.ApprenticeshipIncentiveId, incentives[0].Id)
+        //        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+        //        .Without(x => x.Result)
+        //        .Create();
+        //    incentives[0].EmploymentChecks.Clear();
+        //    incentives[0].EmploymentChecks.Add(employmentCheck1);
+        //    incentives[0].EmploymentChecks.Add(employmentCheck2);
 
-            _context.Accounts.AddRange(allAccounts);
-            _context.ApprenticeshipIncentives.AddRange(incentives);
-            _context.ApplicationApprenticeships.AddRange(allApprenticeships);
-            _context.Learners.AddRange(learners);
+        //    _context.Accounts.AddRange(allAccounts);
+        //    _context.ApprenticeshipIncentives.AddRange(incentives);
+        //    _context.ApplicationApprenticeships.AddRange(allApprenticeships);
+        //    _context.Learners.AddRange(learners);
 
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            // Act
-            var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
+        //    // Act
+        //    var result = (await _sut.GetList(accountId, accountLegalEntityId)).ToArray();
 
-            // Assert
-            result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
-            var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
-            application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-            application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
-        }
+        //    // Assert
+        //    result.Count(x => x.ULN == incentives[0].ULN).Should().Be(1);
+        //    var application = result.FirstOrDefault(x => x.ULN == incentives[0].ULN);
+        //    application.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //    application.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        //}
     }
 }
