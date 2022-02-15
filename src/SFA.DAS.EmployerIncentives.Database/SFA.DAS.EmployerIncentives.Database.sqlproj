@@ -107,6 +107,7 @@
     <Build Include="Tables\ApprenticeshipBreakInLearning.sql" />
     <Build Include="StoredProcedures\CreateRetrospectiveApplication.sql" />
     <Build Include="Tables\AcademicYear.sql" />
+    <None Include="Scripts\Remove.TotalIncentiveAmount.sql" />
     <Build Include="Tables\EmploymentCheck.sql" />
     <Build Include="Schemas\Reports.sql" />
     <Build Include="StoredProcedures\Reports.RecoveryReport.sql" />
@@ -133,6 +134,6 @@
     <None Include="Scripts\Metrics Template.xlsx" />
   </ItemGroup>
   <ItemGroup>
-    <PreDeploy Include="Scripts\Rename.HasEligibleEmploymentStartDate.sql" />
+    <PreDeploy Include="Script.PreDeployment1.sql" />
   </ItemGroup>
 </Project>
