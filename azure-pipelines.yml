@@ -53,8 +53,7 @@ stages:
         organization: $(SonarCloudOrganisationKey)
         scannerMode: MSBuild
         projectName: "$(Build.DefinitionName)"
-        projectKey: "${{ parameters.SonarCloudProjectKey }}"
-        extraProperties: "${{ parameters.SonarCloudExtraProperties }}"
+        projectKey: SkillsFundingAgency_das-employer-incentives
 
     - task: DotNetCoreCLI@2
       displayName: Restore
