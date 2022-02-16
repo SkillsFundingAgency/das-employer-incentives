@@ -159,3 +159,34 @@ Scenario: Employment check payment validation fails due to null employment check
 	And there are failed employment check payment validations for the apprenticeship
 	When a client requests the apprenticeships for the account
 	Then the employment check payment statuses are not set
+
+Scenario: Payment stopped
+	Given an account that is in employer incentives
+	When the incentive has a status of '<Incentive Status>'
+	When a client requests the apprenticeships for the account
+	Then the payment statuses reflect the stopped status of '<Payment Stopped Status>'
+Examples:
+| Incentive Status	  | Payment Stopped Status |
+| Stopped             | true                   |
+| Active              | false                  |
+
+Scenario: Payment clawed back
+	Given an account that is in employer incentives
+	When the '<Earning Type>' payment has been clawed back
+	When a client requests the apprenticeships for the account
+	Then the '<Earning Type>' clawback status reflects the amount clawed back and date
+Examples:
+| Earning Type  |
+| FirstPayment  |
+| SecondPayment |
+
+Scenario: Application withdrawn
+	Given an account that is in employer incentives
+	When the application has been withdrawn by '<Withdrawn By>'
+	When a client requests the apprenticeships for the account
+	Then the payment statuses reflect that the application withdrawal was requested by '<Withdrawn By>'
+Examples:
+| Withdrawn By  |
+| Employer		|
+| Compliance	|
+
