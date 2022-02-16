@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using ValidationOverride = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ValidationOverride;
 
 namespace SFA.DAS.EmployerIncentives.Data
@@ -36,13 +37,13 @@ namespace SFA.DAS.EmployerIncentives.Data
             var accountApplications = _dbContext.ApprenticeApplications.Where(x =>
                 x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId);
 
-            var apprenticeshipIncentives = _dbContext.ApprenticeshipIncentives.Where(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId);
+            var apprenticeshipIncentives = _dbContext.ApprenticeshipIncentives.Where(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId).Include(i => i.ValidationOverrides);
 
             var result = new List<ApprenticeApplicationDto>();
 
             foreach (var data in accountApplications)
             {
-                var validationOverrides = apprenticeshipIncentives.Where(i => i.Id == data.Id).Single().ValidationOverrides;                
+                var validationOverrides = apprenticeshipIncentives.Single(i => i.Id == data.Id).ValidationOverrides;
 
                 var apprenticeApplicationDto = new ApprenticeApplicationDto
                 {
@@ -65,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         InLearning = IsInLearningOverride(validationOverrides, data.InLearning.HasValue && data.InLearning.Value),
                         PausePayments = data.PausePayments,
                         PaymentSent = data.FirstPaymentDate.HasValue,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.FirstPaymentDate, _dateTimeService),
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.FirstPayment, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
                                         EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
@@ -86,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         InLearning = IsInLearningOverride(validationOverrides, data.InLearning.HasValue && data.InLearning.Value),
                         PausePayments = data.PausePayments,
                         PaymentSent = data.SecondPaymentDate.HasValue,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.SecondPaymentDate, _dateTimeService),
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.SecondPayment, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
                                         EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
@@ -247,10 +248,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
             else
             {
-                if (model.SecondPaymentStatus == null)
-                {
-                    model.SecondPaymentStatus = paymentStatus;
-                }
+                model.SecondPaymentStatus = paymentStatus;
             }
         }
         
@@ -292,22 +290,6 @@ namespace SFA.DAS.EmployerIncentives.Data
                 return paymentAmount;
             }
             return pendingPaymentAmount;
-        }
-        
-        private static bool IsPaymentEstimated(DateTime? paymentDate, IDateTimeService dateTimeService)
-        {
-            if(!paymentDate.HasValue)
-            {
-                return true;
-            }
-
-            if (dateTimeService.Now().Day < 27 &&
-                paymentDate.Value.Year == dateTimeService.Now().Year &&
-                paymentDate.Value.Month == dateTimeService.Now().Month)
-            {
-                return true;
-            }
-            return false;
         }
 
         public async Task<Guid?> GetFirstSubmittedApplicationId(long accountLegalEntityId)
