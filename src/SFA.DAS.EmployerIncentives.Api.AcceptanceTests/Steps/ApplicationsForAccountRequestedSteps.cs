@@ -189,7 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"there is a '(.*)' payment that has been sent")]
         public async Task WhenThereIsAPaymentThatHasBeenSent(EarningType earningType)
         {
-            _payment = _fixture.Build<Payment>()
+            _payment = Fixture.Build<Payment>()
                 .With(x => x.AccountId, _account.Id)
                 .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
                 .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
@@ -366,7 +366,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
                 .Without(x => x.Result)
                 .Create();
-            var employmentCheck2 = _fixture.Build<EmploymentCheck>()
+            var employmentCheck2 = Fixture.Build<EmploymentCheck>()
                 .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
                 .Without(x => x.Result)
