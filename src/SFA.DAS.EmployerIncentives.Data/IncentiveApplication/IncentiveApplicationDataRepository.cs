@@ -49,13 +49,13 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             }
         }
 
-        public async Task<List<IncentiveApplicationModel>> FindApplicationsWithoutEarningsCalculated()
+        public async Task<IEnumerable<IncentiveApplicationModel>> FindApplicationsWithoutEarningsCalculated()
         {
             var queryResult = (from result in (_dbContext.Applications.Include(x => x.Apprenticeships)
                                .Where(x => x.Status == Enums.IncentiveApplicationStatus.Submitted
                                && x.Apprenticeships.Any(y => !y.EarningsCalculated)))
                         let item = ApplicationToIncentiveApplicationModel(result)
-                        select item).ToList();
+                        select item);
 
             return await Task.FromResult(queryResult);
         }        

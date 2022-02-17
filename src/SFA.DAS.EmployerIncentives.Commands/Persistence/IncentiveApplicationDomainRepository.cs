@@ -53,12 +53,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
                 select _incentiveApplicationFactory.GetExisting(app.Id, app));
         }
 
-        public async Task<List<IncentiveApplication>> FindIncentiveApplicationsWithoutEarningsCalculations()
+        public async Task<IEnumerable<IncentiveApplication>> FindIncentiveApplicationsWithoutEarningsCalculations()
         {
             var applications = await _incentiveApplicationDataRepository.FindApplicationsWithoutEarningsCalculated();
             
             return (from app in applications
-                    select _incentiveApplicationFactory.GetExisting(app.Id, app)).ToList();
+                    select _incentiveApplicationFactory.GetExisting(app.Id, app));
         }
 
         public async Task Save(IncentiveApplication aggregate)
