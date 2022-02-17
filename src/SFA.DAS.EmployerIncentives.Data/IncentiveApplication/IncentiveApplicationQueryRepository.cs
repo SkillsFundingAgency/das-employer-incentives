@@ -6,13 +6,13 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Data.Map;
-using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
-    public class IncentiveApplicationQueryRepository : IQueryRepository<IncentiveApplicationDto>
+    public class IncentiveApplicationQueryRepository : IIncentiveApplicationQueryRepository
     {
         private class JoinedObject
         {
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         {
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
-                .Select(MapToIncentiveApplicationDto()).SingleOrDefaultAsync(predicate);
+                .Select(MapToIncentiveApplicationDto()).FirstOrDefaultAsync(predicate);
         }
 
         public Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
@@ -42,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 .Select(MapToIncentiveApplicationDto()).Where(predicate).ToListAsync();
         }
 
-        private Expression<Func<JoinedObject, IncentiveApplicationDto>> MapToIncentiveApplicationDto()
+        private static Expression<Func<JoinedObject, IncentiveApplicationDto>> MapToIncentiveApplicationDto()
         {
             return x => new IncentiveApplicationDto
             {
@@ -63,13 +63,12 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 
         private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(Models.IncentiveApplicationApprenticeship apprenticeship)
         {
-            return new IncentiveApplicationApprenticeshipDto
+            var apprenticeshipDto = new IncentiveApplicationApprenticeshipDto
             {
                 Id = apprenticeship.Id,
                 ApprenticeshipId = apprenticeship.ApprenticeshipId,
                 FirstName = apprenticeship.FirstName,
                 LastName = apprenticeship.LastName,
-                TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
                 Uln = apprenticeship.ULN,
                 PlannedStartDate = apprenticeship.PlannedStartDate,
                 DateOfBirth = apprenticeship.DateOfBirth,
@@ -77,7 +76,11 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                 Phase = apprenticeship.Phase,
                 StartDatesAreEligible = apprenticeship.StartDatesAreEligible
             };
+            
+            apprenticeshipDto.TotalIncentiveAmount = Incentive.Create(apprenticeshipDto).GetTotalIncentiveAmount();
+
+            return apprenticeshipDto;
+
         }
-     
     }
 }

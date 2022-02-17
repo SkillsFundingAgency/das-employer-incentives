@@ -108,6 +108,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return paymentProfile.DaysAfterApprenticeshipStart;
         }
         
+        public decimal GetTotalIncentiveAmount()
+        {
+            return PaymentProfiles.Where(x => x.IncentiveType == _incentiveType).Sum(profile => profile.AmountPayable);
+        }
+
         private static int AgeAtStartOfCourse(DateTime dateOfBirth, DateTime startDate)
         {
             return dateOfBirth.AgeOnThisDay(startDate);
