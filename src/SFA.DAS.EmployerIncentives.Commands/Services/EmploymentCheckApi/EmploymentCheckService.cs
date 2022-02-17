@@ -20,11 +20,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi
         public async Task<Guid> RegisterEmploymentCheck(EmploymentCheck employmentCheck, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive apprenticeshipIncentive)
         {
             var correlationId = Guid.NewGuid();
-            var createEmploymentCheckRequest = new CreateEmploymentCheckRequestDto(correlationId, employmentCheck.CheckType.ToString(), apprenticeshipIncentive.Apprenticeship.UniqueLearnerNumber, apprenticeshipIncentive.Account.Id, apprenticeshipIncentive.Apprenticeship.Id, employmentCheck.MinimumDate, employmentCheck.MaximumDate);
+            var createEmploymentCheckRequest = new RegisterCheckRequest
+            {
+                ApprenticeshipAccountId = apprenticeshipIncentive.Account.Id, 
+                ApprenticeshipId = apprenticeshipIncentive.Apprenticeship.Id, 
+                CheckType = employmentCheck.CheckType.ToString(), 
+                CorrelationId = correlationId, 
+                MaxDate = employmentCheck.MaximumDate, 
+                MinDate = employmentCheck.MinimumDate, 
+                Uln = apprenticeshipIncentive.Apprenticeship.UniqueLearnerNumber
+            };
             var content = new StringContent(JsonConvert.SerializeObject(createEmploymentCheckRequest), Encoding.Default, "application/json");
-            var response = await _client.PutAsync("employmentchecks", content);
+            var response = await _client.PutAsync("RegisterCheck", content);
 
-            if (response.StatusCode == HttpStatusCode.Accepted)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 return correlationId;
             }
