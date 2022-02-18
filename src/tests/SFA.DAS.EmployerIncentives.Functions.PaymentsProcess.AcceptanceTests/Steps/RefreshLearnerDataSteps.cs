@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.SubmittedDate, _startDate.AddDays(-30))
                 .Without(p => p.PendingPayments)
                 .Without(p => p.Payments)
-                .With(p => p.Phase, Phase.Phase1)
+                .With(p => p.Phase, Phase.Phase1)             
                 .Create();
 
             _pendingPayments = new List<PendingPayment>
@@ -153,6 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.StartDate, _startDate)
                 .With(s => s.InLearning, true)
                 .With(s => s.HasDataLock, true)
+                .Without(s => s.RefreshDate)
                 .Create();
             });
 
@@ -179,6 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.StartDate, _startDate)
                 .With(s => s.InLearning, true)
                 .With(s => s.HasDataLock, true)
+                .Without(s => s.RefreshDate)
                 .Create();
             });
 
@@ -191,6 +193,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public void AndTheLatestLearnerDataHasInLearningData()
         {
             SetupLearnerMatchApiResponse(LearnerMatchApiResponses.BL_R03_InLearning_json);
+        }
+
+        [Given(@"learner service caching is enabled")]
+        public void GivenLearnerServiceCachingIsEnabled()
+        {
+            _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes = "10";
         }
 
         [Given(@"the latest learner data has a data locked price episode")]
@@ -497,6 +505,21 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             createdClawback.Amount.Should().Be(-1 * _apprenticeshipIncentive.PendingPayments.First().Amount);
             createdClawback.SubnominalCode.Should().Be(_apprenticeshipIncentive.Payments.Single(p => p.PendingPaymentId == _apprenticeshipIncentive.PendingPayments.First().Id).SubnominalCode);
             createdClawback.PaymentId.Should().Be(_apprenticeshipIncentive.Payments.Single(p => p.PendingPaymentId == _apprenticeshipIncentive.PendingPayments.First().Id).Id);
+        }
+
+        [Then(@"the learner match API is called '(.*)' time\(s\)")]
+        public void ThenTheLearnerMatchApiIsCalled(int timesCalled)
+        {
+            var requests = _testContext
+                .LearnerMatchApi
+                .MockServer
+                .FindLogEntries(
+                    Request
+                        .Create()
+                        .WithPath(u => u.StartsWith($"/api/v1.0/{_apprenticeshipIncentive.UKPRN}/{_apprenticeshipIncentive.ULN}"))
+                        .UsingGet());
+
+            requests.AsEnumerable().Count().Should().Be(timesCalled); 
         }
 
         private void SetupLearnerMatchApiResponse(string json)

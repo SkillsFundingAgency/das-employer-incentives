@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.Http.Configuration;
-using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
@@ -19,5 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string EmployerIncentivesWebBaseUrl { get; set; }
         public string LogLevel { get; set; }
         public bool EmploymentCheckEnabled { get; set; }
+        public string LearnerServiceCacheIntervalInMinutes { get; set; }
     }
 }

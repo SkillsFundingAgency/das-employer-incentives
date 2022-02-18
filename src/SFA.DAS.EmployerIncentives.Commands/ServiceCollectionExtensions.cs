@@ -90,6 +90,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
             serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 
+            serviceCollection.AddScoped<ILearnerService, LearnerService>()
+                .Decorate<ILearnerService, LearnerServiceWithCache>();
+
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
             serviceCollection.AddScoped<IScheduledCommandPublisher, ScheduledCommandPublisher>();
 
