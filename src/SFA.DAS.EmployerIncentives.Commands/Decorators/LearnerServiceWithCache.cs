@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
         private readonly ILearnerDomainRepository _learnerDomainRepository;
         private readonly IDateTimeService _dateTimeService;
         private readonly bool _isCaching;
-        private readonly uint _cacheIntervalInMinutes;
+        private readonly int _cacheIntervalInMinutes;
 
         public LearnerServiceWithCache(
             ILearnerService service,
@@ -24,10 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
             IDateTimeService dateTimeService)
         {
             var cacheInterval = options?.Value.LearnerServiceCacheIntervalInMinutes;
-            if(!string.IsNullOrWhiteSpace(cacheInterval))
+            if(cacheInterval.HasValue && cacheInterval.Value > 0)
             {
                 _isCaching = true;
-                _cacheIntervalInMinutes = Convert.ToUInt32(cacheInterval);
+                _cacheIntervalInMinutes = cacheInterval.Value;
             }
             _service = service;
             _learnerDomainRepository = learnerDomainRepository;

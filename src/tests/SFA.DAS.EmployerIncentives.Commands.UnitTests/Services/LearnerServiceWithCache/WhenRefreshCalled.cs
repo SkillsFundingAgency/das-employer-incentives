@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceW
             //Arrange
             _applicationSettings = new ApplicationSettings
             {
-                LearnerServiceCacheIntervalInMinutes = "60"
+                LearnerServiceCacheIntervalInMinutes = 60
             };
 
             _mockDateTimeService
@@ -108,7 +108,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceW
             //Arrange
             _applicationSettings = new ApplicationSettings
             {
-                LearnerServiceCacheIntervalInMinutes = "60"
+                LearnerServiceCacheIntervalInMinutes = 60
             };
 
             var learner = Learner.Get(_fixture
@@ -139,7 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceW
             //Arrange
             _applicationSettings = new ApplicationSettings
             {
-                LearnerServiceCacheIntervalInMinutes = "60"
+                LearnerServiceCacheIntervalInMinutes = 60
             };
            
             _mockDateTimeService
@@ -164,7 +164,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceW
             //Arrange
             _applicationSettings = new ApplicationSettings
             {
-                LearnerServiceCacheIntervalInMinutes = "60"
+                LearnerServiceCacheIntervalInMinutes = 60
             };
 
             var learner = Learner.Get(_fixture

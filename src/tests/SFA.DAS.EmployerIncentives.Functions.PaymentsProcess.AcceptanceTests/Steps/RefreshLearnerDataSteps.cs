@@ -198,7 +198,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"learner service caching is enabled")]
         public void GivenLearnerServiceCachingIsEnabled()
         {
-            _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes = "10";
+            _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes = 10;
         }
 
         [Given(@"the latest learner data has a data locked price episode")]
