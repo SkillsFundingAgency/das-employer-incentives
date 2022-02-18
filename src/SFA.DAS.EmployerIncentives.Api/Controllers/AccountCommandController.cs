@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Types;
@@ -9,6 +10,7 @@ using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.VendorBlock;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -57,6 +59,21 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> AddEmployerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] AddEmployerVendorIdRequest request)
         {
             await SendCommandAsync(new AddEmployerVendorIdForLegalEntityCommand(hashedLegalEntityId, request.EmployerVendorId));
+            return NoContent();
+        }
+
+        [HttpPatch("/legalentities/blockpayments")]
+        public async Task<IActionResult> BlockAccountLegalEntityForPayments([FromBody] BlockAccountLegalEntityForPaymentsRequest request)
+        {
+            foreach(var vendorBlock in request.VendorBlocks)
+            {
+                var vendorBlockCommand = new BlockAccountLegalEntityForPaymentsCommand(vendorBlock.VendorId,
+                    vendorBlock.VendorBlockEndDate,
+                    request.ServiceRequest.TaskId,
+                    request.ServiceRequest.DecisionReference,
+                    request.ServiceRequest.TaskCreatedDate);
+                await SendCommandAsync(vendorBlockCommand);
+            }
             return NoContent();
         }
 

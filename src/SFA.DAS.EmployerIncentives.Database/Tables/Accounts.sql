@@ -10,6 +10,7 @@
     [VrfCaseId] NVARCHAR(100) NULL, 
     [VrfCaseStatus] NVARCHAR(100) NULL, 
     [VrfCaseStatusLastUpdatedDateTime] DATETIME2 NULL, 
+    [VendorBlockEndDate] DATETIME2 NULL
     CONSTRAINT PK_Accounts PRIMARY KEY NONCLUSTERED ([Id], [AccountLegalEntityId])
 )
 GO

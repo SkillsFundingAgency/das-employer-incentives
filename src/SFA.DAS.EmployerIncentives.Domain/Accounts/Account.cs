@@ -66,6 +66,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
         }
 
+        public void SetVendorBlockEndDate(string vendorId, DateTime vendorBlockEndDate)
+        {
+            foreach(var legalEntity in LegalEntities.Where(x => x.VrfVendorId == vendorId))
+            {
+                legalEntity.SetVendorBlockEndDate(vendorBlockEndDate);
+            }
+        }
+
         private IEnumerable<LegalEntity> LegalEntitiesWithIncompleteVendorRegistration(string hashedLegalEntityId)
         {
             return LegalEntities.Where(x => x.HashedLegalEntityId.Equals(hashedLegalEntityId) &&

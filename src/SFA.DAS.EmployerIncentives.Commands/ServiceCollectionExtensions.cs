@@ -60,6 +60,7 @@ using SFA.DAS.EmployerIncentives.Commands.CollectionCalendar.SetActivePeriodToIn
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploymentCheckRequests;
+using SFA.DAS.EmployerIncentives.Data.Account;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -147,7 +148,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
             serviceCollection.AddScoped<IEmploymentCheckAuditRepository, EmploymentCheckAuditRepository>();
-            
+            serviceCollection.AddScoped<IVendorBlockAuditRepository, VendorBlockAuditRepository>();
 
             return serviceCollection;
         }

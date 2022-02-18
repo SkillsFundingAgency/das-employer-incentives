@@ -11,6 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Data
         Task Update(AccountModel account);
         Task Add(AccountModel account);
         Task<AccountModel> Find(long accountId);
+        Task<IEnumerable<AccountModel>> FindByVendorId(string vendorId);
         Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId);
         Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus);       
         Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime();
