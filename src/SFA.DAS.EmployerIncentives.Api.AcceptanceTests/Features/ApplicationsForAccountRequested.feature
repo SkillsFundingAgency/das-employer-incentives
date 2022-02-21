@@ -123,3 +123,70 @@ Examples:
 | true									| false							 | true                          | true                           | false                   |
 | false									| true							 | false                         | false                          | false                   |
 | false									| false							 | false                         | true                           | false                   |
+
+Scenario: Multiple employment check payment validation statuses
+	Given an account that is in employer incentives
+	When there are failed employment check payment validations for the apprenticeship
+	And new employment check results have been recorded
+	And new employment check payment validations are recorded
+	When a client requests the apprenticeships for the account
+	Then the most recent employment check payment validation results are reflected in the payment statuses
+
+Scenario: Payment validation results do not include employment check
+	Given an account that is in employer incentives
+	When new employment check results have been recorded
+	And there are no payment validations for the apprenticeship
+	When a client requests the apprenticeships for the account
+	Then the employment check payment statuses are not set
+
+Scenario: Employment check has no payment validation results
+	Given an account that is in employer incentives
+	When new employment check results have been recorded
+	And there are no employment check payment validations for the apprenticeship
+	When a client requests the apprenticeships for the account
+	Then the employment check payment statuses are not set
+
+Scenario: Employment check payment validation fails due to no employment check record
+	Given an account that is in employer incentives
+	When there are no employment check results for the apprenticeship
+	And there are failed employment check payment validations for the apprenticeship
+	When a client requests the apprenticeships for the account
+	Then the employment check payment statuses are not set
+
+Scenario: Employment check payment validation fails due to null employment check records
+	Given an account that is in employer incentives
+	When there are employment check results for the apprenticeship with null values
+	And there are failed employment check payment validations for the apprenticeship
+	When a client requests the apprenticeships for the account
+	Then the employment check payment statuses are not set
+
+Scenario: Payment stopped
+	Given an account that is in employer incentives
+	When the incentive has a status of '<Incentive Status>'
+	When a client requests the apprenticeships for the account
+	Then the payment statuses reflect the stopped status of '<Payment Stopped Status>'
+Examples:
+| Incentive Status	  | Payment Stopped Status |
+| Stopped             | true                   |
+| Active              | false                  |
+
+Scenario: Payment clawed back
+	Given an account that is in employer incentives
+	When the '<Earning Type>' payment has been clawed back
+	When a client requests the apprenticeships for the account
+	Then the '<Earning Type>' clawback status reflects the amount clawed back and date
+Examples:
+| Earning Type  |
+| FirstPayment  |
+| SecondPayment |
+
+Scenario: Application withdrawn
+	Given an account that is in employer incentives
+	When the application has been withdrawn by '<Withdrawn By>'
+	When a client requests the apprenticeships for the account
+	Then the payment statuses reflect that the application withdrawal was requested by '<Withdrawn By>'
+Examples:
+| Withdrawn By  |
+| Employer		|
+| Compliance	|
+

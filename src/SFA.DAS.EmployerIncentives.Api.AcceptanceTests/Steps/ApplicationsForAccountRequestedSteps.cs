@@ -15,6 +15,7 @@ using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using TechTalk.SpecFlow;
 using ApprenticeshipIncentive = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive;
+using ClawbackPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ClawbackPayment;
 using EmploymentCheck = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.EmploymentCheck;
 using Learner = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Learner;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
@@ -35,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private List<PendingPayment> _pendingPayments;
         private Payment _payment;
         private CollectionCalendarPeriod _activePeriod;
+        private ClawbackPayment _clawbackPayment;
 
         public ApplicationsForAccountRequestedSteps(TestContext testContext) : base(testContext)
         {
@@ -63,12 +65,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeshipIncentive.AccountLegalEntityId = _account.AccountLegalEntityId;
 
             await SetupApprenticeshipIncentive();
-        }
-
-        [When(@"there is no learner record for an apprenticeship")]
-        public void WhenThereIsNoLearnerRecordForAnApprenticeship()
-        {
-
         }
 
         [When(@"there is a learner record with no learner match for an apprenticeship")]
@@ -208,6 +204,150 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.Result, checkResult)
                 .Create();
             await SetupEmploymentCheck(employmentCheck);
+        }
+
+        [When(@"there are failed employment check payment validations for the apprenticeship")]
+        public async Task WhenEmploymentCheckPaymentValidationsHaveBeenPreviouslyRecorded()
+        {
+            var paymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+                .With(x => x.Result, false)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 01, 01))
+                .Create();
+
+            var paymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                .With(x => x.Result, false)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 01, 01))
+                .Create();
+
+            await SetupPaymentValidationResult(paymentValidationResult1);
+            await SetupPaymentValidationResult(paymentValidationResult2);
+        }
+
+        [When(@"new employment check results have been recorded")]
+        public async Task WhenNewEmploymentCheckResultsHaveBeenRecorded()
+        {
+            var employmentCheck1 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .With(x => x.Result, true)
+                .Create();
+            var employmentCheck2 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                .With(x => x.Result, false)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .Create();
+
+            await SetupEmploymentCheck(employmentCheck1);
+            await SetupEmploymentCheck(employmentCheck2);
+        }
+
+        [When(@"new employment check payment validations are recorded")]
+        public async Task WhenNewEmploymentCheckPaymentValidationsHaveBeenRecorded()
+        {
+            var paymentValidationResult1 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedAtStartOfApprenticeship)
+                .With(x => x.Result, true)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 02, 02))
+                .Create();
+
+            var paymentValidationResult2 = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                .With(x => x.Result, true)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 02, 02))
+                .Create();
+
+            await SetupPaymentValidationResult(paymentValidationResult1);
+            await SetupPaymentValidationResult(paymentValidationResult2);
+        }
+
+        [When(@"there are no employment check payment validations for the apprenticeship")]
+        public async Task WhenThereAreNoEmploymentCheckPaymentValidationsForTheApprenticeship()
+        {
+            var paymentValidationResult = _fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, ValidationStep.HasDaysInLearning)
+                .With(x => x.Result, true)
+                .With(x => x.CreatedDateUtc, new DateTime(2022, 02, 02))
+                .Create();
+
+            await SetupPaymentValidationResult(paymentValidationResult);
+        }
+
+        [When(@"there are employment check results for the apprenticeship with null values")]
+        public async Task WhenThereAreEmploymentCheckResultsWithNullValues()
+        {
+            var employmentCheck1 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .Without(x => x.Result)
+                .Create();
+            var employmentCheck2 = _fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                .Without(x => x.Result)
+                .With(x => x.UpdatedDateTime, new DateTime(2022, 02, 01))
+                .Create();
+
+            await SetupEmploymentCheck(employmentCheck1);
+            await SetupEmploymentCheck(employmentCheck2);
+        }
+
+        [When(@"the incentive has a status of '(.*)'")]
+        public async Task WhenTheLearnerHasAStoppedStatus(IncentiveStatus status)
+        {
+            _apprenticeshipIncentive.Status = status;
+            await UpdateApprenticeshipIncentive();
+        }
+
+        [When(@"the '(.*)' payment has been clawed back")]
+        public async Task WhenThePaymentHasBeenClawedBack(EarningType earningType)
+        {
+            _payment = _fixture.Build<Payment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == earningType).Id)
+                .With(x => x.PaidDate, _apprenticeshipIncentive.PendingPayments.First().DueDate.AddDays(1))
+                .Create();
+
+            _clawbackPayment = _fixture.Build<ClawbackPayment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == earningType).Id)
+                .With(x => x.Amount, _payment.Amount)
+                .With(x => x.PaymentId, _payment.Id)
+                .With(x => x.DateClawbackCreated, DateTime.Today)
+                .Create();
+
+            await SetupPayment();
+            await SetupClawback();
+        }
+
+        [When(@"the application has been withdrawn by '(.*)'")]
+        public async Task WhenTheApplicationHasBeenWithdrawn(WithdrawnBy withdrawnBy)
+        {
+            _apprenticeshipIncentive.Status = IncentiveStatus.Withdrawn;
+            _apprenticeshipIncentive.WithdrawnBy = withdrawnBy;
+
+            await UpdateApprenticeshipIncentive();
+        }
+
+        [When(@"there is no learner record for an apprenticeship")]
+        [When(@"there are no payment validations for the apprenticeship")]
+        [When(@"there are no employment check results for the apprenticeship")]
+        public void WhenNoDataInserted()
+        {
+
         }
 
         [When(@"a client requests the apprenticeships for the account")]
@@ -380,6 +520,55 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
         }
 
+        [Then(@"the most recent employment check payment validation results are reflected in the payment statuses")]
+        public void ThenTheMostRecentEmploymentCheckPaymentValidationResultsAreReflectedInThePaymentStatuses()
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+        }
+
+        [Then(@"the employment check payment statuses are not set")]
+        public void ThenTheEmploymentCheckPaymentStatusesAreNotSet()
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        }
+
+        [Then(@"the payment statuses reflect the stopped status of '(.*)'")]
+        public void ThenThePaymentStatusesReflectTheStoppedStatus(bool paymentStopped)
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.SecondPaymentStatus.PaymentIsStopped.Should().Be(paymentStopped);
+        }
+
+        [Then(@"the '(.*)' clawback status reflects the amount clawed back and date")]
+        public void ThenTheClawbackStatusReflectsTheAmountClawedBackAndDate(EarningType earningType)
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            var clawbackStatus = GetClawbackStatus(earningType, apprenticeshipApplication);
+            clawbackStatus.ClawbackAmount.Should().Be(_clawbackPayment.Amount);
+            clawbackStatus.ClawbackDate.Should().Be(_clawbackPayment.DateClawbackCreated);
+            clawbackStatus.OriginalPaymentDate.Should().Be(_payment.PaidDate);
+        }
+
+        [Then(@"the payment statuses reflect that the application withdrawal was requested by '(.*)'")]
+        public void ThenThePaymentStatusesReflectThatTheApplicationWithdrawlWasRequested(WithdrawnBy withdrawnBy)
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            if (withdrawnBy == WithdrawnBy.Compliance)
+            {
+                apprenticeshipApplication.SecondPaymentStatus.WithdrawnByCompliance.Should().BeTrue();
+                apprenticeshipApplication.SecondPaymentStatus.WithdrawnByEmployer.Should().BeFalse();
+            }
+            else if (withdrawnBy == WithdrawnBy.Employer)
+            {
+                apprenticeshipApplication.SecondPaymentStatus.WithdrawnByCompliance.Should().BeFalse();
+                apprenticeshipApplication.SecondPaymentStatus.WithdrawnByEmployer.Should().BeTrue();
+            }
+        }
+
         private async Task SetupApprenticeshipIncentive()
         {
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
@@ -438,6 +627,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(employmentCheck, true);
         }
 
+        private async Task SetupClawback()
+        {
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_clawbackPayment, true);
+        }
+
         private async Task<CollectionCalendarPeriod> GetActivePeriod()
         {
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
@@ -476,6 +671,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             return paymentStatus;
         }
 
+        private static ClawbackStatusDto GetClawbackStatus(EarningType earningType,
+            ApprenticeApplicationDto apprenticeshipApplication)
+        {
+            var clawbackStatus = apprenticeshipApplication.FirstClawbackStatus;
+            if (earningType == EarningType.SecondPayment)
+            {
+                clawbackStatus = apprenticeshipApplication.SecondClawbackStatus;
+            }
 
+            return clawbackStatus;
+        }
     }
 }

@@ -68,12 +68,18 @@ LEFT OUTER JOIN incentives.ClawbackPayment c2
 ON c2.PaymentId = p2.Id
 LEFT OUTER JOIN incentives.Learner l
 ON l.ApprenticeshipIncentiveId = ai.Id
-LEFT OUTER JOIN incentives.PendingPaymentValidationResult ppvr1
-ON ppvr1.PendingPaymentId = pp1.Id
-AND ppvr1.Step = 'EmployedAtStartOfApprenticeship'
-LEFT OUTER JOIN incentives.PendingPaymentValidationResult ppvr2
-ON ppvr2.PendingPaymentId = pp1.Id
-AND ppvr2.Step = 'EmployedBeforeSchemeStarted'
+OUTER APPLY 
+(
+	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC FROM incentives.PendingPaymentValidationResult
+	WHERE Step = 'EmployedAtStartOfApprenticeship' and PendingPaymentId IN (pp1.Id,pp2.Id)
+	ORDER BY CreatedDateUTC DESC
+) ppvr1
+OUTER APPLY 
+(
+	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC FROM incentives.PendingPaymentValidationResult
+	WHERE Step = 'EmployedBeforeSchemeStarted' and PendingPaymentId IN (pp1.Id,pp2.Id)
+	ORDER BY CreatedDateUTC DESC
+) ppvr2
 LEFT OUTER JOIN incentives.EmploymentCheck ec1
 ON ec1.ApprenticeshipIncentiveId = ai.Id
 AND ec1.CheckType = 'EmployedAtStartOfApprenticeship'

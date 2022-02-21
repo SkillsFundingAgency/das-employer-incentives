@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -59,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         InLearning = data.InLearning.HasValue && data.InLearning.Value,
                         PausePayments = data.PausePayments,
                         PaymentSent = data.FirstPaymentDate.HasValue,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.FirstPaymentDate, _dateTimeService),
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.FirstPayment, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation)
                     },
@@ -78,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         InLearning = data.InLearning.HasValue && data.InLearning.Value,
                         PausePayments = data.PausePayments,
                         PaymentSent = data.SecondPaymentDate.HasValue,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.SecondPaymentDate, _dateTimeService),
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.SecondPayment, _dateTimeService),
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation)
                     },
@@ -158,10 +159,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
             else
             {
-                if (model.SecondPaymentStatus == null)
-                {
-                    model.SecondPaymentStatus = paymentStatus;
-                }
+                model.SecondPaymentStatus = paymentStatus;
             }
         }
         
@@ -203,22 +201,6 @@ namespace SFA.DAS.EmployerIncentives.Data
                 return paymentAmount;
             }
             return pendingPaymentAmount;
-        }
-        
-        private static bool IsPaymentEstimated(DateTime? paymentDate, IDateTimeService dateTimeService)
-        {
-            if(!paymentDate.HasValue)
-            {
-                return true;
-            }
-
-            if (dateTimeService.Now().Day < 27 &&
-                paymentDate.Value.Year == dateTimeService.Now().Year &&
-                paymentDate.Value.Month == dateTimeService.Now().Month)
-            {
-                return true;
-            }
-            return false;
         }
 
         public async Task<Guid?> GetFirstSubmittedApplicationId(long accountLegalEntityId)
