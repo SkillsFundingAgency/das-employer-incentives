@@ -2,21 +2,22 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
-using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Handlers
 {
     public class WhenHandlingGetApplicationQuery
     {
         private GetApplicationQueryHandler _sut;
-        private Mock<IQueryRepository<IncentiveApplicationDto>> _applicationRepository;
+        private Mock<IIncentiveApplicationQueryRepository> _applicationRepository;
         private Mock<IQueryRepository<LegalEntityDto>> _legalEntityQueryRepository;
         private Fixture _fixture;
 
@@ -24,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         public void Arrange()
         {
             _fixture = new Fixture();
-            _applicationRepository = new Mock<IQueryRepository<IncentiveApplicationDto>>();
+            _applicationRepository = new Mock<IIncentiveApplicationQueryRepository>();
             _legalEntityQueryRepository = new Mock<IQueryRepository<LegalEntityDto>>();
 
             _sut = new GetApplicationQueryHandler(_applicationRepository.Object, _legalEntityQueryRepository.Object);
