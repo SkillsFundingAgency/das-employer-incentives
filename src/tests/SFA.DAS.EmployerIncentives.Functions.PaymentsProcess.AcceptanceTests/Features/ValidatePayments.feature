@@ -59,3 +59,4 @@ Examples:
 	| LearnerMatchSuccessful            |
 	| EmployedAtStartOfApprenticeship   |
 	| EmployedBeforeSchemeStarted       |
+	| BlockedForPayments		        |

@@ -102,6 +102,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                             .Create()
                     };
                     break;
+                case ValidationStep.BlockedForPayments:
+                    _validatePaymentData.AccountModel.VendorBlockEndDate = DateTime.Now.AddDays(1);
+                    break;
             }
 
             await _validatePaymentData.Create();
