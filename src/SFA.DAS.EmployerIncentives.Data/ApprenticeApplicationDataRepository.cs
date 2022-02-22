@@ -1,18 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
-using Learner = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Learner;
-using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
-using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using ValidationOverride = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ValidationOverride;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -37,101 +34,112 @@ namespace SFA.DAS.EmployerIncentives.Data
             var calendar = await _collectionCalendarService.Get();
             var nextActivePeriod = calendar.GetNextPeriod(calendar.GetActivePeriod());
 
-            var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
-                                      from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
-                                      from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && !x.ClawedBack).DefaultIfEmpty()
-                                      from firstPaymentClawedback in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && x.ClawedBack).DefaultIfEmpty()
-                                      from firstClawback in _dbContext.ClawbackPayments.Where(x => x.PendingPaymentId == firstPaymentClawedback.Id).DefaultIfEmpty()
-                                      from firstClawbackPayment in _dbContext.Payments.Where(x => x.Id == firstClawback.PaymentId).DefaultIfEmpty()
-                                      from secondPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment && !x.ClawedBack).DefaultIfEmpty()
-                                      from secondPaymentClawedback in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment && x.ClawedBack).DefaultIfEmpty()
-                                      from secondClawback in _dbContext.ClawbackPayments.Where(x => x.PendingPaymentId == secondPaymentClawedback.Id).DefaultIfEmpty()
-                                      from secondClawbackPayment in _dbContext.Payments.Where(x => x.Id == secondClawback.PaymentId).DefaultIfEmpty()
-                                      from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
-                                      from secondPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (secondPayment == null ? Guid.Empty : secondPayment.Id)).DefaultIfEmpty()
-                                      from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
-                                      from firstEmploymentCheckValidation in _dbContext.PendingPaymentValidationResults.Where(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship && (x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id)).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
-                                      from secondEmploymentCheckValidation in _dbContext.PendingPaymentValidationResults.Where(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted && (x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id)).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
-                                      from firstEmploymentCheck in _dbContext.EmploymentChecks.Where(x => x.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship && x.ApprenticeshipIncentiveId == incentive.Id).Take(1).DefaultIfEmpty()
-                                      from secondEmploymentCheck in _dbContext.EmploymentChecks.Where(x => x.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted && x.ApprenticeshipIncentiveId == incentive.Id).Take(1).DefaultIfEmpty()
-                                      where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
-                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent, 
-                                                   firstClawback, firstClawbackPayment, secondClawback, secondClawbackPayment, secondPaymentSent,
-                                                   firstEmploymentCheck, firstEmploymentCheckValidation, secondEmploymentCheck, secondEmploymentCheckValidation};
-            
+            var accountApplications = _dbContext.ApprenticeApplications.Where(x =>
+                x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId);
+
+            var apprenticeshipIncentives = _dbContext.ApprenticeshipIncentives.Where(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId).Include(i => i.ValidationOverrides);
+
             var result = new List<ApprenticeApplicationDto>();
 
             foreach (var data in accountApplications)
             {
+                var validationOverrides = apprenticeshipIncentives.Single(i => i.Id == data.Id).ValidationOverrides;
+
                 var apprenticeApplicationDto = new ApprenticeApplicationDto
                 {
-                    AccountId = data.incentive.AccountId,
-                    AccountLegalEntityId = data.incentive.AccountLegalEntityId,
-                    ApplicationDate = data.incentive.SubmittedDate ?? DateTime.Now,
-                    FirstName = data.incentive.FirstName,
-                    LastName = data.incentive.LastName,
-                    ULN = data.incentive.ULN,
-                    LegalEntityName = data.account.LegalEntityName,
-                    SubmittedByEmail = data.incentive.SubmittedByEmail,
-                    TotalIncentiveAmount = data.incentive.PendingPayments.Sum(x => x.Amount),
-                    CourseName = data.incentive.CourseName,
-                    FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
+                    AccountId = data.AccountId,
+                    AccountLegalEntityId = data.AccountLegalEntityId,
+                    ApplicationDate = data.SubmittedDate,
+                    FirstName = data.FirstName,
+                    LastName = data.LastName,
+                    ULN = data.ULN,
+                    LegalEntityName = data.LegalEntityName,
+                    SubmittedByEmail = data.SubmittedByEmail,
+                    TotalIncentiveAmount = CalculateTotalIncentiveAmount(data.FirstPendingPaymentAmount, data.SecondPendingPaymentAmount),
+                    CourseName = data.CourseName,
+                    FirstPaymentStatus = data.FirstPendingPaymentAmount == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = PaymentDate(data.firstPayment, data.firstPaymentSent, nextActivePeriod),
-                        LearnerMatchFound = LearnerMatchFound(data.learner),
-                        PaymentAmount = PaymentAmount(data.firstPayment, data.firstPaymentSent),
-                        HasDataLock = HasDataLockOverride(data.incentive.ValidationOverrides, data.learner, HasDataLock),
-                        InLearning = IsInLearningOverride(data.incentive.ValidationOverrides, data.learner, InLearning),
-                        PausePayments = data.incentive.PausePayments,
-                        PaymentSent = data.firstPaymentSent != null,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
-                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
+                        PaymentDate = PaymentDate(data.FirstPendingPaymentDueDate, data.FirstPaymentDate, data.FirstPaymentCalculatedDate, nextActivePeriod),
+                        LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value,
+                        PaymentAmount = PaymentAmount(data.FirstPendingPaymentAmount, data.FirstPaymentAmount),
+                        HasDataLock = HasDataLockOverride(validationOverrides, data.HasDataLock.HasValue && data.HasDataLock.Value),
+                        InLearning = IsInLearningOverride(validationOverrides, data.InLearning.HasValue && data.InLearning.Value),
+                        PausePayments = data.PausePayments,
+                        PaymentSent = data.FirstPaymentDate.HasValue,
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.FirstPayment, _dateTimeService),
+                        RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
-                                        EmployedAtStartOfApprenticeshipOverride(data.incentive.ValidationOverrides, data.firstEmploymentCheck, data.firstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
-                                        EmployedBeforeSchemeStartedOverride(data.incentive.ValidationOverrides, data.secondEmploymentCheck, data.secondEmploymentCheckValidation, EmployedBeforeSchemeStarted))
+                                        EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
+                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted))
                     },
-                    FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
+                    FirstClawbackStatus = data.FirstClawbackAmount == default ? null : new ClawbackStatusDto
                     {
-                        ClawbackAmount = data.firstClawback.Amount,
-                        ClawbackDate = data.firstClawback.DateClawbackCreated,
-                        OriginalPaymentDate = data.firstClawbackPayment?.PaidDate
+                        ClawbackAmount = data.FirstClawbackAmount.Value,
+                        ClawbackDate = data.FirstClawbackCreated,
+                        OriginalPaymentDate = data.FirstPaymentDate
                     },
-                    SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
+                    SecondPaymentStatus = data.SecondPendingPaymentAmount == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = PaymentDate(data.secondPayment, data.secondPaymentSent, nextActivePeriod),
-                        LearnerMatchFound = LearnerMatchFound(data.learner),
-                        PaymentAmount = data.secondPayment.Amount,
-                        HasDataLock = HasDataLockOverride(data.incentive.ValidationOverrides, data.learner, HasDataLock),
-                        InLearning = IsInLearningOverride(data.incentive.ValidationOverrides, data.learner, InLearning),
-                        PausePayments = data.incentive.PausePayments,
-                        PaymentSent = data.secondPaymentSent != null,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
-                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
+                        PaymentDate = PaymentDate(data.SecondPendingPaymentDueDate, data.SecondPaymentDate, data.SecondPaymentCalculatedDate, nextActivePeriod),
+                        LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value,
+                        PaymentAmount = PaymentAmount(data.SecondPendingPaymentAmount, data.SecondPaymentAmount),
+                        HasDataLock = HasDataLockOverride(validationOverrides, data.HasDataLock.HasValue && data.HasDataLock.Value),
+                        InLearning = IsInLearningOverride(validationOverrides, data.InLearning.HasValue && data.InLearning.Value),
+                        PausePayments = data.PausePayments,
+                        PaymentSent = data.SecondPaymentDate.HasValue,
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.SecondPayment, _dateTimeService),
+                        RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
-                                        EmployedAtStartOfApprenticeshipOverride(data.incentive.ValidationOverrides, data.firstEmploymentCheck, data.firstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
-                                        EmployedBeforeSchemeStartedOverride(data.incentive.ValidationOverrides, data.secondEmploymentCheck, data.secondEmploymentCheckValidation, EmployedBeforeSchemeStarted))
+                                        EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
+                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted))
                     },
-                    SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
+                    SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatusDto
                     {
-                        ClawbackAmount = data.secondClawback.Amount,
-                        ClawbackDate = data.secondClawback.DateClawbackCreated,
-                        OriginalPaymentDate = data.secondClawbackPayment?.PaidDate
+                        ClawbackAmount = data.SecondClawbackAmount.Value,
+                        ClawbackDate = data.SecondClawbackCreated,
+                        OriginalPaymentDate = data.SecondPaymentDate
                     },
                 };
 
-                if (data.incentive.Status == IncentiveStatus.Stopped)
+                if (data.Status == IncentiveStatus.Stopped)
                 {
                     SetStoppedStatus(apprenticeApplicationDto);
                 } 
-                else if (data.incentive.Status == IncentiveStatus.Withdrawn)
+                else if (data.Status == IncentiveStatus.Withdrawn)
                 {
-                    SetWithdrawnStatus(apprenticeApplicationDto, data.incentive.WithdrawnBy.Value);
+                    SetWithdrawnStatus(apprenticeApplicationDto, data.WithdrawnBy.Value);
                 }
                 
                 result.Add(apprenticeApplicationDto);
             }
 
             return result;
+        }
+
+        private static bool HasDataLockOverride(
+            IEnumerable<ValidationOverride> validationOverrides,
+            bool hasDataLock)
+        {
+            if (validationOverrides.Any(x => x.Step == ValidationStep.HasNoDataLocks
+                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
+            {
+                return false;
+            }
+
+            return hasDataLock;
+        }
+
+        private static bool IsInLearningOverride(
+            IEnumerable<ValidationOverride> validationOverrides,
+            bool isInLearning)
+        {
+            if (validationOverrides.Any(x => x.Step == ValidationStep.IsInLearning
+                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
+            {
+                return true;
+            }
+
+            return isInLearning;
         }
 
         private static bool? EmploymentCheckResult(bool? firstEmploymentCheck, bool? secondEmploymentCheck)
@@ -144,24 +152,24 @@ namespace SFA.DAS.EmployerIncentives.Data
             return firstEmploymentCheck.Value && secondEmploymentCheck.Value;
         }
 
-        private static bool? EmployedAtStartOfApprenticeship(ApprenticeshipIncentives.Models.EmploymentCheck firstEmploymentCheck,
-                                                   ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation)
+        private static bool? EmployedAtStartOfApprenticeship(bool? firstEmploymentCheck,
+                                                    bool? firstEmploymentCheckValidation)
         {
-            if (firstEmploymentCheck == null
-                || firstEmploymentCheck.Result == null
-                || firstEmploymentCheckValidation == null
+            if (!firstEmploymentCheck.HasValue
+                || !firstEmploymentCheckValidation.HasValue
                 )
             {
                 return null;
             }
 
-            return firstEmploymentCheckValidation.Result;
-        }
+            return firstEmploymentCheckValidation.Value;
+        }        
+
         private static bool? EmployedAtStartOfApprenticeshipOverride(
-            IEnumerable<ValidationOverride> validationOverrides, 
-            ApprenticeshipIncentives.Models.EmploymentCheck firstEmploymentCheck,
-            ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation,
-            Func<ApprenticeshipIncentives.Models.EmploymentCheck, ApprenticeshipIncentives.Models.PendingPaymentValidationResult, bool?> func)
+            IEnumerable<ValidationOverride> validationOverrides,
+            bool? firstEmploymentCheck,
+            bool? firstEmploymentCheckValidation,
+            Func<bool?, bool?, bool?> func)
         {
             if (validationOverrides.Any(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship
                                                   && x.ExpiryDate.Date > DateTime.UtcNow.Date))
@@ -173,25 +181,24 @@ namespace SFA.DAS.EmployerIncentives.Data
         }
 
         private static bool? EmployedBeforeSchemeStarted(
-            ApprenticeshipIncentives.Models.EmploymentCheck secondEmploymentCheck,
-            ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
+           bool? secondEmploymentCheck,
+           bool? secondEmploymentCheckValidation)
         {
-            if (secondEmploymentCheck == null
-                || secondEmploymentCheck.Result == null
-                || secondEmploymentCheckValidation == null
+            if (!secondEmploymentCheck.HasValue
+                || !secondEmploymentCheckValidation.HasValue
                 )
             {
                 return null;
             }
 
-            return secondEmploymentCheckValidation.Result;
+            return secondEmploymentCheckValidation.Value;
         }
 
         private static bool? EmployedBeforeSchemeStartedOverride(
             IEnumerable<ValidationOverride> validationOverrides,
-            ApprenticeshipIncentives.Models.EmploymentCheck secondEmploymentCheck,
-            ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation,
-            Func<ApprenticeshipIncentives.Models.EmploymentCheck, ApprenticeshipIncentives.Models.PendingPaymentValidationResult, bool?> func)
+            bool? secondEmploymentCheck,
+            bool? secondEmploymentCheckValidation,
+            Func<bool?, bool?, bool?> func)
         {
             if (validationOverrides.Any(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted
                                                   && x.ExpiryDate.Date > DateTime.UtcNow.Date))
@@ -201,6 +208,21 @@ namespace SFA.DAS.EmployerIncentives.Data
 
             return func.Invoke(secondEmploymentCheck, secondEmploymentCheckValidation);
         }
+
+        private decimal CalculateTotalIncentiveAmount(decimal? firstPendingPaymentAmount, decimal? secondPendingPaymentAmount)
+        {
+            var amount = 0m;
+            if (firstPendingPaymentAmount.HasValue)
+            {
+                amount += firstPendingPaymentAmount.Value;
+            }
+            if (secondPendingPaymentAmount.HasValue)
+            {
+                amount += secondPendingPaymentAmount.Value;
+            }
+
+            return amount;
+        }       
 
         private static void SetStoppedStatus(ApprenticeApplicationDto model)
         {
@@ -226,118 +248,48 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
             else
             {
-                if (model.SecondPaymentStatus == null)
-                {
-                    model.SecondPaymentStatus = paymentStatus;
-                }
+                model.SecondPaymentStatus = paymentStatus;
             }
         }
-
-        private static bool LearnerMatchFound(Learner learner)
-        {
-            if(learner == null)
-            {
-                return false;
-            }
-
-            return learner.LearningFound.HasValue && learner.LearningFound.Value;
-        }
-
-        private static bool HasDataLock(Learner learner)
-        {
-            if (learner == null)
-            {
-                return false;
-            }
-
-            return learner.HasDataLock.HasValue && learner.HasDataLock.Value;
-        }
-
-        private static bool HasDataLockOverride(
-            IEnumerable<ValidationOverride> validationOverrides,
-            Learner learner,
-            Func<Learner, bool> func)
-        {
-            if (validationOverrides.Any(x => x.Step == ValidationStep.HasNoDataLocks
-                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
-            {
-                return false;
-            }
-
-            return func.Invoke(learner);
-        }
-
-        private static bool InLearning(Learner learner)
-        {
-            if (learner == null)
-            {
-                return false;
-            }
-
-            return learner.InLearning.HasValue && learner.InLearning.Value;
-        }
-
-        private static bool IsInLearningOverride(
-            IEnumerable<ValidationOverride> validationOverrides,
-            Learner learner,
-            Func<Learner, bool> func)
-        {
-            if (validationOverrides.Any(x => x.Step == ValidationStep.IsInLearning 
-                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
-            {
-                return true;
-            }
-
-            return func.Invoke(learner);
-        }
-
+        
         private static DateTime? PaymentDate(
-            PendingPayment pendingPayment, 
-            Payment payment,
+            DateTime? pendingPaymentDate,
+            DateTime? paymentSentDate,
+            DateTime? paymentCalculatedDate,
             Domain.ValueObjects.CollectionCalendarPeriod nextActivePeriod)
         {
-            if (payment != null)
+
+            if (paymentSentDate.HasValue)
             {
-                if (payment.PaidDate != null)
-                {
-                    return payment.PaidDate.Value;
-                }
-                return payment.CalculatedDate;
+                return paymentSentDate.Value;
+            }
+            else if (paymentCalculatedDate.HasValue)
+            {
+                return paymentCalculatedDate.Value;
             }
             
+            if (!pendingPaymentDate.HasValue)
+            {
+                return default;
+            }
+
             var activePeriodDate = new DateTime(nextActivePeriod.OpenDate.Year, nextActivePeriod.OpenDate.Month, nextActivePeriod.OpenDate.Day);
-            var paymentDueDate = new DateTime(pendingPayment.DueDate.Year, pendingPayment.DueDate.Month, pendingPayment.DueDate.Day);
+            var paymentDueDate = new DateTime(pendingPaymentDate.Value.Year, pendingPaymentDate.Value.Month, pendingPaymentDate.Value.Day);
 
             if (paymentDueDate < activePeriodDate)
             {
                 return new DateTime(nextActivePeriod.CalendarYear, nextActivePeriod.CalendarMonth, 27);
             }
-            return pendingPayment.DueDate.AddMonths(1);
+            return pendingPaymentDate.Value.AddMonths(1);
         }
 
-        private static decimal? PaymentAmount(PendingPayment pendingPayment, Payment payment)
+        private static decimal? PaymentAmount(decimal? pendingPaymentAmount, decimal? paymentAmount)
         {
-            if (payment != null)
+            if (paymentAmount.HasValue)
             {
-                return payment.Amount;
+                return paymentAmount;
             }
-            return pendingPayment.Amount;
-        }
-        
-        private static bool IsPaymentEstimated(Payment payment, IDateTimeService dateTimeService)
-        {
-            if(payment == null || !payment.PaidDate.HasValue)
-            {
-                return true;
-            }
-
-            if (dateTimeService.Now().Day < 27 &&
-                payment.PaidDate.Value.Year == dateTimeService.Now().Year &&
-                payment.PaidDate.Value.Month == dateTimeService.Now().Month)
-            {
-                return true;
-            }
-            return false;
+            return pendingPaymentAmount;
         }
 
         public async Task<Guid?> GetFirstSubmittedApplicationId(long accountLegalEntityId)

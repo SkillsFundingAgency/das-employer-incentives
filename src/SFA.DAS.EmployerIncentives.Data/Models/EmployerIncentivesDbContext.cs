@@ -38,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<EmploymentCheckAudit> EmploymentCheckAudits { get; set; }
         public virtual DbSet<ValidationOverride> ValidationOverrides { get; set; }
         public virtual DbSet<ValidationOverrideAudit> ValidationOverrideAudits { get; set; }
+        public virtual DbSet<ApprenticeApplication> ApprenticeApplications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
