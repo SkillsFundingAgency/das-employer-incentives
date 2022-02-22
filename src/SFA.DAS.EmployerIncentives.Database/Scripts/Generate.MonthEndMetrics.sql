@@ -65,6 +65,7 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
    max(iif(step='LearnerMatchSuccessful',1,0)) as LearnerMatchSuccessful,
    max(iif(step='EmployedAtStartOfApprenticeship',1,0)) as EmployedAtStartOfApprenticeship,
    max(iif(step='EmployedBeforeSchemeStarted',1,0)) as EmployedBeforeSchemeStarted,
+   max(iif(step='BlockedForPayments',1,0)) as BlockedForPayments,
    Result,
    ppvr.PeriodNumber, 
    ppvr.PaymentYear
@@ -86,6 +87,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Vali
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
+  BlockedForPayments,
   count(distinct a.[AccountLegalEntityId]) as [AccountLegalEntityId],
   sum(pp.amount) as EarningAmount
 from PendingPaymentValidations ppv
@@ -102,6 +104,7 @@ group by HasIlrSubmission,
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
+  BlockedForPayments,
   Result
     order by 
   HasLearningRecord desc, 
@@ -114,7 +117,8 @@ group by HasIlrSubmission,
   HasSignedMinVersion desc,
   LearnerMatchSuccessful desc,
   EmployedAtStartOfApprenticeship desc,
-  EmployedBeforeSchemeStarted desc
+  EmployedBeforeSchemeStarted desc,
+  BlockedForPayments desc
 -- YTD Validation (Paste underneath the Period Validation table on the [YTD Validation] tab) 
 ;with latestValidations as (
 select max(ppv.periodnumber) MaxPeriod, 
@@ -131,6 +135,7 @@ select max(ppv.periodnumber) MaxPeriod,
     max((case when ppv.periodnumber < 12 and ppv.paymentyear = 2021 then 1 else iif(step='LearnerMatchSuccessful' and result=1,1,0) end)) as LearnerMatchSuccessful,
     max((case when ppv.periodnumber < 5 and ppv.paymentyear <= 2122 then 1 else iif(step='EmployedAtStartOfApprenticeship' and result=1,1,0) end)) as EmployedAtStartOfApprenticeship,
     max((case when ppv.periodnumber < 5 and ppv.paymentyear <= 2122 then 1 else iif(step='EmployedBeforeSchemeStarted' and result=1,1,0) end)) as EmployedBeforeSchemeStarted,
+    max((case when ppv.periodnumber < 8 and ppv.paymentyear <= 2122 then 1 else iif(step='BlockedForPayments' and result=1,1,0) end)) as BlockedForPayments,
     Amount,
     a.[AccountLegalEntityId] --Should only be one
 from [incentives].[PendingPaymentValidationResult] ppv
@@ -151,6 +156,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A37 on tab {YTD Val
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
+  BlockedForPayments,
   count(distinct [AccountLegalEntityId] ) as [AccountLegalEntityId],
   sum(amount) as EarningAmount
 from latestValidations
@@ -166,7 +172,8 @@ group by
   HasSignedMinVersion,
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
-  EmployedBeforeSchemeStarted
+  EmployedBeforeSchemeStarted,
+  BlockedForPayments
 order by 
   HasLearningRecord desc, 
   IsInLearning desc, 
@@ -179,4 +186,5 @@ order by
   HasSignedMinVersion desc,
   LearnerMatchSuccessful desc,
   EmployedAtStartOfApprenticeship desc,
-  EmployedBeforeSchemeStarted desc
+  EmployedBeforeSchemeStarted desc,
+  BlockedForPayments desc
