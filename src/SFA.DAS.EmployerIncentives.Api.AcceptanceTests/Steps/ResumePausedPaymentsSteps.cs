@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TechTalk.SpecFlow;
 using System.Net.Http;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -73,10 +74,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheResumePausedPaymentsRequestIsSent()
         {
             _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
-                .With(r => r.Action, PausePaymentsAction.Resume)
-                .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
-                .With(r => r.ULN, _apprenticeship.ULN)
-                .Create();           
+                .With(r => r.Action, PausePaymentsAction.Resume)                
+                .Create();
+
+            _pausePaymentsRequest.Applications = new List<Application>()
+            {
+                new Application()
+                {
+                    AccountLegalEntityId = _application.AccountLegalEntityId,
+                    ULN = _apprenticeship.ULN
+                }
+            }.ToArray();
             
             var url = "pause-payments";
 
@@ -88,9 +96,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
                 .With(r => r.Action, PausePaymentsAction.Resume)
-                .With(r => r.AccountLegalEntityId, 0)
-                .With(r => r.ULN, 0)
                 .Create();
+
+            _pausePaymentsRequest.Applications = new List<Application>()
+            {
+                new Application()
+                {
+                    AccountLegalEntityId = 0,
+                    ULN = 0
+                }
+            }.ToArray();
 
             var url = "pause-payments";
 
@@ -120,14 +135,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("not set");
         }
-
-        //[Then(@"the requester is informed the apprenticeship incentive is already paused")]
-        //public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsAlreadyPaused()
-        //{
-        //    EmployerIncentiveApi.GetLastResponse().StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-        //    var content = await EmployerIncentiveApi.GetLastResponse().Content.ReadAsStringAsync();
-        //    JsonConvert.SerializeObject(content).Should().Contain("Payments already paused");
-        //}
 
         [Then(@"the PausePayment status is set to false")]
         public async Task ThenThePausePaymentStatusIsSetToFalse()

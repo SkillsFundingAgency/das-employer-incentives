@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TechTalk.SpecFlow;
 using System.Net.Http;
+using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -79,10 +80,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
                 .With(r => r.Action, PausePaymentsAction.Pause)
-                .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
-                .With(r => r.ULN, _apprenticeship.ULN)
-                .Create();           
-            
+                .Create();
+            _pausePaymentsRequest.Applications = new List<Application>()
+            {
+                new Application()
+                {
+                    AccountLegalEntityId = _application.AccountLegalEntityId,
+                    ULN = _apprenticeship.ULN
+                }
+            }.ToArray();
+
             var url = "pause-payments";
 
             _response = await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);

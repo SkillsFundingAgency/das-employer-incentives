@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +10,10 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
 {
@@ -39,6 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         {
             // Arrange
             var request = _fixture.Create<PausePaymentsRequest>();
+            request.Applications = _fixture.CreateMany<Types.Application>(1).ToArray();            
 
             // Act
             await _sut.PausePayments(request);
@@ -46,8 +48,8 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
             // Assert
             _mockCommandDispatcher
                 .Verify(m => m.Send(It.Is<PausePaymentsCommand>(c => 
-                    c.AccountLegalEntityId == request.AccountLegalEntityId &&
-                    c.ULN == request.ULN && 
+                    c.AccountLegalEntityId == request.Applications.Single().AccountLegalEntityId &&
+                    c.ULN == request.Applications.Single().ULN && 
                     c.ServiceRequestId == request.ServiceRequest.TaskId &&
                     c.DateServiceRequestTaskCreated == request.ServiceRequest.TaskCreatedDate.Value &&
                     c.DecisionReferenceNumber == request.ServiceRequest.DecisionReference), 
