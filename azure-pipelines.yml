@@ -7,9 +7,7 @@ trigger:
   batch: true
   branches:
     include:
-      - "*"
-
-pr: none
+      - "master"
 
 variables:
 - name: SolutionBaseName
@@ -18,7 +16,7 @@ variables:
   value : 'any cpu'
 - name: BuildConfiguration
   value: 'release'
-- group: 'Prod Management Resources'
+- group: 'BUILD Management Resources'
 
 resources:
   repositories:
@@ -26,8 +24,8 @@ resources:
   - repository: das-platform-building-blocks
     type: github
     name: SkillsFundingAgency/das-platform-building-blocks
-    ref: refs/heads/master
-    endpoint: 'GitHub (SFA)'
+    ref: refs/tags/0.4.37
+    endpoint: SkillsFundingAgency
 
 stages:
 - stage: BuildAndTest
@@ -46,6 +44,16 @@ stages:
         versionSpec: 5.x
         useConfigFile: true
         configFilePath: GitVersion.yml
+
+    - task: SonarCloudPrepare@1
+      displayName: Prepare SonarCloud analysis configuration
+      condition: and(succeeded(), or(in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main'), eq(variables['Build.Reason'], 'PullRequest')))
+      inputs:
+        SonarCloud: ESFA - SonarCloud
+        organization: $(SonarCloudOrganisationKey)
+        scannerMode: MSBuild
+        projectName: "$(Build.DefinitionName)"
+        projectKey: SkillsFundingAgency_das-employer-incentives
 
     - task: DotNetCoreCLI@2
       displayName: Restore
@@ -109,6 +117,16 @@ stages:
         command: 'build'
         projects: src/$(SolutionBaseName).Messages/$(SolutionBaseName).Messages.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
+
+    - task: SonarCloudAnalyze@1
+      displayName: Run SonarCloud analysis
+      condition: and(succeeded(), or(in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main'), eq(variables['Build.Reason'], 'PullRequest')))
+
+    - task: SonarCloudPublish@1
+      displayName: Publish SonarCloud analysis results on build summary
+      condition: and(succeeded(), or(in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main'), eq(variables['Build.Reason'], 'PullRequest')))
+      inputs:
+        pollingTimeoutSec: '300'
 
     - task: PowerShell@2
       displayName: 'Set NuGet Package Version'
