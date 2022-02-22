@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _vendorBlockEndDate1 = DateTime.Now.AddDays(28);
             _vendorBlockEndDate2 = DateTime.Now.AddDays(50);
 
-            var url = "legalentities/blockpayments";
+            var url = "/blockedpayments";
             _blockRequest = new BlockAccountLegalEntityForPaymentsRequest
             {
                 ServiceRequest = _fixture.Create<ServiceRequest>(),

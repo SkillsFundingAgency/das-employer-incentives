@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NoContent();
         }
 
-        [HttpPatch("/legalentities/blockpayments")]
+        [HttpPatch("/blockedpayments")]
         public async Task<IActionResult> BlockAccountLegalEntityForPayments([FromBody] BlockAccountLegalEntityForPaymentsRequest request)
         {
             foreach(var vendorBlock in request.VendorBlocks)
