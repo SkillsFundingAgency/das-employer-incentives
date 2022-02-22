@@ -15,6 +15,7 @@ using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.VendorBlock.Handlers
 {
+    [TestFixture]
     public class WhenHandlingBlockAccountLegalEntityForPaymentsCommand
     {
         private BlockAccountLegalEntityForPaymentsCommandHandler _sut;
