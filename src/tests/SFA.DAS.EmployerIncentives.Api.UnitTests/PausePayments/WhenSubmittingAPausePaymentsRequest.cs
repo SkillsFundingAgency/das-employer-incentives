@@ -124,6 +124,20 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         }
 
         [Test]
+        public async Task Then_an_ok_response_is_returned_when_there_are_no_applications()
+        {
+            // Arrange
+            var request = _fixture.Create<PausePaymentsRequest>();
+            request.Applications = new List<Types.Application>().ToArray();
+
+            // Act
+            var actual = await _sut.PausePayments(request) as OkObjectResult;
+
+            // Assert
+            actual.Should().NotBeNull();
+        }
+
+        [Test]
         public async Task Then_when_no_matching_record_a_not_found_response_is_returned()
         {
             // Arrange
