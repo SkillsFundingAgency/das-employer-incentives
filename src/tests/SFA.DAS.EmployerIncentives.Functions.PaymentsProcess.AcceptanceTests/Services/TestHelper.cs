@@ -1,12 +1,14 @@
 ﻿using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
+    [ExcludeFromCodeCoverage]
     public class TestHelper
     {
         private readonly TestContext _testContext;

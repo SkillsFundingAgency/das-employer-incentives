@@ -1,10 +1,12 @@
 ﻿using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
+    [ExcludeFromCodeCoverage]
     public class TestDistributedLockProvider : IDistributedLockProvider
     {
         private static readonly HashSet<string> _locks = new HashSet<string>();

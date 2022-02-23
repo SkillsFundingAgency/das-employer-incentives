@@ -1,10 +1,12 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 {
+    [ExcludeFromCodeCoverage]
     public class CommandHandlerWithDistributedLockInitialiser<T> : ICommandHandler<T> where T : ICommand
     {
         private readonly ICommandHandler<T> _handler;

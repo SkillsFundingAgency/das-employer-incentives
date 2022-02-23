@@ -2,11 +2,13 @@
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
+    [ExcludeFromCodeCoverage]
     public class TestCommandDispatcher : ICommandDispatcher
     {
         private readonly ICommandDispatcher _commandDispatcher;
