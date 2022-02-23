@@ -21,3 +21,10 @@ Scenario: When an invalid request is sent
 	Given a paused apprenticeship incentive exists
 	When an invalid request is sent
 	Then the requester is informed the request is invalid
+
+Scenario: When multiple resume payment requests are made to existing paused incentives
+	Given multiple paused apprenticeship incentives exist
+	When the multiple resume payments request is sent
+	Then the requester is informed the apprenticeship incentives have resumed
+	And the PausePayment status for all incentives is set to false
+	And an Audit record has been added to record all incentives the resume request
