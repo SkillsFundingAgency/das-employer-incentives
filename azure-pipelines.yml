@@ -54,8 +54,7 @@ stages:
         scannerMode: MSBuild
         projectName: "$(Build.DefinitionName)"
         projectKey: SkillsFundingAgency_das-employer-incentives
-         extraProperties: |
-          sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/CoverageResults/coverage.opencover.xml
+        extraProperties: sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/CoverageResults/coverage.opencover.xml
 
     - task: DotNetCoreCLI@2
       displayName: Restore
