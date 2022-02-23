@@ -3,9 +3,11 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
 {
+    [ExcludeFromCodeCoverage]
     public class ValidationOverrideDeleted : IDomainEvent, ILogWriter
     {
         public Guid ValidationOverrideId { get; set; }

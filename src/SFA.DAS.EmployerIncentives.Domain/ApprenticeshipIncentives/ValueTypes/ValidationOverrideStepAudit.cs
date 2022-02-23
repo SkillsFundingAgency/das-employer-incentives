@@ -2,9 +2,11 @@
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
+    [ExcludeFromCodeCoverage]
     public class ValidationOverrideStepAudit : ValueObject
     {
         public ValidationOverrideStepAudit(

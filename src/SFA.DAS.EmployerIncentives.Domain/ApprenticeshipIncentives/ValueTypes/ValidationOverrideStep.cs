@@ -1,9 +1,11 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes
 {
+    [ExcludeFromCodeCoverage]
     public class ValidationOverrideStep : ValueObject
     {
         public ValidationOverrideStep(string validationType, DateTime expiryDate, bool remove = false)
