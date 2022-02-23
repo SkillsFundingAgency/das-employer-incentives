@@ -69,6 +69,48 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         }
 
         [Test]
+        public async Task Then_multiple_PausePaymentsCommands_are_dispatched()
+        {
+            // Arrange
+            var request = _fixture.Create<PausePaymentsRequest>();
+            request.Applications = _fixture.CreateMany<Types.Application>(2).ToArray();
+
+            PausePaymentsCommand sentCommand1 = null;
+            PausePaymentsCommand sentCommand2 = null;
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ICommand>, CancellationToken>((c, t) =>
+                {
+                    sentCommand1 = c.First() as PausePaymentsCommand;
+                    sentCommand2 = c.Last() as PausePaymentsCommand;
+                });
+
+            // Act
+            await _sut.PausePayments(request);
+
+            // Assert
+            _mockCommandDispatcher
+                .Verify(m => m.SendMany(It.Is<List<ICommand>>(c => c.Count == 2),
+                It.IsAny<CancellationToken>())
+                , Times.Once);
+
+            sentCommand1.AccountLegalEntityId.Should().Be(request.Applications.First().AccountLegalEntityId);
+            sentCommand1.ULN.Should().Be(request.Applications.First().ULN);
+            sentCommand1.ServiceRequestId.Should().Be(request.ServiceRequest.TaskId);
+            sentCommand1.DateServiceRequestTaskCreated.Should().Be(request.ServiceRequest.TaskCreatedDate.Value);
+            sentCommand1.DecisionReferenceNumber.Should().Be(request.ServiceRequest.DecisionReference);
+            sentCommand1.Action.Should().Be(request.Action);
+
+            sentCommand2.AccountLegalEntityId.Should().Be(request.Applications.Last().AccountLegalEntityId);
+            sentCommand2.ULN.Should().Be(request.Applications.Last().ULN);
+            sentCommand2.ServiceRequestId.Should().Be(request.ServiceRequest.TaskId);
+            sentCommand2.DateServiceRequestTaskCreated.Should().Be(request.ServiceRequest.TaskCreatedDate.Value);
+            sentCommand2.DecisionReferenceNumber.Should().Be(request.ServiceRequest.DecisionReference);
+            sentCommand2.Action.Should().Be(request.Action);
+        }
+
+        [Test]
         public async Task Then_an_ok_response_is_returned()
         {
             // Arrange
@@ -123,6 +165,23 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
 
             // Act
             var actual = await _sut.PausePayments(request) as BadRequestObjectResult;
+
+            // Assert
+            actual.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task Then_when_an_Exception_is_thrown_a_bad_request_response_is_returned()
+        {
+            // Arrange
+            var request = _fixture.Create<PausePaymentsRequest>();
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new System.Exception(""));
+
+            // Act
+            var actual = await _sut.PausePayments(request) as BadRequestResult;
 
             // Assert
             actual.Should().NotBeNull();
