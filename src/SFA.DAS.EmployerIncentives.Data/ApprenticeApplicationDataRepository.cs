@@ -7,10 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
-using Learner = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Learner;
-using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
-using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -35,27 +32,8 @@ namespace SFA.DAS.EmployerIncentives.Data
             var calendar = await _collectionCalendarService.Get();
             var nextActivePeriod = calendar.GetNextPeriod(calendar.GetActivePeriod());
 
-            var accountApplications = from incentive in _dbContext.ApprenticeshipIncentives
-                                      from account in _dbContext.Accounts.Where(x => x.AccountLegalEntityId == incentive.AccountLegalEntityId)
-                                      from firstPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && !x.ClawedBack).DefaultIfEmpty()
-                                      from firstPaymentClawedback in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.FirstPayment && x.ClawedBack).DefaultIfEmpty()
-                                      from firstClawback in _dbContext.ClawbackPayments.Where(x => x.PendingPaymentId == firstPaymentClawedback.Id).DefaultIfEmpty()
-                                      from firstClawbackPayment in _dbContext.Payments.Where(x => x.Id == firstClawback.PaymentId).DefaultIfEmpty()
-                                      from secondPayment in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment && !x.ClawedBack).DefaultIfEmpty()
-                                      from secondPaymentClawedback in _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.EarningType == EarningType.SecondPayment && x.ClawedBack).DefaultIfEmpty()
-                                      from secondClawback in _dbContext.ClawbackPayments.Where(x => x.PendingPaymentId == secondPaymentClawedback.Id).DefaultIfEmpty()
-                                      from secondClawbackPayment in _dbContext.Payments.Where(x => x.Id == secondClawback.PaymentId).DefaultIfEmpty()
-                                      from firstPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (firstPayment == null ? Guid.Empty : firstPayment.Id)).DefaultIfEmpty()
-                                      from secondPaymentSent in _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == incentive.Id && x.PendingPaymentId == (secondPayment == null ? Guid.Empty : secondPayment.Id)).DefaultIfEmpty()
-                                      from learner in _dbContext.Learners.Where(x => x.ApprenticeshipIncentiveId == incentive.Id).DefaultIfEmpty()
-                                      from firstEmploymentCheckValidation in _dbContext.PendingPaymentValidationResults.Where(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship && (x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id)).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
-                                      from secondEmploymentCheckValidation in _dbContext.PendingPaymentValidationResults.Where(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted && (x.PendingPaymentId == firstPayment.Id || x.PendingPaymentId == secondPayment.Id)).OrderByDescending(x => x.CreatedDateUtc).Take(1).DefaultIfEmpty()
-                                      from firstEmploymentCheck in _dbContext.EmploymentChecks.Where(x => x.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship && x.ApprenticeshipIncentiveId == incentive.Id).Take(1).DefaultIfEmpty()
-                                      from secondEmploymentCheck in _dbContext.EmploymentChecks.Where(x => x.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted && x.ApprenticeshipIncentiveId == incentive.Id).Take(1).DefaultIfEmpty()
-                                      where incentive.AccountId == accountId && incentive.AccountLegalEntityId == accountLegalEntityId
-                                      select new { incentive, account, firstPayment, secondPayment, learner, firstPaymentSent, 
-                                                   firstClawback, firstClawbackPayment, secondClawback, secondClawbackPayment, secondPaymentSent,
-                                                   firstEmploymentCheck, firstEmploymentCheckValidation, secondEmploymentCheck, secondEmploymentCheckValidation};
+            var accountApplications = _dbContext.ApprenticeApplications.Where(x =>
+                x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId);
             
             var result = new List<ApprenticeApplicationDto>();
 
@@ -63,63 +41,63 @@ namespace SFA.DAS.EmployerIncentives.Data
             {
                 var apprenticeApplicationDto = new ApprenticeApplicationDto
                 {
-                    AccountId = data.incentive.AccountId,
-                    AccountLegalEntityId = data.incentive.AccountLegalEntityId,
-                    ApplicationDate = data.incentive.SubmittedDate ?? DateTime.Now,
-                    FirstName = data.incentive.FirstName,
-                    LastName = data.incentive.LastName,
-                    ULN = data.incentive.ULN,
-                    LegalEntityName = data.account.LegalEntityName,
-                    SubmittedByEmail = data.incentive.SubmittedByEmail,
-                    TotalIncentiveAmount = data.incentive.PendingPayments.Sum(x => x.Amount),
-                    CourseName = data.incentive.CourseName,
-                    FirstPaymentStatus = data.firstPayment == default ? null : new PaymentStatusDto
+                    AccountId = data.AccountId,
+                    AccountLegalEntityId = data.AccountLegalEntityId,
+                    ApplicationDate = data.SubmittedDate,
+                    FirstName = data.FirstName,
+                    LastName = data.LastName,
+                    ULN = data.ULN,
+                    LegalEntityName = data.LegalEntityName,
+                    SubmittedByEmail = data.SubmittedByEmail,
+                    TotalIncentiveAmount = CalculateTotalIncentiveAmount(data.FirstPendingPaymentAmount, data.SecondPendingPaymentAmount),
+                    CourseName = data.CourseName,
+                    FirstPaymentStatus = data.FirstPendingPaymentAmount == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = PaymentDate(data.firstPayment, data.firstPaymentSent, nextActivePeriod),
-                        LearnerMatchFound = LearnerMatchFound(data.learner),
-                        PaymentAmount = PaymentAmount(data.firstPayment, data.firstPaymentSent),
-                        HasDataLock = HasDataLock(data.learner),
-                        InLearning = InLearning(data.learner),
-                        PausePayments = data.incentive.PausePayments,
-                        PaymentSent = data.firstPaymentSent != null,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.firstPaymentSent, _dateTimeService),
-                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.firstEmploymentCheckValidation, data.secondEmploymentCheck, data.secondEmploymentCheckValidation)
+                        PaymentDate = PaymentDate(data.FirstPendingPaymentDueDate, data.FirstPaymentDate, data.FirstPaymentCalculatedDate, nextActivePeriod),
+                        LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value,
+                        PaymentAmount = PaymentAmount(data.FirstPendingPaymentAmount, data.FirstPaymentAmount),
+                        HasDataLock = data.HasDataLock.HasValue && data.HasDataLock.Value,
+                        InLearning = data.InLearning.HasValue && data.InLearning.Value,
+                        PausePayments = data.PausePayments,
+                        PaymentSent = data.FirstPaymentDate.HasValue,
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.FirstPayment, _dateTimeService),
+                        RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
+                        EmploymentCheckPassed = EmploymentCheckResult(data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation)
                     },
-                    FirstClawbackStatus = data.firstClawback == default ? null : new ClawbackStatusDto
+                    FirstClawbackStatus = data.FirstClawbackAmount == default ? null : new ClawbackStatusDto
                     {
-                        ClawbackAmount = data.firstClawback.Amount,
-                        ClawbackDate = data.firstClawback.DateClawbackCreated,
-                        OriginalPaymentDate = data.firstClawbackPayment?.PaidDate
+                        ClawbackAmount = data.FirstClawbackAmount.Value,
+                        ClawbackDate = data.FirstClawbackCreated,
+                        OriginalPaymentDate = data.FirstPaymentDate
                     },
-                    SecondPaymentStatus = data.secondPayment == default ? null : new PaymentStatusDto
+                    SecondPaymentStatus = data.SecondPendingPaymentAmount == default ? null : new PaymentStatusDto
                     {
-                        PaymentDate = PaymentDate(data.secondPayment, data.secondPaymentSent, nextActivePeriod),
-                        LearnerMatchFound = LearnerMatchFound(data.learner),
-                        PaymentAmount = data.secondPayment.Amount,
-                        HasDataLock = HasDataLock(data.learner),
-                        InLearning = InLearning(data.learner),
-                        PausePayments = data.incentive.PausePayments,
-                        PaymentSent = data.secondPaymentSent != null,
-                        PaymentSentIsEstimated = IsPaymentEstimated(data.secondPaymentSent, _dateTimeService),
-                        RequiresNewEmployerAgreement = !data.account.SignedAgreementVersion.HasValue || data.account.SignedAgreementVersion < data.incentive.MinimumAgreementVersion,
-                        EmploymentCheckPassed = EmploymentCheckResult(data.firstEmploymentCheck, data.firstEmploymentCheckValidation, data.secondEmploymentCheck, data.secondEmploymentCheckValidation)
+                        PaymentDate = PaymentDate(data.SecondPendingPaymentDueDate, data.SecondPaymentDate, data.SecondPaymentCalculatedDate, nextActivePeriod),
+                        LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value,
+                        PaymentAmount = PaymentAmount(data.SecondPendingPaymentAmount, data.SecondPaymentAmount),
+                        HasDataLock = data.HasDataLock.HasValue && data.HasDataLock.Value,
+                        InLearning = data.InLearning.HasValue && data.InLearning.Value,
+                        PausePayments = data.PausePayments,
+                        PaymentSent = data.SecondPaymentDate.HasValue,
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.SecondPayment, _dateTimeService),
+                        RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
+                        EmploymentCheckPassed = EmploymentCheckResult(data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation)
                     },
-                    SecondClawbackStatus = data.secondClawback == default ? null : new ClawbackStatusDto
+                    SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatusDto
                     {
-                        ClawbackAmount = data.secondClawback.Amount,
-                        ClawbackDate = data.secondClawback.DateClawbackCreated,
-                        OriginalPaymentDate = data.secondClawbackPayment?.PaidDate
+                        ClawbackAmount = data.SecondClawbackAmount.Value,
+                        ClawbackDate = data.SecondClawbackCreated,
+                        OriginalPaymentDate = data.SecondPaymentDate
                     },
                 };
 
-                if (data.incentive.Status == IncentiveStatus.Stopped)
+                if (data.Status == IncentiveStatus.Stopped)
                 {
                     SetStoppedStatus(apprenticeApplicationDto);
                 } 
-                else if (data.incentive.Status == IncentiveStatus.Withdrawn)
+                else if (data.Status == IncentiveStatus.Withdrawn)
                 {
-                    SetWithdrawnStatus(apprenticeApplicationDto, data.incentive.WithdrawnBy.Value);
+                    SetWithdrawnStatus(apprenticeApplicationDto, data.WithdrawnBy.Value);
                 }
                 
                 result.Add(apprenticeApplicationDto);
@@ -128,23 +106,33 @@ namespace SFA.DAS.EmployerIncentives.Data
             return result;
         }
 
-        private static bool? EmploymentCheckResult(ApprenticeshipIncentives.Models.EmploymentCheck firstEmploymentCheck,
-                                                   ApprenticeshipIncentives.Models.PendingPaymentValidationResult firstEmploymentCheckValidation,
-                                                   ApprenticeshipIncentives.Models.EmploymentCheck secondEmploymentCheck,
-                                                   ApprenticeshipIncentives.Models.PendingPaymentValidationResult secondEmploymentCheckValidation)
+        private decimal CalculateTotalIncentiveAmount(decimal? firstPendingPaymentAmount, decimal? secondPendingPaymentAmount)
         {
-            if (firstEmploymentCheck == null
-                || secondEmploymentCheck == null 
-                || firstEmploymentCheck.Result == null
-                || secondEmploymentCheck.Result == null
-                || firstEmploymentCheckValidation == null 
-                || secondEmploymentCheckValidation == null
+            var amount = 0m;
+            if (firstPendingPaymentAmount.HasValue)
+            {
+                amount += firstPendingPaymentAmount.Value;
+            }
+            if (secondPendingPaymentAmount.HasValue)
+            {
+                amount += secondPendingPaymentAmount.Value;
+            }
+
+            return amount;
+        }
+
+        private static bool? EmploymentCheckResult(bool? firstEmploymentCheck, bool? firstEmploymentCheckValidation, bool? secondEmploymentCheck, bool? secondEmploymentCheckValidation)
+        {
+            if (!firstEmploymentCheck.HasValue
+                || !secondEmploymentCheck.HasValue
+                || !firstEmploymentCheckValidation.HasValue 
+                || !secondEmploymentCheckValidation.HasValue
                 )
             {
                 return null;
             }
 
-            return firstEmploymentCheckValidation.Result && secondEmploymentCheckValidation.Result;
+            return firstEmploymentCheckValidation.Value && secondEmploymentCheckValidation.Value;
         }
 
         private static void SetStoppedStatus(ApprenticeApplicationDto model)
@@ -171,89 +159,48 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
             else
             {
-                if (model.SecondPaymentStatus == null)
-                {
-                    model.SecondPaymentStatus = paymentStatus;
-                }
+                model.SecondPaymentStatus = paymentStatus;
             }
         }
-
-        private static bool LearnerMatchFound(Learner learner)
-        {
-            if(learner == null)
-            {
-                return false;
-            }
-
-            return learner.LearningFound.HasValue && learner.LearningFound.Value;
-        }
-
-        private static bool HasDataLock(Learner learner)
-        {
-            if (learner == null)
-            {
-                return false;
-            }
-
-            return learner.HasDataLock.HasValue && learner.HasDataLock.Value;
-        }
-
-        private static bool InLearning(Learner learner)
-        {
-            if (learner == null)
-            {
-                return false;
-            }
-
-            return learner.InLearning.HasValue && learner.InLearning.Value;
-        }
+        
         private static DateTime? PaymentDate(
-            PendingPayment pendingPayment, 
-            Payment payment,
+            DateTime? pendingPaymentDate,
+            DateTime? paymentSentDate,
+            DateTime? paymentCalculatedDate,
             Domain.ValueObjects.CollectionCalendarPeriod nextActivePeriod)
         {
-            if (payment != null)
+
+            if (paymentSentDate.HasValue)
             {
-                if (payment.PaidDate != null)
-                {
-                    return payment.PaidDate.Value;
-                }
-                return payment.CalculatedDate;
+                return paymentSentDate.Value;
+            }
+            else if (paymentCalculatedDate.HasValue)
+            {
+                return paymentCalculatedDate.Value;
             }
             
+            if (!pendingPaymentDate.HasValue)
+            {
+                return default;
+            }
+
             var activePeriodDate = new DateTime(nextActivePeriod.OpenDate.Year, nextActivePeriod.OpenDate.Month, nextActivePeriod.OpenDate.Day);
-            var paymentDueDate = new DateTime(pendingPayment.DueDate.Year, pendingPayment.DueDate.Month, pendingPayment.DueDate.Day);
+            var paymentDueDate = new DateTime(pendingPaymentDate.Value.Year, pendingPaymentDate.Value.Month, pendingPaymentDate.Value.Day);
 
             if (paymentDueDate < activePeriodDate)
             {
                 return new DateTime(nextActivePeriod.CalendarYear, nextActivePeriod.CalendarMonth, 27);
             }
-            return pendingPayment.DueDate.AddMonths(1);
+            return pendingPaymentDate.Value.AddMonths(1);
         }
 
-        private static decimal? PaymentAmount(PendingPayment pendingPayment, Payment payment)
+        private static decimal? PaymentAmount(decimal? pendingPaymentAmount, decimal? paymentAmount)
         {
-            if (payment != null)
+            if (paymentAmount.HasValue)
             {
-                return payment.Amount;
+                return paymentAmount;
             }
-            return pendingPayment.Amount;
-        }
-        
-        private static bool IsPaymentEstimated(Payment payment, IDateTimeService dateTimeService)
-        {
-            if(payment == null || !payment.PaidDate.HasValue)
-            {
-                return true;
-            }
-
-            if (dateTimeService.Now().Day < 27 &&
-                payment.PaidDate.Value.Year == dateTimeService.Now().Year &&
-                payment.PaidDate.Value.Month == dateTimeService.Now().Month)
-            {
-                return true;
-            }
-            return false;
+            return pendingPaymentAmount;
         }
 
         public async Task<Guid?> GetFirstSubmittedApplicationId(long accountLegalEntityId)
