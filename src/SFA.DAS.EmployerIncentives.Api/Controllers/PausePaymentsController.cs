@@ -33,8 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                     .ToList()
                     .ForEach(v => commands.Add(
                         new PausePaymentsCommand(
-                            v.AccountLegalEntityId,
                             v.ULN,
+                            v.AccountLegalEntityId,                            
                             request.ServiceRequest.TaskId,
                             request.ServiceRequest.DecisionReference,
                             request.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow.Date,

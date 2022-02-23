@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
             _sut = new PausePaymentsController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<UpsertLegalEntityCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<PausePaymentsCommand>>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
@@ -40,21 +40,32 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         {
             // Arrange
             var request = _fixture.Create<PausePaymentsRequest>();
-            request.Applications = _fixture.CreateMany<Types.Application>(1).ToArray();            
+            request.Applications = _fixture.CreateMany<Types.Application>(1).ToArray();
+
+            PausePaymentsCommand sentCommand = null;
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ICommand>, CancellationToken>( (c, t) =>
+                {
+                    sentCommand = c.Single() as PausePaymentsCommand;
+                });
 
             // Act
             await _sut.PausePayments(request);
 
             // Assert
             _mockCommandDispatcher
-                .Verify(m => m.Send(It.Is<PausePaymentsCommand>(c => 
-                    c.AccountLegalEntityId == request.Applications.Single().AccountLegalEntityId &&
-                    c.ULN == request.Applications.Single().ULN && 
-                    c.ServiceRequestId == request.ServiceRequest.TaskId &&
-                    c.DateServiceRequestTaskCreated == request.ServiceRequest.TaskCreatedDate.Value &&
-                    c.DecisionReferenceNumber == request.ServiceRequest.DecisionReference), 
+                .Verify(m => m.SendMany(It.Is<List<ICommand>>(c => c.Count == 1), 
                 It.IsAny<CancellationToken>())
-                ,Times.Once);                
+                ,Times.Once);
+            
+            sentCommand.AccountLegalEntityId.Should().Be(request.Applications.Single().AccountLegalEntityId);
+            sentCommand.ULN.Should().Be(request.Applications.Single().ULN);
+            sentCommand.ServiceRequestId.Should().Be(request.ServiceRequest.TaskId);
+            sentCommand.DateServiceRequestTaskCreated.Should().Be(request.ServiceRequest.TaskCreatedDate.Value);
+            sentCommand.DecisionReferenceNumber.Should().Be(request.ServiceRequest.DecisionReference);
+            sentCommand.Action.Should().Be(request.Action);
         }
 
         [Test]
@@ -75,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         {
             // Arrange
             var request = _fixture.Create<PausePaymentsRequest>();
-            _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
+            _mockCommandDispatcher.Setup(x => x.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new KeyNotFoundException(""));
 
             // Act
@@ -90,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         {
             // Arrange
             var request = _fixture.Create<PausePaymentsRequest>();
-            _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
+            _mockCommandDispatcher.Setup(x => x.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidRequestException());
 
             // Act
@@ -105,7 +116,9 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
         {
             // Arrange
             var request = _fixture.Create<PausePaymentsRequest>();
-            _mockCommandDispatcher.Setup(x => x.Send(It.IsAny<ICommand>(), It.IsAny<CancellationToken>()))
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new PausePaymentsException(""));
 
             // Act
