@@ -296,7 +296,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new EmploymentCheckService(client);
+                return new EmploymentCheckService(client, settings.Version);
             });
 
             return serviceCollection;

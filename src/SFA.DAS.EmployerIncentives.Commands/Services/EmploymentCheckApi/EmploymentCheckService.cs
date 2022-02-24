@@ -12,9 +12,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi
     {
         private readonly HttpClient _client;
         
-        public EmploymentCheckService(HttpClient client)
+        public EmploymentCheckService(HttpClient client, string version)
         {
             _client = client;
+            _client.DefaultRequestHeaders.Remove("X-Version");
+            _client.DefaultRequestHeaders.Add("X-Version", version);
         }
         
         public async Task<Guid> RegisterEmploymentCheck(EmploymentCheck employmentCheck, Domain.ApprenticeshipIncentives.ApprenticeshipIncentive apprenticeshipIncentive)
