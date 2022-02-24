@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi
                 Uln = apprenticeshipIncentive.Apprenticeship.UniqueLearnerNumber
             };
             var content = new StringContent(JsonConvert.SerializeObject(createEmploymentCheckRequest), Encoding.Default, "application/json");
-            var response = await _client.PutAsync("RegisterCheck", content);
+            var response = await _client.PostAsync("RegisterCheck", content);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
