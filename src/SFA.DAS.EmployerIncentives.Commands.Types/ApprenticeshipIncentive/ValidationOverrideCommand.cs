@@ -1,13 +1,12 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
-using SFA.DAS.EmployerIncentives.Commands.Types;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System;
 using System.Collections.Generic;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidationOverrides
+namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
 {
-    public class ValidationOverrideCommand : ICommand, ILogWriter, IPeriodEndIncompatible
+    public class ValidationOverrideCommand : DomainCommand, ILogWriter, IPeriodEndIncompatible
     {
         public long AccountLegalEntityId { get; }
         public long ULN { get; }
@@ -47,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Validation
             }
         }
 
-        public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
+        public TimeSpan CommandDelay => TimeSpan.FromMinutes(2);
         public bool CancelCommand => false;
     }
 }
