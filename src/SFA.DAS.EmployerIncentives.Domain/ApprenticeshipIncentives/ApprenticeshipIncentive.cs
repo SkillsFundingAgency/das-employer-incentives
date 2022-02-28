@@ -217,8 +217,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void Reinstate(CollectionCalendar collectionCalendar)
         {
-            Model.Status = IncentiveStatus.Active;
             Model.WithdrawnBy = null;
+            Model.PausePayments = true;
+            Model.Status = IncentiveStatus.Paused;
             CalculateEarnings(collectionCalendar);
         }
 

@@ -118,16 +118,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             publishedCommand.IncentiveApplicationApprenticeshipId.Should().Be(_apprenticeship.Id);
         }
 
-        [Then(@"the apprenticeship incentive status is reset to Active")]
-        public async Task ThenTheApprenticeshipIncentiveIsStatusIsResetToActive()
+        [Then(@"the apprenticeship incentive status is reset to Paused")]
+        public async Task ThenTheApprenticeshipIncentiveIsStatusIsResetToPaused()
         {
             await using var dbConnection = new SqlConnection(_connectionString);
             var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
             
             incentives.Should().HaveCount(1); 
             var incentive = incentives.FirstOrDefault();
-            incentive.Status.Should().Be(IncentiveStatus.Active);
+            incentive.Status.Should().Be(IncentiveStatus.Paused);
             incentive.WithdrawnBy.Should().BeNull();
+            incentive.PausePayments.Should().BeTrue();
         }
 
         [Then(@"the earnings are recalculated")]

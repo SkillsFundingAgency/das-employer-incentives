@@ -44,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.Reinstate(_collectionCalendar);
 
             // assert            
-            _sut.Status.Should().Be(IncentiveStatus.Active);
+            _sut.Status.Should().Be(IncentiveStatus.Paused);
+            _sut.PausePayments.Should().BeTrue();
             _sut.WithdrawnBy.Should().BeNull();
             _sut.PendingPayments.Count.Should().Be(2);
         }

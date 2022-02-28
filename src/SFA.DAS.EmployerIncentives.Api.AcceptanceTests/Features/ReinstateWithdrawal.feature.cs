@@ -125,7 +125,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("the incentive application status is reset", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 12
- testRunner.And("the apprenticeship incentive status is reset to Active", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the apprenticeship incentive status is reset to Paused", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 13
  testRunner.And("the earnings are recalculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
