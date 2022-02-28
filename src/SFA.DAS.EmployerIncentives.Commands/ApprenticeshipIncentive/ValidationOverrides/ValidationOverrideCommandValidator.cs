@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Validation
                 case ValidationStep.EmployedBeforeSchemeStarted:
                     break;
                 default:
-                    result.AddError("ValidationOverrideStep.ValidationStep", "Is not valild");
+                    result.AddError("ValidationOverrideStep.ValidationStep", "Is not valid");
                     break;
             }
 
