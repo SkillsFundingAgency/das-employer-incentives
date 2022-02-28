@@ -80,8 +80,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Configure<EmploymentCheckApi>(l =>
                 {
                     l.ApiBaseUrl = _context.EmploymentCheckApi.BaseAddress;
-                    l.Identifier = "";
-                    l.Version = "1.0";
+                    l.SubscriptionKey = "";
+                    l.ApiVersion = "1";
                 });
                 if (_context.AccountApi != null)
                 {
