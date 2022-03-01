@@ -3,6 +3,8 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -17,8 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPost("/withdrawals")]
-        [ProducesResponseType((int) HttpStatusCode.Accepted)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Accepted)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> WithdrawalIncentiveApplication([FromBody] WithdrawApplicationRequest request)
         {
             if (request.WithdrawalType == WithdrawalType.Employer)
@@ -48,20 +50,27 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             }
             else
             {
-                return BadRequest(new {Error = "Invalid WithdrawalType of {request.WithdrawalType} passed in"});
+                return BadRequest(new { Error = "Invalid WithdrawalType of {request.WithdrawalType} passed in" });
             }
         }
 
         [HttpPost("/withdrawal-reinstatements")]
-        [ProducesResponseType((int) HttpStatusCode.Accepted)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Accepted)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> ReinstateIncentiveApplication([FromBody] ReinstateApplicationRequest request)
         {
-            await SendCommandAsync(
-                new ReinstateWithdrawalCommand(
-                    request.AccountLegalEntityId,
-                    request.ULN
+            var commands = new List<ICommand>();
+
+            request.Applications
+                .ToList()
+                .ForEach(v => commands.Add(
+                    new ReinstateWithdrawalCommand(
+                        v.ULN,
+                        v.AccountLegalEntityId)
                 ));
+
+            await SendCommandsAsync(commands);
+
             return Accepted();
         }
     }

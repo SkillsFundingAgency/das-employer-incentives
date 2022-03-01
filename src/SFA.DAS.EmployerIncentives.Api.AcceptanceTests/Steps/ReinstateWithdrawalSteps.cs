@@ -71,11 +71,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"a request is made to reinstate the application")]
         public async Task WhenARequestIsMadeToReinstateTheApplication()
         {
-            _reinstateApplicationRequest = _fixture
-                .Build<ReinstateApplicationRequest>()
+            var reinstateApplication = _fixture
+                .Build<Application>()
                 .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
                 .With(r => r.ULN, _apprenticeship.ULN)
                 .Create();
+
+            _reinstateApplicationRequest = new ReinstateApplicationRequest {Applications = new[] { reinstateApplication }};
 
             var url = $"withdrawal-reinstatements";
 

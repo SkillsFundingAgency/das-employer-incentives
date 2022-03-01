@@ -36,12 +36,15 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
             await _sut.ReinstateIncentiveApplication(request);
 
             // Assert
-            _mockCommandDispatcher
-                .Verify(m => m.Send(It.Is<ReinstateWithdrawalCommand>(c => 
-                    c.AccountLegalEntityId == request.AccountLegalEntityId &&
-                    c.ULN == request.ULN), 
-                It.IsAny<CancellationToken>())
-                ,Times.Once);                
+            foreach (var application in request.Applications)
+            {
+                _mockCommandDispatcher
+                    .Verify(m => m.Send(It.Is<ReinstateWithdrawalCommand>(c =>
+                                c.AccountLegalEntityId == application.AccountLegalEntityId &&
+                                c.ULN == application.ULN),
+                            It.IsAny<CancellationToken>())
+                        , Times.Once);
+            }
         }
 
         [Test]
