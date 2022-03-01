@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -31,20 +33,33 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
         {
             // Arrange
             var request = _fixture.Create<ReinstateApplicationRequest>();
+            request.Applications = _fixture.CreateMany<Types.Application>(2).ToArray();
+
+            ReinstateWithdrawalCommand sentCommand1 = null;
+            ReinstateWithdrawalCommand sentCommand2 = null;
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ICommand>, CancellationToken>((c, t) =>
+                {
+                    sentCommand1 = c.First() as ReinstateWithdrawalCommand;
+                    sentCommand2 = c.Last() as ReinstateWithdrawalCommand;
+                });
 
             // Act
             await _sut.ReinstateIncentiveApplication(request);
 
             // Assert
-            foreach (var application in request.Applications)
-            {
-                _mockCommandDispatcher
-                    .Verify(m => m.Send(It.Is<ReinstateWithdrawalCommand>(c =>
-                                c.AccountLegalEntityId == application.AccountLegalEntityId &&
-                                c.ULN == application.ULN),
-                            It.IsAny<CancellationToken>())
-                        , Times.Once);
-            }
+            _mockCommandDispatcher
+                .Verify(m => m.SendMany(It.Is<List<ICommand>>(c => c.Count == 2),
+                It.IsAny<CancellationToken>())
+                , Times.Once);
+
+            sentCommand1.AccountLegalEntityId.Should().Be(request.Applications.First().AccountLegalEntityId);
+            sentCommand1.ULN.Should().Be(request.Applications.First().ULN);
+
+            sentCommand2.AccountLegalEntityId.Should().Be(request.Applications.Last().AccountLegalEntityId);
+            sentCommand2.ULN.Should().Be(request.Applications.Last().ULN);
         }
 
         [Test]
