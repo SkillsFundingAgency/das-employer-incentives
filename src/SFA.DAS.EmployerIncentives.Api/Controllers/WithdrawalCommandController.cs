@@ -65,8 +65,8 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 .ToList()
                 .ForEach(v => commands.Add(
                     new ReinstateWithdrawalCommand(
-                        v.ULN,
-                        v.AccountLegalEntityId)
+                        v.AccountLegalEntityId,
+                        v.ULN)
                 ));
 
             await SendCommandsAsync(commands);
