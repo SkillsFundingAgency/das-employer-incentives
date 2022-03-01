@@ -26,6 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public MockApi PaymentsApi { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
+        public string HubName { get; set; }
+
         public TestContext()
         {
             InstanceId = Guid.NewGuid().ToString();

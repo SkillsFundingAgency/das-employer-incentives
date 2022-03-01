@@ -13,8 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
@@ -33,9 +33,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public ObjectResult HttpObjectResult => ResponseObject as ObjectResult;
         public object ResponseObject { get; private set; }
 
-        public TestFunction(TestContext testContext, string hubName)
+        private CancellationTokenSource CancellationTokenSource { get; set; }
+        private CancellationToken CancellationToken { get; set; }
+
+        public TestFunction(TestContext testContext)
         {
-            HubName = hubName;
+            HubName = testContext.HubName;
+            CancellationTokenSource = new CancellationTokenSource();
+            CancellationToken = CancellationTokenSource.Token;
+
             _orchestrationData = new OrchestrationData();
 
             _testContext = testContext;
@@ -109,33 +115,30 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));                        
                        })
                        )
-                    .ConfigureServices(s =>
-                    {
-                        s.AddHostedService<PurgeBackgroundJob>();
-                    })
                 .Build();
         }
 
         public async Task StartHost()
         {
-            var timeout = new TimeSpan(0, 0, 10);
+            var timeout = new TimeSpan(0, 0, 15);
             var delayTask = Task.Delay(timeout);
-            await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
+            
+            await Task.WhenAny(Task.WhenAll(_host.StartAsync(CancellationToken)), delayTask);
 
             if (delayTask.IsCompleted)
             {
                 throw new Exception($"Failed to start test function host within {timeout.Seconds} seconds.  Check the AzureStorageEmulator is running. ");
             }
-        }
+        }                    
 
         public Task Start(OrchestrationStarterInfo starter, bool throwIfFailed = true)
         {
-            return Jobs.Start(starter, throwIfFailed);
+            return Jobs.Start(starter, throwIfFailed, CancellationToken);
         }
 
         public async Task<ObjectResult> CallEndpoint(EndpointInfo endpoint)
         {
-            await Jobs.Start(endpoint);
+            await Jobs.Start(endpoint, CancellationToken);
             return ResponseObject as ObjectResult;
         }
 
@@ -148,13 +151,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task<DurableOrchestrationStatus> GetStatus(string instanceId)
         {
-            await Jobs.RefreshStatus(instanceId);
+            await Jobs.RefreshStatus(instanceId, CancellationToken);
             return _orchestrationData.Status;
+        }
+
+        public Task Terminate()
+        {
+            return Jobs.Terminate(CancellationToken);
         }
 
         public async Task DisposeAsync()
         {
+            CancellationTokenSource.Cancel();
             await Jobs.StopAsync();
+
             Dispose();
         }
 
