@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_incentive_is_marked_as_active()
+        public async Task Then_the_incentive_is_marked_as_paused()
         {
             //Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            incentive.Status.Should().Be(IncentiveStatus.Active);
+            incentive.Status.Should().Be(IncentiveStatus.Paused);
             incentive.WithdrawnBy.Should().BeNull();
         }
         
