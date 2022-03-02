@@ -17,12 +17,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             return context.MessageBus.Start();
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 1)]
         public async Task CleanUp(TestContext context)
         {
             if (context.MessageBus != null && context.MessageBus.IsRunning)
             {
-                await context.MessageBus.Stop();                
+                await context.MessageBus.Stop();
             }            
         }
     }
