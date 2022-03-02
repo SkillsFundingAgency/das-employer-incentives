@@ -23,9 +23,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            _testContext.HubName = Truncate($"TEST{GenerateId()}{_featureContext.FeatureInfo.Title}", 44);
+            _testContext.HubName = Truncate($"EITEST{GenerateId()}{_featureContext.FeatureInfo.Title}", 44);
             _testContext.TestFunction = new TestFunction(_testContext);
-            await _testContext.TestFunction.StartHost();
+            try
+            {
+                await _testContext.TestFunction.StartHost();
+            }
+            catch(InvalidOperationException ex)
+            {
+                if (ex.Message != "Server has already started")
+                {
+                    throw;
+                }
+            }
 
             stopwatch.Stop();
             Console.WriteLine($"Time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Azure.Data.Tables;
+using System;
 using System.IO;
+using System.Linq;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Bindings
@@ -22,6 +24,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
                 DeleteDirectory(new DirectoryInfo(Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.Parent.FullName, "TestDirectory")).FullName);
             }
             catch (Exception) 
+            {
+                // ignore
+            }
+        }
+
+        [BeforeTestRun(Order = 2)]
+        public static void DeleteTaskHubs()
+        {
+            try
+            {
+                var tableClient = new TableServiceClient("UseDevelopmentStorage=true");
+
+                tableClient.Query().ToList().ForEach(t =>
+                {
+                    if (t.Name.StartsWith("EITEST"))
+                    {
+                        tableClient.DeleteTable(t.Name);
+                    }
+                });
+            }
+            catch (Exception ex)
             {
                 // ignore
             }

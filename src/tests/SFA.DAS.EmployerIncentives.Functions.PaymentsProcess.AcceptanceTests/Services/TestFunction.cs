@@ -120,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartHost()
         {
-            var timeout = new TimeSpan(0, 0, 15);
+            var timeout = new TimeSpan(0, 0, 20);
             var delayTask = Task.Delay(timeout);
             
             await Task.WhenAny(Task.WhenAll(_host.StartAsync(CancellationToken)), delayTask);
@@ -164,7 +164,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             CancellationTokenSource.Cancel();
             await Jobs.StopAsync();
-
+            try
+            {
+                await _host.StopAsync(CancellationToken);
+            }
+            catch (Exception) { }
             Dispose();
         }
 
