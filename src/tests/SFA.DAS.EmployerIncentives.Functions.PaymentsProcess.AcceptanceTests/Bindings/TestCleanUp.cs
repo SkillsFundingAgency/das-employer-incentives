@@ -9,13 +9,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
     [Binding]
     public class TestCleanUp
     {
-        private readonly TestContext _context;
-
-        public TestCleanUp(TestContext context)
-        {         
-            _context = context;
-        }
-
         [BeforeTestRun(Order = 1)]
         public static void DeleteTestDirectory()
         {
@@ -51,11 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         }
 
         [AfterScenario(Order = 100)]
-        public void CleanUp()
+        public void CleanUp(TestContext testContext)
         {
             try
             {
-                Directory.Delete(_context.TestDirectory.FullName, true);
+                Directory.Delete(testContext.TestDirectory.FullName, true);
             }
             catch(Exception)
             {

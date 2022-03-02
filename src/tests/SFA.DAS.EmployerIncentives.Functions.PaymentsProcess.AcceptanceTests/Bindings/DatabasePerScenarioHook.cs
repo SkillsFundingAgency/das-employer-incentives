@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         }
 
         [AfterScenario(Order = 100)]
-        public static void TearDownDatabase(TestContext context)
+        public void TearDownDatabase(TestContext context)
         {
             context.SqlDatabase?.Dispose();
         }

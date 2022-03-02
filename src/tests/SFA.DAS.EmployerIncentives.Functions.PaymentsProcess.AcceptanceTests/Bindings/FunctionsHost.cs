@@ -10,24 +10,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
     [Binding]
     public class FunctionsHost
     {
-        private readonly TestContext _testContext;
-        private readonly FeatureContext _featureContext;
-        public FunctionsHost(TestContext testContext, FeatureContext featureContext)
-        {
-            _testContext = testContext;
-            _featureContext = featureContext;
-        }
-
         [BeforeScenario()]
-        public async Task InitialiseHost()
+        public async Task InitialiseHost(TestContext testContext, FeatureContext featureContext)
         {
+            Console.WriteLine($"Here !!!");
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            _testContext.HubName = Truncate($"EITEST{GenerateId()}{_featureContext.FeatureInfo.Title}", 44);
-            _testContext.TestFunction = new TestFunction(_testContext);
+            testContext.HubName = Truncate($"EITEST{GenerateId()}{featureContext.FeatureInfo.Title}", 44);
+            testContext.TestFunction = new TestFunction(testContext);
             try
             {
-                await _testContext.TestFunction.StartHost();
+                await testContext.TestFunction.StartHost();
             }
             catch(InvalidOperationException ex)
             {
@@ -38,35 +32,35 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             }
 
             stopwatch.Stop();
-            Console.WriteLine($"Time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");
+            Console.WriteLine($"Time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {testContext.TestFunction.HubName}");
         }
 
         [AfterScenario()]
-        public async Task Cleanup()
+        public async Task Cleanup(TestContext testContext)
         { 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            if (_testContext.TestFunction != null)
+            if (testContext.TestFunction != null)
             {                
-                await _testContext.TestFunction.Terminate();
-                await _testContext.TestFunction.DisposeAsync();
-                _testContext.TestFunction = null;
+                await testContext.TestFunction.Terminate();
+                await testContext.TestFunction.DisposeAsync();
+                testContext.TestFunction = null;
             }
-            await DeleteTaskHubAsync();
+            await DeleteTaskHubAsync(testContext);
 
             stopwatch.Stop();
-            Console.WriteLine($"Time it took to Cleanup  FunctionsHost: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.HubName}");
+            Console.WriteLine($"Time it took to Cleanup  FunctionsHost: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {testContext.HubName}");
         }
 
-        private async Task DeleteTaskHubAsync()
+        private static async Task DeleteTaskHubAsync(TestContext testContext)
         {
-            if (_testContext.HubName == null) return;
+            if (testContext.HubName == null) return;
 
             var settings = new AzureStorageOrchestrationServiceSettings
             {
                 StorageConnectionString = "UseDevelopmentStorage=true",
-                TaskHubName = _testContext.HubName
+                TaskHubName = testContext.HubName
             };
 
             var service = new AzureStorageOrchestrationService(settings);
