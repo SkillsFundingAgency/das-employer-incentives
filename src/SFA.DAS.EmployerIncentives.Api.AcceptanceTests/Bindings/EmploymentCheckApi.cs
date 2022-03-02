@@ -6,13 +6,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "employmentCheckApi")]
     public class EmploymentCheckApi
     {
-        [BeforeScenario(Order = 5)]
+        [BeforeScenario(Order = 6)]
         public void InitialiseEmploymentCheckApi(TestContext context)
         {
             context.EmploymentCheckApi = new TestEmploymentCheckApi();
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 6)]
         public void CleanUpEmploymentCheckApi(TestContext context)
         {
             context.EmploymentCheckApi.Dispose();

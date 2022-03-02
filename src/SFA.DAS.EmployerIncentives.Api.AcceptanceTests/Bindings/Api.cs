@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using NServiceBus;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "api")]
     public class Api
     {
-        [BeforeScenario(Order = 5)]
+        [BeforeScenario(Order = 7)]
         public void InitialiseApi(TestContext context)
         {
             var eventsHook = new Hook<object>();
@@ -25,22 +26,25 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             var webApi = new TestWebApi(context, eventsHook, commandsHook);
             var options = new WebApplicationFactoryClientOptions
             {                
-                BaseAddress = new System.Uri($"https://localhost:{GetAvailablePort(5001)}")
+                BaseAddress = new Uri($"https://localhost:{GetAvailablePort(5001)}")
             };
-            context.EmployerIncentivesWebApiFactory = webApi;
+            context.TestWebApi = webApi;
             context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 8)]
         public async Task CleanUp(TestContext context)
         {
-            var endpoint = context.EmployerIncentivesWebApiFactory.Services.GetService(typeof(IEndpointInstance)) as IEndpointInstance;
-            if(endpoint != null)
+            var services = context.TestWebApi.Services;
+
+            var endpoint = context.TestWebApi.Services.GetService(typeof(IEndpointInstance)) as IEndpointInstance;
+            if (endpoint != null)
             {
                 await endpoint.Stop();
             }
-            context.EmployerIncentivesWebApiFactory.Server?.Dispose();
-            context.EmployerIncentivesWebApiFactory.Dispose();
+
+            context.TestWebApi.Server?.Dispose();
+            context.TestWebApi.Dispose();
             context.EmployerIncentiveApi?.Dispose();            
         }
 

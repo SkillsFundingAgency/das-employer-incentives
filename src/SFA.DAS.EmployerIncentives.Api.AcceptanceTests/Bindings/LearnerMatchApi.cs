@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             context.LearnerMatchApi = new TestLearnerMatchApi();
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 5)]
         public void CleanUpLearnerMatchApi(TestContext context)
         {
             context.LearnerMatchApi.Dispose();

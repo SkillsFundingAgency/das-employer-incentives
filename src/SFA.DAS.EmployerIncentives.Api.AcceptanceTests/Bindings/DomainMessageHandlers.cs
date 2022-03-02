@@ -8,14 +8,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "domainMessageHandlers")]
     public class DomainMessageHandlers
     {
-        [BeforeScenario(Order = 6)]
+        [BeforeScenario(Order = 8)]
         public async Task InitialiseFunctions(TestContext context)
         {
             context.DomainMessageHandlers = new TestDomainMessageHandlers(context);
             await context.DomainMessageHandlers.Start();
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 7)]
         public async Task CleanUp(TestContext context)
         {
             try

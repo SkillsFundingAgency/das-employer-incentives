@@ -240,7 +240,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
             else
             {
-                _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest);
+                _response = await EmployerIncentiveApi.Post(url, _withdrawApplicationRequest, _testContext.CancellationToken);
             }
         }
 

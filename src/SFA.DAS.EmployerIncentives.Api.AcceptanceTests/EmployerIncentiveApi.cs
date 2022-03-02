@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         }
 
         public void Dispose()
-        {
+        {           
             Dispose(true);
             GC.SuppressFinalize(this);
         }

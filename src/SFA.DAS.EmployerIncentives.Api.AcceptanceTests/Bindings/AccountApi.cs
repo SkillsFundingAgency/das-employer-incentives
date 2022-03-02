@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             context.AccountApi = new TestAccountApi();
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 4)]
         public void CleanUpAccountApi(TestContext context)
         {
             context.AccountApi?.Dispose();

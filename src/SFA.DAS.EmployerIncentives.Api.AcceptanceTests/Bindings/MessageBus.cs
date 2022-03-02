@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using TechTalk.SpecFlow;
-using NServiceBus.Transport;
+﻿using NServiceBus.Transport;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using System.Threading.Tasks;
+using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 {
@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "messageBus")]
     public class MessageBus
     {
-        [BeforeScenario(Order = 2)]
+        [BeforeScenario(Order = 3)]
         public Task InitialiseMessageBus(TestContext context)
         {
             context.MessageBus = new TestMessageBus(context);
@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             return context.MessageBus.Start();
         }
 
-        [AfterScenario(Order = 1)]
+        [AfterScenario(Order = 3)]
         public async Task CleanUp(TestContext context)
         {
             if (context.MessageBus != null && context.MessageBus.IsRunning)
