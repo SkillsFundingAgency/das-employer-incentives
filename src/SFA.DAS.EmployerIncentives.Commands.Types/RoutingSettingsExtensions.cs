@@ -1,4 +1,5 @@
-﻿using NServiceBus;
+﻿using System.Diagnostics.CodeAnalysis;
+using NServiceBus;
 using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
@@ -8,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types
 {
+    [ExcludeFromCodeCoverage]
     public static class RoutingSettingsExtensions
     {
         public static void AddRouting(this RoutingSettings routingSettings)
@@ -23,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
             routingSettings.RouteToEndpoint(typeof(SendEmploymentCheckRequestsCommand), QueueNames.SendEmploymentCheckRequests);
             routingSettings.RouteToEndpoint(typeof(UpdateEmploymentCheckCommand), QueueNames.UpdateEmploymentCheck);
             routingSettings.RouteToEndpoint(typeof(RefreshEmploymentCheckCommand), QueueNames.RefreshEmploymentCheckCommand);
+            routingSettings.RouteToEndpoint(typeof(RecalculateEarningsCommand), QueueNames.RecalculateEarningsCommand);
         }
     }
 }

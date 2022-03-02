@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public PendingPayment NextDuePayment => GetNextDuePayment();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
+
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
         public IncentiveStatus Status => Model.Status;
@@ -93,6 +94,36 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.RefreshedLearnerForEarnings = false;
         }
 
+        public void RecalculateEarnings(CollectionCalendar collectionCalendar)
+        {
+            if (Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
+            {
+                return;
+            }
+
+            var recalculationRequired = false;
+            foreach(var pendingPayment in PendingPayments)
+            {
+                if (!ExistingPendingPaymentHasBeenPaid(pendingPayment))
+                {
+                    var existingPendingPaymentModel = pendingPayment.GetModel();
+                    Model.PendingPaymentModels.Remove(existingPendingPaymentModel);
+                    recalculationRequired = true;
+                }
+            }
+
+            if (recalculationRequired)
+            {
+                AddEvent(new EarningsRecalculationRequired
+                {
+                    ApprenticeshipIncentiveId = Id,
+                    AccountId = Model.Account.Id,
+                    ApprenticeshipId = Model.Apprenticeship.Id
+                });
+            }
+        }
+
+
         private void AddPendingPaymentsAndClawbackWhereRequired(ValueObjects.Payment payment, CollectionCalendar collectionCalendar)
         {
             var pendingPayment = PendingPayment.New(
@@ -135,7 +166,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
             }
-        }     
+        }
 
         private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
         {

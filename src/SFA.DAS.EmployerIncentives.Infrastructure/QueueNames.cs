@@ -19,5 +19,6 @@
         public const string SendEmploymentCheckRequests = "SFA.DAS.EmployerIncentives.RequestEmploymentChecks";
         public const string UpdateEmploymentCheck = "SFA.DAS.EmployerIncentives.UpdateEmploymentCheck";
         public const string RefreshEmploymentCheckCommand = "SFA.DAS.EmployerIncentives.RefreshEmploymentCheck";
+        public const string RecalculateEarningsCommand = "SFA.DAS.EmploymentIncentives.RecalculateEarnings";
     }
 }
