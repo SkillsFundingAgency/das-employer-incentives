@@ -20,10 +20,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             BaseAddress = client.BaseAddress;
         }
       
-        public Task<HttpResponseMessage> PostCommand<T>(string url, T command) where T : ICommand
+        public Task<HttpResponseMessage> PostCommand<T>(string url, T command, CancellationToken cancellationToken = default) where T : ICommand
         {
             var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-            return Client.PostAsJsonAsync(url, commandText);
+            return Client.PostAsJsonAsync(url, commandText, cancellationToken);
         }
 
         public Task<HttpResponseMessage> Post<T>(string url, T data, CancellationToken cancellationToken = default)

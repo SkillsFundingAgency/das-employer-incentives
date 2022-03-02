@@ -6,23 +6,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "accountApi")]
     public class AccountApi
     {
-        private readonly TestContext _context;
-
-        public AccountApi(TestContext context)
-        {
-            _context = context;
-        }
-
         [BeforeScenario(Order = 4)]
-        public void InitialiseAccountApi()
+        public void InitialiseAccountApi(TestContext context)
         {
-            _context.AccountApi = new TestAccountApi();
+            context.AccountApi = new TestAccountApi();
         }
 
         [AfterScenario()]
-        public void CleanUpAccountApi()
+        public void CleanUpAccountApi(TestContext context)
         {
-            _context.AccountApi?.Dispose();
+            context.AccountApi?.Dispose();
         }
     }
 }

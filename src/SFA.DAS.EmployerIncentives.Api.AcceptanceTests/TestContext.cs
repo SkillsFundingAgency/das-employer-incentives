@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         public string InstanceId { get; private set; }
         public CancellationToken CancellationToken { get; set; }
+        public CancellationTokenSource CancellationTokenSource { get; set; }
         public DirectoryInfo TestDirectory { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }

@@ -21,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 {
     [Binding]
     [Scope(Feature = "ValidatePayments")]
+    [Scope(Feature = "ValidatePaymentsFails")]    
     public partial class ValidatePaymentsSteps
     {
         private readonly TestContext _testContext;

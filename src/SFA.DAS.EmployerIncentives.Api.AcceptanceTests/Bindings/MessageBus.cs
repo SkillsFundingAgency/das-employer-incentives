@@ -9,27 +9,20 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "messageBus")]
     public class MessageBus
     {
-        private readonly TestContext _context;
-
-        public MessageBus(TestContext context)
-        {
-            _context = context;
-        }
-
         [BeforeScenario(Order = 2)]
-        public Task InitialiseMessageBus()
+        public Task InitialiseMessageBus(TestContext context)
         {
-            _context.MessageBus = new TestMessageBus(_context);
-             _context.Hooks.Add(new Hook<MessageContext>());
-            return _context.MessageBus.Start();
+            context.MessageBus = new TestMessageBus(context);
+            context.Hooks.Add(new Hook<MessageContext>());
+            return context.MessageBus.Start();
         }
 
         [AfterScenario()]
-        public async Task CleanUp()
+        public async Task CleanUp(TestContext context)
         {
-            if (_context.MessageBus != null && _context.MessageBus.IsRunning)
+            if (context.MessageBus != null && context.MessageBus.IsRunning)
             {
-                await _context.MessageBus.Stop();                
+                await context.MessageBus.Stop();                
             }            
         }
     }

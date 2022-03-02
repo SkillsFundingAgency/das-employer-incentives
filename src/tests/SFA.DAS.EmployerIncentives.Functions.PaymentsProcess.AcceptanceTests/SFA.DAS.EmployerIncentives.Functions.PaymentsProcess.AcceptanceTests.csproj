@@ -5,6 +5,13 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+
+  <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\IlrStartDateChanged - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RefreshLearnerData - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\ValidatePayments - Copy.feature.cs" />
+  </ItemGroup>
     
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
@@ -37,6 +44,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\IlrStartDateChangedClawbacks.feature.cs">
+      <DependentUpon>IlrStartDateChangedClawbacks.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\RefreshLearnerData2.feature.cs">
+      <DependentUpon>RefreshLearnerData2.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\StartDateChangedAndLearningStoppedCoC.feature.cs">
       <DependentUpon>StartDateChangedAndLearningStoppedCoC.feature</DependentUpon>
     </Compile>
@@ -45,6 +58,9 @@
     </Compile>
     <Compile Update="Features\SendPayments.feature.cs">
       <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Features\ValidatePaymentsFails.feature.cs">
+      <DependentUpon>ValidatePaymentsFails.feature</DependentUpon>
     </Compile>
     <Compile Update="Files\LearnerMatchApiResponses.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -61,6 +77,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\IlrStartDateChangedClawbacks.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\RefreshLearnerData2.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\StartDateChangedAndLearningStoppedCoC.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
@@ -72,6 +96,10 @@
     <SpecFlowFeatureFiles Update="Features\SendPayments.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>SendPayments.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ValidatePaymentsFails.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 </Project>

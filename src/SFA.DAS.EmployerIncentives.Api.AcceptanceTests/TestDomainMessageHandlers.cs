@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly List<IHook> _messageHooks;
         private readonly TestContext _testContext;
         private IHost host;
-        private List<IReceivingRawEndpoint> _receivingRawEndpoints = new List<IReceivingRawEndpoint>();
+        private readonly List<IReceivingRawEndpoint> _receivingRawEndpoints = new List<IReceivingRawEndpoint>();
         private bool isDisposed;
 
         public TestDomainMessageHandlers(

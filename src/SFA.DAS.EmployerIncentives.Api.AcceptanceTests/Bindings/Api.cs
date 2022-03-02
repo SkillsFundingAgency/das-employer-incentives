@@ -13,42 +13,35 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "api")]
     public class Api
     {
-        private readonly TestContext _context;
-
-        public Api(TestContext context)
-        {
-            _context = context;
-        }
-
         [BeforeScenario(Order = 5)]
-        public void InitialiseApi()
+        public void InitialiseApi(TestContext context)
         {
             var eventsHook = new Hook<object>();
-            _context.Hooks.Add(eventsHook);
+            context.Hooks.Add(eventsHook);
 
             var commandsHook = new Hook<Abstractions.Commands.ICommand>();
-            _context.Hooks.Add(commandsHook);
+            context.Hooks.Add(commandsHook);
 
-            var webApi = new TestWebApi(_context, eventsHook, commandsHook);
+            var webApi = new TestWebApi(context, eventsHook, commandsHook);
             var options = new WebApplicationFactoryClientOptions
             {                
                 BaseAddress = new System.Uri($"https://localhost:{GetAvailablePort(5001)}")
             };
-            _context.EmployerIncentivesWebApiFactory = webApi;
-            _context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
+            context.EmployerIncentivesWebApiFactory = webApi;
+            context.EmployerIncentiveApi = new EmployerIncentiveApi(webApi.CreateClient(options));
         }
 
         [AfterScenario()]
-        public async Task CleanUp()
+        public async Task CleanUp(TestContext context)
         {
-            var endpoint = _context.EmployerIncentivesWebApiFactory.Services.GetService(typeof(IEndpointInstance)) as IEndpointInstance;
+            var endpoint = context.EmployerIncentivesWebApiFactory.Services.GetService(typeof(IEndpointInstance)) as IEndpointInstance;
             if(endpoint != null)
             {
                 await endpoint.Stop();
             }
-            _context.EmployerIncentivesWebApiFactory.Server?.Dispose();
-            _context.EmployerIncentivesWebApiFactory.Dispose();
-            _context.EmployerIncentiveApi?.Dispose();            
+            context.EmployerIncentivesWebApiFactory.Server?.Dispose();
+            context.EmployerIncentivesWebApiFactory.Dispose();
+            context.EmployerIncentiveApi?.Dispose();            
         }
 
         public int GetAvailablePort(int startingPort)
