@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "messageBus")]
     public class MessageBus
     {
-        [BeforeScenario(Order = 3)]
+        [BeforeScenario(Order = 4)]
         public Task InitialiseMessageBus(TestContext context)
         {
             context.MessageBus = new TestMessageBus(context);
@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             return context.MessageBus.Start();
         }
 
-        [AfterScenario(Order = 3)]
+        [AfterScenario(Order = 4)]
         public async Task CleanUp(TestContext context)
         {
             if (context.MessageBus != null && context.MessageBus.IsRunning)

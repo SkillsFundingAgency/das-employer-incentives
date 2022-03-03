@@ -7,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Binding]
     public class ApplicationSettingsHook
     {
-        [BeforeScenario(Order = 1)]
+        [BeforeScenario(Order = 3)]
         public void InitialiseApplicationSettings(TestContext context)
         {
             context.ApplicationSettings = new ApplicationSettings
