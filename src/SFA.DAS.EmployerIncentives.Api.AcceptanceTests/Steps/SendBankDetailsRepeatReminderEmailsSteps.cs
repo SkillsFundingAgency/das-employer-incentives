@@ -4,7 +4,6 @@ using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Data.SqlClient;
 using System.IO;
@@ -127,7 +126,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 }
             }
                         
-            Assert.Fail($"No NServiceBus Message found with {_application.SubmittedByEmail}");
+            throw new Exception($"No NServiceBus Message found with {_application.SubmittedByEmail}");
         }
     }
 }

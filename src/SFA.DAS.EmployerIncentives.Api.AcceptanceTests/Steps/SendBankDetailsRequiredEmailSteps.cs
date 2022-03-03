@@ -1,6 +1,5 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using System;
@@ -62,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 }
             }
 
-            Assert.Fail($"No NServiceBus Message found with {_request.EmailAddress} and {_request.AddBankDetailsUrl}");
+            throw new Exception($"No NServiceBus Message found with {_request.EmailAddress} and {_request.AddBankDetailsUrl}");
         }
 
         [When(@"a bank details required email is sent with an invalid email address")]

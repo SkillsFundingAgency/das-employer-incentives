@@ -31,8 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "ConfigurationStorageConnectionString", "UseDevelopmentStorage=true" },
                     { "ApplicationSettings:EmployerIncentivesWebBaseUrl", "https://localhost:5001" },
-                    { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
-                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(_context.TestDirectory.FullName, ".learningtransport") },
+                    { "ApplicationSettings:NServiceBusConnectionString", _context.ApplicationSettings.NServiceBusConnectionString},
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _context.ApplicationSettings.UseLearningEndpointStorageDirectory},
                     { "ApplicationSettings:DbConnectionString", _context.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ApplicationSettings:NServiceBusEndpointName", _context.InstanceId },
                     { "ApplicationSettings:LogLevel", "Info" },
@@ -46,6 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 s.Configure<ApplicationSettings>(a =>
                 {
+                    a.ApiBaseUrl = _context.EmployerIncentiveApi.BaseAddress.AbsoluteUri;
                     a.DbConnectionString = _context.ApplicationSettings.DbConnectionString;
                     a.DistributedLockStorage = _context.ApplicationSettings.DistributedLockStorage;
                     a.AllowedHashstringCharacters = _context.ApplicationSettings.AllowedHashstringCharacters;

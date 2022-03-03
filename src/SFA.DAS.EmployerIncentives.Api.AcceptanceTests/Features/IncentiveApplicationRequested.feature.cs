@@ -19,35 +19,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class IncentiveApplicationRequestedFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    public partial class IncentiveApplicationRequestedFeature : object, Xunit.IClassFixture<IncentiveApplicationRequestedFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
                 "api"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "IncentiveApplicationRequested.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public IncentiveApplicationRequestedFeature(IncentiveApplicationRequestedFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "IncentiveApplicationRequested", "\tIn order to confirm the apprenticeships selected\r\n\tAs an employer\r\n\tI want to re" +
@@ -57,24 +51,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "IncentiveApplicationRequested")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.IncentiveApplicationRequestedFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -83,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -96,11 +82,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employer is confirming apprentices")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "IncentiveApplicationRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Employer is confirming apprentices")]
+        [Xunit.TraitAttribute("FeatureTitle", "IncentiveApplicationRequested")]
+        [Xunit.TraitAttribute("Description", "Employer is confirming apprentices")]
         public virtual void EmployerIsConfirmingApprentices()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -137,6 +126,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                IncentiveApplicationRequestedFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                IncentiveApplicationRequestedFeature.FeatureTearDown();
+            }
         }
     }
 }

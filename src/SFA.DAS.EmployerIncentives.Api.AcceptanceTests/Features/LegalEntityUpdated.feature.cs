@@ -19,35 +19,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class LegalEntityUpdatedFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    public partial class LegalEntityUpdatedFeature : object, Xunit.IClassFixture<LegalEntityUpdatedFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
                 "api"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "LegalEntityUpdated.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public LegalEntityUpdatedFeature(LegalEntityUpdatedFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "LegalEntityUpdated", "\tWhen an legal entity has been updated in an account\r\n\tThen the latest details ar" +
@@ -57,24 +51,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "LegalEntityUpdated")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.LegalEntityUpdatedFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -83,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -96,11 +82,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A legal entity is amended in an account")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "LegalEntityUpdated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="A legal entity is amended in an account")]
+        [Xunit.TraitAttribute("FeatureTitle", "LegalEntityUpdated")]
+        [Xunit.TraitAttribute("Description", "A legal entity is amended in an account")]
         public virtual void ALegalEntityIsAmendedInAnAccount()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -137,6 +126,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                LegalEntityUpdatedFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                LegalEntityUpdatedFeature.FeatureTearDown();
+            }
         }
     }
 }

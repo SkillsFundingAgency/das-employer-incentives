@@ -1,9 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+﻿
 #if !DEBUG
-[assembly: Parallelize(Workers = 40, Scope = ExecutionScope.ClassLevel)]
+  [assembly: CollectionBehavior(MaxParallelThreads = 40)]
 #else
-[assembly: Parallelize(Workers = 5, Scope = ExecutionScope.ClassLevel)]
+using Xunit;
+
+[assembly: CollectionBehavior(MaxParallelThreads = 40)]
 #endif
 
 

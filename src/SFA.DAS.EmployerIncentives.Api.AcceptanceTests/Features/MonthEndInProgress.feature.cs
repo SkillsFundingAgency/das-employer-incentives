@@ -19,13 +19,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class MonthEndInProgressFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    [Xunit.TraitAttribute("Category", "domainMessageHandlers")]
+    [Xunit.TraitAttribute("Category", "messageBus")]
+    [Xunit.TraitAttribute("Category", "activeCalendarPeriod")]
+    public partial class MonthEndInProgressFeature : object, Xunit.IClassFixture<MonthEndInProgressFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
@@ -34,23 +36,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "messageBus",
                 "activeCalendarPeriod"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "MonthEndInProgress.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public MonthEndInProgressFeature(MonthEndInProgressFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "MonthEndInProgress", "\tIn order to maintain data consistency\r\n\tAs employer incentives service\r\n\tI want " +
@@ -63,24 +60,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "MonthEndInProgress")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.MonthEndInProgressFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -89,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -102,14 +91,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Earnings calculation is deferred when payment process in progress.")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "MonthEndInProgress")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Earnings calculation is deferred when payment process in progress.")]
+        [Xunit.TraitAttribute("FeatureTitle", "MonthEndInProgress")]
+        [Xunit.TraitAttribute("Description", "Earnings calculation is deferred when payment process in progress.")]
         public virtual void EarningsCalculationIsDeferredWhenPaymentProcessInProgress_()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -151,14 +140,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Withdrawal request is deferred when payment process in progress.")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "MonthEndInProgress")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Withdrawal request is deferred when payment process in progress.")]
+        [Xunit.TraitAttribute("FeatureTitle", "MonthEndInProgress")]
+        [Xunit.TraitAttribute("Description", "Withdrawal request is deferred when payment process in progress.")]
         public virtual void WithdrawalRequestIsDeferredWhenPaymentProcessInProgress_()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -200,14 +184,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Compliance withdrawal request is deferred when payment process in progress.")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "MonthEndInProgress")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Compliance withdrawal request is deferred when payment process in progress.")]
+        [Xunit.TraitAttribute("FeatureTitle", "MonthEndInProgress")]
+        [Xunit.TraitAttribute("Description", "Compliance withdrawal request is deferred when payment process in progress.")]
         public virtual void ComplianceWithdrawalRequestIsDeferredWhenPaymentProcessInProgress_()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -247,6 +226,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                MonthEndInProgressFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                MonthEndInProgressFeature.FeatureTearDown();
+            }
         }
     }
 }

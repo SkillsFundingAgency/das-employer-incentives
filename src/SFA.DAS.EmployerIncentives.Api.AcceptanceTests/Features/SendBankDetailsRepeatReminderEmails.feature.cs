@@ -19,13 +19,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class SendBankDetailsRepeatReminderEmailsFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "messageBus")]
+    [Xunit.TraitAttribute("Category", "api")]
+    [Xunit.TraitAttribute("Category", "activeCalendarPeriod")]
+    public partial class SendBankDetailsRepeatReminderEmailsFeature : object, Xunit.IClassFixture<SendBankDetailsRepeatReminderEmailsFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
@@ -33,23 +34,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "api",
                 "activeCalendarPeriod"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "SendBankDetailsRepeatReminderEmails.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public SendBankDetailsRepeatReminderEmailsFeature(SendBankDetailsRepeatReminderEmailsFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SendBankDetailsRepeatReminderEmails", "\tIn order to receive incentive payments\r\n\tAs an employer\r\n\tI need to be reminded " +
@@ -61,24 +57,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "SendBankDetailsRepeatReminderEmails")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.SendBankDetailsRepeatReminderEmailsFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -87,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -100,13 +88,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employer has applied for the incentive payment but not supplied bank details")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "SendBankDetailsRepeatReminderEmails")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Employer has applied for the incentive payment but not supplied bank details")]
+        [Xunit.TraitAttribute("FeatureTitle", "SendBankDetailsRepeatReminderEmails")]
+        [Xunit.TraitAttribute("Description", "Employer has applied for the incentive payment but not supplied bank details")]
         public virtual void EmployerHasAppliedForTheIncentivePaymentButNotSuppliedBankDetails()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -145,6 +134,22 @@ testRunner.Then("the employer is sent a reminder email to supply their bank deta
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                SendBankDetailsRepeatReminderEmailsFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                SendBankDetailsRepeatReminderEmailsFeature.FeatureTearDown();
+            }
         }
     }
 }

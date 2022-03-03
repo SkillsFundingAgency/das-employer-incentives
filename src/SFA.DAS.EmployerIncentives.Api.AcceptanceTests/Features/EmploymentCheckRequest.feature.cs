@@ -19,13 +19,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class EmploymentCheckRequestFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    [Xunit.TraitAttribute("Category", "activeCalendarPeriod")]
+    [Xunit.TraitAttribute("Category", "messageBus")]
+    [Xunit.TraitAttribute("Category", "domainMessageHandlers")]
+    [Xunit.TraitAttribute("Category", "employmentCheckApi")]
+    public partial class EmploymentCheckRequestFeature : object, Xunit.IClassFixture<EmploymentCheckRequestFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
@@ -35,23 +38,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "domainMessageHandlers",
                 "employmentCheckApi"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "EmploymentCheckRequest.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public EmploymentCheckRequestFeature(EmploymentCheckRequestFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "EmploymentCheckRequest", "\tIn order to allow support to request a new employment check for an apprenticeshi" +
@@ -66,24 +64,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "EmploymentCheckRequest")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.EmploymentCheckRequestFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -92,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -105,15 +95,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check is requested by support")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EmploymentCheckRequest")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("employmentCheckApi")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check is requested by support")]
+        [Xunit.TraitAttribute("FeatureTitle", "EmploymentCheckRequest")]
+        [Xunit.TraitAttribute("Description", "Employment check is requested by support")]
         public virtual void EmploymentCheckIsRequestedBySupport()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -155,15 +144,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check is requested by support for a incentive that does not exist")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EmploymentCheckRequest")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("employmentCheckApi")]
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check is requested by support for a incentive that does not exist")]
+        [Xunit.TraitAttribute("FeatureTitle", "EmploymentCheckRequest")]
+        [Xunit.TraitAttribute("Description", "Employment check is requested by support for a incentive that does not exist")]
         public virtual void EmploymentCheckIsRequestedBySupportForAIncentiveThatDoesNotExist()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -205,15 +188,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check is requested by support during month end processing")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EmploymentCheckRequest")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("employmentCheckApi")]
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check is requested by support during month end processing")]
+        [Xunit.TraitAttribute("FeatureTitle", "EmploymentCheckRequest")]
+        [Xunit.TraitAttribute("Description", "Employment check is requested by support during month end processing")]
         public virtual void EmploymentCheckIsRequestedBySupportDuringMonthEndProcessing()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -258,15 +235,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check result procesing is resumed after month end processing delay")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EmploymentCheckRequest")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("employmentCheckApi")]
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check result procesing is resumed after month end processing delay")]
+        [Xunit.TraitAttribute("FeatureTitle", "EmploymentCheckRequest")]
+        [Xunit.TraitAttribute("Description", "Employment check result procesing is resumed after month end processing delay")]
         public virtual void EmploymentCheckResultProcesingIsResumedAfterMonthEndProcessingDelay()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -311,16 +282,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check result processing is disabled when the feature toggle is switche" +
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check result processing is disabled when the feature toggle is switche" +
             "d off")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EmploymentCheckRequest")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("employmentCheckApi")]
+        [Xunit.TraitAttribute("FeatureTitle", "EmploymentCheckRequest")]
+        [Xunit.TraitAttribute("Description", "Employment check result processing is disabled when the feature toggle is switche" +
+            "d off")]
         public virtual void EmploymentCheckResultProcessingIsDisabledWhenTheFeatureToggleIsSwitchedOff()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -361,6 +327,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                EmploymentCheckRequestFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                EmploymentCheckRequestFeature.FeatureTearDown();
+            }
         }
     }
 }

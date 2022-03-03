@@ -7,10 +7,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using TechTalk.SpecFlow;
 using System.Net.Http;
-using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using Xunit;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -59,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 }
             }
 
-            Assert.Fail($"No NServiceBus Message found with {_request.EmailAddress} and {_request.AddBankDetailsUrl}");
+            throw new Exception($"No NServiceBus Message found with {_request.EmailAddress} and {_request.AddBankDetailsUrl}");
         }
 
         [When(@"a bank details required email is sent with an invalid email address")]

@@ -19,36 +19,31 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class ApplicationsForAccountRequestedFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    [Xunit.TraitAttribute("Category", "activeCalendarPeriod")]
+    public partial class ApplicationsForAccountRequestedFeature : object, Xunit.IClassFixture<ApplicationsForAccountRequestedFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
                 "api",
                 "activeCalendarPeriod"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "ApplicationsForAccountRequested.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public ApplicationsForAccountRequestedFeature(ApplicationsForAccountRequestedFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ApplicationsForAccountRequested", "\tIn order to manage incentive applications\r\n\tAs an account holder\r\n\tI want to be " +
@@ -59,24 +54,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "ApplicationsForAccountRequested")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.ApplicationsForAccountRequestedFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -85,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -98,12 +85,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A list of apprenticeships is requested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="A list of apprenticeships is requested")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "A list of apprenticeships is requested")]
         public virtual void AListOfApprenticeshipsIsRequested()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -142,12 +131,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("No learner record")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="No learner record")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "No learner record")]
         public virtual void NoLearnerRecord()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -189,12 +175,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Learner record with no learner match")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Learner record with no learner match")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Learner record with no learner match")]
         public virtual void LearnerRecordWithNoLearnerMatch()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -236,12 +219,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Learner record with learner match")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Learner record with learner match")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Learner record with learner match")]
         public virtual void LearnerRecordWithLearnerMatch()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -283,12 +263,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Learner record with data lock")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Learner record with data lock")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Learner record with data lock")]
         public virtual void LearnerRecordWithDataLock()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -330,12 +307,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Learner record with no learning found")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Learner record with no learning found")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Learner record with no learning found")]
         public virtual void LearnerRecordWithNoLearningFound()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -377,12 +351,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Learner record with paused payments")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Learner record with paused payments")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Learner record with paused payments")]
         public virtual void LearnerRecordWithPausedPayments()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -424,6 +395,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableTheoryAttribute(DisplayName="Payment sent")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Payment sent")]
+        [Xunit.InlineDataAttribute("FirstPayment", new string[0])]
+        [Xunit.InlineDataAttribute("SecondPayment", new string[0])]
         public virtual void PaymentSent(string earningType, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -469,36 +445,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment sent: FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "FirstPayment")]
-        public virtual void PaymentSent_FirstPayment()
-        {
-#line 51
-this.PaymentSent("FirstPayment", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment sent: SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "SecondPayment")]
-        public virtual void PaymentSent_SecondPayment()
-        {
-#line 51
-this.PaymentSent("SecondPayment", ((string[])(null)));
-#line hidden
-        }
-        
+        [Xunit.SkippableTheoryAttribute(DisplayName="Payment calculated but not sent")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Payment calculated but not sent")]
+        [Xunit.InlineDataAttribute("FirstPayment", new string[0])]
+        [Xunit.InlineDataAttribute("SecondPayment", new string[0])]
         public virtual void PaymentCalculatedButNotSent(string earningType, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -548,36 +499,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment calculated but not sent: FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "FirstPayment")]
-        public virtual void PaymentCalculatedButNotSent_FirstPayment()
-        {
-#line 62
-this.PaymentCalculatedButNotSent("FirstPayment", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment calculated but not sent: SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "SecondPayment")]
-        public virtual void PaymentCalculatedButNotSent_SecondPayment()
-        {
-#line 62
-this.PaymentCalculatedButNotSent("SecondPayment", ((string[])(null)));
-#line hidden
-        }
-        
+        [Xunit.SkippableTheoryAttribute(DisplayName="Payment calculated but not generated")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Payment calculated but not generated")]
+        [Xunit.InlineDataAttribute("FirstPayment", new string[0])]
+        [Xunit.InlineDataAttribute("SecondPayment", new string[0])]
         public virtual void PaymentCalculatedButNotGenerated(string earningType, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -627,36 +553,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment calculated but not generated: FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "FirstPayment")]
-        public virtual void PaymentCalculatedButNotGenerated_FirstPayment()
-        {
-#line 74
-this.PaymentCalculatedButNotGenerated("FirstPayment", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment calculated but not generated: SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "SecondPayment")]
-        public virtual void PaymentCalculatedButNotGenerated_SecondPayment()
-        {
-#line 74
-this.PaymentCalculatedButNotGenerated("SecondPayment", ((string[])(null)));
-#line hidden
-        }
-        
+        [Xunit.SkippableTheoryAttribute(DisplayName="Payment calculated but not generated in current active period")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Payment calculated but not generated in current active period")]
+        [Xunit.InlineDataAttribute("FirstPayment", new string[0])]
+        [Xunit.InlineDataAttribute("SecondPayment", new string[0])]
         public virtual void PaymentCalculatedButNotGeneratedInCurrentActivePeriod(string earningType, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -707,36 +608,15 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment calculated but not generated in current active period: FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "FirstPayment")]
-        public virtual void PaymentCalculatedButNotGeneratedInCurrentActivePeriod_FirstPayment()
-        {
-#line 86
-this.PaymentCalculatedButNotGeneratedInCurrentActivePeriod("FirstPayment", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment calculated but not generated in current active period: SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "SecondPayment")]
-        public virtual void PaymentCalculatedButNotGeneratedInCurrentActivePeriod_SecondPayment()
-        {
-#line 86
-this.PaymentCalculatedButNotGeneratedInCurrentActivePeriod("SecondPayment", ((string[])(null)));
-#line hidden
-        }
-        
+        [Xunit.SkippableTheoryAttribute(DisplayName="New employment agreement signature required")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "New employment agreement signature required")]
+        [Xunit.InlineDataAttribute("null", "null", "true", new string[0])]
+        [Xunit.InlineDataAttribute("null", "4", "true", new string[0])]
+        [Xunit.InlineDataAttribute("4", "null", "false", new string[0])]
+        [Xunit.InlineDataAttribute("4", "4", "false", new string[0])]
+        [Xunit.InlineDataAttribute("5", "6", "true", new string[0])]
+        [Xunit.InlineDataAttribute("7", "6", "false", new string[0])]
         public virtual void NewEmploymentAgreementSignatureRequired(string signedAgreementVersion, string minimumAgreementVersion, string newAgreementRequired, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -783,108 +663,13 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("New employment agreement signature required: Variant 0")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 0")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Signed Agreement Version", "null")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Minimum Agreement Version", "null")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:New Agreement Required", "true")]
-        public virtual void NewEmploymentAgreementSignatureRequired_Variant0()
-        {
-#line 98
-this.NewEmploymentAgreementSignatureRequired("null", "null", "true", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("New employment agreement signature required: Variant 1")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 1")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Signed Agreement Version", "null")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Minimum Agreement Version", "4")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:New Agreement Required", "true")]
-        public virtual void NewEmploymentAgreementSignatureRequired_Variant1()
-        {
-#line 98
-this.NewEmploymentAgreementSignatureRequired("null", "4", "true", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("New employment agreement signature required: Variant 2")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 2")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Signed Agreement Version", "4")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Minimum Agreement Version", "null")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:New Agreement Required", "false")]
-        public virtual void NewEmploymentAgreementSignatureRequired_Variant2()
-        {
-#line 98
-this.NewEmploymentAgreementSignatureRequired("4", "null", "false", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("New employment agreement signature required: Variant 3")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 3")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Signed Agreement Version", "4")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Minimum Agreement Version", "4")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:New Agreement Required", "false")]
-        public virtual void NewEmploymentAgreementSignatureRequired_Variant3()
-        {
-#line 98
-this.NewEmploymentAgreementSignatureRequired("4", "4", "false", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("New employment agreement signature required: Variant 4")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 4")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Signed Agreement Version", "5")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Minimum Agreement Version", "6")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:New Agreement Required", "true")]
-        public virtual void NewEmploymentAgreementSignatureRequired_Variant4()
-        {
-#line 98
-this.NewEmploymentAgreementSignatureRequired("5", "6", "true", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("New employment agreement signature required: Variant 5")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 5")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Signed Agreement Version", "7")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Minimum Agreement Version", "6")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:New Agreement Required", "false")]
-        public virtual void NewEmploymentAgreementSignatureRequired_Variant5()
-        {
-#line 98
-this.NewEmploymentAgreementSignatureRequired("7", "6", "false", ((string[])(null)));
-#line hidden
-        }
-        
+        [Xunit.SkippableTheoryAttribute(DisplayName="Employment check status")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Employment check status")]
+        [Xunit.InlineDataAttribute("true", "true", "true", "false", "true", new string[0])]
+        [Xunit.InlineDataAttribute("true", "false", "true", "true", "false", new string[0])]
+        [Xunit.InlineDataAttribute("false", "true", "false", "false", "false", new string[0])]
+        [Xunit.InlineDataAttribute("false", "false", "false", "true", "false", new string[0])]
         public virtual void EmploymentCheckStatus(string employedAtStartOfApprenticeship, string employedBeforeSchemeStarted, string firstEmploymentCheckResult, string secondEmploymentCheckResult, string employmentCheckStatus, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -940,88 +725,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check status: Variant 0")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 0")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed At Start Of Apprenticeship", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed Before Scheme Started", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:First Employment Check Result", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Second Employment Check Result", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employment Check Status", "true")]
-        public virtual void EmploymentCheckStatus_Variant0()
-        {
-#line 112
-this.EmploymentCheckStatus("true", "true", "true", "false", "true", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check status: Variant 1")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 1")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed At Start Of Apprenticeship", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed Before Scheme Started", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:First Employment Check Result", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Second Employment Check Result", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employment Check Status", "false")]
-        public virtual void EmploymentCheckStatus_Variant1()
-        {
-#line 112
-this.EmploymentCheckStatus("true", "false", "true", "true", "false", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check status: Variant 2")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 2")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed At Start Of Apprenticeship", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed Before Scheme Started", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:First Employment Check Result", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Second Employment Check Result", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employment Check Status", "false")]
-        public virtual void EmploymentCheckStatus_Variant2()
-        {
-#line 112
-this.EmploymentCheckStatus("false", "true", "false", "false", "false", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check status: Variant 3")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 3")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed At Start Of Apprenticeship", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employed Before Scheme Started", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:First Employment Check Result", "false")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Second Employment Check Result", "true")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Employment Check Status", "false")]
-        public virtual void EmploymentCheckStatus_Variant3()
-        {
-#line 112
-this.EmploymentCheckStatus("false", "false", "false", "true", "false", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Multiple employment check payment validation statuses")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Multiple employment check payment validation statuses")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Multiple employment check payment validation statuses")]
         public virtual void MultipleEmploymentCheckPaymentValidationStatuses()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -1070,12 +776,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment validation results do not include employment check")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Payment validation results do not include employment check")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Payment validation results do not include employment check")]
         public virtual void PaymentValidationResultsDoNotIncludeEmploymentCheck()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -1120,12 +823,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check has no payment validation results")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check has no payment validation results")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Employment check has no payment validation results")]
         public virtual void EmploymentCheckHasNoPaymentValidationResults()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -1170,12 +870,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check payment validation fails due to no employment check record")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check payment validation fails due to no employment check record")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Employment check payment validation fails due to no employment check record")]
         public virtual void EmploymentCheckPaymentValidationFailsDueToNoEmploymentCheckRecord()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -1220,12 +917,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employment check payment validation fails due to null employment check records")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Employment check payment validation fails due to null employment check records")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Employment check payment validation fails due to null employment check records")]
         public virtual void EmploymentCheckPaymentValidationFailsDueToNullEmploymentCheckRecords()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -1270,6 +964,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableTheoryAttribute(DisplayName="Payment stopped")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Payment stopped")]
+        [Xunit.InlineDataAttribute("Stopped", "true", new string[0])]
+        [Xunit.InlineDataAttribute("Active", "false", new string[0])]
         public virtual void PaymentStopped(string incentiveStatus, string paymentStoppedStatus, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -1313,38 +1012,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment stopped: Stopped")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Stopped")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Incentive Status", "Stopped")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Payment Stopped Status", "true")]
-        public virtual void PaymentStopped_Stopped()
-        {
-#line 163
-this.PaymentStopped("Stopped", "true", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment stopped: Active")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Active")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Incentive Status", "Active")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Payment Stopped Status", "false")]
-        public virtual void PaymentStopped_Active()
-        {
-#line 163
-this.PaymentStopped("Active", "false", ((string[])(null)));
-#line hidden
-        }
-        
+        [Xunit.SkippableTheoryAttribute(DisplayName="Payment clawed back")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Payment clawed back")]
+        [Xunit.InlineDataAttribute("FirstPayment", new string[0])]
+        [Xunit.InlineDataAttribute("SecondPayment", new string[0])]
         public virtual void PaymentClawedBack(string earningType, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -1387,36 +1059,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment clawed back: FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "FirstPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "FirstPayment")]
-        public virtual void PaymentClawedBack_FirstPayment()
-        {
-#line 173
-this.PaymentClawedBack("FirstPayment", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Payment clawed back: SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "SecondPayment")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Earning Type", "SecondPayment")]
-        public virtual void PaymentClawedBack_SecondPayment()
-        {
-#line 173
-this.PaymentClawedBack("SecondPayment", ((string[])(null)));
-#line hidden
-        }
-        
+        [Xunit.SkippableTheoryAttribute(DisplayName="Application withdrawn")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
+        [Xunit.TraitAttribute("Description", "Application withdrawn")]
+        [Xunit.InlineDataAttribute("Employer", new string[0])]
+        [Xunit.InlineDataAttribute("Compliance", new string[0])]
         public virtual void ApplicationWithdrawn(string withdrawnBy, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -1460,34 +1107,20 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Application withdrawn: Employer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Employer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Withdrawn By", "Employer")]
-        public virtual void ApplicationWithdrawn_Employer()
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
         {
-#line 183
-this.ApplicationWithdrawn("Employer", ((string[])(null)));
-#line hidden
-        }
-        
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Application withdrawn: Compliance")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApplicationsForAccountRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Compliance")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:Withdrawn By", "Compliance")]
-        public virtual void ApplicationWithdrawn_Compliance()
-        {
-#line 183
-this.ApplicationWithdrawn("Compliance", ((string[])(null)));
-#line hidden
+            
+            public FixtureData()
+            {
+                ApplicationsForAccountRequestedFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                ApplicationsForAccountRequestedFeature.FeatureTearDown();
+            }
         }
     }
 }

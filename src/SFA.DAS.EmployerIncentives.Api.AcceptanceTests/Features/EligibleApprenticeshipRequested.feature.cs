@@ -19,35 +19,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class EligibleApprenticeshipRequestedFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    public partial class EligibleApprenticeshipRequestedFeature : object, Xunit.IClassFixture<EligibleApprenticeshipRequestedFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
                 "api"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "EligibleApprenticeshipRequested.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public EligibleApprenticeshipRequestedFeature(EligibleApprenticeshipRequestedFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "EligibleApprenticeshipRequested", "\tIn order to select apprenticeships to apply for an incentive for\r\n\tAs an employe" +
@@ -57,24 +51,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "EligibleApprenticeshipRequested")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.EligibleApprenticeshipRequestedFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -83,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -96,11 +82,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship eligibility is requested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship eligibility is requested")]
+        [Xunit.TraitAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship eligibility is requested")]
         public virtual void ApprenticeshipEligibilityIsRequested()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -139,11 +128,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship eligibility is requested for a previously used ULN")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship eligibility is requested for a previously used ULN")]
+        [Xunit.TraitAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship eligibility is requested for a previously used ULN")]
         public virtual void ApprenticeshipEligibilityIsRequestedForAPreviouslyUsedULN()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -185,11 +172,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship eligibility is requested for a ULN on a draft application")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship eligibility is requested for a ULN on a draft application")]
+        [Xunit.TraitAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship eligibility is requested for a ULN on a draft application")]
         public virtual void ApprenticeshipEligibilityIsRequestedForAULNOnADraftApplication()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -231,11 +216,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship eligibility is requested for a ULN withdrawn by Employer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship eligibility is requested for a ULN withdrawn by Employer")]
+        [Xunit.TraitAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship eligibility is requested for a ULN withdrawn by Employer")]
         public virtual void ApprenticeshipEligibilityIsRequestedForAULNWithdrawnByEmployer()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -280,11 +263,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship eligibility is requested for a ULN withdrawn by Compliance")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship eligibility is requested for a ULN withdrawn by Compliance")]
+        [Xunit.TraitAttribute("FeatureTitle", "EligibleApprenticeshipRequested")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship eligibility is requested for a ULN withdrawn by Compliance")]
         public virtual void ApprenticeshipEligibilityIsRequestedForAULNWithdrawnByCompliance()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -327,6 +308,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                EligibleApprenticeshipRequestedFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                EligibleApprenticeshipRequestedFeature.FeatureTearDown();
+            }
         }
     }
 }

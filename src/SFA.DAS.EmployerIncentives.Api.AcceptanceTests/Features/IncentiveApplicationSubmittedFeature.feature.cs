@@ -19,35 +19,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class IncentiveApplicationSubmittedFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    public partial class IncentiveApplicationSubmittedFeature : object, Xunit.IClassFixture<IncentiveApplicationSubmittedFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
                 "api"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "IncentiveApplicationSubmittedFeature.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public IncentiveApplicationSubmittedFeature(IncentiveApplicationSubmittedFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "IncentiveApplicationSubmitted", "\tIn order to claim the incentive payment\r\n\tAs an employer \r\n\tI want to submit an " +
@@ -57,24 +51,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "IncentiveApplicationSubmitted")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.IncentiveApplicationSubmittedFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -83,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -96,11 +82,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive Application is submitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive Application is submitted")]
+        [Xunit.TraitAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
+        [Xunit.TraitAttribute("Description", "Incentive Application is submitted")]
         public virtual void IncentiveApplicationIsSubmitted()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -139,11 +128,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive Application is submitted with invalid application id")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive Application is submitted with invalid application id")]
+        [Xunit.TraitAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
+        [Xunit.TraitAttribute("Description", "Incentive Application is submitted with invalid application id")]
         public virtual void IncentiveApplicationIsSubmittedWithInvalidApplicationId()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -185,11 +172,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive Application is submitted with invalid account id")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive Application is submitted with invalid account id")]
+        [Xunit.TraitAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
+        [Xunit.TraitAttribute("Description", "Incentive Application is submitted with invalid account id")]
         public virtual void IncentiveApplicationIsSubmittedWithInvalidAccountId()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -231,11 +216,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive Application is submitted but an internal error occurs")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive Application is submitted but an internal error occurs")]
+        [Xunit.TraitAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
+        [Xunit.TraitAttribute("Description", "Incentive Application is submitted but an internal error occurs")]
         public virtual void IncentiveApplicationIsSubmittedButAnInternalErrorOccurs()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -274,11 +257,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive Application is submitted for Phase 3 employment start dates")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive Application is submitted for Phase 3 employment start dates")]
+        [Xunit.TraitAttribute("FeatureTitle", "IncentiveApplicationSubmitted")]
+        [Xunit.TraitAttribute("Description", "Incentive Application is submitted for Phase 3 employment start dates")]
         public virtual void IncentiveApplicationIsSubmittedForPhase3EmploymentStartDates()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -316,6 +297,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                IncentiveApplicationSubmittedFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                IncentiveApplicationSubmittedFeature.FeatureTearDown();
+            }
         }
     }
 }

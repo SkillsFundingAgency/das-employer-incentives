@@ -19,13 +19,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class WithdrawalByEmployerFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    [Xunit.TraitAttribute("Category", "domainMessageHandlers")]
+    [Xunit.TraitAttribute("Category", "messageBus")]
+    [Xunit.TraitAttribute("Category", "activeCalendarPeriod")]
+    public partial class WithdrawalByEmployerFeature : object, Xunit.IClassFixture<WithdrawalByEmployerFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
@@ -34,23 +36,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "messageBus",
                 "activeCalendarPeriod"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "WithdrawalByEmployer.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public WithdrawalByEmployerFeature(WithdrawalByEmployerFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "WithdrawalByEmployer", "\tIn order to handle an Employer withdrawing an apprenticeship from the incentive " +
@@ -64,24 +61,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "WithdrawalByEmployer")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.WithdrawalByEmployerFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -90,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -103,14 +92,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Withdrawal status set against an apprenticeship in an application")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "WithdrawalByEmployer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Withdrawal status set against an apprenticeship in an application")]
+        [Xunit.TraitAttribute("FeatureTitle", "WithdrawalByEmployer")]
+        [Xunit.TraitAttribute("Description", "Withdrawal status set against an apprenticeship in an application")]
         public virtual void WithdrawalStatusSetAgainstAnApprenticeshipInAnApplication()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -152,15 +141,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Withdrawal status set against a ULN with multiple apprenticeships in applications" +
+        [Xunit.SkippableFactAttribute(DisplayName="Withdrawal status set against a ULN with multiple apprenticeships in applications" +
             "")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "WithdrawalByEmployer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.TraitAttribute("FeatureTitle", "WithdrawalByEmployer")]
+        [Xunit.TraitAttribute("Description", "Withdrawal status set against a ULN with multiple apprenticeships in applications" +
+            "")]
         public virtual void WithdrawalStatusSetAgainstAULNWithMultipleApprenticeshipsInApplications()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -204,15 +189,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employer withdrawal removes incentive after an apprenticeship application has bee" +
+        [Xunit.SkippableFactAttribute(DisplayName="Employer withdrawal removes incentive after an apprenticeship application has bee" +
             "n submitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "WithdrawalByEmployer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.TraitAttribute("FeatureTitle", "WithdrawalByEmployer")]
+        [Xunit.TraitAttribute("Description", "Employer withdrawal removes incentive after an apprenticeship application has bee" +
+            "n submitted")]
         public virtual void EmployerWithdrawalRemovesIncentiveAfterAnApprenticeshipApplicationHasBeenSubmitted()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -257,14 +238,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employer withdrawal for an apprenticeship that has paid payments (earnings)")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "WithdrawalByEmployer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Employer withdrawal for an apprenticeship that has paid payments (earnings)")]
+        [Xunit.TraitAttribute("FeatureTitle", "WithdrawalByEmployer")]
+        [Xunit.TraitAttribute("Description", "Employer withdrawal for an apprenticeship that has paid payments (earnings)")]
         public virtual void EmployerWithdrawalForAnApprenticeshipThatHasPaidPaymentsEarnings()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -308,15 +284,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Employer withdrawal for an apprenticeship that has a clawed back paid payment (ea" +
+        [Xunit.SkippableFactAttribute(DisplayName="Employer withdrawal for an apprenticeship that has a clawed back paid payment (ea" +
             "rnings)")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "WithdrawalByEmployer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.TraitAttribute("FeatureTitle", "WithdrawalByEmployer")]
+        [Xunit.TraitAttribute("Description", "Employer withdrawal for an apprenticeship that has a clawed back paid payment (ea" +
+            "rnings)")]
         public virtual void EmployerWithdrawalForAnApprenticeshipThatHasAClawedBackPaidPaymentEarnings()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -358,6 +330,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                WithdrawalByEmployerFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                WithdrawalByEmployerFeature.FeatureTearDown();
+            }
         }
     }
 }

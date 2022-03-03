@@ -19,13 +19,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class ApprenticeshipIncentiveCreatedFeature
+    [Xunit.TraitAttribute("Category", "database")]
+    [Xunit.TraitAttribute("Category", "api")]
+    [Xunit.TraitAttribute("Category", "domainMessageHandlers")]
+    [Xunit.TraitAttribute("Category", "messageBus")]
+    [Xunit.TraitAttribute("Category", "activeCalendarPeriod")]
+    public partial class ApprenticeshipIncentiveCreatedFeature : object, Xunit.IClassFixture<ApprenticeshipIncentiveCreatedFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
-        
-        private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
         private string[] _featureTags = new string[] {
                 "database",
@@ -34,23 +36,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
                 "messageBus",
                 "activeCalendarPeriod"};
         
+        private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
+        
 #line 1 "ApprenticeshipIncentiveCreated.feature"
 #line hidden
         
-        public virtual Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext
+        public ApprenticeshipIncentiveCreatedFeature(ApprenticeshipIncentiveCreatedFeature.FixtureData fixtureData, SFA_DAS_EmployerIncentives_Api_AcceptanceTests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
-            get
-            {
-                return this._testContext;
-            }
-            set
-            {
-                this._testContext = value;
-            }
+            this._testOutputHelper = testOutputHelper;
+            this.TestInitialize();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
-        public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
+        public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ApprenticeshipIncentiveCreated", "\tWhen an application has been submitted\r\n\tThen an apprenticeship incentive is cre" +
@@ -63,24 +60,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.OnFeatureStart(featureInfo);
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute()]
         public static void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();
             testRunner = null;
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute()]
         public virtual void TestInitialize()
         {
-            if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "ApprenticeshipIncentiveCreated")))
-            {
-                global::SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features.ApprenticeshipIncentiveCreatedFeature.FeatureSetup(null);
-            }
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute()]
         public virtual void TestTearDown()
         {
             testRunner.OnScenarioEnd();
@@ -89,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
-            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Microsoft.VisualStudio.TestTools.UnitTesting.TestContext>(_testContext);
+            testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);
         }
         
         public virtual void ScenarioStart()
@@ -102,14 +91,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             testRunner.CollectScenarioErrors();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive Application is submitted")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        void System.IDisposable.Dispose()
+        {
+            this.TestTearDown();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive Application is submitted")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
+        [Xunit.TraitAttribute("Description", "Incentive Application is submitted")]
         public virtual void IncentiveApplicationIsSubmitted()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -148,14 +137,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship incentive is created")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship incentive is created")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship incentive is created")]
         public virtual void ApprenticeshipIncentiveIsCreated()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -195,14 +179,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship incentive earnings are calculated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship incentive earnings are calculated")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship incentive earnings are calculated")]
         public virtual void ApprenticeshipIncentiveEarningsAreCalculated()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -241,14 +220,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive application updated after earnings calculated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive application updated after earnings calculated")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
+        [Xunit.TraitAttribute("Description", "Incentive application updated after earnings calculated")]
         public virtual void IncentiveApplicationUpdatedAfterEarningsCalculated()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -288,14 +262,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Apprenticeship incentive submitted within 21 days of first payment due date")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Apprenticeship incentive submitted within 21 days of first payment due date")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
+        [Xunit.TraitAttribute("Description", "Apprenticeship incentive submitted within 21 days of first payment due date")]
         public virtual void ApprenticeshipIncentiveSubmittedWithin21DaysOfFirstPaymentDueDate()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -334,14 +303,9 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Incentive application is submitted for withdrawn apprenticeship")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("database")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("api")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("domainMessageHandlers")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("messageBus")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("activeCalendarPeriod")]
+        [Xunit.SkippableFactAttribute(DisplayName="Incentive application is submitted for withdrawn apprenticeship")]
+        [Xunit.TraitAttribute("FeatureTitle", "ApprenticeshipIncentiveCreated")]
+        [Xunit.TraitAttribute("Description", "Incentive application is submitted for withdrawn apprenticeship")]
         public virtual void IncentiveApplicationIsSubmittedForWithdrawnApprenticeship()
         {
             string[] tagsOfScenario = ((string[])(null));
@@ -385,6 +349,22 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
             }
             this.ScenarioCleanup();
+        }
+        
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public class FixtureData : System.IDisposable
+        {
+            
+            public FixtureData()
+            {
+                ApprenticeshipIncentiveCreatedFeature.FeatureSetup();
+            }
+            
+            void System.IDisposable.Dispose()
+            {
+                ApprenticeshipIncentiveCreatedFeature.FeatureTearDown();
+            }
         }
     }
 }
