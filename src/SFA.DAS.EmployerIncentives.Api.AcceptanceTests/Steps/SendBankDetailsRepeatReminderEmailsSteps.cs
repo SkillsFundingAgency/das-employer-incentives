@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
@@ -114,8 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
             catch (DirectoryNotFoundException e)
             {
-                Assert.Fail(e.Message + " Check query handlers to ensure domain commands were added");
-                return;
+                throw new Exception("Check query handlers to ensure domain commands were added " + e.Message);
             }
 
             foreach (var file in recentFiles)
@@ -124,12 +122,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
                 if (contents.Contains(_apprenticeshipIncentive.SubmittedByEmail))
                 {
-                    Assert.Pass();
                     return;
                 }
             }
-
-            Assert.Fail($"No NServiceBus Message found with {_application.SubmittedByEmail}");
+                        
+            throw new Exception($"No NServiceBus Message found with {_application.SubmittedByEmail}");
         }
     }
 }

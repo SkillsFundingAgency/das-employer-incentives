@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.NServiceBus.Services;
@@ -9,11 +10,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         private readonly IEventPublisher _eventPublisher;
         private readonly IHook<object> _hook;
+        private readonly CancellationToken _cancellationToken;
 
-        public TestEventPublisher(IEventPublisher eventPublisher, IHook<object> hook)
+        public TestEventPublisher(IEventPublisher eventPublisher, IHook<object> hook, CancellationToken cancellationToken)
         {
             _eventPublisher = eventPublisher;
             _hook = hook;
+            _cancellationToken = cancellationToken;
         }
 
         public async Task Publish<T>(T message) where T : class
@@ -26,6 +29,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         _hook.OnReceived(message);
                     }
+
+                    if(_cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     await _eventPublisher.Publish(message);
 
                     if (_hook?.OnProcessed != null)
@@ -35,6 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 }
                 catch (Exception ex)
                 {
+                    if (_cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     bool suppressError = false;
                     if (_hook?.OnErrored != null)
                     {

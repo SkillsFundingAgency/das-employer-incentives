@@ -8,35 +8,46 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Binding]
     public class TestCleanUp
     {
-        private readonly TestContext _context;
-        private readonly CancellationTokenSource _tokenSource;
-
-        public TestCleanUp(TestContext context)
-        {         
-            _context = context;
-            _tokenSource = new CancellationTokenSource();
-        }
-
         [BeforeScenario(Order = 1)]
-        public void StartUp()
+        public void StartUp(TestContext context)
         {
-            _context.CancellationToken = _tokenSource.Token;
+            context.CancellationTokenSource = new CancellationTokenSource();
+            context.CancellationToken = context.CancellationTokenSource.Token;
         }
 
         [AfterScenario(Order = 1)]
-        public void Cancel()
+        public void Cancel(TestContext context)
         {
-            _tokenSource.Cancel();
+            context.CancellationTokenSource.Cancel();
         }
 
         [AfterScenario(Order = 100)]
-        public void CleanUp()
+        public void CleanUp(TestContext context)
         {
             try
             {
-                Directory.Delete(_context.TestDirectory.FullName, true);
+                DeleteDirectory(context.TestDirectory.FullName);
             }
             catch(Exception){}
+        }
+
+        private static void DeleteDirectory(string directory)
+        {
+            string[] files = Directory.GetFiles(directory);
+            string[] directories = Directory.GetDirectories(directory);
+
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            foreach (string dir in directories)
+            {
+                DeleteDirectory(dir);
+            }
+
+            Directory.Delete(directory, false);
         }
     }
 }

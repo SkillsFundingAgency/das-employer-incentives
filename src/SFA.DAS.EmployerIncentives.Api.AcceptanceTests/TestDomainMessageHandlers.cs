@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly List<IHook> _messageHooks;
         private readonly TestContext _testContext;
         private IHost host;
-        private List<IReceivingRawEndpoint> _receivingRawEndpoints = new List<IReceivingRawEndpoint>();
+        private readonly List<IReceivingRawEndpoint> _receivingRawEndpoints = new List<IReceivingRawEndpoint>();
         private bool isDisposed;
 
         public TestDomainMessageHandlers(
@@ -45,8 +45,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 //{ "ConfigNames", "SFA.DAS.EmployerIncentives" },
                 { "Values:AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                 { "ApplicationSettings:DbConnectionString", testContext.SqlDatabase.DatabaseInfo.ConnectionString },
-                { "ApplicationSettings:NServiceBusConnectionString", "UseLearningEndpoint=true" },
-                { "ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(testContext.TestDirectory.FullName, ".learningtransport") }
+                { "ApplicationSettings:NServiceBusConnectionString", testContext.ApplicationSettings.NServiceBusConnectionString },
+                { "ApplicationSettings:UseLearningEndpointStorageDirectory", testContext.ApplicationSettings.UseLearningEndpointStorageDirectory }
             };
         }
 
@@ -74,6 +74,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     a.ApiBaseUrl = _testContext.EmployerIncentiveApi.BaseAddress.AbsoluteUri;
                     a.Identifier = "";
+                    a.DbConnectionString = _testContext.ApplicationSettings.DbConnectionString;
+                    a.DistributedLockStorage = _testContext.ApplicationSettings.DistributedLockStorage;
+                    a.AllowedHashstringCharacters = _testContext.ApplicationSettings.AllowedHashstringCharacters;
+                    a.Hashstring = _testContext.ApplicationSettings.Hashstring;
+                    a.NServiceBusConnectionString = _testContext.ApplicationSettings.NServiceBusConnectionString;
+                    a.UseLearningEndpointStorageDirectory = _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory;
+                    a.MinimumAgreementVersion = _testContext.ApplicationSettings.MinimumAgreementVersion;
+                    a.EmploymentCheckEnabled = _testContext.ApplicationSettings.EmploymentCheckEnabled;
                 });
 
                 Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
@@ -86,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         o.EndpointConfiguration = (endpoint) =>
                         {
-                            endpoint.UseTransport<LearningTransport>().StorageDirectory(_testMessageBus.StorageDirectory.FullName);
+                            endpoint.UseTransport<LearningTransport>().StorageDirectory(_testContext.ApplicationSettings.UseLearningEndpointStorageDirectory);
                             Commands.Types.RoutingSettingsExtensions.AddRouting(endpoint.UseTransport<LearningTransport>().Routing());
                             return endpoint;
                         };
@@ -145,7 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
         private async Task StopEndpoint(IReceivingRawEndpoint endpoint)
         {
-            await endpoint.Stop().ConfigureAwait(false);
+            await endpoint.Stop();
         }
 
         public IServiceCollection AddDecorators(IServiceCollection serviceCollection)

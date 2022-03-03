@@ -49,7 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             _response = await EmployerIncentiveApi.Put(
                     $"/jobs",
-                   new JobRequest { Type = JobType.RefreshLegalEntities, Data = data });
+                   new JobRequest { Type = JobType.RefreshLegalEntities, Data = data }, 
+                   TestContext.CancellationToken);
 
             _response.StatusCode.Should().Be(_expectedResult);
         }

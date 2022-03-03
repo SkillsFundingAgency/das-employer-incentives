@@ -6,23 +6,41 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "employmentCheckApi")]
     public class EmploymentCheckApi
     {
-        private readonly TestContext _context;
-
-        public EmploymentCheckApi(TestContext context)
+        [BeforeFeature()]
+        public static void InitialiseEmploymentCheckApi(FeatureInfo featureInfo)
         {
-            _context = context;            
+            lock (FeatureTestContext.FeatureData)
+            {
+                FeatureTestContext.FeatureData.GetOrCreate(featureInfo.Title + nameof(TestEmploymentCheckApi), () =>
+                {
+                    return new TestEmploymentCheckApi();
+                });
+            }
         }
 
-        [BeforeScenario(Order = 5)]
-        public void InitialiseEmploymentCheckApi()
+        [AfterFeature()]
+        public static void CleanUpEmploymentCheckApi(FeatureInfo featureInfo)
         {
-            _context.EmploymentCheckApi = new TestEmploymentCheckApi();
+            var employmentCheckApi = FeatureTestContext.FeatureData.Get<TestEmploymentCheckApi>(featureInfo.Title + nameof(TestEmploymentCheckApi));
+            if (employmentCheckApi != null)
+            {
+                employmentCheckApi.Dispose();
+            }
         }
 
-        [AfterScenario()]
-        public void CleanUpEmploymentCheckApi()
+        [BeforeScenario(Order = 6)]
+        public void Initialise(TestContext context, FeatureInfo featureInfo)
         {
-            _context.EmploymentCheckApi.Dispose();
+            if (context.EmploymentCheckApi == null)
+            {
+                context.EmploymentCheckApi = FeatureTestContext.FeatureData.Get<TestEmploymentCheckApi>(featureInfo.Title + nameof(TestEmploymentCheckApi));
+            }
+        }
+
+        [AfterScenario(Order = 6)]
+        public void CleanUpPaymentsApi(TestContext context)
+        {
+            context.EmploymentCheckApi.Reset();
         }
     }
 }

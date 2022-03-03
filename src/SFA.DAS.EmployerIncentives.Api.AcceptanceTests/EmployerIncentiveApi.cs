@@ -20,34 +20,34 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             BaseAddress = client.BaseAddress;
         }
       
-        public Task<HttpResponseMessage> PostCommand<T>(string url, T command) where T : ICommand
+        public Task<HttpResponseMessage> PostCommand<T>(string url, T command, CancellationToken cancellationToken) where T : ICommand
         {
             var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-            return Client.PostAsJsonAsync(url, commandText);
+            return Client.PostAsJsonAsync(url, commandText, cancellationToken);
         }
 
-        public Task<HttpResponseMessage> Post<T>(string url, T data, CancellationToken cancellationToken = default)
+        public Task<HttpResponseMessage> Post<T>(string url, T data, CancellationToken cancellationToken)
         {
             return Client.PostValueAsync(url, data, cancellationToken);
         }
 
-        public Task<HttpResponseMessage> Put<T>(string url, T data, CancellationToken cancellationToken = default)
+        public Task<HttpResponseMessage> Put<T>(string url, T data, CancellationToken cancellationToken)
         {
             return Client.PutValueAsync(url, data, cancellationToken);            
         }
 
-        public Task<HttpResponseMessage> Patch<T>(string url, T data, CancellationToken cancellationToken = default)
+        public Task<HttpResponseMessage> Patch<T>(string url, T data, CancellationToken cancellationToken)
         {
             return Client.PatchValueAsync(url, data, cancellationToken);
         }
 
-        public Task<HttpResponseMessage> Delete(string url, CancellationToken cancellationToken = default)
+        public Task<HttpResponseMessage> Delete(string url, CancellationToken cancellationToken)
         {
             return Client.DeleteAsync(url, cancellationToken);
         }
 
         public void Dispose()
-        {
+        {           
             Dispose(true);
             GC.SuppressFinalize(this);
         }

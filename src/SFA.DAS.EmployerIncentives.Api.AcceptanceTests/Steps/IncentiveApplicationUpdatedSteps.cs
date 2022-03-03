@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _createApplicationRequest = Fixture.Create<CreateIncentiveApplicationRequest>();
             const string url = "applications";
-            _response = await EmployerIncentiveApi.Post(url, _createApplicationRequest);
+            _response = await EmployerIncentiveApi.Post(url, _createApplicationRequest, TestContext.CancellationToken);
         }
 
         [When(@"They have changed selected apprenticeships for the application")]
@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _updateApplicationRequest.Apprenticeships.AddItem(_createApplicationRequest.Apprenticeships.First());
 
             var url = $"applications/{_updateApplicationRequest.IncentiveApplicationId}";
-            _response = await EmployerIncentiveApi.Put(url, _updateApplicationRequest);
+            _response = await EmployerIncentiveApi.Put(url, _updateApplicationRequest, TestContext.CancellationToken);
         }
 
         [Then(@"the application is updated with new selection of apprenticeships")]

@@ -1,6 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
@@ -14,14 +15,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            context.SqlDatabase = new SqlDatabase(context.InstanceId);
+            context.SqlDatabase = new SqlDatabase(context.InstanceId).Create();
             stopwatch.Stop();
             Console.WriteLine($"[{nameof(DatabasePerScenarioHook)}] time it took to deploy test database: {stopwatch.Elapsed.Seconds} seconds");
         }
 
-        [AfterScenario]
+        [AfterScenario(Order = 9)]
         public static void TearDownDatabase(TestContext context)
-        {
+        {            
             context.SqlDatabase?.Dispose();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System.IO;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
@@ -16,7 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
                 AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY",
                 Hashstring = "Test Hashstring",
                 NServiceBusConnectionString = "UseLearningEndpoint=true",
-                MinimumAgreementVersion = 4
+                MinimumAgreementVersion = 4,
+                UseLearningEndpointStorageDirectory = Path.Combine(context.TestDirectory.FullName, ".learningtransport")
             };
         }
     }

@@ -9,10 +9,11 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
-    public class TestContext
+    public class TestContext : IDisposable
     {
         public string InstanceId { get; private set; }
         public CancellationToken CancellationToken { get; set; }
+        public CancellationTokenSource CancellationTokenSource { get; set; }
         public DirectoryInfo TestDirectory { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
@@ -28,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public List<object> EventsPublished { get; set; }
         public List<PublishedEvent> PublishedEvents { get; set; }
         public List<PublishedCommand> CommandsPublished { get; set; }
-        public TestWebApi EmployerIncentivesWebApiFactory { get; set; }
+        public TestWebApi TestWebApi { get; set; }
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
         public ApplicationSettings ApplicationSettings { get; set; }
@@ -50,6 +51,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             EventsPublished = new List<object>();
             PublishedEvents = new List<PublishedEvent>();
             CommandsPublished = new List<PublishedCommand>();
+        }
+
+        private bool _isDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+
+            if (disposing)
+            {
+                EmployerIncentiveApi?.Dispose();
+                AccountApi?.Reset();
+                EmploymentCheckApi?.Reset();
+                LearnerMatchApi?.Reset();
+            }
+
+            _isDisposed = true;
         }
     }
 }

@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 {
     [Binding]
     [Scope(Feature = "IlrStartDateChanged")]
+    [Scope(Feature = "IlrStartDateChangedClawbacks")]
     public partial class IlrStartDateChangedSteps
     {
         [Given(@"a '(.*)' apprenticeship incentive exists")]

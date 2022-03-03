@@ -6,23 +6,42 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "learnerMatchApi")]
     public class LearnerMatchApi
     {
-        private readonly TestContext _context;
-
-        public LearnerMatchApi(TestContext context)
+        [BeforeFeature()]
+        public static void InitialiseAccountApi(FeatureInfo featureInfo)
         {
-            _context = context;            
+            lock (FeatureTestContext.FeatureData)
+            {
+                FeatureTestContext.FeatureData.GetOrCreate(featureInfo.Title + nameof(TestLearnerMatchApi), () =>
+                {
+                    return new TestLearnerMatchApi();
+                });
+            }
         }
 
-        [BeforeScenario(Order = 5)]
-        public void InitialiseLearnerMatchApi()
+        [AfterFeature()]
+        public static void CleanUpAccountApi(FeatureInfo featureInfo)
         {
-            _context.LearnerMatchApi = new TestLearnerMatchApi();
+            var learnerMatchApi = FeatureTestContext.FeatureData.Get<TestLearnerMatchApi>(featureInfo.Title + nameof(TestLearnerMatchApi));
+            if (learnerMatchApi != null)
+            {
+                learnerMatchApi.Dispose();
+            }
         }
 
-        [AfterScenario()]
-        public void CleanUpLearnerMatchApi()
+        [BeforeScenario(Order = 1)]
+        public void Initialise(TestContext context, FeatureInfo featureInfo)
         {
-            _context.LearnerMatchApi.Dispose();
+            if (context.LearnerMatchApi == null)
+            {
+                context.LearnerMatchApi = FeatureTestContext.FeatureData.Get<TestLearnerMatchApi>(featureInfo.Title + nameof(TestLearnerMatchApi));
+            }
+        }
+
+        [AfterScenario(Order = 1)]
+        public void CleanUpPaymentsApi(TestContext context)
+        {
+            context.LearnerMatchApi.Reset();
         }
     }
 }
+

@@ -1,12 +1,10 @@
 ﻿using AutoFixture;
-using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-[assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
     public class StepsBase

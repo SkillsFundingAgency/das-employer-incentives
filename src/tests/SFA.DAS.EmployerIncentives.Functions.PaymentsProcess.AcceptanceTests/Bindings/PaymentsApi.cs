@@ -20,10 +20,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         [AfterFeature()]
         public static void CleanUpPaymentsApi(FeatureInfo featureInfo)
         {
-            var learnerMatchApi = FeatureTestContext.FeatureData.Get<MockApi>(featureInfo.Title + nameof(PaymentsApi));
-            if (learnerMatchApi != null)
+            var paymentsApi = FeatureTestContext.FeatureData.Get<MockApi>(featureInfo.Title + nameof(PaymentsApi));
+            if (paymentsApi != null)
             {
-                learnerMatchApi.Dispose();
+                paymentsApi.Dispose();
             }
         }
     }

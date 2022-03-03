@@ -101,7 +101,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var response = await EmployerIncentiveApi.Put(
                     "/jobs",
-                   new JobRequest { Type = JobType.RefreshEmploymentChecks });
+                   new JobRequest { Type = JobType.RefreshEmploymentChecks }, 
+                   TestContext.CancellationToken);
             response.EnsureSuccessStatusCode();
         }
 

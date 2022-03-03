@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await DataAccess.SetupAccount(_testAccountTable);
 
             var url = $"applications";
-            await EmployerIncentiveApi.Post(url, _request);
+            await EmployerIncentiveApi.Post(url, _request, TestContext.CancellationToken);
         }
 
         [When(@"They retrieve the application")]
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_request.AccountId}/applications/{_request.IncentiveApplicationId}";
             var (_, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplicationDto>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplicationDto>(url, TestContext.CancellationToken);
 
             _returnedApplication = data;
         }

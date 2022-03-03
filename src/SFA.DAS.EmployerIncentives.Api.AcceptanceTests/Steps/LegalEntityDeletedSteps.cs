@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the legal entity is removed from an account")]
         public async Task WhenTheLegalEntityIsRemovedFromAnAccount()
         {
-            _response = await EmployerIncentiveApi.Delete($"/accounts/{_account.Id}/legalEntities/{_account.AccountLegalEntityId}");
+            _response = await EmployerIncentiveApi.Delete($"/accounts/{_account.Id}/legalEntities/{_account.AccountLegalEntityId}", TestContext.CancellationToken);
 
             _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }     
@@ -39,14 +39,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             createApplicationRequest.AccountId = _account.Id;
             createApplicationRequest.AccountLegalEntityId = _account.AccountLegalEntityId;
 
-            _response = await EmployerIncentiveApi.Post("/applications", createApplicationRequest);
+            _response = await EmployerIncentiveApi.Post("/applications", createApplicationRequest, TestContext.CancellationToken);
             var applicationId = _response.Headers.Location.ToString().Substring("/applications/".Length);
 
             var submitApplicationRequest = Fixture.Create<SubmitIncentiveApplicationRequest>();
             submitApplicationRequest.AccountId = _account.Id;
             submitApplicationRequest.IncentiveApplicationId = new Guid(applicationId);
 
-            _response = await EmployerIncentiveApi.Patch($"/applications/{applicationId}", submitApplicationRequest);
+            _response = await EmployerIncentiveApi.Patch($"/applications/{applicationId}", submitApplicationRequest, TestContext.CancellationToken);
         }
 
         [Then(@"the applications for that legal entity should be withdrawn")]

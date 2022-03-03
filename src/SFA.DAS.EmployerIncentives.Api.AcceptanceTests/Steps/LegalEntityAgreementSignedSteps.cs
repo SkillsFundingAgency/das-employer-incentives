@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var url = $"/accounts/{_account.Id}/legalEntities/{_account.AccountLegalEntityId}";
             var request = Fixture.Build<SignAgreementRequest>()
                 .With(r => r.AgreementVersion, AgreementVersion).Create();
-            _response = await EmployerIncentiveApi.Patch(url, request);
+            _response = await EmployerIncentiveApi.Patch(url, request, TestContext.CancellationToken);
         }
 
         [Then(@"the employer can apply for incentives")]

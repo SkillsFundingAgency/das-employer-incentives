@@ -8,29 +8,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "domainMessageHandlers")]
     public class DomainMessageHandlers
     {
-        private readonly TestContext _context;
-
-        public DomainMessageHandlers(TestContext context)
+        [BeforeScenario(Order = 8)]
+        public async Task InitialiseFunctions(TestContext context)
         {
-            _context = context;
+            context.DomainMessageHandlers = new TestDomainMessageHandlers(context);
+            await context.DomainMessageHandlers.Start();
         }
 
-        [BeforeScenario(Order = 6)]
-        public async Task InitialiseFunctions()
-        {
-            _context.DomainMessageHandlers = new TestDomainMessageHandlers(_context);
-            await _context.DomainMessageHandlers.Start();
-        }
-
-        [AfterScenario()]
-        public async Task CleanUp()
+        [AfterScenario(Order = 7)]
+        public async Task CleanUp(TestContext context)
         {
             try
             {
-                await _context.DomainMessageHandlers.Stop();
+                await context.DomainMessageHandlers.Stop();
             }
             catch (OperationCanceledException) { }
-            _context.DomainMessageHandlers?.Dispose();
+            context.DomainMessageHandlers?.Dispose();
         }
     }
 }

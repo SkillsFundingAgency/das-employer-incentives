@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using TechTalk.SpecFlow;
-using NServiceBus.Transport;
+﻿using NServiceBus.Transport;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using System.Threading.Tasks;
+using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 {
@@ -9,27 +9,20 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "messageBus")]
     public class MessageBus
     {
-        private readonly TestContext _context;
-
-        public MessageBus(TestContext context)
+        [BeforeScenario(Order = 4)]
+        public Task InitialiseMessageBus(TestContext context)
         {
-            _context = context;
+            context.MessageBus = new TestMessageBus(context);
+            context.Hooks.Add(new Hook<MessageContext>());
+            return context.MessageBus.Start();
         }
 
-        [BeforeScenario(Order = 2)]
-        public Task InitialiseMessageBus()
+        [AfterScenario(Order = 4)]
+        public async Task CleanUp(TestContext context)
         {
-            _context.MessageBus = new TestMessageBus(_context);
-             _context.Hooks.Add(new Hook<MessageContext>());
-            return _context.MessageBus.Start();
-        }
-
-        [AfterScenario()]
-        public async Task CleanUp()
-        {
-            if (_context.MessageBus != null && _context.MessageBus.IsRunning)
+            if (context.MessageBus != null && context.MessageBus.IsRunning)
             {
-                await _context.MessageBus.Stop();                
+                await context.MessageBus.Stop();
             }            
         }
     }

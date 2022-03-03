@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_account.Id}/legalentities/{_account.AccountLegalEntityId}/apprenticeshipIncentives";
             var (status, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<List<ApprenticeshipIncentiveDto>>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<List<ApprenticeshipIncentiveDto>>(url, TestContext.CancellationToken);
 
             status.Should().Be(HttpStatusCode.OK);
 

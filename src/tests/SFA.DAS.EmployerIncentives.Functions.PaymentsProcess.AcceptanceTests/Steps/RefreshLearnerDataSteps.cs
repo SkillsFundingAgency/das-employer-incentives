@@ -21,6 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 {
     [Binding]
     [Scope(Feature = "RefreshLearnerData")]
+    [Scope(Feature = "RefreshLearnerData2")]
     public class RefreshLearnerDataSteps
     {
         private readonly TestContext _testContext;

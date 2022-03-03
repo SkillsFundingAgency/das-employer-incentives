@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Polly;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -10,45 +11,52 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
     {
         private bool _isDisposed;
         public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();
+        private readonly Policy retryPolicy = Policy.Handle<SqlException>()
+            .WaitAndRetry(retryCount: 3, sleepDurationProvider: _ => TimeSpan.FromMilliseconds(500));
 
         public SqlDatabase(string dbName)
         {
             DatabaseInfo.SetDatabaseName(dbName);
-            CreateTestDatabase();
         }
-
-        private void CreateTestDatabase()
+        public SqlDatabase Create()
         {
             Directory.CreateDirectory("C:\\temp");
             DatabaseInfo.SetConnectionString(
                 @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={DatabaseInfo.DatabaseName};Integrated Security=True;MultipleActiveResultSets=True;Pooling=False;Connect Timeout=30;");
 
-            using var dbConn = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;MultipleActiveResultSets=true");
-            try
+
+            retryPolicy.Execute(() =>
             {
-                var sql = @$"CREATE DATABASE [{DatabaseInfo.DatabaseName}] ON PRIMARY
+                using var dbConn = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;MultipleActiveResultSets=true");
+                try
+                {
+                    var sql = @$"CREATE DATABASE [{DatabaseInfo.DatabaseName}] ON PRIMARY
                      (NAME = [{DatabaseInfo.DatabaseName}_Data],
                       FILENAME = 'C:\\temp\\{DatabaseInfo.DatabaseName}.mdf')
                       LOG ON (NAME = [{DatabaseInfo.DatabaseName}_Log],
                       FILENAME = 'C:\\temp\\{DatabaseInfo.DatabaseName}.ldf')";
-                using var cmd = new SqlCommand(sql, dbConn);
-                dbConn.Open();
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(CreateTestDatabase)} failed. Exception={ex}");
-            }
-            finally
-            {
-                if (dbConn.State == ConnectionState.Open)
-                {
-                    dbConn.Close();
+                    using var cmd = new SqlCommand(sql, dbConn);
+                    dbConn.Open();
+                    cmd.ExecuteNonQuery();
                 }
-            }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[{nameof(SqlDatabaseModel)}] CreateTestDatabase failed. Exception={ex}");
+                    throw;
+                }
+                finally
+                {
+                    if (dbConn.State == ConnectionState.Open)
+                    {
+                        dbConn.Close();
+                    }
+                }
+            });
 
             using var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString);
             dbConnection.Open();
+
+            return this;
         }
 
         private void DeleteTestDatabase()
@@ -81,6 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
                 Console.WriteLine($"[{nameof(SqlDatabase)}] {nameof(DeleteTestDatabase)} exception thrown: {ex.Message}");
                 throw ex;
             }
+
         }
 
         private static void DeleteFile(string file)

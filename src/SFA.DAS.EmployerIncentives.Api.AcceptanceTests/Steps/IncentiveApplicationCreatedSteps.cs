@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             }
 
             var url = $"applications";
-            _response = await EmployerIncentiveApi.Post(url, _request);
+            _response = await EmployerIncentiveApi.Post(url, _request, TestContext.CancellationToken);
         }
 
         [Then(@"the application is saved with the apprentices phases set to (.*)")]

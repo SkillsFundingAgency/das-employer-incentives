@@ -149,7 +149,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Create();
 
             var url = $"applications/{_applicationModel.Id}";
-            await EmployerIncentiveApi.Patch(url, submitRequest);
+            await EmployerIncentiveApi.Patch(url, submitRequest, TestContext.CancellationToken);
         }
 
         [When(@"the apprenticeship incentive is created for each apprenticeship in the application")]

@@ -36,26 +36,3 @@ Scenario: When there is a sent payment clawback
 	Given there are payments with sent clawbacks
 	When the payment process is run
 	Then successful validation results are recorded
-
-Scenario: When at least one validation check fails
-	Given there are pending payments
-	And the '<ValidationStep>' will fail
-	When the payment process is run
-	Then the '<ValidationStep>' will have a failed validation result
-	And no payment records are created
-	And pending payments are not marked as paid
-
-
-Examples:
-	| ValidationStep                    |
-	| HasBankDetails                    |
-	| IsInLearning                      |
-	| HasLearningRecord                 |
-	| HasNoDataLocks                    |
-	| HasIlrSubmission                  |
-	| HasDaysInLearning                 |
-	| PaymentsNotPaused                 |
-	| HasSignedMinVersion               |
-	| LearnerMatchSuccessful            |
-	| EmployedAtStartOfApprenticeship   |
-	| EmployedBeforeSchemeStarted       |
