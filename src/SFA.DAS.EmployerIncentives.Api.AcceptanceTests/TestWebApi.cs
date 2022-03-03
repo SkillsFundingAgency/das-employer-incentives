@@ -51,6 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.AllowedHashstringCharacters = _context.ApplicationSettings.AllowedHashstringCharacters;
                     a.Hashstring = _context.ApplicationSettings.Hashstring;
                     a.NServiceBusConnectionString = _context.ApplicationSettings.NServiceBusConnectionString;
+                    a.UseLearningEndpointStorageDirectory = _context.ApplicationSettings.UseLearningEndpointStorageDirectory;
                     a.MinimumAgreementVersion = _context.ApplicationSettings.MinimumAgreementVersion;
                     a.EmploymentCheckEnabled = _context.ApplicationSettings.EmploymentCheckEnabled;
                 });

@@ -3,7 +3,7 @@
 #if !DEBUG
 [assembly: Parallelize(Workers = 40, Scope = ExecutionScope.ClassLevel)]
 #else
-[assembly: Parallelize(Workers = 10, Scope = ExecutionScope.ClassLevel)]
+[assembly: Parallelize(Workers = 5, Scope = ExecutionScope.ClassLevel)]
 #endif
 
 

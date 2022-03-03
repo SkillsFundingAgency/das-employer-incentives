@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             Console.WriteLine($"[{nameof(DatabasePerScenarioHook)}] time it took to deploy test database: {stopwatch.Elapsed.Seconds} seconds");
         }
 
-        [AfterScenario(Order = 2)]
+        [AfterScenario(Order = 9)]
         public static void TearDownDatabase(TestContext context)
         {            
             context.SqlDatabase?.Dispose();

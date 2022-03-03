@@ -38,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             catch (Exception ex)
             {
                 Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(CreateTestDatabase)} failed. Exception={ex}");
+                throw;
             }
             finally
             {
@@ -49,6 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
             using var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString);
             dbConnection.Open();
+            dbConnection.Close();
         }
 
         private void DeleteTestDatabase()

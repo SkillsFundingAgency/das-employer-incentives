@@ -26,9 +26,28 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             try
             {
-                Directory.Delete(context.TestDirectory.FullName, true);
+                DeleteDirectory(context.TestDirectory.FullName);
             }
             catch(Exception){}
+        }
+
+        private static void DeleteDirectory(string directory)
+        {
+            string[] files = Directory.GetFiles(directory);
+            string[] directories = Directory.GetDirectories(directory);
+
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            foreach (string dir in directories)
+            {
+                DeleteDirectory(dir);
+            }
+
+            Directory.Delete(directory, false);
         }
     }
 }

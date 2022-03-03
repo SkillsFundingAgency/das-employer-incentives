@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         o.EndpointConfiguration = (endpoint) =>
                         {
-                            endpoint.UseTransport<LearningTransport>().StorageDirectory(_testMessageBus.StorageDirectory.FullName);
+                            endpoint.UseTransport<LearningTransport>().StorageDirectory(_testContext.ApplicationSettings.UseLearningEndpointStorageDirectory);
                             Commands.Types.RoutingSettingsExtensions.AddRouting(endpoint.UseTransport<LearningTransport>().Routing());
                             return endpoint;
                         };
