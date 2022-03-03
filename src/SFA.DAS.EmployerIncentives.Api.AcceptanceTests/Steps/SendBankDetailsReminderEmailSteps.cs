@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request, TestContext.CancellationToken);
         }
 
         [Then(@"the employer is sent a reminder email to supply their bank details with a link in case they do not complete the journey")]
@@ -67,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.EmailAddress = null;
 
-            _response = await EmployerIncentiveApi.Post(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request, TestContext.CancellationToken);
         }
 
         [Then(@"the email is not set and an error response returned")]
@@ -82,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AccountId = 0;
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request, TestContext.CancellationToken);
         }
 
         [When(@"a bank details required email is sent with an invalid account legal entity id")]
@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AccountLegalEntityId = 0;
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request, TestContext.CancellationToken);
         }
 
         [When(@"a bank details required email is sent with an invalid account bank details url")]
@@ -100,7 +100,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _request = _fixture.Create<SendBankDetailsEmailRequest>();
             _request.AddBankDetailsUrl = null;
 
-            _response = await EmployerIncentiveApi.Post<SendBankDetailsEmailRequest>(_url, _request);
+            _response = await EmployerIncentiveApi.Post(_url, _request, TestContext.CancellationToken);
         }
     }
 }

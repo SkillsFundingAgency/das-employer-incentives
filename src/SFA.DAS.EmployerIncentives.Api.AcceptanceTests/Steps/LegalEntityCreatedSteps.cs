@@ -44,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         AccountLegalEntityId = _account.AccountLegalEntityId,
                         LegalEntityId = _account.LegalEntityId,
                         OrganisationName = _account.LegalEntityName
-                    });
+                    }, 
+                    TestContext.CancellationToken);
 
             _response.StatusCode.Should().Be(_expectedResult);
         }

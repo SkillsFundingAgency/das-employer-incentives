@@ -99,7 +99,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         CorrelationId = _correlationId,
                         Result = checkResultType.ToString(),
                         DateChecked = DateTime.Today
-                    });
+                    }, 
+                    TestContext.CancellationToken);
                 },
                 (context) => HasProcessedCommand(context),
                 assertOnError: false

@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheyRetrieveTheApplication()
         {
             var url = $"/accounts/{_application.AccountId}/applications/{_application.Id}";
-            var (_, data) = await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplicationDto>(url);
+            var (_, data) = await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplicationDto>(url, TestContext.CancellationToken);
 
             _savedApplication = data;
         }

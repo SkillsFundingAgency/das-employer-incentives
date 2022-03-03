@@ -17,6 +17,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             BaseAddress = MockServer.Urls[0];
         }
 
+        public void Reset()
+        {
+            MockServer.Reset();
+        }
         public void Dispose()
         {
             Dispose(true);

@@ -36,7 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
                     LegalEntityId = _testAccountTable.LegalEntityId,
                     OrganisationName = _testAccountTable.LegalEntityName
-                });
+                }, 
+                TestContext.CancellationToken);
 
             _response.StatusCode.Should().Be(HttpStatusCode.Created);
         }
@@ -53,7 +54,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                         AccountLegalEntityId = _testAccountTable.AccountLegalEntityId,
                         LegalEntityId = _testAccountTable.LegalEntityId,
                         OrganisationName = _newLegalEntityName
-                    });
+                    }, 
+                    TestContext.CancellationToken);
 
             _response.StatusCode.Should().Be(HttpStatusCode.Created);
         }

@@ -85,7 +85,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             
             var url = "pause-payments";
 
-            _response = await EmployerIncentiveApi.Post(url, _pausePaymentsRequest);
+            _response = await EmployerIncentiveApi.Post(url, _pausePaymentsRequest, TestContext.CancellationToken);
         }
 
         [Then(@"the requester is informed no apprenticeship incentive is found")]

@@ -54,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_accountId}/LegalEntities";
             var (status, data) = 
-                await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<LegalEntityDto>>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<LegalEntityDto>>(url, TestContext.CancellationToken);
             
             status.Should().Be(HttpStatusCode.OK);
 

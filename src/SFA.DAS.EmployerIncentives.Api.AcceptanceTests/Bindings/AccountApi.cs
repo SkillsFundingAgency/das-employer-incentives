@@ -6,16 +6,41 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "accountApi")]
     public class AccountApi
     {
-        [BeforeScenario(Order = 5)]
-        public void InitialiseAccountApi(TestContext context)
+        [BeforeFeature()]
+        public static void InitialiseAccountApi(FeatureInfo featureInfo)
         {
-            context.AccountApi = new TestAccountApi();
+            lock (FeatureTestContext.FeatureData)
+            {
+                FeatureTestContext.FeatureData.GetOrCreate(featureInfo.Title + nameof(TestAccountApi), () =>
+                {
+                    return new TestAccountApi();
+                });
+            }
         }
 
-        [AfterScenario(Order = 5)]
-        public void CleanUpAccountApi(TestContext context)
+        [AfterFeature()]
+        public static void CleanUpAccountApi(FeatureInfo featureInfo)
         {
-            context.AccountApi?.Dispose();
+            var accountApi = FeatureTestContext.FeatureData.Get<TestAccountApi>(featureInfo.Title + nameof(TestAccountApi));
+            if (accountApi != null)
+            {
+                accountApi.Dispose();
+            }
+        }
+
+        [BeforeScenario(Order = 1)]
+        public void Initialise(TestContext context, FeatureInfo featureInfo)
+        {
+            if (context.AccountApi == null)
+            {
+                context.AccountApi = FeatureTestContext.FeatureData.Get<TestAccountApi>(featureInfo.Title + nameof(TestAccountApi));
+            }
+        }
+
+        [AfterScenario(Order = 1)]
+        public void CleanUpPaymentsApi(TestContext context)
+        {
+            context.AccountApi.Reset();
         }
     }
 }

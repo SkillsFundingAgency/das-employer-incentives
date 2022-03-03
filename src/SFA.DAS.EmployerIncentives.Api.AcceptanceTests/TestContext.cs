@@ -9,7 +9,7 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
-    public class TestContext
+    public class TestContext : IDisposable
     {
         public string InstanceId { get; private set; }
         public CancellationToken CancellationToken { get; set; }
@@ -51,6 +51,29 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             EventsPublished = new List<object>();
             PublishedEvents = new List<PublishedEvent>();
             CommandsPublished = new List<PublishedCommand>();
+        }
+
+        private bool _isDisposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+
+            if (disposing)
+            {
+                EmployerIncentiveApi?.Dispose();
+                AccountApi?.Reset();
+                EmploymentCheckApi?.Reset();
+                LearnerMatchApi?.Reset();
+            }
+
+            _isDisposed = true;
         }
     }
 }

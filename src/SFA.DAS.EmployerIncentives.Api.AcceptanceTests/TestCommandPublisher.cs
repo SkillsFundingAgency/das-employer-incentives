@@ -10,11 +10,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
     {
         private readonly ICommandPublisher _commandPublisher;
         private readonly IHook<ICommand> _hook;
+        private CancellationToken _cancellationToken;
 
-        public TestCommandPublisher(ICommandPublisher commandPublisher, IHook<ICommand> hook)
+        public TestCommandPublisher(ICommandPublisher commandPublisher, IHook<ICommand> hook, CancellationToken cancellationToken)
         {
             _commandPublisher = commandPublisher;
             _hook = hook;
+            _cancellationToken = cancellationToken;
         }
 
         public async Task Publish<T>(T command, CancellationToken cancellationToken = default) where T : class, ICommand
@@ -27,6 +29,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         _hook.OnReceived(command);
                     }
+                    
+                    if (_cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     await _commandPublisher.Publish(command);
 
                     if (_hook?.OnPublished != null)
@@ -36,6 +44,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 }
                 catch (Exception ex)
                 {
+                    if (_cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     bool suppressError = false;
                     if (_hook?.OnErrored != null)
                     {

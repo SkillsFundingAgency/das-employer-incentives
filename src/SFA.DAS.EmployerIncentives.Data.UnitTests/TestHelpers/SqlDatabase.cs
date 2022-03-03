@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
@@ -19,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         {
             DatabaseInfo.SetDatabaseName(dbName);
         }
-        public async Task<SqlDatabase> Create()
+        public SqlDatabase Create()
         {
             Directory.CreateDirectory("C:\\temp");
             DatabaseInfo.SetConnectionString(
@@ -55,8 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             });
 
             using var dbConnection = new SqlConnection(DatabaseInfo.ConnectionString);
-            await dbConnection.OpenAsync();
-            await dbConnection.CloseAsync();
+            dbConnection.Open();
 
             return this;
         }

@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 EmployerVendorId = _newVendorId
             };
 
-             await EmployerIncentiveApi.Put(url, data);
+             await EmployerIncentiveApi.Put(url, data, TestContext.CancellationToken);
         }
 
         [Then(@"the vendor remains the same for first legal entity")]

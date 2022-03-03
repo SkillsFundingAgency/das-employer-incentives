@@ -9,23 +9,23 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
     public static class HttpClientExtensions
     {
-        public static async Task<(HttpStatusCode, T)> GetValueAsync<T>(this HttpClient client, string url, CancellationToken cancellationToken = default)
+        public static async Task<(HttpStatusCode, T)> GetValueAsync<T>(this HttpClient client, string url, CancellationToken cancellationToken)
         {
             using var response = await client.GetAsync(url, cancellationToken);
             return await ProcessResponse<T>(response);
         }
 
-        public static async Task<HttpResponseMessage> PostValueAsync<T>(this HttpClient client, string url, T data, CancellationToken cancellationToken = default)
+        public static async Task<HttpResponseMessage> PostValueAsync<T>(this HttpClient client, string url, T data, CancellationToken cancellationToken)
         {
             return await client.PostAsync(url, data.GetStringContent(), cancellationToken);
         }
 
-        public static async Task<HttpResponseMessage> PutValueAsync<T>(this HttpClient client, string url, T data, CancellationToken cancellationToken = default)
+        public static async Task<HttpResponseMessage> PutValueAsync<T>(this HttpClient client, string url, T data, CancellationToken cancellationToken)
         {
             return await client.PutAsync(url, data.GetStringContent(), cancellationToken);
         }
 
-        public static async Task<HttpResponseMessage> PatchValueAsync<T>(this HttpClient client, string url, T data, CancellationToken cancellationToken = default)
+        public static async Task<HttpResponseMessage> PatchValueAsync<T>(this HttpClient client, string url, T data, CancellationToken cancellationToken)
         {
             return await client.PatchAsync(url, data.GetStringContent(), cancellationToken);
         }

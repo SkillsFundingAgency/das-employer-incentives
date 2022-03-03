@@ -127,6 +127,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 while (!waitForResult.HasCompleted && !waitForResult.HasTimedOut && !cancellationToken.IsCancellationRequested)
                 {
+                    if(_testContext.CancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
                     await Task.Delay(200);
                 }
             }
