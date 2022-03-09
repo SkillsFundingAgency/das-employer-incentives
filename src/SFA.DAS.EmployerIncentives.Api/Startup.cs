@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<MatchedLearnerApi>(Configuration.GetSection("MatchedLearnerApi"));
             services.Configure<BusinessCentralApiClient>(Configuration.GetSection("BusinessCentralApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
-            services.Configure<EmploymentCheckApi>(Configuration.GetSection("EmploymentCheckApi"));
+            services.Configure<EmployerIncentivesOuterApi>(Configuration.GetSection("EmployerIncentivesOuterApi"));
 
             services.AddNLog(Configuration);
 

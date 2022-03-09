@@ -276,7 +276,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             serviceCollection.AddTransient<IEmploymentCheckService>(s =>
             {
-                var settings = s.GetService<IOptions<EmploymentCheckApi>>().Value;
+                var settings = s.GetService<IOptions<EmployerIncentivesOuterApi>>().Value;
 
                 var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()

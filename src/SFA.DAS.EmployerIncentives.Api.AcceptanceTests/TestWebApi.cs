@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     l.Identifier = "";
                     l.Version = "1.0";
                 });
-                s.Configure<EmploymentCheckApi>(l =>
+                s.Configure<EmployerIncentivesOuterApi>(l =>
                 {
                     l.ApiBaseUrl = _context.EmploymentCheckApi.BaseAddress;
                     l.SubscriptionKey = "";

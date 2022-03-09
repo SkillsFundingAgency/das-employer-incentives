@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
-    public class EmploymentCheckApi : IApimClientConfiguration
+    public class EmployerIncentivesOuterApi : IApimClientConfiguration
     {
         public virtual string ApiBaseUrl { get; set; }
         public string SubscriptionKey { get; set; }
