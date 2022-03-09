@@ -75,7 +75,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 .Include(x => x.BreakInLearnings)
                 .Include(x => x.EmploymentChecks)
                 .Include(x => x.ValidationOverrides)
-                .Where(a => a.ULN == uln && a.AccountLegalEntityId == accountLegalEntityId).ToListAsync();
+                .Where(a => a.ULN == uln && 
+                a.AccountLegalEntityId == accountLegalEntityId &&
+                a.Status != IncentiveStatus.Withdrawn
+                ).ToListAsync();
             var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
 
             return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
