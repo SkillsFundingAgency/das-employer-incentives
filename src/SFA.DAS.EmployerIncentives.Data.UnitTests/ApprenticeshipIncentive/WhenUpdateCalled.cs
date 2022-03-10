@@ -63,6 +63,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
             expected.EmploymentCheckModels = employmentChecks;
 
+            var validationOverrides = _fixture.Build<ValidationOverrideModel>().With(
+                x => x.ApprenticeshipIncentiveId, expected.Id).CreateMany().ToList();
+            expected.ValidationOverrideModels = validationOverrides;
+
             // Act
             await _sut.Update(expected);
             await _dbContext.SaveChangesAsync();
@@ -94,19 +98,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             var savedValidationResults = _dbContext.PendingPaymentValidationResults.Where(x =>
                 x.PendingPaymentId == expected.PendingPaymentModels.First().Id);
-            savedValidationResults.Should().BeEquivalentTo(validationResults, opt => opt
-                .Excluding(x => x.CollectionPeriod)
-            );
 
             _dbContext.PendingPayments.Count().Should().Be(expected.PendingPaymentModels.Count);
             _dbContext.Payments.Count().Should().Be(expected.PaymentModels.Count);
 
             foreach (var result in savedValidationResults)
             {
-                result.PeriodNumber.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
-                result.PaymentYear.Should()
-                    .Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
+                result.Step.Should().Be(validationResults.Single(x => x.Id == result.Id).Step);
+                result.OverrideResult.Should().Be(validationResults.Single(x => x.Id == result.Id).OverrideResult);                
+                result.Result.Should().Be(validationResults.Single(x => x.Id == result.Id).ValidationResult);
+                result.PeriodNumber.Should().Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.PeriodNumber);
+                result.PaymentYear.Should().Be(validationResults.Single(x => x.Id == result.Id).CollectionPeriod.AcademicYear);
                 result.CreatedDateUtc.Should().BeCloseTo(validationResults.Single(x => x.Id == result.Id).CreatedDateUtc, TimeSpan.FromMinutes(1));
             }
 
@@ -123,6 +125,9 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
             var savedEmploymentChecks = _dbContext.EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
             savedEmploymentChecks.Should().BeEquivalentTo(employmentChecks, opts => opts.Excluding(x => x.CreatedDateTime).Excluding(x => x.ResultDateTime).Excluding(x => x.UpdatedDateTime));
+
+            var savedValidationOverrides = _dbContext.ValidationOverrides.Where(x => x.ApprenticeshipIncentiveId == expected.Id);
+            savedValidationOverrides.Should().BeEquivalentTo(validationOverrides, opts => opts.Excluding(x => x.CreatedDate));
         }
 
         [Test]
@@ -202,8 +207,8 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 
         private void AddUpdateAndRemovePendingPaymentsAndValidationResults(ApprenticeshipIncentiveModel expected)
         {
-            expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().Result
-                = !expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().Result;
+            expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().ValidationResult
+                = !expected.PendingPaymentModels.First().PendingPaymentValidationResultModels.First().ValidationResult;
             expected.PendingPaymentModels.First().Amount -= 250;
             expected.PaymentModels.First().Amount -= 250;
             var newPendingPayment = _fixture.Build<PendingPaymentModel>()

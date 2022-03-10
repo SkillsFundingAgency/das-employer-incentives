@@ -163,5 +163,32 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedEmploymentCheck.MinimumDate.Should().Be(testEmploymentCheck.MinimumDate);
             storedEmploymentCheck.Result.Should().Be(testEmploymentCheck.Result);
         }
+
+        [Test]
+        public async Task Then_the_validation_overrides_are_added_to_the_data_store()
+        {
+            var testValidationOverride = _fixture.Create<ValidationOverrideModel>();
+
+            // Arrange
+            var testApprenticeshipIncentive = _fixture
+                .Build<ApprenticeshipIncentiveModel>()
+                .With(f => f.Id, testValidationOverride.ApprenticeshipIncentiveId)
+                .With(f => f.ValidationOverrideModels, new List<ValidationOverrideModel> { testValidationOverride })
+                .Create();
+
+            // Act
+            await _sut.Add(testApprenticeshipIncentive);
+            await _dbContext.SaveChangesAsync();
+
+            // Assert
+            var storedIncentive = _dbContext.ApprenticeshipIncentives.Single();
+            _ = storedIncentive.ValidationOverrides.Count.Should().Be(1);
+            var storedValidationOverride = storedIncentive.ValidationOverrides.Single();
+            storedValidationOverride.Id.Should().Be(testValidationOverride.Id);
+            storedValidationOverride.ApprenticeshipIncentiveId.Should().Be(testValidationOverride.ApprenticeshipIncentiveId);
+            storedValidationOverride.Step.Should().Be(testValidationOverride.Step);
+            storedValidationOverride.ExpiryDate.Should().Be(testValidationOverride.ExpiryDate);
+            storedValidationOverride.CreatedDateTime.Should().Be(testValidationOverride.CreatedDate);
+        }
     }
 }

@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             storedValidationResult.PendingPaymentValidationResultId.Should().Be(testPendingPaymentValidationResult.Id);
             storedValidationResult.PaymentYear.Should().Be(testPendingPaymentValidationResult.CollectionPeriod.AcademicYear);
             storedValidationResult.PeriodNumber.Should().Be(testPendingPaymentValidationResult.CollectionPeriod.PeriodNumber);
-            storedValidationResult.Result.Should().Be(testPendingPaymentValidationResult.Result);
+            storedValidationResult.Result.Should().Be(testPendingPaymentValidationResult.ValidationResult);
             storedValidationResult.Step.Should().Be(testPendingPaymentValidationResult.Step);
             storedValidationResult.CreatedDateUtc.Should().Be(testPendingPaymentValidationResult.CreatedDateUtc);
             storedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
