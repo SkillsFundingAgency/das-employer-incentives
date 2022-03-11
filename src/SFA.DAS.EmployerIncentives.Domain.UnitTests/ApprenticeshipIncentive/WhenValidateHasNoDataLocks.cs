@@ -111,7 +111,53 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
             validationresult.Result.Should().Be(true);
             validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
-        }        
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Then_a_validation_result_is_overridden_for_for_has_no_datalocks_when_an_non_expired_override_exists(bool hasDataLock)
+        {
+            // arrange            
+            var pendingPayment = _sut.PendingPayments.First();
+
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetHasDataLock(hasDataLock);
+            _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.HasNoDataLocks, DateTime.Now.AddDays(1)), _fixture.Create<ServiceRequest>());
+
+            // act
+            _sut.ValidateHasNoDataLocks(pendingPayment.Id, _learner, _collectionPeriod);
+
+            // assert            
+            pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
+            var validationresult = pendingPayment.PendingPaymentValidationResults.First();
+            validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+            validationresult.Result.Should().BeTrue();
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Then_a_validation_result_is_overridden_for_for_has_no_datalocks_when_an_expired_override_exists(bool hasDataLock)
+        {
+            // arrange            
+            var pendingPayment = _sut.PendingPayments.First();
+
+            _learner.SubmissionData.SetLearningData(new LearningData(true));
+            _learner.SubmissionData.LearningData.SetHasDataLock(hasDataLock);
+            _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.HasNoDataLocks, DateTime.Now), _fixture.Create<ServiceRequest>());
+
+            // act
+            _sut.ValidateHasNoDataLocks(pendingPayment.Id, _learner, _collectionPeriod);
+
+            // assert            
+            pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
+            var validationresult = pendingPayment.PendingPaymentValidationResults.First();
+            validationresult.Step.Should().Be(ValidationStep.HasNoDataLocks);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+            validationresult.Result.Should().Be(!hasDataLock);
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
+        }
 
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {

@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
             var calendar = await _collectionCalendarService.Get();
             var collectionCalendarPeriod = calendar.GetPeriod(new Domain.ValueObjects.CollectionPeriod(command.CollectionPeriod, command.CollectionYear));
 
+            incentive.ExpireValidationOverrides(DateTime.Today);
             incentive.ValidatePendingPaymentBankDetails(command.PendingPaymentId, account, collectionCalendarPeriod.CollectionPeriod);
             incentive.ValidateLearningData(command.PendingPaymentId, learner, collectionCalendarPeriod.CollectionPeriod);
             incentive.ValidatePaymentsNotPaused(command.PendingPaymentId, collectionCalendarPeriod.CollectionPeriod);

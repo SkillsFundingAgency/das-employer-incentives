@@ -37,7 +37,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             hook.OnReceived += (message) => { if (predicateDelegate.Invoke(_testContext)) { waitForResult.SetHasStarted(); } };
             hook.OnProcessed += (message) => { if (predicateDelegate.Invoke(_testContext)) { waitForResult.SetHasCompleted(); } };
             hook.OnPublished += (message) => { if( predicateDelegate.Invoke(_testContext)) { waitForResult.SetHasCompleted(); } };
-            hook.OnErrored += (ex, message) => { waitForResult.SetHasErrored(ex); return false; };
+            hook.OnErrored += (ex, message) => {
+                if (!assertOnError)
+                {
+                    if (predicateDelegate.Invoke(_testContext))
+                    {
+                        waitForResult.SetHasErrored(ex);
+                        waitForResult.SetHasCompleted();
+                    }                    
+                }
+                return false;
+            };
 
             try
             {

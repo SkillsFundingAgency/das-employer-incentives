@@ -41,10 +41,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _apprenticeshipIncentive.AccountId = _account.Id;
             _apprenticeshipIncentive.Phase = Enums.Phase.Phase2;
             _apprenticeshipIncentive.AccountLegalEntityId = _account.AccountLegalEntityId;
+            _apprenticeshipIncentive.Status = Enums.IncentiveStatus.Active;
 
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
             await dbConnection.InsertAsync(_account, false);
-            await dbConnection.InsertAsync(_apprenticeshipIncentive, false);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive, true);
         }
 
         [Given(@"an apprenticeship incentive has not been submitted")]

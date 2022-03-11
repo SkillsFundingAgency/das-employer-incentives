@@ -16,6 +16,7 @@
         public const string EmployerWithdrawal = "SFA.DAS.EmployerIncentives.EmployerWithdrawal";
         public const string ComplianceWithdrawal = "SFA.DAS.EmployerIncentives.ComplianceWithdrawal";
         public const string ReinstateWithdrawal = "SFA.DAS.EmployerIncentives.ReinstateWithdrawal";
+        public const string ValidationOverride = "SFA.DAS.EmployerIncentives.ValidationOverride";
 
         public const string UpdateVendorRegistrationCaseStatus = "SFA.DAS.EmployerIncentives.UpdateVrfStatus";
         public const string SendEmploymentCheckRequests = "SFA.DAS.EmployerIncentives.RequestEmploymentChecks";

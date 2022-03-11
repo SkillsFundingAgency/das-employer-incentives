@@ -19,6 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public ICollection<PendingPaymentModel> PendingPaymentModels { get; set; }
         public ICollection<PaymentModel> PaymentModels { get; set; }
         public ICollection<ClawbackPaymentModel> ClawbackPaymentModels { get; set; }
+        public ICollection<ValidationOverrideModel> ValidationOverrideModels { get; set; }
+        public ICollection<EmploymentCheckModel> EmploymentCheckModels { get; set; }
         public bool PausePayments { get; set; }
         public DateTime? SubmittedDate { get; set; }
         public string SubmittedByEmail { get; set; }
@@ -27,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public ICollection<BreakInLearning> BreakInLearnings { get; set; }
         public AgreementVersion MinimumAgreementVersion { get; set; }
         public IncentivePhase Phase { get; set; }
-        public ICollection<EmploymentCheckModel> EmploymentCheckModels { get; set; }
+
 
         public ApprenticeshipIncentiveModel()
         {
@@ -36,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
             ClawbackPaymentModels = new List<ClawbackPaymentModel>();
             BreakInLearnings = new List<BreakInLearning>();
             EmploymentCheckModels = new List<EmploymentCheckModel>();
+            ValidationOverrideModels = new List<ValidationOverrideModel>();
         }
     }
 }

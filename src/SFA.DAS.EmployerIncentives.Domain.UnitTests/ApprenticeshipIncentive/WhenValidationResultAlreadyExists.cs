@@ -55,8 +55,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                         DueDate = startDate.AddDays(90),
                         PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
                         {
-                            new PendingPaymentValidationResultModel { CollectionPeriod = new CollectionPeriod(1, collectionYear), Result = false, Step = ValidationStep.HasBankDetails }, 
-                            new PendingPaymentValidationResultModel { CollectionPeriod = new CollectionPeriod(2, collectionYear), Result = false, Step = ValidationStep.HasBankDetails }
+                            new PendingPaymentValidationResultModel { CollectionPeriod = new CollectionPeriod(1, collectionYear), ValidationResult = false, Step = ValidationStep.HasBankDetails }, 
+                            new PendingPaymentValidationResultModel { CollectionPeriod = new CollectionPeriod(2, collectionYear), ValidationResult = false, Step = ValidationStep.HasBankDetails }
                         }
                     }
                 }
