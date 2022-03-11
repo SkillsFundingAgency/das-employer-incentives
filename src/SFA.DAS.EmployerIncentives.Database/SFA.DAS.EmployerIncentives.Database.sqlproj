@@ -17,7 +17,7 @@
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetLanguage>CS</TargetLanguage>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <SqlServerVerification>False</SqlServerVerification>
@@ -25,6 +25,7 @@
     <TargetDatabaseSet>True</TargetDatabaseSet>
     <Recovery>SIMPLE</Recovery>
     <IsEncryptionOn>True</IsEncryptionOn>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -106,12 +107,17 @@
     <Build Include="Tables\ApprenticeshipBreakInLearning.sql" />
     <Build Include="StoredProcedures\CreateRetrospectiveApplication.sql" />
     <Build Include="Tables\AcademicYear.sql" />
+    <None Include="Scripts\Remove.TotalIncentiveAmount.sql" />
     <Build Include="Tables\EmploymentCheck.sql" />
     <Build Include="Schemas\Reports.sql" />
     <Build Include="StoredProcedures\Reports.RecoveryReport.sql" />
     <Build Include="Tables\Archive.EmploymentCheck.sql" />
     <Build Include="Schemas\audit.sql" />
     <Build Include="Tables\Audit.EmploymentCheckAudit.sql" />
+    <Build Include="Tables\ValidationOverride.sql" />
+    <Build Include="Tables\Audit.ValidationOverride.sql" />
+    <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
+    <Build Include="Views\ApprenticeApplications.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
@@ -129,6 +135,6 @@
     <None Include="Scripts\Metrics Template.xlsx" />
   </ItemGroup>
   <ItemGroup>
-    <PreDeploy Include="Scripts\Rename.HasEligibleEmploymentStartDate.sql" />
+    <PreDeploy Include="Script.PreDeployment1.sql" />
   </ItemGroup>
 </Project>

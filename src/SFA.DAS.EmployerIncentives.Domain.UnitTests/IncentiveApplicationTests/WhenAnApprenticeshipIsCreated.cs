@@ -18,20 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
             _fixture = new Fixture();
         }
 
-        [TestCase(18)]
-        [TestCase(24)]
-        [TestCase(25)]
-        [TestCase(42)]
-        public void Then_the_total_incentive_amount_is_the_expected_amount_regardless_of_the_apprentices_age(int ageInYears)
-        {
-            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
-            var dateOfBirth = startDate.AddYears(-1 * ageInYears);
-
-            var apprenticeship = CreateApprenticeship(startDate, dateOfBirth);
-
-            apprenticeship.TotalIncentiveAmount.Should().Be(3000);
-        }
-
         [TestCase(null, "2021-10-01", false)]
         [TestCase("2021-03-31", "2021-04-01", false)]
         [TestCase("2021-04-01 00:00:00", "2021-04-01", false)]

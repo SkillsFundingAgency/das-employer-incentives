@@ -87,13 +87,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
             // Arrange
             _mockApprenticeshipIncentiveDataRepository
                 .Setup(x => x.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(_uln, _accountLegalEntityId))
-                .ReturnsAsync(new List<ApprenticeshipIncentiveModel> { _fixture.Create<ApprenticeshipIncentiveModel>(), _fixture.Create<ApprenticeshipIncentiveModel>()});
+                .ReturnsAsync(new List<ApprenticeshipIncentiveModel> {
+                    _fixture.Create<ApprenticeshipIncentiveModel>(),
+                    _fixture.Create<ApprenticeshipIncentiveModel>()
+                });
 
             // Act
             Func<Task> act = async () => await _sut.FindByUlnWithinAccountLegalEntity(_uln, _accountLegalEntityId);
 
             // Assert
             act.Should().Throw<InvalidIncentiveException>();
-        }
+        }        
     }
 }

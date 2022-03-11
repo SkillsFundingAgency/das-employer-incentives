@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
             routingSettings.RouteToEndpoint(typeof(SendEmploymentCheckRequestsCommand), QueueNames.SendEmploymentCheckRequests);
             routingSettings.RouteToEndpoint(typeof(UpdateEmploymentCheckCommand), QueueNames.UpdateEmploymentCheck);
             routingSettings.RouteToEndpoint(typeof(RefreshEmploymentCheckCommand), QueueNames.RefreshEmploymentCheckCommand);
+            routingSettings.RouteToEndpoint(typeof(ValidationOverrideCommand), QueueNames.ValidationOverride);
         }
     }
 }

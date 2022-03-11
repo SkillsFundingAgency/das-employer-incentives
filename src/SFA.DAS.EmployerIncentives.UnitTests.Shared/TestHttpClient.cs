@@ -100,12 +100,17 @@ namespace SFA.DAS.EmployerIncentives.UnitTests.Shared
         {
             var content = new StringContent(JsonConvert.SerializeObject(response));
 
+            SetUpGetAsAsync(content, statusCode);
+        }
+
+        public void SetUpGetAsAsync(StringContent content, HttpStatusCode statusCode)
+        {
             _mockHttpMessageHandler
-                  .Protected()
-                  .Setup<Task<HttpResponseMessage>>("SendAsync",
-                  ItExpr.IsAny<HttpRequestMessage>(),
-                      ItExpr.IsAny<CancellationToken>())
-                  .ReturnsAsync(new HttpResponseMessage(statusCode) { Content = content }).Verifiable("");
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(statusCode) { Content = content }).Verifiable("");
         }
 
         public void SetUpPostAsAsync(HttpStatusCode statusCode)
