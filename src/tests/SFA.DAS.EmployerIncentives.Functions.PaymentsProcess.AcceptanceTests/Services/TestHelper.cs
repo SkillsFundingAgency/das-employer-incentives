@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                    Func<Task> func,
                    bool assertOnTimeout = true,
                    bool assertOnError = false,
-                   int timeoutInMs = 15000)
+                   int timeoutInMs = 90000)
         {
             var waitForResult = new WaitForResult();
 

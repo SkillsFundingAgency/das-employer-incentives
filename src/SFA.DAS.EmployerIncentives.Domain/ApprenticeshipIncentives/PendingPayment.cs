@@ -86,13 +86,13 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public bool IsValidated(CollectionPeriod collectionPeriod)
         {
-            return Model.PendingPaymentValidationResultModels.Count() > 0
+            return PendingPaymentValidationResults.Count > 0
                    && AllPendingPaymentsForPeriodAreValid(collectionPeriod);
         }
 
         private bool AllPendingPaymentsForPeriodAreValid(CollectionPeriod collectionPeriod)
         {
-            return Model.PendingPaymentValidationResultModels
+            return PendingPaymentValidationResults
                 .Where(v =>
                     v.CollectionPeriod == collectionPeriod)
                 .All(r => r.Result);

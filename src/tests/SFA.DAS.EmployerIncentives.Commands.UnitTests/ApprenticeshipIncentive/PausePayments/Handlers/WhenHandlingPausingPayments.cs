@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -10,11 +6,13 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.PausePayments.Handlers
 {

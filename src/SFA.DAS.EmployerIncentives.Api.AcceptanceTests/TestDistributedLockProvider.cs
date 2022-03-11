@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     _locks.Add(Id);
                     return Task.FromResult(true);
                 }
-            }
+            }            
         }
 
         public Task ReleaseLock(string Id)
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         }
 
         public Task Start()
-        {
+        {            
             return Task.CompletedTask;
         }
 

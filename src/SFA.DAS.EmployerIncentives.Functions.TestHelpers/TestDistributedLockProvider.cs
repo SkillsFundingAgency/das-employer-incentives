@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
                     _locks.Add(Id);
                     return Task.FromResult(true);
                 }
-            }
+            }            
         }
 
         public Task ReleaseLock(string Id)
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
         }
 
         public Task Start()
-        {
+        {            
             return Task.CompletedTask;
         }
 
