@@ -25,9 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var configuration = serviceProvider.GetService<IConfiguration>();
 
             var configBuilder = new ConfigurationBuilder()
-                .AddConfiguration(configuration)
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddEnvironmentVariables();
+            .AddConfiguration(configuration)
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddEnvironmentVariables();
 
             if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddCommandServices();
             builder.Services.AddEventServices();
 
-            builder.Services.AddNServiceBus(config);
+            builder.Services.AddNServiceBus(config);            
         }
     }
 }

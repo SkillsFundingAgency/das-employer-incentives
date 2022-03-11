@@ -1,9 +1,11 @@
 ﻿using SFA.DAS.UnitOfWork.Managers;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 {
+    [ExcludeFromCodeCoverage]
     public class UnitOfWorkManagerWithScope : IUnitOfWorkManager
     {
         private readonly IUnitOfWorkManager _unitOfWorkManager;
@@ -16,7 +18,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 
         public async Task BeginAsync()
         {
-            await _unitOfWorkManager.BeginAsync();
+            if (counter == 0)
+            {
+                await _unitOfWorkManager.BeginAsync();
+            }
             counter++;
         }
 

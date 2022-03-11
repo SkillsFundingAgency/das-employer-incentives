@@ -101,7 +101,61 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             validationresult.Result.Should().Be(validationResult);
             validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
         }
-        
+
+        [TestCase(89, false)]
+        [TestCase(90, true)]
+        [TestCase(91, true)]
+        public void Then_a_validation_result_is_overridden_for_the_days_in_learning_when_an_non_expired_override_exists(int daysInLearning, bool validationResult)
+        {
+            // arrange            
+            var pendingPayment = _sut.PendingPayments.First();
+
+            _learnerModel.DaysInLearnings = new List<DaysInLearning>() {
+                new DaysInLearning(_collectionPeriod, daysInLearning)
+            };
+
+            _learner = Learner.Get(_learnerModel);
+            _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.HasDaysInLearning, DateTime.Now.AddDays(1)), _fixture.Create<ServiceRequest>());
+
+            // act
+            _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
+
+            // assert            
+            pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
+            var validationresult = pendingPayment.PendingPaymentValidationResults.First();
+            validationresult.Step.Should().Be(ValidationStep.HasDaysInLearning);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+            validationresult.Result.Should().BeTrue();
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
+        }
+
+        [TestCase(89, false)]
+        [TestCase(90, true)]
+        [TestCase(91, true)]
+        public void Then_a_validation_result_is_not_overridden_for_the_days_in_learning_when_an_expired_override_exists(int daysInLearning, bool validationResult)
+        {
+            // arrange            
+            var pendingPayment = _sut.PendingPayments.First();
+
+            _learnerModel.DaysInLearnings = new List<DaysInLearning>() {
+                new DaysInLearning(_collectionPeriod, daysInLearning)
+            };
+
+            _learner = Learner.Get(_learnerModel);
+            _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.HasDaysInLearning, DateTime.Now), _fixture.Create<ServiceRequest>());
+
+            // act
+            _sut.ValidateDaysInLearning(pendingPayment.Id, _learner, _collectionPeriod);
+
+            // assert            
+            pendingPayment.PendingPaymentValidationResults.Count.Should().Be(1);
+            var validationresult = pendingPayment.PendingPaymentValidationResults.First();
+            validationresult.Step.Should().Be(ValidationStep.HasDaysInLearning);
+            validationresult.CollectionPeriod.Should().Be(_collectionPeriod);
+            validationresult.Result.Should().Be(validationResult);
+            validationresult.GetModel().CreatedDateUtc.Should().Be(DateTime.Today);
+        }
+
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
