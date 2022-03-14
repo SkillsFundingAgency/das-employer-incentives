@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Http;
@@ -129,9 +130,48 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             );
         }
 
+        [When(@"a validation override is requested")]
+        public async Task WhenAValidationOverrideIsRequested()
+        {
+            var validationOverrideRequest = Fixture
+                .Build<ValidationOverrideRequest>()
+                .With(p => p.ValidationOverrides,
+                new List<Types.ValidationOverride>() {
+
+                    Fixture.Build<Types.ValidationOverride>()
+                    .With(o => o.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(o => o.ULN, _apprenticeshipIncentive.ULN)
+                    .With(o => o.ValidationSteps, new List<ValidationStep>(){
+                        Fixture.Build<ValidationStep>()
+                        .With(v => v.ValidationType, ValidationType.HasDaysInLearning)
+                        .With(v => v.ExpiryDate, DateTime.Today.AddDays(1))
+                        .With(v => v.Remove, false)
+                        .Create()
+                    }.ToArray())
+                    .Create()
+                }.ToArray())
+                .Create();
+
+            var url = $"validation-overrides";
+
+            await _testContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Post(url, validationOverrideRequest, cancellationToken);
+                },
+                (context) => HasExpectedValidationOverrideEvents(context)
+            );
+        }
+
         private bool HasExpectedEmployerWithdrawEvents(TestContext testContext)
         {   
             var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.Withdrawals.EmployerWithdrawalCommand);
+            return processedCommands == 1;
+        }
+
+        private bool HasExpectedValidationOverrideEvents(TestContext testContext)
+        {
+            var processedCommands = testContext.CommandsPublished.Count(c => c.IsProcessed && c.Command is Commands.Types.ApprenticeshipIncentive.ValidationOverrideCommand);
             return processedCommands == 1;
         }
 
@@ -195,6 +235,23 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             delayedWithdrawCommands.Count().Should().Be(1);
             ((Commands.Types.Withdrawals.ComplianceWithdrawalCommand)delayedWithdrawCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
+        }
+
+        [Then(@"the validation override is deferred")]
+        public void ThenTheValidationOverrideIsDeferred()
+        {
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                var apprenticeApplications = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.ValidationOverride>().Where(x => x.Id == _applicationApprenticeship.Id);
+
+                apprenticeApplications.Count().Should().Be(0);
+            }
+
+            var delayedCommands = _testContext.CommandsPublished
+                .Where(c => c.IsDelayed && c.Command is ValidationOverrideCommand);
+
+            delayedCommands.Count().Should().Be(1);
+            ((ValidationOverrideCommand)delayedCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(12));
         }
     }
 }
