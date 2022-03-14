@@ -3,10 +3,11 @@
     [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,	
 	[PendingPaymentId] UNIQUEIDENTIFIER NOT NULL,
     [Step] NVARCHAR(50) NOT NULL, 
-    [Result] BIT NOT NULL,
+    [Result] BIT NOT NULL,	
     [PeriodNumber] TINYINT NOT NULL, 
     [PaymentYear] SMALLINT NOT NULL, 
-    [CreatedDateUTC] DATETIME2 NOT NULL
+    [CreatedDateUTC] DATETIME2 NOT NULL,
+	[OverrideResult] BIT NULL,
     CONSTRAINT FK_PendingPaymentId FOREIGN KEY (PendingPaymentId) REFERENCES [incentives].[PendingPayment](Id)
 )
 GO

@@ -11,6 +11,8 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private DaysInLearning _daysInLearning;
         private DateTime _startDate;
         private DateTime _payment1DueDate;
+        private ApprenticeshipIncentiveModel _model;
 
         private Fixture _fixture;
 
@@ -47,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
-            
+
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
 
@@ -93,14 +96,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
 
-            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+            _model = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(m => m.Account, _account)
                 .With(m => m.StartDate, _startDate)
                 .With(m => m.PendingPaymentModels, pendingPayments)
                 .With(m => m.PausePayments, false)
                 .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
                 .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
-                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel> 
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel>
                 {
                     _fixture.Build<EmploymentCheckModel>()
                         .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
@@ -111,9 +114,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         .With(x => x.Result, false)
                         .Create()
                 })
+                .Without(m => m.ValidationOverrideModels)
                 .Create();
 
-            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(_model.Id, _model);
 
             _fixture.Register(() => incentive);
 
@@ -147,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockLearnerDomainRepository
                 .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
-            
+
             _sut = new ValidatePendingPaymentCommandHandler(
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
@@ -316,7 +320,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Arrange
             var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _learner.SetSuccessfulLearnerMatch(false);
-            
+
             var pendingPayment = incentive.PendingPayments.First();
             var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
 
@@ -379,11 +383,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 .Create();
 
             var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
-            
+
             _mockIncentiveDomainRespository
                 .Setup(m => m.Find(incentive.Id))
                 .ReturnsAsync(incentive);
-            
+
             _mockLearnerDomainRepository
                 .Setup(m => m.GetOrCreate(incentive))
                 .ReturnsAsync(_learner);
@@ -456,6 +460,31 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
                 .PendingPaymentValidationResults.Single(x => x.Step == "EmployedAtStartOfApprenticeship");
             validationResult.Result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_an_expired_validation_override_is_removed()
+        {
+            //Arrange
+            var expiredValidationOverride = _fixture
+                  .Build<ValidationOverrideModel>()
+                  .With(p => p.ApprenticeshipIncentiveId, _model.Id)
+                  .With(p => p.ExpiryDate, DateTime.UtcNow.AddDays(-1))
+                  .Create();
+
+            _model.ValidationOverrideModels.Add(expiredValidationOverride);
+            var incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            incentive.GetModel().ValidationOverrideModels.Count.Should().Be(0);
         }
 
         [Test]
@@ -669,6 +698,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
                 .PendingPaymentValidationResults.Single(x => x.Step == "BlockedForPayments");
             validationResult.Result.Should().BeTrue();
-        }
+        }        
     }
 }
