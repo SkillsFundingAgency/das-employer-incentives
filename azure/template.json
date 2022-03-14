@@ -102,6 +102,9 @@
             "type": "string",
             "defaultValue": "EP1"
         },
+        "sharedApimName": {
+            "type": "string"
+        },
         "sharedEnvVirtualNetworkName": {
             "type": "string"
         },
