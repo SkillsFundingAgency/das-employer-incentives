@@ -105,6 +105,9 @@
         "sharedApimName": {
             "type": "string"
         },
+        "sharedApimResourceGroup": {
+            "type": "string"
+        },
         "sharedEnvVirtualNetworkName": {
             "type": "string"
         },
