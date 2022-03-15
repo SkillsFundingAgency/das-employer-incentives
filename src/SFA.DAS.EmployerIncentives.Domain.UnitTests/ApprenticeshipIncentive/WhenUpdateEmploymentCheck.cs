@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _sutModel.EmploymentCheckModels.Add(existingCheck) ;
 
-            _sut = Sut(_sutModel);
+            _sut = Sut(_sutModel);            
 
             // act
             _sut.UpdateEmploymentCheck(new EmploymentCheckResult(Guid.NewGuid(), EmploymentCheckResultType.Employed, DateTime.Today));

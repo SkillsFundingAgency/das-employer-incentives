@@ -41,7 +41,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Column(TypeName = "nvarchar(50)")]
         public IncentiveStatus Status { get; set; }
 
-
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<ApprenticeshipBreakInLearning> BreakInLearnings { get; set; }
 
@@ -54,6 +53,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public WithdrawnBy? WithdrawnBy { get; set; }
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<EmploymentCheck> EmploymentChecks { get; set; }
+        [Dapper.Contrib.Extensions.Write(false)]
+        public ICollection<ValidationOverride> ValidationOverrides { get; set; }
 
         public ApprenticeshipIncentive()
         {
@@ -62,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
             ClawbackPayments = new List<ClawbackPayment>();
             BreakInLearnings = new List<ApprenticeshipBreakInLearning>();
             EmploymentChecks = new List<EmploymentCheck>();
+            ValidationOverrides = new List<ValidationOverride>();
         }
     }
 }
