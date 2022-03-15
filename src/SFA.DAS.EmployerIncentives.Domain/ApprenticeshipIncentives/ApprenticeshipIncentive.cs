@@ -108,19 +108,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 if (!ExistingPendingPaymentHasBeenPaid(pendingPayment))
                 {
                     var existingPendingPaymentModel = pendingPayment.GetModel();
-                    Model.PendingPaymentModels.Remove(existingPendingPaymentModel);
+                    if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
+                    {
+                        AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
+                    }
                     recalculationRequired = true;
                 }
             }
 
             if (recalculationRequired)
             {
-                AddEvent(new EarningsRecalculationRequired
-                {
-                    ApprenticeshipIncentiveId = Id,
-                    AccountId = Model.Account.Id,
-                    ApprenticeshipId = Model.Apprenticeship.Id
-                });
+                CalculateEarnings(collectionCalendar);
             }
         }
 

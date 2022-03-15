@@ -17,20 +17,35 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private ApprenticeshipIncentives.ApprenticeshipIncentive _sut;
         private ApprenticeshipIncentiveModel _sutModel;
         private Fixture _fixture;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
         private CollectionCalendar _collectionCalendar;
+        private DateTime _collectionPeriod;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _collectionCalendar = _fixture.Create<CollectionCalendar>();
+            _collectionPeriod = new DateTime(2020, 10, 1);
+            _collectionPeriods = new List<CollectionCalendarPeriod>()
+            {
+                new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(1).AddDays(1), true, false)
+            };
+            for (var i = 1; i <= 12; i++)
+            {
+                _collectionPeriods.Add(new CollectionCalendarPeriod(new CollectionPeriod((byte)i, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(i).Month, (short)_collectionPeriod.AddMonths(i).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(i + 1).AddDays(1), false, false)
+                );
+            }
+
+            _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
         }
 
         [Test]
         public void Then_the_existing_earnings_are_removed_and_a_calculate_earnings_event_is_triggered()
         {
             // Arrange
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .Create();
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(
                 _fixture.Build<PendingPaymentModel>()
                     .Without(x => x.PaymentMadeDate)
@@ -52,13 +67,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_the_earnings_are_not_recalculated_when_the_status_is_invalid(IncentiveStatus status)
         {
             // Arrange
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
-            _sutModel.Status = status;
-            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(
-                _fixture.Build<PendingPaymentModel>()
-                    .Without(x => x.PaymentMadeDate)
-                    .CreateMany(2));
-
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .With(x => x.Status, status)
+                .With(x => x.PendingPaymentModels, new List<PendingPaymentModel>(
+                    _fixture.Build<PendingPaymentModel>()
+                        .Without(x => x.PaymentMadeDate)
+                        .CreateMany(2)))
+                .Create();
+            
             _sut = Sut(_sutModel);
 
             // Act
@@ -74,7 +91,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_the_earnings_are_not_recalculated_if_payments_already_exist()
         {
             // Arrange
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .Create();
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(
                 _fixture.Build<PendingPaymentModel>()
                     .With(x => x.PaymentMadeDate, DateTime.Now.AddDays(-1))
@@ -106,7 +125,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         public void Then_the_earnings_are_recalculated_if_a_payment_exists_for_the_first_earning()
         {
             // Arrange
-            _sutModel = _fixture.Create<ApprenticeshipIncentiveModel>();
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .Create();
 
             var pendingPayments = new List<PendingPaymentModel>();
             var pendingPayment1 = _fixture.Build<PendingPaymentModel>()

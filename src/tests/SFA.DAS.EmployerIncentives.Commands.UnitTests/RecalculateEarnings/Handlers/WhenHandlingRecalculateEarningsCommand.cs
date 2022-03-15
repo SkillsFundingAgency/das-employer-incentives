@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -6,7 +7,6 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.RecalculateEarnings;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
@@ -15,6 +15,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Handlers
 {
@@ -25,6 +26,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
         private Fixture _fixture;
         private Mock<IApprenticeshipIncentiveDomainRepository> _domainRepository;
         private Mock<ICollectionCalendarService> _collectionCalendarService;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
+        private Domain.ValueObjects.CollectionCalendar _collectionCalendar;
+        private DateTime _collectionPeriod;
 
         [SetUp]
         public void Arrange()
@@ -33,8 +37,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
             _domainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _collectionCalendarService = new Mock<ICollectionCalendarService>();
             _sut = new RecalculateEarningsCommandHandler(_domainRepository.Object, _collectionCalendarService.Object);
-            var collectionCalendar = _fixture.Create<Domain.ValueObjects.CollectionCalendar>();
-            _collectionCalendarService.Setup(x => x.Get()).ReturnsAsync(collectionCalendar);
+            _collectionPeriod = new DateTime(2020, 10, 1);
+            _collectionPeriods = new List<CollectionCalendarPeriod>()
+            {
+                new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod(1, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(-1).Month, (short)_collectionPeriod.AddMonths(-1).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(1).AddDays(1), true, false)
+            };
+            for (var i = 1; i <= 12; i++)
+            {
+                _collectionPeriods.Add(new CollectionCalendarPeriod(new Domain.ValueObjects.CollectionPeriod((byte)i, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(i).Month, (short)_collectionPeriod.AddMonths(i).Year, _fixture.Create<DateTime>(), _collectionPeriod.AddMonths(i + 1).AddDays(1), false, false)
+                );
+            }
+
+            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear>(), _collectionPeriods);
+            
+            _collectionCalendarService.Setup(x => x.Get()).ReturnsAsync(_collectionCalendar);
         }
 
         [Test]
@@ -53,6 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
                 var incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                     .With(x => x.Account, account)
                     .With(x => x.Apprenticeship, apprenticeship)
+                    .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
                     .Create();
                 var incentive =  new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
                 _domainRepository

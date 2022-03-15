@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -21,15 +22,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private Fixture _fixture;
         private long _accountLegalEntityId;
         private long _uln;
+        private Guid _apprenticeshipIncentiveId;
         private RecalculateEarningsRequest _request;
         private TestContext _testContext;
-
+        
         public RecalculateEarningsSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
             _fixture = new Fixture();
             _accountLegalEntityId = _fixture.Create<long>();
             _uln = _fixture.Create<long>();
+            _apprenticeshipIncentiveId = Guid.NewGuid();
         }
 
         [Given(@"an apprenticeship incentive exists with calculated earnings")]
@@ -42,17 +45,21 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()
                 .With(x => x.AccountLegalEntityId, _accountLegalEntityId)
                 .With(x => x.ULN, _uln)
+                .With(x => x.Phase, Phase.Phase3)
+                .With(x => x.Id, _apprenticeshipIncentiveId)
                 .Create();
 
             var pendingPayment1 = _fixture.Build<PendingPayment>()
                 .With(x => x.ApprenticeshipIncentiveId, apprenticeshipIncentive.Id)
                 .With(x => x.EarningType, EarningType.FirstPayment)
+                .With(x => x.CalculatedDate, new DateTime(2022, 01, 01))
                 .Without(x => x.PaymentMadeDate)
                 .Create();
 
             var pendingPayment2 = _fixture.Build<PendingPayment>()
                 .With(x => x.ApprenticeshipIncentiveId, apprenticeshipIncentive.Id)
                 .With(x => x.EarningType, EarningType.SecondPayment)
+                .With(x => x.CalculatedDate, new DateTime(2022, 01, 01))
                 .Without(x => x.PaymentMadeDate)
                 .Create();
 
@@ -81,11 +88,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the earnings are updated")]
         public void ThenTheEarningsAreUpdated()
         {
-            _testContext.CommandsPublished.Where(c =>
-                    c.IsPublished &&
-                    c.Command is CalculateEarningsCommand)
-                .Select(c => c.Command)
-                .Count().Should().Be(1);
+            var pendingPayments = DataAccess.GetPendingPayments(_apprenticeshipIncentiveId);
+            foreach(var payment in pendingPayments)
+            {
+                payment.CalculatedDate.Year.Should().Be(DateTime.Now.Year);
+                payment.CalculatedDate.Month.Should().Be(DateTime.Now.Month);
+                payment.CalculatedDate.Day.Should().Be(DateTime.Now.Day);
+            }
         }
     }
 }
