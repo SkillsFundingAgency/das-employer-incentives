@@ -8,11 +8,9 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
-using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprenticeshipIncentivesForAccountLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
 {
@@ -36,17 +34,22 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
             // Arrange
             var incentiveLearnerIdentifiers = _fixture.CreateMany<IncentiveLearnerIdentifierDto>(5).ToList();
             var request = new RecalculateEarningsRequest { IncentiveLearnerIdentifiers = incentiveLearnerIdentifiers };
-            _commandDispatcher
-                .Setup(x => x.Send(It.Is<RecalculateEarningsCommand>(y =>
-                    y.IncentiveLearnerIdentifiers.Equals(incentiveLearnerIdentifiers)), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _commandDispatcher.Setup(
+                x => x.Send(It.IsAny<RecalculateEarningsCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             // Act
             var actual = await _sut.RecalculateEarnings(request) as NoContentResult;
 
             // Assert
             actual.Should().NotBeNull();
-            _commandDispatcher.Verify(x => x.Send(It.Is<RecalculateEarningsCommand>(y =>
-                y.IncentiveLearnerIdentifiers.Equals(incentiveLearnerIdentifiers)), It.IsAny<CancellationToken>()), Times.Once());
+            for(var index = 0; index < incentiveLearnerIdentifiers.Count; index++)
+            {
+                _commandDispatcher.Verify(x => x.Send(It.Is<RecalculateEarningsCommand>(
+                    y => y.IncentiveLearnerIdentifiers.FirstOrDefault(
+                        z => z.AccountLegalEntityId == incentiveLearnerIdentifiers[index].AccountLegalEntityId
+                        && z.ULN == incentiveLearnerIdentifiers[index].ULN) != null),
+                        It.IsAny<CancellationToken>()), Times.Once);
+            }
         }
     }
 }

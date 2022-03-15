@@ -14,6 +14,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Handlers
 {
@@ -40,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
         public async Task Then_the_earnings_are_recalculated_for_the_incentives_identified()
         {
             // Arrange
-            var command = new RecalculateEarningsCommand(_fixture.CreateMany<IncentiveLearnerIdentifierDto>(5));
+            var command = new RecalculateEarningsCommand(_fixture.CreateMany<IncentiveLearnerIdentifier>(5));
 
             foreach(var identifier in command.IncentiveLearnerIdentifiers)
             {
@@ -75,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
         public void Then_an_exception_is_thrown_if_the_incentive_is_not_found()
         {
             // Arrange
-            var command = new RecalculateEarningsCommand(_fixture.CreateMany<IncentiveLearnerIdentifierDto>(1));
+            var command = new RecalculateEarningsCommand(_fixture.CreateMany<IncentiveLearnerIdentifier>(1));
             var identifier = command.IncentiveLearnerIdentifiers.ToList()[0];
 
             Domain.ApprenticeshipIncentives.ApprenticeshipIncentive nullIncentive = null;

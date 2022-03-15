@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Commands.RecalculateEarnings;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Validators
 {
@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Vali
         public async Task Then_validation_fails_if_the_learner_identifiers_are_empty()
         {
             // Arrange
-            var command = new RecalculateEarningsCommand(new List<IncentiveLearnerIdentifierDto>());
+            var command = new RecalculateEarningsCommand(new List<IncentiveLearnerIdentifier>());
 
             // Act
             var result = await _sut.Validate(command);
@@ -49,9 +49,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Vali
         public async Task Then_validation_fails_if_the_learner_identifier_account_legal_entity_is_not_set()
         {
             // Arrange
-            var identifiers = new List<IncentiveLearnerIdentifierDto>
+            var identifiers = new List<IncentiveLearnerIdentifier>
             {
-                new IncentiveLearnerIdentifierDto { ULN = 1234 }
+                new IncentiveLearnerIdentifier(accountLegalEntityId: 0, uln: 1234)
             };
             var command = new RecalculateEarningsCommand(identifiers);
 
@@ -66,9 +66,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Vali
         public async Task Then_validation_fails_if_the_learner_identifier_ULN_is_not_set()
         {
             // Arrange
-            var identifiers = new List<IncentiveLearnerIdentifierDto>
+            var identifiers = new List<IncentiveLearnerIdentifier>
             {
-                new IncentiveLearnerIdentifierDto { AccountLegalEntityId = 1234 }
+                new IncentiveLearnerIdentifier(accountLegalEntityId: 1234, uln: 0)
             };
             var command = new RecalculateEarningsCommand(identifiers);
 
@@ -83,10 +83,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Vali
         public async Task Then_validation_passes_for_a_valid_command()
         {
             // Arrange
-            var identifiers = new List<IncentiveLearnerIdentifierDto>
+            var identifiers = new List<IncentiveLearnerIdentifier>
             {
-                new IncentiveLearnerIdentifierDto { AccountLegalEntityId = 1234, ULN = 11112222 },
-                new IncentiveLearnerIdentifierDto { AccountLegalEntityId = 2345, ULN = 22223333 }
+                new IncentiveLearnerIdentifier(accountLegalEntityId: 1234, uln: 11112222),
+                new IncentiveLearnerIdentifier(accountLegalEntityId: 2345, uln: 22223333)
             };
             var command = new RecalculateEarningsCommand(identifiers);
 

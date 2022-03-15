@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Commands.RecalculateEarnings
 {
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RecalculateEarnings
             return Task.FromResult(result);
         }
 
-        private void ValidateApprenticeshipIdentifier(ValidationResult result, IncentiveLearnerIdentifierDto apprenticeshipIdentifier)
+        private void ValidateApprenticeshipIdentifier(ValidationResult result, IncentiveLearnerIdentifier apprenticeshipIdentifier)
         {
             if (apprenticeshipIdentifier.AccountLegalEntityId == default)
             {
