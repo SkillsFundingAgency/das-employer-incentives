@@ -33,6 +33,32 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
   INNER JOIN incentives.PendingPayment pp ON pp.Id = x.PendingPaymentId
   GROUP By Passed order by passed desc
 
+-- YTD Valid Records (Paste into cell E22)
+;SELECT SUM(Amount) AS [(Paste into cell E22) Valid YTD]
+FROM incentives.Payment
+WHERE PaymentYear = @AcademicYear
+AND PaidDate IS NOT NULL
+
+-- YTD Invalid Records (Paste into cell E23)
+;SELECT SUM(Amount) AS [(Paste into cell E23) Invalid YTD]
+FROM
+(
+SELECT (-1 * SUM(Amount)) AS Amount
+	FROM incentives.Payment
+	WHERE PaymentYear = @AcademicYear
+	AND PaidDate IS NOT NULL
+	UNION ALL
+	SELECT SUM(Amount)
+	FROM incentives.PendingPayment
+	WHERE Id 
+	IN
+	(
+	SELECT DISTINCT PendingPaymentId FROM incentives.PendingPaymentValidationResult
+	WHERE PaymentYear = @AcademicYear
+	)
+)
+AS [(Paste into cell E23) Invalid YTD]
+
   -- Earnings (Paste into cell G6)
   ;SELECT PeriodNumber as [(Paste into cell G6) PeriodNumber], PaymentYear, sum(amount) as Amount, count(*) NumEarnings
   FROM [incentives].[PendingPayment] pp
