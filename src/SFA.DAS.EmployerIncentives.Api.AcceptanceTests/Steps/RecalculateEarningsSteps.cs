@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"a request is made for the incentive's earnings to be recalculated")]
         public async Task WhenARequestIsMadeForAnIncentivesEarningsToBeRecalculated()
         {
-            var url = "/recalculateEarnings";
+            var url = "/earningsRecalculations";
             _request = new RecalculateEarningsRequest()
             {
                 IncentiveLearnerIdentifiers = new List<IncentiveLearnerIdentifierDto>

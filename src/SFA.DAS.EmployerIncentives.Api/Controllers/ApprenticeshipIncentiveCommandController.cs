@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
         }
 
-        [HttpPost("/recalculateEarnings")]
+        [HttpPost("/earningsRecalculations")]
         public async Task<IActionResult> RecalculateEarnings([FromBody] RecalculateEarningsRequest request)
         {
             await SendCommandAsync(new RecalculateEarningsCommand(request.IncentiveLearnerIdentifiers));
