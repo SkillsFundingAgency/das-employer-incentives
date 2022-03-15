@@ -42,20 +42,20 @@ AND PaidDate IS NOT NULL
 -- YTD Invalid Records (Paste into cell E23)
 ;SELECT SUM(Amount) AS [(Paste into cell E23) Invalid YTD]
 FROM
-(
-SELECT (-1 * SUM(Amount)) AS Amount
-	FROM incentives.Payment
-	WHERE PaymentYear = @AcademicYear
-	AND PaidDate IS NOT NULL
-	UNION ALL
-	SELECT SUM(Amount)
+(	
+	SELECT SUM(Amount) AS Amount -- Total amount of all pending payments that have been validated this academic year
 	FROM incentives.PendingPayment
 	WHERE Id 
 	IN
 	(
 	SELECT DISTINCT PendingPaymentId FROM incentives.PendingPaymentValidationResult
-	WHERE PaymentYear = @AcademicYear
+	WHERE PaymentYear = @AcademicYear	
 	)
+	UNION ALL
+	SELECT (-1 * SUM(Amount)) AS Amount -- Amount of all payments for this academic year (subtracted from above total)
+	FROM incentives.Payment
+	WHERE PaymentYear = @AcademicYear
+	AND PaidDate IS NOT NULL
 )
 AS [(Paste into cell E23) Invalid YTD]
 
