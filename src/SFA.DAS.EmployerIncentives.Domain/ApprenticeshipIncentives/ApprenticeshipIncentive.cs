@@ -102,22 +102,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            var recalculationRequired = false;
+            var pendingPaymentsHaveBeenPaid = false;
             foreach(var pendingPayment in PendingPayments)
             {
-                if (!ExistingPendingPaymentHasBeenPaid(pendingPayment))
+                if (ExistingPendingPaymentHasBeenPaid(pendingPayment))
+                {
+                    pendingPaymentsHaveBeenPaid = true;
+                }
+            }
+
+            if (!pendingPaymentsHaveBeenPaid)
+            {
+                foreach(var pendingPayment in PendingPayments)
                 {
                     var existingPendingPaymentModel = pendingPayment.GetModel();
                     if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
                     {
                         AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
                     }
-                    recalculationRequired = true;
                 }
-            }
-
-            if (recalculationRequired)
-            {
                 CalculateEarnings(collectionCalendar);
             }
         }

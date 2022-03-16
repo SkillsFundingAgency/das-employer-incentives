@@ -4,7 +4,6 @@ using System.Linq;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -40,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_the_existing_earnings_are_removed_and_a_calculate_earnings_event_is_triggered()
+        public void Then_both_existing_earnings_are_recalculated_if_no_payments_exist()
         {
             // Arrange
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
@@ -58,8 +57,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Assert
             _sut.GetModel().PendingPaymentModels.Count.Should().Be(0);
-            var events = _sut.FlushEvents().ToList();
-            events.Should().ContainItemsAssignableTo<EarningsRecalculationRequired>();
         }
 
         [TestCase(IncentiveStatus.Withdrawn)]
@@ -83,8 +80,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Assert
             _sut.GetModel().PendingPaymentModels.Count.Should().Be(2);
-            var events = _sut.FlushEvents().ToList();
-            events.Should().BeEmpty();
         }
 
         [Test]
@@ -117,12 +112,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Assert
             _sut.GetModel().PendingPaymentModels.Count.Should().Be(2);
-            var events = _sut.FlushEvents().ToList();
-            events.Should().BeEmpty();
         }
 
         [Test]
-        public void Then_the_earnings_are_recalculated_if_a_payment_exists_for_the_first_earning()
+        public void Then_the_earnings_are_not_recalculated_if_a_payment_exists_for_the_first_earning()
         {
             // Arrange
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
@@ -155,9 +148,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.RecalculateEarnings(_collectionCalendar);
 
             // Assert
-            _sut.GetModel().PendingPaymentModels.Count.Should().Be(1);
-            var events = _sut.FlushEvents().ToList();
-            events.Should().ContainItemsAssignableTo<EarningsRecalculationRequired>();
+            _sut.GetModel().PendingPaymentModels.Count.Should().Be(2);
+            
         }
 
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
