@@ -13,6 +13,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Events;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
+using SFA.DAS.EmployerIncentives.Reports;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
@@ -91,6 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddCommandServices();
             services.AddQueryServices();
             services.AddEventServices();
+            services.AddReportServices();
 
             services
                 .AddMvc(o =>

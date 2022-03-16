@@ -102,6 +102,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.DistributedLockStorage = "UseDevelopmentStorage=true";
                                a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                                a.UseLearningEndpointStorageDirectory = Path.Combine(testContext.TestDirectory.FullName, ".learningtransport");
+                               a.ReportsConnectionString = "UseDevelopmentStorage=true";
+                               a.ReportsContainerName = "reports";
                            });
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();

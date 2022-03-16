@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
+using SFA.DAS.EmployerIncentives.Reports;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -62,6 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.AddQueryServices();
             builder.Services.AddCommandServices();
             builder.Services.AddEventServices();
+            builder.Services.AddReportServices();
 
             builder.Services.AddNServiceBus(config);            
         }
