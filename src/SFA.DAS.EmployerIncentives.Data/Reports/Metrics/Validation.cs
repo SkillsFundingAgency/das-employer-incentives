@@ -1,6 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Reports.Models
+﻿namespace SFA.DAS.EmployerIncentives.Data.Reports.Metrics
 {
-    public class YtdValidation
+    public class Validation
     {
         public int Order { get; set; }
         public int CountOfPayments { get; set; }

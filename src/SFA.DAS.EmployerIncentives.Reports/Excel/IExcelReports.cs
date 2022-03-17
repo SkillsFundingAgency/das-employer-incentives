@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Reports.Models;
+﻿using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Reports.Excel

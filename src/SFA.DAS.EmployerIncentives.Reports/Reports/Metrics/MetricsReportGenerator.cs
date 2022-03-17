@@ -1,7 +1,7 @@
 ﻿using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using SFA.DAS.EmployerIncentives.Reports.Models;
+using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using System.Collections.Generic;
 using System.IO;
 
@@ -46,10 +46,14 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
 
         private static void CreateYTDSheet(IWorkbook workbook, MetricsReport report, IDictionary<Style, ICellStyle> styles)
         {
-            var ytdValidationSheet = workbook.CreateSheet("YTD Validation");
-            new YtdValidationTable(new Context(ytdValidationSheet, styles)).Create(report);
+            var validationSheet = workbook.CreateSheet("YTD Validation");
+            var context = new Context(validationSheet, styles);
 
-            ytdValidationSheet.SetColumnWidths(0, 11, 22);
+            new ValidationTable(context).Create(report);
+            context.RowNumber++;
+            new ValidationTable(context).Create(report, true);
+
+            validationSheet.SetColumnWidths(0, 11, 22);
         }
 
         private static IDictionary<Style, ICellStyle> CreateStyles(IWorkbook workbook)

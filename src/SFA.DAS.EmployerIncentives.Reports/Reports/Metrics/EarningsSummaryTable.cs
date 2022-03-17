@@ -1,5 +1,5 @@
 ﻿using NPOI.SS.UserModel;
-using SFA.DAS.EmployerIncentives.Reports.Models;
+using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using System.Collections.Generic;
 using System.Linq;
 

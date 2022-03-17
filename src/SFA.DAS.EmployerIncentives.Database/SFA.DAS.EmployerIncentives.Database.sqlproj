@@ -118,6 +118,7 @@
     <Build Include="Tables\Audit.ValidationOverride.sql" />
     <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
     <Build Include="Views\ApprenticeApplications.sql" />
+    <Build Include="StoredProcedures\Reports.MetricsReport.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />

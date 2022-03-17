@@ -1,33 +1,33 @@
-﻿using SFA.DAS.EmployerIncentives.Reports.Models;
+﻿using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
 {
-    public class YtdValidationTable
+    public class ValidationTable
     {
         private readonly Context _context;
-        public YtdValidationTable(Context context)
+        public ValidationTable(Context context)
         {
             _context = context;
         }
 
-        public void Create(MetricsReport report)
+        public void Create(MetricsReport report, bool isYtd = false)
         {
-            AddSectionHeaderRow();
+            AddSectionHeaderRow(isYtd);
             AddHeaderRow();
-            AddRows(report.YtdValidations);
+            AddRows(isYtd ? report.YtdValidations : report.PeriodValidations);
             _context.RowNumber++;
         }
 
-        private void AddSectionHeaderRow()
+        private void AddSectionHeaderRow(bool isYtd)
         {
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
 
             var cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
-            cell.SetCellValue("This period validation");
+            cell.SetCellValue(isYtd ? "YTD validation" : "This period validation");
         }
 
         private void AddHeaderRow()
@@ -74,12 +74,12 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             _context.Sheet.SetAutoFilter(new NPOI.SS.Util.CellRangeAddress(_context.RowNumber - 1, _context.RowNumber - 1, _context.StartCellNumber, cellNumber));
         }
 
-        private void AddRows(IEnumerable<YtdValidation> ytdValidations)
+        private void AddRows(IEnumerable<Validation> ytdValidations)
         {
             ytdValidations.OrderBy(p => p.Order).ToList().ForEach(p => AddRow(p));
         }
 
-        private void AddRow(YtdValidation ytdValidation)
+        private void AddRow(Validation ytdValidation)
         {
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;

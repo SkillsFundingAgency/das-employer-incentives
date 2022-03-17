@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Reports.Excel;
 using SFA.DAS.EmployerIncentives.Reports.Respositories;
 
@@ -10,7 +11,8 @@ namespace SFA.DAS.EmployerIncentives.Reports
         {
             serviceCollection.AddScoped<IReportsRepository, AzureBlobRepository>();
             serviceCollection.AddScoped<IExcelReports, ExcelReportsService>();
-            
+            serviceCollection.AddScoped<IReportsDataRepository, ReportsDataRepository>();
+
             return serviceCollection;
         }
     }
