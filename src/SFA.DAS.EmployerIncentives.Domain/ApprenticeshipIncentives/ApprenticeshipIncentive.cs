@@ -64,9 +64,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ApprenticeshipIncentive(id, model);
         }
 
-        public void CalculateEarnings(CollectionCalendar collectionCalendar)
+        public void CalculateEarnings(CollectionCalendar collectionCalendar, bool forceCalculation = false)
         {
-            if (Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
+            if (!forceCalculation && (Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped))
             {
                 return;
             }
@@ -334,6 +334,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 AddEvent(new LearningResumed(
                     Model.Id,
                     learningStoppedStatus.DateResumed.Value));
+            }
+            else if (Model.Status == IncentiveStatus.Stopped && learningStoppedStatus.LearningStopped && PendingPayments.Count == 0)
+            {
+                var incentive = Incentive.Create(this);
+                foreach (var paymentProfile in incentive.PaymentProfiles)
+                {
+                    if (learningStoppedStatus.DateStopped.HasValue
+                        && learningStoppedStatus.DateStopped.Value > StartDate.AddDays(paymentProfile.DaysAfterApprenticeshipStart))
+                    {
+                        CalculateEarnings(collectionCalendar, forceCalculation: true);
+                        break;
+                    }
+                }
             }
         }
 

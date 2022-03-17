@@ -33,7 +33,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             };
 
             _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), collectionPeriods);
-            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.Status, IncentiveStatus.Active).Create();
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Status, IncentiveStatus.Active)
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
+                .With(x => x.StartDate, new DateTime(2020, 10, 1))
+                .Create();
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
             _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>().With(x => x.DueDate, new DateTime(2021, 1, 1)).With(x => x.ClawedBack, false).With(x => x.PaymentMadeDate, (DateTime?)null).Create());
             _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>().With(x => x.DueDate, new DateTime(2021, 2, 28)).With(x => x.ClawedBack, false).With(x => x.PaymentMadeDate, (DateTime?)null).Create());
@@ -152,6 +156,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             //Assert
             _sut.MinimumAgreementVersion.MinimumRequiredVersion.Should().Be(expectedMinimumVersion);
 
+        }
+
+        [Test]
+        public void Then_earnings_are_calculated_if_the_updated_learning_stopped_date_is_after_earnings_due_for_payment()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.PendingPaymentModels.First().DueDate.AddDays(-1)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+            
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(90)));
+            submissionData.SetLearningData(learningData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            // Assert
+            _sutModel.PendingPaymentModels.Count.Should().Be(2);
         }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
