@@ -100,7 +100,6 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
         protected virtual void Dispose(bool disposing)
         {
-            // Check to see if Dispose has already been called.
             if (!_isDisposed)
             {
                 if (disposing)

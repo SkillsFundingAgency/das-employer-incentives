@@ -1,4 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using Azure.Storage.Blobs;
+using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
@@ -24,6 +25,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public MockApi LearnerMatchApi { get; set; }
         
         public MockApi PaymentsApi { get; set; }
+
+        public BlobContainerClient BlobClient { get; set; }
+        
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
         public TestContext()

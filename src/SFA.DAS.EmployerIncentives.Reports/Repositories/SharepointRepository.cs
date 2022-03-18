@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Reports.Respositories
 {
+    [ExcludeFromCodeCoverage]
     public class SharepointRepository : IReportsRepository
     {
         private readonly HttpClient _client;

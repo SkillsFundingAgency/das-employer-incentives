@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.Services;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
@@ -47,6 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ApplicationSettings:ReportsContainerName", _testContext.InstanceId }
             };
 
             _testContext = testContext;
@@ -103,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.NServiceBusConnectionString = "UseLearningEndpoint=true";
                                a.UseLearningEndpointStorageDirectory = Path.Combine(testContext.TestDirectory.FullName, ".learningtransport");
                                a.ReportsConnectionString = "UseDevelopmentStorage=true";
-                               a.ReportsContainerName = "reports";
+                               a.ReportsContainerName = testContext.InstanceId;
                            });
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();

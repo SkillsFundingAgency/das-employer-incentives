@@ -1,8 +1,5 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
-using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using static Dapper.SqlMapper;
@@ -11,11 +8,11 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports
 {
     public class ReportsDataRepository : IReportsDataRepository
     {
-        private readonly string _connectionString;
+        private readonly IReportsConnectionProvider _connectionProvider;
 
-        public ReportsDataRepository(IOptions<ApplicationSettings> options)
+        public ReportsDataRepository(IReportsConnectionProvider connectionProvider)
         {
-            _connectionString = options.Value.DbConnectionString;
+            _connectionProvider = connectionProvider;
         }
 
         public async Task<T> Execute<T>() where T : class, IReport
@@ -25,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports
                 return default;
             }
 
-            using var dbConnection = new SqlConnection(_connectionString);
+            using var dbConnection = _connectionProvider.New();
             var results = await dbConnection.QueryMultipleAsync("reports.MetricsReport", commandType: System.Data.CommandType.StoredProcedure);
 
             var report = new MetricsReport
