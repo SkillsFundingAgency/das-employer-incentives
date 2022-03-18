@@ -74,7 +74,6 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             boldStyle.SetFont(boldFont);
             styles.Add(Style.Bold, boldStyle);
 
-            // To Get the built in data formats use HSSFDataFormat.GetBuiltinFormats();
             var currencyStyle = workbook.CreateCellStyle();
             currencyStyle.DataFormat = HSSFDataFormat.GetBuiltinFormat("\"$\"#,##0.00_);(\"$\"#,##0.00)");
 

@@ -24,10 +24,10 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
             var cellNumber = _context.StartCellNumber;
 
-            var cell = currentRow.CreateCell(cellNumber);
+            var cell = currentRow.CreateCell(cellNumber++);
             cell.SetCellValue("Current Period");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.SetCellValue(period.Period);
             cell.CellStyle = _context.Styles[Style.Default];
         }
@@ -37,10 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber; 
 
-            var cell = currentRow.CreateCell(cellNumber);
+            var cell = currentRow.CreateCell(cellNumber++);
             cell.SetCellValue("Current Year");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(period.AcademicYear);
         }

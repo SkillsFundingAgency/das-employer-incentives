@@ -37,19 +37,19 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
 
-            var cell = currentRow.CreateCell(cellNumber);
+            var cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("PeriodNumber");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("PaymentYear");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Amount");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("NumEarnings");
         }
@@ -64,19 +64,19 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
 
-            var cell = currentRow.CreateCell(cellNumber);
+            var cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(earning.Period);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(earning.Year);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(earning.Amount);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(earning.Number);
         }

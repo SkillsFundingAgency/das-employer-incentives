@@ -30,16 +30,18 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue("Validation");
             cell.AddComment("This shows the last validation record status of each earning.  If the last validation has passed and the earning is due then it should be paid.");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cellNumber++;
+
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Count");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue($"R{collectionPeriod.Period}");
             cell.AddComment("Shows only this months validation record status.");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("YTD");
             cell.AddComment("Shows only the validation status for all records for the academic year to date.");
@@ -54,15 +56,17 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue("Valid records");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cellNumber++;
+
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(validationSummary.ValidRecords.Count);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(validationSummary.ValidRecords.PeriodAmount);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(validationSummary.ValidRecords.YtdAmount);
         }
@@ -76,15 +80,17 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue("Invalid records");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cellNumber++;
+
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(validationSummary.InvalidRecords.Count);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(validationSummary.InvalidRecords.PeriodAmount);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(validationSummary.InvalidRecords.YtdAmount);
         }
@@ -98,11 +104,13 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue("Total Validated");
             cell.CellStyle = _context.Styles[Style.Bold];
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cellNumber++;
+
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.CurrencyBold];
             cell.SetCellValue(validationSummary.ValidRecords.PeriodAmount + validationSummary.InvalidRecords.PeriodAmount);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.CurrencyBold];
             cell.SetCellValue(validationSummary.ValidRecords.YtdAmount + validationSummary.InvalidRecords.YtdAmount);
         }

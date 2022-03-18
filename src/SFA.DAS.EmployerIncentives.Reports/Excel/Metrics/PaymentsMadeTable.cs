@@ -38,20 +38,20 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
 
-            var cell = currentRow.CreateCell(cellNumber);
+            var cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Payment Year");
             cell.AddComment("Shows all the payments that have been made in each monthly run.");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("PaymentPeriod");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("NumPayments");
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("PaymentsAmount");
         }
@@ -66,19 +66,19 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
 
-            var cell = currentRow.CreateCell(cellNumber);
+            var cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(paymentsMade.Year);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(paymentsMade.Period);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(paymentsMade.Number);
 
-            cell = currentRow.CreateCell(++cellNumber);
+            cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue(paymentsMade.Amount);
         }
@@ -88,15 +88,15 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             var currentPeriodRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber + 1;
 
-            var cell = currentPeriodRow.CreateCell(cellNumber);
+            var cell = currentPeriodRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Total");
 
-            cell = currentPeriodRow.CreateCell(++cellNumber);
+            cell = currentPeriodRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue(paymentsMade.Sum(p => p.Number));
 
-            cell = currentPeriodRow.CreateCell(++cellNumber);
+            cell = currentPeriodRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.CurrencyBold];
             cell.SetCellValue(paymentsMade.Sum(p => p.Amount));
         }
