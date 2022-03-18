@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class ValidationTable
     {

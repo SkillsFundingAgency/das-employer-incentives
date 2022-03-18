@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class ClawbacksSummaryTable
     {
@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             var cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Clawbacks");
+            cell.AddComment("This shows all of the clawbacks in the system.");
 
             cellNumber += 2;
 

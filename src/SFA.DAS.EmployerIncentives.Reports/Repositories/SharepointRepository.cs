@@ -14,12 +14,12 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
             _client = client;
         }
 
-        public async Task Save(ReportsFileInfo fileInfo, MemoryStream memoryStream)
+        public async Task Save(ReportsFileInfo fileInfo, Stream stream)
         {
             var fileCollectionEndpoint = $"sp.appcontextsite(@target)/web/getfolderbyserverrelativeurl('{fileInfo.Folder}')/files/add(overwrite=true, url='{fileInfo.Name}.{fileInfo.Extension}')?'";
 
-            using var requestContent = new StreamContent(memoryStream);
-            memoryStream.Position = 0;
+            using var requestContent = new StreamContent(stream);
+            stream.Position = 0;
             requestContent.Headers.ContentType = new MediaTypeHeaderValue(fileInfo.ContentType);
 
             using var response = await _client.PostAsync(fileCollectionEndpoint, requestContent);

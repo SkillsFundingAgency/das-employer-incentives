@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Data.Reports;
+using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using SFA.DAS.EmployerIncentives.Reports.Excel;
+using SFA.DAS.EmployerIncentives.Reports.Excel.Metrics;
 using SFA.DAS.EmployerIncentives.Reports.Respositories;
 
 namespace SFA.DAS.EmployerIncentives.Reports
@@ -10,8 +12,8 @@ namespace SFA.DAS.EmployerIncentives.Reports
         public static IServiceCollection AddReportServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IReportsRepository, AzureBlobRepository>();
-            serviceCollection.AddScoped<IExcelReports, ExcelReportsService>();
             serviceCollection.AddScoped<IReportsDataRepository, ReportsDataRepository>();
+            serviceCollection.AddScoped<IExcelReportGenerator<MetricsReport>, MetricsReportGenerator>();
 
             return serviceCollection;
         }

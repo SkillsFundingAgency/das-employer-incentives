@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class ValidationSummaryTable
     {
@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             var cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Validation");
+            cell.AddComment("This shows the last validation record status of each earning.  If the last validation has passed and the earning is due then it should be paid.");
 
             cell = currentRow.CreateCell(++cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
@@ -36,10 +37,12 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             cell = currentRow.CreateCell(++cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue($"R{collectionPeriod.Period}");
+            cell.AddComment("Shows only this months validation record status.");
 
             cell = currentRow.CreateCell(++cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("YTD");
+            cell.AddComment("Shows only the validation status for all records for the academic year to date.");
         }
 
         private void AddValidRow(PeriodValidationSummary validationSummary)

@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class CollectionPeriodTable
     {

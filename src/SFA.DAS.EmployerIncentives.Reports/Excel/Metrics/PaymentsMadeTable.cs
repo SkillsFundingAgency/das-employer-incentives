@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class PaymentsMadeTable
     {
@@ -41,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             var cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Payment Year");
+            cell.AddComment("Shows all the payments that have been made in each monthly run.");
 
             cell = currentRow.CreateCell(++cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
@@ -106,8 +107,9 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             var cellNumber = _context.StartCellNumber;
 
             var cell = currentPeriodRow.CreateCell(cellNumber);
-            cell.SetCellValue("Percentage of validation records paid");
-            cellNumber = cellNumber + 3;
+            cell.SetCellValue("Percentage of validation records paid");            
+            cellNumber += 3;
+            
 
             cell = currentPeriodRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Percentage];
@@ -116,6 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             {
                 cell.SetCellValue((paymentsMade.Where(p => p.Year == collectionPeriod.AcademicYear && p.Period == collectionPeriod.Period).Sum(p => p.Amount)) / validationSummary.ValidRecords.PeriodAmount);
             }
+            cell.AddComment("If this is not 100% then there are some records which have passed validation which have not been paid. Check the Payments table against any 'unpaid' validation records.");
         }
     }
 }

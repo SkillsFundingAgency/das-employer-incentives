@@ -1,4 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Data.Reports;
+using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
+using SFA.DAS.EmployerIncentives.Reports;
 using SFA.DAS.EmployerIncentives.Reports.Excel;
 using System;
 using System.Threading;
@@ -8,18 +11,27 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 {
     public class SendMetricsReportCommandHandler : ICommandHandler<SendMetricsReportCommand>
     {
-        private readonly IExcelReports _reports;
+        private readonly IReportsDataRepository _reportsDataRepository;
+        private readonly IReportsRepository _reportsRepository;
+        private readonly IExcelReportGenerator<MetricsReport> _metricsExcelReportGenerator;
 
-        public SendMetricsReportCommandHandler(IExcelReports reports)
+        public SendMetricsReportCommandHandler(
+            IReportsDataRepository reportsDataRepository,
+            IReportsRepository reportsRepository,
+            IExcelReportGenerator<MetricsReport> metricsExcelReportGenerator)
         {
-            _reports = reports;
+            _reportsDataRepository = reportsDataRepository;
+            _reportsRepository = reportsRepository;
+            _metricsExcelReportGenerator = metricsExcelReportGenerator;
         }
 
         public async Task Handle(SendMetricsReportCommand command, CancellationToken cancellationToken = default)
         {
-            var report = await _reports.GenerateMetricsReport();
-            report.SetName($"{DateTime.Today:yyMMdd}_{report.Name}");
-            await _reports.Save(report);
+            var report = await _reportsDataRepository.Execute<MetricsReport>();
+
+            await _reportsRepository.Save(
+                new ReportsFileInfo($"{DateTime.Today:yyMMdd}_{report.Name}", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics"), 
+                _metricsExcelReportGenerator.Create(report));
         }
     }
 }

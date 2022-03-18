@@ -1,4 +1,4 @@
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -7,13 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Dapper.SqlMapper;
 
-namespace SFA.DAS.EmployerIncentives.Data
+namespace SFA.DAS.EmployerIncentives.Data.Reports
 {
-    public interface IReportsDataRepository
-    {
-        Task<MetricsReport> Execute();
-    }
-
     public class ReportsDataRepository : IReportsDataRepository
     {
         private readonly string _connectionString;
@@ -23,12 +18,17 @@ namespace SFA.DAS.EmployerIncentives.Data
             _connectionString = options.Value.DbConnectionString;
         }
 
-        public async Task<MetricsReport> Execute()
+        public async Task<T> Execute<T>() where T : class, IReport
         {
+            if (typeof(T) != typeof(MetricsReport))
+            {
+                return default;
+            }
+
             using var dbConnection = new SqlConnection(_connectionString);
             var results = await dbConnection.QueryMultipleAsync("reports.MetricsReport", commandType: System.Data.CommandType.StoredProcedure);
 
-            return new MetricsReport
+            var report = new MetricsReport
             {
                 CollectionPeriod = results.Read<CollectionPeriod>().SingleOrDefault(),
                 PaymentsMade = results.Read<PaymentsMade>().ToList(),
@@ -42,6 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                     InvalidRecords = results.Read<PeriodValidationSummary.ValidationSummaryRecord>().SingleOrDefault()
                 }
             };
-        }      
+
+            return report as T;
+        }
     }
 }

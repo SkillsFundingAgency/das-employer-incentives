@@ -2,29 +2,33 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
-    public class MetricsReportGenerator
+    public class MetricsReportGenerator : IExcelReportGenerator<MetricsReport>
     {
         private readonly XSSFWorkbook _workbook;
         private readonly IDictionary<Style, ICellStyle> _styles;
-        private readonly MetricsReport _metricsReport;
+        private readonly MemoryStream _ms;
+        private bool _isDisposed;
 
-        public MetricsReportGenerator(MetricsReport metricsReport)
+        public MetricsReportGenerator()
         {
             _workbook = new XSSFWorkbook();
-            _metricsReport = metricsReport;
             _styles = CreateStyles(_workbook);
+            _ms = new MemoryStream();
         }
 
-        public void Create(Stream stream)
+        public Stream Create(MetricsReport report)
         {
-            CreateMainSheet(_workbook, _metricsReport, _styles);
-            CreateYTDSheet(_workbook, _metricsReport, _styles);
-            _workbook.Write(stream, true);
+            CreateMainSheet(_workbook, report, _styles);
+            CreateYTDSheet(_workbook, report, _styles);
+
+            _workbook.Write(_ms, true);
+            return _ms;
         }
 
         private static void CreateMainSheet(IWorkbook workbook, MetricsReport report, IDictionary<Style, ICellStyle> styles)
@@ -38,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             new ValidationSummaryTable(context).Create(report);
             new EarningsSummaryTable(context).Create(report);
             new AccountedForEarningsTable(context).Create(report);
-            new ClawbacksSummaryTable(context).Create(report);            
+            new ClawbacksSummaryTable(context).Create(report);
             new EarningsTable(new Context(mainSheet, styles, 3, 6)).Create(report);
 
             mainSheet.SetColumnWidths(0, 9, 20);
@@ -86,6 +90,26 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             styles.Add(Style.CurrencyBold, currencyBoldStyle);
 
             return styles;
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _ms.Dispose();
+                }
+
+                _isDisposed = true;
+            }
         }
     }
 }

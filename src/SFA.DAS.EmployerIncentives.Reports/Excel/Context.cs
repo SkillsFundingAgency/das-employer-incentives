@@ -1,7 +1,7 @@
 ﻿using NPOI.SS.UserModel;
 using System.Collections.Generic;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports
+namespace SFA.DAS.EmployerIncentives.Reports.Excel
 {
     public class Context
     {

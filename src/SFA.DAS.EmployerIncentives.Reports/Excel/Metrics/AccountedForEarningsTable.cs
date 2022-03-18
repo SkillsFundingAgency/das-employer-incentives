@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class AccountedForEarningsTable
     {
@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             var cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
             cell.SetCellValue("Accounted for earnings");
+            cell.AddComment("Paid vs Validation fails");
 
             cellNumber += 3;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class EarningsTable
     {
@@ -29,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             var cell = currentRow.CreateCell(cellNumber);
             cell.SetCellValue("Earnings");
             cell.CellStyle = _context.Styles[Style.Bold];
+            cell.AddComment("This shows the earnings records on a monthly basis. As validation failures can occur these payments may not be paid in the month the earning is due.");
         }
 
         private void AddHeaderRow()

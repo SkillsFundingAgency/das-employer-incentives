@@ -1,9 +1,8 @@
-﻿using NPOI.SS.UserModel;
-using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
+﻿using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
+namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 {
     public class EarningsSummaryTable
     {
@@ -47,6 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports.Metrics
             var cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Default];
             cell.SetCellValue($"R{collectionPeriod.Period} YTD Earnings");
+            cell.AddComment("This shows the earnings which are 'due'. We use the YTD figure as we do not know when the earning will pass validation.  This means that it can be paid in any month on or after the date it is due.");
 
             cellNumber += 4;
 

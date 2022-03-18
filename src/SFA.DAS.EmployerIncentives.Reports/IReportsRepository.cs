@@ -5,6 +5,6 @@ namespace SFA.DAS.EmployerIncentives.Reports
 {
     public interface IReportsRepository
     {
-        Task Save(ReportsFileInfo fileInfo, MemoryStream memoryStream);
+        Task Save(ReportsFileInfo fileInfo, Stream stream);
     }
 }

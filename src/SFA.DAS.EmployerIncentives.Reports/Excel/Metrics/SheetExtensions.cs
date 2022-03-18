@@ -1,7 +1,7 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-namespace SFA.DAS.EmployerIncentives.Reports.Reports
+namespace SFA.DAS.EmployerIncentives.Reports.Excel
 {
     public static class SheetExtensions
     {
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Reports
         public static void AddComment(this ICell cell, string comment)
         {
             cell.CellComment = cell.Sheet.CreateDrawingPatriarch().CreateCellComment(cell.Sheet.Workbook.GetCreationHelper().CreateClientAnchor());
-            cell.CellComment.String = new XSSFRichTextString(comment);
+            cell.CellComment.String = new XSSFRichTextString(comment);            
         }
 
         public static int ToInt(this bool value)

@@ -2,9 +2,9 @@
 
 namespace SFA.DAS.EmployerIncentives.Data.Reports.Metrics
 {
-    public class MetricsReport
+    public class MetricsReport : IReport
     {
-        public string Name { get; private set; }
+        public string Name { get;}
 
         public CollectionPeriod CollectionPeriod { get; set; }
         public IEnumerable<PaymentsMade> PaymentsMade { get; set; }
@@ -21,10 +21,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports.Metrics
             Earnings = new List<Earning>();
             PeriodValidations = new List<Validation>();
             YtdValidations = new List<Validation>();
-        }
-        public void SetName(string name)
-        {
-            Name = name;
         }
     }
 }

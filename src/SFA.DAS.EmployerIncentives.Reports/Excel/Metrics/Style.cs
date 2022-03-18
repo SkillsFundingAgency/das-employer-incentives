@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.EmployerIncentives.Reports.Reports
+﻿namespace SFA.DAS.EmployerIncentives.Reports.Excel
 {
     public enum Style
     {
