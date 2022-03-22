@@ -281,16 +281,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             serviceCollection.AddTransient<IEmploymentCheckService>(s =>
             {
-                var settings = s.GetService<IOptions<EmploymentCheckApi>>().Value;
+                var settings = s.GetService<IOptions<EmployerIncentivesOuterApi>>().Value;
 
                 var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()
+                    .WithApimAuthorisationHeader(settings)
                     .WithLogging(s.GetService<ILoggerFactory>());
-
-                if (!string.IsNullOrEmpty(settings.Identifier))
-                {
-                    clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
-                }
 
                 var client = clientBuilder.Build();
 
@@ -301,7 +297,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new EmploymentCheckService(client);
+                return new EmploymentCheckService(client, settings.ApiVersion);
             });
 
             return serviceCollection;
