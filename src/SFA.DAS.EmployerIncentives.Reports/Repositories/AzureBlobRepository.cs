@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
         public AzureBlobRepository(IOptions<ApplicationSettings> options)
         {
             _connectionString = options.Value.ReportsConnectionString;
-            _containerName = options.Value.ReportsContainerName;
+            _containerName = string.IsNullOrEmpty(options.Value.ReportsContainerName) ? "Reports" : options.Value.ReportsContainerName;
         }
 
         public async Task Save(ReportsFileInfo fileInfo, Stream stream)
