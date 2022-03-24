@@ -20,6 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
 
         public async Task Save(ReportsFileInfo fileInfo, Stream stream)
         {
+            if (string.IsNullOrEmpty(_connectionString))
+            {
+                return;
+            }
+
             var container = new BlobContainerClient(_connectionString, _containerName);
             container.CreateIfNotExists();
 
