@@ -11,16 +11,18 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
     {
         private readonly string _connectionString;
         private readonly string _containerName;
+        private readonly bool _canSave;
 
         public AzureBlobRepository(IOptions<ApplicationSettings> options)
         {
             _connectionString = options.Value.ReportsConnectionString;
+            _canSave = !string.IsNullOrEmpty(_connectionString);
             _containerName = string.IsNullOrEmpty(options.Value.ReportsContainerName) ? "Reports" : options.Value.ReportsContainerName;
         }
 
         public async Task Save(ReportsFileInfo fileInfo, Stream stream)
         {
-            if (string.IsNullOrEmpty(_connectionString))
+            if (!_canSave)
             {
                 return;
             }

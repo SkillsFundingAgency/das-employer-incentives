@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.Extensions.Options;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -10,14 +12,23 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
     public class SharepointRepository : IReportsRepository
     {
         private readonly HttpClient _client;
+        private readonly bool _canSave;
 
-        public SharepointRepository(HttpClient client)
+        public SharepointRepository(
+            HttpClient client,
+            IOptions<ApplicationSettings> options)
         {
             _client = client;
+            _canSave = !string.IsNullOrEmpty(options.Value.ReportsConnectionString);
         }
 
         public async Task Save(ReportsFileInfo fileInfo, Stream stream)
         {
+            if (!_canSave)
+            {
+                return;
+            }
+
             var fileCollectionEndpoint = $"sp.appcontextsite(@target)/web/getfolderbyserverrelativeurl('{fileInfo.Folder}')/files/add(overwrite=true, url='{fileInfo.Name}.{fileInfo.Extension}')?'";
 
             using var requestContent = new StreamContent(stream);
