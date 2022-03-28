@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
                 return;
             }
 
-            incentive.UpdateEmploymentCheck(new EmploymentCheckResult(command.CorrelationId, command.Result, command.DateChecked));
+            incentive.UpdateEmploymentCheck(new EmploymentCheckResult(command.CorrelationId, command.Result, command.DateChecked, command.ErrorType));
 
             await _incentiveDomainRepository.Save(incentive);
         }

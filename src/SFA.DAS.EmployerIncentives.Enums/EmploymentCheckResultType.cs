@@ -4,8 +4,6 @@
     {
         Employed = 0,
         NotEmployed = 1,
-        HMRCUnknown = 2,
-        NoNINOFound = 3,
-        NoAccountFound = 4
+        Error = 2
     }
 }
