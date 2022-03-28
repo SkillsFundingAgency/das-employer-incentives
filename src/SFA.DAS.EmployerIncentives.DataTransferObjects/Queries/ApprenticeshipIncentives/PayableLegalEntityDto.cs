@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives
+﻿namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives
 {
     public class PayableLegalEntityDto
     {

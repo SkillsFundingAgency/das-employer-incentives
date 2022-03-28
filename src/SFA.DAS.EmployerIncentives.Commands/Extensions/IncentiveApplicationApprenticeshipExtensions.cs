@@ -1,8 +1,8 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
-using SFA.DAS.EmployerIncentives.Domain.Factories;
+﻿using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Extensions
 {

@@ -2,11 +2,11 @@
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Commands.AccountVrfCaseStatus;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects
 {
     public class AccountDto
     {

@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+﻿using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication
 {

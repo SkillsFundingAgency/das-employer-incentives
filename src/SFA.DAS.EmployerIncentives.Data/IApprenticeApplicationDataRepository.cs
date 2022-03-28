@@ -1,7 +1,7 @@
 ﻿using System;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {

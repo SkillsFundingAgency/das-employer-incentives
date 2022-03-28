@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 
 namespace SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollectionPeriod
@@ -18,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollect
         {
             var collectionCalendar = await _collectionCalendarService.Get();
             var activePeriod = collectionCalendar.GetActivePeriod();
-            return new GetActiveCollectionPeriodResponse(new Abstractions.DTOs.Queries.ApprenticeshipIncentives.CollectionPeriodDto() 
+            return new GetActiveCollectionPeriodResponse(new CollectionPeriodDto() 
             {
                 CollectionPeriodNumber = activePeriod.CollectionPeriod.PeriodNumber,
                 CollectionYear = activePeriod.CollectionPeriod.AcademicYear,

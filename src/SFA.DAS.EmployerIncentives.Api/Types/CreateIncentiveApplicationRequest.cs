@@ -1,6 +1,6 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.Types
 {

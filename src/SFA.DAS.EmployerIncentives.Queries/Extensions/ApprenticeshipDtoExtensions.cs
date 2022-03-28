@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+﻿using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using SFA.DAS.EmployerIncentives.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Queries.Extensions

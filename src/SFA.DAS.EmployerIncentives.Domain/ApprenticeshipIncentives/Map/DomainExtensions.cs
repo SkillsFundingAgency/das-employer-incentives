@@ -1,8 +1,8 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+﻿using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
 {

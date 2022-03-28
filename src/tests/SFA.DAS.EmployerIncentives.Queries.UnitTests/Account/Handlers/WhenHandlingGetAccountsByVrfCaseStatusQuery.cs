@@ -4,10 +4,10 @@ using SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus;
 using Moq;
 using AutoFixture;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
 {

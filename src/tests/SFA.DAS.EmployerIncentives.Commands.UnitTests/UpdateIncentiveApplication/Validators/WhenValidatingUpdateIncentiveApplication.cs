@@ -1,8 +1,8 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

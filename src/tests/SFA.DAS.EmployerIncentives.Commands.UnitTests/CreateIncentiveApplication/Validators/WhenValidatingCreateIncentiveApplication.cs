@@ -4,9 +4,8 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Commands.CreateIncentiveApplication;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.CreateIncentiveApplication.Validators
 {

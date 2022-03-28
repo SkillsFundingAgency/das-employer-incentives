@@ -1,10 +1,10 @@
 ﻿using AutoFixture;
 using Dapper;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;

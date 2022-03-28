@@ -1,7 +1,7 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Commands
 {
     public class IncentiveApplicationApprenticeshipDto
     {

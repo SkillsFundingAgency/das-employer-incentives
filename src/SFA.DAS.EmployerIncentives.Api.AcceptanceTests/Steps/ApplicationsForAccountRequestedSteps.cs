@@ -11,7 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Dapper.Contrib.Extensions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using TechTalk.SpecFlow;
 using ApprenticeshipIncentive = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive;

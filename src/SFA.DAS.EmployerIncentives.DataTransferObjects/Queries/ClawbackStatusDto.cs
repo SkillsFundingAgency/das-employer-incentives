@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
 {
     public class ClawbackStatusDto
     {

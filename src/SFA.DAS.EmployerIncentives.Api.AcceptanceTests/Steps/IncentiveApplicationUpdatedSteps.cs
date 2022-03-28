@@ -2,9 +2,9 @@
 using CSScriptLib;
 using Dapper;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
