@@ -7,7 +7,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetApplications
 {
     public class GetApplicationsResponse
     {
-        public IEnumerable<ApprenticeApplicationDto> ApprenticeApplications { get; set; }
+        public IEnumerable<ApprenticeApplication> ApprenticeApplications { get; set; }
         public BankDetailsStatus BankDetailsStatus { get; set; }
         public Guid? FirstSubmittedApplicationId { get; set; }
     }

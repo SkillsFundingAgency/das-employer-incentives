@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 
         public int PaymentRequestsLimit => _businessCentralFinancePaymentsService.PaymentRequestsLimit;
 
-        public async Task SendPaymentRequests(IList<PaymentDto> payments)
+        public async Task SendPaymentRequests(IList<Payment> payments)
         {
             var paymentRequests = payments.Select(x => x.Map(_obfuscateSensitiveData)).ToList();
 

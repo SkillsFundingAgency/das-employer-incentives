@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollect
         {
             var collectionCalendar = await _collectionCalendarService.Get();
             var activePeriod = collectionCalendar.GetActivePeriod();
-            return new GetActiveCollectionPeriodResponse(new CollectionPeriodDto() 
+            return new GetActiveCollectionPeriodResponse(new CollectionPeriod() 
             {
                 CollectionPeriodNumber = activePeriod.CollectionPeriod.PeriodNumber,
                 CollectionYear = activePeriod.CollectionPeriod.AcademicYear,

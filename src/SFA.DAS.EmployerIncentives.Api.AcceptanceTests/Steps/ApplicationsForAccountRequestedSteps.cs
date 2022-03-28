@@ -14,6 +14,7 @@ using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using TechTalk.SpecFlow;
+using ApprenticeApplication = SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeApplication;
 using ApprenticeshipIncentive = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive;
 using ClawbackPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ClawbackPayment;
 using EmploymentCheck = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.EmploymentCheck;
@@ -759,8 +760,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             return numericValue;
         }
 
-        private static PaymentStatusDto GetPaymentStatus(EarningType earningType,
-            ApprenticeApplicationDto apprenticeshipApplication)
+        private static PaymentStatus GetPaymentStatus(EarningType earningType,
+            ApprenticeApplication apprenticeshipApplication)
         {
             var paymentStatus = apprenticeshipApplication.FirstPaymentStatus;
             if (earningType == EarningType.SecondPayment)
@@ -771,8 +772,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             return paymentStatus;
         }
 
-        private static ClawbackStatusDto GetClawbackStatus(EarningType earningType,
-            ApprenticeApplicationDto apprenticeshipApplication)
+        private static ClawbackStatus GetClawbackStatus(EarningType earningType,
+            ApprenticeApplication apprenticeshipApplication)
         {
             var clawbackStatus = apprenticeshipApplication.FirstClawbackStatus;
             if (earningType == EarningType.SecondPayment)

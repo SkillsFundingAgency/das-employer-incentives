@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprent
 {
     public class GetApprenticeshipIncentivesResponse: IResponseLogWriter
     {
-        public List<ApprenticeshipIncentiveDto> ApprenticeshipIncentives { get; }
+        public List<ApprenticeshipIncentive> ApprenticeshipIncentives { get; }
 
-        public GetApprenticeshipIncentivesResponse(List<ApprenticeshipIncentiveDto> apprenticeshipIncentives)
+        public GetApprenticeshipIncentivesResponse(List<ApprenticeshipIncentive> apprenticeshipIncentives)
         {
             ApprenticeshipIncentives = apprenticeshipIncentives;
         }

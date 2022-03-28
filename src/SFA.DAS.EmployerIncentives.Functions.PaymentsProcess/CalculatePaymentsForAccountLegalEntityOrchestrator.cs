@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
             var pendingPayments =
-                await context.CallActivityAsync<List<PendingPaymentActivityDto>>(
+                await context.CallActivityAsync<List<PendingPaymentActivity>>(
                     nameof(GetPendingPaymentsForAccountLegalEntity), accountLegalEntityCollectionPeriod);
 
             Task allValidatePaymentTasks = null;

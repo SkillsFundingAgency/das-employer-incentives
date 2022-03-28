@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives
 {
-    public class PendingPaymentDto
+    public class PendingPayment
     {
         public Guid Id { get; set; }
         public byte? PeriodNumber { get; set; }

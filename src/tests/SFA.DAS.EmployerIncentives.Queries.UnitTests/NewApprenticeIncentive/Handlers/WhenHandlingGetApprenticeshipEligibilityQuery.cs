@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprenticeshipEligibility;
 using SFA.DAS.EmployerIncentives.ValueObjects;
+using Apprenticeship = SFA.DAS.EmployerIncentives.DataTransferObjects.Apprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Handlers
 {
@@ -32,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             //Arrange
             var query = _fixture.Create<GetApprenticeshipEligibilityRequest>();
             
-            _eligibilityService.Setup(x => x.IsApprenticeshipEligible(It.Is<Apprenticeship>(y => ApprenticeshipMatchesDto(query.Apprenticeship, y)))).ReturnsAsync(isEligible);
+            _eligibilityService.Setup(x => x.IsApprenticeshipEligible(It.Is<ValueObjects.Apprenticeship>(y => ApprenticeshipMatchesDto(query.Apprenticeship, y)))).ReturnsAsync(isEligible);
 
             //Act
             var result = await _sut.Handle(query, CancellationToken.None);
@@ -41,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
             result.IsEligible.Should().Be(isEligible);
         }
 
-        private bool ApprenticeshipMatchesDto(ApprenticeshipDto dto, Apprenticeship valueObject)
+        private bool ApprenticeshipMatchesDto(Apprenticeship dto, ValueObjects.Apprenticeship valueObject)
         {
             return dto.IsApproved == valueObject.IsApproved &&
                    dto.StartDate == valueObject.StartDate &&

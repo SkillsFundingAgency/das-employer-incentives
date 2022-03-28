@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
         {
             //Arrange
             var query = _fixture.Create<GetApprenticeshipIncentivesRequest>();
-            var data = _fixture.CreateMany<ApprenticeshipIncentiveDto>().ToList();
+            var data = _fixture.CreateMany<ApprenticeshipIncentive>().ToList();
             var expected = new GetApprenticeshipIncentivesResponse(data);
 
             _repositoryMock.Setup(x => x.GetList()).ReturnsAsync(data);

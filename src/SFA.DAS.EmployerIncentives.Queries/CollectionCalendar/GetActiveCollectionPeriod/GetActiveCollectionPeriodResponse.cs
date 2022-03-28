@@ -5,9 +5,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollect
 {
     public class GetActiveCollectionPeriodResponse : IResponseLogWriter
     {
-        public CollectionPeriodDto CollectionPeriod { get; }
+        public CollectionPeriod CollectionPeriod { get; }
 
-        public GetActiveCollectionPeriodResponse(CollectionPeriodDto collectionPeriod)
+        public GetActiveCollectionPeriodResponse(CollectionPeriod collectionPeriod)
         {
             CollectionPeriod = collectionPeriod;
         }

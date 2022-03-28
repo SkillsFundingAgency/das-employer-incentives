@@ -11,9 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
     public class GetApplicationQueryHandler : IQueryHandler<GetApplicationRequest, GetApplicationResponse>
     {
         private readonly IIncentiveApplicationQueryRepository _applicationQueryRepository;
-        private readonly IQueryRepository<LegalEntityDto> _legalEntityQueryRepository;
+        private readonly IQueryRepository<LegalEntity> _legalEntityQueryRepository;
 
-        public GetApplicationQueryHandler(IIncentiveApplicationQueryRepository applicationQueryRepository, IQueryRepository<LegalEntityDto> legalEntityQueryRepository)
+        public GetApplicationQueryHandler(IIncentiveApplicationQueryRepository applicationQueryRepository, IQueryRepository<LegalEntity> legalEntityQueryRepository)
         {
             _applicationQueryRepository = applicationQueryRepository;
             _legalEntityQueryRepository = legalEntityQueryRepository;

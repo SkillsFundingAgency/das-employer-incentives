@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
         {
             //Arrange
             var query = _fixture.Create<GetAccountsWithVrfCaseStatusRequest>();
-            var accountsList = _fixture.CreateMany<AccountDto>().ToList();
+            var accountsList = _fixture.CreateMany<DataTransferObjects.Account>().ToList();
             var expectedResponse = new GetAccountsWithVrfCaseStatusResponse
             {
                 Accounts = accountsList

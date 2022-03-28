@@ -7,9 +7,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetClawbac
 {
     public class GetClawbackLegalEntitiesResponse : IResponseLogWriterWithArgs
     {
-        public List<ClawbackLegalEntityDto> ClawbackLegalEntities { get; }
+        public List<ClawbackLegalEntity> ClawbackLegalEntities { get; }
 
-        public GetClawbackLegalEntitiesResponse(List<ClawbackLegalEntityDto> legalEntities)
+        public GetClawbackLegalEntitiesResponse(List<ClawbackLegalEntity> legalEntities)
         {
             ClawbackLegalEntities = legalEntities;
         }

@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using TechTalk.SpecFlow;
+using ApprenticeshipIncentive = SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives.ApprenticeshipIncentive;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -17,9 +18,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "ApprenticeshipIncentivesRequested")]
     public class ApprenticeshipIncentivesRequestedSteps : StepsBase
     {
-        private List<ApprenticeshipIncentiveDto> _apiResponse;
+        private List<ApprenticeshipIncentive> _apiResponse;
         private Account _account;
-        private ApprenticeshipIncentive _apprenticeshipIncentive;
+        private Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive _apprenticeshipIncentive;
 
         public ApprenticeshipIncentivesRequestedSteps(TestContext testContext) : base(testContext)
         {
@@ -29,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task GivenAnEmployerHasSubmittedApprenticeshipIncentives()
         {
             _account = TestContext.TestData.GetOrCreate<Account>();
-            _apprenticeshipIncentive = TestContext.TestData.GetOrCreate<ApprenticeshipIncentive>();
+            _apprenticeshipIncentive = TestContext.TestData.GetOrCreate<Data.ApprenticeshipIncentives.Models.ApprenticeshipIncentive>();
             _apprenticeshipIncentive.AccountId = _account.Id;
             _apprenticeshipIncentive.AccountLegalEntityId = _account.AccountLegalEntityId;
 
@@ -41,7 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_account.Id}/legalentities/{_account.AccountLegalEntityId}/apprenticeshipIncentives";
             var (status, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<List<ApprenticeshipIncentiveDto>>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<List<ApprenticeshipIncentive>>(url);
 
             status.Should().Be(HttpStatusCode.OK);
 

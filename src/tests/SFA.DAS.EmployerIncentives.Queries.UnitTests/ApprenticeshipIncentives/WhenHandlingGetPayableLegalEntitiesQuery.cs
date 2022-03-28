@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
         {
             //Arrange
             var query = _fixture.Create<GetPayableLegalEntitiesRequest>();
-            var data = _fixture.CreateMany<PayableLegalEntityDto>().ToList();
+            var data = _fixture.CreateMany<PayableLegalEntity>().ToList();
             var expected = new GetPayableLegalEntitiesResponse(data);
 
             _repositoryMock.Setup(x => x.GetPayableLegalEntities(query.CollectionPeriod.AcademicYear, query.CollectionPeriod.PeriodNumber)).ReturnsAsync(data);

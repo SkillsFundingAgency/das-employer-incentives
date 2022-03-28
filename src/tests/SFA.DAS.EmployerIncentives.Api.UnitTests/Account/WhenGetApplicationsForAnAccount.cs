@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 
             var apprenticeApplicationList = new GetApplicationsResponse
             {
-                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplicationDto>(),
+                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplication>(),
                 BankDetailsStatus = Enums.BankDetailsStatus.InProgress
             };
 

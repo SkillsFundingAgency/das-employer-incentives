@@ -8,9 +8,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPending
 {
     public class GetPendingPaymentsForAccountLegalEntityQueryHandler : IQueryHandler<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>
     {
-        private readonly IQueryRepository<PendingPaymentDto> _queryRepository;
+        private readonly IQueryRepository<PendingPayment> _queryRepository;
 
-        public GetPendingPaymentsForAccountLegalEntityQueryHandler(IQueryRepository<PendingPaymentDto> queryRepository)
+        public GetPendingPaymentsForAccountLegalEntityQueryHandler(IQueryRepository<PendingPayment> queryRepository)
         {
             _queryRepository = queryRepository;
         }

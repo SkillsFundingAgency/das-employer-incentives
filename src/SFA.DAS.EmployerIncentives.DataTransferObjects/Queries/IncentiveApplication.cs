@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
 {
-    public class IncentiveApplicationDto
+    public class IncentiveApplication
     {
         public Guid Id { get; set; }
         public long AccountId { get; set; }
@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
         public string SubmittedByName { get; set; }
         public bool BankDetailsRequired { get; set; }
         public bool NewAgreementRequired { get; set; }
-        public LegalEntityDto LegalEntity { get; set; }
-        public IEnumerable<IncentiveApplicationApprenticeshipDto> Apprenticeships { get; set; }
+        public LegalEntity LegalEntity { get; set; }
+        public IEnumerable<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }
     }
 }

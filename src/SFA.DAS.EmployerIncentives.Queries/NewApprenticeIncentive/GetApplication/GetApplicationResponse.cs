@@ -4,9 +4,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
 {
     public class GetApplicationResponse
     {
-        public IncentiveApplicationDto Application { get; }
+        public IncentiveApplication Application { get; }
 
-        public GetApplicationResponse(IncentiveApplicationDto application)
+        public GetApplicationResponse(IncentiveApplication application)
         {
             Application = application;
         }

@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
     public static class PaymentsDataExtensions
     {
-        public static BusinessCentralFinancePaymentRequest Map(this PaymentDto payment, bool obfuscatePrivateData)
+        public static BusinessCentralFinancePaymentRequest Map(this Payment payment, bool obfuscatePrivateData)
         {
             return new BusinessCentralFinancePaymentRequest
             {
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         }
 
 
-        private static string CreatePaymentLineDescription(PaymentDto payment, bool obfuscateSensitiveData)
+        private static string CreatePaymentLineDescription(Payment payment, bool obfuscateSensitiveData)
         {
             var uln = payment.ULN.ToString().ToCharArray();
             if (obfuscateSensitiveData)

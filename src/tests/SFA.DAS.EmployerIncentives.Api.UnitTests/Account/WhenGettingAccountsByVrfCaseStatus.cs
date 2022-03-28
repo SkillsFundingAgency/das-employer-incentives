@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var vrfStatus = LegalEntityVrfCaseStatus.RejectedVerification;
-            var expected = new GetAccountsWithVrfCaseStatusResponse { Accounts = _fixture.CreateMany<AccountDto>() };
+            var expected = new GetAccountsWithVrfCaseStatusResponse { Accounts = _fixture.CreateMany<DataTransferObjects.Account>() };
 
             _queryDispatcherMock.Setup(x => x.Send<GetAccountsWithVrfCaseStatusRequest, GetAccountsWithVrfCaseStatusResponse>(
                     It.Is<GetAccountsWithVrfCaseStatusRequest>(r => r.VrfStatus == vrfStatus)))

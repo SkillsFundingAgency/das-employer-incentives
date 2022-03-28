@@ -14,14 +14,14 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
     public class WhenHandlingGetPendingPaymentsForAccountLegalEntityQuery
     {
         private GetPendingPaymentsForAccountLegalEntityQueryHandler _sut;
-        private Mock<IQueryRepository<PendingPaymentDto>> _repositoryMock;
+        private Mock<IQueryRepository<PendingPayment>> _repositoryMock;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _repositoryMock = new Mock<IQueryRepository<PendingPaymentDto>>();
+            _repositoryMock = new Mock<IQueryRepository<PendingPayment>>();
             _sut = new GetPendingPaymentsForAccountLegalEntityQueryHandler(_repositoryMock.Object);
         }
 
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
         {
             //Arrange
             var query = _fixture.Create<GetPendingPaymentsForAccountLegalEntityRequest>();
-            var data = _fixture.CreateMany<PendingPaymentDto>().ToList();
+            var data = _fixture.CreateMany<PendingPayment>().ToList();
             var expected = new GetPendingPaymentsForAccountLegalEntityResponse(data);
 
             _repositoryMock.Setup(x => x.GetList(dto => dto.AccountLegalEntityId == query.AccountLegalEntityId && !dto.PaymentMadeDate.HasValue && (dto.PaymentYear < query.CollectionPeriod.AcademicYear || (dto.PaymentYear == query.CollectionPeriod.AcademicYear && dto.PeriodNumber <= query.CollectionPeriod.PeriodNumber)))).ReturnsAsync(data);

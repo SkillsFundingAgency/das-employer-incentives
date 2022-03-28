@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             var request = _fixture.Create<AddLegalEntityRequest>();
             var accountId = _fixture.Create<long>();
 
-            var expected = new LegalEntityDto { 
+            var expected = new LegalEntity { 
                 AccountId = accountId,
                 AccountLegalEntityId = request.AccountLegalEntityId,
                 LegalEntityId = request.LegalEntityId,

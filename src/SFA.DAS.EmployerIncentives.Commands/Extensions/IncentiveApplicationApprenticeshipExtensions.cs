@@ -8,7 +8,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Extensions
 {
     public static class IncentiveApplicationApprenticeshipExtensions
     {
-        public static IEnumerable<Apprenticeship> ToEntities(this IEnumerable<IncentiveApplicationApprenticeshipDto> dto, IIncentiveApplicationFactory factory)
+        public static IEnumerable<Apprenticeship> ToEntities(this IEnumerable<IncentiveApplicationApprenticeship> dto, IIncentiveApplicationFactory factory)
         {
             return dto.Select(
                 apprenticeship => factory.CreateApprenticeship(

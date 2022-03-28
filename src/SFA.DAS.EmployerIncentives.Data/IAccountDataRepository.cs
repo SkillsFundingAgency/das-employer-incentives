@@ -12,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Data
         Task Add(AccountModel account);
         Task<AccountModel> Find(long accountId);
         Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId);
-        Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus);       
+        Task<IEnumerable<DataTransferObjects.Account>> GetByVrfCaseStatus(string vrfCaseStatus);       
         Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime();
     }
 }

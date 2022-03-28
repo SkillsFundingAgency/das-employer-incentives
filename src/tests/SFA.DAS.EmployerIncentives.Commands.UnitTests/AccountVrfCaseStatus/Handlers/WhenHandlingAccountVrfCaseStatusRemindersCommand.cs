@@ -43,8 +43,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             // Arrange
             string vrfCaseStatus = null;
 
-            var accounts = _fixture.CreateMany<AccountDto>(10).ToList();
-            var applications = _fixture.CreateMany<ApprenticeApplicationDto>(3).ToList();
+            var accounts = _fixture.CreateMany<Account>(10).ToList();
+            var applications = _fixture.CreateMany<ApprenticeApplication>(3).ToList();
             for(var i=0; i < 3; i++)
             {
                 _applicationRepository.Setup(x => x.GetFirstSubmittedApplicationId(applications[i].AccountLegalEntityId)).ReturnsAsync(Guid.NewGuid());
@@ -67,8 +67,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             // Arrange
             string vrfCaseStatus = null;
 
-            var accounts = _fixture.CreateMany<AccountDto>(10).ToList();
-            var applications = _fixture.CreateMany<ApprenticeApplicationDto>(3).ToList();
+            var accounts = _fixture.CreateMany<Account>(10).ToList();
+            var applications = _fixture.CreateMany<ApprenticeApplication>(3).ToList();
             for (var i = 0; i < 3; i++)
             {
                 applications[i].ApplicationDate = _cutOffDate.AddDays(i);
@@ -92,8 +92,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             // Arrange
             string vrfCaseStatus = null;
 
-            var accounts = _fixture.CreateMany<AccountDto>(10).ToList();
-            var applications = new List<ApprenticeApplicationDto>();
+            var accounts = _fixture.CreateMany<Account>(10).ToList();
+            var applications = new List<ApprenticeApplication>();
 
             _accountRepository.Setup(x => x.GetByVrfCaseStatus(vrfCaseStatus)).ReturnsAsync(accounts);
             _applicationRepository.Setup(x => x.GetList(It.IsAny<long>(), It.IsAny<long>())).ReturnsAsync(applications);
@@ -112,11 +112,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.AccountVrfCaseStatus.Han
             // Arrange
             string vrfCaseStatus = null;
 
-            var accounts = _fixture.CreateMany<AccountDto>(2).ToList();
-            accounts[0].LegalEntities = _fixture.CreateMany<LegalEntityDto>(1).ToList();
-            accounts[1].LegalEntities = _fixture.CreateMany<LegalEntityDto>(1).ToList();
-            var applications1 = _fixture.CreateMany<ApprenticeApplicationDto>(1).ToList();
-            var applications2 = _fixture.CreateMany<ApprenticeApplicationDto>(1).ToList();
+            var accounts = _fixture.CreateMany<Account>(2).ToList();
+            accounts[0].LegalEntities = _fixture.CreateMany<LegalEntity>(1).ToList();
+            accounts[1].LegalEntities = _fixture.CreateMany<LegalEntity>(1).ToList();
+            var applications1 = _fixture.CreateMany<ApprenticeApplication>(1).ToList();
+            var applications2 = _fixture.CreateMany<ApprenticeApplication>(1).ToList();
 
             applications1[0].AccountId = accounts[0].AccountId;
             applications1[0].ApplicationDate = _cutOffDate.AddDays(5);

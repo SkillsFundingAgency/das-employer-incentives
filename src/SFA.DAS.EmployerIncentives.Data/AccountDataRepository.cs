@@ -69,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             return accounts?.Map();
         }
 
-        public async Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus)
+        public async Task<IEnumerable<DataTransferObjects.Account>> GetByVrfCaseStatus(string vrfCaseStatus)
         {
             var accountsWithApplications = await (from account in _dbContext.Accounts
                                            join application in _dbContext.Applications

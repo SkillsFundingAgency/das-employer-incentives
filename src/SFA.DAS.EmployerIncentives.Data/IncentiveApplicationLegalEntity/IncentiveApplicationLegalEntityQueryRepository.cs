@@ -9,7 +9,7 @@ using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplicationLegalEntity
 {
-    public class IncentiveApplicationLegalEntityQueryRepository : IQueryRepository<IncentiveApplicationLegalEntityDto>
+    public class IncentiveApplicationLegalEntityQueryRepository : IQueryRepository<DataTransferObjects.Queries.IncentiveApplicationLegalEntity>
     {
         private class JoinedObject
         {
@@ -25,23 +25,23 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplicationLegalEntity
             _lazyContext = context;
         }
 
-        public Task<IncentiveApplicationLegalEntityDto> Get(Expression<Func<IncentiveApplicationLegalEntityDto, bool>> predicate)
+        public Task<DataTransferObjects.Queries.IncentiveApplicationLegalEntity> Get(Expression<Func<DataTransferObjects.Queries.IncentiveApplicationLegalEntity, bool>> predicate)
         {
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationLegalEntityDto()).SingleOrDefaultAsync(predicate);
         }
 
-        public Task<List<IncentiveApplicationLegalEntityDto>> GetList(Expression<Func<IncentiveApplicationLegalEntityDto, bool>> predicate = null)
+        public Task<List<DataTransferObjects.Queries.IncentiveApplicationLegalEntity>> GetList(Expression<Func<DataTransferObjects.Queries.IncentiveApplicationLegalEntity, bool>> predicate = null)
         {
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationLegalEntityDto()).Where(predicate).ToListAsync();
         }
 
-        private Expression<Func<JoinedObject, IncentiveApplicationLegalEntityDto>> MapToIncentiveApplicationLegalEntityDto()
+        private Expression<Func<JoinedObject, DataTransferObjects.Queries.IncentiveApplicationLegalEntity>> MapToIncentiveApplicationLegalEntityDto()
         {
-            return x => new IncentiveApplicationLegalEntityDto
+            return x => new DataTransferObjects.Queries.IncentiveApplicationLegalEntity
             {
                 ApplicationId = x.Application.Id,
                 ApplicationStatus = x.Application.Status,

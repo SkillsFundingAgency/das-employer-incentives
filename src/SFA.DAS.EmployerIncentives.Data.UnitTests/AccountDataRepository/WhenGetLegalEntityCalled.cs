@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<LegalEntityDto> _sut;
+        private IQueryRepository<LegalEntity> _sut;
 
         [SetUp]
         public void Arrange()

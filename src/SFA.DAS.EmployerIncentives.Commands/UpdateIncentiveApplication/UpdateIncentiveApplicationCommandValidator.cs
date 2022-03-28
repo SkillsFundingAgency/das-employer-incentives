@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
             return Task.FromResult(result);
         }
 
-        private static void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
+        private static void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeship> apprenticeships)
         {
             if (apprenticeships == null)
             {
@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
             }
         }
 
-        private static void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
+        private static void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeship apprenticeship)
         {
             if (apprenticeship.ApprenticeshipId == default)
             {

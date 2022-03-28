@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             const long accountId = 7;
-            var expected = new GetLegalEntitiesResponse { LegalEntities = _fixture.CreateMany<LegalEntityDto>() };
+            var expected = new GetLegalEntitiesResponse { LegalEntities = _fixture.CreateMany<LegalEntity>() };
 
             _queryDispatcherMock.Setup(x => x.Send<GetLegalEntitiesRequest, GetLegalEntitiesResponse>(
                     It.Is<GetLegalEntitiesRequest>(r => r.AccountId == accountId)))

@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayable
 {
     public class GetPayableLegalEntitiesResponse : IResponseLogWriterWithArgs
     {
-        public List<PayableLegalEntityDto> PayableLegalEntities { get; }
+        public List<PayableLegalEntity> PayableLegalEntities { get; }
 
-        public GetPayableLegalEntitiesResponse(List<PayableLegalEntityDto> legalEntities)
+        public GetPayableLegalEntitiesResponse(List<PayableLegalEntity> legalEntities)
         {
             PayableLegalEntities = legalEntities;
         }

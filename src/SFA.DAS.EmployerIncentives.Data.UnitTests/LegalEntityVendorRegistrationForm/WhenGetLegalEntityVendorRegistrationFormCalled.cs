@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LegalEntityVendorRegistratio
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<LegalEntityVendorRegistrationFormDto> _sut;
+        private IQueryRepository<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm> _sut;
 
         [SetUp]
         public void Arrange()

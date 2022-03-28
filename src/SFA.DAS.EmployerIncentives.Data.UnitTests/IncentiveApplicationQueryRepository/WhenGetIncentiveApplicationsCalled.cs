@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             //Assert
             actual.Apprenticeships.Count().Should().Be(4);
 
-            IncentiveApplicationApprenticeshipDto previous = null;
+            DataTransferObjects.Queries.IncentiveApplicationApprenticeship previous = null;
             foreach (var apprenticeship in actual.Apprenticeships)
             {
                 if (previous != null)

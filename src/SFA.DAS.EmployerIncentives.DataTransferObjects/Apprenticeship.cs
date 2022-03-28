@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.DataTransferObjects
 {
-    public class ApprenticeshipDto
+    public class Apprenticeship
     {
         public long UniqueLearnerNumber { get; set; }
         public DateTime StartDate { get; set; }

@@ -18,8 +18,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IPaymentsQueryRepository> _mockPayableLegalEntityQueryRepository;
         private Mock<IPaymentDataRepository> _mockPaymentDataRepository;
         private Mock<IBusinessCentralFinancePaymentsService> _mockBusinessCentralFinancePaymentsService;
-        private List<PaymentDto> _paymentsToSend;
-        private List<PaymentDto> _unsentPayments;
+        private List<Payment> _paymentsToSend;
+        private List<Payment> _unsentPayments;
         private int _paymentRequestsLimit;
 
         private SendPaymentRequestsCommand _command;
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockBusinessCentralFinancePaymentsService = new Mock<IBusinessCentralFinancePaymentsService>();
             _mockBusinessCentralFinancePaymentsService.Setup(x => x.PaymentRequestsLimit)
                 .Returns(_paymentRequestsLimit);
-            _paymentsToSend = _fixture.CreateMany<PaymentDto>(5).ToList();
+            _paymentsToSend = _fixture.CreateMany<Payment>(5).ToList();
             _unsentPayments = _paymentsToSend.TakeLast(5 - _paymentRequestsLimit).ToList();
 
             _command = new SendPaymentRequestsCommand(_fixture.Create<long>(), _fixture.Create<DateTime>(), new Domain.ValueObjects.CollectionPeriod(_fixture.Create<byte>(), _fixture.Create<short>()));
@@ -56,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _mockBusinessCentralFinancePaymentsService.Verify(x =>
-                x.SendPaymentRequests(It.Is<List<PaymentDto>>(p => p.Count == _paymentRequestsLimit && p[0] == _paymentsToSend[0])));
+                x.SendPaymentRequests(It.Is<List<Payment>>(p => p.Count == _paymentRequestsLimit && p[0] == _paymentsToSend[0])));
         }
 
         [Test]
@@ -85,9 +85,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             // Assert
             _mockBusinessCentralFinancePaymentsService.Verify(x =>
-                x.SendPaymentRequests(It.Is<List<PaymentDto>>(p => p.Count == _paymentRequestsLimit && p[0] == _paymentsToSend[0])));
+                x.SendPaymentRequests(It.Is<List<Payment>>(p => p.Count == _paymentRequestsLimit && p[0] == _paymentsToSend[0])));
             _mockBusinessCentralFinancePaymentsService.Verify(x =>
-                x.SendPaymentRequests(It.Is<List<PaymentDto>>(p => p.Count == 2 && p[0] == _paymentsToSend[3])));
+                x.SendPaymentRequests(It.Is<List<Payment>>(p => p.Count == 2 && p[0] == _paymentsToSend[3])));
         }
 
         [Test]

@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             const long accountId = 6;
             const long accountLegalEntityId = 7;
-            var expected = new GetLegalEntityResponse { LegalEntity = _fixture.Create<LegalEntityDto>() };
+            var expected = new GetLegalEntityResponse { LegalEntity = _fixture.Create<LegalEntity>() };
 
             _queryDispatcherMock.Setup(x => x.Send<GetLegalEntityRequest, GetLegalEntityResponse>(
                     It.Is<GetLegalEntityRequest>(r => r.AccountId == accountId && r.AccountLegalEntityId == accountLegalEntityId)))

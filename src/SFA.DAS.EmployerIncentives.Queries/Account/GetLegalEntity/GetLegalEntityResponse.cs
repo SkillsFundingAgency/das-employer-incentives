@@ -4,6 +4,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity
 {
     public class GetLegalEntityResponse
     {
-        public LegalEntityDto LegalEntity { get; set; }
+        public LegalEntity LegalEntity { get; set; }
     }
 }

@@ -17,14 +17,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
     {
         private Fixture _fixture;
         private GetAllApprenticeshipIncentives _sut;
-        private List<ApprenticeshipIncentiveDto> _apprenticeshipIncentives;
+        private List<ApprenticeshipIncentive> _apprenticeshipIncentives;
         private Mock<IQueryDispatcher> _mockQueryDispatcher;
 
         [SetUp]
         public void Setup()
         {
             _fixture = new Fixture();
-            _apprenticeshipIncentives = _fixture.CreateMany<ApprenticeshipIncentiveDto>(3).ToList();
+            _apprenticeshipIncentives = _fixture.CreateMany<ApprenticeshipIncentive>(3).ToList();
             _mockQueryDispatcher = new Mock<IQueryDispatcher>();
             _mockQueryDispatcher
                 .Setup(x =>

@@ -3,7 +3,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
 {
-    public class IncentiveApplicationLegalEntityDto
+    public class IncentiveApplicationLegalEntity
     {
         public Guid ApplicationId { get; set; }
         public long LegalEntityId { get; set; }

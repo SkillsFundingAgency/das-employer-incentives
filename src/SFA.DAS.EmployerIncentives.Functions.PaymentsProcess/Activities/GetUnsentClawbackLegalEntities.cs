@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         }
 
         [FunctionName(nameof(GetUnsentClawbacks))]
-        public async Task<List<ClawbackLegalEntityDto>> Get([ActivityTrigger]CollectionPeriod collectionPeriod)
+        public async Task<List<ClawbackLegalEntity>> Get([ActivityTrigger]CollectionPeriod collectionPeriod)
         {
 			var clawbackLegalEntities = await _queryDispatcher.Send<GetClawbackLegalEntitiesRequest, GetClawbackLegalEntitiesResponse>(new GetClawbackLegalEntitiesRequest(new Domain.ValueObjects.CollectionPeriod(collectionPeriod.Period, collectionPeriod.Year), false));
 

@@ -3,6 +3,8 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using System.Collections.Generic;
 using System.Linq;
 using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using Account = SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes.Account;
+using LegalEntity = SFA.DAS.EmployerIncentives.DataTransferObjects.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
 {
@@ -38,15 +40,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Map
             return PendingPaymentValidationResult.Get(model);
         }
 
-        public static LegalEntity Map(this LegalEntityDto legalEntityDto)
+        public static ValueTypes.LegalEntity Map(this LegalEntity legalEntity)
         {
-            return new LegalEntity(
-                new Account(legalEntityDto.AccountId, legalEntityDto.AccountLegalEntityId),
-                legalEntityDto.LegalEntityId,
-                legalEntityDto.LegalEntityName,
-                legalEntityDto.VrfVendorId,
-                legalEntityDto.VrfCaseStatus,
-                legalEntityDto.HashedLegalEntityId);
+            return new ValueTypes.LegalEntity(
+                new Account(legalEntity.AccountId, legalEntity.AccountLegalEntityId),
+                legalEntity.LegalEntityId,
+                legalEntity.LegalEntityName,
+                legalEntity.VrfVendorId,
+                legalEntity.VrfCaseStatus,
+                legalEntity.HashedLegalEntityId);
         }
 
         public static IEnumerable<ClawbackPayment> Map(this IEnumerable<ClawbackPaymentModel> models)

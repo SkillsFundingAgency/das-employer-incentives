@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
         {
             // Arrange
             var query = _fixture.Create<GetApplicationsRequest>();
-            var applicationsList = _fixture.CreateMany<ApprenticeApplicationDto>().ToList();
+            var applicationsList = _fixture.CreateMany<ApprenticeApplication>().ToList();
             var expectedResponse = new GetApplicationsResponse
             {
                 ApprenticeApplications = applicationsList,

@@ -9,7 +9,7 @@ using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Data.LegalEntityVendorRegistrationForm
 {
-    public class LegalEntityVendorRegistrationFormQueryRepository : IQueryRepository<LegalEntityVendorRegistrationFormDto>
+    public class LegalEntityVendorRegistrationFormQueryRepository : IQueryRepository<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm>
     {
         private Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
@@ -19,21 +19,21 @@ namespace SFA.DAS.EmployerIncentives.Data.LegalEntityVendorRegistrationForm
             _lazyContext = context;
         }
 
-        public Task<LegalEntityVendorRegistrationFormDto> Get(Expression<Func<LegalEntityVendorRegistrationFormDto, bool>> predicate)
+        public Task<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm> Get(Expression<Func<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm, bool>> predicate)
         {
             return _context.Set<Models.Account>()
                 .Select(AccountToLegalVendorRegistrationFormDto()).SingleOrDefaultAsync(predicate);
         }
 
-        public Task<List<LegalEntityVendorRegistrationFormDto>> GetList(Expression<Func<LegalEntityVendorRegistrationFormDto, bool>> predicate = null)
+        public Task<List<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm>> GetList(Expression<Func<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm, bool>> predicate = null)
         {
             return _context.Set<Models.Account>()
                 .Select(AccountToLegalVendorRegistrationFormDto()).Where(predicate).ToListAsync();
         }
 
-        private Expression<Func<Models.Account, LegalEntityVendorRegistrationFormDto>> AccountToLegalVendorRegistrationFormDto()
+        private Expression<Func<Models.Account, DataTransferObjects.Queries.LegalEntityVendorRegistrationForm>> AccountToLegalVendorRegistrationFormDto()
         {
-            return x => new LegalEntityVendorRegistrationFormDto
+            return x => new DataTransferObjects.Queries.LegalEntityVendorRegistrationForm
             {
                 LegalEntityId = x.LegalEntityId,
                 VrfCaseId = x.VrfCaseId,

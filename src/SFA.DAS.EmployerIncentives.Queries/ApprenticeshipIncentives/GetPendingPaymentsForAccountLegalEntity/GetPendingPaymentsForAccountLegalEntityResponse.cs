@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPending
 {
     public class GetPendingPaymentsForAccountLegalEntityResponse : IResponseLogWriterWithArgs
     {
-        public List<PendingPaymentDto> PendingPayments { get; }
+        public List<PendingPayment> PendingPayments { get; }
 
-        public GetPendingPaymentsForAccountLegalEntityResponse(List<PendingPaymentDto> pendingPayments)
+        public GetPendingPaymentsForAccountLegalEntityResponse(List<PendingPayment> pendingPayments)
         {
             PendingPayments = pendingPayments;
         }

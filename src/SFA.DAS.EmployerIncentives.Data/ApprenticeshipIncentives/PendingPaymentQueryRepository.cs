@@ -7,10 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
+using PendingPayment = SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives.PendingPayment;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
-    public class PendingPaymentQueryRepository : IQueryRepository<PendingPaymentDto>
+    public class PendingPaymentQueryRepository : IQueryRepository<PendingPayment>
     {
         private Lazy<EmployerIncentivesDbContext> _lazyContext;
         private EmployerIncentivesDbContext _context => _lazyContext.Value;
@@ -20,21 +21,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             _lazyContext = context;
         }
 
-        public Task<PendingPaymentDto> Get(Expression<Func<PendingPaymentDto, bool>> predicate)
+        public Task<PendingPayment> Get(Expression<Func<PendingPayment, bool>> predicate)
         {
-            return _context.Set<PendingPayment>()
+            return _context.Set<Models.PendingPayment>()
                 .Select(PendingPaymentToPendingPaymentDto()).SingleOrDefaultAsync(predicate);
         }
 
-        public Task<List<PendingPaymentDto>> GetList(Expression<Func<PendingPaymentDto, bool>> predicate = null)
+        public Task<List<PendingPayment>> GetList(Expression<Func<PendingPayment, bool>> predicate = null)
         {
-            return _context.Set<PendingPayment>()
+            return _context.Set<Models.PendingPayment>()
                 .Select(PendingPaymentToPendingPaymentDto()).Where(predicate).ToListAsync();
         }
 
-        private Expression<Func<PendingPayment, PendingPaymentDto>> PendingPaymentToPendingPaymentDto()
+        private Expression<Func<Models.PendingPayment, PendingPayment>> PendingPaymentToPendingPaymentDto()
         {
-            return x => new PendingPaymentDto()
+            return x => new PendingPayment()
             {
                 Id = x.Id,
                 AccountLegalEntityId = x.AccountLegalEntityId,

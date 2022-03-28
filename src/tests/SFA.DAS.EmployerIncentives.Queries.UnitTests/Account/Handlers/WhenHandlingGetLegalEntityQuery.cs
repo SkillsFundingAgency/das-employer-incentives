@@ -13,14 +13,14 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
     public class WhenHandlingGetLegalEntityQueryInvoked
     {
         private GetLegalEntityQueryHandler _sut;
-        private Mock<IQueryRepository<LegalEntityDto>> _repositoryMock;
+        private Mock<IQueryRepository<LegalEntity>> _repositoryMock;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            _repositoryMock = new Mock<IQueryRepository<LegalEntityDto>>();
+            _repositoryMock = new Mock<IQueryRepository<LegalEntity>>();
             _sut = new GetLegalEntityQueryHandler(_repositoryMock.Object);
         }
 
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
         {
             //Arrange
             var query = _fixture.Create<GetLegalEntityRequest>();
-            var data = _fixture.Create<LegalEntityDto>();
+            var data = _fixture.Create<LegalEntity>();
             var expected = new GetLegalEntityResponse
             {
                 LegalEntity = data

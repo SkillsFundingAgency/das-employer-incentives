@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawba
             await Send(clawbacks, command.AccountLegalEntityId, command.ClawbackDate);
         }
 
-        private async Task Send(List<PaymentDto> clawbacks, long accountLegalEntityId, DateTime clawbackDate, CancellationToken cancellationToken = default)
+        private async Task Send(List<Payment> clawbacks, long accountLegalEntityId, DateTime clawbackDate, CancellationToken cancellationToken = default)
         {
             var clawbacksToSend = clawbacks.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
             if (!clawbacksToSend.Any())

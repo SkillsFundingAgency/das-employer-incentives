@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
+using CollectionPeriod = SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.CollectionPeriod;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -17,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Fixture _fixture;
         private CollectionPeriod _collectionPeriod;
         private GetPayableLegalEntities _sut;
-        private List<PayableLegalEntityDto> _legalEntities;
+        private List<PayableLegalEntity> _legalEntities;
         private Mock<IQueryDispatcher> _mockQueryDispatcher;
 
         [SetUp]
@@ -25,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             _fixture = new Fixture();
             _collectionPeriod = _fixture.Create<CollectionPeriod>();
-            _legalEntities = _fixture.CreateMany<PayableLegalEntityDto>(3).ToList();
+            _legalEntities = _fixture.CreateMany<PayableLegalEntity>(3).ToList();
             _mockQueryDispatcher = new Mock<IQueryDispatcher>();
             _mockQueryDispatcher
                 .Setup(x =>

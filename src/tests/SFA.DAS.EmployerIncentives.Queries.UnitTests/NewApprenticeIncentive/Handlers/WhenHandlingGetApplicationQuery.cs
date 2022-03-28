@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
     {
         private GetApplicationQueryHandler _sut;
         private Mock<IIncentiveApplicationQueryRepository> _applicationRepository;
-        private Mock<IQueryRepository<LegalEntityDto>> _legalEntityQueryRepository;
+        private Mock<IQueryRepository<LegalEntity>> _legalEntityQueryRepository;
         private Fixture _fixture;
 
         [SetUp]
@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             _fixture = new Fixture();
             _applicationRepository = new Mock<IIncentiveApplicationQueryRepository>();
-            _legalEntityQueryRepository = new Mock<IQueryRepository<LegalEntityDto>>();
+            _legalEntityQueryRepository = new Mock<IQueryRepository<LegalEntity>>();
 
             _sut = new GetApplicationQueryHandler(_applicationRepository.Object, _legalEntityQueryRepository.Object);
         }
@@ -36,9 +36,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.NewApprenticeIncentive.Ha
         {
             //Arrange
             var query = _fixture.Create<GetApplicationRequest>();
-            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(x => x.Phase, Enums.Phase.Phase1).With(x => x.PlannedStartDate, new DateTime(2020, 9,1)).Create();
-            var data = _fixture.Build<IncentiveApplicationDto>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeshipDto> { apprenticeship }).Create();
-            var accountData = _fixture.Build<LegalEntityDto>().Create();
+            var apprenticeship = _fixture.Build<IncentiveApplicationApprenticeship>().With(x => x.Phase, Enums.Phase.Phase1).With(x => x.PlannedStartDate, new DateTime(2020, 9,1)).Create();
+            var data = _fixture.Build<IncentiveApplication>().With(x => x.Apprenticeships, new List<IncentiveApplicationApprenticeship> { apprenticeship }).Create();
+            var accountData = _fixture.Build<LegalEntity>().Create();
             var expected = new GetApplicationResponse(data);
 
             _applicationRepository.Setup(x => x.Get(dto => dto.Id == query.ApplicationId && dto.AccountId == query.AccountId)).ReturnsAsync(data);

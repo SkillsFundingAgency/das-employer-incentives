@@ -8,6 +8,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Types
     {
         public Guid IncentiveApplicationId { get; set; }
         public long AccountId { get; set; }
-        public IEnumerable<IncentiveApplicationApprenticeshipDto> Apprenticeships { get; set; }
+        public IEnumerable<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }
     }
 }

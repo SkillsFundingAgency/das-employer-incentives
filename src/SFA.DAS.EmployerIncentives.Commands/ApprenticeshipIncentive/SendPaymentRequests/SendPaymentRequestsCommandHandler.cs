@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
             await Send(payments, command.AccountLegalEntityId, command.PaidDate);
         }
 
-        private async Task Send(List<PaymentDto> payments, long accountLegalEntityId, DateTime paidDate, CancellationToken cancellationToken = default)
+        private async Task Send(List<Payment> payments, long accountLegalEntityId, DateTime paidDate, CancellationToken cancellationToken = default)
         {
             var paymentsToSend = payments.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
             if (!paymentsToSend.Any())

@@ -5,9 +5,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApprentic
 {
     public class GetApprenticeshipEligibilityRequest : IQuery
     {
-        public ApprenticeshipDto Apprenticeship { get; }
+        public Apprenticeship Apprenticeship { get; }
 
-        public GetApprenticeshipEligibilityRequest(ApprenticeshipDto apprenticeship)
+        public GetApprenticeshipEligibilityRequest(Apprenticeship apprenticeship)
         {
             Apprenticeship = apprenticeship;
         }

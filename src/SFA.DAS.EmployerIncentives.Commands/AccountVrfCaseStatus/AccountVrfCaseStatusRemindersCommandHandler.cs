@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.AccountVrfCaseStatus
 
             foreach(var account in accountsWithoutVrfStatus)
             {
-                var applications = new List<ApprenticeApplicationDto>();
+                var applications = new List<ApprenticeApplication>();
 
                 foreach (var legalEntity in account.LegalEntities)
                 {

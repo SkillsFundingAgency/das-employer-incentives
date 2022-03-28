@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, incentive.BreakInLearnings, incentive.SubmissionDate);
         }
 
-        public static Incentive Create(IncentiveApplicationApprenticeshipDto application)
+        public static Incentive Create(IncentiveApplicationApprenticeship application)
         {
             return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>(), DateTime.UtcNow);
         }
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
         }
 
-        public static bool IsNewAgreementRequired(IncentiveApplicationDto application)
+        public static bool IsNewAgreementRequired(IncentiveApplication application)
         {
             foreach (var apprenticeship in application.Apprenticeships)
             {
