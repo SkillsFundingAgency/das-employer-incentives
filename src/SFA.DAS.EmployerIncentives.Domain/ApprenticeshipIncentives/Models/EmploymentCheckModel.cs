@@ -13,6 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models
         public DateTime MaximumDate { get; set; }
         public Guid CorrelationId { get; set; }
         public bool? Result { get; set; }
+        public EmploymentCheckResultError? ErrorType { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
         public DateTime? ResultDateTime { get; set; }
