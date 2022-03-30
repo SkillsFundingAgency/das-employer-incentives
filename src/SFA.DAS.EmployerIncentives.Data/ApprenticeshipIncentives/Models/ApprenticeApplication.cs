@@ -46,7 +46,9 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public bool? InLearning { get; set; }
         public bool? FirstEmploymentCheckValidation { get; set; }
         public bool? FirstEmploymentCheckResult { get; set; }
+        public string FirstEmploymentCheckErrorType { get; set; }
         public bool? SecondEmploymentCheckValidation { get; set; }
         public bool? SecondEmploymentCheckResult { get; set; }
+        public string SecondEmploymentCheckErrorType { get; set; }
     }
 }
