@@ -26,6 +26,7 @@ SELECT
     ,case
         when ai.Phase = 'Phase1' then 1
         when ai.Phase = 'Phase2' then 2
+		when ai.Phase = 'Phase3' then 3
      end as [Phase]
     ,cast(ai.SubmittedDate as date) as [Application Date]
   FROM (
