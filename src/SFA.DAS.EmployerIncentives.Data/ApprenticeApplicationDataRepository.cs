@@ -196,17 +196,17 @@ namespace SFA.DAS.EmployerIncentives.Data
             return secondEmploymentCheckValidation.Value;
         }
 
-        private static List<string> EmploymentCheckErrorCodes(string firstEmploymentCheckErrorCode, string secondEmploymentCheckErrorCode)
+        private static List<string> EmploymentCheckErrorCodes(EmploymentCheckResultError? firstEmploymentCheckErrorCode, EmploymentCheckResultError? secondEmploymentCheckErrorCode)
         {
             var errorCodes = new List<string>();
-            if (!String.IsNullOrWhiteSpace(firstEmploymentCheckErrorCode) && !errorCodes.Contains(firstEmploymentCheckErrorCode))
+            if (firstEmploymentCheckErrorCode != null && !errorCodes.Contains(firstEmploymentCheckErrorCode.ToString()))
             {
-                errorCodes.Add(firstEmploymentCheckErrorCode);
+                errorCodes.Add(firstEmploymentCheckErrorCode.ToString());
             }
 
-            if (!String.IsNullOrWhiteSpace(secondEmploymentCheckErrorCode) && !errorCodes.Contains(secondEmploymentCheckErrorCode))
+            if (secondEmploymentCheckErrorCode != null && !errorCodes.Contains(secondEmploymentCheckErrorCode.ToString()))
             {
-                errorCodes.Add(secondEmploymentCheckErrorCode);
+                errorCodes.Add(secondEmploymentCheckErrorCode.ToString());
             }
 
             return errorCodes;

@@ -426,6 +426,18 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             // Empty
         }
 
+        [When(@"there is an '(.*)' employment check error code of '(.*)'")]
+        public async Task WhenThereIsAnEmploymentCheckErrorCode(EmploymentCheckType employmentCheckType, EmploymentCheckResultError? errorCode)
+        {
+            var employmentCheck = Fixture.Build<EmploymentCheck>()
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.CheckType, employmentCheckType)
+                .With(x => x.Result, false)
+                .With(x => x.ErrorType, errorCode)
+                .Create();
+            await SetupEmploymentCheck(employmentCheck);
+        }
+
         [When(@"a client requests the apprenticeships for the account")]
         public async Task WhenAClientRequestsTheApprenticeshipApplicationsForTheAccount()
         {
@@ -655,6 +667,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 apprenticeshipApplication.SecondPaymentStatus.WithdrawnByCompliance.Should().BeFalse();
                 apprenticeshipApplication.SecondPaymentStatus.WithdrawnByEmployer.Should().BeTrue();
             }
+        }
+        
+        [Then(@"the apprenticeship is returned with employment check error code of '(.*)'")]
+        public void ThenTheApprenticeshipIncentiveEmploymentCheckErrorCodeIsReturned(EmploymentCheckResultError errorType)
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckErrorCodes.Should().Contain(errorType.ToString());
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckErrorCodes.Should().Contain(errorType.ToString());
         }
 
         private async Task SetupApprenticeshipIncentive()
