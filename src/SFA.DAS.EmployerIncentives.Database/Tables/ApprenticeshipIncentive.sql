@@ -35,3 +35,5 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_ApprenticeshipIncentive_AccountApprenticesh
     [ApprenticeshipId] ASC
 )WHERE [Status] <> 'Withdrawn' 
 GO
+CREATE INDEX IX_ApprenticeshipIncentive_AccountLegalEntityId ON [incentives].[ApprenticeshipIncentive] ([AccountLegalEntityId])
+GO
