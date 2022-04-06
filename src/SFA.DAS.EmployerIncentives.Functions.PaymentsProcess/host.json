@@ -11,10 +11,11 @@
   "functionTimeout": "00:30:00",
   "extensions": {
     "durableTask": {
+      "controlQueueBufferThreshold": 1000,
       "extendedSessionsEnabled": true,
       "extendedSessionIdleTimeoutInSeconds": 10,
       "maxOrchestrationActions": "10000000",
-      "hubName":  "EIPaymentProcessingHub"   
+      "hubName": "EIPaymentProcessingHub"
     }
   }
 }
