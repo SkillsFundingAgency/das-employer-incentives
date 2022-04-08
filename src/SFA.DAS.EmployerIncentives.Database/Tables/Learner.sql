@@ -21,3 +21,5 @@
 GO
 CREATE CLUSTERED INDEX IX_Learner_ApprenticeshipIncentiveId ON [incentives].Learner (ApprenticeshipIncentiveId)
 GO
+CREATE INDEX IX_Learner_ULN ON [incentives].[Learner] (ULN)
+GO
