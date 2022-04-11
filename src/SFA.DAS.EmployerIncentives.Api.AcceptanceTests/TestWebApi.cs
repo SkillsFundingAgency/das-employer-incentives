@@ -77,11 +77,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     l.Identifier = "";
                     l.Version = "1.0";
                 });
-                s.Configure<EmploymentCheckApi>(l =>
+                s.Configure<EmployerIncentivesOuterApi>(l =>
                 {
                     l.ApiBaseUrl = _context.EmploymentCheckApi.BaseAddress;
-                    l.Identifier = "";
-                    l.Version = "1.0";
+                    l.SubscriptionKey = "";
+                    l.ApiVersion = "1";
                 });
                 if (_context.AccountApi != null)
                 {
@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
-                s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));                
                 s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _commandMessageHook));
                 s.AddSingleton(_commandMessageHook);
             });

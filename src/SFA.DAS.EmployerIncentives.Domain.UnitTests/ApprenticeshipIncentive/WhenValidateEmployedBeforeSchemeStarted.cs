@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -53,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
-            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == "EmployedBeforeSchemeStarted");
+            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted);
             validationResult.Should().NotBeNull();
             validationResult.Result.Should().BeFalse();
         }
@@ -82,13 +85,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
-            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == "EmployedBeforeSchemeStarted");
+            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted);
             validationResult.Should().NotBeNull();
             validationResult.Result.Should().BeFalse();
         }
 
-        [Test]
-        public void Then_a_true_validation_result_is_created_when_the_employment_check_record_returns_false()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Then_a_validation_result_is_created_for_the_employed_before_scheme_started(bool employedBeforeSchemeStarted)
         {
             // Arrange
             _sutModel = _fixture
@@ -101,7 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 })
                 .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>()
                 {
-                    new EmploymentCheckModel { CheckType = EmploymentCheckType.EmployedBeforeSchemeStarted, Result = false }
+                    new EmploymentCheckModel { CheckType = EmploymentCheckType.EmployedBeforeSchemeStarted, Result = employedBeforeSchemeStarted }
                 })
                 .Create();
 
@@ -111,13 +115,46 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
-            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == "EmployedBeforeSchemeStarted");
+            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted);
+            validationResult.Should().NotBeNull();
+            validationResult.Result.Should().Be(!employedBeforeSchemeStarted);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Then_a_validation_result_is_overridden_for_the_employed_before_scheme_started_when_an_non_expired_override_exists(bool employedBeforeSchemeStarted)
+        {
+            // Arrange
+            _sutModel = _fixture
+                .Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
+                .With(a => a.PendingPaymentModels, new List<PendingPaymentModel>()
+                {
+                    _fixture.Build<PendingPaymentModel>()
+                        .With(p => p.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create()
+                })
+                .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>()
+                {
+                    new EmploymentCheckModel { CheckType = EmploymentCheckType.EmployedBeforeSchemeStarted, Result = employedBeforeSchemeStarted }
+                })
+                .Create();
+
+            _sut = Sut(_sutModel);
+
+            _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.EmployedBeforeSchemeStarted, DateTime.Now.AddDays(1)), _fixture.Create<ServiceRequest>());
+
+            // Act
+            _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
+
+            // Assert
+            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted);
             validationResult.Should().NotBeNull();
             validationResult.Result.Should().BeTrue();
         }
 
-        [Test]
-        public void Then_a_false_validation_result_is_created_when_the_employment_check_record_returns_true()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Then_a_validation_result_is_not_overridden_for_the_employed_before_scheme_started_when_an_expired_override_exists(bool employedBeforeSchemeStarted)
         {
             // Arrange
             _sutModel = _fixture
@@ -130,19 +167,21 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 })
                 .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>()
                 {
-                    new EmploymentCheckModel { CheckType = EmploymentCheckType.EmployedBeforeSchemeStarted, Result = true }
+                    new EmploymentCheckModel { CheckType = EmploymentCheckType.EmployedBeforeSchemeStarted, Result = employedBeforeSchemeStarted }
                 })
                 .Create();
 
             _sut = Sut(_sutModel);
 
+            _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.EmployedBeforeSchemeStarted, DateTime.Now), _fixture.Create<ServiceRequest>());
+
             // Act
             _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
-            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == "EmployedBeforeSchemeStarted");
+            var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted);
             validationResult.Should().NotBeNull();
-            validationResult.Result.Should().BeFalse();
+            validationResult.Result.Should().Be(!employedBeforeSchemeStarted);
         }
 
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)

@@ -12,10 +12,13 @@ using TechTalk.SpecFlow;
 using Payment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.Payment;
 using PendingPayment = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPayment;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
+using ValidationOverride = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ValidationOverride;
 using System;
 using AutoFixture;
 using SFA.DAS.EmployerIncentives.Enums;
 using EmploymentCheck = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.EmploymentCheck;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using NUnit.Framework;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -34,22 +37,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _fixture = new Fixture();
             _testContext = testContext;
+            _validatePaymentData = new ValidatePaymentData(_testContext);
         }
 
         [Given(@"there are pending payments")]
         public void GivenThereArePendingPayments()
         {
-            _validatePaymentData = new ValidatePaymentData(_testContext);
+            //
         }
 
         [Given(@"no validations steps will fail")]
-        public async Task GivenNoValidationsStepsWillFailed()
+        public void GivenNoValidationsStepsWillFailed()
         {
-            await _validatePaymentData.Create();
+            //
         }
 
         [Given(@"the '(.*)' will fail")]
-        public async Task GivenTheValidationStepWillFail(string validationStep)
+        public void GivenTheValidationStepWillFail(string validationStep)
         {
             switch (validationStep)
             {
@@ -82,34 +86,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     _validatePaymentData.LearnerModel.SuccessfulLearnerMatchExecution = false;
                     break;
                 case ValidationStep.EmployedAtStartOfApprenticeship:
-                    _validatePaymentData.EmploymentChecks = new List<EmploymentCheck> 
-                    { 
-                        _fixture.Build<EmploymentCheck>()
-                            .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
-                            .With(x => x.Result, false)
-                            .With(x => x.ApprenticeshipIncentiveId, _validatePaymentData.ApprenticeshipIncentiveModel.Id)
-                            .Create()
-                    };
+                    _validatePaymentData.EmploymentChecks
+                        .Single(c => c.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id &&
+                                     c.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .Result = false;
                     break;
                 case ValidationStep.EmployedBeforeSchemeStarted:
-                    _validatePaymentData.EmploymentChecks = new List<EmploymentCheck>
-                    {
-                        _fixture.Build<EmploymentCheck>()
-                            .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
-                            .With(x => x.Result, true)
-                            .With(x => x.ApprenticeshipIncentiveId,
-                                _validatePaymentData.ApprenticeshipIncentiveModel.Id)
-                            .Create()
-                    };
+                    _validatePaymentData.EmploymentChecks
+                        .Single(c => c.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id &&
+                                     c.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted)
+                        .Result = true;                   
                     break;
             }
-
-            await _validatePaymentData.Create();
         }
 
         [When(@"the payment process is run")]
         public async Task WhenThePaymentProcessIsRun()
         {
+            await _validatePaymentData.Create();
+
             await _testContext.SetActiveCollectionCalendarPeriod(new CollectionPeriod() { Period = CollectionPeriod, Year = CollectionPeriodYear });
 
             await _testContext.TestFunction.Start(
@@ -147,17 +142,37 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task ThenSuccessValidationResultsAreRecorded()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.ToList();
+            var results = await connection.GetAllAsync<PendingPaymentValidationResult>();
             results.Should().NotBeEmpty();
             results.All(r => r.Result).Should().BeTrue();
+        }
+
+        [Then(@"the validation result override for '(.*)' is recorded")]
+        public async Task ThenTheValidationResultOverrideForValidationStepIsRecorded(string validationStep)
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = await connection.GetAllAsync<PendingPaymentValidationResult>();
+            results.Should().NotBeEmpty();
+            results.Where(r => r.Step != validationStep).All(r => r.Result).Should().BeTrue();
+            results.Where(r => r.Step != validationStep).All(r => r.OverrideResult.Value).Should().BeFalse();
+            results.Where(r => r.Step == validationStep).All(r => r.OverrideResult.Value).Should().BeTrue();
+            results.Where(r => r.Step == validationStep).All(r => r.Result).Should().BeFalse();
+        }
+
+        [Then(@"the expired validation override is removed")]
+        public async Task ThenTheExpiredValidationOverrideIsRemoved()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = await connection.GetAllAsync<ValidationOverride>();
+            results.Should().BeEmpty();
         }
 
         [Then(@"payment records are created")]
         public async Task AndPaymentRecordIsCreated()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<Payment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id);
+            var results = await connection.GetAllAsync<Payment>();
+            results = results.Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id);
             results.Should().HaveCount(2);
         }
 
@@ -165,8 +180,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task AndNoPaymentRecordIsCreated()
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var results = connection.GetAllAsync<Payment>().Result
-                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id);
+            var results = await connection.GetAllAsync<Payment>();
+            results = results.Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id);
             results.Should().BeEmpty();
         }
 
@@ -205,15 +220,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Given(@"the ILR submission validation step will fail")]
-        public async Task GivenTheIlrSubmissionValidationStepWillFail()
+        public void GivenTheIlrSubmissionValidationStepWillFail()
         {
-            await GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
+            GivenTheValidationStepWillFail(ValidationStep.HasIlrSubmission);
         }
 
         [Given(@"the learner match was unsuccessful")]
-        public async Task GivenTheLearnerMatchWasUnsuccessful()
+        public void GivenTheLearnerMatchWasUnsuccessful()
         {
-            await GivenTheValidationStepWillFail(ValidationStep.LearnerMatchSuccessful);
+            GivenTheValidationStepWillFail(ValidationStep.LearnerMatchSuccessful);
         }
 
         [Then(@"the ILR Submission check will have a failed validation result")]
@@ -245,10 +260,21 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Given(@"there are payments with sent clawbacks")]
-        public async Task GivenThereArePaymentsWithSentClawbacks()
+        public void GivenThereArePaymentsWithSentClawbacks()
         {
             _validatePaymentData.AddClawbackPayment(true);
-            await _validatePaymentData.Create();
+        }
+
+        [Given(@"there is a validation override for '(.*)'")]
+        public void GivenThereIsAValidationOverrideFor(string step)
+        {
+            _validatePaymentData.AddValidationOverride(new ValidationOverrideStep(step, DateTime.Now.AddDays(1)));
+        }
+
+        [Given(@"an expired validation override exists for '(.*)'")]
+        public void GivenAnExpiredValidationOverrideExistsFor(string step)
+        {
+            _validatePaymentData.AddValidationOverride(new ValidationOverrideStep(step, DateTime.Now.AddDays(-1)) );
         }
     }
 }

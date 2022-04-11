@@ -25,3 +25,9 @@ Scenario: Compliance withdrawal request is deferred when payment process in prog
 	And the active collection period is currently in progress
 	When a compliance withdrawal is requested
 	Then the compliance withdrawal is deferred
+
+Scenario: Validation override request is deferred when payment process in progress.
+	Given an apprenticeship incentive exists
+	And the active collection period is currently in progress
+	When a validation override is requested
+	Then the validation override is deferred
