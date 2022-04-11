@@ -21,3 +21,6 @@ GO
 CREATE CLUSTERED INDEX IX_ClawbackPayment_DateClawbackSent ON [incentives].[ClawbackPayment] ([DateClawbackSent], [AccountLegalEntityId])
 GO
 CREATE UNIQUE INDEX IX_ClawbackPayment_ApprenticeshipIncentiveId ON [incentives].[ClawbackPayment] (ApprenticeshipIncentiveId, PendingPaymentId)
+GO
+CREATE INDEX IX_ClawbackPayment_PaymentId ON [incentives].[ClawbackPayment] (PaymentId)
+GO
