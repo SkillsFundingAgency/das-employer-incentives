@@ -17,7 +17,8 @@
       "hubName": "EIPaymentProcessingHub",
       "storageProvider": {
         "controlQueueBufferThreshold": 1000,
-      }
+        "partitionCount": 16
       }
     }
+  }
 }
