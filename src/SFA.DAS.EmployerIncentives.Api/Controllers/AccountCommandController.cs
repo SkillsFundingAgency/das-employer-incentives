@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.AddEmployerVendorIdForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
 using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> UpsertLegalEntity([FromRoute] long accountId, [FromBody] AddLegalEntityRequest request)
         {
             await SendCommandAsync(new UpsertLegalEntityCommand(accountId, request.LegalEntityId, request.OrganisationName, request.AccountLegalEntityId));
-            return Created($"/accounts/{accountId}/LegalEntities", new LegalEntityDto { AccountId = accountId, AccountLegalEntityId = request.AccountLegalEntityId, LegalEntityId = request.LegalEntityId, LegalEntityName = request.OrganisationName });
+            return Created($"/accounts/{accountId}/LegalEntities", new LegalEntity { AccountId = accountId, AccountLegalEntityId = request.AccountLegalEntityId, LegalEntityId = request.LegalEntityId, LegalEntityName = request.OrganisationName });
         }
 
         [HttpDelete("/accounts/{accountId}/legalEntities/{accountLegalEntityId}")]

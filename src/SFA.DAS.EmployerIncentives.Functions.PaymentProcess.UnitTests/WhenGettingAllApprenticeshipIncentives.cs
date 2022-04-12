@@ -2,7 +2,6 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
@@ -10,6 +9,7 @@ using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprentices
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -17,14 +17,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
     {
         private Fixture _fixture;
         private GetAllApprenticeshipIncentives _sut;
-        private List<ApprenticeshipIncentiveDto> _apprenticeshipIncentives;
+        private List<ApprenticeshipIncentive> _apprenticeshipIncentives;
         private Mock<IQueryDispatcher> _mockQueryDispatcher;
 
         [SetUp]
         public void Setup()
         {
             _fixture = new Fixture();
-            _apprenticeshipIncentives = _fixture.CreateMany<ApprenticeshipIncentiveDto>(3).ToList();
+            _apprenticeshipIncentives = _fixture.CreateMany<ApprenticeshipIncentive>(3).ToList();
             _mockQueryDispatcher = new Mock<IQueryDispatcher>();
             _mockQueryDispatcher
                 .Setup(x =>

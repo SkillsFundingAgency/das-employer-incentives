@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -9,7 +9,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
     public static class PaymentsDataExtensions
     {
-        public static BusinessCentralFinancePaymentRequest Map(this PaymentDto payment, bool obfuscatePrivateData)
+        public static BusinessCentralFinancePaymentRequest Map(this Payment payment, bool obfuscatePrivateData)
         {
             return new BusinessCentralFinancePaymentRequest
             {
@@ -63,7 +63,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         }
 
 
-        private static string CreatePaymentLineDescription(PaymentDto payment, bool obfuscateSensitiveData)
+        private static string CreatePaymentLineDescription(Payment payment, bool obfuscateSensitiveData)
         {
             var uln = payment.ULN.ToString().ToCharArray();
             if (obfuscateSensitiveData)

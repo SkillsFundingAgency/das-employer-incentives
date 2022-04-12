@@ -3,11 +3,11 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 {
@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             const long accountId = 6;
             const long accountLegalEntityId = 7;
-            var expected = new GetLegalEntityResponse { LegalEntity = _fixture.Create<LegalEntityDto>() };
+            var expected = new GetLegalEntityResponse { LegalEntity = _fixture.Create<LegalEntity>() };
 
             _queryDispatcherMock.Setup(x => x.Send<GetLegalEntityRequest, GetLegalEntityResponse>(
                     It.Is<GetLegalEntityRequest>(r => r.AccountId == accountId && r.AccountLegalEntityId == accountLegalEntityId)))
