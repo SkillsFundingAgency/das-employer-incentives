@@ -14,7 +14,11 @@
       "extendedSessionsEnabled": true,
       "extendedSessionIdleTimeoutInSeconds": 10,
       "maxOrchestrationActions": "10000000",
-      "hubName":  "EIPaymentProcessingHub"   
+      "hubName": "EIPaymentProcessingHub",
+      "storageProvider": {
+        "controlQueueBufferThreshold": 1000,
+        "partitionCount": 16
+      }
     }
   }
 }
