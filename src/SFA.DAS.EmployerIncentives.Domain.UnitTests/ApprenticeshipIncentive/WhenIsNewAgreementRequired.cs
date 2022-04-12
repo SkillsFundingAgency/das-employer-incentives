@@ -1,8 +1,8 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             var apprenticeships = new[]
             {
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>()
+                _fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(dto => dto.Phase, Phase.Phase3)
                     .With(dto => dto.PlannedStartDate, new DateTime(2021, 10, 2))
                     .With(dto => dto.StartDatesAreEligible, true)
@@ -36,11 +36,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     .Create()
             };
 
-            var entity = _fixture.Build<LegalEntityDto>()
+            var entity = _fixture.Build<LegalEntity>()
                 .With(dto => dto.SignedAgreementVersion, signed)
                 .Create();
 
-            var application = _fixture.Build<IncentiveApplicationDto>()
+            var application = _fixture.Build<IncentiveApplication>()
                 .With(dto => dto.Apprenticeships, apprenticeships)
                 .With(dto => dto.LegalEntity, entity)
                 .Create();
@@ -62,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             var apprenticeships = new[]
             {
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>()
+                _fixture.Build<IncentiveApplicationApprenticeship>()
                     .With(dto => dto.Phase, Phase.Phase3)
                     .With(dto => dto.PlannedStartDate, new DateTime(2021, 10, 2))
                     .With(dto => dto.StartDatesAreEligible, true)
@@ -70,11 +70,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                     .Create()
             };
 
-            var entity = _fixture.Build<LegalEntityDto>()
+            var entity = _fixture.Build<LegalEntity>()
                 .With(dto => dto.SignedAgreementVersion, signed)
                 .Create();
 
-            var application = _fixture.Build<IncentiveApplicationDto>()
+            var application = _fixture.Build<IncentiveApplication>()
                 .With(dto => dto.Apprenticeships, apprenticeships)
                 .With(dto => dto.LegalEntity, entity)
                 .Create();

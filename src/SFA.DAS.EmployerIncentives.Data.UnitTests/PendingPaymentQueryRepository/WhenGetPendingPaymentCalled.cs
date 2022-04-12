@@ -5,9 +5,10 @@ using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
+using PendingPayment = SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives.PendingPayment;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PendingPaymentQueryRepository
 {
@@ -15,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PendingPaymentQueryRepositor
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<PendingPaymentDto> _sut;
+        private IQueryRepository<PendingPayment> _sut;
 
         [SetUp]
         public void Arrange()
@@ -39,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PendingPaymentQueryRepositor
         public async Task Then_data_is_fetched_from_database()
         {
             // Arrange
-            var pendingPayment = _fixture.Create<PendingPayment>();
+            var pendingPayment = _fixture.Create<ApprenticeshipIncentives.Models.PendingPayment>();
             
             _context.PendingPayments.Add(pendingPayment);
             _context.SaveChanges();
@@ -55,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PendingPaymentQueryRepositor
         public async Task Then_null_is_returned_when_the_application_is_not_found()
         {
             // Arrange
-            var allPendingPayments = _fixture.CreateMany<PendingPayment>(10).ToArray();
+            var allPendingPayments = _fixture.CreateMany<ApprenticeshipIncentives.Models.PendingPayment>(10).ToArray();
             
             _context.PendingPayments.AddRange(allPendingPayments);
             _context.SaveChanges();

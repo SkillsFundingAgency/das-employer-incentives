@@ -1,12 +1,12 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
             var pendingPayments =
-                await context.CallActivityAsync<List<PendingPaymentActivityDto>>(
+                await context.CallActivityAsync<List<PendingPaymentActivity>>(
                     nameof(GetPendingPaymentsForAccountLegalEntity), accountLegalEntityCollectionPeriod);
 
             Task allValidatePaymentTasks = null;

@@ -1,7 +1,7 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             await context.CallActivityAsync(nameof(SetActivePeriodToInProgress), null);
 
             context.SetCustomStatus("GettingPayableLegalEntities");
-            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntityDto>>(nameof(GetPayableLegalEntities), collectionPeriod);            
+            var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntity>>(nameof(GetPayableLegalEntities), collectionPeriod);            
 
             context.SetCustomStatus("CalculatingPayments");
             var calculatePaymentTasks = new List<Task>();
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             await Task.WhenAll(calculatePaymentTasks);
 
             context.SetCustomStatus("GettingUnsentClawbackLegalEntities");
-            var clawbackLegalEntities = await context.CallActivityAsync<List<ClawbackLegalEntityDto>>(nameof(GetUnsentClawbacks), collectionPeriod);
+            var clawbackLegalEntities = await context.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), collectionPeriod);
 
             if (!context.IsReplaying)
             {

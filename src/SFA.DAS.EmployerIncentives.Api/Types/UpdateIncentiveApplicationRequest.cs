@@ -1,6 +1,6 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.Types
 {
@@ -8,6 +8,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Types
     {
         public Guid IncentiveApplicationId { get; set; }
         public long AccountId { get; set; }
-        public IEnumerable<IncentiveApplicationApprenticeshipDto> Apprenticeships { get; set; }
+        public IEnumerable<IncentiveApplicationApprenticeship> Apprenticeships { get; set; }
     }
 }

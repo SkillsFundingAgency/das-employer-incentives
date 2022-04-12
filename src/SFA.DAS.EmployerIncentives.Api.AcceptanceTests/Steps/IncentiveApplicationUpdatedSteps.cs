@@ -2,15 +2,16 @@
 using CSScriptLib;
 using Dapper;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
+using IncentiveApplicationApprenticeship = SFA.DAS.EmployerIncentives.DataTransferObjects.Commands.IncentiveApplicationApprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -42,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _updateApplicationRequest = new UpdateIncentiveApplicationRequest()
             {
                 IncentiveApplicationId = _createApplicationRequest.IncentiveApplicationId,
-                Apprenticeships = Fixture.CreateMany<IncentiveApplicationApprenticeshipDto>(4),
+                Apprenticeships = Fixture.CreateMany<IncentiveApplicationApprenticeship>(4),
                 AccountId = _createApplicationRequest.AccountId,
             };
             _updateApplicationRequest.Apprenticeships.AddItem(_createApplicationRequest.Apprenticeships.First());
@@ -58,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var query = $"SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = '{ _updateApplicationRequest.IncentiveApplicationId}'";
-            var apprenticeships = dbConnection.Query<IncentiveApplicationApprenticeship>(query).ToList();
+            var apprenticeships = dbConnection.Query<Data.Models.IncentiveApplicationApprenticeship>(query).ToList();
 
             apprenticeships.Should().BeEquivalentTo(_updateApplicationRequest.Apprenticeships, opts => opts.Excluding(x => x.PlannedStartDate));
         }

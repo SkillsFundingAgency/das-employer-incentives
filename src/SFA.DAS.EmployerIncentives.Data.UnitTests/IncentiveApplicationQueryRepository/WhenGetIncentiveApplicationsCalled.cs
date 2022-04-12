@@ -6,10 +6,9 @@ using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRepository
@@ -97,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             //Assert
             actual.Apprenticeships.Count().Should().Be(4);
 
-            IncentiveApplicationApprenticeshipDto previous = null;
+            DataTransferObjects.Queries.IncentiveApplicationApprenticeship previous = null;
             foreach (var apprenticeship in actual.Apprenticeships)
             {
                 if (previous != null)

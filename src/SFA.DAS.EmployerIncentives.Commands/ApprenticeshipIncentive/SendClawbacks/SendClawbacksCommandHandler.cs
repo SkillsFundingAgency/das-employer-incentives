@@ -1,7 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendClawba
             await Send(clawbacks, command.AccountLegalEntityId, command.ClawbackDate);
         }
 
-        private async Task Send(List<PaymentDto> clawbacks, long accountLegalEntityId, DateTime clawbackDate, CancellationToken cancellationToken = default)
+        private async Task Send(List<Payment> clawbacks, long accountLegalEntityId, DateTime clawbackDate, CancellationToken cancellationToken = default)
         {
             var clawbacksToSend = clawbacks.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
             if (!clawbacksToSend.Any())
