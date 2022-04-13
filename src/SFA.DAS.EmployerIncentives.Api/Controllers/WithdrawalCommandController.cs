@@ -69,7 +69,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                         v.ULN)
                 ));
 
-            await SendCommandsAsync(commands);
+            foreach (var command in commands)
+            {
+                await SendCommandAsync(command);
+            }
 
             return Accepted();
         }

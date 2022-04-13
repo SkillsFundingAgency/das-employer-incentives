@@ -34,7 +34,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
                         application.ReinstateWithdrawal(apprenticeship);
                     }
                 }
-
                 await _domainRepository.Save(application);
             }
         }
