@@ -19,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public bool SuccessfulLearnerMatch => Model.SuccessfulLearnerMatch;
         public bool HasPossibleChangeOfCircumstances { get; private set; }
         public IReadOnlyCollection<LearningPeriod> LearningPeriods => Model.LearningPeriods.OrderBy(l => l.StartDate).ToList().AsReadOnly();
+        public DateTime? LastRefreshed => Model.RefreshDate;
 
         internal static Learner New(
             Guid id,
@@ -56,6 +57,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 HasPossibleChangeOfCircumstances = submissionData.HasChangeOfCircumstances(Model.SubmissionData);
                 Model.SubmissionData = submissionData;
             }
+
+            Model.RefreshDate = DateTime.UtcNow;
         }
 
         public void SetLearningPeriods(IEnumerable<LearningPeriod> learningPeriods)

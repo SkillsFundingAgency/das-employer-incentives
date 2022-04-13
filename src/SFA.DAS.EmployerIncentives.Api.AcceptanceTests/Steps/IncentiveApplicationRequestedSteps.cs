@@ -1,11 +1,12 @@
 ﻿using AutoFixture;
-using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using TechTalk.SpecFlow;
+using IncentiveApplication = SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.IncentiveApplication;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     public class IncentiveApplicationRequestedSteps : StepsBase
     {
         private readonly CreateIncentiveApplicationRequest _request;
-        private IncentiveApplicationDto _returnedApplication;
+        private IncentiveApplication _returnedApplication;
         private readonly Account _testAccountTable;
 
         public IncentiveApplicationRequestedSteps(TestContext testContext) : base(testContext)
@@ -38,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_request.AccountId}/applications/{_request.IncentiveApplicationId}";
             var (_, data) =
-                await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplicationDto>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplication>(url);
 
             _returnedApplication = data;
         }

@@ -3,7 +3,6 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
@@ -11,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
 {
@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.Account.Handlers
         {
             // Arrange
             var query = _fixture.Create<GetApplicationsRequest>();
-            var applicationsList = _fixture.CreateMany<ApprenticeApplicationDto>().ToList();
+            var applicationsList = _fixture.CreateMany<ApprenticeApplication>().ToList();
             var expectedResponse = new GetApplicationsResponse
             {
                 ApprenticeApplications = applicationsList,

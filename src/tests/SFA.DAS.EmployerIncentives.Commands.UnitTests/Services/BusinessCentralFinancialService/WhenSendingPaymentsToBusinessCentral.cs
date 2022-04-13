@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Application.UnitTests;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentralFinancialService
 {
@@ -37,10 +37,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         {
             //Arrange
             _httpClient.SetUpPostAsAsync(System.Net.HttpStatusCode.Accepted);
-            var payment = _fixture.Create<PaymentDto>();
+            var payment = _fixture.Create<Payment>();
 
             //Act
-            await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+            await _sut.SendPaymentRequests(new List<Payment> { payment });
         }
 
         [Test]
@@ -51,13 +51,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
             var decorator = new BusinessCentralFinancePaymentsServiceWithLogging(_sut, loggerMock.Object, false);
             _httpClient.SetUpPostAsAsync(HttpStatusCode.Accepted);
-            var payment1 = _fixture.Create<PaymentDto>();
-            var payment2 = _fixture.Create<PaymentDto>();
+            var payment1 = _fixture.Create<Payment>();
+            var payment2 = _fixture.Create<Payment>();
             var req1 = payment1.Map(false);
             var req2 = payment2.Map(false);
 
             //Act
-            await decorator.SendPaymentRequests(new List<PaymentDto> { payment1, payment2 });
+            await decorator.SendPaymentRequests(new List<Payment> { payment1, payment2 });
 
             //Assert
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.ActivityCode);
@@ -77,10 +77,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         {
             //Arrange
             _httpClient.SetUpPostAsAsync(System.Net.HttpStatusCode.Accepted);
-            var payment = _fixture.Create<PaymentDto>();
+            var payment = _fixture.Create<Payment>();
 
             //Act
-            await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+            await _sut.SendPaymentRequests(new List<Payment> { payment });
 
             // Assert
             _httpClient.VerifyContentType("application/payments-data");
@@ -93,12 +93,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         {
             //Arrange
             _httpClient.SetUpPostAsAsync(statusCode);
-            var payment = _fixture.Create<PaymentDto>();
+            var payment = _fixture.Create<Payment>();
 
             //Act / Assert
             try
             {
-                await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+                await _sut.SendPaymentRequests(new List<Payment> { payment });
             }
             catch(BusinessCentralApiException exception)
             {
@@ -132,10 +132,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         {
             //Arrange
             _httpClient.SetUpPostAsAsync(statusCode);
-            var payment = _fixture.Create<PaymentDto>();
+            var payment = _fixture.Create<Payment>();
 
             //Act
-            Func<Task> act = async () => await _sut.SendPaymentRequests(new List<PaymentDto> { payment });
+            Func<Task> act = async () => await _sut.SendPaymentRequests(new List<Payment> { payment });
 
             act.Should().Throw<BusinessCentralApiException>().WithMessage("Business Central API returned*");
         }
@@ -144,7 +144,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         public void Then_the_payment_fields_are_mapped_correctly()
         {
 
-            var payment = _fixture.Build<PaymentDto>().Create();
+            var payment = _fixture.Build<Payment>().Create();
 
             var paymentRequest = payment.Map(false);
 
@@ -168,7 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         [TestCase(SubnominalCode.NonLevy19Plus, "54156002")]
         public void Then_the_SubnominalCodes_are_mapped_to_AccountCode(SubnominalCode subnominalCode, string expectedAccountCode)
         {
-            var payment = _fixture.Build<PaymentDto>().With(x => x.SubnominalCode, subnominalCode).Create();
+            var payment = _fixture.Build<Payment>().With(x => x.SubnominalCode, subnominalCode).Create();
 
             var paymentRequest = payment.Map(false);
 
@@ -181,7 +181,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         [TestCase(SubnominalCode.NonLevy19Plus, "100397")]
         public void Then_the_SubnominalCodes_are_mapped_to_ActivityCode(SubnominalCode subnominalCode, string expectedActivityCode)
         {
-            var payment = _fixture.Build<PaymentDto>().With(x => x.SubnominalCode, subnominalCode).Create();
+            var payment = _fixture.Build<Payment>().With(x => x.SubnominalCode, subnominalCode).Create();
 
             var paymentRequest = payment.Map(false);
 
@@ -193,7 +193,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         public void Then_the_PaymentLineDescription_is_constructed_as_expected(EarningType earningType, string hashedLegalEntityId, long uln, string expected)
         {
 
-            var payment = _fixture.Build<PaymentDto>()
+            var payment = _fixture.Build<Payment>()
                 .With(x => x.EarningType, earningType)
                 .With(x => x.HashedLegalEntityId, hashedLegalEntityId)
                 .With(x => x.ULN, uln)
@@ -210,7 +210,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         {
             _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true);
 
-            var payment = _fixture.Build<PaymentDto>()
+            var payment = _fixture.Build<Payment>()
                 .With(x => x.EarningType, EarningType.FirstPayment)
                 .With(x => x.HashedLegalEntityId, "ABCD")
 

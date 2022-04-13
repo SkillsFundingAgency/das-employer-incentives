@@ -1,9 +1,5 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Abstractions.Queries;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
-using SFA.DAS.EmployerIncentives.Data.Map;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

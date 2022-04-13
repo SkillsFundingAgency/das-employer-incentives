@@ -4,9 +4,9 @@ using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.LegalEntityVendorRegistrationForm;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LegalEntityVendorRegistrationForm
 {
@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LegalEntityVendorRegistratio
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<LegalEntityVendorRegistrationFormDto> _sut;
+        private IQueryRepository<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm> _sut;
 
         [SetUp]
         public void Arrange()

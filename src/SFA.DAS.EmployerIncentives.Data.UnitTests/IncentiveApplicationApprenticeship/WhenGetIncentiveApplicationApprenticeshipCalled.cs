@@ -5,10 +5,8 @@ using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplicationApprenticeship;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Domain.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationApprenticeship
 {

@@ -74,3 +74,16 @@ Scenario: Request to refresh learner data for an Apprenticeship Incentive where 
 	And a change of circumstances start date is made
 	When the learner data is refreshed for the apprenticeship incentive
 	Then the clawback creation is persisted
+
+Scenario: Request to refresh learner data for an Apprenticeship Incentive calls learner match twice when caching not enabled
+	Given an apprenticeship incentive exists and with a corresponding learner match record
+	And the latest learner data has active in learning data
+	When the learner data is refreshed for the apprenticeship incentive
+	Then the learner match API is called '2' time(s)
+
+Scenario: Request to refresh learner data for an Apprenticeship Incentive calls learner match once when caching is enabled
+	Given an apprenticeship incentive exists and with a corresponding learner match record
+	And the latest learner data has active in learning data
+	And learner service caching is enabled
+	When the learner data is refreshed for the apprenticeship incentive
+	Then the learner match API is called '1' time(s)
