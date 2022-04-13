@@ -35,31 +35,19 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Withdrawal
             var request = _fixture.Create<ReinstateApplicationRequest>();
             request.Applications = _fixture.CreateMany<Types.Application>(2).ToArray();
 
-            ReinstateWithdrawalCommand sentCommand1 = null;
-            ReinstateWithdrawalCommand sentCommand2 = null;
-
-            _mockCommandDispatcher
-                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
-                .Callback<IEnumerable<ICommand>, CancellationToken>((c, t) =>
-                {
-                    sentCommand1 = c.First() as ReinstateWithdrawalCommand;
-                    sentCommand2 = c.Last() as ReinstateWithdrawalCommand;
-                });
-
             // Act
             await _sut.ReinstateIncentiveApplication(request);
 
             // Assert
             _mockCommandDispatcher
-                .Verify(m => m.SendMany(It.Is<List<ICommand>>(c => c.Count == 2),
+                .Verify(m => m.Send<ICommand>(It.Is<ReinstateWithdrawalCommand>(x => x.AccountLegalEntityId == request.Applications[0].AccountLegalEntityId && x.ULN == request.Applications[0].ULN),
                 It.IsAny<CancellationToken>())
                 , Times.Once);
 
-            sentCommand1.AccountLegalEntityId.Should().Be(request.Applications.First().AccountLegalEntityId);
-            sentCommand1.ULN.Should().Be(request.Applications.First().ULN);
-
-            sentCommand2.AccountLegalEntityId.Should().Be(request.Applications.Last().AccountLegalEntityId);
-            sentCommand2.ULN.Should().Be(request.Applications.Last().ULN);
+            _mockCommandDispatcher
+                .Verify(m => m.Send<ICommand>(It.Is<ReinstateWithdrawalCommand>(x => x.AccountLegalEntityId == request.Applications[1].AccountLegalEntityId && x.ULN == request.Applications[1].ULN),
+                        It.IsAny<CancellationToken>())
+                    , Times.Once);
         }
 
         [Test]
