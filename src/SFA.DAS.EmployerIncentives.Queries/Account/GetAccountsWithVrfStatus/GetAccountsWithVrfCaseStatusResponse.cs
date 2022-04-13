@@ -1,10 +1,10 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus
 {
     public class GetAccountsWithVrfCaseStatusResponse
     {
-        public IEnumerable<AccountDto> Accounts { get; set; }
+        public IEnumerable<DataTransferObjects.Account> Accounts { get; set; }
     }
 }

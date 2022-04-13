@@ -1,7 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using System;
 using System.Collections.Generic;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
 {
@@ -9,12 +9,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
     {
         public Guid IncentiveApplicationId { get; }
         public long AccountId { get; }
-        public IEnumerable<IncentiveApplicationApprenticeshipDto> Apprenticeships { get; }
+        public IEnumerable<IncentiveApplicationApprenticeship> Apprenticeships { get; }
 
         public UpdateIncentiveApplicationCommand(
             Guid incentiveApplicationId,
             long accountId,
-            IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
+            IEnumerable<IncentiveApplicationApprenticeship> apprenticeships)
         {
             IncentiveApplicationId = incentiveApplicationId;
             AccountId = accountId;

@@ -8,13 +8,17 @@
       }
     }
   },
-  "functionTimeout": "00:30:00",
+  "functionTimeout": "01:00:00",
   "extensions": {
     "durableTask": {
       "extendedSessionsEnabled": true,
       "extendedSessionIdleTimeoutInSeconds": 10,
       "maxOrchestrationActions": "10000000",
-      "hubName":  "EIPaymentProcessingHub"   
+      "hubName": "EIPaymentProcessingHub",
+      "storageProvider": {
+        "controlQueueBufferThreshold": 1000,
+        "partitionCount": 16
+      }
     }
   }
 }

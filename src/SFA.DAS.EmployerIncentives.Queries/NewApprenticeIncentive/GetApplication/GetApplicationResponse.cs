@@ -1,12 +1,12 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+﻿using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication
 {
     public class GetApplicationResponse
     {
-        public IncentiveApplicationDto Application { get; }
+        public IncentiveApplication Application { get; }
 
-        public GetApplicationResponse(IncentiveApplicationDto application)
+        public GetApplicationResponse(IncentiveApplication application)
         {
             Application = application;
         }
