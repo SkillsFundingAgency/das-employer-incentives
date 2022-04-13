@@ -1,6 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives
+﻿namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives
 {
-    public class CollectionPeriodDto
+    public class CollectionPeriod
     {
         public byte CollectionPeriodNumber { get; set; }
         public short CollectionYear { get; set; }

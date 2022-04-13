@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Data.Models;
+﻿using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
@@ -8,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using LegalEntity = SFA.DAS.EmployerIncentives.DataTransferObjects.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
 {
@@ -85,16 +86,16 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             return model;
         }
 
-        public static IEnumerable<AccountDto> MapDto(this IEnumerable<Models.Account> models)
+        public static IEnumerable<DataTransferObjects.Account> MapDto(this IEnumerable<Models.Account> models)
         {
-            var accounts = new List<AccountDto>();
+            var accounts = new List<DataTransferObjects.Account>();
 
             foreach (var model in models)
             {
                 var account = accounts.SingleOrDefault(a => a.AccountId == model.Id);
                 if (account == null)
                 {
-                    account = new AccountDto { AccountId = model.Id, LegalEntities = new List<LegalEntityDto>() };
+                    account = new DataTransferObjects.Account { AccountId = model.Id, LegalEntities = new List<LegalEntity>() };
                     accounts.Add(account);
                 }
                 account.LegalEntities.Add(MapLegalEntityDto(model));
@@ -103,9 +104,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             return accounts;
         }
 
-        private static LegalEntityDto MapLegalEntityDto(Models.Account model)
+        private static LegalEntity MapLegalEntityDto(Models.Account model)
         {
-            return new LegalEntityDto
+            return new LegalEntity
             {
                 AccountId = model.Id,
                 AccountLegalEntityId = model.AccountLegalEntityId,

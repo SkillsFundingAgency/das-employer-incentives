@@ -83,6 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.LearningFound, true)
                 .Without(s => s.LearningStoppedDate)
                 .Without(s => s.LearningResumedDate)
+                .Without(s => s.RefreshDate)
                 .With(l => l.LearningPeriods, new List<LearningPeriod> {
                     _fixture
                         .Build<LearningPeriod>()
@@ -104,6 +105,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(s => s.LearningFound, true)
                 .Without(s => s.LearningStoppedDate)
                 .Without(s => s.LearningResumedDate)
+                .Without(s => s.RefreshDate)
                 .With(l => l.LearningPeriods, new List<LearningPeriod> {
                     _fixture
                         .Build<LearningPeriod>()

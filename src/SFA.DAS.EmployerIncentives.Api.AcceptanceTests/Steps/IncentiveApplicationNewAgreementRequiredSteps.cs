@@ -1,13 +1,15 @@
 ﻿using AutoFixture;
-using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using TechTalk.SpecFlow;
+using IncentiveApplication = SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.IncentiveApplication;
+using IncentiveApplicationApprenticeship = SFA.DAS.EmployerIncentives.Data.Models.IncentiveApplicationApprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -17,8 +19,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     {
         private Account _account;
         private List<IncentiveApplicationApprenticeship> _apprenticeships;
-        private IncentiveApplication _application;
-        private IncentiveApplicationDto _savedApplication;
+        private Data.Models.IncentiveApplication _application;
+        private IncentiveApplication _savedApplication;
 
         public IncentiveApplicationNewAgreementRequiredSteps(TestContext context) : base(context)
         {
@@ -34,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"the employer has selected the apprenticeships for their application")]
         public async Task GivenTheEmployerHasSelectedTheApprenticeshipsForTheirApplication()
         {
-            _application = Fixture.Build<IncentiveApplication>()
+            _application = Fixture.Build<Data.Models.IncentiveApplication>()
                 .With(a => a.AccountId, _account.Id)
                 .With(a => a.AccountLegalEntityId, _account.AccountLegalEntityId)
                 .With(a => a.Status, IncentiveApplicationStatus.Submitted)
@@ -93,7 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenTheyRetrieveTheApplication()
         {
             var url = $"/accounts/{_application.AccountId}/applications/{_application.Id}";
-            var (_, data) = await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplicationDto>(url);
+            var (_, data) = await EmployerIncentiveApi.Client.GetValueAsync<IncentiveApplication>(url);
 
             _savedApplication = data;
         }

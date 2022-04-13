@@ -1,6 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives
+﻿namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives
 {
-    public class ClawbackLegalEntityDto
+    public class ClawbackLegalEntity
     {
         public bool IsSent { get; set; }
         public long AccountLegalEntityId { get; set; }

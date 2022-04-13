@@ -1,8 +1,8 @@
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -13,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Data
         Task<AccountModel> Find(long accountId);
         Task<IEnumerable<AccountModel>> FindByVendorId(string vendorId);
         Task<IEnumerable<AccountModel>> GetByHashedLegalEntityId(string hashedLegalEntityId);
-        Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus);       
+        Task<IEnumerable<DataTransferObjects.Account>> GetByVrfCaseStatus(string vrfCaseStatus);       
         Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime();
     }
 }
