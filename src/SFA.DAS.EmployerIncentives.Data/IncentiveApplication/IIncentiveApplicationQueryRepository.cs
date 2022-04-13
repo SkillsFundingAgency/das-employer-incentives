@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
     public interface IIncentiveApplicationQueryRepository
     {
-        Task<IncentiveApplicationDto> Get(Expression<Func<IncentiveApplicationDto, bool>> predicate);
-        Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null);
+        Task<DataTransferObjects.Queries.IncentiveApplication> Get(Expression<Func<DataTransferObjects.Queries.IncentiveApplication, bool>> predicate);
+        Task<List<DataTransferObjects.Queries.IncentiveApplication>> GetList(Expression<Func<DataTransferObjects.Queries.IncentiveApplication, bool>> predicate = null);
     }
 }

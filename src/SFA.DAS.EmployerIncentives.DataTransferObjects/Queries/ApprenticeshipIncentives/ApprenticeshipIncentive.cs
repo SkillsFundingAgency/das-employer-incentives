@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives
 {
-    public class ApprenticeshipIncentiveDto
+    public class ApprenticeshipIncentive
     {
         public Guid Id { get; set; }
         public long ApprenticeshipId { get; set; }
