@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Data.Models.Account _account;
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _incentive;
-        private readonly LearnerSubmissionDto _lerner;
+        private readonly LearnerSubmissionDto _learner;
         private DateTime _endDate;
         public RefreshLearnerDataDuringAcademicYearRolloverSteps(TestContext context)
         {
@@ -45,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.Phase, Phase.Phase2)
                 .Create();
 
-            _lerner = _fixture
+            _learner = _fixture
                 .Build<LearnerSubmissionDto>()
                 .With(s => s.Ukprn, _incentive.UKPRN)
                 .With(s => s.Uln, _incentive.ULN)
@@ -106,7 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(pe => pe.Periods, new List<PeriodDto>())
                 .Create();
 
-            _lerner.Training.First().PriceEpisodes.Add(episode);
+            _learner.Training.First().PriceEpisodes.Add(episode);
         }
 
         [When(@"the previous price episode has a period with a matching apprenticeship ID")]
@@ -118,7 +118,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"trigger a learning stopped Change of Circumstance")]
         public async Task ThenTriggerALearningStoppedChangeOfCircumstance()
         {
-            _lerner.IlrSubmissionDate = _lerner.IlrSubmissionDate.AddMonths(1);
+            _learner.IlrSubmissionDate = _learner.IlrSubmissionDate.AddMonths(1);
             SetupMockLearnerMatchResponse();
             await StartLearnerMatching();
         }
@@ -145,7 +145,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .RespondWith(Response.Create()
                     .WithStatusCode(HttpStatusCode.OK)
                     .WithHeader("Content-Type", "application/json")
-                    .WithBodyAsJson(_lerner));
+                    .WithBodyAsJson(_learner));
         }
 
         private async Task StartLearnerMatching()

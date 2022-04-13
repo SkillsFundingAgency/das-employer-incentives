@@ -1,16 +1,16 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntities
 {
     public class GetLegalEntitiesQueryHandler : IQueryHandler<GetLegalEntitiesRequest, GetLegalEntitiesResponse>
     {
-        private readonly IQueryRepository<LegalEntityDto> _repository;
+        private readonly IQueryRepository<LegalEntity> _repository;
 
-        public GetLegalEntitiesQueryHandler(IQueryRepository<LegalEntityDto> repository)
+        public GetLegalEntitiesQueryHandler(IQueryRepository<LegalEntity> repository)
         {
             _repository = repository;
         }

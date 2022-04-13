@@ -1,16 +1,16 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPendingPaymentsForAccountLegalEntity
 {
     public class GetPendingPaymentsForAccountLegalEntityQueryHandler : IQueryHandler<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>
     {
-        private readonly IQueryRepository<PendingPaymentDto> _queryRepository;
+        private readonly IQueryRepository<PendingPayment> _queryRepository;
 
-        public GetPendingPaymentsForAccountLegalEntityQueryHandler(IQueryRepository<PendingPaymentDto> queryRepository)
+        public GetPendingPaymentsForAccountLegalEntityQueryHandler(IQueryRepository<PendingPayment> queryRepository)
         {
             _queryRepository = queryRepository;
         }

@@ -5,11 +5,11 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using SFA.DAS.EmployerIncentives.Enums;
 using TechTalk.SpecFlow;
 
@@ -75,9 +75,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var url = "/earningsRecalculations";
             _request = new RecalculateEarningsRequest()
             {
-                IncentiveLearnerIdentifiers = new List<IncentiveLearnerIdentifierDto>
+                IncentiveLearnerIdentifiers = new List<IncentiveLearnerIdentifier>
                 {
-                    new IncentiveLearnerIdentifierDto { AccountLegalEntityId = _accountLegalEntityId, ULN = _uln }
+                    new IncentiveLearnerIdentifier { AccountLegalEntityId = _accountLegalEntityId, ULN = _uln }
                 }
             };
             var apiResult = await EmployerIncentiveApi.Client.PostAsync(url, _request.GetStringContent());

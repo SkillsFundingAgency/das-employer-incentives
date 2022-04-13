@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 
         public int PaymentRequestsLimit => _businessCentralFinancePaymentsService.PaymentRequestsLimit;
 
-        public async Task SendPaymentRequests(IList<PaymentDto> payments)
+        public async Task SendPaymentRequests(IList<Payment> payments)
         {
             var paymentRequests = payments.Select(x => x.Map(_obfuscateSensitiveData)).ToList();
 

@@ -1,13 +1,13 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
-using SFA.DAS.EmployerIncentives.Abstractions.Logging;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.Logging;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Queries.CollectionCalendar.GetActiveCollectionPeriod
 {
     public class GetActiveCollectionPeriodResponse : IResponseLogWriter
     {
-        public CollectionPeriodDto CollectionPeriod { get; }
+        public CollectionPeriod CollectionPeriod { get; }
 
-        public GetActiveCollectionPeriodResponse(CollectionPeriodDto collectionPeriod)
+        public GetActiveCollectionPeriodResponse(CollectionPeriod collectionPeriod)
         {
             CollectionPeriod = collectionPeriod;
         }

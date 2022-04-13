@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
 {
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
         public async Task Then_the_command_to_recalculate_earnings_is_dispatched()
         {
             // Arrange
-            var incentiveLearnerIdentifiers = _fixture.CreateMany<IncentiveLearnerIdentifierDto>(5).ToList();
+            var incentiveLearnerIdentifiers = _fixture.CreateMany<IncentiveLearnerIdentifier>(5).ToList();
             var request = new RecalculateEarningsRequest { IncentiveLearnerIdentifiers = incentiveLearnerIdentifiers };
             _commandDispatcher.Setup(
                 x => x.Send(It.IsAny<RecalculateEarningsCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);

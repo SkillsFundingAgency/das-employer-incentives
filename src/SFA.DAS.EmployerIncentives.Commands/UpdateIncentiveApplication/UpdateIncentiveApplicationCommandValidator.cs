@@ -1,5 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
             return Task.FromResult(result);
         }
 
-        private static void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeshipDto> apprenticeships)
+        private static void ValidateApprenticeships(ValidationResult result, IEnumerable<IncentiveApplicationApprenticeship> apprenticeships)
         {
             if (apprenticeships == null)
             {
@@ -47,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication
             }
         }
 
-        private static void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeshipDto apprenticeship)
+        private static void ValidateApprenticeship(ValidationResult result, IncentiveApplicationApprenticeship apprenticeship)
         {
             if (apprenticeship.ApprenticeshipId == default)
             {

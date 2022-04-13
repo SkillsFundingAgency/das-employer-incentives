@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPendingPaymentsForAccountLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
@@ -19,14 +19,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         }
 
         [FunctionName(nameof(GetPendingPaymentsForAccountLegalEntity))]
-        public async Task<List<PendingPaymentActivityDto>> Get([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
+        public async Task<List<PendingPaymentActivity>> Get([ActivityTrigger]AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
             var accountLegalEntityId = accountLegalEntityCollectionPeriod.AccountLegalEntityId;
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;
 
             var request = new GetPendingPaymentsForAccountLegalEntityRequest(accountLegalEntityId, new Domain.ValueObjects.CollectionPeriod(collectionPeriod.Period, collectionPeriod.Year));
             var pendingPayments = await _queryDispatcher.Send<GetPendingPaymentsForAccountLegalEntityRequest, GetPendingPaymentsForAccountLegalEntityResponse>(request);
-            return pendingPayments.PendingPayments.Select(x => new PendingPaymentActivityDto { PendingPaymentId = x.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId }).ToList();
+            return pendingPayments.PendingPayments.Select(x => new PendingPaymentActivity { PendingPaymentId = x.Id, ApprenticeshipIncentiveId = x.ApprenticeshipIncentiveId }).ToList();
         }
     }
 }

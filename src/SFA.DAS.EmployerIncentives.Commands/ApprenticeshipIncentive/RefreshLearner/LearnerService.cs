@@ -1,25 +1,28 @@
-﻿using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.Persistence;
+﻿using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner
 {
-    internal class LearnerService
+    public class LearnerService : ILearnerService
     {
         private readonly ILearnerSubmissionService _learnerSubmissionService;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
 
-        internal LearnerService(ILearnerSubmissionService learnerSubmissionService, ILearnerDomainRepository learnerDomainRepository, ICollectionCalendarService collectionCalendarService)
+        public LearnerService(
+            ILearnerSubmissionService learnerSubmissionService, 
+            ILearnerDomainRepository learnerDomainRepository,
+            ICollectionCalendarService collectionCalendarService)
         {
             _learnerSubmissionService = learnerSubmissionService;
             _learnerDomainRepository = learnerDomainRepository;
             _collectionCalendarService = collectionCalendarService;
         }
 
-        internal async Task<Learner> Refresh(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
+        public async Task<Learner> Refresh(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive incentive)
         {
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
             var learnerData = await _learnerSubmissionService.Get(learner);
