@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
@@ -10,6 +9,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using ValidationOverride = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ValidationOverride;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
+using ApprenticeApplication = SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeApplication;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -29,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             _collectionCalendarService = collectionCalendarService;
         }
 
-        public async Task<List<ApprenticeApplicationDto>> GetList(long accountId, long accountLegalEntityId)
+        public async Task<List<ApprenticeApplication>> GetList(long accountId, long accountLegalEntityId)
         {
             var calendar = await _collectionCalendarService.Get();
             var nextActivePeriod = calendar.GetNextPeriod(calendar.GetActivePeriod());
@@ -39,13 +40,13 @@ namespace SFA.DAS.EmployerIncentives.Data
 
             var apprenticeshipIncentives = _dbContext.ApprenticeshipIncentives.Where(x => x.AccountId == accountId && x.AccountLegalEntityId == accountLegalEntityId).Include(i => i.ValidationOverrides);
 
-            var result = new List<ApprenticeApplicationDto>();
+            var result = new List<ApprenticeApplication>();
 
             foreach (var data in accountApplications)
             {
                 var validationOverrides = apprenticeshipIncentives.Single(i => i.Id == data.Id).ValidationOverrides;
 
-                var apprenticeApplicationDto = new ApprenticeApplicationDto
+                var apprenticeApplicationDto = new ApprenticeApplication
                 {
                     AccountId = data.AccountId,
                     AccountLegalEntityId = data.AccountLegalEntityId,
@@ -57,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     SubmittedByEmail = data.SubmittedByEmail,
                     TotalIncentiveAmount = CalculateTotalIncentiveAmount(data.FirstPendingPaymentAmount, data.SecondPendingPaymentAmount),
                     CourseName = data.CourseName,
-                    FirstPaymentStatus = data.FirstPendingPaymentAmount == default ? null : new PaymentStatusDto
+                    FirstPaymentStatus = data.FirstPendingPaymentAmount == default ? null : new PaymentStatus
                     {
                         PaymentDate = PaymentDate(data.FirstPendingPaymentDueDate, data.FirstPaymentDate, data.FirstPaymentCalculatedDate, nextActivePeriod),
                         LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value,
@@ -73,13 +74,13 @@ namespace SFA.DAS.EmployerIncentives.Data
                                         EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted)),
                         EmploymentCheckErrorCodes = EmploymentCheckErrorCodes(data.FirstEmploymentCheckErrorType, data.SecondEmploymentCheckErrorType)
                     },
-                    FirstClawbackStatus = data.FirstClawbackAmount == default ? null : new ClawbackStatusDto
+                    FirstClawbackStatus = data.FirstClawbackAmount == default ? null : new ClawbackStatus
                     {
                         ClawbackAmount = data.FirstClawbackAmount.Value,
                         ClawbackDate = data.FirstClawbackCreated,
                         OriginalPaymentDate = data.FirstPaymentDate
                     },
-                    SecondPaymentStatus = data.SecondPendingPaymentAmount == default ? null : new PaymentStatusDto
+                    SecondPaymentStatus = data.SecondPendingPaymentAmount == default ? null : new PaymentStatus
                     {
                         PaymentDate = PaymentDate(data.SecondPendingPaymentDueDate, data.SecondPaymentDate, data.SecondPaymentCalculatedDate, nextActivePeriod),
                         LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value,
@@ -95,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                         EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted)),
                         EmploymentCheckErrorCodes = EmploymentCheckErrorCodes(data.FirstEmploymentCheckErrorType, data.SecondEmploymentCheckErrorType)
                     },
-                    SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatusDto
+                    SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatus
                     {
                         ClawbackAmount = data.SecondClawbackAmount.Value,
                         ClawbackDate = data.SecondClawbackCreated,
@@ -242,19 +243,19 @@ namespace SFA.DAS.EmployerIncentives.Data
             return amount;
         }       
 
-        private static void SetStoppedStatus(ApprenticeApplicationDto model)
+        private static void SetStoppedStatus(ApprenticeApplication model)
         {
-            var paymentStatus = new PaymentStatusDto { PaymentIsStopped = true };
+            var paymentStatus = new PaymentStatus { PaymentIsStopped = true };
             SetIncentiveStatus(paymentStatus, model);
         }
 
-        private static void SetWithdrawnStatus(ApprenticeApplicationDto model, WithdrawnBy withdrawnBy)
+        private static void SetWithdrawnStatus(ApprenticeApplication model, WithdrawnBy withdrawnBy)
         {
-            var paymentStatus = new PaymentStatusDto { WithdrawnByCompliance = withdrawnBy == WithdrawnBy.Compliance, WithdrawnByEmployer = withdrawnBy == WithdrawnBy.Employer};
+            var paymentStatus = new PaymentStatus { WithdrawnByCompliance = withdrawnBy == WithdrawnBy.Compliance, WithdrawnByEmployer = withdrawnBy == WithdrawnBy.Employer};
             SetIncentiveStatus(paymentStatus, model);
         }
 
-        private static void SetIncentiveStatus(PaymentStatusDto paymentStatus, ApprenticeApplicationDto model)
+        private static void SetIncentiveStatus(PaymentStatus paymentStatus, ApprenticeApplication model)
         {
             if (model.FirstPaymentStatus == null)
             {

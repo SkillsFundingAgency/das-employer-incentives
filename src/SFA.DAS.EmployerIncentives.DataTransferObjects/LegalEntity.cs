@@ -1,6 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
+﻿namespace SFA.DAS.EmployerIncentives.DataTransferObjects
 {
-    public class LegalEntityDto
+    public class LegalEntity
     {
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }

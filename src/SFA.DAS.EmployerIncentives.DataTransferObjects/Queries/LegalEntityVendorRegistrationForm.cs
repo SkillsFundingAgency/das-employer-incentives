@@ -1,6 +1,6 @@
-﻿namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
+﻿namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
 {
-    public class LegalEntityVendorRegistrationFormDto
+    public class LegalEntityVendorRegistrationForm
     {
         public long LegalEntityId { get; set; }
         public string VrfCaseId { get; set; }

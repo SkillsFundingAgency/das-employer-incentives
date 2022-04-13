@@ -26,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public string RawJSON { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public DateTime? RefreshDate { get; set; }
         [Dapper.Contrib.Extensions.Write(false)]
         public ICollection<LearningPeriod> LearningPeriods { get; set; }
         [Dapper.Contrib.Extensions.Write(false)]

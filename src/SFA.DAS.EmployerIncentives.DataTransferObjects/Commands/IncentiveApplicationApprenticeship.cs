@@ -1,9 +1,9 @@
 ﻿using System;
 using SFA.DAS.Common.Domain.Types;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Commands
 {
-    public class IncentiveApplicationApprenticeshipDto
+    public class IncentiveApplicationApprenticeship
     {
         public long ApprenticeshipId { get; set; }
         public string FirstName { get; set; }

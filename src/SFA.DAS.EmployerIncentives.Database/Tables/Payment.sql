@@ -18,3 +18,5 @@ CREATE CLUSTERED INDEX IX_Payment_PaidDate ON [incentives].[Payment] ([PaidDate]
 GO
 CREATE INDEX IX_Payment_ApprenticeshipIncentiveId ON [incentives].[Payment] (ApprenticeshipIncentiveId, PendingPaymentId)
 GO
+CREATE INDEX IX_Payment_PendingPaymentId ON [incentives].[Payment] (PendingPaymentId)
+GO

@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.HouseKeeping
             [DurableClient] IDurableOrchestrationClient orchestrationClient, ILogger log)
         {
             var createdTimeFrom = DateTime.UtcNow.Subtract(TimeSpan.FromDays(365));
-            var createdTimeTo = DateTime.UtcNow.Subtract(TimeSpan.FromDays(7));
+            var createdTimeTo = DateTime.UtcNow.Subtract(TimeSpan.FromDays(3));
             var runtimeStatus = new List<OrchestrationStatus>
             {
                 OrchestrationStatus.Completed,

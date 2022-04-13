@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication;
 using System;
 using System.Threading.Tasks;
@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
             // Arrange
             var accountId = _fixture.Create<long>();
             var applicationId = Guid.NewGuid();
-            var expected = new GetApplicationResponse(_fixture.Create<IncentiveApplicationDto>());
+            var expected = new GetApplicationResponse(_fixture.Create<IncentiveApplication>());
 
             _queryDispatcherMock.Setup(x => x.Send<GetApplicationRequest, GetApplicationResponse>(
                     It.Is<GetApplicationRequest>(r => r.AccountId == accountId && r.ApplicationId == applicationId)))

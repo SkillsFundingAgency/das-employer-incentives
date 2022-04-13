@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
 {
-    public class ApprenticeApplicationDto
+    public class ApprenticeApplication
     {
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
@@ -14,10 +14,10 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
         public decimal TotalIncentiveAmount { get; set; }
         public string CourseName { get; set; }
         public string SubmittedByEmail { get; set; }
-        public PaymentStatusDto FirstPaymentStatus { get; set; }
-        public PaymentStatusDto SecondPaymentStatus { get; set; }
-        public ClawbackStatusDto FirstClawbackStatus { get; set; }
-        public ClawbackStatusDto SecondClawbackStatus { get; set; }
+        public PaymentStatus FirstPaymentStatus { get; set; }
+        public PaymentStatus SecondPaymentStatus { get; set; }
+        public ClawbackStatus FirstClawbackStatus { get; set; }
+        public ClawbackStatus SecondClawbackStatus { get; set; }
     }
 
 }

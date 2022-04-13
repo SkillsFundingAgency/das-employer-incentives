@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
 {
-    public class PaymentStatusDto
+    public class PaymentStatus
     {
         public decimal? PaymentAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
