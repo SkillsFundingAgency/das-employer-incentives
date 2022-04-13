@@ -3,13 +3,13 @@ using FluentAssertions;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
         private CalculatePaymentsForAccountLegalEntityOrchestrator _orchestrator;
         private AccountLegalEntityCollectionPeriod _accountLegalEntityCollectionPeriod;
-        private List<PendingPaymentActivityDto> _pendingPayments;
+        private List<PendingPaymentActivity> _pendingPayments;
 
         [SetUp]
         public void Setup()
@@ -32,8 +32,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
             _mockOrchestrationContext.Setup(x => x.GetInput<AccountLegalEntityCollectionPeriod>()).Returns(_accountLegalEntityCollectionPeriod);
 
-            _pendingPayments = _fixture.CreateMany<PendingPaymentActivityDto>(3).ToList();
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod)).ReturnsAsync(_pendingPayments);
+            _pendingPayments = _fixture.CreateMany<PendingPaymentActivity>(3).ToList();
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<List<PendingPaymentActivity>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod)).ReturnsAsync(_pendingPayments);
 
             _orchestrator = new CalculatePaymentsForAccountLegalEntityOrchestrator();
         }
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PendingPaymentActivityDto>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync<List<PendingPaymentActivity>>("GetPendingPaymentsForAccountLegalEntity", _accountLegalEntityCollectionPeriod), Times.Once);
         }
 
         [Test]

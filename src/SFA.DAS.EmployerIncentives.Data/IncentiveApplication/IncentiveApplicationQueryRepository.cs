@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.Domain.Extensions;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using SFA.DAS.EmployerIncentives.Enums;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
 {
@@ -28,23 +26,23 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             _lazyContext = context;
         }
 
-        public Task<IncentiveApplicationDto> Get(Expression<Func<IncentiveApplicationDto, bool>> predicate)
+        public Task<DataTransferObjects.Queries.IncentiveApplication> Get(Expression<Func<DataTransferObjects.Queries.IncentiveApplication, bool>> predicate)
         {
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).FirstOrDefaultAsync(predicate);
         }
 
-        public Task<List<IncentiveApplicationDto>> GetList(Expression<Func<IncentiveApplicationDto, bool>> predicate = null)
+        public Task<List<DataTransferObjects.Queries.IncentiveApplication>> GetList(Expression<Func<DataTransferObjects.Queries.IncentiveApplication, bool>> predicate = null)
         {
             return _context.Set<Models.IncentiveApplication>()
                 .Join(_context.Set<Models.Account>(), app => app.AccountLegalEntityId, acc => acc.AccountLegalEntityId, (application, account) => new JoinedObject { Account = account, Application = application })
                 .Select(MapToIncentiveApplicationDto()).Where(predicate).ToListAsync();
         }
 
-        private static Expression<Func<JoinedObject, IncentiveApplicationDto>> MapToIncentiveApplicationDto()
+        private static Expression<Func<JoinedObject, DataTransferObjects.Queries.IncentiveApplication>> MapToIncentiveApplicationDto()
         {
-            return x => new IncentiveApplicationDto
+            return x => new DataTransferObjects.Queries.IncentiveApplication
             {
                 Id = x.Application.Id,
                 AccountId = x.Application.AccountId,
@@ -61,9 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
             };
         }
 
-        private static IncentiveApplicationApprenticeshipDto MapToApprenticeshipDto(Models.IncentiveApplicationApprenticeship apprenticeship)
+        private static DataTransferObjects.Queries.IncentiveApplicationApprenticeship MapToApprenticeshipDto(Models.IncentiveApplicationApprenticeship apprenticeship)
         {
-            var apprenticeshipDto = new IncentiveApplicationApprenticeshipDto
+            var apprenticeshipDto = new DataTransferObjects.Queries.IncentiveApplicationApprenticeship
             {
                 Id = apprenticeship.Id,
                 ApprenticeshipId = apprenticeship.ApprenticeshipId,

@@ -6,9 +6,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetApprenticeshipIncentivesForAccountLegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
@@ -33,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
             // Arrange
             const long accountId = 7;
             const long accountLegalEntityId = 19;
-            var expected = new GetApprenticeshipIncentivesForAccountLegalEntityResponse(_fixture.CreateMany<ApprenticeshipIncentiveDto>().ToList());
+            var expected = new GetApprenticeshipIncentivesForAccountLegalEntityResponse(_fixture.CreateMany<DataTransferObjects.Queries.ApprenticeshipIncentives.ApprenticeshipIncentive>().ToList());
 
             _queryDispatcherMock.Setup(x => x.Send<GetApprenticeshipIncentivesForAccountLegalEntityRequest, GetApprenticeshipIncentivesForAccountLegalEntityResponse>(
                     It.Is<GetApprenticeshipIncentivesForAccountLegalEntityRequest>(r => r.AccountId == accountId && r.AccountLegalEntityId == accountLegalEntityId)))
@@ -53,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
             // Arrange
             const long accountId = 7;
             const long accountLegalEntityId = 19;
-            var expected = new GetApprenticeshipIncentivesForAccountLegalEntityResponse(new List<ApprenticeshipIncentiveDto>());
+            var expected = new GetApprenticeshipIncentivesForAccountLegalEntityResponse(new List<DataTransferObjects.Queries.ApprenticeshipIncentives.ApprenticeshipIncentive>());
 
             _queryDispatcherMock.Setup(x => x.Send<GetApprenticeshipIncentivesForAccountLegalEntityRequest, GetApprenticeshipIncentivesForAccountLegalEntityResponse>(
                     It.Is<GetApprenticeshipIncentivesForAccountLegalEntityRequest>(r => r.AccountId == accountId && r.AccountLegalEntityId == accountLegalEntityId)))

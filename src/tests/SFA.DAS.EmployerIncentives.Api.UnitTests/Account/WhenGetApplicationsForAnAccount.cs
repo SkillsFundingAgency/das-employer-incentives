@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetApplications;
 using System.Threading.Tasks;
 
@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
 
             var apprenticeApplicationList = new GetApplicationsResponse
             {
-                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplicationDto>(),
+                ApprenticeApplications = _fixture.CreateMany<ApprenticeApplication>(),
                 BankDetailsStatus = Enums.BankDetailsStatus.InProgress
             };
 

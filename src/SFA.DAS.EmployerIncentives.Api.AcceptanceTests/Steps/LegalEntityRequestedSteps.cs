@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using TechTalk.SpecFlow;
+using Account = SFA.DAS.EmployerIncentives.Data.Models.Account;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -11,7 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "LegalEntityRequested")]
     public class LegalEntityRequestedSteps : StepsBase
     {
-        private LegalEntityDto _getLegalEntityResponse;
+        private LegalEntity _getLegalEntityResponse;
         private readonly Account _testAccountTable;
 
         public LegalEntityRequestedSteps(TestContext testContext) : base(testContext)
@@ -24,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_testAccountTable.Id}/LegalEntities/{_testAccountTable.AccountLegalEntityId}";
             var (status, data) = 
-                await EmployerIncentiveApi.Client.GetValueAsync<LegalEntityDto>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<LegalEntity>(url);
             
             status.Should().Be(HttpStatusCode.OK);
 

@@ -1,13 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data.Map;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace SFA.DAS.EmployerIncentives.Data
 {
@@ -70,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Data
             return accounts?.Map();
         }
 
-        public async Task<IEnumerable<AccountDto>> GetByVrfCaseStatus(string vrfCaseStatus)
+        public async Task<IEnumerable<DataTransferObjects.Account>> GetByVrfCaseStatus(string vrfCaseStatus)
         {
             var accountsWithApplications = await (from account in _dbContext.Accounts
                                            join application in _dbContext.Applications

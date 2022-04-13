@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace SFA.DAS.EmployerIncentives.Abstractions.DTOs
+namespace SFA.DAS.EmployerIncentives.DataTransferObjects
 {
-    public class PendingPaymentActivityDto
+    public class PendingPaymentActivity
     {
         public Guid PendingPaymentId { get; set; }
         public Guid ApprenticeshipIncentiveId { get; set; }
