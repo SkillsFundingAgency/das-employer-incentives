@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Api.Controllers;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus;
 using System.Threading.Tasks;
@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var vrfStatus = LegalEntityVrfCaseStatus.RejectedVerification;
-            var expected = new GetAccountsWithVrfCaseStatusResponse { Accounts = _fixture.CreateMany<AccountDto>() };
+            var expected = new GetAccountsWithVrfCaseStatusResponse { Accounts = _fixture.CreateMany<DataTransferObjects.Account>() };
 
             _queryDispatcherMock.Setup(x => x.Send<GetAccountsWithVrfCaseStatusRequest, GetAccountsWithVrfCaseStatusResponse>(
                     It.Is<GetAccountsWithVrfCaseStatusRequest>(r => r.VrfStatus == vrfStatus)))
