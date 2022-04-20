@@ -71,7 +71,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
             foreach (var command in commands)
             {
-                await SendCommandAsync(command);
+                await SendCommandAsync(command as dynamic);
             }
 
             return Accepted();
