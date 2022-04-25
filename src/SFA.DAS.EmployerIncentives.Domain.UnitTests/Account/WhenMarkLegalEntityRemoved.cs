@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
 
             // Assert
             _sut.LegalEntities.Count.Should().Be(3);
-            Assert.AreEqual(legalEntity.GetModel().HasBeenDeleted, true);
+            Assert.AreEqual(true, legalEntity.GetModel().HasBeenDeleted);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.AccountTests
             // Assert
             _sut.LegalEntities.Count.Should().Be(2);
             _sut.LegalEntities.SingleOrDefault(i => i.GetModel().AccountLegalEntityId == legalEntityModel.AccountLegalEntityId).Should().BeNull();
-            Assert.AreEqual(legalEntity.GetModel().HasBeenDeleted, false);
+            Assert.AreEqual(false, legalEntity.GetModel().HasBeenDeleted);
         }
     }
 }

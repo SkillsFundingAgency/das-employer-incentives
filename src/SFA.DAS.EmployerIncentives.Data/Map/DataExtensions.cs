@@ -29,7 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
                                                             VrfVendorId = i.VrfVendorId,
-                                                            VrfCaseStatusLastUpdatedDateTime = i.VrfCaseStatusLastUpdatedDateTime
+                                                            VrfCaseStatusLastUpdatedDateTime = i.VrfCaseStatusLastUpdatedDateTime,
+                                                            HasBeenDeleted = i.HasBeenDeleted
                                                         }
             ));
 
@@ -67,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
-                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status
+                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status,
+                HasBeenDeleted = model.HasBeenDeleted
             };
         }
 

@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RemoveLegalEntity
                 return;
             }
 
-            var applications = await _incentiveApplicationRepository.FindByAccountLegalEntity(legalEntity.Id);
+            var applications = await _incentiveApplicationRepository.FindByAccountLegalEntity(command.AccountLegalEntityId);
 
             if (applications != null && applications.Any())
             {
