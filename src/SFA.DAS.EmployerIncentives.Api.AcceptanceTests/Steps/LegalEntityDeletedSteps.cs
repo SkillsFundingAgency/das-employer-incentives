@@ -35,12 +35,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
-        [Given(@"a legal entity that is in employer incentives and has submitted one or more applications")]
-        public void GivenALegalEntityThatIsInEmployerIncentivesAndHasSubmittedOneOrMoreApplications()
-        {
-            throw new PendingStepException();
-        }
-
         [Given(@"has submitted one or more applications")]
         public async Task GivenHasSubmittedOneOrMoreApplications()
         {
