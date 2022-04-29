@@ -183,6 +183,32 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
         }
 
+
+        [Test]
+        public void Then_the_first_earning_is_calculated_if_the_updated_learning_stopped_date_is_on_the_payment_due_date()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(70)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(89)));
+            submissionData.SetLearningData(learningData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            // Assert
+            _sutModel.PendingPaymentModels.Count.Should().Be(1);
+        }
+
         [Test]
         public void Then_the_second_earning_is_recalculated_if_the_first_earning_is_paid_and_the_updated_learning_stopped_date_is_after_the_due_date()
         {
@@ -271,6 +297,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             learningData = new LearningData(true);
             learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(363)));
+            submissionData.SetLearningData(learningData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            // Assert
+            _sutModel.PendingPaymentModels.Count.Should().Be(1);
+        }
+
+        [Test]
+        public void Then_the_first_payment_is_recalculated_if_the_next_stopped_date_received_is_after_the_due_date_and_the_previous_payments_were_removed()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(60)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            _sutModel.PendingPaymentModels.Count.Should().Be(0);
+
+            learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(104)));
             submissionData.SetLearningData(learningData);
 
             // Act

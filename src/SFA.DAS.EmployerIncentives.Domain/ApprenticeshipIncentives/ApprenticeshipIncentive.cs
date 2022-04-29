@@ -373,7 +373,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 for (var index = 2; index >= 1; index--)
                 {
                     if (learningStoppedStatus.DateStopped.HasValue
-                        && learningStoppedStatus.DateStopped.Value > StartDate.AddDays(paymentProfiles[index-1].DaysAfterApprenticeshipStart))
+                        && learningStoppedStatus.DateStopped.Value >= StartDate.AddDays(paymentProfiles[index-1].DaysAfterApprenticeshipStart))
                     {
                         CalculateEarningsForStoppedLearner(collectionCalendar, index);
                         break;
