@@ -15,11 +15,11 @@ using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
 
-namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWithdrawal.Handlers
+namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWithdrawal.Handlers
 {
-    public class WhenHandlingComplianceWithdrawalCommand
+    public class WhenHandlingReinstateWithdrawalCommand
     {
-        private ComplianceWithdrawalCommandHandler _sut;
+        private ReinstateWithdrawalCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRepository;
          
         private Fixture _fixture;
@@ -32,18 +32,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWi
 
             _mockDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
             
-            _sut = new ComplianceWithdrawalCommandHandler(_mockDomainRepository.Object);
+            _sut = new ReinstateWithdrawalCommandHandler(_mockDomainRepository.Object);
         }
 
         [Test]
         public async Task Then_changes_to_the_application_are_persisted_to_the_domain_repository_for_matching_ULNs()
         {
             //Arrange            
-            var command = _fixture.Create<ComplianceWithdrawalCommand>();
+            var command = _fixture.Create<ReinstateWithdrawalCommand>();
 
             var apprenticeshipModel = _fixture
                 .Build<ApprenticeshipModel>()
                 .With(a => a.ULN, command.ULN)
+                .With(a => a.WithdrawnByCompliance, true)
+                .With(a => a.WithdrawnByEmployer, true)
                 .Create();
 
             var incentiveApplicationModel = _fixture
@@ -78,7 +80,58 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWi
                  a.Id == testApplication.Id &&
                  a.Apprenticeships.Count(a => 
                     a.ULN == command.ULN &&
-                    a.WithdrawnByCompliance) == 1)),
+                    !a.WithdrawnByCompliance &&
+                    !a.WithdrawnByEmployer) == 1)),
+                 Times.Once);
+        }
+
+        [Test]
+        public async Task Then_applications_not_withdrawn_by_compliance_are_not_reinstated()
+        {
+            //Arrange            
+            var command = _fixture.Create<ReinstateWithdrawalCommand>();
+
+            var apprenticeshipModel = _fixture
+                .Build<ApprenticeshipModel>()
+                .With(a => a.ULN, command.ULN)
+                .With(a => a.WithdrawnByCompliance, false)
+                .With(a => a.WithdrawnByEmployer, true)
+                .Create();
+
+            var incentiveApplicationModel = _fixture
+                .Build<IncentiveApplicationModel>()
+                .With(i => i.ApprenticeshipModels,
+                    new List<ApprenticeshipModel> {
+                        _fixture.Create<ApprenticeshipModel>(),
+                        apprenticeshipModel,
+                        _fixture.Create<ApprenticeshipModel>(),
+                    })
+                .Create();
+
+            var testApplication = new IncentiveApplicationFactory().GetExisting(incentiveApplicationModel.Id, incentiveApplicationModel);
+
+            var applications = new List<IncentiveApplication>()
+            {
+                _fixture.Create<IncentiveApplication>(),
+                testApplication,
+                _fixture.Create<IncentiveApplication>()
+            };
+
+            _mockDomainRepository
+                .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
+                .ReturnsAsync(applications);
+
+            //Act
+            await _sut.Handle(command);
+
+            //Assert
+            _mockDomainRepository
+                .Verify(m => m.Save(It.Is<IncentiveApplication>(a =>
+                 a.Id == testApplication.Id &&
+                 a.Apprenticeships.Count(a =>
+                    a.ULN == command.ULN &&
+                    !a.WithdrawnByCompliance &&
+                    a.WithdrawnByEmployer) == 1)),
                  Times.Once);
         }
 
@@ -86,7 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWi
         public void Then_a_WithdrawalException_is_thrown_when_there_are_no_matching_apprenticeships()
         {
             //Arrange            
-            var command = _fixture.Create<ComplianceWithdrawalCommand>();
+            var command = _fixture.Create<ReinstateWithdrawalCommand>();
 
             _mockDomainRepository
                 .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
@@ -98,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWi
             //Assert
             action.Should()
                 .Throw<WithdrawalException>()
-                .WithMessage("Unable to handle Compliance withdrawal command.*");           
+                .WithMessage("Unable to handle reinstate withdrawal command.*");           
         }
     }
 }
