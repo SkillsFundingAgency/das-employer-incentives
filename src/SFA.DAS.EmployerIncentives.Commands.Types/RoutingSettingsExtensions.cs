@@ -19,8 +19,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
             routingSettings.RouteToEndpoint(typeof(CompleteEarningsCalculationCommand), QueueNames.CompleteEarningsCalculation);
             routingSettings.RouteToEndpoint(typeof(AddEmployerVendorIdCommand), QueueNames.AddEmployerVendorId);
             routingSettings.RouteToEndpoint(typeof(WithdrawCommand), QueueNames.ApprenticeshipIncentivesWithdraw);
+            routingSettings.RouteToEndpoint(typeof(ReinstateApprenticeshipIncentiveCommand), QueueNames.ApprenticeshipIncentivesReinstate);
             routingSettings.RouteToEndpoint(typeof(EmployerWithdrawalCommand), QueueNames.EmployerWithdrawal);
             routingSettings.RouteToEndpoint(typeof(ComplianceWithdrawalCommand), QueueNames.ComplianceWithdrawal);
+            routingSettings.RouteToEndpoint(typeof(ReinstateWithdrawalCommand), QueueNames.ReinstateWithdrawal);
             routingSettings.RouteToEndpoint(typeof(UpdateVendorRegistrationCaseStatusForAccountCommand), QueueNames.UpdateVendorRegistrationCaseStatus);
             routingSettings.RouteToEndpoint(typeof(SendEmploymentCheckRequestsCommand), QueueNames.SendEmploymentCheckRequests);
             routingSettings.RouteToEndpoint(typeof(UpdateEmploymentCheckCommand), QueueNames.UpdateEmploymentCheck);

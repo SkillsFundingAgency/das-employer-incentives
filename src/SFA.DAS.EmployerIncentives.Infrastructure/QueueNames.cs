@@ -12,8 +12,10 @@
         public const string CompleteEarningsCalculation = "SFA.DAS.EmployerIncentives.CompleteEarningsCalc";
         public const string AddEmployerVendorId = "SFA.DAS.EmployerIncentives.AddEmployerVendorId";
         public const string ApprenticeshipIncentivesWithdraw = "SFA.DAS.EmployerIncentives.Withdraw";
+        public const string ApprenticeshipIncentivesReinstate = "SFA.DAS.EmployerIncentives.Reinstate";
         public const string EmployerWithdrawal = "SFA.DAS.EmployerIncentives.EmployerWithdrawal";
         public const string ComplianceWithdrawal = "SFA.DAS.EmployerIncentives.ComplianceWithdrawal";
+        public const string ReinstateWithdrawal = "SFA.DAS.EmployerIncentives.ReinstateWithdrawal";
         public const string ValidationOverride = "SFA.DAS.EmployerIncentives.ValidationOverride";
 
         public const string UpdateVendorRegistrationCaseStatus = "SFA.DAS.EmployerIncentives.UpdateVrfStatus";
