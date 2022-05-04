@@ -216,6 +216,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
+        public void Reinstate(CollectionCalendar collectionCalendar)
+        {
+            Model.WithdrawnBy = null;
+            Model.PausePayments = true;
+            Model.Status = IncentiveStatus.Paused;
+            CalculateEarnings(collectionCalendar);
+        }
+
         public void CreatePayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPayment(pendingPaymentId);
