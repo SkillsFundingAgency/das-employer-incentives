@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +18,17 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [HttpPost("/earningsRecalculations")]
         public async Task<IActionResult> RecalculateEarnings([FromBody] RecalculateEarningsRequest request)
         {
-            await SendCommandAsync(new RecalculateEarningsCommand(
+            try
+            {
+                await SendCommandAsync(new RecalculateEarningsCommand(
                 request.IncentiveLearnerIdentifiers.Select(dto => new IncentiveLearnerIdentifier(dto.AccountLegalEntityId, dto.ULN))));
 
-            return NoContent();
+                return NoContent();            
+            }            
+            catch (ArgumentException invalidDetailsException)
+            {
+                return BadRequest(invalidDetailsException.Message);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -50,6 +51,23 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.ApprenticeshipIncentive
                         && z.ULN == incentiveLearnerIdentifiers[index].ULN) != null),
                         It.IsAny<CancellationToken>()), Times.Once);
             }
+        }
+
+        [Test]
+        public async Task Then_a_bad_request_response_is_returned_for_invalid_account_legal_entity_and_ULN()
+        {
+            // Arrange
+            var incentiveLearnerIdentifiers = _fixture.CreateMany<IncentiveLearnerIdentifier>(5).ToList();
+            var request = new RecalculateEarningsRequest { IncentiveLearnerIdentifiers = incentiveLearnerIdentifiers };
+            _commandDispatcher.Setup(
+                x => x.Send(It.IsAny<RecalculateEarningsCommand>(), It.IsAny<CancellationToken>())).Throws(new ArgumentException("Invalid details"));
+
+            // Act
+            var actual = await _sut.RecalculateEarnings(request) as BadRequestObjectResult;
+
+            // Assert
+            actual.Should().NotBeNull();
+            actual.Value.Should().Be("Invalid details");
         }
     }
 }
