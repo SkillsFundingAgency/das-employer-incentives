@@ -94,6 +94,35 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.RefreshedLearnerForEarnings = false;
         }
 
+        private void CalculateEarningsForStoppedLearner(CollectionCalendar collectionCalendar, int paymentsCount)
+        {
+            var incentive = Incentive.Create(this);
+
+            var payments = incentive.Payments.ToList();
+            if (!payments.Any())
+            {
+                return;
+            }
+
+            for(var index = 0; index < paymentsCount; index ++)
+            {
+                AddPendingPaymentsAndClawbackWhereRequired(payments[index], collectionCalendar);
+            }
+
+            if (paymentsCount < PendingPayments.Count)
+            {
+                Model.PendingPaymentModels.Remove(PendingPayments.Last().GetModel());
+            }
+
+            AddEvent(new EarningsCalculated
+            {
+                ApprenticeshipIncentiveId = Id,
+                AccountId = Account.Id,
+                ApprenticeshipId = Apprenticeship.Id,
+                ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
+            });
+        }
+
         private void AddPendingPaymentsAndClawbackWhereRequired(ValueObjects.Payment payment, CollectionCalendar collectionCalendar)
         {
             var pendingPayment = PendingPayment.New(
@@ -342,6 +371,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 AddEvent(new LearningResumed(
                     Model.Id,
                     learningStoppedStatus.DateResumed.Value));
+            }
+            else if (Model.Status == IncentiveStatus.Stopped && learningStoppedStatus.LearningStopped)
+            {
+                var incentive = Incentive.Create(this);
+                var paymentProfiles = incentive.PaymentProfiles.Where(x => x.IncentiveType == incentive.IncentiveType)
+                                                                .OrderBy(y => y.DaysAfterApprenticeshipStart).ToList();
+
+                for (var index = 2; index >= 1; index--)
+                {
+                    if (learningStoppedStatus.DateStopped.HasValue
+                        && learningStoppedStatus.DateStopped.Value >= StartDate.AddDays(paymentProfiles[index-1].DaysAfterApprenticeshipStart))
+                    {
+                        CalculateEarningsForStoppedLearner(collectionCalendar, index);
+                        break;
+                    }
+                }
             }
         }
 
