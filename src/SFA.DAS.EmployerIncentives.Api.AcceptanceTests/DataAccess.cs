@@ -1,8 +1,11 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using Dapper;
 using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -32,6 +35,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 new { accountId, accountLegalEntityId });
 
             return account;
+        }
+
+        public IEnumerable<PendingPayment> GetPendingPayments(Guid apprenticeshipIncentiveId)
+        {
+            using var dbConnection = new SqlConnection(_connectionString);
+            var pendingPayments = dbConnection.Query<PendingPayment>("SELECT * FROM incentives.PendingPayment WHERE ApprenticeshipIncentiveId = @apprenticeshipIncentiveId",
+                new { apprenticeshipIncentiveId });
+
+            return pendingPayments;
         }
 
         public async Task Insert<T>(T entity) where T : class
