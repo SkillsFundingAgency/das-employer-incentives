@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
     public interface IIncentiveApplicationDomainRepository : IDomainRepository<Guid, IncentiveApplication>
     {
         Task<List<IncentiveApplication>> FindIncentiveApplicationsWithoutEarningsCalculations();
-        Task<IEnumerable<IncentiveApplication>> Find(WithdrawalCommand withdrawalCommand);
+        Task<IEnumerable<IncentiveApplication>> Find(long accountLegalEntityId, long uln);
         Task<IEnumerable<IncentiveApplication>> FindByAccountLegalEntity(long accountLegalEntityId);
     }
 }
