@@ -37,9 +37,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             return null;
         }
 
-        public async Task<IEnumerable<IncentiveApplication>> Find(WithdrawalCommand withdrawalCommand)
+        public async Task<IEnumerable<IncentiveApplication>> Find(long accountLegalEntityId, long uln)
         {
-            var applications = await _incentiveApplicationDataRepository.FindApplicationsByAccountLegalEntityAndUln(withdrawalCommand.AccountLegalEntityId, withdrawalCommand.ULN);
+            var applications = await _incentiveApplicationDataRepository.FindApplicationsByAccountLegalEntityAndUln(accountLegalEntityId, uln);
 
             return (from app in applications
                     select _incentiveApplicationFactory.GetExisting(app.Id, app));

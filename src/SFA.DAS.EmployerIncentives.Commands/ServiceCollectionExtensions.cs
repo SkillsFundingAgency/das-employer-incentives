@@ -189,6 +189,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<ValidateIncompleteEarningsCalculationCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<ReinstateApprenticeshipIncentiveCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateVendorRegistrationCaseStatusForAccountCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendClawbacksCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SetSuccessfulLearnerMatchCommand>), new NullValidator())
