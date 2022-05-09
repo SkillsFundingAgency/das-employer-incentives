@@ -614,7 +614,10 @@
                         "value": "[parameters('subnetDelegations')]"
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "message-handler-function-subnet"
+            ]
         },
         {
             "apiVersion": "2021-04-01",
