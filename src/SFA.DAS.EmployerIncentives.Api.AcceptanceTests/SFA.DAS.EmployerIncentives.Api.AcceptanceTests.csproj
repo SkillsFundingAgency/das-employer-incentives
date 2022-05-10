@@ -8,6 +8,7 @@
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\BlockAccountLegalEntityForPayments.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\LegalEntityUpdated.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RecalculateEarnings.feature.cs" />
   </ItemGroup>
  
   <ItemGroup>

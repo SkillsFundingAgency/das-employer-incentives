@@ -26,7 +26,10 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
 -- Current Period Totals (Paste into cell C22)
   ;SELECT Passed as [(Paste into cell C22) Passed], SUM(Amount) as PeriodValidation FROM
 (SELECT [PendingPaymentId],
-      MIN(CAST(Result AS INT)) AS Passed
+      MIN(CAST((CASE OverrideResult
+WHEN 1 THEN 1
+ELSE Result
+END) AS INT)) AS Passed
   FROM [incentives].[PendingPaymentValidationResult]
   WHERE PeriodNumber = @PERIOD AND PaymentYear = @AcademicYear
   GROUP BY PendingPaymentId) x
@@ -80,25 +83,78 @@ AS [(Paste into cell E23) Invalid YTD]
   select top 1 PeriodNumber, PaymentYear from [BusinessGetMonthEndRuntimes] order by [LastValidation] desc)
 ,PendingPaymentValidations as (
  select PendingPaymentId [PendingPaymentId], 
-   max(iif(step='HasIlrSubmission',1,0)) as HasIlrSubmission,
-   max(iif(step='HasLearningRecord',1,0)) as HasLearningRecord,
-   max(iif(step='IsInLearning',1,0)) as IsInLearning,
-   max(iif(step='HasDaysInLearning',1,0)) as HasDaysInLearning,
-   max(iif(step='HasNoDataLocks',1,0)) as HasNoDataLocks,
-   max(iif(step='HasBankDetails',1,0)) as HasBankDetails,
-   max(iif(step='PaymentsNotPaused',1,0)) as PaymentsNotPaused,
-   max(iif(step='HasSignedMinVersion',1,0)) as HasSignedMinVersion,
-   max(iif(step='LearnerMatchSuccessful',1,0)) as LearnerMatchSuccessful,
-   max(iif(step='EmployedAtStartOfApprenticeship',1,0)) as EmployedAtStartOfApprenticeship,
-   max(iif(step='EmployedBeforeSchemeStarted',1,0)) as EmployedBeforeSchemeStarted,
-   max(iif(step='BlockedForPayments',1,0)) as BlockedForPayments,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasIlrSubmission',1,0)) 
+	END
+   as HasIlrSubmission,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasLearningRecord',1,0))
+	END
+    as HasLearningRecord,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='IsInLearning',1,0)) 
+	END
+   as IsInLearning,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasDaysInLearning',1,0)) 
+	END
+   as HasDaysInLearning,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasNoDataLocks',1,0)) 
+	END
+   as HasNoDataLocks,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasBankDetails',1,0)) 
+	END
+   as HasBankDetails,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='PaymentsNotPaused',1,0)) 
+	END
+   as PaymentsNotPaused,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasSignedMinVersion',1,0)) 
+	END
+   as HasSignedMinVersion,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='LearnerMatchSuccessful',1,0)) 
+	END
+   as LearnerMatchSuccessful,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='EmployedAtStartOfApprenticeship',1,0))
+	END
+    as EmployedAtStartOfApprenticeship,
+	CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='EmployedBeforeSchemeStarted',1,0)) 
+	END
+   as EmployedBeforeSchemeStarted,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='EmployedBeforeSchemeStarted',1,0)) 
+	END
+   as EmployedBeforeSchemeStarted,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='BlockedForPayments',1,0)) 
+	END
+   as BlockedForPayments,
    Result,
    ppvr.PeriodNumber, 
    ppvr.PaymentYear
  from [incentives].[PendingPaymentValidationResult] ppvr
  inner join LatestPeriod on ppvr.PeriodNumber = LatestPeriod.PeriodNumber and ppvr.PaymentYear = LatestPeriod.PaymentYear
  and result = 1 
- group by PendingPaymentId, result, ppvr.PeriodNumber, ppvr.PaymentYear
+ group by PendingPaymentId, ppvr.Result, ppvr.OverrideResult, ppvr.PeriodNumber, ppvr.PaymentYear 
 )
 select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Validation}) CountOfPayments], 
   HasLearningRecord,
@@ -149,25 +205,77 @@ group by HasIlrSubmission,
 ;with latestValidations as (
 select max(ppv.periodnumber) MaxPeriod, 
   PendingPaymentId, 
-  max(iif(step='HasIlrSubmission' and result=1,1,0)) as HasIlrSubmission,
-  max(iif(step='HasLearningRecord' and result=1,1,0)) as HasLearningRecord,
-    max(iif(step='IsInLearning' and result=1,1,0)) as IsInLearning,
-    max(iif(step='HasDaysInLearning' and result=1,1,0)) as HasDaysInLearning,
-    max(iif(step='HasNoDataLocks' and result=1,1,0)) as HasNoDataLocks,
-    max(iif(step='HasBankDetails' and result=1,1,0)) as HasBankDetails,
-    max(iif(step='PaymentsNotPaused' and result=1,1,0)) as PaymentsNotPaused,
-    max((case when ppv.periodnumber <> 6 and ppv.paymentyear = 2021 then 1 else iif(step='HasNoUnsentClawbacks' and result=1,1,0) end)) as HasNoUnsentClawbacks,
-    max((case when ppv.periodnumber < 9 and ppv.paymentyear = 2021 then 1 else iif(step='HasSignedMinVersion' and result=1,1,0) end)) as HasSignedMinVersion,
-    max((case when ppv.periodnumber < 12 and ppv.paymentyear = 2021 then 1 else iif(step='LearnerMatchSuccessful' and result=1,1,0) end)) as LearnerMatchSuccessful,
-    max((case when ppv.periodnumber < 5 and ppv.paymentyear <= 2122 then 1 else iif(step='EmployedAtStartOfApprenticeship' and result=1,1,0) end)) as EmployedAtStartOfApprenticeship,
-    max((case when ppv.periodnumber < 5 and ppv.paymentyear <= 2122 then 1 else iif(step='EmployedBeforeSchemeStarted' and result=1,1,0) end)) as EmployedBeforeSchemeStarted,
-    max((case when ppv.periodnumber < 8 and ppv.paymentyear <= 2122 then 1 else iif(step='BlockedForPayments' and result=1,1,0) end)) as BlockedForPayments,
+  CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasIlrSubmission' and result=1,1,0))
+	END
+   as HasIlrSubmission,
+  CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasLearningRecord' and result=1,1,0))
+	END
+  as HasLearningRecord,
+  CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='IsInLearning' and result=1,1,0)) 
+	END
+    as IsInLearning,
+	CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasDaysInLearning' and result=1,1,0)) 
+	END
+    as HasDaysInLearning,
+	CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasNoDataLocks' and result=1,1,0)) 
+	END
+    as HasNoDataLocks,
+    CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='HasBankDetails' and result=1,1,0)) 
+	END
+	as HasBankDetails,
+	CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='PaymentsNotPaused' and result=1,1,0))
+	END
+    as PaymentsNotPaused,
+	CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max((case when ppv.periodnumber <> 6 and ppv.paymentyear = 2021 then 1 else iif(step='HasNoUnsentClawbacks' and result=1,1,0) end)) 
+	END
+    as HasNoUnsentClawbacks,
+	CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max((case when ppv.periodnumber < 9 and ppv.paymentyear = 2021 then 1 else iif(step='HasSignedMinVersion' and result=1,1,0) end))
+	END
+    as HasSignedMinVersion,
+    CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max((case when ppv.periodnumber < 12 and ppv.paymentyear = 2021 then 1 else iif(step='LearnerMatchSuccessful' and result=1,1,0) end)) 
+	END
+	as LearnerMatchSuccessful,
+	CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max((case when ppv.periodnumber < 5 and ppv.paymentyear <= 2122 then 1 else iif(step='EmployedAtStartOfApprenticeship' and result=1,1,0) end))
+	END
+    as EmployedAtStartOfApprenticeship,
+    CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max((case when ppv.periodnumber < 5 and ppv.paymentyear <= 2122 then 1 else iif(step='EmployedBeforeSchemeStarted' and result=1,1,0) end))
+	END
+	as EmployedBeforeSchemeStarted,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max((case when ppv.periodnumber < 10 and ppv.paymentyear <= 2122 then 1 else iif(step='BlockedForPayments' and result=1,1,0) end)) 
+	END
+	as BlockedForPayments,  
     Amount,
     a.[AccountLegalEntityId] --Should only be one
 from [incentives].[PendingPaymentValidationResult] ppv
 left join [incentives].[PendingPayment] pp on pp.id=ppv.PendingPaymentId
 left join [dbo].[Accounts] a on pp.AccountLegalEntityId=a.AccountLegalEntityId
-group by PendingPaymentId , amount, a.[AccountLegalEntityId]
+group by PendingPaymentId , amount, a.[AccountLegalEntityId], OverrideResult
 )
 select count(distinct pendingpaymentId) as [(Paste into cell A37 on tab {YTD Validation}) CountOfPayments], 
   HasLearningRecord, 
