@@ -44,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     {
                         waitForResult.SetHasErrored(ex);
                         waitForResult.SetHasCompleted();
-                    }                    
+                    }
                 }
                 return false;
             };

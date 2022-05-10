@@ -13,9 +13,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
 
         public Task<bool> AcquireLock(string Id, CancellationToken cancellationToken)
         {
-            lock(_locks)
+            lock (_locks)
             {
-                if(_locks.Contains(Id))
+                if (_locks.Contains(Id))
                 {
                     return Task.FromResult(false);
                 }
