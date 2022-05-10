@@ -521,6 +521,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
         }
 
+        internal static VendorBlockAudit Map(this VendorBlockRequestAudit entity)
+        {
+            return new VendorBlockAudit
+            {
+                Id = entity.Id,
+                VrfVendorId = entity.VrfVendorId,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                VendorBlockEndDate = entity.VendorBlockEndDate,
+                CreatedDateTime = DateTime.Now
+            };
+        }
+
         internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)
         {
             if (model != null)
@@ -545,19 +559,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
             return null;
         }
-        
-        internal static VendorBlockAudit Map(this VendorBlockRequestAudit entity)
-        {
-            return new VendorBlockAudit
-            {
-                Id = entity.Id,
-                VrfVendorId = entity.VrfVendorId,
-                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
-                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
-                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                VendorBlockEndDate = entity.VendorBlockEndDate,
-                CreatedDateTime = DateTime.Now
-            };
-        }
+
     }
 }
