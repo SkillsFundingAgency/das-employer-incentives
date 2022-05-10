@@ -11,7 +11,7 @@ using SFA.DAS.UnitOfWork.Managers;
 namespace SFA.DAS.EmployerIncentives.Commands
 {
     public class CommandDispatcher : ICommandDispatcher
-    {        
+    {
         private readonly IServiceProvider _serviceProvider;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             var handler = _serviceProvider.GetService<ICommandHandler<TCommand>>();
 
-            if(handler == null)
+            if (handler == null)
             {
                 throw new CommandDispatcherException($"Unable to dispatch command '{command.GetType().Name}'. No matching handler found.");
             }
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 foreach (var command in commands)
                 {
-                    if(command is ILockIdentifier)
+                    if (command is ILockIdentifier)
                     {
                         throw new NotSupportedException("Not currently possible to dispatch multiple commands if any implement the ILockIdentifier interface");
                     }
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 throw;
             }
 
-            await _unitOfWorkManager.EndAsync(); 
+            await _unitOfWorkManager.EndAsync();
         }
     }
 }
