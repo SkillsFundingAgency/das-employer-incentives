@@ -71,7 +71,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
                                         EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
-                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted))
+                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted)),
+                        EmploymentCheckErrorCodes = EmploymentCheckErrorCodes(data.FirstEmploymentCheckErrorType, data.SecondEmploymentCheckErrorType)
                     },
                     FirstClawbackStatus = data.FirstClawbackAmount == default ? null : new ClawbackStatus
                     {
@@ -92,7 +93,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
                                         EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
-                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted))
+                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted)),
+                        EmploymentCheckErrorCodes = EmploymentCheckErrorCodes(data.FirstEmploymentCheckErrorType, data.SecondEmploymentCheckErrorType)
                     },
                     SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatus
                     {
@@ -193,6 +195,22 @@ namespace SFA.DAS.EmployerIncentives.Data
             }
 
             return secondEmploymentCheckValidation.Value;
+        }
+
+        private static List<string> EmploymentCheckErrorCodes(EmploymentCheckResultError? firstEmploymentCheckErrorCode, EmploymentCheckResultError? secondEmploymentCheckErrorCode)
+        {
+            var errorCodes = new List<string>();
+            if (firstEmploymentCheckErrorCode != null && !errorCodes.Contains(firstEmploymentCheckErrorCode.ToString()))
+            {
+                errorCodes.Add(firstEmploymentCheckErrorCode.ToString());
+            }
+
+            if (secondEmploymentCheckErrorCode != null && !errorCodes.Contains(secondEmploymentCheckErrorCode.ToString()))
+            {
+                errorCodes.Add(secondEmploymentCheckErrorCode.ToString());
+            }
+
+            return errorCodes;
         }
 
         private static bool? EmployedBeforeSchemeStartedOverride(

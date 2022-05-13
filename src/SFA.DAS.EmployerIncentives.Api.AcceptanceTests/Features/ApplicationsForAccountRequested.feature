@@ -256,3 +256,34 @@ Examples:
 | Employer		|
 | Compliance	|
 
+Scenario: Employment check failed with error code
+	Given an account that is in employer incentives
+	When there is an 'EmployedAtStartOfApprenticeship' employment check error code of '<EC Error Code>'
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with employment check error code of '<EC Error Code>'
+Examples:
+| EC Error Code			|
+| NinoNotFound          |
+| NinoFailure           |
+| NinoInvalid           |
+| PAYENotFound          |
+| PAYEFailure           |
+| NinoAndPAYENotFound   |
+| HmrcFailure           |
+
+Scenario: Employment check failed with multiple error codes
+	Given an account that is in employer incentives
+	When there is an 'EmployedAtStartOfApprenticeship' employment check error code of '<First EC Error Code>'
+	And there is an 'EmployedBeforeSchemeStarted' employment check error code of '<Second EC Error Code>'
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with employment check error code of '<First EC Error Code>'
+	And the apprenticeship is returned with employment check error code of '<Second EC Error Code>'
+Examples:
+| First EC Error Code	| Second EC Error Code  |
+| NinoNotFound	        | HmrcFailure	        |
+| NinoFailure           | NinoAndPAYENotFound	|
+| NinoInvalid           | PAYEFailure			|
+| PAYENotFound          | NinoInvalid			|
+| PAYEFailure           | PAYENotFound			|
+| NinoAndPAYENotFound   | NinoFailure			|
+| HmrcFailure           | NinoNotFound			|

@@ -1323,6 +1323,117 @@ this.ScenarioInitialize(scenarioInfo);
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employment check failed with error code")]
+        [NUnit.Framework.TestCaseAttribute("NinoNotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoFailure", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoInvalid", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYENotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYEFailure", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoAndPAYENotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("HmrcFailure", null)]
+        public virtual void EmploymentCheckFailedWithErrorCode(string eCErrorCode, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("EC Error Code", eCErrorCode);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check failed with error code", null, tagsOfScenario, argumentsOfScenario);
+#line 259
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 260
+ testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 261
+ testRunner.When(string.Format("there is an \'EmployedAtStartOfApprenticeship\' employment check error code of \'{0}" +
+                            "\'", eCErrorCode), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 262
+ testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 263
+ testRunner.Then(string.Format("the apprenticeship is returned with employment check error code of \'{0}\'", eCErrorCode), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employment check failed with multiple error codes")]
+        [NUnit.Framework.TestCaseAttribute("NinoNotFound", "HmrcFailure", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoFailure", "NinoAndPAYENotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoInvalid", "PAYEFailure", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYENotFound", "NinoInvalid", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYEFailure", "PAYENotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoAndPAYENotFound", "NinoFailure", null)]
+        [NUnit.Framework.TestCaseAttribute("HmrcFailure", "NinoNotFound", null)]
+        public virtual void EmploymentCheckFailedWithMultipleErrorCodes(string firstECErrorCode, string secondECErrorCode, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("First EC Error Code", firstECErrorCode);
+            argumentsOfScenario.Add("Second EC Error Code", secondECErrorCode);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check failed with multiple error codes", null, tagsOfScenario, argumentsOfScenario);
+#line 274
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 275
+ testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 276
+ testRunner.When(string.Format("there is an \'EmployedAtStartOfApprenticeship\' employment check error code of \'{0}" +
+                            "\'", firstECErrorCode), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 277
+ testRunner.And(string.Format("there is an \'EmployedBeforeSchemeStarted\' employment check error code of \'{0}\'", secondECErrorCode), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 278
+ testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 279
+ testRunner.Then(string.Format("the apprenticeship is returned with employment check error code of \'{0}\'", firstECErrorCode), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 280
+ testRunner.And(string.Format("the apprenticeship is returned with employment check error code of \'{0}\'", secondECErrorCode), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore
