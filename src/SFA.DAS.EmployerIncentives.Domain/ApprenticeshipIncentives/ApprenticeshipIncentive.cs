@@ -112,7 +112,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (paymentsCount < PendingPayments.Count)
             {
-                Model.PendingPaymentModels.Remove(PendingPayments.Last().GetModel());
+                Model.PendingPaymentModels.Remove(PendingPayments.OrderBy(x => x.DueDate).Last().GetModel());
             }
 
             AddEvent(new EarningsCalculated
