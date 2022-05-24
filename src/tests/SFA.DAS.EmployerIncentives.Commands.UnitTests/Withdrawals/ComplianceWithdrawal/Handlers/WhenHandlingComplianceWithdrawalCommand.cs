@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWi
             };
 
             _mockDomainRepository
-                .Setup(m => m.Find(command))
+                .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
                 .ReturnsAsync(applications);
           
             //Act
@@ -89,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ComplianceWi
             var command = _fixture.Create<ComplianceWithdrawalCommand>();
 
             _mockDomainRepository
-                .Setup(m => m.Find(command))
+                .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
                 .ReturnsAsync(new List<IncentiveApplication>());
 
             // Act
