@@ -176,21 +176,15 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (ExistingPendingPaymentHasBeenPaid(existingPendingPayment))
             {
-                if (learningStopped)
+                if (learningStopped && (existingPendingPayment.PaymentMadeDate.HasValue && !existingPendingPayment.ClawedBack))
                 {
-                    if (existingPendingPayment.PaymentMadeDate.HasValue && !existingPendingPayment.ClawedBack)
-                    {
-                        return;
-                    }
+                    return;
                 }
-                else
+                if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
                 {
-                    if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
-                    {
-                        return;
-                    }
+                    return;
                 }
-
+                
                 AddClawback(existingPendingPayment, collectionCalendar.GetActivePeriod().CollectionPeriod);
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
                 return;
