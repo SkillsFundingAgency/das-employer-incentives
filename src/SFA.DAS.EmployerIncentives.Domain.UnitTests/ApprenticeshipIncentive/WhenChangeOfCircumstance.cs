@@ -368,9 +368,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
 
             // Assert
-            _sutModel.PendingPaymentModels.Count.Should().Be(1);
-            _sutModel.PendingPaymentModels.First(x => x.EarningType == EarningType.FirstPayment).ClawedBack.Should().Be(false);
-            _sutModel.PendingPaymentModels.First(x => x.EarningType == EarningType.FirstPayment).PaymentMadeDate.Should().BeNull();
+            _sutModel.PendingPaymentModels.Count.Should().Be(2);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && x.ClawedBack).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && !x.ClawedBack).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && !x.PaymentMadeDate.HasValue).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && x.PaymentMadeDate.HasValue).Should().Be(1);
         }
 
         [Test]

@@ -95,7 +95,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.RefreshedLearnerForEarnings = false;
         }
 
-        private void CalculateEarningsForStoppedLearner(CollectionCalendar collectionCalendar, int paymentsCount)
+        private void CalculateEarningsForStoppedLearner(CollectionCalendar collectionCalendar, int paymentNumber)
         {
             var incentive = Incentive.Create(this);
 
@@ -105,12 +105,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            for(var index = 0; index < paymentsCount; index ++)
+            for(var index = 0; index < paymentNumber; index++)
             {
-                AddPendingPaymentsAndClawbackWhereRequired(payments[index], collectionCalendar);
+                AddPendingPaymentsAndClawbackWhereRequiredForStoppedLearner(payments[index], collectionCalendar);
             }
 
-            if (paymentsCount < PendingPayments.Count)
+            if (paymentNumber < PendingPayments.Count(x => !x.ClawedBack))
             {
                 Model.PendingPaymentModels.Remove(PendingPayments.OrderBy(x => x.DueDate).Last().GetModel());
             }
@@ -177,6 +177,50 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (ExistingPendingPaymentHasBeenPaid(existingPendingPayment))
             {
                 if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
+                {
+                    return;
+                }
+
+                AddClawback(existingPendingPayment, collectionCalendar.GetActivePeriod().CollectionPeriod);
+                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+                return;
+            }
+
+            RemoveUnpaidPaymentIfExists(existingPendingPayment);
+            if (!existingPendingPayment.EquivalentTo(pendingPayment))
+            {
+                var existingPendingPaymentModel = existingPendingPayment.GetModel();
+                if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
+                {
+                    AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
+                }
+                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+            }
+        }
+
+        private void AddPendingPaymentsAndClawbackWhereRequiredForStoppedLearner(ValueObjects.Payment payment, CollectionCalendar collectionCalendar)
+        {
+            var pendingPayment = PendingPayment.New(
+                Guid.NewGuid(),
+                Model.Account,
+                Model.Id,
+                payment.Amount,
+                payment.PaymentDate,
+                DateTime.Now,
+                payment.EarningType);
+
+            pendingPayment.SetPaymentPeriod(collectionCalendar);
+
+            var existingPendingPayment = PendingPayments.SingleOrDefault(x => x.EarningType == pendingPayment.EarningType && !x.ClawedBack);
+            if (existingPendingPayment == null)
+            {
+                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
+                return;
+            }
+
+            if (ExistingPendingPaymentHasBeenPaid(existingPendingPayment))
+            {
+                if (existingPendingPayment.PaymentMadeDate.HasValue && !existingPendingPayment.ClawedBack)
                 {
                     return;
                 }
