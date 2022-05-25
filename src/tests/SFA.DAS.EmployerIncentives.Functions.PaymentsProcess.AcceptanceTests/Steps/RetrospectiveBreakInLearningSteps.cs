@@ -358,7 +358,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             breaksInLearning.Count(b => b.EndDate != null).Should().Be(1);
             breaksInLearning.Single(b => b.EndDate != null).StartDate.Should().Be(_breakStart);
             breaksInLearning.Single(b => b.EndDate != null).EndDate.Should().Be(_breakEnd.AddDays(-1));
-            breaksInLearning.Single(b => b.EndDate != null).CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
+            breaksInLearning.Single(b => b.EndDate != null).CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
             breaksInLearning.Single(b => b.EndDate != null).UpdatedDate.Should().BeNull();
         }
 
@@ -372,8 +372,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             breaksInLearning.Count(b => b.EndDate != null).Should().Be(1);
             breaksInLearning.Single(b => b.EndDate != null).StartDate.Should().Be(_breakStart);
             breaksInLearning.Single(b => b.EndDate != null).EndDate.Should().Be(_breakEnd.AddDays(-1));
-            breaksInLearning.Single(b => b.EndDate != null).CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
-            breaksInLearning.Single(b => b.EndDate != null).UpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
+            breaksInLearning.Single(b => b.EndDate != null).CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
+            breaksInLearning.Single(b => b.EndDate != null).UpdatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
         }
         
 
