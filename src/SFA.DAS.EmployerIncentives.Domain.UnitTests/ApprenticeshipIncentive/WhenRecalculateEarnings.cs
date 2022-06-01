@@ -44,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .With(x => x.StartDate, new DateTime(2021, 09, 30))
                 .Create();
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(
                 _fixture.Build<PendingPaymentModel>()
