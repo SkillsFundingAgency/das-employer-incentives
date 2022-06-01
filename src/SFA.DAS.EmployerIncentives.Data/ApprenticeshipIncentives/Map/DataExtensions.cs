@@ -447,6 +447,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateTime = x.CreatedDateTime,
                 UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
+                ErrorType = x.ErrorType,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
         }
@@ -464,6 +465,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateTime = x.CreatedDateTime,
                 UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
+                ErrorType = x.ErrorType,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
         }

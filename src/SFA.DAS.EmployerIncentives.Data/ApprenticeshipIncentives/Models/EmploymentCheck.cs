@@ -20,5 +20,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public DateTime CreatedDateTime { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
         public DateTime? ResultDateTime { get; set; }
+        [Column(TypeName = "nvarchar(50)")]
+        public EmploymentCheckResultError? ErrorType { get; set; }
+
     }
 }

@@ -10,6 +10,7 @@
 	[CreatedDateTime] DATETIME2 NOT NULL,
 	[UpdatedDateTime] DATETIME2 NULL,
 	[ResultDateTime] DATETIME2 NULL,
+	[ErrorType] NVARCHAR(50) NULL,
 	CONSTRAINT FK_EC_ApprenticeshipIncentive FOREIGN KEY (ApprenticeshipIncentiveId) REFERENCES [incentives].[ApprenticeshipIncentive](Id), 
 )
 GO
