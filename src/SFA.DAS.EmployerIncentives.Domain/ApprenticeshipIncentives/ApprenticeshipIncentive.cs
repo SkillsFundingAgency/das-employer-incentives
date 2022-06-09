@@ -807,12 +807,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return; // ignore older changes
             }
 
-            employmentCheck.Result = false;
             employmentCheck.ResultDateTime = checkResult.DateChecked;
 
-            if (checkResult.Result == EmploymentCheckResultType.Employed)
+            switch (checkResult.Result)
             {
-                employmentCheck.Result = true;                
+                case EmploymentCheckResultType.Employed:
+                    employmentCheck.Result = true;
+                    break;
+
+                case EmploymentCheckResultType.NotEmployed:
+                    employmentCheck.Result = false;
+                    break;
+
+                case EmploymentCheckResultType.Error:
+                    {
+                        employmentCheck.Result = null;
+                        if (checkResult.ErrorType.HasValue)
+                        {
+                            employmentCheck.ErrorType = checkResult.ErrorType;
+                        }
+                        else
+                        {
+                            throw new InvalidEmploymentCheckErrorTypeException("Value not set");
+                        }
+                    }
+                    break;
             }
         }
 

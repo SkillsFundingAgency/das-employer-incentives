@@ -10,17 +10,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive
     {
         public Guid CorrelationId { get; }
         public EmploymentCheckResultType Result { get; }
+        public EmploymentCheckResultError? ErrorType { get; }
         public DateTime DateChecked { get; }
         public string LockId { get => $"{nameof(Domain.ApprenticeshipIncentives.EmploymentCheck)}_{CorrelationId}"; }
         public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
 
         public bool CancelCommand => false;
 
-        public UpdateEmploymentCheckCommand(Guid correlationId, EmploymentCheckResultType result, DateTime dateChecked)
+        public UpdateEmploymentCheckCommand(Guid correlationId, EmploymentCheckResultType result, DateTime dateChecked, EmploymentCheckResultError? errorType = null)
         {
             CorrelationId = correlationId;
             Result = result;
             DateChecked = dateChecked;
+            ErrorType = errorType;
         }
 
         [Newtonsoft.Json.JsonIgnore]

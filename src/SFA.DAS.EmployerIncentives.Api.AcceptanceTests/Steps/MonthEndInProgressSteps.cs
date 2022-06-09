@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly IncentiveApplicationApprenticeship _applicationApprenticeship;
         private readonly Account _accountModel;
         private HttpResponseMessage _response;
+        private CalculateEarningsCommand _command;
 
         public MonthEndInProgressSteps(TestContext testContext) : base(testContext)
         {
@@ -56,6 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(p => p.StartDate, today.AddDays(1))
                 .With(p => p.DateOfBirth, today.AddYears(-20))
                 .With(p => p.Status, IncentiveStatus.Active)
+                .With(p => p.Phase, Phase.Phase3)
                 .Create();            
         }
 
@@ -79,13 +81,30 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.UpdateAsync(_testContext.ActivePeriod);
         }
 
+        [Given(@"the active collection period is currently not in progress")]
+        [When(@"the active collection period is currently not in progress")]
+        public async Task GivenTheActiveCollectionPeriodIsNotInProgress()
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            _testContext.ActivePeriod.PeriodEndInProgress = false;
+            await dbConnection.UpdateAsync(_testContext.ActivePeriod);
+        }
+
+        [Given(@"an earnings calculation is requested")]
         [When(@"an earnings calculation is requested")]
         public async Task WhenAnEarningsCalculationIsRequested()
         {
-            var calcEarningsCommand = new CalculateEarningsCommand(_apprenticeshipIncentive.Id);
+            _command = new CalculateEarningsCommand(_apprenticeshipIncentive.Id);
 
             await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
-                await _testContext.MessageBus.Send(calcEarningsCommand), numberOfOnProcessedEventsExpected: 1);
+                await _testContext.MessageBus.Send(_command), numberOfOnProcessedEventsExpected: 1);
+        }
+
+        [When(@"the earnings calculation request is resumed")]
+        public async Task WhenTheEarningsCalculationIsResumed()
+        {
+            await _testContext.WaitFor<ICommand>(async (cancellationToken) =>
+                await _testContext.MessageBus.Send(_command), numberOfOnProcessedEventsExpected: 1);
         }
 
         [When(@"an employer withdrawal is requested")]
@@ -182,6 +201,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
 
+        [Given(@"the earnings calculation is deferred")]
         [Then(@"the earnings calculation is deferred")]
         public void ThenTheEarningsCalculationIsDeferred()
         {
@@ -197,6 +217,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             delayedCalculateEarningsCommands.Count().Should().Be(1);
             ((CalculateEarningsCommand)delayedCalculateEarningsCommands.Single().Command).CommandDelay.Should().BeGreaterThan(TimeSpan.FromMinutes(55));
+            _command = ((CalculateEarningsCommand)delayedCalculateEarningsCommands.Single().Command);
         }
 
         [Then(@"the employer withdrawal is deferred")]

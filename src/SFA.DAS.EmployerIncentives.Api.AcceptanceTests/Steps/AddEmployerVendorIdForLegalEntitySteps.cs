@@ -3,6 +3,9 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Threading.Tasks;
 using AutoFixture;
 using TechTalk.SpecFlow;
+using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using System;
+using Newtonsoft.Json;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {

@@ -6,6 +6,7 @@
     [HashedLegalEntityId] NVARCHAR(6) NULL, 
     [LegalEntityName] VARCHAR(MAX)  NOT NULL,
     [SignedAgreementVersion] INT NULL,
+    [HasBeenDeleted] BIT NOT NULL DEFAULT 0,
     [VrfVendorId] NVARCHAR(100) NULL, 
     [VrfCaseId] NVARCHAR(100) NULL, 
     [VrfCaseStatus] NVARCHAR(100) NULL, 
