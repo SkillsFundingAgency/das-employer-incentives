@@ -59,8 +59,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var account = accounts.Single(a => a.Id == _account.Id && a.AccountLegalEntityId == _account.AccountLegalEntityId);
 
             account.Should().BeEquivalentTo(_account,
-                opts => opts.Excluding(x => x.HashedLegalEntityId)
+            opts => opts.Excluding(x => x.HashedLegalEntityId)
                     .Excluding(x => x.VrfCaseStatusLastUpdatedDateTime)
+                    .Excluding(x => x.HasBeenDeleted)
                     .Excluding(x => x.VendorBlockEndDate));
             account.HashedLegalEntityId.Should().NotBeNullOrEmpty();
         }

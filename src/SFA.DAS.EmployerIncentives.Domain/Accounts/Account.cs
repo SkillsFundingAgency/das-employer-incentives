@@ -44,6 +44,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             }
         }
 
+        public void MarkLegalEntityRemoved(LegalEntity legalEntity)
+        {
+            var accountLegalEntityId = legalEntity.GetModel().AccountLegalEntityId;
+            var legalEntityModel = Model.LegalEntityModels.SingleOrDefault(l => l.AccountLegalEntityId == accountLegalEntityId);
+            if (legalEntityModel != null)
+            {
+                legalEntityModel.HasBeenDeleted = true;
+                AddEvent(new AccountLegalEntityRemoved { AccountLegalEntityId = accountLegalEntityId });
+            }
+        }
+
         public void AddLegalEntity(long accountLegalEntityId, LegalEntity legalEntity)
         {
             if (Model.LegalEntityModels.Any(i => i.AccountLegalEntityId.Equals(accountLegalEntityId)))

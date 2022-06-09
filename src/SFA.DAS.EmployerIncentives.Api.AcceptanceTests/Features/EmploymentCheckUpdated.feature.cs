@@ -94,9 +94,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         [NUnit.Framework.DescriptionAttribute("Employment check is updated")]
         [NUnit.Framework.TestCaseAttribute("Employed", "true", null)]
         [NUnit.Framework.TestCaseAttribute("NotEmployed", "false", null)]
-        [NUnit.Framework.TestCaseAttribute("HMRCUnknown", "false", null)]
-        [NUnit.Framework.TestCaseAttribute("NoNINOFound", "false", null)]
-        [NUnit.Framework.TestCaseAttribute("NoAccountFound", "false", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoFailure", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoInvalid", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYENotFound", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYEFailure", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoAndPAYENotFound", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("HmrcFailure", "null", null)]
         public virtual void EmploymentCheckIsUpdated(string checkResultType, string hasPassed, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -138,13 +141,21 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Employment check result procesing is delayed during month end processing")]
-        public virtual void EmploymentCheckResultProcesingIsDelayedDuringMonthEndProcessing()
+        [NUnit.Framework.DescriptionAttribute("Employment check error is stored")]
+        [NUnit.Framework.TestCaseAttribute("NinoNotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoFailure", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoInvalid", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYENotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("PAYEFailure", null)]
+        [NUnit.Framework.TestCaseAttribute("NinoAndPAYENotFound", null)]
+        [NUnit.Framework.TestCaseAttribute("HmrcFailure", null)]
+        public virtual void EmploymentCheckErrorIsStored(string checkResultType, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check result procesing is delayed during month end processing", null, tagsOfScenario, argumentsOfScenario);
-#line 24
+            argumentsOfScenario.Add("checkResultType", checkResultType);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check error is stored", null, tagsOfScenario, argumentsOfScenario);
+#line 27
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -164,14 +175,54 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 25
+#line 28
  testRunner.Given("an apprenticeship incentive has submitted a new employment check", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 26
+#line 29
+ testRunner.When(string.Format("the employment check result is returned with an error result of {0}", checkResultType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 30
+ testRunner.Then(string.Format("the apprenticeship incentive employment check result error type is stored as {0}", checkResultType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employment check result procesing is delayed during month end processing")]
+        public virtual void EmploymentCheckResultProcesingIsDelayedDuringMonthEndProcessing()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check result procesing is delayed during month end processing", null, tagsOfScenario, argumentsOfScenario);
+#line 43
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 44
+ testRunner.Given("an apprenticeship incentive has submitted a new employment check", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 45
  testRunner.When("the employment check result is returned during month end payment process is runni" +
                         "ng", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 27
+#line 46
  testRunner.Then("the apprenticeship incentive employment check result processing is delayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -185,7 +236,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check result procesing is resumed after month end processing delay", null, tagsOfScenario, argumentsOfScenario);
-#line 29
+#line 48
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -205,16 +256,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 30
+#line 49
  testRunner.Given("an apprenticeship incentive has submitted a new employment check", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 31
+#line 50
  testRunner.And("the employment check result processing has been delayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 32
+#line 51
  testRunner.When("the employment check result processing resumes", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 33
+#line 52
  testRunner.Then("the apprenticeship incentive employment check result is processed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

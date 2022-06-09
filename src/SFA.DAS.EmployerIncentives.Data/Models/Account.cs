@@ -29,5 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
 
         public DateTime? VrfCaseStatusLastUpdatedDateTime { get; set; }
         public DateTime? VendorBlockEndDate { get; set; }
+        public bool HasBeenDeleted { get; set; }
     }
 }
