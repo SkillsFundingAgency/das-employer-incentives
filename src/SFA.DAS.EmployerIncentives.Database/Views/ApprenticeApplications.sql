@@ -37,8 +37,10 @@ l.HasDataLock,
 l.InLearning,
 ppvr1.Result AS FirstEmploymentCheckValidation,
 ec1.Result AS FirstEmploymentCheckResult,
+ec1.ErrorType AS FirstEmploymentCheckErrorType,
 ppvr2.Result AS SecondEmploymentCheckValidation,
-ec2.Result AS SecondEmploymentCheckResult
+ec2.Result AS SecondEmploymentCheckResult,
+ec2.ErrorType AS SecondEmploymentCheckErrorType
 FROM incentives.ApprenticeshipIncentive ai
 INNER JOIN dbo.Accounts a
 ON ai.AccountLegalEntityId = a.AccountLegalEntityId
