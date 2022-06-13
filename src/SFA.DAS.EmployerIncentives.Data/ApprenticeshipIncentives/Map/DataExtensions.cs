@@ -261,6 +261,8 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 Ukprn = model.Ukprn,
                 UniqueLearnerNumber = model.ULN,
                 CreatedDate = model.CreatedDate,
+                UpdatedDate = model.UpdatedDate,
+                RefreshDate = model.RefreshDate,
                 SuccessfulLearnerMatch = model.SuccessfulLearnerMatchExecution,
                 LearningPeriods = model.LearningPeriods.Map(),
                 DaysInLearnings = model.DaysInLearnings.Map(),
@@ -318,6 +320,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 LearningStoppedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateStopped,
                 LearningResumedDate = model.SubmissionData.LearningData?.StoppedStatus?.DateResumed,
                 SuccessfulLearnerMatchExecution = model.SuccessfulLearnerMatch,
+                RefreshDate = model.RefreshDate
             };
 
             return learner;
@@ -444,6 +447,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateTime = x.CreatedDateTime,
                 UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
+                ErrorType = x.ErrorType,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
         }
@@ -461,6 +465,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateTime = x.CreatedDateTime,
                 UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
+                ErrorType = x.ErrorType,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
         }

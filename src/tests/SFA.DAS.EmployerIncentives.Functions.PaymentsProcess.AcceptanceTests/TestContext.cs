@@ -3,6 +3,7 @@ using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -21,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public TestData TestData { get; set; }        
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
+        public ApplicationSettings ApplicationSettings { get; set; }        
 
         public MockApi LearnerMatchApi { get; set; }
         
@@ -40,6 +42,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             }
             TestData = new TestData();
             Hooks = new List<IHook>();
+            ApplicationSettings = new ApplicationSettings
+            {
+                DistributedLockStorage = "UseDevelopmentStorage=true",
+                NServiceBusConnectionString = "UseLearningEndpoint=true",
+                UseLearningEndpointStorageDirectory = Path.Combine(TestDirectory.FullName, ".learningtransport"),
+            };
         }
 
         private bool _isDisposed;

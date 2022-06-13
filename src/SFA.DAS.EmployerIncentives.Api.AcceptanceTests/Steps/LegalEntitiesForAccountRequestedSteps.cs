@@ -1,12 +1,13 @@
 ﻿using AutoFixture;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using TechTalk.SpecFlow;
+using Account = SFA.DAS.EmployerIncentives.Data.Models.Account;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
     [Scope(Feature = "LegalEntitiesForAccountRequested")]
     public class LegalEntitiesForAccountRequestedSteps : StepsBase
     {
-        private IEnumerable<LegalEntityDto> _getLegalEntitiesResponse;
+        private IEnumerable<LegalEntity> _getLegalEntitiesResponse;
         private long _accountId;
         private readonly Fixture _fixture;
         private Account _accountWithSignedPhase3Agreement;
@@ -54,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var url = $"/accounts/{_accountId}/LegalEntities";
             var (status, data) = 
-                await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<LegalEntityDto>>(url);
+                await EmployerIncentiveApi.Client.GetValueAsync<IEnumerable<LegalEntity>>(url);
             
             status.Should().Be(HttpStatusCode.OK);
 

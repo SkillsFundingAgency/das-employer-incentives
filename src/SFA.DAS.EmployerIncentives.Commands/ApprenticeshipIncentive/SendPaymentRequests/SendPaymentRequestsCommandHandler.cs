@@ -1,8 +1,7 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi;
-using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymen
             await Send(payments, command.AccountLegalEntityId, command.PaidDate);
         }
 
-        private async Task Send(List<PaymentDto> payments, long accountLegalEntityId, DateTime paidDate, CancellationToken cancellationToken = default)
+        private async Task Send(List<Payment> payments, long accountLegalEntityId, DateTime paidDate, CancellationToken cancellationToken = default)
         {
             var paymentsToSend = payments.Take(_businessCentralFinancePaymentsService.PaymentRequestsLimit).ToList();
             if (!paymentsToSend.Any())

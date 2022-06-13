@@ -21,3 +21,17 @@ Scenario: When an apprenticeship incentive exists, but it's already paused
 	Given a paused apprenticeship incentive exists
 	When the pause payments request is sent
 	Then the requester is informed the apprenticeship incentive is already paused
+
+Scenario: When multiple pause payment requests are made
+	Given multiple apprenticeship incentives exist
+	When the multiple pause payments request is sent
+	Then the requester is informed the apprenticeship incentives are paused
+	And the PausePayment status for all incentives is set to true
+	And an Audit record has been added to record all incentives in the pause request
+
+Scenario: When multiple pause payment requests are made and one fails
+	Given multiple apprenticeship incentives exist
+	When the multiple pause payments request is sent with one that is invalid
+	Then the requester is informed the request has failed
+	And the PausePayment status for all incentives remains as false
+	And Audit records are not created

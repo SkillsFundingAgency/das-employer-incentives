@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Account;
@@ -7,7 +6,8 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
+using FluentAssertions;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
@@ -15,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<LegalEntityDto> _sut;
+        private IQueryRepository<LegalEntity> _sut;
 
         [SetUp]
         public void Arrange()

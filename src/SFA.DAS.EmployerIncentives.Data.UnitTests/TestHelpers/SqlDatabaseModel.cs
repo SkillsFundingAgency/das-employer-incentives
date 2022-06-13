@@ -81,19 +81,21 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 
         private static void PublishModel()
         {
-            var dbPackage = DacPackage.Load(_dacpacFileLocation);
-            var services = new DacServices(ConnectionString);
-
-            var policy = Policy
-                .Handle<DacServicesException>()
-                .WaitAndRetry(Enumerable.Repeat(TimeSpan.FromMilliseconds(250), 40));
-
-            policy.Execute(() =>
+            using (var dbPackage = DacPackage.Load(_dacpacFileLocation))
             {
-                Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(PublishModel)} attempted");
-                var options = new DacDeployOptions() { BlockOnPossibleDataLoss = false };
-                services.Deploy(dbPackage, "model", upgradeExisting: true, options);
-            });
+                var services = new DacServices(ConnectionString);
+
+                var policy = Policy
+                    .Handle<DacServicesException>()
+                    .WaitAndRetry(Enumerable.Repeat(TimeSpan.FromMilliseconds(250), 40));
+
+                policy.Execute(() =>
+                {
+                    Console.WriteLine($"[{nameof(SqlDatabaseModel)}] {nameof(PublishModel)} attempted");
+                    var options = new DacDeployOptions() {BlockOnPossibleDataLoss = false};
+                    services.Deploy(dbPackage, "model", upgradeExisting: true, options);
+                });
+            }
         }
     }
 }

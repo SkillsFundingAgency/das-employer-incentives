@@ -1,10 +1,10 @@
 ﻿using AutoFixture;
 using Dapper;
 using FluentAssertions;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Data.Models;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -13,6 +13,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
+using IncentiveApplicationApprenticeship = SFA.DAS.EmployerIncentives.DataTransferObjects.Commands.IncentiveApplicationApprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -34,10 +35,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _fixture = new Fixture();
             _firstApprenticeshipId = _fixture.Create<long>();
             _secondApprenticeshipId = _firstApprenticeshipId + 1;
-            var apprenticeships = new List<IncentiveApplicationApprenticeshipDto>
+            var apprenticeships = new List<IncentiveApplicationApprenticeship>
             {
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 10, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create(),
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 12, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 11, 01)).Create()
+                _fixture.Build<IncentiveApplicationApprenticeship>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 10, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create(),
+                _fixture.Build<IncentiveApplicationApprenticeship>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 12, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 11, 01)).Create()
             };
 
             _createRequest = _fixture
@@ -69,10 +70,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Given(@"an employer has entered incentive claim application details with employment start dates for Phase 3")]
         public async Task GivenAnEmployerHasEnteredIncentiveClaimApplicationDetailsForPhase3()
         {
-            var apprenticeships = new List<IncentiveApplicationApprenticeshipDto>
+            var apprenticeships = new List<IncentiveApplicationApprenticeship>
             {
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 10, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create(),
-                _fixture.Build<IncentiveApplicationApprenticeshipDto>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2022, 1, 1)).With(p => p.EmploymentStartDate, new DateTime(2022, 01, 31)).Create()
+                _fixture.Build<IncentiveApplicationApprenticeship>().With(p => p.ApprenticeshipId, _firstApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2021, 10, 1)).With(p => p.EmploymentStartDate, new DateTime(2021, 10, 01)).Create(),
+                _fixture.Build<IncentiveApplicationApprenticeship>().With(p => p.ApprenticeshipId, _secondApprenticeshipId).With(p => p.PlannedStartDate, new DateTime(2022, 1, 1)).With(p => p.EmploymentStartDate, new DateTime(2022, 01, 31)).Create()
             };
 
             _createRequest.Apprenticeships = apprenticeships;
@@ -119,7 +120,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 application.Should().HaveCount(1);
                 application.Single().Id.Should().Be(_submitRequest.IncentiveApplicationId);
 
-                var apprenticeships = await dbConnection.QueryAsync<IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
+                var apprenticeships = await dbConnection.QueryAsync<Data.Models.IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
                     new { _submitRequest.IncentiveApplicationId });
 
                 apprenticeships.Count().Should().Be(2);
@@ -146,7 +147,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
-                var apprenticeships = await dbConnection.QueryAsync<IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
+                var apprenticeships = await dbConnection.QueryAsync<Data.Models.IncentiveApplicationApprenticeship>("SELECT * FROM IncentiveApplicationApprenticeship WHERE IncentiveApplicationId = @IncentiveApplicationId",
                     new { _submitRequest.IncentiveApplicationId });
 
                 apprenticeships.Count().Should().Be(2);

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayableLegalEntities
 {
     public class GetPayableLegalEntitiesResponse : IResponseLogWriterWithArgs
     {
-        public List<PayableLegalEntityDto> PayableLegalEntities { get; }
+        public List<PayableLegalEntity> PayableLegalEntities { get; }
 
-        public GetPayableLegalEntitiesResponse(List<PayableLegalEntityDto> legalEntities)
+        public GetPayableLegalEntitiesResponse(List<PayableLegalEntity> legalEntities)
         {
             PayableLegalEntities = legalEntities;
         }

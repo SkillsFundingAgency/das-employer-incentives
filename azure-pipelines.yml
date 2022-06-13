@@ -24,7 +24,7 @@ resources:
   - repository: das-platform-building-blocks
     type: github
     name: SkillsFundingAgency/das-platform-building-blocks
-    ref: refs/tags/0.4.37
+    ref: refs/tags/0.4.55
     endpoint: SkillsFundingAgency
 
 stages:
@@ -109,8 +109,6 @@ stages:
           src/**/*.AcceptanceTests.csproj
           !src/**/*.PaymentsProcess.AcceptanceTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
-
-    - template: azure-pipelines-templates/build/step/dependency-check.yml@das-platform-building-blocks
 
     - task: DotNetCoreCLI@2
       displayName: Build $(SolutionBaseName).Messages

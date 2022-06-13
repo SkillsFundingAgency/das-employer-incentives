@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.Configure<PolicySettings>(config.GetSection("PolicySettings"));
             builder.Services.Configure<MatchedLearnerApi>(config.GetSection("MatchedLearnerApi"));
             builder.Services.Configure<BusinessCentralApiClient>(config.GetSection("BusinessCentralApi"));
-            builder.Services.Configure<EmploymentCheckApi>(config.GetSection("EmploymentCheckApi"));
+            builder.Services.Configure<EmployerIncentivesOuterApi>(config.GetSection("EmployerIncentivesOuterApi"));
 
             builder.Services.AddNLog(config);
 

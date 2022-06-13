@@ -5,8 +5,8 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPayableLegalEntities;
 
 namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.UnitTests.ApprenticeshipIncentives
         {
             //Arrange
             var query = _fixture.Create<GetPayableLegalEntitiesRequest>();
-            var data = _fixture.CreateMany<PayableLegalEntityDto>().ToList();
+            var data = _fixture.CreateMany<PayableLegalEntity>().ToList();
             var expected = new GetPayableLegalEntitiesResponse(data);
 
             _repositoryMock.Setup(x => x.GetPayableLegalEntities(query.CollectionPeriod.AcademicYear, query.CollectionPeriod.PeriodNumber)).ReturnsAsync(data);

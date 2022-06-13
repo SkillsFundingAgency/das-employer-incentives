@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
-using System;
+﻿using System;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {

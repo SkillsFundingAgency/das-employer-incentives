@@ -92,6 +92,9 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddScoped<ICollectionCalendarService, CollectionCalendarService>();
             serviceCollection.AddSingleton<IDateTimeService, DateTimeService>();
 
+            serviceCollection.AddScoped<ILearnerService, LearnerService>()
+                .Decorate<ILearnerService, LearnerServiceWithCache>();
+
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
             serviceCollection.AddScoped<IScheduledCommandPublisher, ScheduledCommandPublisher>();
 
@@ -184,6 +187,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<EarningsResilienceIncentivesCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendPaymentRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<WithdrawCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<ReinstateApprenticeshipIncentiveCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateVendorRegistrationCaseStatusForAccountCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendClawbacksCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SetSuccessfulLearnerMatchCommand>), new NullValidator())
@@ -281,16 +285,12 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             serviceCollection.AddTransient<IEmploymentCheckService>(s =>
             {
-                var settings = s.GetService<IOptions<EmploymentCheckApi>>().Value;
+                var settings = s.GetService<IOptions<EmployerIncentivesOuterApi>>().Value;
 
                 var clientBuilder = new HttpClientBuilder()
                     .WithDefaultHeaders()
+                    .WithApimAuthorisationHeader(settings)
                     .WithLogging(s.GetService<ILoggerFactory>());
-
-                if (!string.IsNullOrEmpty(settings.Identifier))
-                {
-                    clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
-                }
 
                 var client = clientBuilder.Build();
 
@@ -301,7 +301,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 client.BaseAddress = new Uri(settings.ApiBaseUrl);
 
-                return new EmploymentCheckService(client);
+                return new EmploymentCheckService(client, settings.ApiVersion);
             });
 
             return serviceCollection;

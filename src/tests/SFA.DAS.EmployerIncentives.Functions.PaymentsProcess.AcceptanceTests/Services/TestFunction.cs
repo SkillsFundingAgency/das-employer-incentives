@@ -11,12 +11,14 @@ using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services
 {
+    [ExcludeFromCodeCoverage]
     public class TestFunction : IDisposable
     {
         public const int BusinessCentralPaymentRequestsLimit = 1;
@@ -99,9 +101,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            s.Configure<ApplicationSettings>(a =>
                            {
                                a.DbConnectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
-                               a.DistributedLockStorage = "UseDevelopmentStorage=true";
-                               a.NServiceBusConnectionString = "UseLearningEndpoint=true";
-                               a.UseLearningEndpointStorageDirectory = Path.Combine(testContext.TestDirectory.FullName, ".learningtransport");
+                               a.DistributedLockStorage = _testContext.ApplicationSettings.DistributedLockStorage;
+                               a.LockedRetryPolicyInMilliSeconds = _testContext.ApplicationSettings.LockedRetryPolicyInMilliSeconds;
+                               a.AllowedHashstringCharacters = _testContext.ApplicationSettings.AllowedHashstringCharacters;
+                               a.Hashstring = _testContext.ApplicationSettings.Hashstring;
+                               a.NServiceBusConnectionString = _testContext.ApplicationSettings.NServiceBusConnectionString;
+                               a.NServiceBusLicense = _testContext.ApplicationSettings.NServiceBusLicense;
+                               a.UseLearningEndpointStorageDirectory = _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory;
+                               a.MinimumAgreementVersion = _testContext.ApplicationSettings.MinimumAgreementVersion;
+                               a.ApiBaseUrl = _testContext.ApplicationSettings.ApiBaseUrl;
+                               a.Identifier = _testContext.ApplicationSettings.Identifier;
+                               a.EmployerIncentivesWebBaseUrl = _testContext.ApplicationSettings.EmployerIncentivesWebBaseUrl;
+                               a.LogLevel = _testContext.ApplicationSettings.LogLevel;
+                               a.EmploymentCheckEnabled = _testContext.ApplicationSettings.EmploymentCheckEnabled;
+                               a.LearnerServiceCacheIntervalInMinutes = _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes;
                                a.ReportsConnectionString = "UseDevelopmentStorage=true";
                                a.ReportsContainerName = testContext.InstanceId;
                            });

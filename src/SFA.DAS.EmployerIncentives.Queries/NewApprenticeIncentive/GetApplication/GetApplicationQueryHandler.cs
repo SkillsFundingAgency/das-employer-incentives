@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplication
@@ -11,9 +11,9 @@ namespace SFA.DAS.EmployerIncentives.Queries.NewApprenticeIncentive.GetApplicati
     public class GetApplicationQueryHandler : IQueryHandler<GetApplicationRequest, GetApplicationResponse>
     {
         private readonly IIncentiveApplicationQueryRepository _applicationQueryRepository;
-        private readonly IQueryRepository<LegalEntityDto> _legalEntityQueryRepository;
+        private readonly IQueryRepository<LegalEntity> _legalEntityQueryRepository;
 
-        public GetApplicationQueryHandler(IIncentiveApplicationQueryRepository applicationQueryRepository, IQueryRepository<LegalEntityDto> legalEntityQueryRepository)
+        public GetApplicationQueryHandler(IIncentiveApplicationQueryRepository applicationQueryRepository, IQueryRepository<LegalEntity> legalEntityQueryRepository)
         {
             _applicationQueryRepository = applicationQueryRepository;
             _legalEntityQueryRepository = legalEntityQueryRepository;

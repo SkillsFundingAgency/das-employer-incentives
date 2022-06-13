@@ -75,18 +75,51 @@ AS
 		PaymentYear FROM [BusinessGetMonthEndRuntimes] ORDER BY [LastValidation] DESC),
 		PendingPaymentValidations AS (
 			SELECT
-				PendingPaymentId [PendingPaymentId], 
-				MAX(IIF(step='HasIlrSubmission',1,0))	AS HasIlrSubmission,
-				MAX(IIF(step='HasLearningRecord',1,0))	AS HasLearningRecord,
-				MAX(IIF(step='IsInLearning',1,0))		AS IsInLearning,
-				MAX(IIF(step='HasDaysInLearning',1,0))	AS HasDaysInLearning,
-				MAX(IIF(step='HasNoDataLocks',1,0))		AS HasNoDataLocks,
-				MAX(IIF(step='HasBankDetails',1,0))		AS HasBankDetails,
-				MAX(IIF(step='PaymentsNotPaused',1,0))	AS PaymentsNotPaused,
-				MAX(IIF(step='HasSignedMinVersion',1,0))	AS HasSignedMinVersion,
-				MAX(IIF(step='LearnerMatchSuccessful',1,0)) AS LearnerMatchSuccessful,
-				MAX(IIF(step='EmployedAtStartOfApprenticeship',1,0))	AS EmployedAtStartOfApprenticeship,
-				MAX(IIF(step='EmployedBeforeSchemeStarted',1,0))		AS EmployedBeforeSchemeStarted,
+				PendingPaymentId [PendingPaymentId], 				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='HasIlrSubmission',1,0)) 
+				END AS HasIlrSubmission,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='HasLearningRecord',1,0)) 
+				END AS HasLearningRecord,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='IsInLearning',1,0)) 
+				END AS IsInLearning,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='HasDaysInLearning',1,0)) 
+				END AS HasDaysInLearning,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='HasNoDataLocks',1,0)) 
+				END AS HasNoDataLocks,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='HasBankDetails',1,0)) 
+				END AS HasBankDetails,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='PaymentsNotPaused',1,0)) 
+				END AS PaymentsNotPaused,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='HasSignedMinVersion',1,0)) 
+				END AS HasSignedMinVersion,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='LearnerMatchSuccessful',1,0)) 
+				END AS LearnerMatchSuccessful,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='EmployedAtStartOfApprenticeship',1,0)) 
+				END AS EmployedAtStartOfApprenticeship,				
+				CASE OverrideResult
+					WHEN 1 THEN 1
+					ELSE MAX(IIF(step='EmployedBeforeSchemeStarted',1,0)) 
+				END AS EmployedBeforeSchemeStarted,				
 				Result,
 				ppvr.PeriodNumber, 
 				ppvr.PaymentYear
@@ -97,7 +130,8 @@ AS
 					AND result = 1 
 			GROUP BY
 				PendingPaymentId, 
-				result, 
+				ppvr.Result, 
+				ppvr.OverrideResult,
 				ppvr.PeriodNumber, 
 				ppvr.PaymentYear
 			)
@@ -155,18 +189,58 @@ AS
 		SELECT 
 			MAX(ppv.periodnumber) MaxPeriod, 
 			PendingPaymentId, 
-			MAX(IIF(step='HasIlrSubmission' AND result=1,1,0)) AS HasIlrSubmission,
-			MAX(IIF(step='HasLearningRecord' AND result=1,1,0)) AS HasLearningRecord,
-			MAX(IIF(step='IsInLearning' AND result=1,1,0)) AS IsInLearning,
-			MAX(IIF(step='HasDaysInLearning' AND result=1,1,0)) AS HasDaysInLearning,
-			MAX(IIF(step='HasNoDataLocks' AND result=1,1,0)) AS HasNoDataLocks,
-			MAX(IIF(step='HasBankDetails' AND result=1,1,0)) AS HasBankDetails,
-			MAX(IIF(step='PaymentsNotPaused' AND result=1,1,0)) AS PaymentsNotPaused,
-			MAX((CASE WHEN ppv.periodnumber <> 6 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='HasNoUnsentClawbacks' AND result=1,1,0) END)) AS HasNoUnsentClawbacks,
-			MAX((CASE WHEN ppv.periodnumber < 9 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='HasSignedMinVersion' AND result=1,1,0) END)) AS HasSignedMinVersion,
-			MAX((CASE WHEN ppv.periodnumber < 12 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='LearnerMatchSuccessful' AND result=1,1,0) END)) AS LearnerMatchSuccessful,
-			MAX((CASE WHEN ppv.periodnumber < 5 AND ppv.paymentyear <= 2122 THEN 1 ELSE IIF(step='EmployedAtStartOfApprenticeship' AND result=1,1,0) END)) AS EmployedAtStartOfApprenticeship,
-			MAX((CASE WHEN ppv.periodnumber < 5 AND ppv.paymentyear <= 2122 THEN 1 ELSE IIF(step='EmployedBeforeSchemeStarted' AND result=1,1,0) END)) AS EmployedBeforeSchemeStarted,
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE max(IIF(step='HasIlrSubmission' AND result=1,1,0))
+			END AS HasIlrSubmission,			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE max(IIF(step='HasLearningRecord' AND result=1,1,0))
+			END AS HasLearningRecord,			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE max(IIF(step='IsInLearning' AND result=1,1,0))
+			END AS IsInLearning,			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE max(IIF(step='HasDaysInLearning' AND result=1,1,0))
+			END AS HasDaysInLearning,			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE max(IIF(step='HasNoDataLocks' AND result=1,1,0))
+			END AS HasNoDataLocks,			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE max(IIF(step='HasBankDetails' AND result=1,1,0))
+			END AS HasBankDetails,			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE max(IIF(step='PaymentsNotPaused' AND result=1,1,0))
+			END AS PaymentsNotPaused,			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE MAX((CASE WHEN ppv.periodnumber <> 6 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='HasNoUnsentClawbacks' AND result=1,1,0) END))
+			END AS HasNoUnsentClawbacks,
+			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE MAX((CASE WHEN ppv.periodnumber < 9 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='HasSignedMinVersion' AND result=1,1,0) END))
+			END AS HasSignedMinVersion,
+			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE MAX((CASE WHEN ppv.periodnumber < 12 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='LearnerMatchSuccessful' AND result=1,1,0) END))
+			END AS LearnerMatchSuccessful,
+			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE MAX((CASE WHEN ppv.periodnumber < 5 AND ppv.paymentyear <= 2122 THEN 1 ELSE IIF(step='EmployedAtStartOfApprenticeship' AND result=1,1,0) END))
+			END AS EmployedAtStartOfApprenticeship,
+			
+			CASE OverrideResult
+				WHEN 1 THEN 1
+				ELSE MAX((CASE WHEN ppv.periodnumber < 5 AND ppv.paymentyear <= 2122 THEN 1 ELSE IIF(step='EmployedBeforeSchemeStarted' AND result=1,1,0) END))
+			END AS EmployedBeforeSchemeStarted,
 			ISNULL(Amount, 0) AS 'Amount',
 			a.[AccountLegalEntityId] --Should only be one
 		FROM [incentives].[PendingPaymentValidationResult] ppv LEFT JOIN [incentives].[PendingPayment] pp 
@@ -176,7 +250,8 @@ AS
 	GROUP BY
 		PendingPaymentId, 
 		amount, 
-		a.[AccountLegalEntityId]
+		a.[AccountLegalEntityId],
+		OverrideResult
 	)
 	SELECT
 		ISNULL(NULL, 'YtdValidations'),
@@ -242,8 +317,11 @@ AS
 		WHERE PeriodNumber = @Period
 		AND PaymentYear = @AcademicYear
 		GROUP BY
-			PendingPaymentId
-		HAVING MIN(CAST(Result AS INT)) = 1) As Passed
+			PendingPaymentId	
+		HAVING MIN(CAST((CASE OverrideResult
+						WHEN 1 THEN 1
+						ELSE Result
+						END) AS INT)) = 1) As Passed		
 		ON pp.Id = Passed.PendingPaymentId
 
 	-- Invalid Validation records

@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.EmployerWithdrawal
 
         public async Task Handle(EmployerWithdrawalCommand command, CancellationToken cancellationToken = default)
         {
-            var applications = (await _domainRepository.Find(command)).ToList();
+            var applications = (await _domainRepository.Find(command.AccountLegalEntityId, command.ULN)).ToList();
             if(!applications.Any())
             {
                 throw new WithdrawalException($"Unable to handle Employer withdrawal command. No matching incentive applications found for {command}");

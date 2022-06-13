@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Domain;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
@@ -9,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
 using Apprenticeship = SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Apprenticeship;
 
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
@@ -22,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
         private readonly DateTime _submissionDate;
         public static readonly List<EarningType> EarningTypes = new List<EarningType> { EarningType.FirstPayment, EarningType.SecondPayment };
         public IReadOnlyCollection<Payment> Payments => Generate(_incentiveType, _breaksInLearning, _submissionDate).AsReadOnly();
+        public IncentiveType IncentiveType => _incentiveType;
         public abstract bool IsEligible { get; }
         public abstract List<PaymentProfile> PaymentProfiles { get; }
         public abstract List<EligibilityPeriod> EligibilityPeriods { get; }
@@ -53,7 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return Create(incentive.Phase.Identifier, incentive.Apprenticeship.DateOfBirth, incentive.StartDate, incentive.BreakInLearnings, incentive.SubmissionDate);
         }
 
-        public static Incentive Create(IncentiveApplicationApprenticeshipDto application)
+        public static Incentive Create(IncentiveApplicationApprenticeship application)
         {
             return Create(application.Phase, application.DateOfBirth, application.PlannedStartDate, new Collection<BreakInLearning>(), DateTime.UtcNow);
         }
@@ -68,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects
             return signedAgreementVersion < applicablePeriod.MinimumAgreementVersion;
         }
 
-        public static bool IsNewAgreementRequired(IncentiveApplicationDto application)
+        public static bool IsNewAgreementRequired(IncentiveApplication application)
         {
             foreach (var apprenticeship in application.Apprenticeships)
             {

@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<PendingPayment> PendingPayments => Model.PendingPaymentModels.Map().ToList().AsReadOnly();
         public PendingPayment NextDuePayment => GetNextDuePayment();
         public IReadOnlyCollection<Payment> Payments => Model.PaymentModels.Map().ToList().AsReadOnly();
+
         public bool PausePayments => Model.PausePayments;
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
         public IncentiveStatus Status => Model.Status;
@@ -94,6 +95,65 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.RefreshedLearnerForEarnings = false;
         }
 
+        private void CalculateEarningsForStoppedLearner(CollectionCalendar collectionCalendar, int paymentsCount)
+        {
+            var incentive = Incentive.Create(this);
+
+            var payments = incentive.Payments.ToList();
+            if (!payments.Any())
+            {
+                return;
+            }
+
+            for(var index = 0; index < paymentsCount; index ++)
+            {
+                AddPendingPaymentsAndClawbackWhereRequired(payments[index], collectionCalendar);
+            }
+
+            if (paymentsCount < PendingPayments.Count)
+            {
+                Model.PendingPaymentModels.Remove(PendingPayments.Last().GetModel());
+            }
+
+            AddEvent(new EarningsCalculated
+            {
+                ApprenticeshipIncentiveId = Id,
+                AccountId = Account.Id,
+                ApprenticeshipId = Apprenticeship.Id,
+                ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
+            });
+        }
+
+        public void RecalculateEarnings(CollectionCalendar collectionCalendar)
+        {
+            if (Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
+            {
+                return;
+            }
+
+            var pendingPaymentsHaveBeenPaid = false;
+            foreach(var pendingPayment in PendingPayments)
+            {
+                if (ExistingPendingPaymentHasBeenPaid(pendingPayment))
+                {
+                    pendingPaymentsHaveBeenPaid = true;
+                }
+            }
+
+            if (!pendingPaymentsHaveBeenPaid)
+            {
+                foreach(var pendingPayment in PendingPayments)
+                {
+                    var existingPendingPaymentModel = pendingPayment.GetModel();
+                    if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
+                    {
+                        AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
+                    }
+                }
+                CalculateEarnings(collectionCalendar);
+            }
+        }
+
         private void AddPendingPaymentsAndClawbackWhereRequired(ValueObjects.Payment payment, CollectionCalendar collectionCalendar)
         {
             var pendingPayment = PendingPayment.New(
@@ -136,7 +196,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
                 Model.PendingPaymentModels.Add(pendingPayment.GetModel());
             }
-        }     
+        }
 
         private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
         {
@@ -214,6 +274,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 RemoveUnpaidEarnings();
             }
+        }
+
+        public void Reinstate(CollectionCalendar collectionCalendar)
+        {
+            Model.WithdrawnBy = null;
+            Model.PausePayments = true;
+            Model.Status = IncentiveStatus.Paused;
+            CalculateEarnings(collectionCalendar);
         }
 
         public void CreatePayment(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
@@ -334,6 +402,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 AddEvent(new LearningResumed(
                     Model.Id,
                     learningStoppedStatus.DateResumed.Value));
+            }
+            else if (Model.Status == IncentiveStatus.Stopped && learningStoppedStatus.LearningStopped)
+            {
+                var incentive = Incentive.Create(this);
+                var paymentProfiles = incentive.PaymentProfiles.Where(x => x.IncentiveType == incentive.IncentiveType)
+                                                                .OrderBy(y => y.DaysAfterApprenticeshipStart).ToList();
+
+                for (var index = 2; index >= 1; index--)
+                {
+                    if (learningStoppedStatus.DateStopped.HasValue
+                        && learningStoppedStatus.DateStopped.Value >= StartDate.AddDays(paymentProfiles[index-1].DaysAfterApprenticeshipStart))
+                    {
+                        CalculateEarningsForStoppedLearner(collectionCalendar, index);
+                        break;
+                    }
+                }
             }
         }
 
@@ -719,12 +803,31 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return; // ignore older changes
             }
 
-            employmentCheck.Result = false;
             employmentCheck.ResultDateTime = checkResult.DateChecked;
 
-            if (checkResult.Result == EmploymentCheckResultType.Employed)
+            switch (checkResult.Result)
             {
-                employmentCheck.Result = true;                
+                case EmploymentCheckResultType.Employed:
+                    employmentCheck.Result = true;
+                    break;
+
+                case EmploymentCheckResultType.NotEmployed:
+                    employmentCheck.Result = false;
+                    break;
+
+                case EmploymentCheckResultType.Error:
+                    {
+                        employmentCheck.Result = null;
+                        if (checkResult.ErrorType.HasValue)
+                        {
+                            employmentCheck.ErrorType = checkResult.ErrorType;
+                        }
+                        else
+                        {
+                            throw new InvalidEmploymentCheckErrorTypeException("Value not set");
+                        }
+                    }
+                    break;
             }
         }
 
