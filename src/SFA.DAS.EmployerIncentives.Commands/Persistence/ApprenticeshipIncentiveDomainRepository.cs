@@ -12,15 +12,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
     public class ApprenticeshipIncentiveDomainRepository : IApprenticeshipIncentiveDomainRepository
     {
         private readonly IApprenticeshipIncentiveDataRepository _apprenticeshipIncentiveDataRepository;
+        private readonly IPaymentDataRepository _paymentDataRepository;
         private readonly IApprenticeshipIncentiveFactory _apprenticeshipIncentiveFactory;
         private readonly IDomainEventDispatcher _domainEventDispatcher;
 
         public ApprenticeshipIncentiveDomainRepository(
             IApprenticeshipIncentiveDataRepository apprenticeshipIncentiveDataRepository,
+            IPaymentDataRepository paymentDataRepository,
             IApprenticeshipIncentiveFactory apprenticeshipIncentiveFactory,
             IDomainEventDispatcher domainEventDispatcher)
         {
             _apprenticeshipIncentiveDataRepository = apprenticeshipIncentiveDataRepository;
+            _paymentDataRepository = paymentDataRepository;
             _apprenticeshipIncentiveFactory = apprenticeshipIncentiveFactory;
             _domainEventDispatcher = domainEventDispatcher;
         }
@@ -86,6 +89,25 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
             var incentives = await _apprenticeshipIncentiveDataRepository.FindIncentivesWithLearningFound();
             return (from incentive in incentives
                 select _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive)).ToList();
+        }
+
+        public async Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByPaymentId(Guid paymentId)
+        {
+            var payment = await _paymentDataRepository.Get(paymentId);
+
+            if (payment == null)
+            {
+                throw new ArgumentException($"Payment id {paymentId} not found");
+            }
+
+            var incentive = await _apprenticeshipIncentiveDataRepository.Get(payment.ApprenticeshipIncentiveId);
+
+            if (incentive == null)
+            {
+                throw new ArgumentException($"Apprenticeship incentive with ID of {payment.ApprenticeshipIncentiveId} and payment ID of {paymentId} not found");
+            }
+
+            return _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive);
         }
 
         public async Task Save(Domain.ApprenticeshipIncentives.ApprenticeshipIncentive aggregate)

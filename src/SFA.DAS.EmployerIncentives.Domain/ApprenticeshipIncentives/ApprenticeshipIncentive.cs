@@ -925,6 +925,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 });
         }
 
+        public void RevertPayment(Guid paymentId, ServiceRequest serviceRequest)
+        {
+            var payment = Model.PaymentModels.FirstOrDefault(x => x.Id == paymentId);
+            if (payment == null)
+            {
+                return;
+            }
+            
+            var pendingPayment = Model.PendingPaymentModels.FirstOrDefault(x => x.Id == payment.PendingPaymentId);
+            if (pendingPayment == null)
+            {
+                return;
+            }
+
+            pendingPayment.PaymentMadeDate = null;
+
+            Model.PaymentModels.Remove(payment);
+
+            AddEvent(new PaymentReverted(payment, serviceRequest));
+        }
+
         private DateTime GetPhaseStartDate()
         {
             if (Phase.Identifier == Enums.Phase.Phase1)
