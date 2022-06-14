@@ -362,7 +362,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             addedAudit.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             addedAudit.Step.Should().Be(_pendingPaymentValidationResult.Step);
             addedAudit.ExpiryDate.Should().Be(_expiryDate);
-            addedAudit.CreatedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 2, 0));
+            addedAudit.CreatedDateTime.Should().BeCloseTo(DateTime.Now, new TimeSpan(0, 2, 0));
         }
 
         [Then(@"the existing validation override is archived")]
@@ -384,7 +384,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             deletedAudit.Step.Should().Be(_validationOverrideAudit.Step);
             deletedAudit.ExpiryDate.Should().Be(_validationOverrideAudit.ExpiryDate);
             deletedAudit.CreatedDateTime.Should().Be(_validationOverrideAudit.CreatedDateTime);
-            deletedAudit.DeletedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 2, 0));
+            deletedAudit.DeletedDateTime.Should().BeCloseTo(DateTime.Now, new TimeSpan(0, 2, 0));
         }
 
         [Then(@"the validation overrides are stored against the apprenticeship incentives")]
