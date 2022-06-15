@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
         }
 
         [Test]
-        public async Task Then_an_exception_is_thrown_when_the_payment_is_not_found()
+        public void Then_an_exception_is_thrown_when_the_payment_is_not_found()
         {
             // Arrange
             PaymentModel nullPayment = null;
@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
         }
 
         [Test]
-        public async Task Then_an_exception_is_thrown_when_the_incentive_is_not_found()
+        public void Then_an_exception_is_thrown_when_the_incentive_is_not_found()
         {
             // Arrange
             var payment = _fixture.Create<PaymentModel>();

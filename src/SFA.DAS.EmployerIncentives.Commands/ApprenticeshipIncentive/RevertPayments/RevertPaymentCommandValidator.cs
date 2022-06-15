@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RevertPaym
         {
             var result = new ValidationResult();
 
-            if (item.PaymentId == default)
+            if (item.PaymentId == Guid.Empty)
             {
                 result.AddError("PaymentId", "Is not set");
             }
