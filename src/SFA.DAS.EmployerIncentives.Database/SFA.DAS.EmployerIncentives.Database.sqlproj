@@ -117,7 +117,7 @@
     <Build Include="Tables\ValidationOverride.sql" />
     <Build Include="Tables\Audit.ValidationOverride.sql" />
     <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
-    <Build Include="Views\ApprenticeApplications.sql" />
+    <Build Include="Views\ApprenticeApplications.sql" />    
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
@@ -133,6 +133,7 @@
     <None Include="Scripts\Update.MinimumAgreementVersion.sql" />
     <None Include="Scripts\Generate.MonthEndMetrics.sql" />
     <None Include="Scripts\Metrics Template.xlsx" />
+	<None Include="Scripts\Update.ReinstatedAuditRecords.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Script.PreDeployment1.sql" />
