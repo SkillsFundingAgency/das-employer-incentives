@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RevertPayments
@@ -14,12 +15,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RevertPaym
                 result.AddError("PaymentId", "Is not set");
             }
 
-            if (item.ServiceRequestId == default)
+            if (String.IsNullOrWhiteSpace(item.ServiceRequestId))
             {
                 result.AddError("ServiceRequestId", "Is not set");
             }
 
-            if (item.DecisionReferenceNumber == default)
+            if (String.IsNullOrWhiteSpace(item.DecisionReferenceNumber))
             {
                 result.AddError("DecisionReferenceNumber", "Is not set");
             }
