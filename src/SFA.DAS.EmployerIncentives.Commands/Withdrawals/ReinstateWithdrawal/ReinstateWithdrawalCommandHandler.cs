@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +32,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
                 {
                     if(apprenticeship.ULN == command.ULN && apprenticeship.WithdrawnByCompliance)
                     {
-                        application.ReinstateWithdrawal(apprenticeship);
+                        application.ReinstateWithdrawal(apprenticeship,
+                            new ServiceRequest(
+                                command.ServiceRequestTaskId,
+                                command.DecisionReference,
+                                command.ServiceRequestCreated));
                     }
                 }
                 await _domainRepository.Save(application);
