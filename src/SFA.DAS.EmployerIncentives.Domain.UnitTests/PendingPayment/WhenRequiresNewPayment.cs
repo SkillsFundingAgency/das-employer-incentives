@@ -29,6 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(p => p.DueDate, DateTime.Today)
                 .With(p => p.CollectionPeriod, new CollectionPeriod((byte)1, (short)2021))
                 .With(p => p.EarningType, EarningType.FirstPayment)
+                .Without(p => p.PaymentMadeDate)
+                .With(p => p.ClawedBack, false)
                 .Create();
 
             _newPendingPaymentModel =
@@ -38,6 +40,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(p => p.ApprenticeshipIncentiveId, _sutModel.ApprenticeshipIncentiveId)
                 .With(p => p.Amount, _sutModel.Amount)
                 .With(p => p.CollectionPeriod, new CollectionPeriod(_sutModel.CollectionPeriod.PeriodNumber, _sutModel.CollectionPeriod.AcademicYear))
+                .Without(p => p.PaymentMadeDate)
+                .With(p => p.ClawedBack, false)
                 .Create();
 
             _newPendingPayment = PendingPayment.Get(_newPendingPaymentModel);
