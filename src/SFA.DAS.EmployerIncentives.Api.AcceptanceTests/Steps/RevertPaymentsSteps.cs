@@ -145,6 +145,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
             var revertedPayment = pendingPayments.FirstOrDefault(x => x.Id == _payment.PendingPaymentId);
             revertedPayment.PaymentMadeDate.Should().BeNull();
+
+            var revertedPaymentAudits = dbConnection.GetAll<RevertedPaymentAudit>().ToList();
+            revertedPaymentAudits.Count.Should().Be(1);
+            revertedPaymentAudits[0].PaymentId.Should().Be(_payment.Id);
         }
 
         [Then(@"the payment is not reverted")]
@@ -182,10 +186,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             payments.Count().Should().Be(0);
 
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
-            foreach(var payment in _payments)
+            var revertedPaymentAudits = dbConnection.GetAll<RevertedPaymentAudit>().ToList();
+            
+            foreach (var payment in _payments)
             {
                 var revertedPayment = pendingPayments.FirstOrDefault(x => x.Id == payment.PendingPaymentId);
                 revertedPayment.PaymentMadeDate.Should().BeNull();
+                var auditRecord = revertedPaymentAudits.FirstOrDefault(x => x.PendingPaymentId == payment.PendingPaymentId);
+                auditRecord.Should().NotBeNull();
             }
         }
     }
