@@ -76,14 +76,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         public void Then_an_exception_is_thrown_if_the_incentive_cannot_be_found_by_payment_id()
         {
             // Arrange
-            const string errorMessage = "Incentive not found";
-            _mockDomainRepository.Setup(x => x.FindByPaymentId(_command.PaymentId)).ThrowsAsync(new ArgumentException(errorMessage));
+            Domain.ApprenticeshipIncentives.ApprenticeshipIncentive nullIncentive = null;
+            _mockDomainRepository.Setup(x => x.FindByPaymentId(_command.PaymentId)).ReturnsAsync(nullIncentive);
 
             // Act
             Func<Task> action = async () => await _sut.Handle(_command);
 
             // Assert
-            action.Should().Throw<ArgumentException>().WithMessage(errorMessage);
+            action.Should().Throw<ArgumentException>().WithMessage($"Apprentice Incentive for Payment id {_command.PaymentId} not found");
         }
     }
 }

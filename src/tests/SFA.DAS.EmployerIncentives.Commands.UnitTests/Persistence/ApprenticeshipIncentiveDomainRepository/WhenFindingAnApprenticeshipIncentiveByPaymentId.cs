@@ -70,7 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_when_the_payment_is_not_found()
+        public async Task Then_a_null_value_is_returned_when_the_payment_is_not_found()
         {
             // Arrange
             PaymentModel nullPayment = null;
@@ -79,14 +79,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
                 .Setup(x => x.Get(_paymentId)).ReturnsAsync(nullPayment);
 
             // Act
-            Func<Task> action = async () => await _sut.FindByPaymentId(_paymentId);
+            var result = await _sut.FindByPaymentId(_paymentId);
 
             // Assert
-            action.Should().Throw<ArgumentException>().WithMessage($"Payment id {_paymentId} not found");
+            result.Should().BeNull();
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_when_the_incentive_is_not_found()
+        public async Task Then_a_null_value_is_returned_when_the_incentive_is_not_found()
         {
             // Arrange
             var payment = _fixture.Create<PaymentModel>();
@@ -100,10 +100,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
                 .ReturnsAsync(nullApprenticeship);
 
             // Act
-            Func<Task> action = async () => await _sut.FindByPaymentId(_paymentId);
+            var result = await _sut.FindByPaymentId(_paymentId);
 
             // Assert
-            action.Should().Throw<ArgumentException>().WithMessage($"Apprenticeship incentive with ID of {payment.ApprenticeshipIncentiveId} and payment ID of {_paymentId} not found");
+            result.Should().BeNull();
         }
     }
 }

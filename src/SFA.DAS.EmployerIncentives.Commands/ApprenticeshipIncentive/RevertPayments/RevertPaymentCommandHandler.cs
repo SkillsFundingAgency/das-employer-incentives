@@ -19,6 +19,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RevertPaym
         public async Task Handle(RevertPaymentCommand command, CancellationToken cancellationToken = default)
         {
             var incentive = await _incentiveDomainRepository.FindByPaymentId(command.PaymentId);
+            if (incentive == null)
+            {
+                throw new ArgumentException($"Apprentice Incentive for Payment id {command.PaymentId} not found");
+            }
 
             incentive.RevertPayment(command.PaymentId, new ServiceRequest(command.ServiceRequestId, command.DecisionReferenceNumber, command.DateServiceRequestTaskCreated.Value));
 

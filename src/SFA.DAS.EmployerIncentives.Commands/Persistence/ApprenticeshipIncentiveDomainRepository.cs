@@ -97,14 +97,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 
             if (payment == null)
             {
-                throw new ArgumentException($"Payment id {paymentId} not found");
+                return null;
             }
 
             var incentive = await _apprenticeshipIncentiveDataRepository.Get(payment.ApprenticeshipIncentiveId);
 
             if (incentive == null)
             {
-                throw new ArgumentException($"Apprenticeship incentive with ID of {payment.ApprenticeshipIncentiveId} and payment ID of {paymentId} not found");
+                return null;
             }
 
             return _apprenticeshipIncentiveFactory.GetExisting(incentive.Id, incentive);
