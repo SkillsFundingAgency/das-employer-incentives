@@ -333,6 +333,109 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
         }
 
+        [Test]
+        public void Then_the_first_payment_is_recalculated_if_the_next_stopped_date_received_is_after_the_due_date_and_the_payment_was_clawed_back()
+        {
+            // Arrange
+            _sutModel.Status = IncentiveStatus.Stopped;
+            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
+            _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>()
+                .With(x => x.EarningType, EarningType.FirstPayment)
+                .With(x => x.DueDate, new DateTime(2021, 1, 1))
+                .With(x => x.ClawedBack, true)
+                .With(x => x.PaymentMadeDate, _fixture.Create<DateTime>())
+                .Create());
+            _sutModel.PaymentModels = new List<PaymentModel>();
+            _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel> 
+            {
+                _fixture.Build<ClawbackPaymentModel>()
+                    .With(x => x.DateClawbackSent, _fixture.Create<DateTime>())
+                    .With(x => x.PendingPaymentId, _sutModel.PendingPaymentModels.ToList()[0].Id)
+                    .With(x => x.ApprenticeshipIncentiveId, _sutModel.PendingPaymentModels.ToList()[0].ApprenticeshipIncentiveId)
+                    .Create()
+            };
+            _sut = Sut(_sutModel);
+
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(104)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            // Assert
+            _sutModel.PendingPaymentModels.Count.Should().Be(2);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && x.ClawedBack).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && !x.ClawedBack).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && !x.PaymentMadeDate.HasValue).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment && x.PaymentMadeDate.HasValue).Should().Be(1);
+        }
+
+        [Test]
+        public void Then_the_second_payment_is_recalculated_if_the_next_stopped_date_received_is_after_the_due_date_and_the_payment_was_clawed_back()
+        {
+            // Arrange
+            _sutModel.Status = IncentiveStatus.Stopped;
+            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
+            _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>()
+                .With(x => x.EarningType, EarningType.FirstPayment)
+                .With(x => x.DueDate, new DateTime(2021, 1, 1))
+                .With(x => x.ClawedBack, false)
+                .With(x => x.PaymentMadeDate, _fixture.Create<DateTime>())
+                .With(x => x.Amount, 1000m)
+                .Create());
+            _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>()
+                .With(x => x.EarningType, EarningType.SecondPayment)
+                .With(x => x.DueDate, new DateTime(2021, 1, 1))
+                .With(x => x.ClawedBack, true)
+                .With(x => x.PaymentMadeDate, _fixture.Create<DateTime>())
+                .With(x => x.Amount, 1000m)
+                .Create());
+            _sutModel.PaymentModels = new List<PaymentModel> 
+            { 
+                _fixture.Build<PaymentModel>()
+                    .With(x => x.PaidDate, _fixture.Create<DateTime>())
+                    .With(x => x.PendingPaymentId, _sutModel.PendingPaymentModels.ToList()[0].Id)
+                    .With(x => x.ApprenticeshipIncentiveId, _sutModel.PendingPaymentModels.ToList()[0].ApprenticeshipIncentiveId)
+                    .With(x => x.Amount, _sutModel.PendingPaymentModels.ToList()[0].Amount)
+                    .Create()
+            };
+            _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>
+            {
+                _fixture.Build<ClawbackPaymentModel>()
+                    .With(x => x.DateClawbackSent, _fixture.Create<DateTime>())
+                    .With(x => x.PendingPaymentId, _sutModel.PendingPaymentModels.ToList()[1].Id)
+                    .With(x => x.ApprenticeshipIncentiveId, _sutModel.PendingPaymentModels.ToList()[1].ApprenticeshipIncentiveId)
+                    .With(x => x.Amount, _sutModel.PendingPaymentModels.ToList()[1].Amount)
+                    .Create()
+            };
+            _sut = Sut(_sutModel);
+
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(366)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            // Assert
+            _sutModel.PendingPaymentModels.Count.Should().Be(3);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment).Should().Be(2);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && x.ClawedBack).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && !x.ClawedBack).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && !x.PaymentMadeDate.HasValue).Should().Be(1);
+            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && x.PaymentMadeDate.HasValue).Should().Be(1);
+        }
+
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);
