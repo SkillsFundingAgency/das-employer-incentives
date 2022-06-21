@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPost("/signedAgreements")]
-        public async Task<IActionResult> SignedAgreements([FromBody] SignedAgreement request)
+        public async Task<IActionResult> SignAgreement([FromBody] SignedAgreement request)
         {
             await SendCommandAsync(new SignLegalEntityAgreementCommand(
                 request.AccountId,
@@ -52,11 +52,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             request.AccountId = accountId;
             request.AccountLegalEntityId = accountLegalEntityId;
-            return await SignedAgreements(request);
+            return await SignAgreement(request);
         }
 
         [HttpPost("/changeOfVendorCases")]
-        public async Task<IActionResult> ChangeOfVendorCases([FromBody] ChangeOfVendorCase request)
+        public async Task<IActionResult> ChangeOfVendorCase([FromBody] VendorCase request)
         {
             await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(request.HashedLegalEntityId, request.CaseId, request.Status, request.CaseStatusLastUpdatedDate));
             return NoContent();
@@ -64,14 +64,14 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPatch("/legalentities/{hashedLegalEntityId}/vendorregistrationform")]
         [Obsolete("Use changeOfVendorCases endpoint instead")]
-        public async Task<IActionResult> UpdateVendorRegistrationCaseStatus([FromRoute] string hashedLegalEntityId, [FromBody] ChangeOfVendorCase request)
+        public async Task<IActionResult> UpdateVendorRegistrationCaseStatus([FromRoute] string hashedLegalEntityId, [FromBody] VendorCase request)
         {
             request.HashedLegalEntityId = hashedLegalEntityId;
-            return await ChangeOfVendorCases(request);
+            return await ChangeOfVendorCase(request);
         }
 
         [HttpPost("/vendors")]
-        public async Task<IActionResult> Vendors([FromBody] Vendors request)
+        public async Task<IActionResult> CreateVendor([FromBody] Vendor request)
         {
             await SendCommandAsync(new AddEmployerVendorIdForLegalEntityCommand(request.HashedLegalEntityId, request.EmployerVendorId));
             return NoContent();
@@ -82,7 +82,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         public async Task<IActionResult> AddEmployerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] Vendors request)
         {
             request.HashedLegalEntityId = hashedLegalEntityId;
-            return await Vendors(request);
+            return await CreateVendor(request);
         }
     }
 }

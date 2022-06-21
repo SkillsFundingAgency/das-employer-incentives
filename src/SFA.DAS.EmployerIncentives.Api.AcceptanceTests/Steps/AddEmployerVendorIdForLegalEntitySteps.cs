@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         public async Task WhenWeAddTheEmployerVendorForThisLegalEntity()
         {
             var url = $"/Vendors";
-            var data = new Vendors
+            var data = new Vendor
             {
                 HashedLegalEntityId = _hashedLegalEntityId,
                 EmployerVendorId = _newVendorId

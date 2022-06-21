@@ -124,7 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the multiple resume payments request is sent")]
         public async Task WhenTheMultipleResumePausedPaymentsRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Resume)
                 .Create();
 

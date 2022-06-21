@@ -35,10 +35,12 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<string>();
-            var request = _fixture.Create<ChangeOfVendorCase>();
+            var request = _fixture.Build<VendorCase>()
+                .With(p => p.HashedLegalEntityId, accountLegalEntityId)
+                .Create();
 
             // Act
-            await _sut.UpdateVendorRegistrationCaseStatus(accountLegalEntityId, request);
+            await _sut.ChangeOfVendorCase(request);
 
             // Assert
             _mockCommandDispatcher
@@ -56,10 +58,12 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
         {
             // Arrange
             var accountLegalEntityId = _fixture.Create<string>();
-            var request = _fixture.Create<ChangeOfVendorCase>();
+            var request = _fixture.Build<VendorCase>()
+                .With(p => p.HashedLegalEntityId, accountLegalEntityId)
+                .Create();
 
             // Act
-            var actual = await _sut.UpdateVendorRegistrationCaseStatus(accountLegalEntityId, request) as NoContentResult;
+            var actual = await _sut.ChangeOfVendorCase(request) as NoContentResult;
 
             // Assert
             actual.Should().NotBeNull();

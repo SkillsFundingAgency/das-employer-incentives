@@ -36,6 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Given(@"has submitted one or more applications")]
+        [Given(@"a legal entity has submitted one or more applications")]
         public async Task GivenHasSubmittedOneOrMoreApplications()
         {
             var createApplicationRequest = Fixture.Create<CreateIncentiveApplicationRequest>();
@@ -45,13 +46,12 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _response = await EmployerIncentiveApi.Post("/applications", createApplicationRequest);
             var applicationId = _response.Headers.Location.ToString().Substring("/applications/".Length);
 
-            var submitApplicationRequest = Fixture.Create<SubmitIncentiveApplicationRequest>();
+            var submitApplicationRequest = Fixture.Create<Submission>();
             submitApplicationRequest.AccountId = _account.Id;
             submitApplicationRequest.IncentiveApplicationId = new Guid(applicationId);
 
             _response = await EmployerIncentiveApi.Patch($"/applications/{applicationId}", submitApplicationRequest);
         }
-
 
 
         [Given(@"a legal entity has submitted one or more applications")]
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             submitApplicationRequest.AccountId = _account.Id;
             submitApplicationRequest.IncentiveApplicationId = new Guid(applicationId);
 
-            _response = await EmployerIncentiveApi.Patch($"/applications/{applicationId}", submitApplicationRequest);
+            _response = await EmployerIncentiveApi.Post($"/applications/{applicationId}/submisions", submitApplicationRequest);
         }
 
         [Then(@"the applications for that legal entity should be withdrawn")]
