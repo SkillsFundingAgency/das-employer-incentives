@@ -7,10 +7,15 @@
 
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\LegalEntityUpdated.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RecalculateEarnings.feature.cs" />
   </ItemGroup>
  
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.11" />

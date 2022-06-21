@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.Http.Configuration;
-using System.Collections.Generic;
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
@@ -14,11 +13,11 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string NServiceBusLicense { get; set; }
         public string UseLearningEndpointStorageDirectory { get; set; }        
         public virtual int MinimumAgreementVersion { get; set; }
-        public List<IncentivePaymentProfile> IncentivePaymentProfiles { get; set; }
         public string ApiBaseUrl { get; set; }
         public string Identifier { get; set; }
         public string EmployerIncentivesWebBaseUrl { get; set; }
         public string LogLevel { get; set; }
         public bool EmploymentCheckEnabled { get; set; }
+        public int? LearnerServiceCacheIntervalInMinutes { get; set; }
     }
 }

@@ -9,7 +9,6 @@
 	[ULN] BIGINT NOT NULL,
 	[PlannedStartDate] DATETIME2 NOT NULL,
 	[ApprenticeshipEmployerTypeOnApproval] INT NOT NULL,
-	[TotalIncentiveAmount] MONEY NOT NULL, 
     [UKPRN] BIGINT NULL, 
 	[EarningsCalculated] [bit] NOT NULL  DEFAULT 0,
 	[WithdrawnByEmployer] BIT NOT NULL DEFAULT 0,
@@ -17,7 +16,7 @@
 	[CourseName] NVARCHAR(126) NULL,
 	[EmploymentStartDate] DATETIME2 NULL,
 	[Phase] NVARCHAR(50) NULL,
-	[HasEligibleEmploymentStartDate] [bit] NOT NULL DEFAULT 0,
+	[StartDatesAreEligible] [bit] NOT NULL DEFAULT 0,
     CONSTRAINT FK_IncentiveApplication FOREIGN KEY (IncentiveApplicationId) REFERENCES IncentiveApplication(Id)
 )
 GO

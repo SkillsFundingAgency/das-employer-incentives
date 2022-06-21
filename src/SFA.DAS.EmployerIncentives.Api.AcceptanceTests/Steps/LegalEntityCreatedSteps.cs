@@ -37,6 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the legal entity is added to an account")]
         public async Task WhenAddedLegalEntityEventIsTriggered()
         {
+            _account.HasBeenDeleted = false;
             _response = await EmployerIncentiveApi.Put(
                     $"/accounts/{_account.Id}/legalEntities",
                     new AddLegalEntityRequest

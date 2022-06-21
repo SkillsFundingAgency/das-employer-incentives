@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries;
+using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRepository
 {
@@ -15,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
     {
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
-        private IQueryRepository<IncentiveApplicationDto> _sut;
+        private IIncentiveApplicationQueryRepository _sut;
 
         [SetUp]
         public void Arrange()
@@ -25,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _context = new EmployerIncentivesDbContext(options);
-
+           
             _sut = new IncentiveApplication.IncentiveApplicationQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }
 
@@ -44,6 +47,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var applicationId = Guid.NewGuid();
 
             allApplications[1].Id = applicationId;
+            foreach(var apprentice in allApplications[1].Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
 
             _context.Accounts.Add(account);
             _context.Applications.AddRange(allApplications);
@@ -86,7 +93,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var application = _fixture.Create<Models.IncentiveApplication>();            
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
@@ -113,7 +123,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
             var application = _fixture.Create<Models.IncentiveApplication>();
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
@@ -140,7 +153,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
@@ -168,7 +184,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();
@@ -193,7 +212,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.IncentiveApplicationQueryRep
 
             application.Id = applicationId;
             application.AccountLegalEntityId = account.AccountLegalEntityId;
-
+            foreach (var apprentice in application.Apprenticeships)
+            {
+                apprentice.Phase = Phase.Phase2;
+            }
             _context.Accounts.Add(account);
             _context.Applications.Add(application);
             _context.SaveChanges();

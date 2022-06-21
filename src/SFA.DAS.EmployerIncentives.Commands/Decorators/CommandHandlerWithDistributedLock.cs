@@ -1,11 +1,13 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Decorators
 {
+    [ExcludeFromCodeCoverage]
     public class CommandHandlerWithDistributedLock<T> : ICommandHandler<T> where T : ICommand
     {
         private readonly ICommandHandler<T> _handler;
@@ -23,28 +25,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.Decorators
         {
             if (command is ILockIdentifier identifier)
             {
-                await _lockProvider.Start();
+                var lockId = identifier.LockId;
+
+                if (!await _lockProvider.AcquireLock(lockId, cancellationToken))
+                {
+                    throw new EntityLockedException($"Unable to handle command '{command.GetType().FullName}'. The entity with with identifier '{lockId}' is already handling a command.");
+                }
 
                 try
                 {
-                    var lockId = identifier.LockId;
-                    try
-                    {
-                        if (!await _lockProvider.AcquireLock(lockId, cancellationToken))
-                        {
-                            throw new EntityLockedException($"Unable to handle command '{command.GetType().FullName}'. The entity with with identifier '{lockId}' is already handling a command.");
-                        }
-
-                        await _handler.Handle(command, cancellationToken);
-                    }
-                    finally
-                    {
-                        await _lockProvider.ReleaseLock(lockId);
-                    }
+                    await _handler.Handle(command, cancellationToken);
                 }
                 finally
                 {
-                    await _lockProvider.Stop();
+                    await _lockProvider.ReleaseLock(lockId);
                 }
             }
             else

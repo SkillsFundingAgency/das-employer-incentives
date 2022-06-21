@@ -46,8 +46,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             Model.SubmittedByEmail = submittedByEmail;
             Model.SubmittedByName = submittedByName;
 
-            Model.ApprenticeshipModels.ToList().ForEach(m => m.Phase = IncentivePhase.Create().Identifier);
-
             Model.ApprenticeshipModels = FilterEligibleApprenticeships(Model.ApprenticeshipModels);
 
             AddEvent(new Submitted(Model));
@@ -98,6 +96,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 serviceRequest));
         }
 
+        public void ReinstateWithdrawal(Apprenticeship apprenticeship)
+        {
+            var apprenticeToReinstate = Apprenticeships.Single(m => m.Id == apprenticeship.Id);
+            apprenticeToReinstate.ReinstateApplication();
+
+            AddEvent(new ApplicationReinstated(
+                Model.AccountId,
+                Model.AccountLegalEntityId,
+                apprenticeToReinstate.GetModel()));
+        }
+
         public void EarningsCalculated(Guid apprenticeshipId)
         {
             var apprenticeship = Apprenticeships.Single(a => a.Id == apprenticeshipId);
@@ -114,7 +123,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
 
         private static List<ApprenticeshipModel> FilterEligibleApprenticeships(ICollection<ApprenticeshipModel> apprenticeshipModels)
         {
-            return new List<ApprenticeshipModel>(apprenticeshipModels.Where(a => a.HasEligibleEmploymentStartDate));
+            return new List<ApprenticeshipModel>(apprenticeshipModels.Where(a => a.StartDatesAreEligible));
         }
 
         private static List<Apprenticeship> Map(ICollection<ApprenticeshipModel> apprenticeshipModels)

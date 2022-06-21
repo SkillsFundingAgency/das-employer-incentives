@@ -9,5 +9,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.Services
         {
             return DateTime.Now;
         }
+
+        public DateTime UtcNow()
+        {
+            return DateTime.UtcNow;
+        }
     }
 }

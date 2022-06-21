@@ -1,5 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.DTOs;
-using SFA.DAS.EmployerIncentives.Data.Models;
+﻿using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Domain.Accounts.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
@@ -8,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using LegalEntity = SFA.DAS.EmployerIncentives.DataTransferObjects.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
 {
@@ -28,7 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
                                                             VrfVendorId = i.VrfVendorId,
-                                                            VrfCaseStatusLastUpdatedDateTime = i.VrfCaseStatusLastUpdatedDateTime
+                                                            VrfCaseStatusLastUpdatedDateTime = i.VrfCaseStatusLastUpdatedDateTime,
+                                                            HasBeenDeleted = i.HasBeenDeleted
                                                         }
             ));
 
@@ -66,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
-                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status
+                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status,
+                HasBeenDeleted = model.HasBeenDeleted
             };
         }
 
@@ -83,16 +86,16 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             return model;
         }
 
-        public static IEnumerable<AccountDto> MapDto(this IEnumerable<Models.Account> models)
+        public static IEnumerable<DataTransferObjects.Account> MapDto(this IEnumerable<Models.Account> models)
         {
-            var accounts = new List<AccountDto>();
+            var accounts = new List<DataTransferObjects.Account>();
 
             foreach (var model in models)
             {
                 var account = accounts.SingleOrDefault(a => a.AccountId == model.Id);
                 if (account == null)
                 {
-                    account = new AccountDto { AccountId = model.Id, LegalEntities = new List<LegalEntityDto>() };
+                    account = new DataTransferObjects.Account { AccountId = model.Id, LegalEntities = new List<LegalEntity>() };
                     accounts.Add(account);
                 }
                 account.LegalEntities.Add(MapLegalEntityDto(model));
@@ -101,9 +104,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             return accounts;
         }
 
-        private static LegalEntityDto MapLegalEntityDto(Models.Account model)
+        private static LegalEntity MapLegalEntityDto(Models.Account model)
         {
-            return new LegalEntityDto
+            return new LegalEntity
             {
                 AccountId = model.Id,
                 AccountLegalEntityId = model.AccountLegalEntityId,
@@ -112,7 +115,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 HashedLegalEntityId = model.HashedLegalEntityId,
-                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase2Incentive.MinimumAgreementVersion(),
+                IsAgreementSigned = model.SignedAgreementVersion.HasValue && model.SignedAgreementVersion >= Phase3Incentive.MinimumAgreementVersion(),
                 BankDetailsRequired = MapBankDetailsRequired(model.VrfCaseStatus, model.VrfVendorId)
             };
         }
@@ -149,11 +152,10 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
                 ULN = x.ULN,
-                TotalIncentiveAmount = x.TotalIncentiveAmount,
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
                 EmploymentStartDate = x.EmploymentStartDate,
-                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                StartDatesAreEligible = x.StartDatesAreEligible,
                 Phase = x.Phase                
             }).ToList();
         }
@@ -186,14 +188,13 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ApprenticeshipEmployerTypeOnApproval = x.ApprenticeshipEmployerTypeOnApproval,
                 PlannedStartDate = x.PlannedStartDate,
                 ULN = x.ULN,
-                TotalIncentiveAmount = x.TotalIncentiveAmount,
                 EarningsCalculated = x.EarningsCalculated,
                 WithdrawnByEmployer = x.WithdrawnByEmployer,
                 WithdrawnByCompliance = x.WithdrawnByCompliance,
                 UKPRN = x.UKPRN,
                 CourseName = x.CourseName,
                 EmploymentStartDate = x.EmploymentStartDate,
-                HasEligibleEmploymentStartDate = x.HasEligibleEmploymentStartDate,
+                StartDatesAreEligible = x.StartDatesAreEligible,
                 Phase = x.Phase
             }).ToList();
         }

@@ -6,7 +6,6 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders.Configuration;
 using SFA.DAS.NServiceBus.Services;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         private readonly Dictionary<string, string> _config;
         private readonly IHook<object> _eventMessageHook;
         private readonly IHook<ICommand> _commandMessageHook;
-        private readonly List<IncentivePaymentProfile> _paymentProfiles;
 
         public TestWebApi(TestContext context, IHook<object> eventMessageHook, IHook<ICommand> commandMessageHook)
         {
@@ -40,9 +38,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" }
                 };
-
-            _paymentProfiles = new IncentivePaymentProfileListBuilder().Build();
-
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -58,7 +53,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     a.NServiceBusConnectionString = _context.ApplicationSettings.NServiceBusConnectionString;
                     a.MinimumAgreementVersion = _context.ApplicationSettings.MinimumAgreementVersion;
                     a.EmploymentCheckEnabled = _context.ApplicationSettings.EmploymentCheckEnabled;
-                    a.IncentivePaymentProfiles = _paymentProfiles;
                 });
                 s.Configure<PolicySettings>(a =>
                 {
@@ -83,11 +77,11 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     l.Identifier = "";
                     l.Version = "1.0";
                 });
-                s.Configure<EmploymentCheckApi>(l =>
+                s.Configure<EmployerIncentivesOuterApi>(l =>
                 {
                     l.ApiBaseUrl = _context.EmploymentCheckApi.BaseAddress;
-                    l.Identifier = "";
-                    l.Version = "1.0";
+                    l.SubscriptionKey = "";
+                    l.ApiVersion = "1";
                 });
                 if (_context.AccountApi != null)
                 {
@@ -102,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 
                 s.AddTransient<IDistributedLockProvider, NullLockProvider>();
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
-                s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));
+                s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));                
                 s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _commandMessageHook));
                 s.AddSingleton(_commandMessageHook);
             });

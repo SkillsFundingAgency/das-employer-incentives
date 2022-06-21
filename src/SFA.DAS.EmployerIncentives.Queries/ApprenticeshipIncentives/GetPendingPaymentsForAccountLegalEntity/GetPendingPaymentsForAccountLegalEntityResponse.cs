@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using SFA.DAS.EmployerIncentives.Abstractions.DTOs.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetPendingPaymentsForAccountLegalEntity
 {
     public class GetPendingPaymentsForAccountLegalEntityResponse : IResponseLogWriterWithArgs
     {
-        public List<PendingPaymentDto> PendingPayments { get; }
+        public List<PendingPayment> PendingPayments { get; }
 
-        public GetPendingPaymentsForAccountLegalEntityResponse(List<PendingPaymentDto> pendingPayments)
+        public GetPendingPaymentsForAccountLegalEntityResponse(List<PendingPayment> pendingPayments)
         {
             PendingPayments = pendingPayments;
         }

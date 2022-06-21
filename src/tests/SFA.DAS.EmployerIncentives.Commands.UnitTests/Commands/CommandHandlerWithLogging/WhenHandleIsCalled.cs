@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandlerWithLogging
 {
@@ -16,9 +17,11 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
         private CommandHandlerWithLogging<TestCommand> _sut;
         private Mock<ICommandHandler<TestCommand>> _mockHandler;
         private Mock<ILogger<TestCommand>> _mockLogger;
+        private ILoggerFactory _loggerFactory;
+        private Mock<ILoggerProvider> _mockLoggerProvider;
         private Fixture _fixture;
 
-        public class TestCommand : ICommand{}
+        public class TestCommand : ICommand { }
 
         [SetUp]
         public void Arrange()
@@ -27,7 +30,13 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             _mockHandler = new Mock<ICommandHandler<TestCommand>>();
             _mockLogger = new Mock<ILogger<TestCommand>>();
 
-            _sut = new CommandHandlerWithLogging<TestCommand>(_mockHandler.Object, _mockLogger.Object);
+            _mockLoggerProvider = new Mock<ILoggerProvider>();
+            _mockLoggerProvider.Setup(m => m.CreateLogger(It.IsAny<string>())).Returns(_mockLogger.Object);
+            
+            _loggerFactory = new LoggerFactory();
+            _loggerFactory.AddProvider(_mockLoggerProvider.Object);
+
+            _sut = new CommandHandlerWithLogging<TestCommand>(_mockHandler.Object, _loggerFactory);
         }
 
         [Test]
@@ -40,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             await _sut.Handle(command);
 
             //Assert
-            _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"Start handle command '{typeof(TestCommand)}' : ");
+            _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"Start handle '{typeof(TestCommand)}' command : ");
         }
 
         [Test]
@@ -53,7 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             await _sut.Handle(command);
 
             //Assert
-            _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"End handle command '{typeof(TestCommand)}' : ");
+            _mockLogger.VerifyLog(LogLevel.Debug, Times.Once(), $"End handle '{typeof(TestCommand)}' command : ");
         }
 
         [Test]
@@ -85,7 +94,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandl
             action.Invoke();
 
             //Assert
-            _mockLogger.VerifyLog(LogLevel.Error, Times.Once(), $"Error handling command '{typeof(TestCommand)}' : ", exception);
+            _mockLogger.VerifyLog(LogLevel.Error, Times.Once(), $"Error handling '{typeof(TestCommand)}' command : ", exception);
         }
 
         [Test]

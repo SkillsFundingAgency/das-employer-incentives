@@ -102,6 +102,12 @@
             "type": "string",
             "defaultValue": "EP1"
         },
+        "sharedApimName": {
+            "type": "string"
+        },
+        "sharedApimResourceGroup": {
+            "type": "string"
+        },
         "sharedEnvVirtualNetworkName": {
             "type": "string"
         },
@@ -144,6 +150,30 @@
             "location": "[parameters('resourceGroupLocation')]",
             "tags": "[parameters('tags')]",
             "properties": {
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "apim-subscription",
+            "resourceGroup": "[parameters('sharedApimResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'apim/apim-subscription.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "apimName": {
+                        "value": "[parameters('sharedApimName')]"
+                    },
+                    "subscriptionName": {
+                        "value": "[variables('apiAppServiceName')]"
+                    },
+                    "subscriptionScope": {
+                        "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('sharedApimResourceGroup'), '/providers/Microsoft.ApiManagement/service/', parameters('sharedApimName'), '/products/EmployerIncentivesOuterApi')]"
+                    }
+                }
             }
         },
         {
@@ -465,60 +495,60 @@
                     },
                     "functionAppAppSettings": {
                         "value": {
-                          "array": [
-                            {
-                              "name": "ConfigurationStorageConnectionString",
-                              "value": "[parameters('configurationStorageConnectionString')]"
-                            },
-                            {
-                              "name": "ConfigNames",
-                              "value": "[parameters('configNames')]"
-                            },
-                            {
-                              "name": "EnvironmentName",
-                              "value": "[parameters('environmentName')]"
-                            },
-                            {
-                              "name": "Version",
-                              "value": "[parameters('version')]"
-                            },
-                            {
-                              "name": "AzureWebJobsStorage",
-                              "value": "[parameters('sharedStorageAccountConnectionString')]"
-                            },
-                            {
-                              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                              "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
-                            },
-                            {
-                              "name": "FUNCTIONS_EXTENSION_VERSION",
-                              "value": "~3"
-                            },
-                            {
-                              "name": "LoggingRedisConnectionString",
-                              "value": "[parameters('loggingRedisConnectionString')]"
-                            },
-                            {
-                              "name": "FUNCTIONS_WORKER_RUNTIME",
-                              "value": "dotnet"
-                            },
-                            {
-                              "name": "NServiceBusConnectionString",
-                              "value": "[parameters('nServiceBusConnectionString')]"
-                            },
-                            {
-                              "name": "NServiceBusLicense",
-                              "value": "[parameters('nServiceBusLicense')]"
-                            },
-                            {
-                              "name": "WEBSITE_RUN_FROM_PACKAGE",
-                              "value": "1"
-                            },
-                            {
-                              "name": "AzureWebJobsFeatureFlags",
-                              "value": "EnableEnhancedScopes"
-                            }
-                          ]
+                            "array": [
+                                {
+                                    "name": "ConfigurationStorageConnectionString",
+                                    "value": "[parameters('configurationStorageConnectionString')]"
+                                },
+                                {
+                                    "name": "ConfigNames",
+                                    "value": "[parameters('configNames')]"
+                                },
+                                {
+                                    "name": "EnvironmentName",
+                                    "value": "[parameters('environmentName')]"
+                                },
+                                {
+                                    "name": "Version",
+                                    "value": "[parameters('version')]"
+                                },
+                                {
+                                    "name": "AzureWebJobsStorage",
+                                    "value": "[parameters('sharedStorageAccountConnectionString')]"
+                                },
+                                {
+                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                    "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                                    "value": "~3"
+                                },
+                                {
+                                    "name": "LoggingRedisConnectionString",
+                                    "value": "[parameters('loggingRedisConnectionString')]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet"
+                                },
+                                {
+                                    "name": "NServiceBusConnectionString",
+                                    "value": "[parameters('nServiceBusConnectionString')]"
+                                },
+                                {
+                                    "name": "NServiceBusLicense",
+                                    "value": "[parameters('nServiceBusLicense')]"
+                                },
+                                {
+                                    "name": "WEBSITE_RUN_FROM_PACKAGE",
+                                    "value": "1"
+                                },
+                                {
+                                    "name": "AzureWebJobsFeatureFlags",
+                                    "value": "EnableEnhancedScopes"
+                                }
+                            ]
                         }
                     }
                 }
@@ -582,6 +612,30 @@
                     },
                     "delegations": {
                         "value": "[parameters('subnetDelegations')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "message-handler-function-subnet"
+            ]
+        },
+        {
+            "apiVersion": "2021-04-01",
+            "name": "payment-process-function-sql-firewall-rule",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'), 'sql-server-firewall-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "serverName": {
+                        "value": "[parameters('sharedSQLServerName')]"
+                    },
+                    "subnetResourceIdList": {
+                        "value": "[createArray(reference('payment-process-function-subnet').outputs.SubnetResourceId.value)]"
                     }
                 }
             }
@@ -678,11 +732,11 @@
                                     "name": "AzureWebJobsStorage",
                                     "value": "[parameters('sharedStorageAccountConnectionString')]"
                                 },
-                                                            {
+                                {
                                     "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                                     "value": "[parameters('sharedStorageAccountConnectionString')]"
                                 },
-                                                            {
+                                {
                                     "name": "WEBSITE_CONTENTSHARE",
                                     "value": "[variables('paymentProcessFunctionAppName')]"
                                 },

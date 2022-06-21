@@ -110,14 +110,13 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
                                             Id = apprenticeship.Id,
                                             LastName = apprenticeship.LastName,
                                             PlannedStartDate = apprenticeship.PlannedStartDate,
-                                            TotalIncentiveAmount = apprenticeship.TotalIncentiveAmount,
                                             ULN = apprenticeship.ULN,
                                             UKPRN = apprenticeship.UKPRN,
                                             WithdrawnByEmployer = apprenticeship.WithdrawnByEmployer,
                                             WithdrawnByCompliance = apprenticeship.WithdrawnByCompliance,
                                             CourseName = apprenticeship.CourseName,
                                             EmploymentStartDate = apprenticeship.EmploymentStartDate,
-                                            HasEligibleEmploymentStartDate = apprenticeship.HasEligibleEmploymentStartDate,
+                                            StartDatesAreEligible = apprenticeship.StartDatesAreEligible,
                                             Phase = apprenticeship.Phase
                                         }
                                         select apprenticeshipModel).ToList();

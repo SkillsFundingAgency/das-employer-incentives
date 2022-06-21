@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private RefreshLearnerCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockApprenticeshipIncentiveDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
-        private Mock<ILearnerSubmissionService> _mockLearnerService;
+        private Mock<ILearnerSubmissionService> _mockLearnerSubmissionService;
         private Mock<ICollectionCalendarService> _collectionCalendarService;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
@@ -35,6 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private DateTime _testStartDate;
         private DateTime _censusDate;
         private AcademicYear _academicYear;
+        private ILearnerService _learnerService;
 
         [SetUp]
         public void Arrange()
@@ -46,7 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
-            _mockLearnerService = new Mock<ILearnerSubmissionService>();
+            _mockLearnerSubmissionService = new Mock<ILearnerSubmissionService>();
 
             var apprenticeship = _fixture.Create<Apprenticeship>();
             
@@ -65,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             _learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(_learnerSubmissionDto);
 
@@ -92,11 +93,14 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .Setup(m => m.Get())
                 .ReturnsAsync(new Domain.ValueObjects.CollectionCalendar(new List<AcademicYear> { _academicYear }, _collectionPeriods));
 
-            _sut = new RefreshLearnerCommandHandler(
-                _mockApprenticeshipIncentiveDomainRepository.Object,
-                _mockLearnerService.Object,
+            _learnerService = new LearnerService(
+                _mockLearnerSubmissionService.Object,
                 _mockLearnerDomainRepository.Object,
                 _collectionCalendarService.Object);
+
+            _sut = new RefreshLearnerCommandHandler(
+                _mockApprenticeshipIncentiveDomainRepository.Object,
+                _learnerService);
         }
 
         [Test]
@@ -144,7 +148,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             //Arrange
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(null as LearnerSubmissionDto);
 
@@ -166,7 +170,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
             var learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -186,7 +190,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var command = new RefreshLearnerCommand(_apprenticeshipIncentiveId);
             var learnerSubmissionDto = _fixture.Create<LearnerSubmissionDto>();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -230,7 +234,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                             })
                         .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -257,7 +261,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                         .With(l => l.IlrSubmissionDate, testDate)
                         .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -301,7 +305,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                     )
                 .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -336,7 +340,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -410,7 +414,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -475,7 +479,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -506,7 +510,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -583,7 +587,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -674,7 +678,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -755,7 +759,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -825,7 +829,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -902,7 +906,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -983,7 +987,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 })
                 .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 
@@ -1058,7 +1062,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                    })
                .Create();
 
-            _mockLearnerService
+            _mockLearnerSubmissionService
                 .Setup(m => m.Get(It.IsAny<Learner>()))
                 .ReturnsAsync(learnerSubmissionDto);
 

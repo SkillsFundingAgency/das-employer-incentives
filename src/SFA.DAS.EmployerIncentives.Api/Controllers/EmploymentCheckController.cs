@@ -2,6 +2,7 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Net;
@@ -35,10 +36,20 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 new UpdateEmploymentCheckCommand(
                     updateRequest.CorrelationId,
                     Map(updateRequest.Result),
-                    updateRequest.DateChecked)
+                    updateRequest.DateChecked),
+                    MapError(updateRequest.Result)
                 );
 
-            return Ok($"/employmentchecks/{updateRequest.CorrelationId}");
+                return Ok($"/employmentchecks/{updateRequest.CorrelationId}");
+            }
+            catch (InvalidEmploymentCheckErrorTypeException)
+            {
+                return BadRequest();
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest();
+            }
         }
 
         private EmploymentCheckResultType Map(string result)
@@ -47,9 +58,24 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             {
                 "employed" => EmploymentCheckResultType.Employed,
                 "notemployed" => EmploymentCheckResultType.NotEmployed,
-                "hmrcunknown" => EmploymentCheckResultType.HMRCUnknown,
-                "noninofound" => EmploymentCheckResultType.NoNINOFound,
-                _ => EmploymentCheckResultType.NoAccountFound,
+                _ => EmploymentCheckResultType.Error,
+            };
+        }
+
+        private EmploymentCheckResultError? MapError(string errorResult)
+        {  
+            return errorResult.ToLower() switch
+            {
+                "employed" => null,
+                "notemployed" => null,
+                "ninonotfound" => EmploymentCheckResultError.NinoNotFound,
+                "ninofailure" => EmploymentCheckResultError.NinoFailure,
+                "ninoinvalid" => EmploymentCheckResultError.NinoInvalid,
+                "payenotfound" => EmploymentCheckResultError.PAYENotFound,
+                "payefailure" => EmploymentCheckResultError.PAYEFailure,
+                "ninoandpayenotfound" => EmploymentCheckResultError.NinoAndPAYENotFound,
+                "hmrcfailure" => EmploymentCheckResultError.HmrcFailure,
+                _ => throw new InvalidOperationException("Invalid error result")
             };
         }
 

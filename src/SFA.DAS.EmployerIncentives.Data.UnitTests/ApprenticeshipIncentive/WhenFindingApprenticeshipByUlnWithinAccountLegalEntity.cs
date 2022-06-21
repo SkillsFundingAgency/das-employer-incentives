@@ -65,15 +65,33 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
             matchingIncentives.Count.Should().Be(0);
         }
 
-        private async Task AddApprenticeshipIncentiveModel(long accountLegalEntityId, long uln)
+        [Test]
+        public async Task Then_when_an_active_apprenticeship_incentive_exists_with_a_duplicated_withdrawn_status_it_is_returned_from_the_database()
+        {
+            // Act
+            await AddApprenticeshipIncentiveModel(_accountLegalEntityId, _uln, Enums.IncentiveStatus.Withdrawn);
+
+            var matchingIncentives = await _sut.FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(_uln, _accountLegalEntityId);
+
+            // Assert
+            matchingIncentives.Should().NotBeNull();
+            matchingIncentives.Count.Should().Be(1);
+            matchingIncentives.First().Apprenticeship.UniqueLearnerNumber.Should().Be(_uln);
+            matchingIncentives.First().Account.AccountLegalEntityId.Should().Be(_accountLegalEntityId);
+        }
+
+        private async Task AddApprenticeshipIncentiveModel(long accountLegalEntityId, long uln, Enums.IncentiveStatus status = Enums.IncentiveStatus.Active)
         {
             var account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(_fixture.Create<long>(), accountLegalEntityId);
             var apprenticeship = new Apprenticeship(_fixture.Create<long>(), _fixture.Create<string>(),
                 _fixture.Create<string>(), _fixture.Create<DateTime>(), uln,
                 _fixture.Create<ApprenticeshipEmployerType>(), _fixture.Create<string>(), _fixture.Create<DateTime>(), _fixture.Create<Provider>());
 
-            var incentive = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.Apprenticeship, apprenticeship)
-                .With(x => x.Account, account).Create();
+            var incentive = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.Apprenticeship, apprenticeship)
+                .With(x => x.Account, account)
+                .With(x => x.Status, status)
+                .Create();
 
             await _sut.Add(incentive);
             await _dbContext.SaveChangesAsync();
