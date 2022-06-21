@@ -44,3 +44,16 @@ Scenario: Learner data contains a learning resumed change with start date before
 	Then the incentive is updated to active
 	And the most recent break in learning record is deleted
 	And the learner data stopped and resumed dates are deleted
+
+Scenario: Learning data contains a change to learning stopped date
+	Given an apprenticeship incentive exists that has stopped learning before the first payment is due
+	And the learner data identifies the learning stopped date has changed to a date after the first payment is due
+	When the incentive learner data is refreshed
+	Then the first payment is recalculated
+
+Scenario: Learning data contains a change to learning stopped date with a clawed back payment
+	Given an apprenticeship incentive exists that has stopped learning before the first payment is due
+	And the learner data identifies the learning stopped date has changed to a date after the first payment is due
+	And the first payment has previously been clawed back
+	When the incentive learner data is refreshed
+	Then the previously clawed back payment is recalculated
