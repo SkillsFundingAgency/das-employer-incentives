@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPut("/legalentities/{hashedLegalEntityId}/employervendorid")]
         [Obsolete("Use legalentities/{hashedLegalEntityId}/vendors endpoint instead")]
-        public async Task<IActionResult> AddEmployerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] Vendors request)
+        public async Task<IActionResult> AddEmployerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] Vendor request)
         {
             request.HashedLegalEntityId = hashedLegalEntityId;
             return await CreateVendor(request);
