@@ -35,13 +35,13 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return Ok($"/applications/{request.IncentiveApplicationId}");
         }
 
-        //[HttpPatch("/applications/{applicationId}")]
-        //[ProducesResponseType((int)HttpStatusCode.OK)]
-        //[Obsolete("Post to the submissions endpoint instead")]
-        //public async Task<IActionResult> SubmitIncentiveApplication([FromBody] Submission request)
-        //{
-        //    return await Submissions(request);
-        //}
+        [HttpPatch("/applications/{applicationId}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [Obsolete("Post to the submissions endpoint instead")]
+        public async Task<IActionResult> SubmitIncentiveApplication([FromBody] Submission request)
+        {
+            return await Submissions(request);
+        }
 
         [HttpPost("/applications/{applicationId}/submissions")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
