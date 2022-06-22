@@ -20,19 +20,26 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
         }
 
-        [HttpPut("/employmentchecks/{correlationId}")]  
+        [HttpPut("/employmentchecks/{correlationId}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Update([FromBody] UpdateEmploymentCheckRequest updateRequest)
+        [Obsolete("Use employmentCheckResults endpoint instead")]
+        public async Task<IActionResult> Update([FromBody] EmploymentCheckResult updateRequest)
         {
-            try
+            return await CreateEmploymentCheckResult(updateRequest);
+        }
+
+        [HttpPost("/employmentCheckResults")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> CreateEmploymentCheckResult([FromBody] EmploymentCheckResult updateRequest)
+        {
+            try 
             {
                 await SendCommandAsync(
                     new UpdateEmploymentCheckCommand(
                         updateRequest.CorrelationId,
                         Map(updateRequest.Result),
                         updateRequest.DateChecked,
-                        MapError(updateRequest.Result)
-                        )
+                        MapError(updateRequest.Result))
                     );
 
                 return Ok($"/employmentchecks/{updateRequest.CorrelationId}");

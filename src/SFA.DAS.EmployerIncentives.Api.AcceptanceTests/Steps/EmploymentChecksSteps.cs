@@ -93,9 +93,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await TestContext.WaitFor(
                 async (cancellationToken) =>
                 {
-                    _response = await EmployerIncentiveApi.Put(
-                    $"/employmentchecks/{_correlationId}",
-                    new UpdateEmploymentCheckRequest
+                    _response = await EmployerIncentiveApi.Post(
+                    $"/employmentCheckResults",
+                    new EmploymentCheckResult
                     {
                         CorrelationId = _correlationId,
                         Result = checkResultType,
@@ -117,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 {
                     _response = await EmployerIncentiveApi.Put(
                     $"/employmentchecks/{_correlationId}",
-                    new UpdateEmploymentCheckRequest
+                    new EmploymentCheckResult
                     {
                         CorrelationId = _correlationId,
                         Result = checkResultType.ToString(),

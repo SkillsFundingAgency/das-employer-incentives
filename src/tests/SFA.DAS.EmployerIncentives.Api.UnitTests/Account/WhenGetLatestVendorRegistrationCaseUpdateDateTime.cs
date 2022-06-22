@@ -35,7 +35,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                     It.IsAny<GetLatestVendorRegistrationCaseUpdateDateTimeRequest>())).ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetLatestVendorRegistrationCaseUpdateDateTime() as OkObjectResult;
+            var actual = await _sut.GetAccounts( new Types.AccountFilter {OrderBy = "VrfCaseStatusLastUpdatedDateTime" }) as OkObjectResult;
 
             // Assert
             actual?.Value.Should().NotBeNull();

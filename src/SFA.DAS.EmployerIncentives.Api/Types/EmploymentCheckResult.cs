@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Api.Types
 {
-    public class UpdateEmploymentCheckRequest
+    public class EmploymentCheckResult
     {
         public Guid CorrelationId { get; set; }
         public string Result { get; set; }

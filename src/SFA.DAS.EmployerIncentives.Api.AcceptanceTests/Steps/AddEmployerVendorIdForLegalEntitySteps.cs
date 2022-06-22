@@ -6,6 +6,7 @@ using TechTalk.SpecFlow;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using System;
 using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.Api.Types;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 {
@@ -48,13 +49,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"we add the employer vendor for this legal entity")]
         public async Task WhenWeAddTheEmployerVendorForThisLegalEntity()
         {
-            var url = $"/legalentities/{_hashedLegalEntityId}/employervendorid";
-            var data = new
+            var url = $"/Vendors";
+            var data = new Vendor
             {
+                HashedLegalEntityId = _hashedLegalEntityId,
                 EmployerVendorId = _newVendorId
             };
 
-             await EmployerIncentiveApi.Put(url, data);
+             await EmployerIncentiveApi.Post(url, data);
         }
 
         [Then(@"the vendor remains the same for first legal entity")]

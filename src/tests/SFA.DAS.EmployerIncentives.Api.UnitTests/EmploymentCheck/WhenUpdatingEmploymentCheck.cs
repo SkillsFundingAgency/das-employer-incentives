@@ -33,12 +33,12 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EmploymentCheck
         public async Task Then_a_UpdateEmploymentCheckCommand_command_is_dispatched()
         {
             // Arrange
-            var request = _fixture.Build<UpdateEmploymentCheckRequest>()
+            var request = _fixture.Build<EmploymentCheckResult>()
                  .With(e => e.Result, EmploymentCheckResultType.Employed.ToString())
                  .Create();
 
             // Act
-            await _sut.Update(request);
+            await _sut.CreateEmploymentCheckResult(request);
 
             // Assert
             _mockCommandDispatcher
@@ -55,12 +55,12 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EmploymentCheck
         public async Task Then_an_Ok_response_is_returned(string sucessResult)
         {
             // Arrange
-            var request = _fixture.Build<UpdateEmploymentCheckRequest>()
+            var request = _fixture.Build<EmploymentCheckResult>()
                 .With(e => e.Result, sucessResult)
                 .Create();
 
             // Act
-            var actual = await _sut.Update(request) as OkObjectResult;
+            var actual = await _sut.CreateEmploymentCheckResult(request) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();
@@ -77,12 +77,12 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EmploymentCheck
         public async Task Then_an_Ok_response_is_returned_with_error_types(EmploymentCheckResultError errorType)
         {
             // Arrange
-            var request = _fixture.Build<UpdateEmploymentCheckRequest>()
+            var request = _fixture.Build<EmploymentCheckResult>()
                 .With(e => e.Result, errorType.ToString)
                 .Create();
 
             // Act
-            var actual = await _sut.Update(request) as OkObjectResult;
+            var actual = await _sut.CreateEmploymentCheckResult(request) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();
@@ -93,7 +93,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EmploymentCheck
         public async Task Then_a_BadRequest_response_is_returned_when_an_InvalidEmploymentCheckErrorTypeException_is_thrown()
         {
             // Arrange
-            var request = _fixture.Build<UpdateEmploymentCheckRequest>()
+            var request = _fixture.Build<EmploymentCheckResult>()
                  .With(e => e.Result, EmploymentCheckResultType.Employed.ToString())
                  .Create();
 
@@ -103,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EmploymentCheck
             _sut = new EmploymentCheckController(_mockCommandDispatcher.Object);
 
             // Act
-            var actual = await _sut.Update(request) as BadRequestResult;
+            var actual = await _sut.CreateEmploymentCheckResult(request) as BadRequestResult;
 
             // Assert
             actual.Should().NotBeNull();
@@ -113,14 +113,14 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.EmploymentCheck
         public async Task Then_a_BadRequest_response_is_returned_when_an_InvalidEmploymentCheckErrorType_is_passed()
         {
             // Arrange
-            var request = _fixture.Build<UpdateEmploymentCheckRequest>()
+            var request = _fixture.Build<EmploymentCheckResult>()
                  .With(e => e.Result, Guid.NewGuid().ToString())
                  .Create();
             
             _sut = new EmploymentCheckController(_mockCommandDispatcher.Object);
 
             // Act
-            var actual = await _sut.Update(request) as BadRequestResult;
+            var actual = await _sut.CreateEmploymentCheckResult(request) as BadRequestResult;
 
             // Assert
             actual.Should().NotBeNull();

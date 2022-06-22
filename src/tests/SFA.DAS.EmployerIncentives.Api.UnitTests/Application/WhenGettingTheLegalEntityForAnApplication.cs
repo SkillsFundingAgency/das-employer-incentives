@@ -40,11 +40,11 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
                 .ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetApplicationAccountLegalEntity(accountId, applicationId) as OkObjectResult;
+            var actual = await _sut.GetApplication(accountId, applicationId) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();
-            actual.Value.Should().Be(expected.Application.AccountLegalEntityId);
+            (actual.Value as IncentiveApplication).AccountLegalEntityId.Should().Be(expected.Application.AccountLegalEntityId);
         }
     }
 }

@@ -15,7 +15,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
         }
 
-        [HttpGet("{uln}")]
+        // TODO : return an Apprenticeship with the IsEligible filter set
+        // /apprenticeshipIncentives?isEligible={isEligible}
+        // move to ApprenticeshipIncentiveQueryController
+        [HttpGet("{uln}")]        
         public async Task<IActionResult> IsApprenticeshipEligible(long uln, [FromQuery]DateTime startDate, [FromQuery]bool isApproved)
         {
             var request = new GetApprenticeshipEligibilityRequest(new Apprenticeship { UniqueLearnerNumber = uln, StartDate = startDate, IsApproved = isApproved });

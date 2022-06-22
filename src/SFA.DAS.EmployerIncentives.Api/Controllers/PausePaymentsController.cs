@@ -23,7 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> PausePayments([FromBody] PausePaymentsRequest request)
+        public async Task<IActionResult> PausePayments([FromBody] PausePayment request)
         {
             var commands = new List<ICommand>();
 

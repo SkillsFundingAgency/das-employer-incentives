@@ -36,10 +36,13 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
             var accountId = _fixture.Create<long>();
-            var request = _fixture.Create<SignAgreementRequest>();
+            var request = _fixture.Build<SignedAgreement>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .Create();
 
             // Act
-            await _sut.SignAgreement(accountId, accountLegalEntityId, request);
+            await _sut.SignAgreement(request);
 
             // Assert
             _mockCommandDispatcher
@@ -57,10 +60,13 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
             // Arrange
             var accountLegalEntityId = _fixture.Create<long>();
             var accountId = _fixture.Create<long>();
-            var request = _fixture.Create<SignAgreementRequest>();
+            var request = _fixture.Build<SignedAgreement>()
+                .With(p => p.AccountId, accountId)
+                .With(p => p.AccountLegalEntityId, accountLegalEntityId)
+                .Create();
 
             // Act
-            var actual = await _sut.SignAgreement(accountId, accountLegalEntityId, request) as NoContentResult;
+            var actual = await _sut.SignAgreement(request) as NoContentResult;
 
             // Assert
             actual.Should().NotBeNull();

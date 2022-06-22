@@ -7,6 +7,8 @@ using SFA.DAS.EmployerIncentives.Queries.Account.GetLegalEntity;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Queries.Account.GetAccountsWithVrfStatus;
+using SFA.DAS.EmployerIncentives.Api.Types;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -60,24 +62,44 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NotFound();
         }
 
+        [HttpGet("/accounts")]
+        public async Task<IActionResult> GetAccounts(AccountFilter filter)
+        {
+            if(!string.IsNullOrEmpty(filter.VrfCaseStatus))
+            {
+                var request = new GetAccountsWithVrfCaseStatusRequest(filter.VrfCaseStatus);
+
+                var response = await QueryAsync<GetAccountsWithVrfCaseStatusRequest, GetAccountsWithVrfCaseStatusResponse>(request);
+
+                return Ok(response.Accounts);
+            }
+
+            if (!string.IsNullOrEmpty(filter.OrderBy) && 
+                filter.OrderBy == "VrfCaseStatusLastUpdatedDateTime" && 
+                filter.Limit.HasValue && 
+                filter.Limit.Value == 1)
+            {
+                var request = new GetLatestVendorRegistrationCaseUpdateDateTimeRequest();
+                var response = await QueryAsync<GetLatestVendorRegistrationCaseUpdateDateTimeRequest, GetLatestVendorRegistrationCaseUpdateDateTimeResponse>(request);
+                
+                return Ok(response); // ideally this would return an account dto as above but it has been implemented as RPC rather than as a resource                
+            }
+             
+            return NotFound();
+        }
+
         [HttpGet("/accounts/vendorregistrationform/status")]
+        [Obsolete("Use accounts endpoint instead with vrfCaseStatus querystring")]
         public async Task<IActionResult> GetAccountsWithVrfCaseStatus(string vrfCaseStatus)
         {
-            var request = new GetAccountsWithVrfCaseStatusRequest(vrfCaseStatus);
-
-            var response = await QueryAsync<GetAccountsWithVrfCaseStatusRequest, GetAccountsWithVrfCaseStatusResponse>(request);
-
-            return Ok(response.Accounts);
+            return await GetAccounts(new AccountFilter { VrfCaseStatus = vrfCaseStatus });
         }
-                
 
         [HttpGet("/accounts/last-vrf-update-date")]
+        [Obsolete("Use accounts endpoint instead with vrfCaseStatus querystring")]
         public async Task<IActionResult> GetLatestVendorRegistrationCaseUpdateDateTime()
         {
-            var request = new GetLatestVendorRegistrationCaseUpdateDateTimeRequest();
-            var response = await QueryAsync<GetLatestVendorRegistrationCaseUpdateDateTimeRequest, GetLatestVendorRegistrationCaseUpdateDateTimeResponse>(request);
-
-            return Ok(response);
+            return await GetAccounts(new AccountFilter { OrderBy = "VrfCaseStatusLastUpdatedDateTime", Limit = 1 });
         }
     }
 }

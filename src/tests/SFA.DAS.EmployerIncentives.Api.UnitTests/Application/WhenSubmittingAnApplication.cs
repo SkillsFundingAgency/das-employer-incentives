@@ -31,10 +31,10 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
         public async Task Then_a_submit_application_command_is_dispatched()
         {
             // Arrange
-            var request = _fixture.Create<SubmitIncentiveApplicationRequest>();
+            var request = _fixture.Create<Submission>();
 
             // Act
-            await _sut.SubmitIncentiveApplication(request);
+            await _sut.Submissions(request);
 
             // Assert
             _mockCommandDispatcher
@@ -51,10 +51,10 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
         public async Task Then_a_success_response_is_returned()
         {
             // Arrange
-            var request = _fixture.Create<SubmitIncentiveApplicationRequest>();
+            var request = _fixture.Create<Submission>();
 
             // Act
-            var result = await _sut.SubmitIncentiveApplication(request) as OkResult;
+            var result = await _sut.Submissions(request) as OkResult;
 
             // Assert
             result.Should().NotBeNull();
@@ -64,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
         public async Task Then_a_conflict_response_is_returned_when_a_uln_has_already_been_submitted()
         {
             // Arrange
-            var request = _fixture.Create<SubmitIncentiveApplicationRequest>();
+            var request = _fixture.Create<Submission>();
             _mockCommandDispatcher
                 .Setup(m => m.Send(It.Is<SubmitIncentiveApplicationCommand>(c =>
                             c.IncentiveApplicationId == request.IncentiveApplicationId &&
@@ -75,7 +75,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Application
                 ).ThrowsAsync(new UlnAlreadySubmittedException());
 
             // Act
-            var result = await _sut.SubmitIncentiveApplication(request) as ConflictObjectResult;
+            var result = await _sut.Submissions(request) as ConflictObjectResult;
 
             // Assert
             result.Should().NotBeNull();

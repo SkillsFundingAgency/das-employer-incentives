@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpGet("/accounts/{accountId}/applications/{applicationId}/accountlegalentity")]
+        [Obsolete("Use the applications GET endpoint and get the account legal entity id from the application returned")]
         public async Task<IActionResult> GetApplicationAccountLegalEntity(long accountId, Guid applicationId)
         {
             var request = new GetApplicationRequest(accountId, applicationId);

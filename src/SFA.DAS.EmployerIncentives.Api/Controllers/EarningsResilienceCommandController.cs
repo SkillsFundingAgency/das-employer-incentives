@@ -16,6 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         }
 
         [HttpPost("")]
+        [HttpPost("/resilienceChecks")]
         public async Task<IActionResult> CheckApplications()
         {
             await SendCommandsAsync(new List<ICommand>() {

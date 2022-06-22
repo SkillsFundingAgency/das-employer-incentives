@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.EmployerIncentives.Api.Types
 {
-    public class SignAgreementRequest
+    public class SignedAgreement
     {
         public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }

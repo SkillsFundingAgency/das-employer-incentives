@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly string _connectionString;
         private readonly IncentiveApplication _application;
         private readonly IncentiveApplicationApprenticeship _apprenticeship;
-        private PausePaymentsRequest _pausePaymentsRequest;
+        private PausePayment _pausePaymentsRequest;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly IncentiveApplication _application2;
         private readonly IncentiveApplicationApprenticeship _apprenticeship2;
@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the pause payments request is sent")]
         public async Task WhenThePausePaymentsRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Pause)
                 .Create();
             _pausePaymentsRequest.Applications = new List<Application>()
@@ -127,7 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the multiple pause payments request is sent with one that is invalid")]
         public async Task WhenTheMuliplePausePaymentsRequestIsSentWithOneThatIsInvalid()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Pause)
                 .Create();
             _pausePaymentsRequest.Applications = new List<Application>()
@@ -151,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the multiple pause payments request is sent")]
         public async Task WhenTheMultiplePausePaymentsRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Pause)
                 .Create();
             _pausePaymentsRequest.Applications = new List<Application>()

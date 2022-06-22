@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         private readonly string _connectionString;
         private readonly IncentiveApplication _application;
         private readonly IncentiveApplicationApprenticeship _apprenticeship;
-        private PausePaymentsRequest _pausePaymentsRequest;
+        private PausePayment _pausePaymentsRequest;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly IncentiveApplication _application2;
         private readonly IncentiveApplicationApprenticeship _apprenticeship2;
@@ -103,7 +103,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the resume payments request is sent")]
         public async Task WhenTheResumePausedPaymentsRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Resume)                
                 .Create();
 
@@ -124,7 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"the multiple resume payments request is sent")]
         public async Task WhenTheMultipleResumePausedPaymentsRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Resume)
                 .Create();
 
@@ -150,7 +150,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [When(@"an invalid request is sent")]
         public async Task WhenAnInvalidRequestIsSent()
         {
-            _pausePaymentsRequest = _fixture.Build<PausePaymentsRequest>()
+            _pausePaymentsRequest = _fixture.Build<PausePayment>()
                 .With(r => r.Action, PausePaymentsAction.Resume)
                 .Create();
 

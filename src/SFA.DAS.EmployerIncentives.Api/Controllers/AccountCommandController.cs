@@ -7,12 +7,12 @@ using SFA.DAS.EmployerIncentives.Commands.SignLegalEntityAgreement;
 using SFA.DAS.EmployerIncentives.Commands.UpdateVrfCaseStatusForLegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
 using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class AccountCommandController : ApiCommandControllerBase
     {
@@ -33,12 +33,12 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NoContent();
         }
 
-        [HttpPatch("/accounts/{accountId}/legalEntities/{accountLegalEntityId}")]
-        public async Task<IActionResult> SignAgreement([FromRoute] long accountId, [FromRoute] long accountLegalEntityId, [FromBody] SignAgreementRequest request)
+        [HttpPost("/signedAgreements")]
+        public async Task<IActionResult> SignAgreement([FromBody] SignedAgreement request)
         {
             await SendCommandAsync(new SignLegalEntityAgreementCommand(
-                accountId,
-                accountLegalEntityId,
+                request.AccountId,
+                request.AccountLegalEntityId,
                 request.AgreementVersion,
                 request.LegalEntityName,
                 request.LegalEntityId
@@ -46,19 +46,43 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return NoContent();
         }
 
-        [HttpPatch("/legalentities/{hashedLegalEntityId}/vendorregistrationform")]
-        public async Task<IActionResult> UpdateVendorRegistrationCaseStatus([FromRoute] string hashedLegalEntityId, [FromBody] UpdateVendorRegistrationCaseStatusRequest request)
+        [HttpPatch("/accounts/{accountId}/legalEntities/{accountLegalEntityId}")]
+        [Obsolete("Use SignedAgreements endpoint to sign the agreement")]
+        public async Task<IActionResult> SignAgreement([FromRoute] long accountId, [FromRoute] long accountLegalEntityId, [FromBody] SignedAgreement request)
         {
-            await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(hashedLegalEntityId, request.CaseId, request.Status, request.CaseStatusLastUpdatedDate));
+            request.AccountId = accountId;
+            request.AccountLegalEntityId = accountLegalEntityId;
+            return await SignAgreement(request);
+        }
+
+        [HttpPost("/changeOfVendorCases")]
+        public async Task<IActionResult> ChangeOfVendorCase([FromBody] VendorCase request)
+        {
+            await SendCommandAsync(new UpdateVendorRegistrationCaseStatusCommand(request.HashedLegalEntityId, request.CaseId, request.Status, request.CaseStatusLastUpdatedDate));
+            return NoContent();
+        }
+
+        [HttpPatch("/legalentities/{hashedLegalEntityId}/vendorregistrationform")]
+        [Obsolete("Use changeOfVendorCases endpoint instead")]
+        public async Task<IActionResult> UpdateVendorRegistrationCaseStatus([FromRoute] string hashedLegalEntityId, [FromBody] VendorCase request)
+        {
+            request.HashedLegalEntityId = hashedLegalEntityId;
+            return await ChangeOfVendorCase(request);
+        }
+
+        [HttpPost("/vendors")]
+        public async Task<IActionResult> CreateVendor([FromBody] Vendor request)
+        {
+            await SendCommandAsync(new AddEmployerVendorIdForLegalEntityCommand(request.HashedLegalEntityId, request.EmployerVendorId));
             return NoContent();
         }
 
         [HttpPut("/legalentities/{hashedLegalEntityId}/employervendorid")]
-        public async Task<IActionResult> AddEmployerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] AddEmployerVendorIdRequest request)
+        [Obsolete("Use legalentities/{hashedLegalEntityId}/vendors endpoint instead")]
+        public async Task<IActionResult> AddEmployerVendorId([FromRoute] string hashedLegalEntityId, [FromBody] Vendor request)
         {
-            await SendCommandAsync(new AddEmployerVendorIdForLegalEntityCommand(hashedLegalEntityId, request.EmployerVendorId));
-            return NoContent();
+            request.HashedLegalEntityId = hashedLegalEntityId;
+            return await CreateVendor(request);
         }
-
     }
 }

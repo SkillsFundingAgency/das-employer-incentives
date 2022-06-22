@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Account
                 .ReturnsAsync(expected);
 
             // Act
-            var actual = await _sut.GetAccountsWithVrfCaseStatus(vrfStatus) as OkObjectResult;
+            var actual = await _sut.GetAccounts(new Types.AccountFilter { VrfCaseStatus = vrfStatus }) as OkObjectResult;
 
             // Assert
             actual.Should().NotBeNull();

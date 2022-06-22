@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.EmployerIncentives.Api.Types
 {
-    public class SubmitIncentiveApplicationRequest
+    public class Submission
     {
         public Guid IncentiveApplicationId { get; set; }
         public long AccountId { get; set; }

@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Commands.UpdateIncentiveApplication;
 using System.Net;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
+using System;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -36,7 +37,15 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         [HttpPatch("/applications/{applicationId}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SubmitIncentiveApplication([FromBody] SubmitIncentiveApplicationRequest request)
+        [Obsolete("Post to the submissions endpoint instead")]
+        public async Task<IActionResult> SubmitIncentiveApplication([FromBody] Submission request)
+        {
+            return await Submissions(request);
+        }
+
+        [HttpPost("/applications/{applicationId}/submissions")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Submissions([FromBody] Submission request)
         {
             try
             {
