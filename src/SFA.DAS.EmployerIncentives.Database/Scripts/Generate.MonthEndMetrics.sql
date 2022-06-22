@@ -140,11 +140,6 @@ AS [(Paste into cell E23) Invalid YTD]
    as EmployedBeforeSchemeStarted,
    CASE OverrideResult
 	WHEN 1 THEN 1
-	ELSE max(iif(step='EmployedBeforeSchemeStarted',1,0)) 
-	END
-   as EmployedBeforeSchemeStarted,
-   CASE OverrideResult
-	WHEN 1 THEN 1
 	ELSE max(iif(step='BlockedForPayments',1,0)) 
 	END
    as BlockedForPayments,
