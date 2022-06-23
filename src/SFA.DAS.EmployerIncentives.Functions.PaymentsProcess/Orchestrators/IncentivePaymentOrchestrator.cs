@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been approved", collectionPeriod);
 
             var sendPaymentTasks = new List<Task>();
-            foreach (var legalEntity in payableLegalEntities)
+            foreach (var legalEntity in accountLegalEntitiesToProcess)
             {
                 var sendPaymentTask = context.CallSubOrchestratorAsync(nameof(SendPaymentsForAccountLegalEntityOrchestrator), new AccountLegalEntityCollectionPeriod { AccountId = legalEntity.AccountId, AccountLegalEntityId = legalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
                 sendPaymentTasks.Add(sendPaymentTask);
