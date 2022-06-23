@@ -38,6 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
 
             incentive.ExpireValidationOverrides(DateTime.Today);
             incentive.ValidatePendingPaymentBankDetails(command.PendingPaymentId, account, collectionCalendarPeriod.CollectionPeriod);
+            incentive.ValidatePaymentsNotBlockedForAccountLegalEntity(command.PendingPaymentId, account, collectionCalendarPeriod.CollectionPeriod);
             incentive.ValidateLearningData(command.PendingPaymentId, learner, collectionCalendarPeriod.CollectionPeriod);
             incentive.ValidatePaymentsNotPaused(command.PendingPaymentId, collectionCalendarPeriod.CollectionPeriod);
             incentive.ValidateMinimumRequiredAgreementVersion(command.PendingPaymentId, account, collectionCalendarPeriod.CollectionPeriod);

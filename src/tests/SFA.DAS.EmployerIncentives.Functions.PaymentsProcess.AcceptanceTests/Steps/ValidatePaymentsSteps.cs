@@ -97,6 +97,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                      c.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted)
                         .Result = true;                   
                     break;
+                case ValidationStep.BlockedForPayments:
+                    _validatePaymentData.AccountModel.VendorBlockEndDate = DateTime.Now.AddDays(1);
+                    break;
             }
         }
 
