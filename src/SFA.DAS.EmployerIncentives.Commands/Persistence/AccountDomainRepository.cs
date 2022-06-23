@@ -51,5 +51,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 
             return data.Select(Account.Create);
         }
+
+        public async Task<IEnumerable<Account>> FindByVendorId(string vendorId)
+        {
+            var data = await _accountDataRepository.FindByVendorId(vendorId);
+
+            return data.Select(Account.Create);
+        }
     }
 }

@@ -117,6 +117,7 @@
     <Build Include="Tables\ValidationOverride.sql" />
     <Build Include="Tables\Audit.ValidationOverride.sql" />
     <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
+    <Build Include="Tables\VendorBlockAudit.sql" />
     <Build Include="Views\ApprenticeApplications.sql" />
   </ItemGroup>
   <ItemGroup>
