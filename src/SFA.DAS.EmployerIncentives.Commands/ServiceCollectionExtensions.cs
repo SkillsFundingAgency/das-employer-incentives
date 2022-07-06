@@ -61,6 +61,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.Account;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -152,6 +153,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
             serviceCollection.AddScoped<IEmploymentCheckAuditRepository, EmploymentCheckAuditRepository>();
+            serviceCollection.AddScoped<IVendorBlockAuditRepository, VendorBlockAuditRepository>();
 
             serviceCollection.AddScoped<IValidationOverrideAuditRepository, ValidationOverrideAuditRepository>();
             serviceCollection.AddScoped<IRevertedPaymentAuditRepository, RevertedPaymentAuditRepository>();

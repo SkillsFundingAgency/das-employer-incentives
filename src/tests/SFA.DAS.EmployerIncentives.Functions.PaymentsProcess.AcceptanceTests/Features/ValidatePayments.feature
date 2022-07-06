@@ -58,6 +58,7 @@ Examples:
 	| LearnerMatchSuccessful            |
 	| EmployedAtStartOfApprenticeship   |
 	| EmployedBeforeSchemeStarted       |
+	| BlockedForPayments		        |
 
 Scenario Outline: Expired validation overrides are removed
 	Given there are pending payments	

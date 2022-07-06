@@ -8,6 +8,7 @@ using ChangeOfCircumstance = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncen
 using LearningPeriod = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.LearningPeriod;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
 using RevertedPaymentAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.RevertedPaymentAudit;
+using VendorBlockAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.VendorBlockAudit;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 {
@@ -544,6 +545,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
         }
 
+        internal static VendorBlockAudit Map(this VendorBlockRequestAudit entity)
+        {
+            return new VendorBlockAudit
+            {
+                Id = entity.Id,
+                VrfVendorId = entity.VrfVendorId,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                VendorBlockEndDate = entity.VendorBlockEndDate,
+                CreatedDateTime = DateTime.Now
+            };
+        }
+
         internal static Domain.ValueObjects.CollectionCalendarPeriod MapCollectionCalendarPeriod(this CollectionCalendarPeriod model)
         {
             if (model != null)
@@ -568,5 +583,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
             return null;
         }
+
     }
 }
