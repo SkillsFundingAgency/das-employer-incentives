@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.Map;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
@@ -55,6 +57,18 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                     clawback.VrfVendorId = account.VrfVendorId;
                 }
             }
+        }
+
+        public async Task<PaymentModel> Get(Guid paymentId)
+        {
+            var payment = _dbContext.Payments.FirstOrDefault(x => x.Id == paymentId);
+
+            if (payment == null)
+            {
+                return null;
+            }
+
+            return await Task.FromResult(payment.Map());
         }
     }
 }
