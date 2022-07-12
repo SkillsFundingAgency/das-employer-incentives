@@ -69,7 +69,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
                 var incentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                     .With(x => x.Account, account)
                     .With(x => x.Apprenticeship, apprenticeship)
+                    .With(x => x.Status, IncentiveStatus.Active)
+                    .With(x => x.PreviousStatus, IncentiveStatus.Active)
                     .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                    .Without(x => x.PaymentModels)
+                    .Without(x => x.PendingPaymentModels)
                     .Create();
                 var incentive =  new ApprenticeshipIncentiveFactory().GetExisting(incentiveModel.Id, incentiveModel);
                 _domainRepository

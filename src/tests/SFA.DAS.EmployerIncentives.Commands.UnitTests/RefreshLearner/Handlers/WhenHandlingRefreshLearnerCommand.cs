@@ -1016,6 +1016,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.StartDate, new DateTime(2021, 06, 01))
                 .With(p => p.Apprenticeship, apprenticeship)
+                .With(p => p.Status, Enums.IncentiveStatus.Active)
+                .With(p => p.PreviousStatus, Enums.IncentiveStatus.Active)
                 .With(p => p.PendingPaymentModels, new List<PendingPaymentModel> { pendingPaymentModel })
                 .Without(p => p.EmploymentCheckModels)
                 .Create();

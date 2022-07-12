@@ -43,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 var startDate = DateTime.Today.AddDays(1);
                 var dueDate = startDate.AddDays(90);
                 AccountModel.SignedAgreementVersion = 5;
+                AccountModel.VendorBlockEndDate = null;
 
                 IncentiveApplicationModel = _fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
