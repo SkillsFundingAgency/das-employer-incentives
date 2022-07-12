@@ -58,38 +58,60 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
         {
             RemoveUnpaidEarnings(Model.PendingPaymentModels);
         }
-        
+
+        protected void Delete(PendingPaymentModel pendingPaymentModel)
+        {
+            if (Model.PendingPaymentModels.Remove(pendingPaymentModel))
+            {
+                EventHandler.Invoke(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, pendingPaymentModel));
+            }
+        }
+
+        protected void Delete(PaymentModel paymentModel, Action OnDeleted = null)
+        {
+            if (paymentModel != null && paymentModel.PaidDate == null)
+            {
+                if (Model.PaymentModels.Remove(paymentModel))
+                {
+                    EventHandler.Invoke(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, paymentModel));
+                }
+
+                OnDeleted.Invoke();
+            }
+        }
+
+        protected void Delete(List<PendingPaymentModel> pendingPaymentModels)
+        {
+            foreach (var pendingPaymentModel in pendingPaymentModels)
+            {
+                Delete(pendingPaymentModel);
+            }
+        }
+
+        protected void Delete(ClawbackPaymentModel clawbackPaymentModel)
+        {
+            if (Model.ClawbackPaymentModels.Remove(clawbackPaymentModel))
+            {
+                EventHandler.Invoke(new ClawbackDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, clawbackPaymentModel));
+            }
+        }
+
         protected void RemoveUnpaidEarnings(IEnumerable<PendingPaymentModel> pendingPaymentModels)
         {
-            pendingPaymentModels.Where(x => x.PaymentMadeDate == null).ToList()
-                .ForEach(pp => {
-                    if (Model.PendingPaymentModels.Remove(pp))
-                    {
-                        EventHandler.Invoke(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, pp));
-                    }
-                });
+            pendingPaymentModels
+                .Where(x => x.PaymentMadeDate == null)
+                .ToList()
+                .ForEach(pp => Delete(pp));
 
             var pendingPaymentsToDelete = new List<PendingPaymentModel>();
             foreach (var paidPendingPayment in pendingPaymentModels.Where(x => x.PaymentMadeDate != null))
             {
                 var payment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == paidPendingPayment.Id);
-                if (payment != null && payment.PaidDate == null)
-                {
-                    if (Model.PaymentModels.Remove(payment))
-                    {
-                        EventHandler.Invoke(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, payment));
-                    }
-                    pendingPaymentsToDelete.Add(paidPendingPayment);
-                }
+
+                Delete(payment, () => pendingPaymentsToDelete.Add(paidPendingPayment));
             }
 
-            foreach (var deletedPendingPayment in pendingPaymentsToDelete)
-            {
-                if (Model.PendingPaymentModels.Remove(deletedPendingPayment))
-                {
-                    EventHandler.Invoke(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, deletedPendingPayment));
-                }
-            }
+            Delete(pendingPaymentsToDelete);            
         }
 
 
