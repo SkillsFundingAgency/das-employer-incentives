@@ -146,9 +146,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
             // assert
-            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("SendPaymentsForAccountLegalEntityOrchestrator", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(3));
+            var expectedCallCount = _payableLegalEntities.Count + _clawbackLegalEntities.Count - 1; // one account legal entity has both payments and clawbacks
+            _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync("SendPaymentsForAccountLegalEntityOrchestrator", It.IsAny<AccountLegalEntityCollectionPeriod>()), Times.Exactly(expectedCallCount));
 
             foreach (var entity in _payableLegalEntities)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
+                    "SendPaymentsForAccountLegalEntityOrchestrator",
+                    It.Is<AccountLegalEntityCollectionPeriod>(input =>
+                        input.AccountLegalEntityId == entity.AccountLegalEntityId &&
+                        input.AccountId == entity.AccountId &&
+                        input.CollectionPeriod.Period == _collectionPeriod.Period &&
+                        input.CollectionPeriod.Year == _collectionPeriod.Year)
+
+                ), Times.Once);
+            }
+
+            foreach (var entity in _clawbackLegalEntities)
             {
                 _mockOrchestrationContext.Verify(x => x.CallSubOrchestratorAsync(
                     "SendPaymentsForAccountLegalEntityOrchestrator",

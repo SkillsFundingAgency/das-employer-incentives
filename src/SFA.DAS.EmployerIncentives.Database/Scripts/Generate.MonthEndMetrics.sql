@@ -138,6 +138,11 @@ AS [(Paste into cell E23) Invalid YTD]
 	ELSE max(iif(step='EmployedBeforeSchemeStarted',1,0)) 
 	END
    as EmployedBeforeSchemeStarted,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max(iif(step='BlockedForPayments',1,0)) 
+	END
+   as BlockedForPayments,
    Result,
    ppvr.PeriodNumber, 
    ppvr.PaymentYear
@@ -159,6 +164,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Vali
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
+  BlockedForPayments,
   count(distinct a.[AccountLegalEntityId]) as [AccountLegalEntityId],
   sum(pp.amount) as EarningAmount
 from PendingPaymentValidations ppv
@@ -175,6 +181,7 @@ group by HasIlrSubmission,
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
+  BlockedForPayments,
   Result
     order by 
   HasLearningRecord desc, 
@@ -187,7 +194,8 @@ group by HasIlrSubmission,
   HasSignedMinVersion desc,
   LearnerMatchSuccessful desc,
   EmployedAtStartOfApprenticeship desc,
-  EmployedBeforeSchemeStarted desc
+  EmployedBeforeSchemeStarted desc,
+  BlockedForPayments desc
 -- YTD Validation (Paste underneath the Period Validation table on the [YTD Validation] tab) 
 ;with latestValidations as (
 select max(ppv.periodnumber) MaxPeriod, 
@@ -252,6 +260,11 @@ select max(ppv.periodnumber) MaxPeriod,
 	ELSE max((case when ppv.periodnumber < 5 and ppv.paymentyear <= 2122 then 1 else iif(step='EmployedBeforeSchemeStarted' and result=1,1,0) end))
 	END
 	as EmployedBeforeSchemeStarted,
+   CASE OverrideResult
+	WHEN 1 THEN 1
+	ELSE max((case when ppv.periodnumber < 10 and ppv.paymentyear <= 2122 then 1 else iif(step='BlockedForPayments' and result=1,1,0) end)) 
+	END
+	as BlockedForPayments,  
     Amount,
     a.[AccountLegalEntityId] --Should only be one
 from [incentives].[PendingPaymentValidationResult] ppv
@@ -272,6 +285,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A37 on tab {YTD Val
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
+  BlockedForPayments,
   count(distinct [AccountLegalEntityId] ) as [AccountLegalEntityId],
   sum(amount) as EarningAmount
 from latestValidations
@@ -287,7 +301,8 @@ group by
   HasSignedMinVersion,
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
-  EmployedBeforeSchemeStarted
+  EmployedBeforeSchemeStarted,
+  BlockedForPayments
 order by 
   HasLearningRecord desc, 
   IsInLearning desc, 
@@ -300,4 +315,5 @@ order by
   HasSignedMinVersion desc,
   LearnerMatchSuccessful desc,
   EmployedAtStartOfApprenticeship desc,
-  EmployedBeforeSchemeStarted desc
+  EmployedBeforeSchemeStarted desc,
+  BlockedForPayments desc
