@@ -16,28 +16,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
 
         public override void Calculate()
         {
-            if (Incentive.IsEligible)
-            {
-                foreach (var incentivePayment in Incentive.Payments)
-                {
-                    Calculate(incentivePayment);
-                }
-
-                EventHandler.Invoke(new EarningsCalculated
-                {
-                    ApprenticeshipIncentiveId = Model.Id,
-                    AccountId = Model.Account.Id,
-                    ApprenticeshipId = Model.Apprenticeship.Id,
-                    ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
-                });
-
-                Model.RefreshedLearnerForEarnings = false;
-            }
-            else
+            if (!Incentive.IsEligible)
             {
                 RemoveUnpaidEarnings();
                 ClawbackAllPayments();
+                return;
             }
+
+            foreach (var incentivePayment in Incentive.Payments)
+            {
+                Calculate(incentivePayment);
+            }
+
+            EventHandler.Invoke(new EarningsCalculated
+            {
+                ApprenticeshipIncentiveId = Model.Id,
+                AccountId = Model.Account.Id,
+                ApprenticeshipId = Model.Apprenticeship.Id,
+                ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
+            });
+
+            Model.RefreshedLearnerForEarnings = false;
         }
 
         public override void ReCalculate()
@@ -68,7 +67,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
                 {
                     if (PaymentHasChanged(pendingPayment.Model, incentivePayment))
                     {
-                        ClawbackPayment(CollectionCalendar.GetActivePeriod().CollectionPeriod, pendingPayment.Model);
+                        ClawbackPayment(pendingPayment.Model);
                         AddNewPendingPayment(incentivePayment);
                     }
                 }

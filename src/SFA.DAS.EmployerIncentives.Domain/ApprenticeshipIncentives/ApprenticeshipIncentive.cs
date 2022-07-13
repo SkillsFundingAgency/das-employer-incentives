@@ -92,30 +92,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             calculator.Calculate();
         }
 
-        private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
-        {
-            pendingPayment.ClawBack();
-            var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
-
-            if (!Model.ClawbackPaymentModels.Any(c => c.PendingPaymentId == pendingPayment.Id))
-            {
-                var clawback = ClawbackPayment.New(
-                    Guid.NewGuid(),
-                    Model.Account,
-                    Model.Id,
-                    pendingPayment.Id,
-                    -pendingPayment.Amount,
-                    DateTime.Now,
-                    payment.SubnominalCode,
-                    payment.Id,
-                    payment.VrfVendorId);
-
-                clawback.SetPaymentPeriod(collectionPeriod);
-
-                Model.ClawbackPaymentModels.Add(clawback.GetModel());
-            }
-        }
-
         public void CalculatePayments()
         {
             AddEvent(new PaymentsCalculationRequired(Model));
