@@ -119,6 +119,7 @@
     <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
     <Build Include="Tables\VendorBlockAudit.sql" />
     <Build Include="Views\ApprenticeApplications.sql" />
+    <Build Include="Tables\Audit.RevertedPayment.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
