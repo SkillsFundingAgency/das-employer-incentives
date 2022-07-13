@@ -18,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
     {
         private Commands.Persistence.ApprenticeshipIncentiveDomainRepository _sut;
         private Mock<IApprenticeshipIncentiveDataRepository> _mockApprenticeshipIncentiveDataRepository;
+        private Mock<IPaymentDataRepository> _mockPaymentDataRepository;
         private Mock<IApprenticeshipIncentiveFactory> _mockApprenticeshipIncentiveFactory;
         private Mock<IDomainEventDispatcher> _mockDomainEventDispatcher;
         private long _accountLegalEntityId;
@@ -36,11 +37,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Persistence.Apprenticesh
 
 
             _mockApprenticeshipIncentiveDataRepository = new Mock<IApprenticeshipIncentiveDataRepository>();
+            _mockPaymentDataRepository = new Mock<IPaymentDataRepository>();
             _mockApprenticeshipIncentiveFactory = new Mock<IApprenticeshipIncentiveFactory>();
             _mockDomainEventDispatcher = new Mock<IDomainEventDispatcher>();
 
             _sut = new Commands.Persistence.ApprenticeshipIncentiveDomainRepository(
                 _mockApprenticeshipIncentiveDataRepository.Object,
+                _mockPaymentDataRepository.Object,
                 _mockApprenticeshipIncentiveFactory.Object, 
                 _mockDomainEventDispatcher.Object);
         }
