@@ -2,6 +2,8 @@
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using System;
+using System.Linq;
+
 namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
 {
     public class DefaultEarningsCalculator : EarningsCalculator
@@ -42,12 +44,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
         public override void ReCalculate()
         {
             var pendingPaymentsHaveBeenPaid = false;
-            foreach (var pendingPaymentModel in Model.PendingPaymentModels)
+            foreach (var pendingPaymentModel in Model.PendingPaymentModels.Where(m => HasPaidEarning(m)))
             {
-                if (HasPaidEarning(pendingPaymentModel))
-                {
-                    pendingPaymentsHaveBeenPaid = true;
-                }
+                pendingPaymentsHaveBeenPaid = true;
             }
 
             if (!pendingPaymentsHaveBeenPaid)
