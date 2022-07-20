@@ -10,7 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ReinstateP
         {
             var result = new ValidationResult();
 
-            if (item.PendingPaymentId == default)
+            if (item.PendingPaymentId == Guid.Empty)
             {
                 result.AddError("PendingPaymentId", "Is not set");
             }
