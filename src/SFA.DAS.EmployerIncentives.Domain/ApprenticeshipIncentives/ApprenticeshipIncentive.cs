@@ -971,6 +971,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             AddEvent(new PaymentReverted(payment, serviceRequest));
         }
 
+        public void ReinstatePendingPayment(PendingPaymentModel pendingPaymentModel, ReinstatePaymentRequest reinstatePaymentRequest)
+        {
+            pendingPaymentModel.ClawedBack = false;
+            pendingPaymentModel.PaymentMadeDate = null;
+            pendingPaymentModel.CalculatedDate = DateTime.UtcNow;
+
+            Model.PendingPaymentModels.Add(pendingPaymentModel);
+
+            AddEvent(new PendingPaymentReinstated(pendingPaymentModel, reinstatePaymentRequest));
+        }
+
         private DateTime GetPhaseStartDate()
         {
             if (Phase.Identifier == Enums.Phase.Phase1)

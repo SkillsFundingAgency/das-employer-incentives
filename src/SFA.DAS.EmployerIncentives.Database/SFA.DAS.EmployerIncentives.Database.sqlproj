@@ -120,6 +120,7 @@
     <Build Include="Tables\VendorBlockAudit.sql" />
     <Build Include="Views\ApprenticeApplications.sql" />
     <Build Include="Tables\Audit.RevertedPayment.sql" />
+    <Build Include="Tables\Audit.ReinstatedPendingPayment.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
