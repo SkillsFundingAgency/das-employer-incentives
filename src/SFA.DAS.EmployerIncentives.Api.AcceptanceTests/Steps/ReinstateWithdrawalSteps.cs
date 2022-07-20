@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(r => r.ULN, _apprenticeship.ULN)
                 .Create();
 
-            _reinstateApplicationRequest = new ReinstateApplicationRequest {Applications = new[] { reinstateApplication }};
+            _reinstateApplicationRequest = new ReinstateApplicationRequest { Applications = new[] { reinstateApplication } };
 
             var url = $"withdrawal-reinstatements";
 
@@ -109,7 +109,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var incentiveApplicationAudits = await dbConnection.GetAllAsync<IncentiveApplicationStatusAudit>();
             incentiveApplicationAudits.Should().HaveCount(1);
             var auditRecord = incentiveApplicationAudits.Single(a => a.IncentiveApplicationApprenticeshipId == _apprenticeship.Id);
-            auditRecord.Process.Should().Be(IncentiveApplicationStatus.Submitted);
+            auditRecord.Process.Should().Be(IncentiveApplicationStatus.Reinstated);
 
             var publishedCommand = _testContext
                 .CommandsPublished
@@ -125,8 +125,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             await using var dbConnection = new SqlConnection(_connectionString);
             var incentives = await dbConnection.GetAllAsync<ApprenticeshipIncentive>();
-            
-            incentives.Should().HaveCount(1); 
+
+            incentives.Should().HaveCount(1);
             var incentive = incentives.FirstOrDefault();
             incentive.Status.Should().Be(IncentiveStatus.Paused);
             incentive.WithdrawnBy.Should().BeNull();
@@ -136,10 +136,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the earnings are recalculated")]
         public async Task ThenTheEarningsAreRecalculated()
         {
-            
+
             await using var dbConnection = new SqlConnection(_connectionString);
             var pendingPayments = await dbConnection.GetAllAsync<PendingPayment>();
-            
+
             pendingPayments.Should().HaveCount(2);
         }
     }

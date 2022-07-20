@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 
 namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
 {
@@ -8,15 +9,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
         public long AccountId { get; }
         public long AccountLegalEntityId { get; }
         public ApprenticeshipModel Model { get; }
-        
+        public ServiceRequest ServiceRequest { get; }
+
         public ApplicationReinstated(
             long accountId,
             long accountLegalEntityId, 
-            ApprenticeshipModel model)
+            ApprenticeshipModel model,
+            ServiceRequest serviceRequest)
         {
             AccountLegalEntityId = accountLegalEntityId;
             AccountId = accountId;
             Model = model;
+            ServiceRequest = serviceRequest;
         }
 
         public Log Log
@@ -25,7 +29,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events
             {
                 var message =
                     $"Application Apprenticeship has been reinstated for ApprenticeshipId {Model.ApprenticeshipId} and " +
-                    $"AccountLegalEntityId {AccountLegalEntityId} and ULN {Model.ULN}";
+                    $"AccountLegalEntityId {AccountLegalEntityId} and ULN {Model.ULN}" +
+                    $"ServiceRequest TaskId {ServiceRequest?.TaskId}";
                 return new Log
                 {
                     OnProcessing = () => message,
