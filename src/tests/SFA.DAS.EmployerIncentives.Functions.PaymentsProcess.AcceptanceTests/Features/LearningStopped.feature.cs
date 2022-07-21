@@ -372,6 +372,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 52
  testRunner.Then("the first payment is recalculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
+#line 53
+ testRunner.And("the stopped change of circumstance is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
             }
             this.ScenarioCleanup();
         }
@@ -385,7 +388,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Learning data contains a change to learning stopped date with a clawed back payme" +
                     "nt", null, tagsOfScenario, argumentsOfScenario);
-#line 54
+#line 55
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -405,22 +408,25 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 55
+#line 56
  testRunner.Given("an apprenticeship incentive exists that has stopped learning before the first pay" +
                         "ment is due", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 56
+#line 57
  testRunner.And("the learner data identifies the learning stopped date has changed to a date after" +
                         " the first payment is due", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 57
+#line 58
  testRunner.And("the first payment has previously been clawed back", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 58
+#line 59
  testRunner.When("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 59
+#line 60
  testRunner.Then("the previously clawed back payment is recalculated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 61
+ testRunner.And("the stopped change of circumstance is updated", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -454,7 +460,7 @@ this.ScenarioInitialize(scenarioInfo);
             argumentsOfScenario.Add("firstEarningResult", firstEarningResult);
             argumentsOfScenario.Add("secondEarningResult", secondEarningResult);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Retrospective stopped tests on stopped incentive", null, tagsOfScenario, argumentsOfScenario);
-#line 61
+#line 63
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -474,31 +480,31 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 62
+#line 64
  testRunner.Given("a stopped apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 63
+#line 65
  testRunner.And(string.Format("the first payment is {0}", firstPaymentIsPaid), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 64
+#line 66
  testRunner.And(string.Format("the second payment is {0}", secondPaymentIsPaid), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 65
+#line 67
  testRunner.And(string.Format("the stop date is {0} the first payment and {1} the second payment", whenfirstPaymentIsPaid, whenSecondPaymentIsPaid), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 66
+#line 68
  testRunner.And("the learner data identifies the learning stopped date has changed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 67
+#line 69
  testRunner.When("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 68
+#line 70
  testRunner.Then("the incentive is updated to stopped", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 69
+#line 71
  testRunner.And(string.Format("the first earning is {0}", firstEarningResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 70
+#line 72
  testRunner.And(string.Format("the second earning is {0}", secondEarningResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

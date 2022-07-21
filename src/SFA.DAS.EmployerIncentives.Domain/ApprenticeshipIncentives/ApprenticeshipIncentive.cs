@@ -253,6 +253,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 ChangeStatus(IncentiveStatus.Stopped);
                 CalculateEarnings(collectionCalendar, learner);
+
+                AddEvent(new LearningStopped(
+                    Model.Id,
+                    stoppedStatus.DateStopped.Value));
             }
         }
 
