@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Arrange
             var archivedPendingPayment = _fixture.Create<PendingPaymentModel>();
 
-            _archiveRepository.Setup(x => x.Get(archivedPendingPayment.Id)).ReturnsAsync(archivedPendingPayment);
+            _archiveRepository.Setup(x => x.GetArchivedPendingPayment(archivedPendingPayment.Id)).ReturnsAsync(archivedPendingPayment);
 
             var incentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(archivedPendingPayment.ApprenticeshipIncentiveId,
                 _fixture.Build<ApprenticeshipIncentiveModel>()
@@ -66,7 +66,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             // Arrange
             PendingPaymentModel nullPendingPaymentModel = null;
-            _archiveRepository.Setup(x => x.Get(It.IsAny<Guid>())).ReturnsAsync(nullPendingPaymentModel);
+            _archiveRepository.Setup(x => x.GetArchivedPendingPayment(It.IsAny<Guid>())).ReturnsAsync(nullPendingPaymentModel);
 
             var command = _fixture.Create<ReinstatePendingPaymentCommand>();
 
@@ -83,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Arrange
             var archivedPendingPayment = _fixture.Create<PendingPaymentModel>();
 
-            _archiveRepository.Setup(x => x.Get(archivedPendingPayment.Id)).ReturnsAsync(archivedPendingPayment);
+            _archiveRepository.Setup(x => x.GetArchivedPendingPayment(archivedPendingPayment.Id)).ReturnsAsync(archivedPendingPayment);
 
             Domain.ApprenticeshipIncentives.ApprenticeshipIncentive nullIncentive = null;
 

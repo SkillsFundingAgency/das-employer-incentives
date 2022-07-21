@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             await _dbContext.AddAsync(employmentCheckModel.Map());
         }
 
-        public async Task<PendingPaymentModel> Get(Guid pendingPaymentId)
+        public async Task<PendingPaymentModel> GetArchivedPendingPayment(Guid pendingPaymentId)
         {
             var archivedPendingPayment = _dbContext.ArchivedPendingPayments.Where(x => x.PendingPaymentId == pendingPaymentId)
                 .OrderByDescending(y => y.ArchiveDateUTC).FirstOrDefault();

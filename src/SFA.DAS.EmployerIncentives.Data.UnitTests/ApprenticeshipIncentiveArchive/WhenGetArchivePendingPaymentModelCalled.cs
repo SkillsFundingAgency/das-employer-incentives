@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentiveArchi
             await _dbContext.SaveChangesAsync();
 
             // Act
-            var pendingPayment = await _sut.Get(pendingPaymentId);
+            var pendingPayment = await _sut.GetArchivedPendingPayment(pendingPaymentId);
 
             // Assert
             pendingPayment.Should().NotBeNull();

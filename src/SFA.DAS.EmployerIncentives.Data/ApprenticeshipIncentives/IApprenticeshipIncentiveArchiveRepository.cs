@@ -9,6 +9,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
         Task Archive(PendingPaymentModel pendingPaymentModel);
         Task Archive(PaymentModel paymentModel);
         Task Archive(EmploymentCheckModel employmentCheckModel);
-        Task<PendingPaymentModel> Get(Guid pendingPaymentId);
+        Task<PendingPaymentModel> GetArchivedPendingPayment(Guid pendingPaymentId);
     }
 }

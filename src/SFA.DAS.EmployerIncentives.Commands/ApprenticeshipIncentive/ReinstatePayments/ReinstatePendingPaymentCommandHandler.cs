@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ReinstateP
 
         public async Task Handle(ReinstatePendingPaymentCommand command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var pendingPayment = await _apprenticeshipIncentiveArchiveRepository.Get(command.PendingPaymentId);
+            var pendingPayment = await _apprenticeshipIncentiveArchiveRepository.GetArchivedPendingPayment(command.PendingPaymentId);
 
             if (pendingPayment == null)
             {
