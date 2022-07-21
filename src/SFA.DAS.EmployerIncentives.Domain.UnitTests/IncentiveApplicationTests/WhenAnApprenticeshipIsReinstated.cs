@@ -6,10 +6,8 @@ using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
-using SFA.DAS.EmployerIncentives.Enums;
 using System.Collections.Generic;
 using System.Linq;
-using SFA.DAS.EmployerIncentives.Domain.Accounts;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
 {
@@ -44,10 +42,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         public void Then_withdrawn_flags_are_removed()
         {
             // Arrange
+            var serviceRequest = _fixture.Create<ServiceRequest>();
             var apprenticeship = _sut.Apprenticeships.Single();
             
             // Act
-            _sut.ReinstateWithdrawal(apprenticeship);
+            _sut.ReinstateWithdrawal(apprenticeship, serviceRequest);
 
             // Assert
             apprenticeship.WithdrawnByEmployer.Should().BeFalse();
@@ -58,16 +57,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.IncentiveApplicationTests
         public void Then_an_ApplicationReinstated_event_is_raised_when_the_application_is_reinstated()
         {
             // Arrange
+            var serviceRequest = _fixture.Create<ServiceRequest>();
             var apprenticeship = _sut.Apprenticeships.Single();
 
             // Act
-            _sut.ReinstateWithdrawal(apprenticeship);
+            _sut.ReinstateWithdrawal(apprenticeship, serviceRequest);
 
             // Assert
             var raisedEvent = _sut.FlushEvents().Single() as ApplicationReinstated;
             raisedEvent.AccountId.Should().Be(_sut.AccountId);
             raisedEvent.AccountLegalEntityId.Should().Be(_sut.AccountLegalEntityId);
             raisedEvent.Model.Should().Be(apprenticeship.GetModel());
+            raisedEvent.ServiceRequest.Should().Be(serviceRequest);
         }
     }
 }

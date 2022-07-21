@@ -66,7 +66,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 .ForEach(v => commands.Add(
                     new ReinstateWithdrawalCommand(
                         v.AccountLegalEntityId,
-                        v.ULN)
+                        v.ULN,
+                        v.ServiceRequest.TaskId,
+                        v.ServiceRequest.DecisionReference,
+                        v.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow)
                 ));
 
             foreach (var command in commands)
