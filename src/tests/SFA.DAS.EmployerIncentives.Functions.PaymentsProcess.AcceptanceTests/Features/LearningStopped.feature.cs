@@ -425,6 +425,85 @@ this.ScenarioInitialize(scenarioInfo);
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Retrospective stopped tests on stopped incentive")]
+        [NUnit.Framework.TestCaseAttribute("not paid", "not paid", "before", "before", "deleted", "deleted", null)]
+        [NUnit.Framework.TestCaseAttribute("not paid", "not paid", "on", "before", "retained", "deleted", null)]
+        [NUnit.Framework.TestCaseAttribute("not paid", "not paid", "after", "before", "retained", "deleted", null)]
+        [NUnit.Framework.TestCaseAttribute("not paid", "not paid", "after", "on", "retained", "retained", null)]
+        [NUnit.Framework.TestCaseAttribute("not paid", "not paid", "after", "after", "retained", "retained", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "not paid", "before", "before", "clawedback", "deleted", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "not paid", "on", "before", "retained", "deleted", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "not paid", "after", "before", "retained", "deleted", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "not paid", "after", "on", "retained", "retained", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "not paid", "after", "after", "retained", "retained", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "paid", "before", "before", "clawedback", "clawedback", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "paid", "on", "before", "retained", "clawedback", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "paid", "after", "before", "retained", "clawedback", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "paid", "after", "on", "retained", "retained", null)]
+        [NUnit.Framework.TestCaseAttribute("paid", "paid", "after", "after", "retained", "retained", null)]
+        public virtual void RetrospectiveStoppedTestsOnStoppedIncentive(string firstPaymentIsPaid, string secondPaymentIsPaid, string whenfirstPaymentIsPaid, string whenSecondPaymentIsPaid, string firstEarningResult, string secondEarningResult, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("firstPaymentIsPaid", firstPaymentIsPaid);
+            argumentsOfScenario.Add("secondPaymentIsPaid", secondPaymentIsPaid);
+            argumentsOfScenario.Add("whenfirstPaymentIsPaid", whenfirstPaymentIsPaid);
+            argumentsOfScenario.Add("whenSecondPaymentIsPaid", whenSecondPaymentIsPaid);
+            argumentsOfScenario.Add("firstEarningResult", firstEarningResult);
+            argumentsOfScenario.Add("secondEarningResult", secondEarningResult);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Retrospective stopped tests on stopped incentive", null, tagsOfScenario, argumentsOfScenario);
+#line 61
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 62
+ testRunner.Given("a stopped apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 63
+ testRunner.And(string.Format("the first payment is {0}", firstPaymentIsPaid), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 64
+ testRunner.And(string.Format("the second payment is {0}", secondPaymentIsPaid), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 65
+ testRunner.And(string.Format("the stop date is {0} the first payment and {1} the second payment", whenfirstPaymentIsPaid, whenSecondPaymentIsPaid), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 66
+ testRunner.And("the learner data identifies the learning stopped date has changed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 67
+ testRunner.When("the incentive learner data is refreshed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 68
+ testRunner.Then("the incentive is updated to stopped", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 69
+ testRunner.And(string.Format("the first earning is {0}", firstEarningResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 70
+ testRunner.And(string.Format("the second earning is {0}", secondEarningResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore
