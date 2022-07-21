@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
                     EventHandler.Invoke(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, paymentModel));
                 }
 
-                OnDeleted.Invoke();
+                OnDeleted?.Invoke();
             }
         }
 
@@ -114,28 +114,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
             Delete(pendingPaymentsToDelete);            
         }
 
-
-        protected void RemoveUnsentClawbacks(IEnumerable<ClawbackPaymentModel> clawbackModels)
-        {
-            clawbackModels.Where(x => x.DateClawbackSent == null).ToList()
-                .ForEach(cb => {
-                    if (Model.ClawbackPaymentModels.Remove(cb))
-                    {
-                        EventHandler.Invoke(new ClawbackDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, cb));
-                    }
-                });
-        }
         protected void ClawbackAllPayments()
         {
             ClawbackPayments(Model.PendingPaymentModels);
         }
 
         protected void ClawbackPayments(IEnumerable<PendingPaymentModel> pendingPaymentModels)
-        {
-            ClawbackPayments(pendingPaymentModels, CollectionCalendar.GetActivePeriod().CollectionPeriod);
-        }
-
-        protected void ClawbackPayments(IEnumerable<PendingPaymentModel> pendingPaymentModels, CollectionPeriod collectionPeriod)
         {
             foreach (var pendingPaymentModel in pendingPaymentModels.Where(pp => pp.PaymentMadeDate != null))
             {

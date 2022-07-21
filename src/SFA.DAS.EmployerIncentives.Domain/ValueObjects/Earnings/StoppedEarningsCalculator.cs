@@ -39,35 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
 
             if (Model.PreviousStatus == IncentiveStatus.Stopped)
             {
-                foreach (var incentivePayment in Incentive.Payments.OrderBy(p => p.PaymentDate))
-                {
-                    if (incentivePayment.PaymentDate <= _learner.StoppedStatus.DateStopped.Value)
-                    {
-                        var pendingPayment = PendingPaymentLookup(incentivePayment);
-                        if (pendingPayment.Exists)
-                        {
-                            if (!HasPaidEarning(pendingPayment.Model))
-                            {
-                                var unpaidPayment = PaymentLookup(pendingPayment.Model);
-
-                                if (unpaidPayment.Exists)
-                                {
-                                    DeletePayment(unpaidPayment.Model);
-                                }
-
-                                if (PendingPaymentHasChanged(pendingPayment.Model, incentivePayment))
-                                {
-                                    DeletePendingPayment(pendingPayment.Model);
-                                    AddNewPendingPayment(incentivePayment);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            AddNewPendingPayment(incentivePayment);
-                        }
-                    }
-                }
+                CalculateChangeInStopDate();
             }
 
             RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate > _learner.StoppedStatus.DateStopped.Value));
@@ -76,6 +48,44 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
         public override void ReCalculate()
         {
             // do nothing
+        }
+
+        private void CalculateChangeInStopDate()
+        {
+            foreach (var incentivePayment in Incentive.Payments.OrderBy(p => p.PaymentDate))
+            {
+                if (incentivePayment.PaymentDate <= _learner.StoppedStatus.DateStopped.Value)
+                {
+                    var pendingPayment = PendingPaymentLookup(incentivePayment);
+                    if (pendingPayment.Exists)
+                    {
+                        if (!HasPaidEarning(pendingPayment.Model))
+                        {
+                            RefreshUnpaidEarning(pendingPayment.Model, incentivePayment);
+                        }
+                    }
+                    else
+                    {
+                        AddNewPendingPayment(incentivePayment);
+                    }
+                }
+            }
+        }
+
+        private void RefreshUnpaidEarning(PendingPaymentModel pendingPaymentModel, Payment incentivePayment)
+        {
+            var unpaidPayment = PaymentLookup(pendingPaymentModel);
+
+            if (unpaidPayment.Exists)
+            {
+                DeletePayment(unpaidPayment.Model);
+            }
+
+            if (PendingPaymentHasChanged(pendingPaymentModel, incentivePayment))
+            {
+                DeletePendingPayment(pendingPaymentModel);
+                AddNewPendingPayment(incentivePayment);
+            }
         }
 
         private bool IsChangeOfCircumstance()
