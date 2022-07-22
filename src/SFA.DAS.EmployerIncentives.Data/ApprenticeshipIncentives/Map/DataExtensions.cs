@@ -450,12 +450,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
         internal static List<Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance> Map(this List<ChangeOfCircumstance> models)
         {
-            var valueTypes = new List<Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance>();
-            foreach(var model in models)
-            {
-                valueTypes.Add(model.Map());
-            }
-            return valueTypes;
+            return models.Select(model => model.Map()).ToList();
         }
 
         private static ICollection<EmploymentCheck> Map(this ICollection<EmploymentCheckModel> models)
