@@ -102,8 +102,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.DbConnectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
                                a.DistributedLockStorage = _testContext.ApplicationSettings.DistributedLockStorage;
                                a.LockedRetryPolicyInMilliSeconds = _testContext.ApplicationSettings.LockedRetryPolicyInMilliSeconds;
-                               a.AllowedHashstringCharacters = _testContext.ApplicationSettings.AllowedHashstringCharacters;
-                               a.Hashstring = _testContext.ApplicationSettings.Hashstring;
                                a.NServiceBusConnectionString = _testContext.ApplicationSettings.NServiceBusConnectionString;
                                a.NServiceBusLicense = _testContext.ApplicationSettings.NServiceBusLicense;
                                a.UseLearningEndpointStorageDirectory = _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory;
