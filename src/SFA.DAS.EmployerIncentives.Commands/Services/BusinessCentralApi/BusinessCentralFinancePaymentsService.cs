@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default, "application/json");
+            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), System.Text.Encoding.Default, "application/json");
         }
 
         private static HttpContent CreateErrorLogJsonContent(IEnumerable<BusinessCentralFinancePaymentRequest> payments)
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), Encoding.Default, "application/json");
+            return new StringContent(JsonConvert.SerializeObject(body, jsonSerializerSettings), System.Text.Encoding.Default, "application/json");
         }
     }
 }
