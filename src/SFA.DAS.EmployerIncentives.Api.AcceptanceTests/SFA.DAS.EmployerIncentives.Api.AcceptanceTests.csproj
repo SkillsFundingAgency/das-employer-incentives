@@ -8,19 +8,6 @@
   <ItemGroup>
     <None Remove="local.encoding.json" />
   </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\BlockAccountLegalEntityForPayments.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\LegalEntityUpdated.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\PausePayments - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RecalculateEarnings.feature.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="local.encoding.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
  
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
