@@ -92,8 +92,14 @@ namespace SFA.DAS.EmployerIncentives.Api
                 var encodingConfigJson = Configuration.GetSection(EncodingConfigKey).Value;
                 var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
                 services.AddSingleton(encodingConfig);
-                services.AddSingleton<IEncodingService, EncodingService>();
             }
+            else
+            {
+                var encodingConfigJson = File.ReadAllText(Directory.GetCurrentDirectory() + "\\local.encoding.json");
+                var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
+                services.AddSingleton(encodingConfig);
+            }
+            services.AddSingleton<IEncodingService, EncodingService>();
 
             services.AddNLog(Configuration);
 

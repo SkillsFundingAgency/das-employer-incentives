@@ -42,13 +42,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             {
                 Directory.CreateDirectory(TestDirectory.FullName);
             }
-            var encodingConfigJson = File.ReadAllText(Directory.GetCurrentDirectory() + "\\local.encoding.json");
-            var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
             TestData = new TestData();
             TestData.GetOrCreate("ThrowErrorAfterPublishCommand", () => false);
             TestData.GetOrCreate("ThrowErrorAfterProcessedCommand", () => false);
             TestData.GetOrCreate("ThrowErrorAfterPublishEvent", () => false);
-            EncodingService = new EncodingService(encodingConfig);
             Hooks = new List<IHook>();
             EventsPublished = new List<object>();
             PublishedEvents = new List<PublishedEvent>();
