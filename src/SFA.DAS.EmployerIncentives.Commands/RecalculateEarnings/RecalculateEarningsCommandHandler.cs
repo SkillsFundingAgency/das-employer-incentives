@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.RecalculateEarnings
                     throw new ArgumentException($"Apprenticeship incentive not found for account legal entity {learnerIdentifier.AccountLegalEntityId} and ULN {learnerIdentifier.ULN}");
                 }
 
-                incentive.RecalculateEarnings(collectionCalendar);
+                incentive.ReCalculateEarnings(collectionCalendar);
                 await _domainRepository.Save(incentive);
             }
         }
