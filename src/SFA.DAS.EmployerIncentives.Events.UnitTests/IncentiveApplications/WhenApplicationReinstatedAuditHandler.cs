@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Events.UnitTests.IncentiveApplications
             _mockAuditDataRepository.Verify(m =>
             m.Add(It.Is<IncentiveApplicationAudit>(i =>
                    i.IncentiveApplicationApprenticeshipId == @event.Model.Id &&
-                   i.Process == Enums.IncentiveApplicationStatus.Submitted)),
+                   i.Process == Enums.IncentiveApplicationStatus.Reinstated)),
                    Times.Once);
         }
     }

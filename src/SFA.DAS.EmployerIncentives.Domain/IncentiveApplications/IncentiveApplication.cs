@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
                 serviceRequest));
         }
 
-        public void ReinstateWithdrawal(Apprenticeship apprenticeship)
+        public void ReinstateWithdrawal(Apprenticeship apprenticeship, ServiceRequest serviceRequest)
         {
             var apprenticeToReinstate = Apprenticeships.Single(m => m.Id == apprenticeship.Id);
             apprenticeToReinstate.ReinstateApplication();
@@ -104,7 +104,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.IncentiveApplications
             AddEvent(new ApplicationReinstated(
                 Model.AccountId,
                 Model.AccountLegalEntityId,
-                apprenticeToReinstate.GetModel()));
+                apprenticeToReinstate.GetModel(),
+                serviceRequest));
         }
 
         public void EarningsCalculated(Guid apprenticeshipId)

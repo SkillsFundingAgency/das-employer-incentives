@@ -20,11 +20,11 @@ namespace SFA.DAS.EmployerIncentives.Events.IncentiveApplications
 
         public Task Handle(ApplicationReinstated @event, CancellationToken cancellationToken = default)
         {
-            return _auditRepository.Add(new Domain.ValueObjects.IncentiveApplicationAudit(
+            return _auditRepository.Add(new IncentiveApplicationAudit(
                 Guid.NewGuid(),
                 @event.Model.Id,
-                IncentiveApplicationStatus.Submitted,
-                new ServiceRequest(string.Empty, string.Empty, DateTime.Now)));
+                IncentiveApplicationStatus.Reinstated,
+                @event.ServiceRequest));
         }
     }
 }

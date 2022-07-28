@@ -28,6 +28,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Fixture _fixture;
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly PendingPayment _pendingPayment;
+        private PendingPayment _firstPendingPayment;
+        private PendingPayment _secondPendingPayment;
+        private Payment _firstPayment;
+        private Payment _secondPayment;
+
         private readonly Learner _learner;
         private readonly LearningPeriod _learningPeriod1;
         private readonly LearnerSubmissionDto _stoppedLearnerMatchApiData;
@@ -40,6 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly int _breakInLearning;
         private readonly DateTime _resumedDate;
         private readonly DateTime _stoppedDate;
+        private bool _dataIsInitialised = true;
 
         public LearningStoppedSteps(TestContext testContext)
         {
@@ -262,12 +268,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"an apprenticeship incentive exists")]
         public async Task GivenAnApprenticeshipIncentiveExists()
         {
-            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
-            {
-                await dbConnection.InsertAsync(_accountModel);
-                await dbConnection.InsertAsync(_apprenticeshipIncentive);                
-                await dbConnection.InsertWithEnumAsStringAsync(_pendingPayment);
-            }
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertAsync(_accountModel);
+            await dbConnection.InsertAsync(_apprenticeshipIncentive);
+            await dbConnection.InsertWithEnumAsStringAsync(_pendingPayment);            
         }
 
         [Given(@"an apprenticeship incentive exists that has stopped learning")]
@@ -284,6 +288,141 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await dbConnection.InsertAsync(_learner);
                 await dbConnection.InsertAsync(_learningPeriod1);
             }
+        }
+
+        [Given(@"a stopped apprenticeship incentive exists")]
+        public void GivenAStoppedApprenticeshipIncentiveExists()
+        {
+            _apprenticeshipIncentive.StartDate = _plannedStartDate;
+            _apprenticeshipIncentive.Status = IncentiveStatus.Stopped;
+            _apprenticeshipIncentive.Phase = Phase.Phase1;
+            _apprenticeshipIncentive.PendingPayments = new List<PendingPayment>();
+            _apprenticeshipIncentive.Payments = new List<Payment>();
+            _learner.StartDate = _apprenticeshipIncentive.StartDate;
+            _learner.InLearning = false;
+            _learner.LearningStoppedDate = _learner.StartDate.Value.AddDays(366);
+            _learner.LearningResumedDate = null;
+            
+            _dataIsInitialised = false;
+        }
+
+        [Given(@"the first payment is (.*)")]
+        public void GivenTheFirstPaymentIsXWhenTheStopDateIsY(string firstPaymentIsPaid)
+        {
+            _firstPendingPayment = _fixture.Build<PendingPayment>()
+                    .With(p => p.AccountId, _accountModel.Id)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.DueDate, _learner.StartDate.Value.AddDays(89))
+                    .With(p => p.ClawedBack, false)
+                    .With(p => p.EarningType, EarningType.FirstPayment)
+                    .With(p => p.Amount, 1000)
+                    .Without(p => p.ValidationResults)
+                    .Create();
+
+            _firstPendingPayment.PaymentYear = 2021;
+            _firstPendingPayment.PeriodNumber = 3;
+
+            if (firstPaymentIsPaid == "not paid")
+            {
+                _firstPendingPayment.PaymentMadeDate = null;
+                _firstPayment = null;
+            }
+            else if (firstPaymentIsPaid == "paid")
+            {
+                _firstPendingPayment.PaymentMadeDate = _firstPendingPayment.DueDate;
+
+                _firstPayment = _fixture.Build<Payment>()
+                   .With(p => p.AccountId, _accountModel.Id)
+                   .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                   .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                   .With(p => p.PaidDate, _firstPendingPayment.PaymentMadeDate)
+                   .With(p => p.PendingPaymentId, _firstPendingPayment.Id)
+                   .With(p => p.PaymentYear, _firstPendingPayment.PaymentYear)
+                   .With(p => p.PaymentPeriod, _firstPendingPayment.PeriodNumber)
+                   .Create();
+            }
+            else
+            {
+                throw new Exception("Invalid firstPaymentIsPaid");
+            }
+        }
+
+        [Given(@"the second payment is (.*)")]
+        public void GivenTheSecondPaymentIsXWhenTheStopDateIsY(string secondPaymentIsPaid)
+        {
+            _secondPendingPayment = _fixture.Build<PendingPayment>()
+                    .With(p => p.AccountId, _accountModel.Id)
+                    .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(p => p.DueDate, _learner.StartDate.Value.AddDays(364))
+                    .With(p => p.ClawedBack, false)
+                    .With(p => p.EarningType, EarningType.SecondPayment)
+                    .With(p => p.Amount, 1000)
+                    .Without(p => p.ValidationResults)
+                    .Create();
+
+            _secondPendingPayment.PaymentYear = 2021;
+            _secondPendingPayment.PeriodNumber = 12;
+
+            if (secondPaymentIsPaid == "not paid")
+            {
+                _secondPendingPayment.PaymentMadeDate = null;
+                _secondPayment = null;
+            }
+            else if (secondPaymentIsPaid == "paid")
+            {
+                _secondPendingPayment.PaymentMadeDate = _learner.StartDate.Value.AddDays(364);
+
+                _secondPayment = _fixture.Build<Payment>()
+                   .With(p => p.AccountId, _accountModel.Id)
+                   .With(p => p.AccountLegalEntityId, _apprenticeshipIncentive.AccountLegalEntityId)
+                   .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                   .With(p => p.PaidDate, _secondPendingPayment.PaymentMadeDate)
+                   .With(p => p.PendingPaymentId, _secondPendingPayment.Id)
+                   .With(p => p.PaymentYear, _secondPendingPayment.PaymentYear)
+                   .With(p => p.PaymentPeriod, _secondPendingPayment.PeriodNumber)
+                   .Create();
+            }
+            else
+            {
+                throw new Exception("Invalid secondPaymentIsPaid");
+            }
+        }
+
+        [Given(@"the stop date is (.*) the first payment and (.*) the second payment")]
+        public void GivenTheStopdateIsXTheFirstPaymentAndYTheSecondPayment(string whenFirstPaymentIsPaid, string whenSecondPaymentIsPaid)
+        {
+            _stoppedLearnerMatchApiData.Training.First().PriceEpisodes.First().EndDate = whenSecondPaymentIsPaid
+            switch
+            {
+                "before" => whenFirstPaymentIsPaid
+                switch
+                {
+                    "before" => _firstPendingPayment.DueDate.AddDays(-2),
+                    "on" => _firstPendingPayment.DueDate.AddDays(1),
+                    "after" => _firstPendingPayment.DueDate.AddDays(2),
+                    _ => throw new Exception("Invalid whenFirstPaymentIsPaid"),
+                },
+                "on" => _secondPendingPayment.DueDate.AddDays(1),
+                "after" => _secondPendingPayment.DueDate.AddDays(2),
+                _ => throw new Exception("Invalid whenSecondPaymentIsPaid"),
+            };
+        }
+
+        [Given(@"the learner data identifies the learning stopped date has changed")]
+        public async Task GivenTheIlrStoppedDateHasChanged()
+        {
+            await ClearActiveCollectionCalendar();
+
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var calendar = await dbConnection.GetAllAsync<CollectionCalendarPeriod>();
+            var period = calendar.Single(p => p.CalendarYear == 2021 && p.CalendarMonth == 11);
+            period.Active = true;
+            await dbConnection.UpdateAsync(period);
+
+            SetupMockLearnerMatchResponse(_stoppedLearnerMatchApiData);
         }
 
         [Given(@"an apprenticeship incentive exists that has stopped learning before the first payment is due")]
@@ -443,6 +582,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [When(@"the incentive learner data is refreshed")]
         public async Task WhenTheIncentiveLearnerDataIsRefreshed()
         {
+            if (!_dataIsInitialised)
+            {
+                await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+                await dbConnection.InsertAsync(_accountModel);
+                await dbConnection.InsertAsync(_apprenticeshipIncentive);
+                if (_firstPendingPayment != null)
+                {
+                    await dbConnection.InsertWithEnumAsStringAsync(_firstPendingPayment);
+                }
+                if (_secondPendingPayment != null)
+                {
+                    await dbConnection.InsertWithEnumAsStringAsync(_secondPendingPayment);
+                }
+                if (_firstPayment != null)
+                {
+                    await dbConnection.InsertWithEnumAsStringAsync(_firstPayment);
+                }
+                if (_secondPayment != null)
+                {
+                    await dbConnection.InsertWithEnumAsStringAsync(_secondPayment);
+                }
+            }
+
             await StartLearnerMatching();
         }
 
@@ -583,6 +745,82 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             pendingPayments.Single().EarningType.Should().Be(EarningType.FirstPayment);
         }
 
+        [Then(@"the first earning is (.*)")]
+        public async Task ThenTheFirstEarningIsX(string earningState)
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var pendingPayment = dbConnection.GetAll<PendingPayment>().SingleOrDefault(p => p.EarningType == EarningType.FirstPayment);
+
+            switch (earningState)
+            {
+                case "retained":
+                    pendingPayment.Should().BeEquivalentTo(_firstPendingPayment, opt => opt.Excluding(i => i.CalculatedDate));
+                    pendingPayment.CalculatedDate.Should().BeCloseTo(_firstPendingPayment.CalculatedDate, new TimeSpan(0, 1, 0));
+                    if (_firstPayment != null)
+                    {
+                        var payment = dbConnection.GetAll<Payment>().SingleOrDefault(p => p.PendingPaymentId == _firstPendingPayment.Id);
+                        payment.Should().NotBeNull();
+                    }
+                    var clawbackPayment = dbConnection.GetAll<ClawbackPayment>().SingleOrDefault(c => c.PendingPaymentId == _firstPendingPayment.Id);
+                    clawbackPayment.Should().BeNull();
+                    break;
+
+                case "clawedback":
+                    pendingPayment.ClawedBack.Should().BeTrue();
+                    var clawbackPayment2 = dbConnection.GetAll<ClawbackPayment>().SingleOrDefault(c => c.PendingPaymentId == _firstPendingPayment.Id);
+                    clawbackPayment2.Should().NotBeNull();
+                    break;
+
+                case "deleted":
+                    pendingPayment.Should().BeNull();
+                    _firstPayment.Should().BeNull();
+                    dbConnection.GetAll<Payment>().SingleOrDefault(p => p.PendingPaymentId == _firstPendingPayment.Id).Should().BeNull();
+                    break;
+
+                default:
+                    throw new Exception("Invalid first earningState");
+            }
+        }
+
+        [Then(@"the second earning is (.*)")]
+        public async Task ThenTheSecondEarningIsX(string earningState)
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var pendingPayment = dbConnection.GetAll<PendingPayment>().SingleOrDefault(p => p.EarningType == EarningType.SecondPayment);
+
+            switch (earningState)
+            {
+                case "retained":
+                    pendingPayment.Should().BeEquivalentTo(_secondPendingPayment, opt => opt.Excluding(i => i.CalculatedDate));
+                    pendingPayment.CalculatedDate.Should().BeCloseTo(_secondPendingPayment.CalculatedDate, new TimeSpan(0, 1, 0));
+                    if (_secondPayment != null)
+                    {
+                        var payment = dbConnection.GetAll<Payment>().SingleOrDefault(p => p.PendingPaymentId == _secondPendingPayment.Id);
+                        payment.Should().NotBeNull();
+                    }
+                    var clawbackPayment = dbConnection.GetAll<ClawbackPayment>().SingleOrDefault(c => c.PendingPaymentId == _secondPendingPayment.Id);
+                    clawbackPayment.Should().BeNull();
+                    break;
+
+                case "clawedback":
+                    pendingPayment.ClawedBack.Should().BeTrue();
+                    var clawbackPayment2 = dbConnection.GetAll<ClawbackPayment>().SingleOrDefault(c => c.PendingPaymentId == _secondPendingPayment.Id);
+                    clawbackPayment2.Should().NotBeNull();
+                    break;
+
+                case "deleted":
+                    pendingPayment.Should().BeNull();
+                    _secondPayment.Should().BeNull();
+                    dbConnection.GetAll<Payment>().SingleOrDefault(p => p.PendingPaymentId == _secondPendingPayment.Id).Should().BeNull();
+                    break;
+
+                default:
+                    throw new Exception("Invalid second earningState");
+            }
+        }
+
         [Then(@"the previously clawed back payment is recalculated")]
         public void ThenThePreviouslyClawedBackPaymentIsRecalculated()
         {
@@ -592,6 +830,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             pendingPayments.Count().Should().Be(2);
             pendingPayments.Count(x => x.EarningType == EarningType.FirstPayment && x.ClawedBack).Should().Be(1);
             pendingPayments.Count(x => x.EarningType == EarningType.FirstPayment && !x.ClawedBack).Should().Be(1);
+        }
+
+        private async Task ClearActiveCollectionCalendar()
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+
+            var calendar = await dbConnection.GetAllAsync<CollectionCalendarPeriod>();
+
+            var activePeriods = calendar.Where(c => c.Active);
+
+            foreach (var period in activePeriods)
+            {
+                period.Active = false;
+                period.PeriodEndInProgress = false;
+                await dbConnection.UpdateAsync(period);
+            }
         }
 
         private void SetupMockLearnerMatchResponse(LearnerSubmissionDto learnerMatchApiData)
