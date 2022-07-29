@@ -86,12 +86,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
+                PreviousStatus = entity.Status,
                 BreakInLearnings = entity.BreakInLearnings.Map(),                
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase),
                 WithdrawnBy = entity.WithdrawnBy,
                 EmploymentCheckModels = entity.EmploymentChecks.Map(),
-                ValidationOverrideModels = entity.ValidationOverrides.Map()
+                ValidationOverrideModels = entity.ValidationOverrides.Map(),                
             };
         }
 
@@ -505,7 +506,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                CreatedDateTime = DateTime.Now
+                CreatedDateTime = DateTime.UtcNow
             };
         }
 
@@ -520,7 +521,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                CreatedDateTime = DateTime.Now                
+                CreatedDateTime = DateTime.UtcNow                
             };
         }
 
@@ -555,7 +556,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 VendorBlockEndDate = entity.VendorBlockEndDate,
-                CreatedDateTime = DateTime.Now
+                CreatedDateTime = DateTime.UtcNow
             };
         }
 

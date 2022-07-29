@@ -55,7 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.VendorBlockAuditRepository
             storedAudit.Id.Should().Be(testAudit.Id);
             storedAudit.VrfVendorId.Should().Be(testAudit.VrfVendorId);
             storedAudit.VendorBlockEndDate.Should().Be(testAudit.VendorBlockEndDate);
-            storedAudit.CreatedDateTime.Should().BeCloseTo(DateTime.Now, new TimeSpan(0, 1, 0));
+            storedAudit.CreatedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 1, 0));
             storedAudit.ServiceRequestCreatedDate.Should().Be(testAudit.ServiceRequest.Created);
             storedAudit.ServiceRequestDecisionReference.Should().Be(testAudit.ServiceRequest.DecisionReference);
             storedAudit.ServiceRequestTaskId.Should().Be(testAudit.ServiceRequest.TaskId);

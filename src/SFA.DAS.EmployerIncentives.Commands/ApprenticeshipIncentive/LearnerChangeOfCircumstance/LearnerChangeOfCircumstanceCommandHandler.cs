@@ -34,6 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
 
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
             var collectionCalendar = await _collectionCalendarService.Get();
+
             incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), collectionCalendar);
 
             if (learner.HasFoundSubmission)
@@ -43,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
                     incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, collectionCalendar);
                 }
 
-                incentive.SetLearningStoppedChangeOfCircumstance(learner.StoppedStatus, collectionCalendar);
+                incentive.SetLearningStoppedChangeOfCircumstance(learner, collectionCalendar);
             }
 
             incentive.SetHasPossibleChangeOfCircumstances(false);
