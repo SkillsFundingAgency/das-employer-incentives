@@ -11,9 +11,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="5.1.0" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.1.0" />    
     <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
-    <PackageReference Include="SFA.DAS.NServiceBus" Version="17.0.13" />
+    <!--<PackageReference Include="SFA.DAS.NServiceBus" Version="17.0.13" />-->
     <PackageReference Include="SFA.DAS.UnitOfWork.EntityFrameworkCore" Version="9.0.28" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
@@ -40,6 +40,7 @@
   </ItemGroup>-->
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\das-shared-packages\SFA.DAS.NServiceBus\SFA.DAS.NServiceBus\SFA.DAS.NServiceBus.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Commands\SFA.DAS.EmployerIncentives.Commands.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Events\SFA.DAS.EmployerIncentives.Events.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Queries\SFA.DAS.EmployerIncentives.Queries.csproj" />
