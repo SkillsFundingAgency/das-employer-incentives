@@ -11,6 +11,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
             {
                 ActivityCode = payment.ActivityCode,
                 AccountCode = payment.AccountCode,
+                AnalysisCode = payment.AnalysisCode,
                 DueDate = payment.DueDate,
                 CostCentreCode = payment.CostCentreCode,
                 RequestorUniquePaymentIdentifier = payment.RequestorUniquePaymentIdentifier,
@@ -26,5 +27,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         public string AccountCode { get; set; }
 
         public string ActivityCode { get; set; }
+        public string AnalysisCode { get; set; }
     }
 }

@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         public string VendorNo { get; set; }
         public string AccountCode { get; set; }
         public string ActivityCode { get; set; }
+        public string AnalysisCode { get; set; }
         public string CostCentreCode { get; set; }
         public decimal Amount { get; set; }
         public string Currency { get; set; }

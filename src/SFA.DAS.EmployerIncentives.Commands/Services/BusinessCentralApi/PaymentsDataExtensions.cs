@@ -25,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                 VendorNo = payment.VendorId,
                 AccountCode = MapToAccountCode(payment.SubnominalCode),
                 ActivityCode = MapToActivityCode(payment.SubnominalCode),
+                AnalysisCode = MapToAnalysisCode(payment.SubnominalCode),
                 CostCentreCode = "10233",
                 Amount = payment.Amount,
                 Currency = "GBP",
@@ -46,7 +47,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
                     DueDate = payment.DueDate,
                     AccountCode = payment.AccountCode,
                     CostCentreCode = payment.CostCentreCode,
-                    ActivityCode = payment.ActivityCode
+                    ActivityCode = payment.ActivityCode,
+                    AnalysisCode = payment.AnalysisCode
                 }).ToArray();
         }
 
@@ -54,11 +56,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         {
             return subnominalCode switch
             {
-                SubnominalCode.Levy16To18 => "100339",
-                SubnominalCode.Levy19Plus => "100388",
-                SubnominalCode.NonLevy16To18 => "100349",
-                SubnominalCode.NonLevy19Plus => "100397",
+                SubnominalCode.Levy16To18 => "100331",
+                SubnominalCode.Levy19Plus => "100377",
+                SubnominalCode.NonLevy16To18 => "100334",
+                SubnominalCode.NonLevy19Plus => "100381",
                 _ => throw new InvalidIncentiveException($"No mapping found for SubnominalCode {subnominalCode}")
+            };
+        }
+
+        private static string MapToAnalysisCode(SubnominalCode subnominalCode)
+        {
+            return subnominalCode switch
+            {
+                SubnominalCode.Levy16To18 => "10456",
+                SubnominalCode.Levy19Plus => "10483",
+                SubnominalCode.NonLevy16To18 => "10469",
+                SubnominalCode.NonLevy19Plus => "10495"
             };
         }
 

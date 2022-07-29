@@ -62,6 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             //Assert
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.ActivityCode);
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.AccountCode);
+            loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.AnalysisCode);
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.CostCentreCode);
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.RequestorUniquePaymentIdentifier);
             loggerMock.VerifyLogContains(LogLevel.Information, Times.Once(), req1.DueDate);
@@ -113,6 +114,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
                     paymentRequest.AccountCode.Should().NotBeNull();
                     paymentRequest.CostCentreCode.Should().NotBeNull();
                     paymentRequest.ActivityCode.Should().NotBeNull();
+                    paymentRequest.AnalysisCode.Should().NotBeNull();
                     paymentRequest.Amount.Should().Be(0);
                     paymentRequest.Approver.Should().BeNullOrEmpty();
                     paymentRequest.Currency.Should().BeNullOrEmpty();
@@ -175,10 +177,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             paymentRequest.AccountCode.Should().Be(expectedAccountCode);
         }
 
-        [TestCase(SubnominalCode.Levy16To18, "100339")]
-        [TestCase(SubnominalCode.Levy19Plus, "100388")]
-        [TestCase(SubnominalCode.NonLevy16To18, "100349")]
-        [TestCase(SubnominalCode.NonLevy19Plus, "100397")]
+        [TestCase(SubnominalCode.Levy16To18, "100331")]
+        [TestCase(SubnominalCode.Levy19Plus, "100377")]
+        [TestCase(SubnominalCode.NonLevy16To18, "100334")]
+        [TestCase(SubnominalCode.NonLevy19Plus, "100381")]
         public void Then_the_SubnominalCodes_are_mapped_to_ActivityCode(SubnominalCode subnominalCode, string expectedActivityCode)
         {
             var payment = _fixture.Build<Payment>().With(x => x.SubnominalCode, subnominalCode).Create();
@@ -186,6 +188,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             var paymentRequest = payment.Map(false);
 
             paymentRequest.ActivityCode.Should().Be(expectedActivityCode);
+        }
+
+        [TestCase(SubnominalCode.Levy16To18, "10456")]
+        [TestCase(SubnominalCode.Levy19Plus, "10483")]
+        [TestCase(SubnominalCode.NonLevy16To18, "10469")]
+        [TestCase(SubnominalCode.NonLevy19Plus, "10495")]
+        public void Then_the_SubnominalCodes_are_mapped_to_AnalysisCode(SubnominalCode subnominalCode, string expectedAnalysisCode)
+        {
+            var payment = _fixture.Build<Payment>().With(x => x.SubnominalCode, subnominalCode).Create();
+
+            var paymentRequest = payment.Map(false);
+
+            paymentRequest.AnalysisCode.Should().Be(expectedAnalysisCode);
         }
 
         [TestCase(EarningType.FirstPayment, "XXX", 12345, "Hire a new apprentice (first payment). Employer: XXX ULN: 12345")]
