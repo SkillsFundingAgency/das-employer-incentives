@@ -322,8 +322,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             var endpointConfiguration = new EndpointConfiguration(endpointName)
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
-                .UseOutbox(true)
-                .UseServicesBuilder(serviceProvider)
+                .UseOutbox(true)                
                 .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
