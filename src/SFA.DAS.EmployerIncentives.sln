@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9517C39E-1329-48E8-91A6-4F2B7543837D}"
 EndProject
@@ -80,7 +80,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TEST", "TEST", "{1BBE41D6-1
 		Reports\TEST\EI Metrics - Payments - Recovery-Test-1637681951869.json = Reports\TEST\EI Metrics - Payments - Recovery-Test-1637681951869.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.DataTransferObjects", "SFA.DAS.EmployerIncentives.DataTransferObjects\SFA.DAS.EmployerIncentives.DataTransferObjects.csproj", "{4444AA37-45C2-40E6-A332-C5296F210C23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.DataTransferObjects", "SFA.DAS.EmployerIncentives.DataTransferObjects\SFA.DAS.EmployerIncentives.DataTransferObjects.csproj", "{4444AA37-45C2-40E6-A332-C5296F210C23}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.NServiceBus.SqlServer", "..\..\das-shared-packages\SFA.DAS.NServiceBus\SFA.DAS.NServiceBus.SqlServer\SFA.DAS.NServiceBus.SqlServer.csproj", "{3B3944AD-A09C-4E1B-907E-27EDB1D9FCD6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.NServiceBus", "..\..\das-shared-packages\SFA.DAS.NServiceBus\SFA.DAS.NServiceBus\SFA.DAS.NServiceBus.csproj", "{691FE13C-E81F-4F6C-AF7A-677162C1FBE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -210,6 +214,14 @@ Global
 		{4444AA37-45C2-40E6-A332-C5296F210C23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4444AA37-45C2-40E6-A332-C5296F210C23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4444AA37-45C2-40E6-A332-C5296F210C23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B3944AD-A09C-4E1B-907E-27EDB1D9FCD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B3944AD-A09C-4E1B-907E-27EDB1D9FCD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B3944AD-A09C-4E1B-907E-27EDB1D9FCD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B3944AD-A09C-4E1B-907E-27EDB1D9FCD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{691FE13C-E81F-4F6C-AF7A-677162C1FBE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{691FE13C-E81F-4F6C-AF7A-677162C1FBE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{691FE13C-E81F-4F6C-AF7A-677162C1FBE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{691FE13C-E81F-4F6C-AF7A-677162C1FBE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

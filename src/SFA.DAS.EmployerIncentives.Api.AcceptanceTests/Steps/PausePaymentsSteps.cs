@@ -184,7 +184,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the requester is informed the apprenticeship incentives are paused")]        
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsPaused()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Paused");
         }
@@ -192,13 +192,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the requester is informed the request has failed")]
         public void ThenTheRequesterIsInformedTheRequestHasFailed()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Then(@"the requester is informed the apprenticeship incentive is already paused")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsAlreadyPaused()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments already paused");
         }

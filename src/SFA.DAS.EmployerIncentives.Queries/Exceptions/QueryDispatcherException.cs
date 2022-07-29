@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 namespace SFA.DAS.EmployerIncentives.Queries.Exceptions
 {
@@ -21,7 +20,6 @@ namespace SFA.DAS.EmployerIncentives.Queries.Exceptions
         {
         }
 
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         private QueryDispatcherException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

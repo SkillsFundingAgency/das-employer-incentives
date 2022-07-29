@@ -5,8 +5,6 @@ using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 {

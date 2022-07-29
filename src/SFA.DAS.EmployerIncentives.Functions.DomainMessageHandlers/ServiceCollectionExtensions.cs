@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                     .WithDefaultHeaders()                       
                     .WithLogging(s.GetService<ILoggerFactory>());
 
-                if(!string.IsNullOrEmpty(settings.Identifier))
+                if(!string.IsNullOrEmpty(settings.IdentifierUri))
                 {
                     clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
                 }

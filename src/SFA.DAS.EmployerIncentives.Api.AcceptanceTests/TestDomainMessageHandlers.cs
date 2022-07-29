@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Configure<ApplicationSettings>(a =>
                 {
                     a.ApiBaseUrl = _testContext.EmployerIncentiveApi.BaseAddress.AbsoluteUri;
-                    a.Identifier = "";
+                    a.IdentifierUri = "";
                 });
 
                 Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);

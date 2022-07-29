@@ -128,7 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         [TestCase(HttpStatusCode.NotFound)]
         [TestCase(HttpStatusCode.Unauthorized)]
         [TestCase(HttpStatusCode.Forbidden)]
-        public async Task Then_the_payment_is_posted_and_we_get_an_access_error_from_business_central_api(HttpStatusCode statusCode)
+        public Task Then_the_payment_is_posted_and_we_get_an_access_error_from_business_central_api(HttpStatusCode statusCode)
         {
             //Arrange
             _httpClient.SetUpPostAsAsync(statusCode);
@@ -137,7 +137,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             //Act
             Func<Task> act = async () => await _sut.SendPaymentRequests(new List<Payment> { payment });
 
-            act.Should().Throw<BusinessCentralApiException>().WithMessage("Business Central API returned*");
+            return act.Should().ThrowAsync<BusinessCentralApiException>().WithMessage("Business Central API returned*");
         }
 
         [Test]

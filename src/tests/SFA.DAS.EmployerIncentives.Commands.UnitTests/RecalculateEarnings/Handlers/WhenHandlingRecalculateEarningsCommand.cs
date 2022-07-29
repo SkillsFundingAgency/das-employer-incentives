@@ -90,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_if_the_incentive_is_not_found()
+        public Task Then_an_exception_is_thrown_if_the_incentive_is_not_found()
         {
             // Arrange
             var command = new RecalculateEarningsCommand(_fixture.CreateMany<IncentiveLearnerIdentifier>(1));
@@ -106,7 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RecalculateEarnings.Hand
             Func<Task> commandAction = async () => await _sut.Handle(command);
             
             // Assert
-            commandAction.Should().Throw<ArgumentException>();
+            return commandAction.Should().ThrowAsync<ArgumentException>();
         }
     }
 }

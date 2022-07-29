@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_when_the_command_type_is_not_valid()
+        public Task Then_an_exception_is_thrown_when_the_command_type_is_not_valid()
         {
             // arrange
             var invalidCommand = new InvalidCommand();
@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
             Func<Task> result = async () => await _sut.Dispatch(invalidCommand);
 
             // assert
-            result.Should().Throw<ArgumentException>().WithMessage($"Invalid command type {invalidCommand.GetType().FullName}");
+            return result.Should().ThrowAsync<ArgumentException>().WithMessage($"Invalid command type {invalidCommand.GetType().FullName}");
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
         }
 
         [Test]
-        public void Then_an_exception_is_thrown_when_the_call_to_the_api_fails()
+        public Task Then_an_exception_is_thrown_when_the_call_to_the_api_fails()
         {
             // arrange
             var validCommand = _fixture.Create<CreateIncentiveCommand>();
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.DomainMessageHandlers.UnitTests.CommandServ
             Func<Task> result = async () => await _sut.Dispatch(validCommand);
 
             // assert
-            result.Should().Throw<HttpRequestException>().WithMessage("Response status code does not indicate success: 500 (Internal Server Error).");
+            return result.Should().ThrowAsync<HttpRequestException>().WithMessage("Response status code does not indicate success: 500 (Internal Server Error).");
         }
 
         public class InvalidCommand : DomainCommand

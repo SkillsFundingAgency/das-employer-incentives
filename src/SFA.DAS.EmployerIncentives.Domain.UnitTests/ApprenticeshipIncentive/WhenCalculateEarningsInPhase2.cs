@@ -493,7 +493,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public async Task Then_the_first_earning_is_set_to_the_end_of_the_delay_period_when_it_falls_within_the_delay_period()
+        public void Then_the_first_earning_is_set_to_the_end_of_the_delay_period_when_it_falls_within_the_delay_period()
         {
             // Arrange
             var submissionDate = _sutModel.StartDate.AddDays(20);
@@ -509,7 +509,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public async Task Then_the_first_earning_is_set_using_the_payment_profile_when_it_is_not_within_the_delay_period()
+        public void Then_the_first_earning_is_set_using_the_payment_profile_when_it_is_not_within_the_delay_period()
         {
             // Arrange
             var expectedDueDate = _sutModel.StartDate.AddDays(_firstPaymentDaysAfterApprenticeshipStart);
@@ -522,7 +522,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public async Task Then_a_break_in_learning_is_not_added_when_the_first_earning_is_due_within_the_delay_period()
+        public void Then_a_break_in_learning_is_not_added_when_the_first_earning_is_due_within_the_delay_period()
         {
             // Arrange
             var submissionDate = _sutModel.StartDate.AddDays(100);

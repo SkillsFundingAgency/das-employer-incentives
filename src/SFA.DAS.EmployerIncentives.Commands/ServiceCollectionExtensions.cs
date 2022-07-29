@@ -263,7 +263,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                     .WithDefaultHeaders()
                     .WithLogging(s.GetService<ILoggerFactory>());
 
-                if (!string.IsNullOrEmpty(settings.Identifier))
+                if (!string.IsNullOrEmpty(settings.IdentifierUri))
                 {
                     clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
                 }
@@ -324,6 +324,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
                 .UseServicesBuilder(serviceProvider)
+                .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
 
@@ -332,10 +333,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 endpointConfiguration
                     .UseTransport<LearningTransport>()
-                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory",
+                    .StorageDirectory(configuration["ApplicationSettings:UseLearningEndpointStorageDirectory"] ??
                         Path.Combine(
                             Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")),
-                            @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
+                            @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport"));
+
                 endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
@@ -348,7 +350,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
                 endpointConfiguration.License(configuration["ApplicationSettings:NServiceBusLicense"]);
             }
-
+                        
             var endpoint = await Endpoint.Start(endpointConfiguration);
 
             serviceProvider.AddSingleton(p => endpoint)

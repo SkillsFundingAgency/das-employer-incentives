@@ -1,10 +1,7 @@
 ﻿using AutoFixture;
-using CSScriptLib;
 using Dapper;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Api.Types;
-using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.DataTransferObjects.Commands;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
@@ -46,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 Apprenticeships = Fixture.CreateMany<IncentiveApplicationApprenticeship>(4),
                 AccountId = _createApplicationRequest.AccountId,
             };
-            _updateApplicationRequest.Apprenticeships.AddItem(_createApplicationRequest.Apprenticeships.First());
+            _updateApplicationRequest.Apprenticeships.ToList().Add(_createApplicationRequest.Apprenticeships.First());
 
             var url = $"applications/{_updateApplicationRequest.IncentiveApplicationId}";
             _response = await EmployerIncentiveApi.Put(url, _updateApplicationRequest);

@@ -12,7 +12,6 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -71,8 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            options.ExtendedSessionsEnabled = false;
                            options.StorageProvider["maxQueuePollingInterval"] = new TimeSpan(0, 0, 0, 0, 500);
                            options.StorageProvider["partitionCount"] = 1;
-                           options.NotificationUrl = new Uri("localhost:7071");
 #pragma warning disable S125 // Sections of code should not be commented out
+                           //options.NotificationUrl = new Uri("localhost:7071");
                            //options.StorageProvider["controlQueueBatchSize"] = 5;
                            //options.HttpSettings.DefaultAsyncRequestSleepTimeMilliseconds = 500;
                            //options.MaxConcurrentActivityFunctions = 10;
@@ -87,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            s.Configure<MatchedLearnerApi>(l =>
                            {
                                l.ApiBaseUrl = _testContext.LearnerMatchApi.BaseAddress;
-                               l.Identifier = "";
+                               l.IdentifierUri = "";
                                l.Version = "1.0";
                            });
 
@@ -109,7 +108,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.UseLearningEndpointStorageDirectory = _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory;
                                a.MinimumAgreementVersion = _testContext.ApplicationSettings.MinimumAgreementVersion;
                                a.ApiBaseUrl = _testContext.ApplicationSettings.ApiBaseUrl;
-                               a.Identifier = _testContext.ApplicationSettings.Identifier;
+                               a.IdentifierUri = _testContext.ApplicationSettings.IdentifierUri;
                                a.EmployerIncentivesWebBaseUrl = _testContext.ApplicationSettings.EmployerIncentivesWebBaseUrl;
                                a.LogLevel = _testContext.ApplicationSettings.LogLevel;
                                a.EmploymentCheckEnabled = _testContext.ApplicationSettings.EmploymentCheckEnabled;

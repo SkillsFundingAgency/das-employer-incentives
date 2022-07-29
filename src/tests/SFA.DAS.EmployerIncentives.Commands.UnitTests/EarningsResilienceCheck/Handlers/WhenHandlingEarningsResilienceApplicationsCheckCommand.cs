@@ -5,14 +5,13 @@ using SFA.DAS.EmployerIncentives.Abstractions.Events;
 using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
-using SFA.DAS.EmployerIncentives.Commands.EarningsResilienceCheck;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
+using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
+using SFA.DAS.EmployerIncentives.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Events;
-using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications.Models;
-using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.EarningsResilienceCheck.Handlers
 {

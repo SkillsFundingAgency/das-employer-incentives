@@ -26,8 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
         private Fixture _fixture;
-        private List<IncentivePaymentProfile> _paymentProfiles;
-        private List<Domain.ValueObjects.CollectionCalendarPeriod> _collectionPeriods;
+        private List<CollectionCalendarPeriod> _collectionPeriods;
 
         [SetUp]
         public void Arrange()

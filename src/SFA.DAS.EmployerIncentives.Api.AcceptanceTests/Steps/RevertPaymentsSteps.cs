@@ -133,7 +133,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the payment is reverted")]
         public async Task ThenThePaymentIsReverted()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully reverted");
 
@@ -168,7 +168,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the requester is informed no payment is found")]
         public async Task ThenTheRequesterIsInformedNoPaymentIsFound()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            _response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain($"Payment id {_revertPaymentsRequest.Payments[0]} not found");
         }
@@ -176,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the payments are reverted")]
         public async Task ThenThePaymensAresReverted()
         {
-            _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
             var content = await _response.Content.ReadAsStringAsync();
             JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully reverted");
 

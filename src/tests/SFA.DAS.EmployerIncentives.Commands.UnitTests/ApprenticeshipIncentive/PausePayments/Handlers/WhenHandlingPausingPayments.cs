@@ -35,13 +35,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_KeyNotFoundException_is_thrown_when_no_incentive_is_found_for_this_uln_and_accountlegalentityid()
+        public Task Then_the_KeyNotFoundException_is_thrown_when_no_incentive_is_found_for_this_uln_and_accountlegalentityid()
         {
             var command = _fixture.Create<PausePaymentsCommand>();
 
             Func<Task> act = async () => await _sut.Handle(command); 
 
-            act.Should().Throw<KeyNotFoundException>();
+            return act.Should().ThrowAsync<KeyNotFoundException>();
         }
 
         [Test]
@@ -86,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_PausePaymentsException_is_thrown_when_the_incentive_is_already_paused()
+        public Task Then_the_PausePaymentsException_is_thrown_when_the_incentive_is_already_paused()
         {
             // Arrange
             var command = CreatePausedPaymentsCommandWithActionPause();
@@ -104,7 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             Func<Task> act = async () => await _sut.Handle(command);
 
             // Assert
-            act.Should().Throw<PausePaymentsException>().WithMessage("Payments already paused");
+            return act.Should().ThrowAsync<PausePaymentsException>().WithMessage("Payments already paused");
         }
 
         private PausePaymentsCommand CreatePausedPaymentsCommandWithActionPause()

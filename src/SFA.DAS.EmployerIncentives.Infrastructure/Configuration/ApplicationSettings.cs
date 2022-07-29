@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
         public string UseLearningEndpointStorageDirectory { get; set; }        
         public virtual int MinimumAgreementVersion { get; set; }
         public string ApiBaseUrl { get; set; }
-        public string Identifier { get; set; }
+        public string IdentifierUri { get; set; }
         public string EmployerIncentivesWebBaseUrl { get; set; }
         public string LogLevel { get; set; }
         public bool EmploymentCheckEnabled { get; set; }

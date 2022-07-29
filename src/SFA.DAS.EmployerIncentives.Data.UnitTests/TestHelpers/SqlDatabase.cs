@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             catch (Exception ex)
             {
                 Console.WriteLine($"[{nameof(SqlDatabase)}] {nameof(DeleteTestDatabase)} exception thrown: {ex.Message}");
-                throw ex;
+                throw;
             }
         }
 

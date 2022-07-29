@@ -486,7 +486,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public async Task Then_the_first_earning_is_set_using_the_payment_profile()
+        public void Then_the_first_earning_is_set_using_the_payment_profile()
         {
             // Arrange
             _sutModel.SubmittedDate = _sutModel.StartDate.AddDays(20);

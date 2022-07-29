@@ -64,7 +64,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
         }
 
         [Test]
-        public void Then_an_application_with_an_invalid_application_id_is_rejected()
+        public async Task Then_an_application_with_an_invalid_application_id_is_rejected()
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
@@ -78,12 +78,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            action.Should().Throw<InvalidRequestException>();
+            await action.Should().ThrowAsync<InvalidRequestException>();
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
 
         [Test]
-        public void Then_an_application_with_an_invalid_account_id_is_rejected()
+        public async Task Then_an_application_with_an_invalid_account_id_is_rejected()
         {
             //Arrange
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
@@ -96,12 +96,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            action.Should().Throw<InvalidRequestException>();
+            await action.Should().ThrowAsync<InvalidRequestException>();
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
 
         [Test]
-        public void Then_an_application_with_an_already_submitted_uln_is_rejected()
+        public async Task Then_an_application_with_an_already_submitted_uln_is_rejected()
         {
             var incentiveApplication = _fixture.Create<IncentiveApplication>();
             incentiveApplication.SetApprenticeships(_fixture.CreateMany<Apprenticeship>(3));
@@ -117,7 +117,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SubmitIncentiveApplicati
             Func<Task> action = async () => await _sut.Handle(command);
 
             // Assert
-            action.Should().Throw<UlnAlreadySubmittedException>();
+            await action.Should().ThrowAsync<UlnAlreadySubmittedException>();
             _mockDomainRepository.Verify(m => m.Save(incentiveApplication), Times.Never);
         }
 

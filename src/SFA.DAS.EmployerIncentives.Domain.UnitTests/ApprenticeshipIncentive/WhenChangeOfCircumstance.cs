@@ -143,7 +143,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         [TestCase(Phase.Phase3, 6, "2022-01-31", 7)]
         [TestCase(Phase.Phase3, 7, "2021-10-01", 7)]
         [TestCase(Phase.Phase3, 7, "2022-01-31", 7)]
-        public async Task Then_minimum_agreement_version_is_set_when_the_start_date_changes(Phase phase, int agreementVersion, DateTime startDate, int expectedMinimumVersion)
+        public void Then_minimum_agreement_version_is_set_when_the_start_date_changes(Phase phase, int agreementVersion, DateTime startDate, int expectedMinimumVersion)
         {
             // Arrange
             _sutModel.MinimumAgreementVersion = new AgreementVersion(agreementVersion);

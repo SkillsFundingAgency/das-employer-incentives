@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
@@ -13,15 +13,15 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
 {
     public class AzureDistributedLockProvider : IDistributedLockProvider
     {
-        private readonly CloudBlobClient _client;
         private readonly ILogger<AzureDistributedLockProvider> _log;
-        private readonly List<ControlledLock> _locks = new List<ControlledLock>();
-        private readonly AutoResetEvent _mutex = new AutoResetEvent(true);
+        private readonly List<ControlledLock> _locks = new();
+        private readonly AutoResetEvent _mutex = new(true);
         private readonly string _containerName;
-        private CloudBlobContainer _container;
+        private readonly string _connectionString;
+        private readonly BlobContainerClient _container;
         private Timer _renewTimer;
-        private TimeSpan LockTimeout => TimeSpan.FromMinutes(1);
-        private TimeSpan RenewInterval => TimeSpan.FromSeconds(45);
+        private static TimeSpan LockTimeout => TimeSpan.FromMinutes(1);
+        private static TimeSpan RenewInterval => TimeSpan.FromSeconds(45);
 
         public AzureDistributedLockProvider(
             IOptions<ApplicationSettings> options,
@@ -29,22 +29,22 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
             string containerName)
         {
             _log = log;
-            var account = CloudStorageAccount.Parse(options?.Value.DistributedLockStorage);
+            _connectionString = options?.Value.DistributedLockStorage;
             _containerName = containerName ?? "distributed-locks";
-            _client = account.CreateCloudBlobClient();
+            _container = new BlobContainerClient(_connectionString, _containerName);
         }
 
         public async Task<bool> AcquireLock(string Id, CancellationToken cancellationToken)
         {
-            var blob = _container.GetBlockBlobReference(Id);
+            var blob = _container.GetBlobClient(Id);
 
-            if (!await blob.ExistsAsync())
+            if (!await blob.ExistsAsync(cancellationToken))
             {
                 try
                 {
-                    await blob.UploadTextAsync(string.Empty);
+                    await blob.UploadAsync(string.Empty);
                 }
-                catch (StorageException ex)
+                catch (Azure.RequestFailedException ex)
                 {
                     if (!ex.Message.StartsWith("There is currently a lease on the blob", StringComparison.OrdinalIgnoreCase))
                     {
@@ -57,11 +57,12 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
             {
                 try
                 {
-                    var leaseId = await blob.AcquireLeaseAsync(LockTimeout);
-                    _locks.Add(new ControlledLock(Id, leaseId, blob));
+                    var leaseClient = blob.GetBlobLeaseClient();
+                    var leaseResponse = await leaseClient.AcquireAsync(LockTimeout, cancellationToken: cancellationToken);
+                    _locks.Add(new ControlledLock(Id, leaseClient));
                     return true;
                 }
-                catch (StorageException ex)
+                catch (Azure.RequestFailedException ex)
                 {
                     _log.LogDebug($"Failed to acquire lock {Id} - {ex.Message}");
                     return false;
@@ -86,7 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
                     {
                         try
                         {
-                            await entry.Blob.ReleaseLeaseAsync(Microsoft.WindowsAzure.Storage.AccessCondition.GenerateLeaseCondition(entry.LeaseId));
+                            await entry.Client.ReleaseAsync();
                         }
                         catch (Exception ex)
                         {
@@ -104,7 +105,6 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
 
         public async Task Start()
         {
-            _container = _client.GetContainerReference(_containerName);
             await _container.CreateIfNotExistsAsync();
             _renewTimer = new Timer(async o => await RenewLeases(o), null, RenewInterval, RenewInterval);
         }
@@ -146,7 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
         {
             try
             {
-                await entry.Blob.RenewLeaseAsync(Microsoft.WindowsAzure.Storage.AccessCondition.GenerateLeaseCondition(entry.LeaseId));
+                await entry.Client.RenewAsync();
             }
             catch (Exception ex)
             {

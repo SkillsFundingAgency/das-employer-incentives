@@ -77,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
-        public async Task Then_the_PausePaymentsException_is_thrown_when_the_incentive_is_not_paused()
+        public Task Then_the_PausePaymentsException_is_thrown_when_the_incentive_is_not_paused()
         {
             // Arrange
             var command = CreatePausedPaymentsCommandWithActionResume();
@@ -91,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             Func<Task> act = async () => await _sut.Handle(command);
 
             // Assert
-            act.Should().Throw<PausePaymentsException>().WithMessage("Payments are not paused");
+            return act.Should().ThrowAsync<PausePaymentsException>().WithMessage("Payments are not paused");
         }
 
         private PausePaymentsCommand CreatePausedPaymentsCommandWithActionResume()
