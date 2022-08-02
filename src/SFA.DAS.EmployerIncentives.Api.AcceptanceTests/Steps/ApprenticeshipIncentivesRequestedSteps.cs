@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             apprenticeshipIncentive.FirstName.Should().Be(_apprenticeshipIncentive.FirstName);
             apprenticeshipIncentive.LastName.Should().Be(_apprenticeshipIncentive.LastName);
             apprenticeshipIncentive.CourseName.Should().Be(_apprenticeshipIncentive.CourseName);
-            apprenticeshipIncentive.StartDate.Should().Be(_apprenticeshipIncentive.StartDate);
+            apprenticeshipIncentive.StartDate.Should().BeCloseTo(_apprenticeshipIncentive.StartDate, TimeSpan.FromMilliseconds(100));
             apprenticeshipIncentive.ApprenticeshipId.Should().Be(_apprenticeshipIncentive.ApprenticeshipId);
             apprenticeshipIncentive.Id.Should().Be(_apprenticeshipIncentive.Id);
             apprenticeshipIncentive.UKPRN.Should().Be(_apprenticeshipIncentive.UKPRN);

@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             await _context.DomainMessageHandlers.Start();
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 1)]
         public async Task CleanUp()
         {
             try

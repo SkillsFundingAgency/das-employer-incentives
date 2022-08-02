@@ -505,7 +505,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                CreatedDateTime = DateTime.Now
+                CreatedDateTime = DateTime.UtcNow
             };
         }
 
@@ -520,7 +520,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                CreatedDateTime = DateTime.Now                
+                CreatedDateTime = DateTime.UtcNow                
             };
         }
 

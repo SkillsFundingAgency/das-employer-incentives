@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers

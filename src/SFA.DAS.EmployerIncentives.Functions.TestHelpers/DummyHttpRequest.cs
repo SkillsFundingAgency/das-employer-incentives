@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.Extensions.Primitives;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
 {
@@ -34,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
         public override PathString PathBase { get; set; }
         public override PathString Path { get; set; }
         public override QueryString QueryString { get; set; }
-        public override IQueryCollection Query { get; set; } = new QueryCollection();
+        public override IQueryCollection Query { get; set; }
         public override string Protocol { get; set; }
         public override IHeaderDictionary Headers { get; } = new HeaderDictionary();
         public override IRequestCookieCollection Cookies { get; set; }

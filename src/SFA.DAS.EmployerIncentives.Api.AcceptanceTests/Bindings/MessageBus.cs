@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             return _context.MessageBus.Start();
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 2)]
         public async Task CleanUp()
         {
             if (_context.MessageBus != null && _context.MessageBus.IsRunning)
