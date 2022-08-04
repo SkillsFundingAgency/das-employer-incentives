@@ -128,9 +128,6 @@
         },
         "tags": {
             "type": "object"
-        },
-        "workerAccessRestrictions": {
-            "type": "array"
         }
     },
     "variables": {
@@ -496,9 +493,6 @@
                     "subnetResourceId": {
                         "value": "[reference('message-handler-function-subnet').outputs.SubnetResourceId.value]"
                     },
-                    "ipSecurityRestrictions": {
-                        "value": "[parameters('workerAccessRestrictions')]"
-                    },
                     "functionAppAppSettings": {
                         "value": {
                             "array": [
@@ -714,9 +708,6 @@
                     },
                     "runtimeScaleMonitoringEnabled": {
                         "value": true
-                    },
-                    "ipSecurityRestrictions": {
-                        "value": "[parameters('workerAccessRestrictions')]"
                     },
                     "functionAppAppSettings": {
                         "value": {
