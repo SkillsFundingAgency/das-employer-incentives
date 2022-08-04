@@ -1,13 +1,19 @@
 ﻿using Dapper.Contrib.Extensions;
+using Microsoft.AspNetCore.Http;
+using Moq;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
@@ -26,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public MockApi LearnerMatchApi { get; set; }
         
         public MockApi PaymentsApi { get; set; }
-        public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
+        public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }        
 
         public TestContext()
         {
@@ -52,6 +58,33 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public static HttpRequest TestRequest(string path, object body = null)
+        {
+            if(!path.StartsWith("/"))
+            {
+                path = string.Concat("/", path);
+            }
+
+            var json = body == null ? "{}" : JsonSerializer.Serialize(body);
+
+            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+
+            var context = new DefaultHttpContext();
+            var request = context.Request;
+            request.Body = memoryStream;
+            request.ContentType = "application/json";
+            request.Method = "Get";
+            request.Scheme = "http";
+            request.Host = new HostString("dummy");
+
+            request.Query = new QueryCollection();
+            request.Path = path;
+            request.ContentLength = request.Body.Length;
+            request.Form = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
+
+            return request;
         }
 
         public async Task SetActiveCollectionCalendarPeriod(CollectionPeriod collectionPeriod)

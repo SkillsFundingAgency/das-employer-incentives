@@ -78,7 +78,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                            //options.MaxConcurrentOrchestratorFunctions = 5;
 #pragma warning restore S125
                        })
-                       .AddAzureStorageCoreServices()
+                       .AddAzureStorageCoreServices()                       
                        .ConfigureServices(s =>
                        {
                            new Startup().Configure(builder);
@@ -131,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             var timeout = new TimeSpan(0, 0, 10);
             var delayTask = Task.Delay(timeout);
-            await Task.WhenAny(Task.WhenAll(_host.StartAsync(), Jobs.Terminate()), delayTask);
+            await Task.WhenAny(_host.StartAsync(), delayTask);
 
             if (delayTask.IsCompleted)
             {

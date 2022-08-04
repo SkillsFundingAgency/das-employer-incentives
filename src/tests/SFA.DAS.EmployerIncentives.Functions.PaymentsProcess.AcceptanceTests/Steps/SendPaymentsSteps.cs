@@ -160,13 +160,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "IncentivePaymentOrchestrator_HttpStart",
-                    nameof(IncentivePaymentOrchestrator),
+                    nameof(IncentivePaymentOrchestratorHttpStart),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/IncentivePaymentOrchestrator"
-                        }
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/IncentivePaymentOrchestrator")
                     },
                     expectedCustomStatus: "WaitingForPaymentApproval"
                 ));
@@ -181,13 +178,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "PaymentApproval_HttpStart",
-                    nameof(IncentivePaymentOrchestrator),
+                    nameof(IncentivePaymentOrchestratorHttpStart),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/approvePayments/{_orchestratorInstanceId}"
-                        },
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/approvePayments/{_orchestratorInstanceId}"),
                         ["instanceId"] = _orchestratorInstanceId
                     }
                 ));
@@ -199,13 +193,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "PaymentRejection_HttpStart",
-                    nameof(IncentivePaymentOrchestrator),
+                    nameof(IncentivePaymentOrchestratorHttpStart),
                     new Dictionary<string, object>
                     {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/rejectPayments/{_orchestratorInstanceId}"
-                        },
+                        ["req"] = TestContext.TestRequest($"/api/orchestrators/rejectPayments/{_orchestratorInstanceId}"),
                         ["instanceId"] = _orchestratorInstanceId
                     }
                 ));

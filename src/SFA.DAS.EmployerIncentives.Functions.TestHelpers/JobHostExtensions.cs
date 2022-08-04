@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
 
         public static async Task<IJobHost> Start(this IJobHost jobs, OrchestrationStarterInfo starterInfo,
             bool throwIfFailed)
-        {
+        {   
             await jobs.CallAsync(starterInfo.StarterName, starterInfo.StarterArgs);
 
             if (throwIfFailed)
