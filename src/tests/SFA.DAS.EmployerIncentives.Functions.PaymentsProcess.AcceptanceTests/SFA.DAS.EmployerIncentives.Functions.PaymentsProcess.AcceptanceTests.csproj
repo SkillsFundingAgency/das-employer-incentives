@@ -45,42 +45,4 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Features\StartDateChangedAndLearningStoppedCoC.feature.cs">
-      <DependentUpon>StartDateChangedAndLearningStoppedCoC.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\LearningStopped.feature.cs">
-      <DependentUpon>LearningStopped.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\SendPayments.feature.cs">
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Update="Files\LearnerMatchApiResponses.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LearnerMatchApiResponses.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Files\LearnerMatchApiResponses.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>LearnerMatchApiResponses.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\StartDateChangedAndLearningStoppedCoC.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\LearningStopped.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\SendPayments.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>SendPayments.feature.cs</LastGenOutput>
-    </SpecFlowFeatureFiles>
-  </ItemGroup>
 </Project>

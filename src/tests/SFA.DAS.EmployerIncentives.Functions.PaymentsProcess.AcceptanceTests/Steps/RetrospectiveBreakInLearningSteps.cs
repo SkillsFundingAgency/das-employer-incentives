@@ -42,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _testContext = context;
             _fixture = new Fixture();
             _accountModel = _fixture.Build<Account>()                
-                .With(a => a.SignedAgreementVersion, Domain.ValueObjects.Phase2Incentive.MinimumAgreementVersion())
+                .With(a => a.SignedAgreementVersion, Domain.ValueObjects.Phase2Incentive.MinimumAgreementVersion())                
+                .With(a => a.VendorBlockEndDate, (DateTime?)null)
                 .Create();
 
             _apprenticeshipIncentive = _fixture.Build<ApprenticeshipIncentive>()

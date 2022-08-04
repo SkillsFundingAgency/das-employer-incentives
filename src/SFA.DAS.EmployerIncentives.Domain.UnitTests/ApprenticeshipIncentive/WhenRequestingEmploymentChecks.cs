@@ -27,7 +27,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
 
             var startDate = DateTime.Now.AddDays(-42);
-            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>().With(x => x.StartDate, startDate).Without(x => x.EmploymentCheckModels).Create();
+            _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.StartDate, startDate)
+                .With(x => x.Status, IncentiveStatus.Active)
+                .Without(x => x.EmploymentCheckModels)
+                .Create();
 
             _sut = Sut(_sutModel);
         }
