@@ -12,15 +12,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
         private readonly IApprenticeshipIncentiveDomainRepository _domainRepository;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
+        private readonly IDateTimeService _dateTimeService;
 
         public LearnerChangeOfCircumstanceCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository, 
             ILearnerDomainRepository learnerDomainRepository,
-            ICollectionCalendarService collectionCalendarService)
+            ICollectionCalendarService collectionCalendarService,
+            IDateTimeService dateTimeService)
         {
             _domainRepository = domainRepository;
             _learnerDomainRepository = learnerDomainRepository;
             _collectionCalendarService = collectionCalendarService;
+            _dateTimeService = dateTimeService;
         }
 
         public async Task Handle(LearnerChangeOfCircumstanceCommand command, CancellationToken cancellationToken = default)
@@ -41,7 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
             {
 				if (learner.HasStartDate)
                 {
-                    incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, collectionCalendar);
+                    incentive.SetStartDateChangeOfCircumstance(learner.StartDate.Value, collectionCalendar, _dateTimeService);
                 }
 
                 incentive.SetLearningStoppedChangeOfCircumstance(learner, collectionCalendar);

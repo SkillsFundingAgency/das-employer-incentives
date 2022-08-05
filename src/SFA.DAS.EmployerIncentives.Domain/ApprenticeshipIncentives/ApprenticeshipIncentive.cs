@@ -8,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -159,7 +160,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetStartDateChangeOfCircumstance(
             DateTime startDate,
-            CollectionCalendar collectionCalendar)
+            CollectionCalendar collectionCalendar,
+            IDateTimeService dateTimeService)
         {
             var previousStartDate = Model.StartDate;
             SetStartDate(startDate);
@@ -174,7 +176,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model));
 
                 SetMinimumAgreementVersion(startDate);
-                AddEmploymentChecks();
+                RefreshEmploymentChecks(dateTimeService);
             }
         }
 
@@ -631,24 +633,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     }
                     break;
             }
-        }
+        }      
 
-        private void RequestEmploymentChecks(bool? isInLearning)
-        {
-            if (EmploymentChecks.Any())
-            {
-                return;
-            }
-
-            if (!isInLearning.HasValue || !isInLearning.Value)
-            {
-                return;
-            }
-
-            AddEmploymentChecks();
-        }
-
-        public void AddEmploymentChecks(ServiceRequest serviceRequest = null)
+        public void RefreshEmploymentChecks(IDateTimeService dateTimeService, ServiceRequest serviceRequest = null)
         {
             Model.EmploymentCheckModels.ToList()
                 .ForEach(ec =>
@@ -659,12 +646,60 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     }
                 });
 
+            AddEmploymentChecks(dateTimeService, serviceRequest);
+        }
+
+        public void AddEmploymentChecks(IDateTimeService dateTimeService, ServiceRequest serviceRequest = null)
+        {
+            var paymentDueDate = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack)?.DueDate;
+
+            if (paymentDueDate != null && 
+                paymentDueDate.Value.AddDays(21).Date <= dateTimeService.UtcNow().Date && 
+                HasSuccessfulChecks(new List<EmploymentCheckType> { EmploymentCheckType.EmployedAtStartOfApprenticeship, EmploymentCheckType.EmployedBeforeSchemeStarted }))
+            {
+                var existingCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAfter365Days);
+
+                if(existingCheck == null) // check never performed
+                {
+                    AddEmployedAt365Check();
+                }
+                else if(existingCheck.Result.HasValue && !existingCheck.Result.Value) // first check failed
+                {
+                    if (Model.EmploymentCheckModels.Remove(existingCheck))
+                    {
+                        AddEvent(new EmploymentCheckDeleted(existingCheck));
+                    }
+
+                    AddEmployedAt365Check(42);
+                }
+                else if(existingCheck.Result.HasValue && existingCheck.Result.Value) // first check succeeded
+                {
+                    return;
+                }
+                else // refresh the first check
+                {
+                    if (Model.EmploymentCheckModels.Remove(existingCheck))
+                    {
+                        AddEvent(new EmploymentCheckDeleted(existingCheck));
+                    }
+
+                    AddEmployedAt365Check();
+                }
+
+                return;
+            }
+
             if (Status == IncentiveStatus.Withdrawn)
             {
                 return;
             }
 
-            if (StartDate.AddDays(42) > DateTime.Now)
+            if (StartDate.AddDays(42) > DateTime.Now) // has not started 6 weeks ago
+            {   
+                return;
+            }
+
+            if (EmploymentChecks.Any()) // already requested
             {
                 return;
             }
@@ -674,6 +709,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             AddEvent(new EmploymentChecksCreated(Id, serviceRequest));
         }
+        
 
         private void AddEmployedAtStartOfApprenticeshipCheck()
         {
@@ -688,11 +724,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.EmploymentCheckModels.Add(firstCheck.GetModel());
         }
 
-        public void RefreshLearner(Learner learner)
+        private void AddEmployedAt365Check(double checkWindowInDays = 21)
+        {
+            var secondPayment = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack);
+            if (secondPayment != null)
+            {
+                var initial365Check = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAfter365Days, secondPayment.DueDate, secondPayment.DueDate.AddDays(checkWindowInDays));
+                Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+            }
+        }        
+
+        public void RefreshLearner(Learner learner, IDateTimeService dateTimeService)
         {
             SetHasPossibleChangeOfCircumstances(learner.HasPossibleChangeOfCircumstances);
             LearnerRefreshCompleted();
-            RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
+            
+            if (learner.SubmissionData.LearningData.LearningFound)
+            {
+                AddEmploymentChecks(dateTimeService);
+            }
         }
 
         public void AddValidationOverride(ValidationOverrideStep validationOverrideStep, ServiceRequest serviceRequest)
@@ -775,6 +825,55 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return null;
             }
             return new ValidationOverrideStep(validationOverride.Step, validationOverride.ExpiryDate);
+        }
+
+        private bool HasSuccessfulChecks(IList<EmploymentCheckType> checkTypes)
+        {
+            var checks = new List<bool>();
+
+            foreach (var checkType in checkTypes)
+            {
+                switch (checkType)
+                {
+                    case EmploymentCheckType.EmployedAtStartOfApprenticeship:
+
+                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && c.Result.Value))
+                        {
+                            checks.Add(true);
+                        }
+                        else
+                        {
+                            checks.Add(false);
+                        }
+                        break;
+
+                    case EmploymentCheckType.EmployedBeforeSchemeStarted:
+
+                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && !c.Result.Value))
+                        {
+                            checks.Add(true);
+                        }
+                        else
+                        {
+                            checks.Add(false);
+                        }
+                        break;
+
+                    case EmploymentCheckType.EmployedAfter365Days:
+
+                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && c.Result.Value))
+                        {
+                            checks.Add(true);
+                        }
+                        else
+                        {
+                            checks.Add(false);
+                        }
+                        break;
+                }
+            }
+
+            return checks.All(c => c);
         }
     }
 }

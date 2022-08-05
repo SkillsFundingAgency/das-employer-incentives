@@ -29,6 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Account _accountModel;
         private DateTime _plannedStartDate;
         private readonly PendingPayment _pendingPayment;
+        private PendingPayment _secondPendingPayment;
         private LearnerSubmissionDto _learnerMatchApiData;
 
         public EmploymentCheckSteps(TestContext testContext)
@@ -58,8 +59,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .With(p => p.EarningType, EarningType.FirstPayment)
                 .Without(p => p.PaymentMadeDate)
                 .Create();
-
-            _learnerMatchApiData = CreateLearnerMatchApiData();
         }
 
         private LearnerSubmissionDto CreateLearnerMatchApiData()
@@ -93,6 +92,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"an apprenticeship incentive has been submitted in phase 1")]
         public async Task GivenAPhase1ApprenticeshipIncentiveExists()
         {
+            _plannedStartDate = new DateTime(2020, 8, 1);
+            _pendingPayment.DueDate = _plannedStartDate.AddDays(1);
+            _apprenticeshipIncentive.StartDate = _plannedStartDate;
+            _apprenticeshipIncentive.Phase = Phase.Phase1;
             await CreateIncentive();
         }
 
@@ -100,9 +103,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task GivenAPhase2ApprenticeshipIncentiveExists()
         {
             _plannedStartDate = new DateTime(2021, 08, 01);
+            _pendingPayment.DueDate = _plannedStartDate.AddDays(1);
             _apprenticeshipIncentive.StartDate = _plannedStartDate;
             _apprenticeshipIncentive.Phase = Phase.Phase2;
-            _learnerMatchApiData = CreateLearnerMatchApiData();
+            await CreateIncentive();
+        }
+
+        [Given(@"an apprenticeship incentive has been submitted in phase 3")]
+        public async Task GivenAPhase3ApprenticeshipIncentiveExists()
+        {
+            _plannedStartDate = new DateTime(2021, 11, 01);
+            _pendingPayment.DueDate = _plannedStartDate.AddDays(1);
+            _apprenticeshipIncentive.StartDate = _plannedStartDate;
+            _apprenticeshipIncentive.Phase = Phase.Phase3;
             await CreateIncentive();
         }
         private async Task CreateIncentive()
@@ -118,11 +131,31 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Given(@"we have not previously requested an employment check for the learner")]
         public void GivenWeHaveNotPreviouslyRequestedAnEmploymentCheckForTheLearner()
         {
+            // empty
         }
 
         [Given(@"6 weeks has elapsed since the start date of the apprenticeship")]
         public void GivenSixWeeksHasElapsedSinceTheStartDateOfTheApprenticeship()
         {
+            // empty
+        }
+
+        [Given(@"6 weeks has elapsed since 365 days after the due date of the second payment")]
+        public async Task GivenSixWeeksHasElapsedSince365DaysAfterTheDueDateOfTheSecondPayment()
+        {
+            _testContext.DateTimeService.SetUtcNow(_plannedStartDate.AddDays(365).AddDays(21));
+
+            _secondPendingPayment = _fixture.Build<PendingPayment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.DueDate, _plannedStartDate.AddDays(365))
+                .With(p => p.ClawedBack, false)
+                .With(p => p.EarningType, EarningType.SecondPayment)
+                .Without(p => p.PaymentMadeDate)
+                .Create();
+
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertWithEnumAsStringAsync(_secondPendingPayment);
         }
 
         [Given(@"we have previously requested an employment check for the learner")]
@@ -139,37 +172,102 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
+        [Given(@"start of apprenticeship employment checks have passed")]
+        public async Task GivenStartOfApprenticeshipEmploymentChecksHavePassed()
+        {
+            var employmentChecks = new List<EmploymentCheck>()
+            {
+                _fixture.Build<EmploymentCheck>()
+                    .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                    .With(x => x.Result, true)
+                    .Create(),
+
+                _fixture.Build<EmploymentCheck>()
+                    .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                    .With(x => x.Result, false)
+                    .Create(),
+            };
+
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            foreach (var employmentCheck in employmentChecks)
+            {
+                await dbConnection.InsertWithEnumAsStringAsync(employmentCheck);
+            }
+        }
+
         [Given(@"the learner data is updated with new valid start date for phase 1")]
-        public async Task GivenTheLearnerIsUpdatedWithANewPhase1StartDate()
+        public void GivenTheLearnerIsUpdatedWithANewPhase1StartDate()
         {
             _plannedStartDate = new DateTime(2020, 9, 1);
-            _learnerMatchApiData = CreateLearnerMatchApiData();
         }
 
         [Given(@"the learner data is updated with new valid start date for phase 2")]
-        public async Task GivenTheLearnerIsUpdatedWithANewPhase2StartDate()
+        public void GivenTheLearnerIsUpdatedWithANewPhase2StartDate()
         {
-            _plannedStartDate = new DateTime(2021, 9, 1);
-            _learnerMatchApiData = CreateLearnerMatchApiData();
+            _plannedStartDate = new DateTime(2021, 9, 1);            
+        }
+
+        [Given(@"the learner data is updated with new valid start date for phase 3")]
+        public void GivenTheLearnerIsUpdatedWithANewPhase3StartDate()
+        {
+            _plannedStartDate = new DateTime(2021, 12, 01);            
         }
 
         [When(@"an ILR submission is received for that learner")]
-        public async Task WhenTheIlrSubmissionIsReceived()
+        public Task WhenTheIlrSubmissionIsReceived()
         {
+            _learnerMatchApiData = CreateLearnerMatchApiData();
+
             SetupMockLearnerMatchResponse(_learnerMatchApiData);
-            await StartLearnerMatching();
+            return StartLearnerMatching();
         }
 
         [Then(@"a new employment check is requested to ensure the apprentice was not employed in the 6 months prior to phase 1 starting")]
-        public async Task ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreatedForPhase1()
+        public void ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreatedForPhase1()
         {
             VerifyEmployedPriorToPhaseCheck(new DateTime(2020, 08, 01).AddMonths(-6), new DateTime(2020, 07, 31));
         }
 
         [Then(@"a new employment check is requested to ensure the apprentice was not employed in the 6 months prior to phase 2 starting")]
-        public async Task ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreatedForPhase2()
+        public void ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreatedForPhase2()
         {
             VerifyEmployedPriorToPhaseCheck(new DateTime(2021, 4, 1).AddMonths(-6), new DateTime(2021, 3, 31));
+        }
+
+        [Then(@"a new employment check is requested to ensure the apprentice was not employed in the 6 months prior to phase 3 starting")]
+        public void ThenNotEmployedPriorToPhaseStartEmploymentCheckIsCreatedForPhase3()
+        {
+            VerifyEmployedPriorToPhaseCheck(new DateTime(2021, 10, 1).AddMonths(-6), new DateTime(2021, 09, 30));
+        }
+
+        [Then(@"a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 1")]
+        [Then(@"a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 2")]
+        [Then(@"a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 3")]
+        public void Then365EmploymentCheckOnSecondPaymentForPhase1()
+        {
+            VerifyEmployedAtSecondPayment(_secondPendingPayment.DueDate.Date, _secondPendingPayment.DueDate.AddDays(21).Date);
+        }
+
+        [Then(@"a 365 employment check is not requested")]
+        public void Then365EmploymentCheckIsNotRequested()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
+                .SingleOrDefault(x => x.CheckType == EmploymentCheckType.EmployedAfter365Days);
+
+            employmentCheck.Should().BeNull();
+        }
+
+        private void VerifyEmployedAtSecondPayment(DateTime minDate, DateTime maxDate)
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
+                .Single(x => x.CheckType == EmploymentCheckType.EmployedAfter365Days);
+            employmentCheck.MinimumDate.Should().Be(minDate);
+            employmentCheck.MaximumDate.Should().Be(maxDate);
+            employmentCheck.Result.Should().BeNull();
         }
 
         private void VerifyEmployedPriorToPhaseCheck(DateTime minDate, DateTime maxDate)

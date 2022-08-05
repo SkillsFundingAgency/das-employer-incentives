@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -118,6 +119,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();
                            s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
+                           s.AddSingleton(typeof(IDateTimeService), _testContext.DateTimeService);
                            s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));                        
                        })
                        )

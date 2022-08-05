@@ -13,6 +13,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Enums;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared.AutoFixtureCustomizations;
@@ -25,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockDomainRepository;
         private Mock<IEmploymentCheckService> _mockEmploymentCheckService;
         private Mock<IOptions<ApplicationSettings>> _mockApplicationSettings;
+        private Mock<IDateTimeService> _mockDateTimeService;
         private Fixture _fixture;
 
         [SetUp]
@@ -33,6 +35,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _fixture = new Fixture();
             _fixture.Customize(new ApprenticeshipIncentiveCustomization());
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
+
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             _mockDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockEmploymentCheckService = new Mock<IEmploymentCheckService>();
@@ -50,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             apprenticeshipIncentive.SetStartDate(new DateTime(2021, 9, 1));
             var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
             learner.SubmissionData.SetLearningData(new LearningData(true));
-            apprenticeshipIncentive.RefreshLearner(learner);
+            apprenticeshipIncentive.RefreshLearner(learner, _mockDateTimeService.Object);
 
             _mockDomainRepository.Setup(x => x.Find(command.ApprenticeshipIncentiveId)).ReturnsAsync(apprenticeshipIncentive);
             var firstCheckCorrelationId = Guid.NewGuid();

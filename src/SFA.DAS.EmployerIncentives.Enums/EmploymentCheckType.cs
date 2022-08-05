@@ -3,6 +3,7 @@
     public enum EmploymentCheckType
     {
         EmployedBeforeSchemeStarted,
-        EmployedAtStartOfApprenticeship
+        EmployedAtStartOfApprenticeship,
+        EmployedAfter365Days
     }
 }
