@@ -61,20 +61,69 @@ Scenario: Employment checks requested on Start date change of circumstance (phas
 Scenario: 365 Employment check requested for Phase 1
 	Given an apprenticeship incentive has been submitted in phase 1
 	And start of apprenticeship employment checks have passed
-	And 6 weeks has elapsed since 365 days after the due date of the second payment
+	And 3 weeks has elapsed since 365 days after the due date of the second payment
 	When an ILR submission is received for that learner
 	Then a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 1
 
 Scenario: 365 Employment check requested for Phase 2
 	Given an apprenticeship incentive has been submitted in phase 2
 	And start of apprenticeship employment checks have passed
-	And 6 weeks has elapsed since 365 days after the due date of the second payment
+	And 3 weeks has elapsed since 365 days after the due date of the second payment
 	When an ILR submission is received for that learner
 	Then a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 2
 
 Scenario: 365 Employment check requested for Phase 3
 	Given an apprenticeship incentive has been submitted in phase 3
 	And start of apprenticeship employment checks have passed
-	And 6 weeks has elapsed since 365 days after the due date of the second payment
+	And 3 weeks has elapsed since 365 days after the due date of the second payment
 	When an ILR submission is received for that learner
 	Then a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 3
+
+Scenario: 365 Employment check not re-requested for Phase 1 after initial failure
+	Given an apprenticeship incentive has been submitted in phase 1	
+	And start of apprenticeship employment checks have passed
+	And 3 weeks has elapsed since 365 days after the due date of the second payment
+	And the initial 365 check has failed
+	When an ILR submission is received for that learner
+	Then a re-request 365 employment check is not requested for the phase 1
+
+Scenario: 365 Employment check not re-requested for Phase 2 after initial failure
+	Given an apprenticeship incentive has been submitted in phase 2
+	And start of apprenticeship employment checks have passed	
+	And 3 weeks has elapsed since 365 days after the due date of the second payment
+	And the initial 365 check has failed
+	When an ILR submission is received for that learner
+	Then a re-request 365 employment check is not requested for the phase 2
+
+Scenario: 365 Employment check not re-requested for Phase 3 after initial failure
+	Given an apprenticeship incentive has been submitted in phase 3
+	And start of apprenticeship employment checks have passed	
+	And 3 weeks has elapsed since 365 days after the due date of the second payment
+	And the initial 365 check has failed
+	When an ILR submission is received for that learner
+	Then a re-request 365 employment check is not requested for the phase 3
+
+Scenario: 365 Employment check re-requested for Phase 1 after initial failure
+	Given an apprenticeship incentive has been submitted in phase 1
+	And start of apprenticeship employment checks have passed
+	And 6 weeks has elapsed since 365 days after the due date of the second payment
+	And the initial 365 check has failed
+	When an ILR submission is received for that learner
+	Then a re-request 365 employment check is requested for the phase 1
+
+Scenario: 365 Employment check re-requested for Phase 2 after initial failure
+	Given an apprenticeship incentive has been submitted in phase 2
+	And start of apprenticeship employment checks have passed
+	And 6 weeks has elapsed since 365 days after the due date of the second payment
+	And the initial 365 check has failed
+	When an ILR submission is received for that learner
+	Then a re-request 365 employment check is requested for the phase 2
+
+Scenario: 365 Employment check re-requested for Phase 3 after initial failure
+	Given an apprenticeship incentive has been submitted in phase 3
+	And start of apprenticeship employment checks have passed
+	And 6 weeks has elapsed since 365 days after the due date of the second payment
+	And the initial 365 check has failed
+	When an ILR submission is received for that learner
+	Then a re-request 365 employment check is requested for the phase 3
+

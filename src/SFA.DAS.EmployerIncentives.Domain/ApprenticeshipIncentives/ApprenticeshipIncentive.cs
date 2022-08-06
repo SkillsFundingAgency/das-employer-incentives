@@ -663,27 +663,27 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 {
                     AddEmployedAt365Check();
                 }
-                else if(existingCheck.Result.HasValue && !existingCheck.Result.Value) // first check failed
-                {
-                    if (Model.EmploymentCheckModels.Remove(existingCheck))
-                    {
-                        AddEvent(new EmploymentCheckDeleted(existingCheck));
-                    }
-
-                    AddEmployedAt365Check(42);
-                }
-                else if(existingCheck.Result.HasValue && existingCheck.Result.Value) // first check succeeded
+                else if (existingCheck.Result.HasValue && existingCheck.Result.Value) // first check succeeded
                 {
                     return;
                 }
-                else // refresh the first check
+                else if(existingCheck.Result.HasValue && !existingCheck.Result.Value) // first check failed
                 {
-                    if (Model.EmploymentCheckModels.Remove(existingCheck))
+                    if (paymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
                     {
-                        AddEvent(new EmploymentCheckDeleted(existingCheck));
+                        AddEmployedAt365Check(42);
                     }
-
-                    AddEmployedAt365Check();
+                }                
+                else // refresh the check
+                {
+                    if (paymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
+                    {
+                        AddEmployedAt365Check(42);
+                    }
+                    else
+                    {
+                        AddEmployedAt365Check();
+                    }
                 }
 
                 return;
@@ -730,7 +730,24 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (secondPayment != null)
             {
                 var initial365Check = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAfter365Days, secondPayment.DueDate, secondPayment.DueDate.AddDays(checkWindowInDays));
-                Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+
+                var existingCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAfter365Days);
+
+                if (existingCheck == null)
+                {
+                    Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+                }
+                else if (existingCheck.MinimumDate != initial365Check.MinimumDate ||
+                       existingCheck.MaximumDate != initial365Check.MaximumDate ||
+                       existingCheck.Result != initial365Check.Result)
+                {
+                    if (Model.EmploymentCheckModels.Remove(existingCheck))
+                    {
+                        AddEvent(new EmploymentCheckDeleted(existingCheck));
+                    }
+
+                    Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+                }
             }
         }        
 

@@ -140,10 +140,28 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             // empty
         }
 
+        [Given(@"3 weeks has elapsed since 365 days after the due date of the second payment")]
+        public async Task GivenTHreeWeeksHasElapsedSince365DaysAfterTheDueDateOfTheSecondPayment()
+        {
+            _testContext.DateTimeService.SetUtcNow(_plannedStartDate.AddDays(365).AddDays(21));
+
+            _secondPendingPayment = _fixture.Build<PendingPayment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.DueDate, _plannedStartDate.AddDays(365))
+                .With(p => p.ClawedBack, false)
+                .With(p => p.EarningType, EarningType.SecondPayment)
+                .Without(p => p.PaymentMadeDate)
+                .Create();
+
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertWithEnumAsStringAsync(_secondPendingPayment);
+        }
+
         [Given(@"6 weeks has elapsed since 365 days after the due date of the second payment")]
         public async Task GivenSixWeeksHasElapsedSince365DaysAfterTheDueDateOfTheSecondPayment()
         {
-            _testContext.DateTimeService.SetUtcNow(_plannedStartDate.AddDays(365).AddDays(21));
+            _testContext.DateTimeService.SetUtcNow(_plannedStartDate.AddDays(365).AddDays(42));
 
             _secondPendingPayment = _fixture.Build<PendingPayment>()
                 .With(p => p.AccountId, _accountModel.Id)
@@ -186,6 +204,27 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 _fixture.Build<EmploymentCheck>()
                     .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                     .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                    .With(x => x.Result, false)
+                    .Create(),
+            };
+
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            foreach (var employmentCheck in employmentChecks)
+            {
+                await dbConnection.InsertWithEnumAsStringAsync(employmentCheck);
+            }
+        }
+
+        [Given(@"the initial 365 check has failed")]
+        public async Task GiventheInitial365CheckHasFailed()
+        {
+            var employmentChecks = new List<EmploymentCheck>()
+            {
+                _fixture.Build<EmploymentCheck>()
+                    .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAfter365Days)
+                    .With(x => x.MinimumDate, _secondPendingPayment.DueDate)
+                    .With(x => x.MaximumDate, _testContext.DateTimeService.UtcNow().Date)
                     .With(x => x.Result, false)
                     .Create(),
             };
@@ -245,9 +284,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 1")]
         [Then(@"a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 2")]
         [Then(@"a new 365 employment check is requested to ensure the apprentice was employed when the second payment was due for the phase 3")]
-        public void Then365EmploymentCheckOnSecondPaymentForPhase1()
+        public void Then365EmploymentCheckOnSecondPaymentForPhase()
         {
             VerifyEmployedAtSecondPayment(_secondPendingPayment.DueDate.Date, _secondPendingPayment.DueDate.AddDays(21).Date);
+        }
+
+        [Then(@"a re-request 365 employment check is not requested for the phase 1")]
+        [Then(@"a re-request 365 employment check is not requested for the phase 2")]
+        [Then(@"a re-request 365 employment check is not requested for the phase 3")]
+        public void ThenAReRequest365EmploymentCheckOnSecondPaymentIsNotRequestedForPhase()
+        {
+            VerifyEmployedAtSecondPayment(_secondPendingPayment.DueDate.Date, _secondPendingPayment.DueDate.AddDays(21).Date, false);
+        }
+
+        [Then(@"a re-request 365 employment check is requested for the phase 1")]
+        [Then(@"a re-request 365 employment check is requested for the phase 2")]
+        [Then(@"a re-request 365 employment check is requested for the phase 3")]
+        public void ThenAReRequest365EmploymentCheckOnSecondPaymentIsRequestedForPhase()
+        {
+            VerifyEmployedAtSecondPayment(_secondPendingPayment.DueDate.Date, _secondPendingPayment.DueDate.AddDays(42).Date);
         }
 
         [Then(@"a 365 employment check is not requested")]
@@ -260,14 +315,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             employmentCheck.Should().BeNull();
         }
 
-        private void VerifyEmployedAtSecondPayment(DateTime minDate, DateTime maxDate)
+        private void VerifyEmployedAtSecondPayment(DateTime minDate, DateTime maxDate, bool? expectedResult = null)
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
                 .Single(x => x.CheckType == EmploymentCheckType.EmployedAfter365Days);
             employmentCheck.MinimumDate.Should().Be(minDate);
-            employmentCheck.MaximumDate.Should().Be(maxDate);
-            employmentCheck.Result.Should().BeNull();
+            employmentCheck.MaximumDate.Should().Be(maxDate);            
+
+            if(expectedResult.HasValue)
+            {
+                employmentCheck.Result.Should().Be(expectedResult.Value);
+            }
+            else
+            {
+                employmentCheck.Result.Should().BeNull();
+            }
         }
 
         private void VerifyEmployedPriorToPhaseCheck(DateTime minDate, DateTime maxDate)
