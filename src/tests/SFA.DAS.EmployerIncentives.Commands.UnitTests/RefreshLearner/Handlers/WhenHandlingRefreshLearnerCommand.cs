@@ -716,6 +716,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Stopped)
                .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -800,6 +801,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
                .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -868,6 +870,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
                .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -945,6 +948,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
                .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository

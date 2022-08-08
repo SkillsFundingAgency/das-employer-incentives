@@ -651,17 +651,22 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void AddEmploymentChecks(IDateTimeService dateTimeService, ServiceRequest serviceRequest = null)
         {
-            var paymentDueDate = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack)?.DueDate;
+            if (Status == IncentiveStatus.Withdrawn)
+            {
+                return;
+            }
 
-            if (paymentDueDate != null && 
-                paymentDueDate.Value.AddDays(21).Date <= dateTimeService.UtcNow().Date && 
+            var secondPaymentDueDate = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack)?.DueDate;
+
+            if (secondPaymentDueDate != null &&
+                secondPaymentDueDate.Value.AddDays(21).Date <= dateTimeService.UtcNow().Date && 
                 HasSuccessfulChecks(new List<EmploymentCheckType> { EmploymentCheckType.EmployedAtStartOfApprenticeship, EmploymentCheckType.EmployedBeforeSchemeStarted }))
             {
                 var existingCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAfter365Days);
 
                 if(existingCheck == null) // check never performed
                 {
-                    AddEmployedAt365Check();
+                    AddEmployedAt365Check(serviceRequest: serviceRequest);
                 }
                 else if (existingCheck.Result.HasValue && existingCheck.Result.Value) // first check succeeded
                 {
@@ -669,32 +674,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
                 else if(existingCheck.Result.HasValue && !existingCheck.Result.Value) // first check failed
                 {
-                    if (paymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
+                    if (secondPaymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
                     {
-                        AddEmployedAt365Check(42);
-                    }
-                }                
-                else // refresh the check
-                {
-                    if (paymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
-                    {
-                        AddEmployedAt365Check(42);
-                    }
-                    else
-                    {
-                        AddEmployedAt365Check();
+                        AddEmployedAt365Check(42, serviceRequest);
                     }
                 }
 
                 return;
             }
 
-            if (Status == IncentiveStatus.Withdrawn)
-            {
-                return;
-            }
-
-            if (StartDate.AddDays(42) > DateTime.Now) // has not started 6 weeks ago
+            if (StartDate.AddDays(42) > dateTimeService.UtcNow()) // has not started 6 weeks ago
             {   
                 return;
             }
@@ -724,7 +713,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.EmploymentCheckModels.Add(firstCheck.GetModel());
         }
 
-        private void AddEmployedAt365Check(double checkWindowInDays = 21)
+        private void AddEmployedAt365Check(double checkWindowInDays = 21, ServiceRequest serviceRequest = null)
         {
             var secondPayment = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack);
             if (secondPayment != null)
@@ -736,6 +725,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 if (existingCheck == null)
                 {
                     Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+
+                    AddEvent(new EmploymentChecksCreated(Id, serviceRequest));
                 }
                 else if (existingCheck.MinimumDate != initial365Check.MinimumDate ||
                        existingCheck.MaximumDate != initial365Check.MaximumDate ||
@@ -747,6 +738,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     }
 
                     Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+
+                    AddEvent(new EmploymentChecksCreated(Id, serviceRequest));
                 }
             }
         }        
