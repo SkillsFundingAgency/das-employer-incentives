@@ -368,7 +368,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             ValidateEmployedAtStartOfApprenticeship(collectionPeriod, pendingPayment);
 
             ValidateNotEmployedBeforeSchemeStartDate(collectionPeriod, pendingPayment);
-        }
+
+            ValidateEmployedAt365Days(collectionPeriod, pendingPayment);
+        } 
 
         public void ValidatePaymentsNotBlockedForAccountLegalEntity(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {
@@ -390,7 +392,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.BlockedForPayments, isValid));
         }
-
+        
         private void ValidateNotEmployedBeforeSchemeStartDate(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
         {
             var employedBeforeSchemeStartedCheck = EmploymentChecks.FirstOrDefault(x =>
@@ -423,6 +425,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     ValidationStep.EmployedAtStartOfApprenticeship,
                     employedAtStartOfApprenticeshipResult,
                     GetOverrideStep(ValidationStep.EmployedAtStartOfApprenticeship)));
+        }
+
+        private void ValidateEmployedAt365Days(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
+        {
+            if (pendingPayment.EarningType  == EarningType.FirstPayment)
+            {
+                return;
+            }
         }
 
         private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
