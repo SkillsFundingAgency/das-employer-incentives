@@ -4,6 +4,7 @@
     {
         EmployedBeforeSchemeStarted,
         EmployedAtStartOfApprenticeship,
-        EmployedAfter365Days
+        EmployedAt365PaymentDueDateFirstCheck,
+        EmployedAt365PaymentDueDateSecondCheck
     }
 }

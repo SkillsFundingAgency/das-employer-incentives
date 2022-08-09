@@ -222,7 +222,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 _fixture.Build<EmploymentCheck>()
                     .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                    .With(x => x.CheckType, EmploymentCheckType.EmployedAfter365Days)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
                     .With(x => x.MinimumDate, _secondPendingPayment.DueDate)
                     .With(x => x.MaximumDate, _testContext.DateTimeService.UtcNow().Date)
                     .With(x => x.Result, false)
@@ -302,7 +302,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"a re-request 365 employment check is requested for the phase 3")]
         public void ThenAReRequest365EmploymentCheckOnSecondPaymentIsRequestedForPhase()
         {
-            VerifyEmployedAtSecondPayment(_secondPendingPayment.DueDate.Date, _secondPendingPayment.DueDate.AddDays(42).Date);
+            VerifyEmployedAtSecondPaymentRecheck(_secondPendingPayment.DueDate.Date, _secondPendingPayment.DueDate.AddDays(42).Date);
         }
 
         [Then(@"a 365 employment check is not requested")]
@@ -310,7 +310,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
-                .SingleOrDefault(x => x.CheckType == EmploymentCheckType.EmployedAfter365Days);
+                .SingleOrDefault(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
 
             employmentCheck.Should().BeNull();
         }
@@ -319,11 +319,29 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
-                .Single(x => x.CheckType == EmploymentCheckType.EmployedAfter365Days);
+                .Single(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
             employmentCheck.MinimumDate.Should().Be(minDate);
             employmentCheck.MaximumDate.Should().Be(maxDate);            
 
             if(expectedResult.HasValue)
+            {
+                employmentCheck.Result.Should().Be(expectedResult.Value);
+            }
+            else
+            {
+                employmentCheck.Result.Should().BeNull();
+            }
+        }
+
+        private void VerifyEmployedAtSecondPaymentRecheck(DateTime minDate, DateTime maxDate, bool? expectedResult = null)
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
+                .Single(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
+            employmentCheck.MinimumDate.Should().Be(minDate);
+            employmentCheck.MaximumDate.Should().Be(maxDate);
+
+            if (expectedResult.HasValue)
             {
                 employmentCheck.Result.Should().Be(expectedResult.Value);
             }
