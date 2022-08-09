@@ -13,7 +13,6 @@ using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using SFA.DAS.EmployerIncentives.UnitTests.Shared.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,12 +30,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private ApprenticeshipIncentiveModel _incentiveModel;
         private Learner _learner;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
-        private List<IncentivePaymentProfile> _paymentProfiles;
+        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
+
 
             _mockIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
@@ -79,7 +83,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new LearnerChangeOfCircumstanceCommandHandler(
                 _mockIncentiveDomainRepository.Object, 
                 _mockLearnerDomainRepository.Object, 
-                _mockCollectionCalendarService.Object);
+                _mockCollectionCalendarService.Object,
+                _mockDateTimeService.Object);
 
             _incentive = _fixture.Create<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>();
             _mockIncentiveDomainRepository.Setup(x => x.Find(incentive.Id)).ReturnsAsync(_incentive);

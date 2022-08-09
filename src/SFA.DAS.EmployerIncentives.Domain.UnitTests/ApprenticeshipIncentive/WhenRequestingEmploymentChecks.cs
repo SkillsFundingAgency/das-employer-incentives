@@ -2,12 +2,14 @@
 using System.Linq;
 using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -19,12 +21,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private Fixture _fixture;
         private ApprenticeshipIncentiveModel _sutModel;
         private ApprenticeshipIncentive _sut;
+        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
+
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             var startDate = DateTime.Now.AddDays(-42);
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
@@ -46,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
             learner.SubmissionData.SetLearningData(new LearningData(true));
-            _sut.RefreshLearner(learner);
+            _sut.RefreshLearner(learner, _mockDateTimeService.Object);
 
             _sut.EmploymentChecks.Count.Should().Be(2);
 
@@ -74,9 +81,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
             learner.SubmissionData.SetLearningData(new LearningData(true));
-            _sut.RefreshLearner(learner);
+            _sut.RefreshLearner(learner, _mockDateTimeService.Object);
 
-            _sut.EmploymentChecks.Count().Should().Be(expectedEmploymentChecks.Count);
+            _ = _sut.EmploymentChecks.Count.Should().Be(expectedEmploymentChecks.Count);
         }
 
         [Test]
@@ -84,7 +91,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         {
             var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
             learner.SubmissionData.SetLearningData(new LearningData(false));
-            _sut.RefreshLearner(learner);
+            _sut.RefreshLearner(learner, _mockDateTimeService.Object);
 
             _sut.EmploymentChecks.Count.Should().Be(0);
         }
@@ -99,7 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             var learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
             learner.SubmissionData.SetLearningData(new LearningData(true));
-            _sut.RefreshLearner(learner);
+            _sut.RefreshLearner(learner, _mockDateTimeService.Object);
 
             _sut.EmploymentChecks.Count.Should().Be(0);
         }

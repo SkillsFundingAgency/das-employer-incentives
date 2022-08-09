@@ -1,9 +1,11 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -21,11 +23,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private Learner _learner;
         private CollectionCalendar _collectionCalendar;
         private CollectionPeriod _collectionPeriod;
+        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             _collectionPeriod = new CollectionPeriod(6, 2021);
 
@@ -183,7 +190,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             //Act
-            _sut.SetStartDateChangeOfCircumstance(startDate, _collectionCalendar);
+            _sut.SetStartDateChangeOfCircumstance(startDate, _collectionCalendar, _mockDateTimeService.Object);
 
             //Assert
             _sut.MinimumAgreementVersion.MinimumRequiredVersion.Should().Be(expectedMinimumVersion);

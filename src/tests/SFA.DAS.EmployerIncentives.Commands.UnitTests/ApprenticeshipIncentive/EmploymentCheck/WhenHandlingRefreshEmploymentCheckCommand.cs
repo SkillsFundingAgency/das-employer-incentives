@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -20,15 +21,22 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     {
         private RefreshEmploymentCheckCommandHandler _sut;
         private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
+        private Mock<IDateTimeService> _mockDateTimeService;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
-            _fixture = new Fixture(); 
+            _fixture = new Fixture();
+
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
+
+
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
 
-            _sut = new RefreshEmploymentCheckCommandHandler(_mockIncentiveDomainRespository.Object);
+            _sut = new RefreshEmploymentCheckCommandHandler(_mockIncentiveDomainRespository.Object, _mockDateTimeService.Object);
         }
 
         [Test]
