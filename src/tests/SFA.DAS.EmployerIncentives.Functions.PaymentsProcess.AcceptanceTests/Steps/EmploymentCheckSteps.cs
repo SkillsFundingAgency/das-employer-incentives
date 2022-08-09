@@ -349,6 +349,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 employmentCheck.Result.Should().BeNull();
             }
+
+            dbConnection.GetAll<EmploymentCheck>().Any(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck).Should().BeFalse();
         }
 
         private void VerifyEmployedPriorToPhaseCheck(DateTime minDate, DateTime maxDate)

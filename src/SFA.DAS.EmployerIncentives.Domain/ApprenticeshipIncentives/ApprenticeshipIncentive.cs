@@ -662,17 +662,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 secondPaymentDueDate.Value.AddDays(21).Date <= dateTimeService.UtcNow().Date && 
                 HasSuccessfulChecks(new List<EmploymentCheckType> { EmploymentCheckType.EmployedAtStartOfApprenticeship, EmploymentCheckType.EmployedBeforeSchemeStarted }))
             {
-                var existingCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+                var existingFirstCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+                var existingSecondCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
 
-                if(existingCheck == null) // check never performed
+                if (existingFirstCheck == null && existingSecondCheck == null) // check never performed
                 {
                     AddEmployedAt365PaymentDueDateFirstCheck(serviceRequest: serviceRequest);
                 }
-                else if (existingCheck.Result.HasValue && existingCheck.Result.Value) // first check succeeded
+                else if (existingSecondCheck == null && existingFirstCheck.Result.HasValue && existingFirstCheck.Result.Value) // first check succeeded
                 {
                     return;
                 }
-                else if(existingCheck.Result.HasValue && !existingCheck.Result.Value) // first check failed
+                else if(existingFirstCheck != null && existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value) // first check failed
                 {
                     if (secondPaymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
                     {
@@ -752,12 +753,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 var initial365Check = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
 
-                if (initial365Check != null)
+                if (initial365Check != null && Model.EmploymentCheckModels.Remove(initial365Check))
                 {
-                    if (Model.EmploymentCheckModels.Remove(initial365Check))
-                    {
-                        AddEvent(new EmploymentCheckDeleted(initial365Check));
-                    }
+                    AddEvent(new EmploymentCheckDeleted(initial365Check));
                 }
 
                 var second365Check = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck, secondPayment.DueDate, secondPayment.DueDate.AddDays(checkWindowInDays));
@@ -771,7 +769,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     AddEvent(new EmploymentChecksCreated(Id, serviceRequest));
                 }
                 else if (existingCheck.MinimumDate != second365Check.MinimumDate ||
-                       existingCheck.MaximumDate != initial365Check.MaximumDate ||
+                       existingCheck.MaximumDate != second365Check.MaximumDate ||
                        existingCheck.Result != second365Check.Result)
                 {
                     if (Model.EmploymentCheckModels.Remove(existingCheck))
