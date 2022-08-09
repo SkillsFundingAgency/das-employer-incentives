@@ -3,6 +3,8 @@
     public enum EmploymentCheckType
     {
         EmployedBeforeSchemeStarted,
-        EmployedAtStartOfApprenticeship
+        EmployedAtStartOfApprenticeship,
+        EmployedAt365PaymentDueDateFirstCheck,
+        EmployedAt365PaymentDueDateSecondCheck
     }
 }
