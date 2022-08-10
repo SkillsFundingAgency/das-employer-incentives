@@ -14,17 +14,20 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
         private readonly IAccountDomainRepository _accountDomainRepository;
         private readonly ICollectionCalendarService _collectionCalendarService;
         private readonly ILearnerDomainRepository _learnerDomainRepository;
+        private readonly IDateTimeService _dateTimeService;
 
         public ValidatePendingPaymentCommandHandler(
             IApprenticeshipIncentiveDomainRepository domainRepository,
             IAccountDomainRepository accountDomainRepository,
             ICollectionCalendarService collectionCalendarService,
-            ILearnerDomainRepository learnerDomainRepository)
+            ILearnerDomainRepository learnerDomainRepository,
+            IDateTimeService dateTimeService)
         {
             _domainRepository = domainRepository;
             _accountDomainRepository = accountDomainRepository;
             _collectionCalendarService = collectionCalendarService;
             _learnerDomainRepository = learnerDomainRepository;
+            _dateTimeService = dateTimeService;
         }
 
         public async Task Handle(ValidatePendingPaymentCommand command, CancellationToken cancellationToken = default)
@@ -42,7 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.ValidatePe
             incentive.ValidateLearningData(command.PendingPaymentId, learner, collectionCalendarPeriod.CollectionPeriod);
             incentive.ValidatePaymentsNotPaused(command.PendingPaymentId, collectionCalendarPeriod.CollectionPeriod);
             incentive.ValidateMinimumRequiredAgreementVersion(command.PendingPaymentId, account, collectionCalendarPeriod.CollectionPeriod);
-            incentive.ValidateEmploymentChecks(command.PendingPaymentId, collectionCalendarPeriod.CollectionPeriod);
+            incentive.ValidateEmploymentChecks(_dateTimeService, command.PendingPaymentId, collectionCalendarPeriod.CollectionPeriod);
 
             await _domainRepository.Save(incentive);
         }

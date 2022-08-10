@@ -363,7 +363,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasSignedMinVersion, isValid));
         }
 
-        public void ValidateEmploymentChecks(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
+        public void ValidateEmploymentChecks(IDateTimeService dateTimeService, Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
@@ -371,7 +371,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             ValidateNotEmployedBeforeSchemeStartDate(collectionPeriod, pendingPayment);
 
-            ValidateEmployedAt365Days(collectionPeriod, pendingPayment);
+            ValidateEmployedAt365Days(dateTimeService, collectionPeriod, pendingPayment);
         } 
 
         public void ValidatePaymentsNotBlockedForAccountLegalEntity(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
@@ -429,11 +429,47 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     GetOverrideStep(ValidationStep.EmployedAtStartOfApprenticeship)));
         }
 
-        private void ValidateEmployedAt365Days(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
+        private void ValidateEmployedAt365Days(IDateTimeService dateTimeService, CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
         {
             if (pendingPayment.EarningType  == EarningType.FirstPayment)
             {
                 return;
+            }
+
+            if (pendingPayment.DueDate.AddDays(21) > dateTimeService.UtcNow().Date)
+            {
+                return;
+            }
+
+            var employedAt365DaysFirstCheck = EmploymentChecks.FirstOrDefault(x =>
+                x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+
+            var employedAt365DaysFirstCheckResult = employedAt365DaysFirstCheck?.Result != null &&
+                                                        employedAt365DaysFirstCheck.Result.Value;
+            
+            pendingPayment.AddValidationResult(
+                PendingPaymentValidationResult.New(
+                    Guid.NewGuid(),
+                    collectionPeriod,
+                    ValidationStep.EmployedAt365Days,
+                    true,
+                    GetOverrideStep(ValidationStep.EmployedAt365Days)));
+
+            if (!employedAt365DaysFirstCheckResult)
+            {
+                var employedAt365DaysSecondCheck = EmploymentChecks.FirstOrDefault(x =>
+                    x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
+
+                var employedAt365DaysSecondCheckResult = employedAt365DaysSecondCheck?.Result != null &&
+                                                         employedAt365DaysSecondCheck.Result.Value;
+
+                pendingPayment.AddValidationResult(
+                    PendingPaymentValidationResult.New(
+                        Guid.NewGuid(),
+                        collectionPeriod,
+                        ValidationStep.EmployedAt365Days,
+                        employedAt365DaysSecondCheckResult,
+                        GetOverrideStep(ValidationStep.EmployedAt365Days)));
             }
         }
 
