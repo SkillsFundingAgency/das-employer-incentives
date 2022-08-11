@@ -212,7 +212,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.BreakInLearnings = breaks;
 
             CalculateEarnings(collectionCalendar);
-        }
+        }   
 
         private void StartBreakInLearning(DateTime startDate)
         {
@@ -230,7 +230,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 ChangeStatus(IncentiveStatus.Stopped);
                 StartBreakInLearning(stoppedStatus.DateStopped.Value);
-
+                
+                RemoveAll365Checks();
                 CalculateEarnings(collectionCalendar, learner);
 
                 AddEvent(new LearningStopped(
@@ -245,6 +246,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
                 AddEvent(new BreakInLearningDeleted(Model.Id));
 
+                RemoveAll365Checks();
                 CalculateEarnings(collectionCalendar, learner);
 
                 AddEvent(new LearningResumed(
@@ -254,6 +256,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             else if (Model.Status == IncentiveStatus.Stopped && stoppedStatus.LearningStopped)
             {
                 ChangeStatus(IncentiveStatus.Stopped);
+                RemoveAll365Checks();
                 CalculateEarnings(collectionCalendar, learner);
             }
         }
@@ -877,6 +880,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return new ValidationOverrideStep(validationOverride.Step, validationOverride.ExpiryDate);
         }
 
+        private void RemoveAll365Checks()
+        {
+            var existingChecks = Model.EmploymentCheckModels.Where(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck ||
+                                                    ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck).ToList();
+
+            foreach (var existingCheck in existingChecks)
+            {
+                if (Model.EmploymentCheckModels.Remove(existingCheck))
+                {
+                    AddEvent(new EmploymentCheckDeleted(existingCheck));
+                }
+            }
+        }
         private bool HasSuccessfulChecks(IList<EmploymentCheckType> checkTypes)
         {
             var checks = new List<bool>();

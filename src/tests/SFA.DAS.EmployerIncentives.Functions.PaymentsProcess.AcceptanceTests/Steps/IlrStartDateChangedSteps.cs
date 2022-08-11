@@ -165,7 +165,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Should().Be(1);
             var archivedPendingPayment = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPayment>().Single(p =>
                 p.PendingPaymentId == _pendingPayment.Id);
-            archivedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedPendingPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
             archivedPendingPayment.Should().BeEquivalentTo(_pendingPayment, opt => opt.ExcludingMissingMembers()
                     .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
             );
@@ -183,7 +183,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Count(p => p.ApprenticeshipIncentiveId == _payment.ApprenticeshipIncentiveId)
                 .Should().Be(1);
             var archivedPayment = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.Payment>().Single(p => p.PaymentId == _payment.Id);
-            archivedPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedPayment.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
             archivedPayment.Should().BeEquivalentTo(_payment, opt => opt.ExcludingMissingMembers()
                     .Excluding(x => x.CalculatedDate) // millisecond difference due to SQL DateTime2 to .NET DateTime conversion
                 );
@@ -196,10 +196,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var archivedValidationResult = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.PendingPaymentValidationResult>().Single(p =>
                p.PendingPaymentId == _pendingPayment.Id);
-            archivedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
+            archivedValidationResult.ArchiveDateUTC.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
             archivedValidationResult.Should().BeEquivalentTo(_pendingPaymentValidationResult, opt => opt.ExcludingMissingMembers()
                 .Excluding(x => x.CreatedDateUtc));
-            archivedValidationResult.CreatedDateUtc.Should().BeCloseTo(_pendingPaymentValidationResult.CreatedDateUtc, TimeSpan.FromMinutes(1));
+            archivedValidationResult.CreatedDateUtc.Should().BeCloseTo(_pendingPaymentValidationResult.CreatedDateUtc, TimeSpan.FromMinutes(2));
         }
 
         [Then(@"earnings are recalculated")]
