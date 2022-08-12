@@ -25,27 +25,39 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         {
             if (request.WithdrawalType == WithdrawalType.Employer)
             {
-                await SendCommandAsync(
-                    new EmployerWithdrawalCommand(
-                        request.AccountLegalEntityId,
-                        request.ULN,
-                        request.ServiceRequest.TaskId,
-                        request.ServiceRequest.DecisionReference,
-                        request.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow,
-                        request.AccountId,
-                        request.EmailAddress
-                    ));
+                var employerWithdrawalCommands = new List<EmployerWithdrawalCommand>();
+                foreach(var application in request.Applications)
+                {
+                    employerWithdrawalCommands.Add(
+                        new EmployerWithdrawalCommand(
+                            application.AccountLegalEntityId,
+                            application.ULN,
+                            request.ServiceRequest.TaskId,
+                            request.ServiceRequest.DecisionReference,
+                            request.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow,
+                            request.AccountId,
+                            request.EmailAddress
+                        ));
+                }
+
+                await SendCommandsAsync(employerWithdrawalCommands);
                 return Accepted();
             }
             else if (request.WithdrawalType == WithdrawalType.Compliance)
             {
-                await SendCommandAsync(
-                    new ComplianceWithdrawalCommand(
-                        request.AccountLegalEntityId,
-                        request.ULN,
-                        request.ServiceRequest.TaskId,
-                        request.ServiceRequest.DecisionReference,
-                        request.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow));
+                var complianceWithdrawalCommands = new List<ComplianceWithdrawalCommand>();
+                foreach (var application in request.Applications)
+                {
+                    complianceWithdrawalCommands.Add(
+                        new ComplianceWithdrawalCommand(
+                            application.AccountLegalEntityId,
+                            application.ULN,
+                            request.ServiceRequest.TaskId,
+                            request.ServiceRequest.DecisionReference,
+                            request.ServiceRequest.TaskCreatedDate ?? DateTime.UtcNow));
+                }
+
+                await SendCommandsAsync(complianceWithdrawalCommands);
                 return Accepted();
             }
             else
