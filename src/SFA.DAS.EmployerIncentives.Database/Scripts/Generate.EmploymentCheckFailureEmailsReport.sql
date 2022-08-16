@@ -16,7 +16,7 @@ DECLARE @EmployedBeforeSchemeStartedFailures TABLE
 	PendingPaymentId UNIQUEIDENTIFIER
 )
 
--- Pending payments that have faiiled EC validation in previous runs
+-- Pending payments that have failed EC validation in previous runs
 INSERT INTO @EmployedAtStartOfApprenticeshipFailures
 SELECT DISTINCT PendingPaymentId 
 FROM incentives.PendingPaymentValidationResult
