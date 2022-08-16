@@ -143,6 +143,11 @@ AS [(Paste into cell E23) Invalid YTD]
 	ELSE max(iif(step='BlockedForPayments',1,0)) 
 	END
    as BlockedForPayments,
+   CASE OverrideResult
+   WHEN 1 THEN 1
+   ELSE max(iif(step='EmployedAt365Days',1,0))
+   END 
+   as EmployedAt365Days, 
    Result,
    ppvr.PeriodNumber, 
    ppvr.PaymentYear
@@ -165,6 +170,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Vali
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
   BlockedForPayments,
+  EmployedAt365Days,
   count(distinct a.[AccountLegalEntityId]) as [AccountLegalEntityId],
   sum(pp.amount) as EarningAmount
 from PendingPaymentValidations ppv
@@ -182,6 +188,7 @@ group by HasIlrSubmission,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
   BlockedForPayments,
+  EmployedAt365Days,
   Result
     order by 
   HasLearningRecord desc, 
@@ -265,6 +272,11 @@ select max(ppv.periodnumber) MaxPeriod,
 	ELSE max((case when ppv.periodnumber < 10 and ppv.paymentyear <= 2122 then 1 else iif(step='BlockedForPayments' and result=1,1,0) end)) 
 	END
 	as BlockedForPayments,  
+  CASE OverrideResult
+  WHEN 1 THEN 1
+  ELSE max((case when ppv.paymentyear <= 2223 then 1 else iif(step='EmployedAt365Days' and result=1,1,0) end)) 
+  END
+  as EmployedAt365Days,
     Amount,
     a.[AccountLegalEntityId] --Should only be one
 from [incentives].[PendingPaymentValidationResult] ppv
@@ -286,6 +298,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A37 on tab {YTD Val
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
   BlockedForPayments,
+  EmployedAt365Days,
   count(distinct [AccountLegalEntityId] ) as [AccountLegalEntityId],
   sum(amount) as EarningAmount
 from latestValidations
@@ -302,7 +315,8 @@ group by
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
-  BlockedForPayments
+  BlockedForPayments,
+  EmployedAt365Days
 order by 
   HasLearningRecord desc, 
   IsInLearning desc, 
