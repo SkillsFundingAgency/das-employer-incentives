@@ -149,13 +149,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await SetUpValidationOverrides(_validationOverrides);
         }
 
-        [When(@"there is an EmployedBeforeSchemeStarted validation override and expiry of '(.*)'")]
-        public async Task WhenThereIsAnEmployedBeforeSchemeStartedValidationOverrideAndExpiryOf(bool hasExpired)
+        [When(@"there is a validation override for validation step '(.*)' and expiry of '(.*)'")]
+        public async Task WhenThereIsAnEmployedBeforeSchemeStartedValidationOverrideAndExpiryOf(string step, bool hasExpired)
         {
             var validationOverride = Fixture
                   .Build<Data.ApprenticeshipIncentives.Models.ValidationOverride>()
                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                   .With(p => p.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                   .With(p => p.Step, step)
                    .With(p => p.ExpiryDate, hasExpired ? DateTime.UtcNow.Date : DateTime.UtcNow.AddDays(1).Date)
                    .With(p => p.CreatedDateTime, DateTime.Today.AddDays(-1))
                    .Create();
@@ -272,14 +272,37 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await SetupPaymentValidationResult(paymentValidationResult);
         }
 
+        [When(@"there is an '(.*)' second payment validation status of '(.*)'")]
+        public async Task WhenThereIsAnEmploymentCheckSecondPaymentValidationStatus(string validationStep, string validationResult)
+        {
+            if (validationResult != "null")
+            {
+                bool.TryParse(validationResult, out var result);
+                var paymentValidationResult = Fixture.Build<PendingPaymentValidationResult>()
+                    .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.Last().Id)
+                    .With(x => x.Step, validationStep)
+                    .With(x => x.Result, result)
+                    .Create();
+                await SetupPaymentValidationResult(paymentValidationResult);
+            }
+        }
+
         [When(@"there is an '(.*)' employment check result of '(.*)'")]
-        public async Task WhenThereIsAnEmploymentCheckResult(EmploymentCheckType employmentCheckType, bool checkResult)
+        public async Task WhenThereIsAnEmploymentCheckResult(EmploymentCheckType employmentCheckType, string checkResult)
         {
             var employmentCheck = Fixture.Build<EmploymentCheck>()
                 .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(x => x.CheckType, employmentCheckType)
-                .With(x => x.Result, checkResult)
+                .Without(x => x.Result)
                 .Create();
+
+            if (checkResult != "null")
+            {
+                bool result;
+                bool.TryParse(checkResult, out result);
+                employmentCheck.Result = result;
+            }
+
             await SetupEmploymentCheck(employmentCheck);
         }
 
@@ -602,10 +625,17 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Then(@"the apprenticeship is returned with employment check status of '(.*)'")]
-        public void ThenTheEmploymentCheckStatusIsSet(bool employmentCheckStatus)
+        public void ThenTheEmploymentCheckStatusIsSet(bool? employmentCheckStatus)
         {
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
             apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
+        }
+
+        [Then(@"the apprenticeship is returned with second payment employment check status of '(.*)'")]
+        public void ThenTheSecondPaymentEmploymentCheckStatusIsSet(bool? employmentCheckStatus)
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
             apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
         }
 

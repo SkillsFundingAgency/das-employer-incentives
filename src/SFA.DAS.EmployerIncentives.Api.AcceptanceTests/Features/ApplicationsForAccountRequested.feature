@@ -176,7 +176,7 @@ Scenario Outline: EmployedBeforeSchemeStarted Employment check status with overr
 	And there is an 'EmployedBeforeSchemeStarted' payment validation status of '<Employed Before Scheme Started>'
 	And there is an 'EmployedAtStartOfApprenticeship' employment check result of '<First Employment Check Result>'
 	And there is an 'EmployedBeforeSchemeStarted' employment check result of '<Second Employment Check Result>'
-	And there is an EmployedBeforeSchemeStarted validation override and expiry of '<HasExpired>'
+	And there is a validation override for validation step 'EmployedBeforeSchemeStarted' and expiry of '<HasExpired>'
 	When a client requests the apprenticeships for the account
 	Then the apprenticeship is returned with employment check status of '<Employment Check Status>'
 Examples:
@@ -256,3 +256,39 @@ Examples:
 | Employer		|
 | Compliance	|
 
+Scenario: Employment check status with 365 day check
+	Given an account that is in employer incentives
+	When there is an 'EmployedAtStartOfApprenticeship' payment validation status of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' payment validation status of 'true'
+	And there is an 'EmployedAtStartOfApprenticeship' employment check result of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' employment check result of 'false'
+	And there is an 'EmployedAt365Days' second payment validation status of '<Employed At 365 Days>'
+	And there is an 'EmployedAt365PaymentDueDateFirstCheck' employment check result of '<365 Days Employment First Check Result>'
+	And there is an 'EmployedAt365PaymentDueDateSecondCheck' employment check result of '<365 Days Employment Second Check Result>'
+	When a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with second payment employment check status of '<Employment Check Status>'
+Examples:
+| Employed At 365 Days | 365 Days Employment First Check Result | 365 Days Employment Second Check Result | Employment Check Status |
+| true                 | true                                   | null                                    | true                    |
+| false                | false                                  | null                                    | false                   |
+| false                | false                                  | false                                   | false                   |
+| true                 | false                                  | true                                    | true                    |
+| null                 | null                                   | null                                    | true                    |
+
+Scenario Outline: EmployedAt365Days Employment check status with override
+	Given an account that is in employer incentives
+	When there is an 'EmployedAtStartOfApprenticeship' payment validation status of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' payment validation status of 'true'
+	And there is an 'EmployedAtStartOfApprenticeship' employment check result of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' employment check result of 'false'
+	When there is an 'EmployedAt365Days' payment validation status of '<Employed At 365 Days>'
+	And there is an 'EmployedAt365PaymentDueDateFirstCheck' employment check result of '<Employed At 365 Days>'
+	And there is a validation override for validation step 'EmployedAt365Days' and expiry of '<HasExpired>'
+	When a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with second payment employment check status of '<Employment Check Status>'
+Examples:
+| Employed At 365 Days | HasExpired | Employment Check Status |
+| true                 | false      | true                    |
+| false                | false      | true                    |
+| true                 | true       | true                    |
+| false                | true       | false                   |

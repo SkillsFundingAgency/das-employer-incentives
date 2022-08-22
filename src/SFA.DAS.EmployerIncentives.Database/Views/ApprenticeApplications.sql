@@ -38,7 +38,10 @@ l.InLearning,
 ppvr1.Result AS FirstEmploymentCheckValidation,
 ec1.Result AS FirstEmploymentCheckResult,
 ppvr2.Result AS SecondEmploymentCheckValidation,
-ec2.Result AS SecondEmploymentCheckResult
+ec2.Result AS SecondEmploymentCheckResult,
+ppvr3.Result AS EmployedAt365DaysValidation,
+ec3.Result AS EmployedAt365DaysFirstCheck,
+ec4.Result AS EmployedAt365DaysSecondCheck
 FROM incentives.ApprenticeshipIncentive ai
 INNER JOIN dbo.Accounts a
 ON ai.AccountLegalEntityId = a.AccountLegalEntityId
@@ -80,11 +83,24 @@ OUTER APPLY
 	WHERE Step = 'EmployedBeforeSchemeStarted' and PendingPaymentId IN (pp1.Id,pp2.Id)
 	ORDER BY CreatedDateUTC DESC
 ) ppvr2
+OUTER APPLY 
+(
+	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC FROM incentives.PendingPaymentValidationResult
+	WHERE Step = 'EmployedAt365Days' and PendingPaymentId IN (pp1.Id,pp2.Id)
+	ORDER BY CreatedDateUTC DESC
+) ppvr3
 LEFT OUTER JOIN incentives.EmploymentCheck ec1
 ON ec1.ApprenticeshipIncentiveId = ai.Id
 AND ec1.CheckType = 'EmployedAtStartOfApprenticeship'
 LEFT OUTER JOIN incentives.EmploymentCheck ec2
 ON ec2.ApprenticeshipIncentiveId = ai.Id
 AND ec2.CheckType = 'EmployedBeforeSchemeStarted'
+LEFT OUTER JOIN incentives.EmploymentCheck ec3
+ON ec3.CheckType = 'EmployedAt365PaymentDueDateFirstCheck'
+AND ec3.ApprenticeshipIncentiveId = ai.Id
+LEFT OUTER JOIN incentives.EmploymentCheck ec4
+ON ec4.CheckType = 'EmployedAt365PaymentDueDateSecondCheck'
+AND ec4.ApprenticeshipIncentiveId = ai.Id
+
 
 
