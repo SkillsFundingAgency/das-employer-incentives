@@ -55,6 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(x => x.PreviousStatus, IncentiveStatus.Active)
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
                 .With(x => x.StartDate, new DateTime(2020, 10, 1))
+                .Without(x => x.EmploymentCheckModels)
                 .Create();
 
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>
@@ -471,6 +472,60 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && !x.ClawedBack).Should().Be(1);
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && !x.PaymentMadeDate.HasValue).Should().Be(1);
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && x.PaymentMadeDate.HasValue).Should().Be(1);
+        }
+
+        [Test]
+        public void Then_365_employment_checks_are_removed_when_the_incentive_is_stopped()
+        {
+            //Arrange
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck });
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck });
+
+            //Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+
+            //Assert
+            _sutModel.EmploymentCheckModels.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void Then_365_employment_checks_are_removed_when_the_stopped_incentive_has_a_learning_stopped_event()
+        {
+            //Arrange
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck });
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck });
+
+            _sutModel.Status = IncentiveStatus.Stopped;
+
+            //Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+
+            //Assert
+            _sutModel.EmploymentCheckModels.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void Then_365_employment_checks_are_removed_when_the_stopped_incentive_is_resumed()
+        {
+            //Arrange
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck });
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck });
+
+            _sutModel.Status = IncentiveStatus.Stopped;
+
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(false, _sutModel.StartDate.AddDays(366)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+
+            //Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+
+            //Assert
+            _sutModel.EmploymentCheckModels.Count.Should().Be(0);
         }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
