@@ -274,7 +274,7 @@ select max(ppv.periodnumber) MaxPeriod,
 	as BlockedForPayments,  
   CASE OverrideResult
   WHEN 1 THEN 1
-  ELSE max((case when ppv.paymentyear <= 2223 then 1 else iif(step='EmployedAt365Days' and result=1,1,0) end)) 
+  ELSE max((case when ppv.periodnumber < 2 and ppv.paymentyear <= 2223 then 1 else iif(step='EmployedAt365Days' and result=1,1,0) end)) 
   END
   as EmployedAt365Days,
     Amount,
