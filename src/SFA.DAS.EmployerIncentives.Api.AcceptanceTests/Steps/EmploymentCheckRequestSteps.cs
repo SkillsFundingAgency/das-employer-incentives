@@ -116,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                {
                    _response = await EmployerIncentiveApi.Put(
                     "/jobs",
-                   new JobRequest { Type = JobType.RefreshEmploymentCheck, Data = data });
+                   new JobRequest { Type = JobType.RefreshEmploymentChecks, Data = data });
                },
                (context) => HasProcessedCommand(context),
                assertOnError: false

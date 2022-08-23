@@ -48,7 +48,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             };
 
             var request = _fixture.Build<JobRequest>()
-                    .With(r => r.Type, JobType.RefreshEmploymentCheck)
+                    .With(r => r.Type, JobType.RefreshEmploymentChecks)
                     .With(r => r.Data, data)
                     .Create();
 
@@ -81,7 +81,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             };
 
             var request = _fixture.Build<JobRequest>()
-                    .With(r => r.Type, JobType.RefreshEmploymentCheck)
+                    .With(r => r.Type, JobType.RefreshEmploymentChecks)
                     .With(r => r.Data, data)
                     .Create();
 

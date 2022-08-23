@@ -27,11 +27,11 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 var command = ParseJobRequestToRefreshCommand(request);
                 await SendCommandAsync(command);
             }
-            else if (request.Type == JobType.RefreshEmploymentChecks)
+            else if (request.Type == JobType.RefreshAllEmploymentChecks)
             {
                 await SendCommandAsync(new RefreshEmploymentChecksCommand());
             }
-            else if (request.Type == JobType.RefreshEmploymentCheck)
+            else if (request.Type == JobType.RefreshEmploymentChecks)
             {
                 var command = ParseJobRequestToRefreshEmploymentCheckCommand(request);
                 await SendCommandAsync(command);
