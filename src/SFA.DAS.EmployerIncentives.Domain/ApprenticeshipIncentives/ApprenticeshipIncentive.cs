@@ -733,7 +733,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            if (StartDate.AddDays(42) > dateTimeService.UtcNow()) // has not started 6 weeks ago
+            if (StartDate.AddDays(42).Date > dateTimeService.UtcNow().Date) // has not started 6 weeks ago
             {   
                 return;
             }
