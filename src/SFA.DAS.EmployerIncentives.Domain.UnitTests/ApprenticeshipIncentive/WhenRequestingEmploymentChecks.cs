@@ -65,10 +65,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             secondCheck.MinimumDate.Should().Be(startDate);
             secondCheck.MaximumDate.Should().Be(startDate.AddDays(42));
 
-            var events = _sut.FlushEvents();
+            var events = _sut.FlushEvents().OfType<EmploymentChecksCreated>();
+        
+            events.Count().Should().Be(2);
 
-            var expectedEvent = events.Single() as EmploymentChecksCreated;
-            expectedEvent.ApprenticeshipIncentiveId.Should().Be(_sutModel.Id);
+            @events.First().ApprenticeshipIncentiveId.Should().Be(_sutModel.Id);
+            @events.First().Model.CheckType.Should().Be(EmploymentCheckType.EmployedBeforeSchemeStarted);
+            @events.Last().ApprenticeshipIncentiveId.Should().Be(_sutModel.Id);
+            @events.Last().Model.CheckType.Should().Be(EmploymentCheckType.EmployedAtStartOfApprenticeship);
         }
 
         [Test]

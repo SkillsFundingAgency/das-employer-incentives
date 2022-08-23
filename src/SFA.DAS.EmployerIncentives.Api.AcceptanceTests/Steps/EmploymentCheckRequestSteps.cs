@@ -140,16 +140,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     c.IsDomainCommand &&
                     c.IsPublished &&
                     c.Command is SendEmploymentCheckRequestsCommand)
-                .Should().Be(1);
+                .Should().Be(2);
+
+            TestContext.CommandsPublished.Count(c => c.IsDomainCommand && c.IsPublished && c.Command is SendEmploymentCheckRequestsCommand command && command.CheckType == Enums.EmploymentCheckType.EmployedBeforeSchemeStarted).Should().Be(1);
+            TestContext.CommandsPublished.Count(c => c.IsDomainCommand && c.IsPublished && c.Command is SendEmploymentCheckRequestsCommand command && command.CheckType == Enums.EmploymentCheckType.EmployedAtStartOfApprenticeship).Should().Be(1);
 
             await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var audits = await dbConnection.GetAllAsync<EmploymentCheckAudit>();
-            audits.Should().HaveCount(1);
-            var audit = audits.Single();
-            audit.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            audit.ServiceRequestTaskId.Should().Be(_serviceRequest.TaskId);
-            audit.ServiceRequestDecisionReference.Should().Be(_serviceRequest.DecisionReference);
-            audit.ServiceRequestCreatedDate.Should().Be(_serviceRequest.TaskCreatedDate.Value);
+            audits.Should().HaveCount(2);
+            
+            audits.First().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            audits.First().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            audits.First().ServiceRequestTaskId.Should().Be(_serviceRequest.TaskId);
+            audits.First().ServiceRequestDecisionReference.Should().Be(_serviceRequest.DecisionReference);
+            audits.First().ServiceRequestCreatedDate.Should().Be(_serviceRequest.TaskCreatedDate.Value);
+
+            audits.Last().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            audits.Last().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            audits.Last().ServiceRequestTaskId.Should().Be(_serviceRequest.TaskId);
+            audits.Last().ServiceRequestDecisionReference.Should().Be(_serviceRequest.DecisionReference);
+            audits.Last().ServiceRequestCreatedDate.Should().Be(_serviceRequest.TaskCreatedDate.Value);
         }
 
         [Then(@"a request is not made to refresh the employment checks for the incentive")]
