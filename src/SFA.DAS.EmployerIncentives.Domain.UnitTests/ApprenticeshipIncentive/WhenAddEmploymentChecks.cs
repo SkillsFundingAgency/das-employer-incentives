@@ -72,9 +72,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.AddEmploymentChecks(_dateTimeService);
 
             // assert
-            var events = _sut.FlushEvents().ToList();
-            var @event = events.Single() as EmploymentChecksCreated;
-            @event.ApprenticeshipIncentiveId.Should().Be(_sut.Id);
+            var events = _sut.FlushEvents().OfType<EmploymentChecksCreated>();
+            events.Count().Should().Be(2);
+            @events.First().ApprenticeshipIncentiveId.Should().Be(_sut.Id);
+            @events.First().Model.CheckType.Should().Be(EmploymentCheckType.EmployedBeforeSchemeStarted);
+            @events.Last().ApprenticeshipIncentiveId.Should().Be(_sut.Id);
+            @events.Last().Model.CheckType.Should().Be(EmploymentCheckType.EmployedAtStartOfApprenticeship);
         }
 
         [Test]
@@ -105,9 +108,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.AddEmploymentChecks(_dateTimeService);
 
             // assert
-            var events = _sut.FlushEvents().ToList();
-            var @event = events.Single() as EmploymentChecksCreated;
-            @event.ApprenticeshipIncentiveId.Should().Be(_sut.Id);
+            var events = _sut.FlushEvents().OfType<EmploymentChecksCreated>();
+            events.Count().Should().Be(2);
+            @events.First().ApprenticeshipIncentiveId.Should().Be(_sut.Id);
+            @events.First().Model.CheckType.Should().Be(EmploymentCheckType.EmployedBeforeSchemeStarted);
+            @events.Last().ApprenticeshipIncentiveId.Should().Be(_sut.Id);
+            @events.Last().Model.CheckType.Should().Be(EmploymentCheckType.EmployedAtStartOfApprenticeship);
         }
 
         [Test]

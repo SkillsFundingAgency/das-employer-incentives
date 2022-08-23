@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi;
@@ -27,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendEmploy
                 return;
             }
 
-            foreach (var employmentCheck in apprenticeshipIncentive.EmploymentChecks)
+            foreach (var employmentCheck in apprenticeshipIncentive.EmploymentChecks.Where(ec => ec.CheckType == command.CheckType))
             {
                 var correlationId = await _employmentCheckService.RegisterEmploymentCheck(employmentCheck, apprenticeshipIncentive);
                 employmentCheck.SetCorrelationId(correlationId);
