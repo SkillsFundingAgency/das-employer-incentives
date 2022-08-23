@@ -69,12 +69,18 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 ));
 
             // Assert
-            var createdEvent = incentive.FlushEvents().OfType<EmploymentChecksCreated>().Single();
-            createdEvent.Should().NotBeNull();
-            createdEvent.ApprenticeshipIncentiveId.Should().Be(model.Id);
-            createdEvent.ServiceRequest.TaskId.Should().Be(serviceRequest.TaskId);
-            createdEvent.ServiceRequest.DecisionReference.Should().Be(serviceRequest.DecisionReference);
-            createdEvent.ServiceRequest.Created.Should().Be(serviceRequest.Created);
+            var createdEvents = incentive.FlushEvents().OfType<EmploymentChecksCreated>();
+            createdEvents.Should().NotBeNull();
+            createdEvents.Count().Should().Be(2);
+            _ = createdEvents.First().ApprenticeshipIncentiveId.Should().Be(model.Id);
+            _ = createdEvents.First().ServiceRequest.TaskId.Should().Be(serviceRequest.TaskId);
+            _ = createdEvents.First().ServiceRequest.DecisionReference.Should().Be(serviceRequest.DecisionReference);
+            _ = createdEvents.First().ServiceRequest.Created.Should().Be(serviceRequest.Created);
+
+            _ = createdEvents.Last().ApprenticeshipIncentiveId.Should().Be(model.Id);
+            _ = createdEvents.Last().ServiceRequest.TaskId.Should().Be(serviceRequest.TaskId);
+            _ = createdEvents.Last().ServiceRequest.DecisionReference.Should().Be(serviceRequest.DecisionReference);
+            _ = createdEvents.Last().ServiceRequest.Created.Should().Be(serviceRequest.Created);
 
             _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Once);
         }
