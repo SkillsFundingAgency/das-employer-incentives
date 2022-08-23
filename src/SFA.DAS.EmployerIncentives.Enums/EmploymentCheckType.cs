@@ -2,6 +2,7 @@
 {
     public enum EmploymentCheckType
     {
+        Unknown,
         EmployedBeforeSchemeStarted,
         EmployedAtStartOfApprenticeship,
         EmployedAt365PaymentDueDateFirstCheck,
