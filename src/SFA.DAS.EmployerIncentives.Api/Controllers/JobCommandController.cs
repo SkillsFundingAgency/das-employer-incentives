@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
@@ -9,6 +10,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -22,19 +24,26 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> AddJob([FromBody] JobRequest request)
         {
-            if (request.Type == JobType.RefreshLegalEntities)
+            try
             {
-                var command = ParseJobRequestToRefreshCommand(request);
-                await SendCommandAsync(command);
+                if (request.Type == JobType.RefreshLegalEntities)
+                {
+                    var command = ParseJobRequestToRefreshCommand(request);
+                    await SendCommandAsync(command);
+                }
+                else if (request.Type == JobType.RefreshAllEmploymentChecks)
+                {
+                    await SendCommandAsync(new RefreshEmploymentChecksCommand());
+                }
+                else if (request.Type == JobType.RefreshEmploymentChecks)
+                {
+                    var commands = ParseJobRequestToRefreshEmploymentCheckCommands(request);
+                    await SendCommandsAsync(commands);
+                }
             }
-            else if (request.Type == JobType.RefreshAllEmploymentChecks)
+            catch (ArgumentException e)
             {
-                await SendCommandAsync(new RefreshEmploymentChecksCommand());
-            }
-            else if (request.Type == JobType.RefreshEmploymentChecks)
-            {
-                var command = ParseJobRequestToRefreshEmploymentCheckCommand(request);
-                await SendCommandAsync(command);
+                return new BadRequestObjectResult(e.Message);
             }
             return NoContent();
         }
@@ -53,15 +62,29 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             return command;
         }
 
-        private static RefreshEmploymentCheckCommand ParseJobRequestToRefreshEmploymentCheckCommand(JobRequest request)
+        private static List<RefreshEmploymentCheckCommand> ParseJobRequestToRefreshEmploymentCheckCommands(JobRequest request)
         {
-            request.Data.TryGetValue("AccountLegalEntityId", out object accountLegalEntityIdRequest);
-            request.Data.TryGetValue("ULN", out object ulnRequest);
+            request.Data.TryGetValue("CheckType", out object checkTypeRequest);
+            request.Data.TryGetValue("Applications", out object applicationsRequest);
             request.Data.TryGetValue("ServiceRequest", out object serviceRequestRequest);
-            long.TryParse(accountLegalEntityIdRequest.ToString(), out long accountLegalEntityId);
-            long.TryParse(ulnRequest.ToString(), out long uln);
+            var applications = JsonConvert.DeserializeObject<Application[]>(applicationsRequest.ToString());            
             var serviceRequest = JsonConvert.DeserializeObject<ServiceRequest>(serviceRequestRequest.ToString());
-            return new RefreshEmploymentCheckCommand(accountLegalEntityId, uln, serviceRequest.TaskId, serviceRequest.DecisionReference, serviceRequest.TaskCreatedDate);
+
+            var commands = new List<RefreshEmploymentCheckCommand>();
+            foreach (var application in applications) 
+            {
+                commands.Add(
+                        new RefreshEmploymentCheckCommand(
+                            checkTypeRequest.ToString(), 
+                            application.AccountLegalEntityId, 
+                            application.ULN, 
+                            serviceRequest.TaskId, 
+                            serviceRequest.DecisionReference, 
+                            serviceRequest.TaskCreatedDate)
+                    );
+            }
+
+            return commands;
         }
     }
 }

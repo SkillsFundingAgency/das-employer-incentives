@@ -684,16 +684,30 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }      
 
-        public void RefreshEmploymentChecks(IDateTimeService dateTimeService, ServiceRequest serviceRequest = null)
+        public void RefreshEmploymentChecks(IDateTimeService dateTimeService, ServiceRequest serviceRequest = null, string checkType = null)
         {
-            Model.EmploymentCheckModels.ToList()
-                .ForEach(ec =>
-                {
-                    if (Model.EmploymentCheckModels.Remove(ec))
+            if (checkType == RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString())
+            {
+                Model.EmploymentCheckModels.Where(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck).ToList()
+                    .ForEach(ec =>
                     {
-                        AddEvent(new EmploymentCheckDeleted(ec));
-                    }
-                });
+                        if (Model.EmploymentCheckModels.Remove(ec))
+                        {
+                            AddEvent(new EmploymentCheckDeleted(ec));
+                        }
+                    });
+            }
+            else
+            {
+                Model.EmploymentCheckModels.ToList()
+                    .ForEach(ec =>
+                    {
+                        if (Model.EmploymentCheckModels.Remove(ec))
+                        {
+                            AddEvent(new EmploymentCheckDeleted(ec));
+                        }
+                    });
+            }
 
             AddEmploymentChecks(dateTimeService, serviceRequest);
         }
@@ -802,13 +816,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             if (secondPayment != null)
             {
-                var initial365Check = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
-
-                if (initial365Check != null && Model.EmploymentCheckModels.Remove(initial365Check))
-                {
-                    AddEvent(new EmploymentCheckDeleted(initial365Check));
-                }
-
                 var second365Check = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck, secondPayment.DueDate, secondPayment.DueDate.AddDays(checkWindowInDays));
 
                 var existingCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
@@ -941,7 +948,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
             }
         }
-        private bool HasSuccessfulChecks(IList<EmploymentCheckType> checkTypes)
+        public bool HasSuccessfulChecks(IList<EmploymentCheckType> checkTypes)
         {
             var checks = new List<bool>();
 
@@ -988,6 +995,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             return checks.All(c => c);
+        }
+
+        public bool HasEmploymentCheck(EmploymentCheckType employmentCheckType)
+        {
+            return Model.EmploymentCheckModels.Any(c => c.CheckType == employmentCheckType);
         }
     }
 }

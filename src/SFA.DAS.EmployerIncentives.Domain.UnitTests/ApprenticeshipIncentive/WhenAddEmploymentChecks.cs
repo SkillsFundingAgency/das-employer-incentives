@@ -469,7 +469,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             check.MaximumDate.Should().Be(paymentDueDate.AddDays(42));
             check.Result.Should().BeNull();
 
-            _sut.EmploymentChecks.Any(c => c.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck).Should().BeFalse();
+            _sut.EmploymentChecks.Any(c => c.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck).Should().BeTrue();
         }
 
         [Test]
@@ -511,9 +511,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var events = _sut.FlushEvents().ToList();
             var createdEvent = events.Single(e => e is EmploymentChecksCreated) as EmploymentChecksCreated;
             createdEvent.ApprenticeshipIncentiveId.Should().Be(_sut.Id);
-
-            var deletedEvent = events.Single(e => e is EmploymentCheckDeleted) as EmploymentCheckDeleted;
-            deletedEvent.Model.Should().Be(failedEmploymentCheckModel);
         }
 
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
