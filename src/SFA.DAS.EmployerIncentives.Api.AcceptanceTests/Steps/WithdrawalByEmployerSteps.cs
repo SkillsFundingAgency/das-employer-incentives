@@ -220,8 +220,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _withdrawApplicationRequest = _fixture
                 .Build<WithdrawApplicationRequest>()
                 .With(r => r.WithdrawalType, WithdrawalType.Employer)
-                .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
-                .With(r => r.ULN, _apprenticeship.ULN)
+                .With(r => r.Applications, new[]
+                {
+                    new Application { AccountLegalEntityId = _application.AccountLegalEntityId, ULN = _apprenticeshipIncentive.ULN }
+                })
                 .With(r => r.AccountId, _application.AccountId)
                 .With(r => r.EmailAddress, "test@email.com")
                 .Create();
