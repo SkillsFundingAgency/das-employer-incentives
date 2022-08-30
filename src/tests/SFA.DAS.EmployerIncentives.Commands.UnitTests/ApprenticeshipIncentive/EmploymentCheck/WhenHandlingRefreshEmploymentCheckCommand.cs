@@ -331,8 +331,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                         .With(x => x.Result, false)
                         .Create()
                 })
-                .With(x => x.StartDate, new DateTime(2021, 10, 01))
-                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
+                .With(x => x.StartDate, new DateTime(2020, 10, 01))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
+                .With(x => x.PendingPaymentModels, new List<PendingPaymentModel>
+                {
+                    _fixture.Build<PendingPaymentModel>()
+                        .With(x => x.EarningType, EarningType.FirstPayment)
+                        .With(x => x.DueDate, new DateTime(2020, 10, 01).AddDays(90))
+                        .Create(),
+                    _fixture.Build<PendingPaymentModel>()
+                        .With(x => x.EarningType, EarningType.SecondPayment)
+                        .With(x => x.DueDate, new DateTime(2020, 10, 01).AddDays(365))
+                        .Create()
+                })
                 .Create();
 
             var serviceRequest = _fixture.Create<ServiceRequest>();
