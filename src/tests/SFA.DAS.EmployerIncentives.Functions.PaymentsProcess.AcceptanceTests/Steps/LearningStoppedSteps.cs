@@ -868,7 +868,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "LearnerMatchingOrchestrator_Start",
-                    nameof(LearnerMatchingOrchestratorStart),
+                    nameof(LearnerMatchingOrchestrator),
                     new Dictionary<string, object>
                     {
                         ["req"] = TestContext.TestRequest($"/api/orchestrators/LearnerMatchingOrchestrator")
