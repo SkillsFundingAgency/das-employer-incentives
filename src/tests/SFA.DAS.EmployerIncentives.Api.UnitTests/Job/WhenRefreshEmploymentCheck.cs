@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System;
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -10,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Api.Types;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Enums;
@@ -31,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             _sut = new JobCommandController(_mockCommandDispatcher.Object);
 
             _mockCommandDispatcher
-                .Setup(m => m.Send(It.IsAny<RefreshEmploymentCheckCommand>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<RefreshEmploymentCheckCommand>>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         }
 
@@ -109,6 +111,84 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
 
             // Assert
             actual.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task Then_a_BadRequest_response_is_returned_if_the_incentive_does_not_exist()
+        {
+            // Arrange
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+            var accountLegalEntityId = _fixture.Create<long>();
+            var uln = _fixture.Create<long>();
+            var checkType = RefreshEmploymentCheckType.InitialEmploymentChecks.ToString();
+            var applications = new List<Types.Application>
+            {
+                new Types.Application { AccountLegalEntityId = accountLegalEntityId, ULN = uln }
+            };
+            var data = new Dictionary<string, object>
+            {
+                { "CheckType", checkType },
+                { "Applications", JsonConvert.SerializeObject(applications) },
+                { "ServiceRequest", JsonConvert.SerializeObject(serviceRequest) }
+            };
+
+            var request = _fixture.Build<JobRequest>()
+                .With(r => r.Type, JobType.RefreshEmploymentChecks)
+                .With(r => r.Data, data)
+                .Create();
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<RefreshEmploymentCheckCommand>>(), It.IsAny<CancellationToken>()))
+                .Throws(new ArgumentException("Incentive not found"));
+
+            _sut = new JobCommandController(_mockCommandDispatcher.Object);
+
+            // Act
+            var actual = await _sut.AddJob(request) as BadRequestObjectResult;
+
+            // Assert
+            actual.Should().NotBeNull();
+            actual.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            actual.Value.Should().Be("Incentive not found");
+        }
+
+        [Test]
+        public async Task Then_a_BadRequest_response_is_returned_if_the_incentive_employment_checks_are_in_an_invalid_state()
+        {
+            // Arrange
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+            var accountLegalEntityId = _fixture.Create<long>();
+            var uln = _fixture.Create<long>();
+            var checkType = RefreshEmploymentCheckType.InitialEmploymentChecks.ToString();
+            var applications = new List<Types.Application>
+            {
+                new Types.Application { AccountLegalEntityId = accountLegalEntityId, ULN = uln }
+            };
+            var data = new Dictionary<string, object>
+            {
+                { "CheckType", checkType },
+                { "Applications", JsonConvert.SerializeObject(applications) },
+                { "ServiceRequest", JsonConvert.SerializeObject(serviceRequest) }
+            };
+
+            var request = _fixture.Build<JobRequest>()
+                .With(r => r.Type, JobType.RefreshEmploymentChecks)
+                .With(r => r.Data, data)
+                .Create();
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<RefreshEmploymentCheckCommand>>(), It.IsAny<CancellationToken>()))
+                .Throws(new InvalidOperationException("Employment checks not completed"));
+
+            _sut = new JobCommandController(_mockCommandDispatcher.Object);
+
+            // Act
+            var actual = await _sut.AddJob(request) as BadRequestObjectResult;
+
+            // Assert
+            actual.Should().NotBeNull();
+            actual.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            actual.Value.Should().Be("Employment checks not completed");
         }
     }
 }

@@ -38,13 +38,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
                     EmploymentCheckType.EmployedBeforeSchemeStarted 
             }))
             {
-                throw new ArgumentException("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
+                throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
             }
 
             if (command.CheckType == RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString()
                 && !incentive.HasEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
             {
-                throw new ArgumentException("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
+                throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
             }
 
             incentive.RefreshEmploymentChecks(

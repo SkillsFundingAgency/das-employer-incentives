@@ -45,6 +45,10 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
             {
                 return new BadRequestObjectResult(e.Message);
             }
+            catch (InvalidOperationException e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
             return NoContent();
         }
 

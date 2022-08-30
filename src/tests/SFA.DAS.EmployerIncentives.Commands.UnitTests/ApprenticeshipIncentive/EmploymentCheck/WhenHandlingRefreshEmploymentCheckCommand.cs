@@ -158,7 +158,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             ));
 
             // Assert
-            result.Should().Throw<ArgumentException>().WithMessage("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
+            result.Should().Throw<InvalidOperationException>().WithMessage("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
             
             _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Never);
         }
@@ -206,7 +206,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             ));
 
             // Assert
-            result.Should().Throw<ArgumentException>().WithMessage("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
+            result.Should().Throw<InvalidOperationException>().WithMessage("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
 
             _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Never);
         }
@@ -252,7 +252,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             ));
 
             // Assert
-            result.Should().Throw<ArgumentException>().WithMessage("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
+            result.Should().Throw<InvalidOperationException>().WithMessage("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
 
             _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Never);
         }
@@ -302,7 +302,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             ));
 
             // Assert
-            result.Should().Throw<ArgumentException>().WithMessage("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
+            result.Should().Throw<InvalidOperationException>().WithMessage("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
 
             _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Never);
         }
