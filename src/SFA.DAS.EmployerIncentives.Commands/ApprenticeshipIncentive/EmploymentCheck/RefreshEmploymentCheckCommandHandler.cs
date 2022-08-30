@@ -1,10 +1,13 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck
 {
@@ -26,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
 
             if (incentive == null)
             {
-                return;
+                throw new ArgumentException($"Apprenticeship incentive with account legal entity of {command.AccountLegalEntityId} and ULN {command.ULN} not found");
             }
 
             incentive.RefreshEmploymentChecks(
@@ -34,7 +37,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
                 new ServiceRequest(
                     command.ServiceRequestTaskId, 
                     command.DecisionReference, 
-                    command.ServiceRequestCreated));
+                    command.ServiceRequestCreated),
+                command.CheckType);
 
             await _incentiveDomainRepository.Save(incentive);
         }
