@@ -688,6 +688,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         {
             if (checkType == RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString())
             {
+                if (!HasSuccessfulChecks(new List<EmploymentCheckType> {
+                        EmploymentCheckType.EmployedAtStartOfApprenticeship,
+                        EmploymentCheckType.EmployedBeforeSchemeStarted
+                    }))
+                {
+                    throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
+                }
+
+                if (!HasEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
+                {
+                    throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
+                }
+
                 Model.EmploymentCheckModels.Where(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck).ToList()
                     .ForEach(ec =>
                     {
@@ -948,7 +961,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 }
             }
         }
-        public bool HasSuccessfulChecks(IList<EmploymentCheckType> checkTypes)
+        private bool HasSuccessfulChecks(IList<EmploymentCheckType> checkTypes)
         {
             var checks = new List<bool>();
 
@@ -997,7 +1010,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return checks.All(c => c);
         }
 
-        public bool HasEmploymentCheck(EmploymentCheckType employmentCheckType)
+        private bool HasEmploymentCheck(EmploymentCheckType employmentCheckType)
         {
             return Model.EmploymentCheckModels.Any(c => c.CheckType == employmentCheckType);
         }

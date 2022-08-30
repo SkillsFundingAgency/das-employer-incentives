@@ -32,21 +32,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Employment
                 throw new ArgumentException($"Apprenticeship incentive with account legal entity of {command.AccountLegalEntityId} and ULN {command.ULN} not found");
             }
 
-            if (command.CheckType == RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString() 
-                && !incentive.HasSuccessfulChecks(new List<EmploymentCheckType> { 
-                    EmploymentCheckType.EmployedAtStartOfApprenticeship, 
-                    EmploymentCheckType.EmployedBeforeSchemeStarted 
-            }))
-            {
-                throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
-            }
-
-            if (command.CheckType == RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString()
-                && !incentive.HasEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
-            {
-                throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
-            }
-
             incentive.RefreshEmploymentChecks(
                 _dateTimeService,
                 new ServiceRequest(
