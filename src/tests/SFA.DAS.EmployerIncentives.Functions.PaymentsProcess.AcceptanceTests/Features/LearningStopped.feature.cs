@@ -372,7 +372,7 @@ this.ScenarioInitialize(scenarioInfo);
         [NUnit.Framework.TestCaseAttribute("paid", "paid", "after", "before", "retained", "clawedback", null)]
         [NUnit.Framework.TestCaseAttribute("paid", "paid", "after", "on", "retained", "retained", null)]
         [NUnit.Framework.TestCaseAttribute("paid", "paid", "after", "after", "retained", "retained", null)]
-        public virtual void RetrospectiveStoppedTestsOnStoppedIncentive(string firstPaymentIsPaid, string secondPaymentIsPaid, string whenfirstPaymentIsPaid, string whenSecondPaymentIsPaid, string firstEarningResult, string secondEarningResult, string[] exampleTags)
+        public void RetrospectiveStoppedTestsOnStoppedIncentive(string firstPaymentIsPaid, string secondPaymentIsPaid, string whenfirstPaymentIsPaid, string whenSecondPaymentIsPaid, string firstEarningResult, string secondEarningResult, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
@@ -382,21 +382,11 @@ this.ScenarioInitialize(scenarioInfo);
             argumentsOfScenario.Add("whenSecondPaymentIsPaid", whenSecondPaymentIsPaid);
             argumentsOfScenario.Add("firstEarningResult", firstEarningResult);
             argumentsOfScenario.Add("secondEarningResult", secondEarningResult);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Retrospective stopped tests on stopped incentive", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Retrospective stopped tests on stopped incentive", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 61
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }

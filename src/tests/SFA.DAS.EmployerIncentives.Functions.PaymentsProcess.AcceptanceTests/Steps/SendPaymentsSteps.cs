@@ -160,7 +160,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "IncentivePaymentOrchestrator_HttpStart",
-                    nameof(IncentivePaymentOrchestratorHttpStart),
+                    nameof(IncentivePaymentOrchestrator),
                     new Dictionary<string, object>
                     {
                         ["req"] = TestContext.TestRequest($"/api/orchestrators/IncentivePaymentOrchestrator")
@@ -178,7 +178,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "PaymentApproval_HttpStart",
-                    nameof(IncentivePaymentOrchestratorHttpStart),
+                    nameof(IncentivePaymentOrchestrator),
                     new Dictionary<string, object>
                     {
                         ["req"] = TestContext.TestRequest($"/api/orchestrators/approvePayments/{_orchestratorInstanceId}"),
@@ -193,7 +193,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await _testContext.TestFunction.Start(
                 new OrchestrationStarterInfo(
                     "PaymentRejection_HttpStart",
-                    nameof(IncentivePaymentOrchestratorHttpStart),
+                    nameof(IncentivePaymentOrchestrator),
                     new Dictionary<string, object>
                     {
                         ["req"] = TestContext.TestRequest($"/api/orchestrators/rejectPayments/{_orchestratorInstanceId}"),

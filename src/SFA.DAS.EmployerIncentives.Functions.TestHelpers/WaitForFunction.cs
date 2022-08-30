@@ -25,7 +25,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
         private static bool OrchestrationsCompleteOrAwaitingInput(string orchestratorName, string expectedCustomStatus, DurableOrchestrationStatus orchestrationStatus)
         {
             var customStatus = orchestrationStatus.CustomStatus.ToObject<string>();
-            return orchestrationStatus.Name != orchestratorName || (expectedCustomStatus != null && customStatus == expectedCustomStatus);
+            
+            return orchestrationStatus.Name != orchestratorName ||
+                (expectedCustomStatus != null && customStatus == expectedCustomStatus) ||
+                (expectedCustomStatus == null && orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed);
         }
     }
 }

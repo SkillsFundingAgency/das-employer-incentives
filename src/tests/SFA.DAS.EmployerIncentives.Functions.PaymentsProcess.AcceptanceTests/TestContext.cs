@@ -1,10 +1,10 @@
 ﻿using Dapper.Contrib.Extensions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Moq;
+using Microsoft.Extensions.Primitives;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
-using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public MockApi LearnerMatchApi { get; set; }
         
         public MockApi PaymentsApi { get; set; }
-        public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }        
+        public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
+
+        public static HttpRequest TestRequest(string path, object body = null) => CreateTestRequest(path, body);
 
         public TestContext()
         {
@@ -58,34 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        public static HttpRequest TestRequest(string path, object body = null)
-        {
-            if(!path.StartsWith("/"))
-            {
-                path = string.Concat("/", path);
-            }
-
-            var json = body == null ? "{}" : JsonSerializer.Serialize(body);
-
-            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-
-            var context = new DefaultHttpContext();
-            var request = context.Request;
-            request.Body = memoryStream;
-            request.ContentType = "application/json";
-            request.Method = "Get";
-            request.Scheme = "http";
-            request.Host = new HostString("dummy");
-
-            request.Query = new QueryCollection();
-            request.Path = path;
-            request.ContentLength = request.Body.Length;
-            request.Form = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
-
-            return request;
-        }
+        }        
 
         public async Task SetActiveCollectionCalendarPeriod(CollectionPeriod collectionPeriod)
         {
@@ -133,6 +108,36 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             }
 
             _isDisposed = true;
+        }
+
+        private static HttpRequest CreateTestRequest(string path, object body = null)
+        {
+            if (!path.StartsWith("/"))
+            {
+                path = string.Concat("/", path);
+            }
+
+            var json = body == null ? "{}" : JsonSerializer.Serialize(body);
+
+            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+
+            var context = new DefaultHttpContext();
+            var request = context.Request;
+            request.Body = memoryStream;
+            request.ContentType = "application/json";
+            request.Method = HttpMethod.Get.ToString();
+            request.Scheme = "https";
+            request.Host = new HostString("localhost:7071");
+            request.IsHttps = false;
+            request.Query = new QueryCollection();
+            request.Path = path;
+            request.QueryString = QueryString.Empty;
+            request.Protocol = string.Empty;
+            request.ContentLength = request.Body.Length;
+            request.Form = new FormCollection(new Dictionary<string, StringValues>());
+
+
+            return request;
         }
     }
 }
