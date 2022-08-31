@@ -45,10 +45,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
                     { "FUNCTIONS_WORKER_RUNTIME", "dotnet" },
-                    { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
-                    { "ApplicationSettings:LogLevel", "Info" },                    
+                    { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ApplicationSettings:NServiceBusConnectionString", _testContext.ApplicationSettings.NServiceBusConnectionString },
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory }
             };
 
             _testContext = testContext;
