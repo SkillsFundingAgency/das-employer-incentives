@@ -23,27 +23,6 @@
      <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />    
   </ItemGroup>
 
-  <!--<ItemGroup>
-    <PackageReference Include="AutoFixture" Version="4.17.0" />
-    <PackageReference Include="coverlet.collector" Version="3.1.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="FluentAssertions" Version="6.7.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-    <PackageReference Include="Microsoft.SqlServer.DACFx" Version="160.6161.0" />
-    <PackageReference Include="Moq" Version="4.14.2" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Polly" Version="7.2.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.0" />
-  </ItemGroup>-->
-
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Abstractions\SFA.DAS.EmployerIncentives.Abstractions.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data\SFA.DAS.EmployerIncentives.Data.csproj" />
