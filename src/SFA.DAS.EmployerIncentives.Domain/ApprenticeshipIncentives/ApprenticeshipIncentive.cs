@@ -749,7 +749,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 {
                     return;
                 }
-                else if(existingFirstCheck != null && existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value) // first check failed
+                else if(existingFirstCheck != null && (existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value)
+                        || (!existingFirstCheck.Result.HasValue && existingFirstCheck.ErrorType != null)) // first check failed or returned error code
                 {
                     if (secondPaymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
                     {
@@ -1012,7 +1013,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         private bool HasEmploymentCheck(EmploymentCheckType employmentCheckType)
         {
-            return Model.EmploymentCheckModels.Any(c => c.CheckType == employmentCheckType);
+            var employmentCheck = Model.EmploymentCheckModels.FirstOrDefault(c => c.CheckType == employmentCheckType);
+            if (employmentCheck == null)
+            {
+                return false;
+            }
+
+            if (employmentCheck.Result.HasValue)
+            {
+                return true;
+            }
+            
+            if (!employmentCheck.Result.HasValue && employmentCheck.ErrorType != null)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

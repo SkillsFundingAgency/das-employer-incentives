@@ -308,6 +308,112 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         }
 
         [Test]
+        public void Then_a_refresh_of_the_365_day_employment_check_is_not_requested_if_the_first_365_day_check_has_not_returned_a_result()
+        {
+            // Arrange
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, true)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                        .With(x => x.Result, false)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
+                        .Without(x => x.Result)
+                        .Create()
+                })
+                .With(x => x.StartDate, new DateTime(2021, 10, 01))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
+                .Create();
+
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+
+            var incentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
+
+            _mockIncentiveDomainRespository
+                .Setup(x => x.FindByUlnWithinAccountLegalEntity(
+                    model.Apprenticeship.UniqueLearnerNumber,
+                    model.Account.AccountLegalEntityId))
+                .ReturnsAsync(incentive);
+
+            // Act
+            Func<Task> result = async () => await _sut.Handle(new RefreshEmploymentCheckCommand(
+                RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString(),
+                model.Account.AccountLegalEntityId,
+                model.Apprenticeship.UniqueLearnerNumber,
+                serviceRequest.TaskId,
+                serviceRequest.DecisionReference,
+                serviceRequest.Created
+            ));
+
+            // Assert
+            result.Should().Throw<InvalidOperationException>().WithMessage("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
+
+            _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Never);
+        }
+
+        [Test]
+        public void Then_a_refresh_of_the_365_day_employment_check_is_not_requested_if_the_second_365_day_check_has_not_returned_a_result()
+        {
+            // Arrange
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, true)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                        .With(x => x.Result, false)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
+                        .Without(x => x.Result)
+                        .Without(x => x.ErrorType)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck)
+                        .Without(x => x.Result)
+                        .Without(x => x.ErrorType)
+                        .Create()
+                })
+                .With(x => x.StartDate, new DateTime(2021, 10, 01))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase2))
+                .Create();
+
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+
+            var incentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
+
+            _mockIncentiveDomainRespository
+                .Setup(x => x.FindByUlnWithinAccountLegalEntity(
+                    model.Apprenticeship.UniqueLearnerNumber,
+                    model.Account.AccountLegalEntityId))
+                .ReturnsAsync(incentive);
+
+            // Act
+            Func<Task> result = async () => await _sut.Handle(new RefreshEmploymentCheckCommand(
+                RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString(),
+                model.Account.AccountLegalEntityId,
+                model.Apprenticeship.UniqueLearnerNumber,
+                serviceRequest.TaskId,
+                serviceRequest.DecisionReference,
+                serviceRequest.Created
+            ));
+
+            // Assert
+            result.Should().Throw<InvalidOperationException>().WithMessage("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
+
+            _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Never);
+        }
+
+        [Test]
         public async Task Then_a_refresh_of_the_365_day_employment_checks_are_requested_if_initial_and_365_day_checks_have_been_executed()
         {
             // Arrange
@@ -377,6 +483,81 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             checkCreatedEvent.ServiceRequest.DecisionReference.Should().Be(serviceRequest.DecisionReference);
             checkCreatedEvent.ServiceRequest.Created.Should().Be(serviceRequest.Created);
             
+            _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_a_refresh_of_the_365_day_employment_checks_are_requested_if_the_checks_have_returned_an_error()
+        {
+            // Arrange
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(x => x.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, true)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                        .With(x => x.Result, false)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
+                        .Without(x => x.Result)
+                        .With(x => x.ErrorType, EmploymentCheckResultError.PAYENotFound)
+                        .Create(),
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck)
+                        .Without(x => x.Result)
+                        .With(x => x.ErrorType, EmploymentCheckResultError.NinoAndPAYENotFound)
+                        .Create()
+                })
+                .With(x => x.StartDate, new DateTime(2020, 10, 01))
+                .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
+                .With(x => x.PendingPaymentModels, new List<PendingPaymentModel>
+                {
+                    _fixture.Build<PendingPaymentModel>()
+                        .With(x => x.EarningType, EarningType.FirstPayment)
+                        .With(x => x.DueDate, new DateTime(2020, 10, 01).AddDays(90))
+                        .Create(),
+                    _fixture.Build<PendingPaymentModel>()
+                        .With(x => x.EarningType, EarningType.SecondPayment)
+                        .With(x => x.DueDate, new DateTime(2020, 10, 01).AddDays(365))
+                        .Create()
+                })
+                .Create();
+
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+
+            var incentive = Domain.ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
+
+            _mockIncentiveDomainRespository
+                .Setup(x => x.FindByUlnWithinAccountLegalEntity(
+                    model.Apprenticeship.UniqueLearnerNumber,
+                    model.Account.AccountLegalEntityId))
+                .ReturnsAsync(incentive);
+
+            // Act
+            await _sut.Handle(new RefreshEmploymentCheckCommand(
+                RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString(),
+                model.Account.AccountLegalEntityId,
+                model.Apprenticeship.UniqueLearnerNumber,
+                serviceRequest.TaskId,
+                serviceRequest.DecisionReference,
+                serviceRequest.Created
+            ));
+
+            // Assert
+            var createdEvents = incentive.FlushEvents().OfType<EmploymentChecksCreated>();
+            createdEvents.Should().NotBeNull();
+            createdEvents.Count().Should().Be(1);
+            var checkCreatedEvent = createdEvents.First();
+            checkCreatedEvent.ApprenticeshipIncentiveId.Should().Be(model.Id);
+            checkCreatedEvent.Model.CheckType.Should().Be(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
+            checkCreatedEvent.ServiceRequest.TaskId.Should().Be(serviceRequest.TaskId);
+            checkCreatedEvent.ServiceRequest.DecisionReference.Should().Be(serviceRequest.DecisionReference);
+            checkCreatedEvent.ServiceRequest.Created.Should().Be(serviceRequest.Created);
+
             _mockIncentiveDomainRespository.Verify(m => m.Save(incentive), Times.Once);
         }
     }
