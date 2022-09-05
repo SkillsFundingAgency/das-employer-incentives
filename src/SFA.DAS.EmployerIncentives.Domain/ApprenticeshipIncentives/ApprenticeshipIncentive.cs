@@ -696,7 +696,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
                 }
 
-                if (!HasEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
+                if (!CanRefreshEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
                 {
                     throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
                 }
@@ -1011,7 +1011,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return checks.All(c => c);
         }
 
-        private bool HasEmploymentCheck(EmploymentCheckType employmentCheckType)
+        private bool CanRefreshEmploymentCheck(EmploymentCheckType employmentCheckType)
         {
             var employmentCheck = Model.EmploymentCheckModels.FirstOrDefault(c => c.CheckType == employmentCheckType);
             if (employmentCheck == null)
