@@ -14,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         /// Sets period 2020/1 (August) with Opening Date 2020-08-08 & Census Date 2020-08-31 as active
         /// </summary>
         [BeforeScenario(Order = 20)]
-        public async Task SetActiveCollectionCalendarPeriod(TestContext context)
+        public async Task SetActiveCollectionCalendarPeriod(AcceptanceTests.TestContext context)
         {
             await using var dbConnection = new SqlConnection(context.SqlDatabase.DatabaseInfo.ConnectionString);
 

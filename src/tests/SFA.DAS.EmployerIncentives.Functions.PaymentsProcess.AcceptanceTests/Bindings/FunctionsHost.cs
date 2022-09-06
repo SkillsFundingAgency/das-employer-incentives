@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             _featureContext = featureContext;
         }
 
-        [BeforeScenario()]
+        [BeforeScenario(Order = 3)]
         public async Task InitialiseHost()
         {
             var stopwatch = new Stopwatch();
@@ -28,12 +28,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             Console.WriteLine($"Time it took to spin up Azure Functions Host: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");
         }
 
-        [AfterScenario()]
+        [AfterScenario(Order = 2)]
         public async Task Cleanup()
         { 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            await _testContext.TestFunction.DisposeAsync();
+            if (_testContext.TestFunction != null)
+            {
+                await _testContext.TestFunction.DisposeAsync();
+            }
             stopwatch.Stop();
             Console.WriteLine($"Time it took to Cleanup  FunctionsHost: {stopwatch.Elapsed.Milliseconds} milliseconds for hub {_testContext.TestFunction.HubName}");
         }

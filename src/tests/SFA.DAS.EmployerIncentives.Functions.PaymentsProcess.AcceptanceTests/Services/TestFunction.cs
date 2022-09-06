@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using NServiceBus;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
@@ -26,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
         private readonly OrchestrationData _orchestrationData;
+
         private bool isDisposed;
 
         private IJobHost Jobs => _host.Services.GetService<IJobHost>();
@@ -146,7 +148,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         public async Task StartHost()
         {
-            var timeout = new TimeSpan(0, 0, 10);
+            var timeout = new TimeSpan(0, 0, 30);
             var delayTask = Task.Delay(timeout);
             await Task.WhenAny(_host.StartAsync(), delayTask);
 
@@ -182,6 +184,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         public async Task DisposeAsync()
         {
             await Jobs.StopAsync();
+
+            var endPoints = _host.Services.GetServices<IEndpointInstance>();
+            foreach (var endPoint in endPoints)
+            {
+                await endPoint.Stop();
+            }
+
             Dispose();
         }
 

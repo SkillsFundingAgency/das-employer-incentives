@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLea
                 {
                     OnProcessing = () => new Tuple<string, object[]>("Creating " + message, new object[] { ApprenticeshipIncentiveId }),
                     OnProcessed = () => new Tuple<string, object[]>("Created " + message, new object[] { ApprenticeshipIncentiveId }),
-                    OnError = () => new Tuple<string, object[]>("Created " + message, new object[] { ApprenticeshipIncentiveId })
+                    OnError = () => new Tuple<string, object[]>("Error creating " + message, new object[] { ApprenticeshipIncentiveId })
                 };
             }
         }

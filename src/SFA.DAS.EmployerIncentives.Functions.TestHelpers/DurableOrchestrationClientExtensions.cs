@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
                     break;
                 }
 
-                await Task.Delay(TimeSpan.FromMilliseconds(100), token);
+                await Task.Delay(TimeSpan.FromMilliseconds(200), token);
             }
         }
     }

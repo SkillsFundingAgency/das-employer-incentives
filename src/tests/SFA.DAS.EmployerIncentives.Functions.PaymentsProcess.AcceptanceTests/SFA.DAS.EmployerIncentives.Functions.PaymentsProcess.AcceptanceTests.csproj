@@ -10,6 +10,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Ductus.FluentDocker" Version="2.10.56" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />        
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.7.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
@@ -26,6 +27,7 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess\SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.Functions.TestHelpers\SFA.DAS.EmployerIncentives.Functions.TestHelpers.csproj" />
+    <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.TestHelpers\SFA.DAS.EmployerIncentives.TestHelpers.csproj" />
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 

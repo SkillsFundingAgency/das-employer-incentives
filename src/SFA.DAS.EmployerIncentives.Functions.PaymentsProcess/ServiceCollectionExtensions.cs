@@ -88,7 +88,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
 
             var endpointWithExternallyManagedServiceProvider = EndpointWithExternallyManagedServiceProvider.Create(endpointConfiguration, serviceCollection);
-            endpointWithExternallyManagedServiceProvider.Start(new UpdateableServiceProvider(serviceCollection));
+            var endPointInstance = endpointWithExternallyManagedServiceProvider.Start(new UpdateableServiceProvider(serviceCollection)).GetAwaiter().GetResult();
+            serviceCollection.AddSingleton(endPointInstance);
             serviceCollection.AddSingleton(p => endpointWithExternallyManagedServiceProvider.MessageSession.Value);
 
             return serviceCollection;

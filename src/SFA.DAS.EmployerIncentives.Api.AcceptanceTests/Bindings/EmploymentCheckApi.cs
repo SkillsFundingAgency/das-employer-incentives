@@ -6,9 +6,9 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
     [Scope(Tag = "employmentCheckApi")]
     public class EmploymentCheckApi
     {
-        private readonly TestContext _context;
+        private readonly AcceptanceTests.TestContext _context;
 
-        public EmploymentCheckApi(TestContext context)
+        public EmploymentCheckApi(AcceptanceTests.TestContext context)
         {
             _context = context;            
         }

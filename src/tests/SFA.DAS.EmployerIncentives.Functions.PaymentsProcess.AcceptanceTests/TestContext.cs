@@ -2,10 +2,11 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
+using SFA.DAS.EmployerIncentives.TestHelpers.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -16,13 +17,17 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 {
     public class TestContext : IDisposable
     {
         public string InstanceId { get; private set; }
+
+        public string SqlDataSource { get; private set; }
+
         public DirectoryInfo TestDirectory { get; set; }
-        public TestFunction TestFunction { get; set; }
+        public TestFunction TestFunction { get; set; }        
 
         public TestData TestData { get; set; }        
         public List<IHook> Hooks { get; set; }
@@ -52,6 +57,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
                 NServiceBusConnectionString = "UseLearningEndpoint=true",
                 UseLearningEndpointStorageDirectory = Path.Combine(TestDirectory.FullName, ".learningtransport"),
             };
+        }
+        public void Initialise(SqlServerImageInfo sqlServerImageInfo)
+        {
+            SqlDataSource = sqlServerImageInfo.DataSource;
         }
 
         private bool _isDisposed;
