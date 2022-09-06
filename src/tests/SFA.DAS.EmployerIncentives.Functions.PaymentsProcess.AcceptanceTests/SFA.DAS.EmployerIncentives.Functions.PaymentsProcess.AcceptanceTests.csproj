@@ -6,25 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Files\acrossyear-R03-inlearning.json.txt" />
-    <None Remove="Files\acrossyear-R04-inlearning.json.txt" />
-    <None Remove="Files\BL-R03-InBreak.json.txt" />
-    <None Remove="Files\BL-R03-InLearning-DifferentApprenticeship.json.txt" />
-    <None Remove="Files\BL-R03-InLearning-NoEndDate.json.txt" />
-    <None Remove="Files\BL-R03-InLearning-NoPayable.json.txt" />
-    <None Remove="Files\BL-R03-InLearning-NoTraining.txt" />
-    <None Remove="Files\BL-R03-InLearning-NoZPROG001.json.txt" />
-    <None Remove="Files\BL-R03-InLearning.json.txt" />
-    <None Remove="Files\BL-R04-InBreak.json.txt" />
-    <None Remove="Files\Course-Price-DlcokResoved-R04.json.txt" />
-    <None Remove="Files\Course-Price-Dlock-R03.json.txt" />
-    <None Remove="Files\PC-R03-NoDlock.json.txt" />
-    <None Remove="Files\PC-R04-Pricechange-DLock7.json.txt" />
-    <None Remove="Files\StartDateChange.json.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Files\acrossyear-R03-inlearning.json.txt" />
+    <EmbeddedResource Include="Files\acrossyear-R03-inlearning.json.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Files\acrossyear-R04-inlearning.json.txt" />
     <EmbeddedResource Include="Files\BL-R03-InBreak.json.txt" />
     <EmbeddedResource Include="Files\BL-R03-InLearning-DifferentApprenticeship.json.txt" />
