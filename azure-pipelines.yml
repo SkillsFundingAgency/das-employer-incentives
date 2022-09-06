@@ -114,7 +114,7 @@ stages:
       displayName: 'Copy dacpac from: $(build.artifactstagingdirectory) to source location'
       inputs:
         Contents: |
-          $(build.artifactstagingdirectory)\publish\*.dacpac
+          $(build.artifactstagingdirectory)\publish\**\*.dacpac
         TargetFolder: 'src/$(SolutionBaseName)/bin/release'
 
     - task: DockerInstaller@0
