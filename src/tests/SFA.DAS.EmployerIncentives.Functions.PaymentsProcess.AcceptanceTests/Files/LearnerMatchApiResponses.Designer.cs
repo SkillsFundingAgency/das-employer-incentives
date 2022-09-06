@@ -80,9 +80,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Acrossyear_R03_InLearning_json {
+        internal static string acrossyear_r03_inlearning_json {
             get {
-                return ResourceManager.GetString("Acrossyear_R03_InLearning_json", resourceCulture);
+                return ResourceManager.GetString("acrossyear_r03_inlearning_json", resourceCulture);
             }
         }
         
