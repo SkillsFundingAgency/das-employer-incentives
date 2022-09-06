@@ -6,26 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Files/acrossyear-r03-inlearning.json.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Files/acrossyear-r04-inlearning.json.txt" />
-    <EmbeddedResource Include="Files/BL-R03-InBreak.json.txt" />
-    <EmbeddedResource Include="Files/BL-R03-InLearning-DifferentApprenticeship.json.txt" />
-    <EmbeddedResource Include="Files/BL-R03-InLearning-NoEndDate.json.txt" />
-    <EmbeddedResource Include="Files/BL-R03-InLearning-NoPayable.json.txt" />
-    <EmbeddedResource Include="Files/BL-R03-InLearning-NoTraining.txt" />
-    <EmbeddedResource Include="Files/BL-R03-InLearning-NoZPROG001.json.txt" />
-    <EmbeddedResource Include="Files/BL-R03-InLearning.json.txt" />
-    <EmbeddedResource Include="Files/BL-R04-InBreak.json.txt" />
-    <EmbeddedResource Include="Files/Course-Price-DlcokResoved-R04.json.txt" />
-    <EmbeddedResource Include="Files/Course-Price-Dlock-R03.json.txt" />
-    <EmbeddedResource Include="Files/PC-R03-NoDlock.json.txt" />
-    <EmbeddedResource Include="Files/PC-R04-Pricechange-DLock7.json.txt" />
-    <EmbeddedResource Include="Files/StartDateChange.json.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="3.1.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -52,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Files\LearnerMatchApiResponses.Designer.cs">
+    <Compile Update="LearnerMatchApiResponses.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>LearnerMatchApiResponses.resx</DependentUpon>
@@ -60,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Files\LearnerMatchApiResponses.resx">
+    <EmbeddedResource Update="LearnerMatchApiResponses.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LearnerMatchApiResponses.Designer.cs</LastGenOutput>
     </EmbeddedResource>
