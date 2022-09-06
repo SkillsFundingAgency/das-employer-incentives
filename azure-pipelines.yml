@@ -58,11 +58,11 @@ stages:
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
     - task: CopyFiles@2
-      displayName: 'Copy dacpac to: $(build.binariesdirectory)'
+      displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
       inputs:
         Contents: |
           src\**\*.dacpac
-        TargetFolder: '$(build.binariesdirectory)/publish'
+        TargetFolder: '$(build.artifactstagingdirectory)/publish'
 
   - job: 'BuildAndTest'
     pool:
@@ -125,10 +125,10 @@ stages:
         arguments: '--configuration $(buildConfiguration) --no-restore'
 
     - task: CopyFiles@2
-      displayName: 'Copy dacpac from: $(build.binariesdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac, to source location $(build.sourcesdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac'
+      displayName: 'Copy dacpac from: $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac, to source location $(build.sourcesdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac'
       inputs:           
         Contents: |
-          $(build.binariesdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
+          $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
         TargetFolder: '$(build.sourcesdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac'
         Overwrite : true
         RetryCount : 3
