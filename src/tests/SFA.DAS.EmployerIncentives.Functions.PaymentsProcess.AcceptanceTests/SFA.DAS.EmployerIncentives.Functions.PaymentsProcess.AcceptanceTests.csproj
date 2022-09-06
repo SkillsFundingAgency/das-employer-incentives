@@ -6,10 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Files/acrossyear-R03-inlearning.json.txt">
+    <EmbeddedResource Include="Files/acrossyear-r03-inlearning.json.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Files/acrossyear-R04-inlearning.json.txt" />
+    <EmbeddedResource Include="Files/acrossyear-r04-inlearning.json.txt" />
     <EmbeddedResource Include="Files/BL-R03-InBreak.json.txt" />
     <EmbeddedResource Include="Files/BL-R03-InLearning-DifferentApprenticeship.json.txt" />
     <EmbeddedResource Include="Files/BL-R03-InLearning-NoEndDate.json.txt" />
