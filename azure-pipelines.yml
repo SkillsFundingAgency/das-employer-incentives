@@ -125,11 +125,11 @@ stages:
         arguments: '--configuration $(buildConfiguration) --no-restore'
 
     - task: CopyFiles@2
-      displayName: 'Copy dacpac from: $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac, to source location $(build.artifactstagingdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).dacpac'
+      displayName: 'Copy dacpac from: $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac, to source location src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac'
       inputs:           
         Contents: |
           $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
-        TargetFolder: '$(build.artifactstagingdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).dacpac'
+        TargetFolder: /src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac
         Overwrite : true
         RetryCount : 3
 
