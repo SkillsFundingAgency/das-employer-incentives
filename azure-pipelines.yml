@@ -112,10 +112,12 @@ stages:
 
     - task: CopyFiles@2
       displayName: 'Copy dacpac from: $(build.artifactstagingdirectory) to source location'
-      inputs:        
+      inputs:           
         Contents: |
-          $(build.artifactstagingdirectory)\publish\$(SolutionBaseName).Database\bin\Release\$(SolutionBaseName).Database.dacpac
+          $(build.artifactstagingdirectory)/publish/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
         TargetFolder: 'src/$(SolutionBaseName)/bin/release'
+        Overwrite : true
+        RetryCount : 3
 
     - task: DockerInstaller@0
       displayName: Docker Installer
