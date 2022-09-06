@@ -110,15 +110,6 @@ stages:
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    - task: CopyFiles@2
-      displayName: 'Copy dacpac from: $(build.artifactstagingdirectory) to source location'
-      inputs:           
-        Contents: |
-          $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
-        TargetFolder: 'src/$(SolutionBaseName)/bin/release'
-        Overwrite : true
-        RetryCount : 3
-
     - task: DockerInstaller@0
       displayName: Docker Installer
       inputs:
@@ -132,6 +123,15 @@ stages:
         projects: |
           src/**/*.AcceptanceTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
+
+     - task: CopyFiles@2
+      displayName: 'Copy dacpac from: $(build.artifactstagingdirectory) to source location'
+      inputs:           
+        Contents: |
+          $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
+        TargetFolder: 'src/$(SolutionBaseName).Database/bin/release'
+        Overwrite : true
+        RetryCount : 3
 
     - task: DotNetCoreCLI@2
       displayName: Run Acceptance Tests
