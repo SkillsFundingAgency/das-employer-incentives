@@ -33,7 +33,7 @@ stages:
   jobs:
   - job: 'BuildAndTest'
     pool:
-      name: 'DAS - Continuous Integration Agents'      
+      name: DAS - Continuous Integration Agents
     workspace:
       clean: all
     steps:
