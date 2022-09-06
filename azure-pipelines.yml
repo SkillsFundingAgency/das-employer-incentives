@@ -33,9 +33,9 @@ stages:
   jobs:
   - job: 'BuildAndTest'
     pool:
-      name: 'DAS - Continuous Integration'
+      name: 'DAS - Continuous Integration Agents'
       demands:
-        - Agent.OS -equals Windows_NT
+        - LATEST_DOTNET_VERSION -equals 6.0
     workspace:
       clean: all
     steps:
