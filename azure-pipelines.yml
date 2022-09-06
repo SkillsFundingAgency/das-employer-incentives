@@ -110,12 +110,14 @@ stages:
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    #- task: CopyFiles@2 ??
-    #  displayName: 'Copy dacpac from: $(build.artifactstagingdirectory) to source location'
-    #  inputs:
-    #    Contents: |
-    #      $(build.artifactstagingdirectory)\publish\**\*.dacpac
-    #    TargetFolder: '$(build.artifactstagingdirectory)/publish'
+    - task: CopyFiles@2
+      displayName: 'Copy dacpac from: $(build.artifactstagingdirectory) to source location'
+      inputs:
+        Contents: |
+          $(build.artifactstagingdirectory)\publish\*.dacpac
+        TargetFolder: 'src/$(SolutionBaseName)/bin/release'
+
+        src/$(SolutionBaseName).Api/$(SolutionBaseName).Api.csproj
 
     #- task: VSBuild@1
     #  displayName: 'Build DACPAC'
