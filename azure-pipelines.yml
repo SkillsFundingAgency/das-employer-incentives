@@ -124,7 +124,7 @@ stages:
           src/**/*.AcceptanceTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
 
-     - task: CopyFiles@2
+    - task: CopyFiles@2
       displayName: 'Copy dacpac from: $(build.artifactstagingdirectory) to source location'
       inputs:           
         Contents: |
