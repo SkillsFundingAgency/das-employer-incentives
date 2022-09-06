@@ -31,4 +31,19 @@
     <ProjectReference Include="..\..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="LearnerMatchApiResponses.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LearnerMatchApiResponses.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="LearnerMatchApiResponses.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>LearnerMatchApiResponses.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

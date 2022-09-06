@@ -76,8 +76,6 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
                 cmd.CommandText = $"EXEC sp_detach_db '{dbName}', 'true';";
                 cmd.ExecuteNonQuery();
                 dbConn.Close();
-
-                //files.ForEach(DeleteFile);
             }
             catch (Exception ex)
             {

@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
             _dacpacFileLocation = Path.Combine(
                 Directory.GetCurrentDirectory().Substring(0,
                     Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
-                $"src\\{DatabaseProjectName}\\bin\\{environment}\\{DatabaseProjectName}.dacpac");
+                $"src/{DatabaseProjectName}/bin/{environment}/{DatabaseProjectName}.dacpac");
 
             if (!File.Exists(_dacpacFileLocation))
                 throw new FileNotFoundException($"DACPAC file not found in: {_dacpacFileLocation}.  Rebuid the database project.");
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
             _dockerFileLocation = Path.Combine(
                 Directory.GetCurrentDirectory().Substring(0,
                     Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
-                $"src\\{DockerProjectLocation}\\Images\\Dockerfile");
+                $"src/{DockerProjectLocation}/Images/Dockerfile");
 
             if (!File.Exists(_dockerFileLocation))
                 throw new FileNotFoundException($"Dockerfile not found in: {_dockerFileLocation}. ");

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files {
+namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LearnerMatchApiResponses {
@@ -39,8 +39,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Files.Learne" +
-                            "rMatchApiResponses", typeof(LearnerMatchApiResponses).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.LearnerMatch" +
+                            "ApiResponses", typeof(LearnerMatchApiResponses).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -80,9 +80,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Acrossyear_R03_InLearning_json {
+        internal static string AcrossYear_R03_InLearning {
             get {
-                return ResourceManager.GetString("Acrossyear_R03_InLearning_json", resourceCulture);
+                return ResourceManager.GetString("AcrossYear-R03-InLearning", resourceCulture);
             }
         }
         
@@ -105,9 +105,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///          [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Acrossyear_R04_InLearning_json {
+        internal static string AcrossYear_R04_InLearning {
             get {
-                return ResourceManager.GetString("Acrossyear_R04_InLearning_json", resourceCulture);
+                return ResourceManager.GetString("AcrossYear-R04-InLearning", resourceCulture);
             }
         }
         
@@ -130,9 +130,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BL_R03_InBreak_json {
+        internal static string BL_R03_InBreak {
             get {
-                return ResourceManager.GetString("BL_R03_InBreak_json", resourceCulture);
+                return ResourceManager.GetString("BL-R03-InBreak", resourceCulture);
             }
         }
         
@@ -155,9 +155,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BL_R03_InLearning_DifferentApprenticeship_json {
+        internal static string BL_R03_InLearning {
             get {
-                return ResourceManager.GetString("BL_R03_InLearning_DifferentApprenticeship_json", resourceCulture);
+                return ResourceManager.GetString("BL-R03-InLearning", resourceCulture);
             }
         }
         
@@ -180,9 +180,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BL_R03_InLearning_json {
+        internal static string BL_R03_InLearning_DifferentApprenticeship {
             get {
-                return ResourceManager.GetString("BL_R03_InLearning_json", resourceCulture);
+                return ResourceManager.GetString("BL-R03-InLearning-DifferentApprenticeship", resourceCulture);
             }
         }
         
@@ -205,9 +205,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BL_R03_InLearning_NoEndDate_json {
+        internal static string BL_R03_InLearning_NoEndDate {
             get {
-                return ResourceManager.GetString("BL_R03_InLearning_NoEndDate_json", resourceCulture);
+                return ResourceManager.GetString("BL-R03-InLearning-NoEndDate", resourceCulture);
             }
         }
         
@@ -230,9 +230,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BL_R03_InLearning_NoPayable_json {
+        internal static string BL_R03_InLearning_NoPayable {
             get {
-                return ResourceManager.GetString("BL_R03_InLearning_NoPayable_json", resourceCulture);
+                return ResourceManager.GetString("BL-R03-InLearning-NoPayable", resourceCulture);
             }
         }
         
@@ -250,7 +250,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         /// </summary>
         internal static string BL_R03_InLearning_NoTraining {
             get {
-                return ResourceManager.GetString("BL_R03_InLearning_NoTraining", resourceCulture);
+                return ResourceManager.GetString("BL-R03-InLearning-NoTraining", resourceCulture);
             }
         }
         
@@ -273,9 +273,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BL_R03_InLearning_NoZPROG001_json {
+        internal static string BL_R03_InLearning_NoZPROG001 {
             get {
-                return ResourceManager.GetString("BL_R03_InLearning_NoZPROG001_json", resourceCulture);
+                return ResourceManager.GetString("BL-R03-InLearning-NoZPROG001", resourceCulture);
             }
         }
         
@@ -298,9 +298,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string BL_R04_InBreak_json {
+        internal static string BL_R04_InBreak {
             get {
-                return ResourceManager.GetString("BL_R04_InBreak_json", resourceCulture);
+                return ResourceManager.GetString("BL-R04-InBreak", resourceCulture);
             }
         }
         
@@ -323,9 +323,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///          [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Course_Price_DlcokResoved_R04_json {
+        internal static string Course_Price_DlcokResoved_R04 {
             get {
-                return ResourceManager.GetString("Course_Price_DlcokResoved_R04_json", resourceCulture);
+                return ResourceManager.GetString("Course-Price-DlcokResoved-R04", resourceCulture);
             }
         }
         
@@ -348,9 +348,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Course_Price_Dlock_R03_json {
+        internal static string Course_Price_Dlock_R03 {
             get {
-                return ResourceManager.GetString("Course_Price_Dlock_R03_json", resourceCulture);
+                return ResourceManager.GetString("Course-Price-Dlock-R03", resourceCulture);
             }
         }
         
@@ -373,9 +373,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string PC_R03_NoDlock_json {
+        internal static string PC_R03_NoDlock {
             get {
-                return ResourceManager.GetString("PC_R03_NoDlock_json", resourceCulture);
+                return ResourceManager.GetString("PC-R03-NoDlock", resourceCulture);
             }
         }
         
@@ -398,9 +398,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string PC_R04_Pricechange_DLock7_json {
+        internal static string PC_R04_Pricechange_DLock7 {
             get {
-                return ResourceManager.GetString("PC_R04_Pricechange_DLock7_json", resourceCulture);
+                return ResourceManager.GetString("PC-R04-Pricechange-DLock7", resourceCulture);
             }
         }
         
@@ -423,9 +423,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         ///            &quot;FundingLineType&quot;: null,
         ///        [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string StartDateChange_json {
+        internal static string StartDateChange {
             get {
-                return ResourceManager.GetString("StartDateChange_json", resourceCulture);
+                return ResourceManager.GetString("StartDateChange", resourceCulture);
             }
         }
     }
