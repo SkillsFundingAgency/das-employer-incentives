@@ -129,7 +129,7 @@ stages:
       inputs:           
         Contents: |
           $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
-        TargetFolder: ''$(build.sourcesdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac''
+        TargetFolder: '$(build.sourcesdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac'
         Overwrite : true
         RetryCount : 3
 
