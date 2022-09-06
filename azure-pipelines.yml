@@ -117,16 +117,6 @@ stages:
           $(build.artifactstagingdirectory)\publish\*.dacpac
         TargetFolder: 'src/$(SolutionBaseName)/bin/release'
 
-        src/$(SolutionBaseName).Api/$(SolutionBaseName).Api.csproj
-
-    #- task: VSBuild@1
-    #  displayName: 'Build DACPAC'
-    #  inputs:
-    #    solution: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
-    #    platform: 'anycpu'
-    #    configuration: '$(buildConfiguration)'
-    #    msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
-
     - task: DockerInstaller@0
       displayName: Docker Installer
       inputs:
