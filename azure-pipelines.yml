@@ -85,12 +85,12 @@ stages:
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
 
-    - task: CmdLine@2
-      displayName: 'Install MsSqlLocalDb'
+    - task: DockerInstaller@0
+      displayName: Docker Installer
       inputs:
-        script: 'choco install sqllocaldb -y && refreshenv && sqllocaldb start mssqllocaldb'
-        failOnStderr: true
-
+        dockerVersion: 20.10.16-ce
+        releaseType: stable    
+    
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
       inputs:
