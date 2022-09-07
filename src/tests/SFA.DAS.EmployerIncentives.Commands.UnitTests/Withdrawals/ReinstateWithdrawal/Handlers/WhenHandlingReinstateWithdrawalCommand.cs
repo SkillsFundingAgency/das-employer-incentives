@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ReinstateWithdrawal;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
@@ -23,9 +24,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
     {
         private ReinstateWithdrawalCommandHandler _sut;
         private Mock<IIncentiveApplicationDomainRepository> _mockDomainRepository;
-        private Mock<IIncentiveApplicationStatusAuditDataRepository> _mockIncentiveApplicationStatusAuditDataRepository;
-
-
         private Fixture _fixture;
 
         [SetUp]
@@ -35,9 +33,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             _fixture.Customize(new IncentiveApplicationCustomization());
 
             _mockDomainRepository = new Mock<IIncentiveApplicationDomainRepository>();
-            _mockIncentiveApplicationStatusAuditDataRepository = new Mock<IIncentiveApplicationStatusAuditDataRepository>();
 
-            _sut = new ReinstateWithdrawalCommandHandler(_mockDomainRepository.Object, _mockIncentiveApplicationStatusAuditDataRepository.Object);
+            _sut = new ReinstateWithdrawalCommandHandler(_mockDomainRepository.Object);
         }
 
         [Test]
@@ -63,12 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                     })
                 .With(x => x.Status, IncentiveApplicationStatus.ComplianceWithdrawn)
                 .Create();
-
-            var lstIncentiveApplicationStatusAudit = _fixture.Build<Data.Models.IncentiveApplicationStatusAudit>()
-                    .With(a => a.IncentiveApplicationApprenticeshipId, apprenticeshipModel.Id)
-                    .With(a => a.Process, IncentiveApplicationStatus.ComplianceWithdrawn)
-                    .CreateMany(2).ToList();
-
+            
             var testApplication = new IncentiveApplicationFactory().GetExisting(incentiveApplicationModel.Id, incentiveApplicationModel);
 
             var applications = new List<IncentiveApplication>()
@@ -82,8 +74,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                 .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
                 .ReturnsAsync(applications);
 
-            _mockIncentiveApplicationStatusAuditDataRepository.Setup(x => x.GetByApplicationApprenticeshipId(It.IsAny<Guid>())).Returns(lstIncentiveApplicationStatusAudit);
-          
             //Act
             await _sut.Handle(command);
 
@@ -122,11 +112,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                 .With(x => x.Status, IncentiveApplicationStatus.EmployerWithdrawn)
                 .Create();
 
-            var lstIncentiveApplicationStatusAudit = _fixture.Build<Data.Models.IncentiveApplicationStatusAudit>()
-                    .With(a => a.IncentiveApplicationApprenticeshipId, apprenticeshipModel.Id)
-                    .With(a => a.Process, IncentiveApplicationStatus.ComplianceWithdrawn)
-                    .CreateMany(2).ToList();
-
             var testApplication = new IncentiveApplicationFactory().GetExisting(incentiveApplicationModel.Id, incentiveApplicationModel);
 
             var applications = new List<IncentiveApplication>()
@@ -139,9 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             _mockDomainRepository
                 .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
                 .ReturnsAsync(applications);
-
-            _mockIncentiveApplicationStatusAuditDataRepository.Setup(x => x.GetByApplicationApprenticeshipId(It.IsAny<Guid>())).Returns(lstIncentiveApplicationStatusAudit);
-
+            
             //Act
             Func<Task> action = async () => await _sut.Handle(command);
 
@@ -203,21 +186,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             _mockDomainRepository
                 .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
                 .ReturnsAsync(applications);
-
-            var lstIncentiveApplicationStatusAudit = new List<Data.Models.IncentiveApplicationStatusAudit> 
-            {
-                _fixture.Build<Data.Models.IncentiveApplicationStatusAudit>()
-                    .With(a => a.IncentiveApplicationApprenticeshipId, firstApprenticeshipModel.Id)
-                    .With(a => a.Process, IncentiveApplicationStatus.ComplianceWithdrawn)
-                    .Create(),
-                _fixture.Build<Data.Models.IncentiveApplicationStatusAudit>()
-                    .With(a => a.IncentiveApplicationApprenticeshipId, secondApprenticeshipModel.Id)
-                    .With(a => a.Process, IncentiveApplicationStatus.ComplianceWithdrawn)
-                    .Create()
-            }; 
-        
-            _mockIncentiveApplicationStatusAuditDataRepository.Setup(x => x.GetByApplicationApprenticeshipId(It.IsAny<Guid>())).Returns(lstIncentiveApplicationStatusAudit);
-
+            
             //Act
             await _sut.Handle(command);
 
@@ -284,21 +253,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             _mockDomainRepository
                 .Setup(m => m.Find(command.AccountLegalEntityId, command.ULN))
                 .ReturnsAsync(applications);
-
-            var lstIncentiveApplicationStatusAudit = new List<Data.Models.IncentiveApplicationStatusAudit>
-            {
-                _fixture.Build<Data.Models.IncentiveApplicationStatusAudit>()
-                    .With(a => a.IncentiveApplicationApprenticeshipId, firstApprenticeshipModel.Id)
-                    .With(a => a.Process, IncentiveApplicationStatus.EmployerWithdrawn)
-                    .Create(),
-                _fixture.Build<Data.Models.IncentiveApplicationStatusAudit>()
-                    .With(a => a.IncentiveApplicationApprenticeshipId, secondApprenticeshipModel.Id)
-                    .With(a => a.Process, IncentiveApplicationStatus.ComplianceWithdrawn)
-                    .Create()
-            };
-
-            _mockIncentiveApplicationStatusAuditDataRepository.Setup(x => x.GetByApplicationApprenticeshipId(It.IsAny<Guid>())).Returns(lstIncentiveApplicationStatusAudit);
-
+            
             //Act
             await _sut.Handle(command);
 

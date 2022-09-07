@@ -1,26 +1,22 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
-using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
+namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ReinstateWithdrawal
 {
     public class ReinstateWithdrawalCommandHandler : ICommandHandler<ReinstateWithdrawalCommand>
     {
         private readonly IIncentiveApplicationDomainRepository _domainRepository;
-        private readonly IIncentiveApplicationStatusAuditDataRepository _incentiveApplicationStatusAuditDataRepository;
 
-        public ReinstateWithdrawalCommandHandler(IIncentiveApplicationDomainRepository domainRepository,
-            IIncentiveApplicationStatusAuditDataRepository incentiveApplicationStatusAuditDataRepository)
+        public ReinstateWithdrawalCommandHandler(IIncentiveApplicationDomainRepository domainRepository)
         {
             _domainRepository = domainRepository;
-            _incentiveApplicationStatusAuditDataRepository = incentiveApplicationStatusAuditDataRepository; 
         }
 
         public async Task Handle(ReinstateWithdrawalCommand command, CancellationToken cancellationToken = default)

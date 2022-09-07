@@ -1,8 +1,8 @@
-﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+﻿using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
-using System.Threading.Tasks;
 
-namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
+namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ReinstateWithdrawal
 {
     public class ReinstateWithdrawalCommandValidator : IValidator<ReinstateWithdrawalCommand>
     {
