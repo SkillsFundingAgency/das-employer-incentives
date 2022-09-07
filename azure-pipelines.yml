@@ -44,12 +44,14 @@ stages:
         versionSpec: 5.x
         useConfigFile: true
         configFilePath: GitVersion.yml
+
     - task: DotNetCoreCLI@2
       displayName: Restore
       inputs:
         command: restore
         projects: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
         noCache: true
+
     - task: VSBuild@1
       displayName: 'Build DACPAC'
       inputs:
@@ -57,6 +59,7 @@ stages:
         platform: 'anycpu'
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
+
     - task: CopyFiles@2
       displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
       inputs:
@@ -64,7 +67,14 @@ stages:
           src\**\*.dacpac
         TargetFolder: '$(build.artifactstagingdirectory)/publish'
 
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: dacpac'
+      inputs:
+        targetPath: $(build.artifactstagingdirectory)/publish
+        artifactName: dacpac
+
   - job: 'BuildAndTest'
+    dependsOn: BuildDacpac
     pool:
       name: 'DAS - Continuous Integration Agents'
     workspace:
@@ -114,8 +124,8 @@ stages:
       displayName: Docker Installer
       inputs:
         dockerVersion: '20.10.9'
-        releaseType: stable    
-    
+        releaseType: stable
+
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
       inputs:
@@ -124,14 +134,10 @@ stages:
           src/**/*.AcceptanceTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    - task: CopyFiles@2
-      displayName: 'Copy dacpac from: $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac, to source location $(build.sourcesdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac'
-      inputs:           
-        Contents: |
-          $(build.artifactstagingdirectory)/publish/src/$(SolutionBaseName).Database/bin/Release/$(SolutionBaseName).Database.dacpac
-        TargetFolder: '$(build.sourcesdirectory)/src/$(SolutionBaseName).Database/bin/release/$(SolutionBaseName).Database.dacpac'
-        Overwrite : true
-        RetryCount : 3
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifactName: dacpac
+        targetPath: $(Build.SourcesDirectory)
 
     - task: DotNetCoreCLI@2
       displayName: Run Acceptance Tests
@@ -197,7 +203,7 @@ stages:
         projects: 'src/$(SolutionBaseName).Api/$(SolutionBaseName).Api.csproj'
         arguments: '-o $(build.artifactstagingdirectory)/publish -c $(BuildConfiguration)'
         publishWebProjects: false #set to false as this setting (which defaults to true) will parse the entire repo for web projects
-        
+
     - task: DotNetCoreCLI@2
       displayName: 'Publish - dotnet publish application $(SolutionBaseName).Functions.DomainMessageHandlers'
       inputs:
@@ -227,7 +233,7 @@ stages:
       inputs:
         targetPath: $(build.artifactstagingdirectory)/NugetPackages
         artifactName: NugetPackages
- 
+
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifact: drop'
       inputs:
