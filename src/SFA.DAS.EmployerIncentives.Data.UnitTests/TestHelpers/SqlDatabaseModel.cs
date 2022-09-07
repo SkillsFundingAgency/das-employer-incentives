@@ -40,7 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
             var current = File.GetLastWriteTime(_dacpacFileLocation);
             var previous = GetSavedModifiedDateTime();
 
-            return Math.Floor((current - previous).TotalSeconds) != 0; 
+            return Math.Floor((current - previous).TotalSeconds) != 0;
         }
 
         private static DateTime GetSavedModifiedDateTime()
@@ -68,7 +68,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 #if DEBUG
             const string environment = "debug";
 #else
-            const string environment = "release";
+            const string environment = "Release";
 #endif
             _dacpacFileLocation = Path.Combine(
                 Directory.GetCurrentDirectory().Substring(0,
