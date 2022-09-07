@@ -135,6 +135,7 @@ stages:
         arguments: '--configuration $(buildConfiguration) --no-restore'
 
     - task: DownloadPipelineArtifact@2
+      displayName: 'Download Artifact: dacpac'
       inputs:
         artifactName: dacpac
         targetPath: $(Build.SourcesDirectory)
