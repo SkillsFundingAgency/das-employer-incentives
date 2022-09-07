@@ -120,34 +120,34 @@ stages:
           src/**/*.UnitTests.csproj
         arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    - task: DockerInstaller@0
-      displayName: Docker Installer
-      inputs:
-        dockerVersion: '20.10.9'
-        releaseType: stable
+    #- task: DockerInstaller@0
+    #  displayName: Docker Installer
+    #  inputs:
+    #    dockerVersion: '20.10.9'
+    #    releaseType: stable
 
-    - task: DotNetCoreCLI@2
-      displayName: Build Acceptance Tests
-      inputs:
-        command: 'build'
-        projects: |
-          src/**/*.AcceptanceTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-restore'
+    #- task: DotNetCoreCLI@2
+    #  displayName: Build Acceptance Tests
+    #  inputs:
+    #    command: 'build'
+    #    projects: |
+    #      src/**/*.AcceptanceTests.csproj
+    #    arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    - task: DownloadPipelineArtifact@2
-      displayName: 'Download Artifact: dacpac'
-      inputs:
-        artifactName: dacpac
-        targetPath: $(Build.SourcesDirectory)
+    #- task: DownloadPipelineArtifact@2
+    #  displayName: 'Download Artifact: dacpac'
+    #  inputs:
+    #    artifactName: dacpac
+    #    targetPath: $(Build.SourcesDirectory)
 
-    - task: DotNetCoreCLI@2
-      displayName: Run Acceptance Tests
-      inputs:
-        command: test
-        projects: |
-          src/**/*.AcceptanceTests.csproj
-          !src/**/*.PaymentsProcess.AcceptanceTests.csproj
-        arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
+    #- task: DotNetCoreCLI@2
+    #  displayName: Run Acceptance Tests
+    #  inputs:
+    #    command: test
+    #    projects: |
+    #      src/**/*.AcceptanceTests.csproj
+    #      !src/**/*.PaymentsProcess.AcceptanceTests.csproj
+    #    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
     - task: DotNetCoreCLI@2
       displayName: Build $(SolutionBaseName).Messages
