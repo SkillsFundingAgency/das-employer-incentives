@@ -28,7 +28,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\release\</OutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
@@ -119,7 +119,7 @@
     <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
     <Build Include="Tables\VendorBlockAudit.sql" />
     <Build Include="Views\ApprenticeApplications.sql" />
-    <Build Include="Views\ApprenticeApplications.sql" />    
+    <Build Include="Views\ApprenticeApplications.sql" />
     <Build Include="Tables\Audit.RevertedPayment.sql" />
   </ItemGroup>
   <ItemGroup>
