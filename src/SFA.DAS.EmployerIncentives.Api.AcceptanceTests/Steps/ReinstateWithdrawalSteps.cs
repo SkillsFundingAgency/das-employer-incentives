@@ -36,7 +36,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             _fixture = new Fixture();
             _connectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
 
-            _application = _fixture.Create<IncentiveApplication>();
+            _application = _fixture.Build<IncentiveApplication>()
+                .With(x => x.Status, IncentiveApplicationStatus.ComplianceWithdrawn)
+                .Create();
+
             _apprenticeship = _fixture
                 .Build<IncentiveApplicationApprenticeship>()
                 .With(a => a.IncentiveApplicationId, _application.Id)
