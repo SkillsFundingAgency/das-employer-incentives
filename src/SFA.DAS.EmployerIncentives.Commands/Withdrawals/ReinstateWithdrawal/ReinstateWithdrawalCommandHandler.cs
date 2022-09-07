@@ -31,22 +31,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal
                 throw new WithdrawalException($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for {command}");
             }
 
-            foreach(var application in applications)
+            var applicationToReinstate = applications.Where(x => x.Status == IncentiveApplicationStatus.ComplianceWithdrawn)
+                                                     .OrderByDescending(x => x.DateSubmitted).FirstOrDefault();
+            
+            if (applicationToReinstate == null)
             {
-                foreach(var apprenticeship in application.Apprenticeships)
-                {
-                    if(apprenticeship.ULN == command.ULN && apprenticeship.WithdrawnByCompliance &&
-                        !_incentiveApplicationStatusAuditDataRepository.GetByApplicationApprenticeshipId(apprenticeship.Id).Any(x => x.Process == IncentiveApplicationStatus.EmployerWithdrawn))
-                    {
-                        application.ReinstateWithdrawal(apprenticeship,
-                            new ServiceRequest(
-                                command.ServiceRequestTaskId,
-                                command.DecisionReference,
-                                command.ServiceRequestCreated));
-                    }
-                }
-                await _domainRepository.Save(application);
+                throw new WithdrawalException($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for {command}");
             }
+
+            var apprenticeship = applicationToReinstate.Apprenticeships.FirstOrDefault(x => x.ULN == command.ULN);
+            
+            applicationToReinstate.ReinstateWithdrawal(apprenticeship,
+                new ServiceRequest(
+                    command.ServiceRequestTaskId,
+                    command.DecisionReference,
+                    command.ServiceRequestCreated));
+    
+            await _domainRepository.Save(applicationToReinstate);
         }
     }
 }
