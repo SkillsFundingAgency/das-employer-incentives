@@ -8,9 +8,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
 using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ReinstateWithdrawal;
-using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
@@ -131,7 +129,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             //Assert
             action.Should()
                 .Throw<WithdrawalException>()
-                .WithMessage("Unable to handle reinstate withdrawal command.*");
+                .WithMessage($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for ULN {command.ULN}*");
         }
 
         [Test]
@@ -284,7 +282,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             //Assert
             action.Should()
                 .Throw<WithdrawalException>()
-                .WithMessage("Unable to handle reinstate withdrawal command.*");           
+                .WithMessage($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for ULN {command.ULN}*");           
         }
     }
 }
