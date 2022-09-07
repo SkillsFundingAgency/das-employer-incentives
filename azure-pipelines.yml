@@ -134,11 +134,11 @@ stages:
     #      src/**/*.AcceptanceTests.csproj
     #    arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    #- task: DownloadPipelineArtifact@2
-    #  displayName: 'Download Artifact: dacpac'
-    #  inputs:
-    #    artifactName: dacpac
-    #    targetPath: $(Build.SourcesDirectory)
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Artifact: dacpac'
+      inputs:
+        artifactName: dacpac
+        targetPath: $(Build.SourcesDirectory)
 
     #- task: DotNetCoreCLI@2
     #  displayName: Run Acceptance Tests
