@@ -202,7 +202,8 @@ group by HasIlrSubmission,
   LearnerMatchSuccessful desc,
   EmployedAtStartOfApprenticeship desc,
   EmployedBeforeSchemeStarted desc,
-  BlockedForPayments desc
+  BlockedForPayments desc,
+  EmployedAt365Days desc
 -- YTD Validation (Paste underneath the Period Validation table on the [YTD Validation] tab) 
 ;with latestValidations as (
 select max(ppv.periodnumber) MaxPeriod, 
@@ -330,4 +331,5 @@ order by
   LearnerMatchSuccessful desc,
   EmployedAtStartOfApprenticeship desc,
   EmployedBeforeSchemeStarted desc,
-  BlockedForPayments desc
+  BlockedForPayments desc,
+  EmployedAt365Days desc
