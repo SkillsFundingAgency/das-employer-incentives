@@ -696,7 +696,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
                 }
 
-                if (!HasEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
+                if (!CanRefreshEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
                 {
                     throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
                 }
@@ -749,7 +749,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 {
                     return;
                 }
-                else if(existingFirstCheck != null && existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value) // first check failed
+                else if(existingFirstCheck != null && (existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value)
+                        || (existingFirstCheck != null && !existingFirstCheck.Result.HasValue && existingFirstCheck.ErrorType != null)) // first check failed or returned error code
                 {
                     if (secondPaymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
                     {
@@ -1010,9 +1011,25 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             return checks.All(c => c);
         }
 
-        private bool HasEmploymentCheck(EmploymentCheckType employmentCheckType)
+        private bool CanRefreshEmploymentCheck(EmploymentCheckType employmentCheckType)
         {
-            return Model.EmploymentCheckModels.Any(c => c.CheckType == employmentCheckType);
+            var employmentCheck = Model.EmploymentCheckModels.FirstOrDefault(c => c.CheckType == employmentCheckType);
+            if (employmentCheck == null)
+            {
+                return false;
+            }
+
+            if (employmentCheck.Result.HasValue)
+            {
+                return true;
+            }
+            
+            if (!employmentCheck.Result.HasValue && employmentCheck.ErrorType != null)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
