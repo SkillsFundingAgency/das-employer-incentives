@@ -56,7 +56,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                         apprenticeshipModel,
                         _fixture.Create<ApprenticeshipModel>(),
                     })
-                .With(x => x.Status, IncentiveApplicationStatus.ComplianceWithdrawn)
                 .Create();
             
             var testApplication = new IncentiveApplicationFactory().GetExisting(incentiveApplicationModel.Id, incentiveApplicationModel);
@@ -107,7 +106,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                         apprenticeshipModel,
                         _fixture.Create<ApprenticeshipModel>(),
                     })
-                .With(x => x.Status, IncentiveApplicationStatus.EmployerWithdrawn)
                 .Create();
 
             var testApplication = new IncentiveApplicationFactory().GetExisting(incentiveApplicationModel.Id, incentiveApplicationModel);
@@ -159,7 +157,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                         firstApprenticeshipModel
                     })
                 .With(x => x.DateSubmitted, new DateTime(2021, 10, 01))
-                .With(x => x.Status, IncentiveApplicationStatus.ComplianceWithdrawn)
                 .Create();
 
             var secondIncentiveApplicationModel = _fixture
@@ -169,7 +166,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                         secondApprenticeshipModel
                     })
                 .With(x => x.DateSubmitted, new DateTime(2021, 11, 01))
-                .With(x => x.Status, IncentiveApplicationStatus.ComplianceWithdrawn)
                 .Create();
             
             var firstApplication = new IncentiveApplicationFactory().GetExisting(firstIncentiveApplicationModel.Id, firstIncentiveApplicationModel);
@@ -225,7 +221,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                     new List<ApprenticeshipModel> {
                         firstApprenticeshipModel
                     })
-                .With(x => x.Status, IncentiveApplicationStatus.EmployerWithdrawn)
                 .With(x => x.DateSubmitted, new DateTime(2021, 10, 01))
                 .Create();
 
@@ -235,7 +230,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
                     new List<ApprenticeshipModel> {
                         secondApprenticeshipModel
                     })
-                .With(x => x.Status, IncentiveApplicationStatus.ComplianceWithdrawn)
                 .With(x => x.DateSubmitted, new DateTime(2021, 11, 01))
                 .Create();
 
