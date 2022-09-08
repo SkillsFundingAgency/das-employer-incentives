@@ -26,7 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
                 {
                     OnProcessing = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId }),
                     OnProcessed = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId }),
-                    OnError = () => new Tuple<string, object[]>("Error - " + message, new object[] { ApprenticeshipIncentiveId })
+                    OnError = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId })
                 };
             }
         }

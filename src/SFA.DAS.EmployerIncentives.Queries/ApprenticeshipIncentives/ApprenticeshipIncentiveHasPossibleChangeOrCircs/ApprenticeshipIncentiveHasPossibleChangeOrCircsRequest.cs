@@ -22,7 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.Apprentice
                 return new RequestLogWithArgs
                 {
                     OnProcessing = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId }),
-                    OnError = () => new Tuple<string, object[]>("Error - " + message, new object[] { ApprenticeshipIncentiveId })
+                    OnError = () => new Tuple<string, object[]>(message, new object[] { ApprenticeshipIncentiveId })
                 };
             }
         }

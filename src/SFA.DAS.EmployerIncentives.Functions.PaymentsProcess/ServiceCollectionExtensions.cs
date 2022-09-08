@@ -14,12 +14,14 @@ using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
+    [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddNLog(this IServiceCollection serviceCollection, IConfiguration configuration)

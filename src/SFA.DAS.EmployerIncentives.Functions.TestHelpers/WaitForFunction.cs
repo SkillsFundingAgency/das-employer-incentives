@@ -8,11 +8,11 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
 {
+    [ExcludeFromCodeCoverage]
     public static class WaitForFunction
     {
         [FunctionName(nameof(WaitForFunction))]
-        [NoAutomaticTrigger]
-        [ExcludeFromCodeCoverage]
+        [NoAutomaticTrigger]        
         public static async Task Run([DurableClient] IDurableOrchestrationClient client, string name, TimeSpan? timeout, string expectedCustomStatus)
         {
             using var cts = new CancellationTokenSource();
