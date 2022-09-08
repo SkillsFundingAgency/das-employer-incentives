@@ -55,9 +55,20 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
         {
-            return await GetList(a => a.ULN == uln &&
-                                      a.AccountLegalEntityId == accountLegalEntityId &&
-                                      a.Status != IncentiveStatus.Withdrawn);
+            var apprenticeships = await _dbContext.ApprenticeshipIncentives
+                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
+                .Include(x => x.Payments)
+                .Include(x => x.ClawbackPayments)
+                .Include(x => x.BreakInLearnings)
+                .Include(x => x.EmploymentChecks)
+                .Include(x => x.ValidationOverrides)
+                .Where(a => a.ULN == uln &&
+                            a.AccountLegalEntityId == accountLegalEntityId &&
+                            a.Status != IncentiveStatus.Withdrawn
+                ).ToListAsync();
+            var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
+
+            return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
         }
 
         public async Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByEmploymentCheckId(Guid correlationId)
@@ -129,24 +140,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
             }
 
             return null;
-        }
-
-        private async Task<List<ApprenticeshipIncentiveModel>> GetList(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
-        {
-            var apprenticeships = await _dbContext.ApprenticeshipIncentives.Where(predicate).ToListAsync();
-            if (apprenticeships.Any())
-            {
-                foreach (var apprenticeship in apprenticeships)
-                {
-                    await PopulateApprenticeshipIncentive(apprenticeship);
-                }
-
-                var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
-
-                return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
-            }
-
-            return new List<ApprenticeshipIncentiveModel>();
         }
 
         private async Task PopulateApprenticeshipIncentive(ApprenticeshipIncentive apprenticeshipIncentive)
