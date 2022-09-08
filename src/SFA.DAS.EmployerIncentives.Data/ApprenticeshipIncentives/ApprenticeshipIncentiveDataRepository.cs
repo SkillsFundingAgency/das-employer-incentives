@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -49,39 +50,14 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<ApprenticeshipIncentiveModel> FindByApprenticeshipId(Guid incentiveApplicationApprenticeshipId)
         {
-            var collectionPeriods = _dbContext.CollectionPeriods.AsEnumerable();
-
-            var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
-               .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
-               .Include(x => x.Payments)
-               .Include(x => x.ClawbackPayments)
-               .Include(x => x.BreakInLearnings)
-               .Include(x => x.EmploymentChecks)
-               .Include(x => x.ValidationOverrides)
-               .FirstOrDefaultAsync(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
-            if (apprenticeshipIncentive != null)
-            {
-                return apprenticeshipIncentive.Map(collectionPeriods);
-            }
-            return null;
+            return await Get(a => a.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId);
         }
 
         public async Task<List<ApprenticeshipIncentiveModel>> FindApprenticeshipIncentiveByUlnWithinAccountLegalEntity(long uln, long accountLegalEntityId)
         {
-            var apprenticeships = await _dbContext.ApprenticeshipIncentives
-                .Include(x => x.PendingPayments).ThenInclude(x => x.ValidationResults)
-                .Include(x => x.Payments)
-                .Include(x => x.ClawbackPayments)
-                .Include(x => x.BreakInLearnings)
-                .Include(x => x.EmploymentChecks)
-                .Include(x => x.ValidationOverrides)
-                .Where(a => a.ULN == uln && 
-                a.AccountLegalEntityId == accountLegalEntityId &&
-                a.Status != IncentiveStatus.Withdrawn
-                ).ToListAsync();
-            var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
-
-            return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
+            return await GetList(a => a.ULN == uln &&
+                                      a.AccountLegalEntityId == accountLegalEntityId &&
+                                      a.Status != IncentiveStatus.Withdrawn);
         }
 
         public async Task<ApprenticeshipIncentiveModel> FindApprenticeshipIncentiveByEmploymentCheckId(Guid correlationId)
@@ -111,16 +87,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         public async Task<ApprenticeshipIncentiveModel> Get(Guid id)
         {
-            var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
-                .Include(x => x.PendingPayments)
-                .ThenInclude(x => x.ValidationResults)
-                .Include(x => x.Payments)
-                .Include(x => x.ClawbackPayments)
-                .Include(x => x.BreakInLearnings)
-                .Include(x => x.EmploymentChecks)
-                .Include(x => x.ValidationOverrides)
-                .FirstOrDefaultAsync(a => a.Id == id);
-            return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
+            return await Get(x => x.Id == id);
         }
 
         public async Task Update(ApprenticeshipIncentiveModel apprenticeshipIncentive)
@@ -150,6 +117,52 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
                 _dbContext.Remove(pendingPayment);
             }
         }
+
+        private async Task<ApprenticeshipIncentiveModel> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
+        {
+            var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(predicate);
+
+            if (apprenticeshipIncentive != null)
+            {
+                await PopulateApprenticeshipIncentive(apprenticeshipIncentive);
+                return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
+            }
+
+            return null;
+        }
+
+        private async Task<List<ApprenticeshipIncentiveModel>> GetList(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
+        {
+            var apprenticeships = await _dbContext.ApprenticeshipIncentives.Where(predicate).ToListAsync();
+            if (apprenticeships.Any())
+            {
+                foreach (var apprenticeship in apprenticeships)
+                {
+                    await PopulateApprenticeshipIncentive(apprenticeship);
+                }
+
+                var collectionPeriods = await _dbContext.CollectionPeriods.ToListAsync();
+
+                return apprenticeships.Select(x => x.Map(collectionPeriods)).ToList();
+            }
+
+            return new List<ApprenticeshipIncentiveModel>();
+        }
+
+        private async Task PopulateApprenticeshipIncentive(ApprenticeshipIncentive apprenticeshipIncentive)
+        {
+            apprenticeshipIncentive.PendingPayments = await _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+            foreach (var pendingPayment in apprenticeshipIncentive.PendingPayments)
+            {
+                pendingPayment.ValidationResults = await _dbContext.PendingPaymentValidationResults.Where(x => x.PendingPaymentId == pendingPayment.Id).ToListAsync();
+            }
+            apprenticeshipIncentive.Payments = await _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+            apprenticeshipIncentive.ClawbackPayments = await _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+            apprenticeshipIncentive.BreakInLearnings = await _dbContext.BreakInLearnings.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+            apprenticeshipIncentive.EmploymentChecks = await _dbContext.EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+            apprenticeshipIncentive.ValidationOverrides = await _dbContext.ValidationOverrides.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+        }
+
 
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
         {
