@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.TestHelpers
     {
         [FunctionName(nameof(WaitForFunction))]
         [NoAutomaticTrigger]
+        [ExcludeFromCodeCoverage]
         public static async Task Run([DurableClient] IDurableOrchestrationClient client, string name, TimeSpan? timeout, string expectedCustomStatus)
         {
             using var cts = new CancellationTokenSource();

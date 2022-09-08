@@ -5,12 +5,14 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
 {
+    [ExcludeFromCodeCoverage]
     public class AzureDistributedLockProvider : IDistributedLockProvider
     {
         private readonly ILogger<AzureDistributedLockProvider> _log;
