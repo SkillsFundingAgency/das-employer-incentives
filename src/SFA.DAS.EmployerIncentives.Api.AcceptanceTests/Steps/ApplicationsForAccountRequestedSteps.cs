@@ -268,6 +268,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
                 .With(x => x.Step, validationStep)
                 .With(x => x.Result, validationResult)
+                .Without(x => x.OverrideResult)
+                .Create();
+            await SetupPaymentValidationResult(paymentValidationResult);
+        }
+
+        [When(@"there is a validation override result of '(.*)' and an '(.*)' payment validation status of '(.*)'")]
+        public async Task WhenThereIsAnEmploymentCheckPaymentValidationStatusWithAValidationOverride( string overrideResult, string validationStep, string validationResult)
+        {
+            bool.TryParse(validationResult, out var validationResultValue);
+            bool.TryParse(overrideResult, out var overrideResultValue);
+
+            var paymentValidationResult = Fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, validationStep)
+                .With(x => x.Result, validationResultValue)
+                .With(x => x.OverrideResult, overrideResultValue)
                 .Create();
             await SetupPaymentValidationResult(paymentValidationResult);
         }
@@ -282,6 +298,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.Last().Id)
                     .With(x => x.Step, validationStep)
                     .With(x => x.Result, result)
+                    .Without(x => x.OverrideResult)
                     .Create();
                 await SetupPaymentValidationResult(paymentValidationResult);
             }
