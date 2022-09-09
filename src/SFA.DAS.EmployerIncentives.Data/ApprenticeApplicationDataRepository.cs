@@ -71,8 +71,8 @@ namespace SFA.DAS.EmployerIncentives.Data
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
                                         EarningType.FirstPayment,
-                                        EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
-                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted),
+                                        EmployedAtStartOfApprenticeshipOverride(data.FirstEmploymentCheckOverrideResult, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
+                                        EmployedBeforeSchemeStartedOverride(data.SecondEmploymentCheckOverrideResult, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted),
                                         null)
                     },
                     FirstClawbackStatus = data.FirstClawbackAmount == default ? null : new ClawbackStatus
@@ -94,9 +94,9 @@ namespace SFA.DAS.EmployerIncentives.Data
                         RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
                         EmploymentCheckPassed = EmploymentCheckResult(
                                         EarningType.SecondPayment,
-                                        EmployedAtStartOfApprenticeshipOverride(validationOverrides, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
-                                        EmployedBeforeSchemeStartedOverride(validationOverrides, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted),
-                                        EmployedAt365DaysOverride(validationOverrides, data.EmployedAt365DaysFirstCheck, data.EmployedAt365DaysValidation, EmployedAt365Days))
+                                        EmployedAtStartOfApprenticeshipOverride(data.FirstEmploymentCheckOverrideResult, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
+                                        EmployedBeforeSchemeStartedOverride(data.SecondEmploymentCheckOverrideResult, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted),
+                                        EmployedAt365DaysOverride(data.EmployedAt365DaysCheckOverrideResult, data.EmployedAt365DaysFirstCheck, data.EmployedAt365DaysValidation, EmployedAt365Days))
                     },
                     SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatus
                     {
@@ -174,13 +174,12 @@ namespace SFA.DAS.EmployerIncentives.Data
         }        
 
         private static bool? EmployedAtStartOfApprenticeshipOverride(
-            IEnumerable<ValidationOverride> validationOverrides,
+            bool? firstEmploymentCheckOverrideResult,
             bool? firstEmploymentCheck,
             bool? firstEmploymentCheckValidation,
             Func<bool?, bool?, bool?> func)
         {
-            if (validationOverrides.Any(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship
-                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
+            if (firstEmploymentCheckOverrideResult.HasValue && firstEmploymentCheckOverrideResult.Value)
             {
                 return true;
             }
@@ -203,13 +202,12 @@ namespace SFA.DAS.EmployerIncentives.Data
         }
 
         private static bool? EmployedBeforeSchemeStartedOverride(
-            IEnumerable<ValidationOverride> validationOverrides,
+            bool? secondEmploymentCheckOverrideResult,
             bool? secondEmploymentCheck,
             bool? secondEmploymentCheckValidation,
             Func<bool?, bool?, bool?> func)
         {
-            if (validationOverrides.Any(x => x.Step == ValidationStep.EmployedBeforeSchemeStarted
-                                                  && x.ExpiryDate.Date > DateTime.UtcNow.Date))
+            if (secondEmploymentCheckOverrideResult.HasValue && secondEmploymentCheckOverrideResult.Value)
             {
                 return true;
             }
@@ -232,13 +230,12 @@ namespace SFA.DAS.EmployerIncentives.Data
         }
 
         private static bool? EmployedAt365DaysOverride(
-            IEnumerable<ValidationOverride> validationOverrides,
+            bool? employedAt365DaysCheckOverrideResult,
             bool? employedAt365DaysCheck,
             bool? employedAt365DaysValidation,
             Func<bool?, bool?, bool?> func)
         {
-            if(validationOverrides.Any(x => x.Step == ValidationStep.EmployedAt365Days
-                                           && x.ExpiryDate.Date > DateTime.UtcNow.Date))
+            if(employedAt365DaysCheckOverrideResult.HasValue && employedAt365DaysCheckOverrideResult.Value)
             {
                 return true;
             }

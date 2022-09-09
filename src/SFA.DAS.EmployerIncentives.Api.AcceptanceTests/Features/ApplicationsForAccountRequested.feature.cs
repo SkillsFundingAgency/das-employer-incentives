@@ -1401,15 +1401,17 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("EmployedAt365Days Employment check status with override")]
-        [NUnit.Framework.TestCaseAttribute("true", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("false", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("true", "true", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("false", "true", "false", null)]
-        public virtual void EmployedAt365DaysEmploymentCheckStatusWithOverride(string employedAt365Days, string hasExpired, string employmentCheckStatus, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("true", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "true", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "false", "true", "false", null)]
+        public virtual void EmployedAt365DaysEmploymentCheckStatusWithOverride(string employedAt365Days, string employedAt365DaysOverride, string hasExpired, string employmentCheckStatus, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("Employed At 365 Days", employedAt365Days);
+            argumentsOfScenario.Add("Employed At 365 Days Override", employedAt365DaysOverride);
             argumentsOfScenario.Add("HasExpired", hasExpired);
             argumentsOfScenario.Add("Employment Check Status", employmentCheckStatus);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("EmployedAt365Days Employment check status with override", null, tagsOfScenario, argumentsOfScenario);
@@ -1450,7 +1452,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("there is an \'EmployedBeforeSchemeStarted\' employment check result of \'false\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 284
- testRunner.When(string.Format("there is an \'EmployedAt365Days\' payment validation status of \'{0}\'", employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When(string.Format("there is an override result of \'{0}\' and an \'EmployedAt365Days\' second payment va" +
+                            "lidation status of \'{1}\'", employedAt365DaysOverride, employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 285
  testRunner.And(string.Format("there is an \'EmployedAt365PaymentDueDateFirstCheck\' employment check result of \'{" +
