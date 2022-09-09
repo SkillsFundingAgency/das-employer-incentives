@@ -131,7 +131,10 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         private async Task<ApprenticeshipIncentiveModel> Get(Expression<Func<ApprenticeshipIncentive, bool>> predicate)
         {
-            var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives.FirstOrDefaultAsync(predicate);
+            var apprenticeshipIncentive = await _dbContext.ApprenticeshipIncentives
+                .Include(x =>x .PendingPayments)
+                .ThenInclude(x => x.ValidationResults)
+                .FirstOrDefaultAsync(predicate);
 
             if (apprenticeshipIncentive != null)
             {
@@ -144,19 +147,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
         private async Task PopulateApprenticeshipIncentive(ApprenticeshipIncentive apprenticeshipIncentive)
         {
-            apprenticeshipIncentive.PendingPayments = await _dbContext.PendingPayments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
-            foreach (var pendingPayment in apprenticeshipIncentive.PendingPayments)
-            {
-                pendingPayment.ValidationResults = await _dbContext.PendingPaymentValidationResults.Where(x => x.PendingPaymentId == pendingPayment.Id).ToListAsync();
-            }
             apprenticeshipIncentive.Payments = await _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
             apprenticeshipIncentive.ClawbackPayments = await _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
             apprenticeshipIncentive.BreakInLearnings = await _dbContext.BreakInLearnings.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
             apprenticeshipIncentive.EmploymentChecks = await _dbContext.EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
             apprenticeshipIncentive.ValidationOverrides = await _dbContext.ValidationOverrides.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
         }
-
-
+        
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)
         {
             _dbContext.Entry(existingIncentive).CurrentValues.SetValues(updatedIncentive);
