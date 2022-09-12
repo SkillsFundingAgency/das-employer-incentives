@@ -129,7 +129,7 @@ stages:
     - task: CmdLine@2
       displayName: Start Docker
       inputs:
-        script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker/docker start'
+        script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
 
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
