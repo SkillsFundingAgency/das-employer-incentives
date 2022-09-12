@@ -127,12 +127,7 @@ stages:
         releaseType: stable
 
     - task: CmdLine@2
-      displayName: Start Docker1
-      inputs:
-        script: 'sudo install docker-engine'
-
-    - task: CmdLine@2
-      displayName: Start Docker2
+      displayName: Start Docker
       inputs:
         script: 'sudo service docker start'
 
