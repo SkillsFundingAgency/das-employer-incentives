@@ -6,8 +6,10 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using Moq;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -17,13 +19,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
         private ApprenticeshipIncentives.Models.CollectionCalendarPeriod _collectionCalendarPeriod;
+        private Mock<IEmployerIncentivesDbContextFactory> _dbContextFactory;
 
         [SetUp]
         public async Task Setup()
         {
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
+            _dbContextFactory = new Mock<IEmployerIncentivesDbContextFactory>();
+            _dbContextFactory.Setup(x => x.Create(It.IsAny<DbTransaction>())).Returns(_dbContext);
+
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContextFactory.Object);
             await AddCollectionCalendarPeriod();
         }
 

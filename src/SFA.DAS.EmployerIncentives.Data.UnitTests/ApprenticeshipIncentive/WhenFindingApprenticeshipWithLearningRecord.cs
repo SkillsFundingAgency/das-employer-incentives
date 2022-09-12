@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -18,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private Fixture _fixture;
         private EmployerIncentivesDbContext _dbContext;
         private long _accountLegalEntityId;
+        private Mock<IEmployerIncentivesDbContextFactory> _dbContextFactory;
 
         [SetUp]
         public void Arrange()
@@ -29,7 +32,10 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
 
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
+            _dbContextFactory = new Mock<IEmployerIncentivesDbContextFactory>();
+            _dbContextFactory.Setup(x => x.Create(It.IsAny<DbTransaction>())).Returns(_dbContext);
+
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContextFactory.Object);
         }
 
         [Test]

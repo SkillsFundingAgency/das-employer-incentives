@@ -17,6 +17,8 @@ using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace SFA.DAS.EmployerIncentives.Api
 {
@@ -86,6 +88,13 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
+
+            services.AddTransient<IEmployerIncentivesDbContextFactory>(provider =>
+            {
+                var settings = Configuration.GetSection("ApplicationSettings");
+                var employerIncentivesOptions = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(settings["DbConnectionString"]).Options;
+                return new EmployerIncentivesDbContextFactory(employerIncentivesOptions);
+            });
 
             services.AddPersistenceServices();
             services.AddCommandServices();
