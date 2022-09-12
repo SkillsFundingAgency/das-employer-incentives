@@ -129,7 +129,7 @@ stages:
     - task: CmdLine@2
       displayName: Start Docker
       inputs:
-        script: 'sudo service docker restart'
+        script: 'sudo systemctl start docker'
 
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
