@@ -126,6 +126,11 @@ stages:
         dockerVersion: '20.10.9'
         releaseType: stable
 
+    - task: CmdLine@2
+      displayName: Start Docker
+      inputs:
+        script: 'sudo service docker restart'
+
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
       inputs:
