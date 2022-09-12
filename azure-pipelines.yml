@@ -127,9 +127,14 @@ stages:
         releaseType: stable
 
     - task: CmdLine@2
-      displayName: Start Docker
+      displayName: Start Docker1
       inputs:
-        script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
+        script: 'sudo install docker-engine'
+
+    - task: CmdLine@2
+      displayName: Start Docker2
+      inputs:
+        script: 'sudo service docker start'
 
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
