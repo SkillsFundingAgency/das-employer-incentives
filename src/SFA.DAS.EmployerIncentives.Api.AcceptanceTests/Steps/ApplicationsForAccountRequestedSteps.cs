@@ -661,14 +661,22 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
             apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
-            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
         }
 
         [Then(@"the apprenticeship is returned with second payment employment check status of '(.*)'")]
-        public void ThenTheSecondPaymentEmploymentCheckStatusIsSet(bool? employmentCheckStatus)
+        public void ThenTheSecondPaymentEmploymentCheckStatusIsSet(string employmentCheckStatus)
         {
+            bool? employmentCheckStatusValue = null;
+            if (employmentCheckStatus != "null")
+            {
+                bool result;
+                bool.TryParse(employmentCheckStatus, out result);
+                employmentCheckStatusValue = result;
+            }
+
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
-            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatusValue);
         }
 
         [Then(@"the most recent employment check payment validation results are reflected in the payment statuses")]
@@ -676,7 +684,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
             apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
-            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
         }
 
         [Then(@"the employment check payment statuses are not set")]

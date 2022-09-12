@@ -96,7 +96,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                                         EarningType.SecondPayment,
                                         EmployedAtStartOfApprenticeshipOverride(data.FirstEmploymentCheckOverrideResult, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
                                         EmployedBeforeSchemeStartedOverride(data.SecondEmploymentCheckOverrideResult, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted),
-                                        EmployedAt365DaysOverride(data.EmployedAt365DaysCheckOverrideResult, data.EmployedAt365DaysFirstCheck, data.EmployedAt365DaysValidation, EmployedAt365Days))
+                                        EmployedAt365DaysOverride(data.EmployedAt365DaysCheckOverrideResult, data.EmployedAt365DaysFirstCheck, data.EmployedAt365DaysSecondCheck,  data.EmployedAt365DaysValidation, EmployedAt365Days))
                     },
                     SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatus
                     {
@@ -153,10 +153,15 @@ namespace SFA.DAS.EmployerIncentives.Data
             {
                 return null;
             }
-            if (earningType == EarningType.FirstPayment || !employedAt365DaysCheck.HasValue)
+            if (earningType == EarningType.FirstPayment)
             {
                 return firstEmploymentCheck.Value && secondEmploymentCheck.Value;
             }
+            if (earningType == EarningType.SecondPayment && !employedAt365DaysCheck.HasValue)
+            {
+                return null;
+            }
+
             return firstEmploymentCheck.Value && secondEmploymentCheck.Value && employedAt365DaysCheck.Value;
         }
 
@@ -217,10 +222,11 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         private static bool? EmployedAt365Days(
             bool? first365DaysCheck,
+            bool? second365DaysCheck,
             bool? employedAt365DayValidation)
         {
             if (!first365DaysCheck.HasValue
-                || !employedAt365DayValidation.HasValue
+                || !employedAt365DayValidation.HasValue || !second365DaysCheck.HasValue
                )
             {
                 return null;
@@ -231,16 +237,17 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         private static bool? EmployedAt365DaysOverride(
             bool? employedAt365DaysCheckOverrideResult,
-            bool? employedAt365DaysCheck,
+            bool? employedAt365DaysFirstCheck,
+            bool? employedAt365DaysSecondCheck,
             bool? employedAt365DaysValidation,
-            Func<bool?, bool?, bool?> func)
+            Func<bool?, bool?, bool?, bool?> func)
         {
             if(employedAt365DaysCheckOverrideResult.HasValue && employedAt365DaysCheckOverrideResult.Value)
             {
                 return true;
             }
 
-            return func.Invoke(employedAt365DaysCheck, employedAt365DaysValidation);
+            return func.Invoke(employedAt365DaysFirstCheck, employedAt365DaysSecondCheck, employedAt365DaysValidation);
         }
 
         private decimal CalculateTotalIncentiveAmount(decimal? firstPendingPaymentAmount, decimal? secondPendingPaymentAmount)

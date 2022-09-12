@@ -1321,11 +1321,11 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Employment check status with 365 day check")]
-        [NUnit.Framework.TestCaseAttribute("true", "true", "null", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("false", "false", "null", "false", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "null", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "false", "null", "null", null)]
         [NUnit.Framework.TestCaseAttribute("false", "false", "false", "false", null)]
         [NUnit.Framework.TestCaseAttribute("true", "false", "true", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("null", "null", "null", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("null", "null", "null", "null", null)]
         public virtual void EmploymentCheckStatusWith365DayCheck(string employedAt365Days, string _365DaysEmploymentFirstCheckResult, string _365DaysEmploymentSecondCheckResult, string employmentCheckStatus, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -1450,17 +1450,21 @@ this.ScenarioInitialize(scenarioInfo);
                             "lidation status of \'{1}\'", employedAt365DaysOverride, employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 283
- testRunner.And(string.Format("there is an \'EmployedAt365PaymentDueDateFirstCheck\' employment check result of \'{" +
-                            "0}\'", employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("there is an \'EmployedAt365PaymentDueDateFirstCheck\' employment check result of \'f" +
+                        "alse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 284
+ testRunner.And(string.Format("there is an \'EmployedAt365PaymentDueDateSecondCheck\' employment check result of \'" +
+                            "{0}\'", employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 285
  testRunner.And(string.Format("there is a validation override for validation step \'EmployedAt365Days\' and expiry" +
                             " of \'{0}\'", hasExpired), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 285
+#line 286
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 286
+#line 287
  testRunner.Then(string.Format("the apprenticeship is returned with second payment employment check status of \'{0" +
                             "}\'", employmentCheckStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
