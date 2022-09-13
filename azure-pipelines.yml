@@ -132,7 +132,7 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
-        script: 'echo "Hello World"'
+        script: 'sudo dockerd'
     
     - task: Docker@2
       inputs:
