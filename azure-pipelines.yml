@@ -132,7 +132,7 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
-        script: 'docker ps'
+        script: 'sudo service docker status'
 
     - task: CmdLine@2
       displayName: Test command
