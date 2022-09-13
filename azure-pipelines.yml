@@ -129,15 +129,11 @@ stages:
         dockerVersion: '20.10.9'
         releaseType: stable
 
-    - task: CmdLine@2
-      displayName: Test command
-      inputs:
-        script: 'sudo groupadd docker'
+    #- task: CmdLine@2
+    #  displayName: Test command
+    #  inputs:
+    #    script: 'sudo groupadd docker'
 
-    - task: CmdLine@2
-      displayName: Test command
-      inputs:
-        script: 'sudo newgrp docker'
         
     #- task: CmdLine@2
     #  displayName: Test command
@@ -152,7 +148,7 @@ stages:
     - task: CmdLine@2
       displayName: Start Docker
       inputs:
-        script: 'sudo service docker start'
+        script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
 
     #- task: CmdLine@2
     #  displayName: Start Docker
