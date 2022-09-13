@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 
@@ -20,6 +22,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private CollectionPeriod _collectionPeriod;
         private short _collectionYear;
         private Fixture _fixture;
+        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void Arrange()
@@ -30,6 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             _collectionPeriod = new CollectionPeriod(1, _collectionYear);
 
+            _mockDateTimeService = new Mock<IDateTimeService>();
         }
 
 
@@ -53,7 +57,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // Act
-            _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
+            _sut.ValidateEmploymentChecks(_mockDateTimeService.Object, _sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
             var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship);
@@ -82,7 +86,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // Act
-            _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
+            _sut.ValidateEmploymentChecks(_mockDateTimeService.Object, _sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
             var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship);
@@ -112,7 +116,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // Act
-            _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
+            _sut.ValidateEmploymentChecks(_mockDateTimeService.Object, _sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
             var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship);
@@ -144,7 +148,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.EmployedAtStartOfApprenticeship, DateTime.Now.AddDays(1)), _fixture.Create<ServiceRequest>());
 
             // Act
-            _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
+            _sut.ValidateEmploymentChecks(_mockDateTimeService.Object, _sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
             var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship);
@@ -176,7 +180,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.AddValidationOverride(new ValidationOverrideStep(ValidationStep.EmployedAtStartOfApprenticeship, DateTime.Now), _fixture.Create<ServiceRequest>());
 
             // Act
-            _sut.ValidateEmploymentChecks(_sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
+            _sut.ValidateEmploymentChecks(_mockDateTimeService.Object, _sutModel.PendingPaymentModels.First().Id, _collectionPeriod);
 
             // Assert
             var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedAtStartOfApprenticeship);
