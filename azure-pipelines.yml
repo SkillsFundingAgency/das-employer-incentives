@@ -100,12 +100,12 @@ stages:
     #    projectKey: SkillsFundingAgency_das-employer-incentives
     #    extraProperties: sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/CoverageResults/coverage.opencover.xml
 
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: restore
-        projects: 'src/**/*.csproj'
-        noCache: true
+    #- task: DotNetCoreCLI@2
+    #  displayName: Restore
+    #  inputs:
+    #    command: restore
+    #    projects: 'src/**/*.csproj'
+    #    noCache: true
 
     #- task: DotNetCoreCLI@2
     #  displayName: Build UnitTests
@@ -137,22 +137,22 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
-        script: 'whoami'    
-
+        script: 'sudo gpasswd -a $USER docker'    
+        
     - task: CmdLine@2
       displayName: Start Docker
       inputs:
-        script: 'sudo service docker restart'
+        script: 'sudo service docker start'
+
+    #- task: CmdLine@2
+    #  displayName: Start Docker
+    #  inputs:
+    #    script: 'sudo service docker restart'
 
     - task: Docker@2
       inputs:
         command: start
         container: builder
-
-    - task: CmdLine@2
-      displayName: Start Docker
-      inputs:
-        script: 'sudo service docker start'
 
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
