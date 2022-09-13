@@ -137,7 +137,7 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
-        script: 'sudo usermod -aG docker sudo'    
+        script: 'who'    
 
     - task: CmdLine@2
       displayName: Start Docker
