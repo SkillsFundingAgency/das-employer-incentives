@@ -18,18 +18,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
         private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
-        private Mock<IEmployerIncentivesDbContextFactory> _dbContextFactory;
 
         [SetUp]
         public void Setup()
         {
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
-
-            _dbContextFactory = new Mock<IEmployerIncentivesDbContextFactory>();
-            _dbContextFactory.Setup(x => x.Create(It.IsAny<DbTransaction>())).Returns(_dbContext);
-
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContextFactory.Object);
+            
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 
         [TearDown]

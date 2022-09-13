@@ -14,13 +14,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class ApprenticeshipIncentiveDataRepository : IApprenticeshipIncentiveDataRepository
     {
-        private readonly IEmployerIncentivesDbContextFactory _dbContextFactory;
         private readonly EmployerIncentivesDbContext _dbContext;
 
-        public ApprenticeshipIncentiveDataRepository(IEmployerIncentivesDbContextFactory dbContextFactory)
+        public ApprenticeshipIncentiveDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContextFactory = dbContextFactory;
-            _dbContext = _dbContextFactory.Create();
+            _dbContext = dbContext.Value;
         }
 
         public async Task Add(ApprenticeshipIncentiveModel apprenticeshipIncentive)
@@ -139,42 +137,16 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 
             if (apprenticeshipIncentive != null)
             {
-                await Task.WhenAll(
-                    GetPayments(apprenticeshipIncentive),
-                    GetClawbackPayments(apprenticeshipIncentive),
-                    GetBreaksInLearning(apprenticeshipIncentive),
-                    GetEmploymentChecks(apprenticeshipIncentive),
-                    GetValidationOverrides(apprenticeshipIncentive)
-                    );
+                apprenticeshipIncentive.Payments = await _dbContext.Payments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+                apprenticeshipIncentive.ClawbackPayments = await _dbContext.ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+                apprenticeshipIncentive.BreakInLearnings = await _dbContext.BreakInLearnings.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+                apprenticeshipIncentive.EmploymentChecks = await _dbContext.EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
+                apprenticeshipIncentive.ValidationOverrides = await _dbContext.ValidationOverrides.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
 
                 return apprenticeshipIncentive?.Map(_dbContext.CollectionPeriods.AsEnumerable());
             }
 
             return null;
-        }
-
-        private async Task GetPayments(ApprenticeshipIncentive apprenticeshipIncentive)
-        {
-            apprenticeshipIncentive.Payments = await _dbContextFactory.Create().Payments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
-        }
-
-        private async Task GetClawbackPayments(ApprenticeshipIncentive apprenticeshipIncentive)
-        {
-            apprenticeshipIncentive.ClawbackPayments = await _dbContextFactory.Create().ClawbackPayments.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
-        }
-
-        private async Task GetBreaksInLearning(ApprenticeshipIncentive apprenticeshipIncentive)
-        {
-            apprenticeshipIncentive.BreakInLearnings = await _dbContextFactory.Create().BreakInLearnings.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
-        }
-
-        private async Task GetEmploymentChecks(ApprenticeshipIncentive apprenticeshipIncentive)
-        {
-            apprenticeshipIncentive.EmploymentChecks = await _dbContextFactory.Create().EmploymentChecks.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
-        }
-        private async Task GetValidationOverrides(ApprenticeshipIncentive apprenticeshipIncentive)
-        {
-            apprenticeshipIncentive.ValidationOverrides = await _dbContextFactory.Create().ValidationOverrides.Where(x => x.ApprenticeshipIncentiveId == apprenticeshipIncentive.Id).ToListAsync();
         }
         
         private void UpdateApprenticeshipIncentive(ApprenticeshipIncentive updatedIncentive, ApprenticeshipIncentive existingIncentive)

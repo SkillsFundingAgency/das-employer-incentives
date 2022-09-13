@@ -21,17 +21,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private EmployerIncentivesDbContext _dbContext;
         private List<ApprenticeshipIncentives.Models.ApprenticeshipIncentive> _incentives;
         private (Guid IncentiveWithPendingPayments, ApprenticeshipIncentives.Models.ApprenticeshipIncentive[] IncentivesWithoutPendingPyaments) _expected;
-        private Mock<IEmployerIncentivesDbContextFactory> _dbContextFactory;
-
+        
         [SetUp]
         public async Task SetUp()
         {
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
-            _dbContextFactory = new Mock<IEmployerIncentivesDbContextFactory>();
-            _dbContextFactory.Setup(x => x.Create(It.IsAny<DbTransaction>())).Returns(_dbContext);
 
-            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(_dbContextFactory.Object);
+            _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
 
             var cpData = _fixture.Build<CollectionCalendarPeriod>()
                 .With(x => x.Active, true)

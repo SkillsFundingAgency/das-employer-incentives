@@ -89,13 +89,6 @@ namespace SFA.DAS.EmployerIncentives.Api
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
 
-            services.AddTransient<IEmployerIncentivesDbContextFactory>(provider =>
-            {
-                var settings = Configuration.GetSection("ApplicationSettings");
-                var employerIncentivesOptions = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(settings["DbConnectionString"]).Options;
-                return new EmployerIncentivesDbContextFactory(employerIncentivesOptions);
-            });
-
             services.AddPersistenceServices();
             services.AddCommandServices();
             services.AddQueryServices();
