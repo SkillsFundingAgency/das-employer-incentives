@@ -137,7 +137,7 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
-        script: 'newgrp docker'
+        script: 'sudo newgrp docker'
         
     #- task: CmdLine@2
     #  displayName: Test command
