@@ -28,7 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
            
             if (existingAuditStep != null)
             {
-                existingAuditStep.DeletedDateTime = DateTime.Now;
+                existingAuditStep.DeletedDateTime = DateTime.UtcNow;
                 _dbContext.Entry(existingAuditStep).CurrentValues.SetValues(existingAuditStep);
             }
         }

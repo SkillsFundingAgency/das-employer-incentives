@@ -1,15 +1,16 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -21,26 +22,63 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private Fixture _fixture;
         private Learner _learner;
         private CollectionCalendar _collectionCalendar;
-        
+        private CollectionPeriod _collectionPeriod;
+        private Mock<IDateTimeService> _mockDateTimeService;
+
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
-            
+
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
+
+            _collectionPeriod = new CollectionPeriod(6, 2021);
+
             var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
-                new CollectionCalendarPeriod(new CollectionPeriod(1, _fixture.Create<short>()), _fixture.Create<byte>(), _fixture.Create<short>(), _fixture.Create<DateTime>(), _fixture.Create<DateTime>(), true, false),
+                new CollectionCalendarPeriod(
+                    _collectionPeriod,
+                    _fixture.Create<byte>(), 
+                    _fixture.Create<short>(), 
+                    _fixture.Create<DateTime>(),
+                    new DateTime(2022, 1, 1),
+                    true, 
+                    false),
             };
 
             _collectionCalendar = new CollectionCalendar(new List<AcademicYear>(), collectionPeriods);
+
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Status, IncentiveStatus.Active)
+                .With(x => x.PreviousStatus, IncentiveStatus.Active)
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase1))
                 .With(x => x.StartDate, new DateTime(2020, 10, 1))
+                .Without(x => x.EmploymentCheckModels)
                 .Create();
-            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>();
-            _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>().With(x => x.DueDate, new DateTime(2021, 1, 1)).With(x => x.ClawedBack, false).With(x => x.PaymentMadeDate, (DateTime?)null).Create());
-            _sutModel.PendingPaymentModels.Add(_fixture.Build<PendingPaymentModel>().With(x => x.DueDate, new DateTime(2021, 2, 28)).With(x => x.ClawedBack, false).With(x => x.PaymentMadeDate, (DateTime?)null).Create());
+
+            _sutModel.PendingPaymentModels = new List<PendingPaymentModel>
+            {
+                _fixture.Build<PendingPaymentModel>()
+                .With(x => x.DueDate, _sutModel.StartDate.AddDays(89))
+                .With(x => x.ClawedBack, false)
+                .With(x => x.PaymentMadeDate, (DateTime?)null)
+                .With(x => x.Amount, 1000)
+                .With(x => x.EarningType, EarningType.FirstPayment)
+                .With(x => x.CollectionPeriod, _collectionPeriod)
+                .Create(),
+
+                _fixture.Build<PendingPaymentModel>()
+                .With(x => x.DueDate, _sutModel.StartDate.AddDays(364))
+                .With(x => x.ClawedBack, false)
+                .With(x => x.PaymentMadeDate, (DateTime?)null)
+                .With(x => x.Amount, 1000)
+                .With(x => x.EarningType, EarningType.SecondPayment)
+                .With(x => x.CollectionPeriod, _collectionPeriod)
+                .Create()
+            };
+
             _sutModel.PaymentModels = new List<PaymentModel>();
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
             _sut = Sut(_sutModel);
@@ -61,7 +99,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
 
             //Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -79,23 +117,23 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             {
                 _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create()
             };
+            
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
-
+            
             pendingPayment = _sutModel.PendingPaymentModels.Last();
             pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
             {
                 _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create()
-            };
+            };            
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
-
+            
             var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
 
             //Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             //Assert
-            _sutModel.PendingPaymentModels.Count.Should().Be(1);
-            _sutModel.PendingPaymentModels.First().GetHashCode().Should().Be(expectedPaymentHashCode);
+            _sutModel.PendingPaymentModels.Count.Should().Be(1);            
         }
 
         [Test]
@@ -113,15 +151,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
             
             pendingPayment = _sutModel.PendingPaymentModels.Last();
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create());
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
+            {
+                _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create()
+            };
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
 
             _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
             _sutModel.PaymentModels.Last().PaidDate = DateTime.Now;
 
             //Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             //Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(2);
@@ -143,7 +183,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         [TestCase(Phase.Phase3, 6, "2022-01-31", 7)]
         [TestCase(Phase.Phase3, 7, "2021-10-01", 7)]
         [TestCase(Phase.Phase3, 7, "2022-01-31", 7)]
-        public async Task Then_minimum_agreement_version_is_set_when_the_start_date_changes(Phase phase, int agreementVersion, DateTime startDate, int expectedMinimumVersion)
+        public void Then_minimum_agreement_version_is_set_when_the_start_date_changes(Phase phase, int agreementVersion, DateTime startDate, int expectedMinimumVersion)
         {
             // Arrange
             _sutModel.MinimumAgreementVersion = new AgreementVersion(agreementVersion);
@@ -151,11 +191,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             //Act
-            _sut.SetStartDateChangeOfCircumstance(startDate, _collectionCalendar);
+            _sut.SetStartDateChangeOfCircumstance(startDate, _collectionCalendar, _mockDateTimeService.Object);
 
             //Assert
             _sut.MinimumAgreementVersion.MinimumRequiredVersion.Should().Be(expectedMinimumVersion);
-
         }
 
         [Test]
@@ -169,20 +208,19 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             submissionData.SetLearningData(learningData);
             _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
             _learner.SetSubmissionData(submissionData);
-            
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             learningData = new LearningData(true);
             learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(90)));
             submissionData.SetLearningData(learningData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
         }
-
 
         [Test]
         public void Then_the_first_earning_is_calculated_if_the_updated_learning_stopped_date_is_on_the_payment_due_date()
@@ -196,14 +234,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
             _learner.SetSubmissionData(submissionData);
 
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             learningData = new LearningData(true);
             learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(89)));
             submissionData.SetLearningData(learningData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -224,7 +262,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetSubmissionData(submissionData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(2);
@@ -242,14 +280,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
             _learner.SetSubmissionData(submissionData);
 
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             learningData = new LearningData(true);
             learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(90)));
             submissionData.SetLearningData(learningData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.First().DueDate.Year.Should().Be(_learner.SubmissionData.LearningData.StoppedStatus.DateStopped.Value.Year);
@@ -268,14 +306,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
             _learner.SetSubmissionData(submissionData);
 
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             learningData = new LearningData(true);
             learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(88)));
             submissionData.SetLearningData(learningData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(0);
@@ -293,14 +331,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
             _learner.SetSubmissionData(submissionData);
 
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             learningData = new LearningData(true);
             learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(363)));
             submissionData.SetLearningData(learningData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -318,7 +356,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
             _learner.SetSubmissionData(submissionData);
 
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             _sutModel.PendingPaymentModels.Count.Should().Be(0);
 
@@ -327,7 +365,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             submissionData.SetLearningData(learningData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(1);
@@ -365,7 +403,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetSubmissionData(submissionData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(2);
@@ -425,7 +463,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetSubmissionData(submissionData);
 
             // Act
-            _sut.SetLearningStoppedChangeOfCircumstance(_learner.SubmissionData.LearningData.StoppedStatus, _collectionCalendar);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
             // Assert
             _sutModel.PendingPaymentModels.Count.Should().Be(3);
@@ -434,6 +472,60 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && !x.ClawedBack).Should().Be(1);
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && !x.PaymentMadeDate.HasValue).Should().Be(1);
             _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.SecondPayment && x.PaymentMadeDate.HasValue).Should().Be(1);
+        }
+
+        [Test]
+        public void Then_365_employment_checks_are_removed_when_the_incentive_is_stopped()
+        {
+            //Arrange
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck });
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck });
+
+            //Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+
+            //Assert
+            _sutModel.EmploymentCheckModels.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void Then_365_employment_checks_are_removed_when_the_stopped_incentive_has_a_learning_stopped_event()
+        {
+            //Arrange
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck });
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck });
+
+            _sutModel.Status = IncentiveStatus.Stopped;
+
+            //Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+
+            //Assert
+            _sutModel.EmploymentCheckModels.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void Then_365_employment_checks_are_removed_when_the_stopped_incentive_is_resumed()
+        {
+            //Arrange
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck });
+            _sutModel.EmploymentCheckModels.Add(new EmploymentCheckModel() { ApprenticeshipIncentiveId = _sutModel.Id, CheckType = EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck });
+
+            _sutModel.Status = IncentiveStatus.Stopped;
+
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(false, _sutModel.StartDate.AddDays(366)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+
+            //Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+
+            //Assert
+            _sutModel.EmploymentCheckModels.Count.Should().Be(0);
         }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)

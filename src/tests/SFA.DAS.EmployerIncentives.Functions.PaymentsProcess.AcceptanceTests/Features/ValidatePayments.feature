@@ -46,19 +46,19 @@ Scenario Outline: When at least one validation check fails
 	And pending payments are not marked as paid
 
 Examples:
-	| ValidationStep                    |
-	| HasBankDetails                    |
-	| IsInLearning                      |
-	| HasLearningRecord                 |
-	| HasNoDataLocks                    |
-	| HasIlrSubmission                  |
-	| HasDaysInLearning                 |
-	| PaymentsNotPaused                 |
-	| HasSignedMinVersion               |
-	| LearnerMatchSuccessful            |
-	| EmployedAtStartOfApprenticeship   |
-	| EmployedBeforeSchemeStarted       |
-	| BlockedForPayments		        |
+	| ValidationStep                  |
+	| HasBankDetails                  |
+	| IsInLearning                    |
+	| HasLearningRecord               |
+	| HasNoDataLocks                  |
+	| HasIlrSubmission                |
+	| HasDaysInLearning               |
+	| PaymentsNotPaused               |
+	| HasSignedMinVersion             |
+	| LearnerMatchSuccessful          |
+	| EmployedAtStartOfApprenticeship |
+	| EmployedBeforeSchemeStarted     |
+	| BlockedForPayments              |
 
 Scenario Outline: Expired validation overrides are removed
 	Given there are pending payments	
@@ -72,7 +72,7 @@ Examples:
 	| HasNoDataLocks                    |
 	| HasDaysInLearning                 |
 	| EmployedAtStartOfApprenticeship   |
-	| EmployedBeforeSchemeStarted       |
+	| EmployedBeforeSchemeStarted       |	
 
 Scenario Outline: When at least one validation check fails and is overriden
 	Given there are pending payments
@@ -89,4 +89,21 @@ Examples:
 	| HasNoDataLocks                    |
 	| HasDaysInLearning                 |
 	| EmployedAtStartOfApprenticeship   |
-	| EmployedBeforeSchemeStarted       |
+	| EmployedBeforeSchemeStarted       |	
+
+Scenario: Employed at 365 days validation check fails
+	Given an apprentice has a pending 365 day payment
+	And the employed at 365 days check will fail
+	When the payment process is run
+	Then the employed at 365 days check will have a failed validation result
+	And no payment records are created
+	And the 365 day pending payment is not marked as paid
+
+
+Scenario: Employed at 365 days validation check fails and is overriden
+	Given an apprentice has a pending 365 day payment
+	And the employed at 365 days check will fail
+	And there is a validation override for 'EmployedAt365Days'
+	When the payment process is run
+	Then the validation result override for the 365 days check is recorded
+	And the 365 day pending payment is marked as paid
