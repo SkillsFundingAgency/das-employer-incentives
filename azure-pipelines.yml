@@ -132,7 +132,7 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
-        script: 'sudo dockerd'
+        script: 'systemctl status docker'
     
     - task: Docker@2
       inputs:
