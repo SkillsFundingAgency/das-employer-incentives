@@ -37,11 +37,14 @@ l.HasDataLock,
 l.InLearning,
 ppvr1.Result AS FirstEmploymentCheckValidation,
 ec1.Result AS FirstEmploymentCheckResult,
+ppvr1.OverrideResult AS FirstEmploymentCheckOverrideResult,
 ppvr2.Result AS SecondEmploymentCheckValidation,
 ec2.Result AS SecondEmploymentCheckResult,
+ppvr2.OverrideResult AS SecondEmploymentCheckOverrideResult,
 ppvr3.Result AS EmployedAt365DaysValidation,
 ec3.Result AS EmployedAt365DaysFirstCheck,
-ec4.Result AS EmployedAt365DaysSecondCheck
+ec4.Result AS EmployedAt365DaysSecondCheck,
+ppvr3.OverrideResult AS EmployedAt365DaysCheckOverrideResult
 FROM incentives.ApprenticeshipIncentive ai
 INNER JOIN dbo.Accounts a
 ON ai.AccountLegalEntityId = a.AccountLegalEntityId
@@ -73,19 +76,19 @@ LEFT OUTER JOIN incentives.Learner l
 ON l.ApprenticeshipIncentiveId = ai.Id
 OUTER APPLY 
 (
-	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC FROM incentives.PendingPaymentValidationResult
+	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC, OverrideResult FROM incentives.PendingPaymentValidationResult
 	WHERE Step = 'EmployedAtStartOfApprenticeship' and PendingPaymentId IN (pp1.Id,pp2.Id)
 	ORDER BY CreatedDateUTC DESC
 ) ppvr1
 OUTER APPLY 
 (
-	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC FROM incentives.PendingPaymentValidationResult
+	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC, OverrideResult FROM incentives.PendingPaymentValidationResult
 	WHERE Step = 'EmployedBeforeSchemeStarted' and PendingPaymentId IN (pp1.Id,pp2.Id)
 	ORDER BY CreatedDateUTC DESC
 ) ppvr2
 OUTER APPLY 
 (
-	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC FROM incentives.PendingPaymentValidationResult
+	SELECT TOP 1 PendingPaymentId, Step, Result, CreatedDateUTC, OverrideResult FROM incentives.PendingPaymentValidationResult
 	WHERE Step = 'EmployedAt365Days' and PendingPaymentId IN (pp1.Id,pp2.Id)
 	ORDER BY CreatedDateUTC DESC
 ) ppvr3
