@@ -132,6 +132,11 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
+        script: 'docker ps'
+
+    - task: CmdLine@2
+      displayName: Test command
+      inputs:
         script: 'sudo groupadd docker'
         
     - task: CmdLine@2
