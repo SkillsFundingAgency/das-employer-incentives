@@ -132,8 +132,18 @@ stages:
     - task: CmdLine@2
       displayName: Test command
       inputs:
-        script: 'systemctl status docker'
-    
+        script: 'sudo groupadd docker'
+        
+    - task: CmdLine@2
+      displayName: Test command
+      inputs:
+        script: 'sudo usermod -aG docker docker-test'    
+
+    - task: CmdLine@2
+      displayName: Start Docker
+      inputs:
+        script: 'sudo service docker restart'
+
     - task: Docker@2
       inputs:
         command: start
