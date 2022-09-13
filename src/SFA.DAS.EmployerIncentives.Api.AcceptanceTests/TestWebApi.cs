@@ -98,6 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));                
                 s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _commandMessageHook));
+                s.AddSingleton(typeof(IDateTimeService), _context.DateTimeService);
                 s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>

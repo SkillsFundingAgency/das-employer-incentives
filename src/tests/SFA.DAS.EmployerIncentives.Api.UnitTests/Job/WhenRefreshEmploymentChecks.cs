@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
         public async Task Then_a_refresh_employment_checks_command_is_dispatched()
         {
             // Arrange
-            var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.RefreshEmploymentChecks).Create();
+            var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.RefreshAllEmploymentChecks).Create();
 
             // Act
             await _sut.AddJob(request);
@@ -49,7 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
         public async Task Then_a_NoContent_response_is_returned()
         {
             // Arrange
-            var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.RefreshEmploymentChecks).Create();
+            var request = _fixture.Build<JobRequest>().With(r => r.Type, JobType.RefreshAllEmploymentChecks).Create();
 
             // Act
             var actual = await _sut.AddJob(request) as NoContentResult;
