@@ -34,47 +34,47 @@ stages:
 - stage: BuildAndTest
   displayName: 'Build and Test'
   jobs:
-  #- job: 'BuildDacpac'
-  #  pool:
-  #    name: 'DAS - Continuous Integration'
-  #    demands:
-  #    - Agent.OS -equals Windows_NT
-  #    workspace:
-  #    clean: all
-  #  steps:
-  #  - task: UseGitVersion@5
-  #    inputs:
-  #      versionSpec: 5.x
-  #      useConfigFile: true
-  #      configFilePath: GitVersion.yml
+  - job: 'BuildDacpac'
+    pool:
+      name: 'DAS - Continuous Integration'
+      demands:
+      - Agent.OS -equals Windows_NT
+      workspace:
+      clean: all
+    steps:
+    - task: UseGitVersion@5
+      inputs:
+        versionSpec: 5.x
+        useConfigFile: true
+        configFilePath: GitVersion.yml
 
-  #  - task: DotNetCoreCLI@2
-  #    displayName: Restore
-  #    inputs:
-  #      command: restore
-  #      projects: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
-  #      noCache: true
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
+        noCache: true
 
-  #  - task: VSBuild@1
-  #    displayName: 'Build DACPAC'
-  #    inputs:
-  #      solution: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
-  #      platform: 'anycpu'
-  #      configuration: '$(buildConfiguration)'
-  #      msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
+    - task: VSBuild@1
+      displayName: 'Build DACPAC'
+      inputs:
+        solution: 'src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj'
+        platform: 'anycpu'
+        configuration: '$(buildConfiguration)'
+        msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
 
-  #  - task: CopyFiles@2
-  #    displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
-  #    inputs:
-  #      Contents: |
-  #        src\**\*.dacpac
-  #      TargetFolder: '$(build.artifactstagingdirectory)/publish'
+    - task: CopyFiles@2
+      displayName: 'Copy dacpac to: $(build.artifactstagingdirectory)'
+      inputs:
+        Contents: |
+          src\**\*.dacpac
+        TargetFolder: '$(build.artifactstagingdirectory)/publish'
 
-  #  - task: PublishPipelineArtifact@1
-  #    displayName: 'Publish Artifact: dacpac'
-  #    inputs:
-  #      targetPath: $(build.artifactstagingdirectory)/publish
-  #      artifactName: dacpac
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifact: dacpac'
+      inputs:
+        targetPath: $(build.artifactstagingdirectory)/publish
+        artifactName: dacpac
 
   - job: 'BuildAndTest'
     dependsOn: BuildDacpac
