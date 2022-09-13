@@ -127,6 +127,11 @@ stages:
         releaseType: stable
 
     - task: CmdLine@2
+      displayName: Test command
+      inputs:
+        script: 'echo "Hello World"'
+
+    - task: CmdLine@2
       displayName: Start Docker
       inputs:
         script: 'sudo service docker start'
