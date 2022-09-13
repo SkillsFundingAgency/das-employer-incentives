@@ -26,6 +26,9 @@ resources:
     name: SkillsFundingAgency/das-platform-building-blocks
     ref: refs/tags/0.4.63
     endpoint: SkillsFundingAgency
+  containers:
+    - container: builder
+      image: ubuntu:18.04
 
 stages:
 - stage: BuildAndTest
@@ -130,6 +133,11 @@ stages:
       displayName: Test command
       inputs:
         script: 'echo "Hello World"'
+    
+    - task: Docker@2
+      inputs:
+        command: start
+        container: builder
 
     - task: CmdLine@2
       displayName: Start Docker
