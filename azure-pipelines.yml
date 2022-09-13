@@ -155,10 +155,10 @@ stages:
     #  inputs:
     #    script: 'sudo service docker restart'
 
-    - task: Docker@2
-      inputs:
-        command: start
-        container: builder
+    #- task: Docker@2
+    #  inputs:
+    #    command: start
+    #    container: builder
 
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
