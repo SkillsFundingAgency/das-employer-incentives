@@ -6,10 +6,8 @@ using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Moq;
 using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
@@ -21,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private EmployerIncentivesDbContext _dbContext;
         private List<ApprenticeshipIncentives.Models.ApprenticeshipIncentive> _incentives;
         private (Guid IncentiveWithPendingPayments, ApprenticeshipIncentives.Models.ApprenticeshipIncentive[] IncentivesWithoutPendingPyaments) _expected;
-        
+
         [SetUp]
         public async Task SetUp()
         {

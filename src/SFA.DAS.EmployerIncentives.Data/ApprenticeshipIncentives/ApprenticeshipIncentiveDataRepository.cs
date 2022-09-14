@@ -14,11 +14,12 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives
 {
     public class ApprenticeshipIncentiveDataRepository : IApprenticeshipIncentiveDataRepository
     {
-        private readonly EmployerIncentivesDbContext _dbContext;
+        private readonly Lazy<EmployerIncentivesDbContext> _lazyContext;
+        private EmployerIncentivesDbContext _dbContext => _lazyContext.Value;
 
         public ApprenticeshipIncentiveDataRepository(Lazy<EmployerIncentivesDbContext> dbContext)
         {
-            _dbContext = dbContext.Value;
+            _lazyContext = dbContext;
         }
 
         public async Task Add(ApprenticeshipIncentiveModel apprenticeshipIncentive)

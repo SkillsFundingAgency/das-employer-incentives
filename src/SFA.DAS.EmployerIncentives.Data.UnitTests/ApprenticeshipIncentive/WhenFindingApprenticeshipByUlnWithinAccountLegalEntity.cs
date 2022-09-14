@@ -19,7 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private EmployerIncentivesDbContext _dbContext;
         private long _uln;
         private long _accountLegalEntityId;
-        
+
         [SetUp]
         public async Task Arrange()
         {

@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
         private ApprenticeshipIncentives.Models.CollectionCalendarPeriod _collectionCalendarPeriod;
-        
+
         [SetUp]
         public async Task Setup()
         {
