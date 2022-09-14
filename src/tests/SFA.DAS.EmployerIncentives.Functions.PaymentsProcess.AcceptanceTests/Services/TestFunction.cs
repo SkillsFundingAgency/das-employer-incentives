@@ -12,7 +12,6 @@ using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -43,11 +42,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             _appConfig = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
-                    { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
-                    { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
+                    { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },                    
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
+                    { "ApplicationSettings:NServiceBusConnectionString", _testContext.ApplicationSettings.NServiceBusConnectionString },
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory },
+                    { "ApplicationSettings:DistributedLockStorage", _testContext.ApplicationSettings.DistributedLockStorage }
             };
 
             _testContext = testContext;
@@ -118,7 +119,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();
                            s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
-                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));                        
+                           s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));
                        })
                        )
                     .ConfigureServices(s =>

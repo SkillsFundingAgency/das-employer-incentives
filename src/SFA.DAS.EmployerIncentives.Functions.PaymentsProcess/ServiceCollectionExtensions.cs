@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,6 +7,7 @@ using NLog.Extensions.Logging;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.EmployerIncentives.Commands;
+using SFA.DAS.EmployerIncentives.Data;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
@@ -62,11 +62,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             var webBuilder = serviceCollection.AddWebJobs(x => { });
             webBuilder.AddExecutionContextBinding();
 
+            UpdateableServiceProvider container = null;
+
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
-                .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
+                .UseSqlServerPersistence(() =>  container.GetService<ISqlConnectionProvider>().Get(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
             
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
@@ -88,7 +90,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             }
 
             var endpointWithExternallyManagedServiceProvider = EndpointWithExternallyManagedServiceProvider.Create(endpointConfiguration, serviceCollection);
-            endpointWithExternallyManagedServiceProvider.Start(new UpdateableServiceProvider(serviceCollection));
+            container = new UpdateableServiceProvider(serviceCollection);
+            endpointWithExternallyManagedServiceProvider.Start(container);
             serviceCollection.AddSingleton(p => endpointWithExternallyManagedServiceProvider.MessageSession.Value);
 
             return serviceCollection;

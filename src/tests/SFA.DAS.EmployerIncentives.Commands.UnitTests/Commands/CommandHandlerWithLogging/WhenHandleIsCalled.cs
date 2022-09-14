@@ -8,7 +8,6 @@ using SFA.DAS.EmployerIncentives.Commands.Decorators;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.Commands.CommandHandlerWithLogging
 {
