@@ -17,8 +17,8 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
         }
 
         public Task Handle(EmploymentChecksCreated @event, CancellationToken cancellationToken = default)
-        {
-            var command = new SendEmploymentCheckRequestsCommand(@event.ApprenticeshipIncentiveId);
+        {            
+            var command = new SendEmploymentCheckRequestsCommand(@event.ApprenticeshipIncentiveId, @event.Model.CheckType);
 
             return _commandPublisher.Publish(command);
         }

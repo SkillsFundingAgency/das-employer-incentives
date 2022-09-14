@@ -503,6 +503,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             {
                 Id = entity.Id,
                 ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                CheckType = entity.CheckType.ToString(),
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,

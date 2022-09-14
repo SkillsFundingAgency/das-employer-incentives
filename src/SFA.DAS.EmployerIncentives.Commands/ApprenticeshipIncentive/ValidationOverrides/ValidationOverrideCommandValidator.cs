@@ -44,6 +44,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.Validation
                 case ValidationStep.HasDaysInLearning:
                 case ValidationStep.EmployedAtStartOfApprenticeship:
                 case ValidationStep.EmployedBeforeSchemeStarted:
+                case ValidationStep.EmployedAt365Days:
                     break;
                 default:
                     result.AddError("ValidationOverrideStep.ValidationStep", "Is not valid");
