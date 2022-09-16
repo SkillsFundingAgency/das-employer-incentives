@@ -83,14 +83,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     l.SubscriptionKey = "";
                     l.ApiVersion = "1";
                 });
-                if (_context.AccountApi != null)
-                {
-                    s.Configure<AccountApi>(a =>
-                    {
-                        a.ApiBaseUrl = _context.AccountApi.BaseAddress;
-                        a.ClientId = "";
-                    });
-                }
 
                 Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
 
