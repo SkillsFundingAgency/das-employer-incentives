@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Application.UnitTests;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
+using Microsoft.Extensions.Options;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentralFinancialService
 {
@@ -29,7 +31,16 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             _fixture = new Fixture();
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
+
+            var options = Options.Create(
+             new BusinessCentralApiClient()
+             {
+                 ApiVersion = "XXX",
+                 PaymentRequestsLimit = 3,
+                 ObfuscateSensitiveData = false
+             });
+
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, options);
         }
 
         [Test]
@@ -47,9 +58,17 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         public async Task Then_the_nonsensitive_payment_data_is_logged()
         {
             //Arrange
+            var options = Options.Create(
+              new BusinessCentralApiClient()
+              {
+                  ApiVersion = "XXX",
+                  PaymentRequestsLimit = 3,
+                  ObfuscateSensitiveData = false
+              });
+
             var loggerMock = new Mock<ILogger<BusinessCentralFinancePaymentsServiceWithLogging>>();
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", false);
-            var decorator = new BusinessCentralFinancePaymentsServiceWithLogging(_sut, loggerMock.Object, false);
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, options);
+            var decorator = new BusinessCentralFinancePaymentsServiceWithLogging(_sut, loggerMock.Object, options);
             _httpClient.SetUpPostAsAsync(HttpStatusCode.Accepted);
             var payment1 = _fixture.Create<Payment>();
             var payment2 = _fixture.Create<Payment>();
@@ -100,13 +119,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             {
                 await _sut.SendPaymentRequests(new List<Payment> { payment });
             }
-            catch(BusinessCentralApiException exception)
+            catch (BusinessCentralApiException exception)
             {
                 exception.Message.Should().StartWith("Business Central API is unavailable and returned an internal");
                 var delimiter = "Data sent: ";
                 var json = exception.Message.Substring(exception.Message.IndexOf(delimiter) + delimiter.Length - 1);
                 var paymentRequests = JsonConvert.DeserializeObject<PaymentRequestContainer>(json);
-                foreach(var paymentRequest in paymentRequests.PaymentRequests)
+                foreach (var paymentRequest in paymentRequests.PaymentRequests)
                 {
                     paymentRequest.DueDate.Should().NotBeNull();
                     paymentRequest.RequestorUniquePaymentIdentifier.Should().NotBeNull();
@@ -208,7 +227,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
         [TestCase(123456789, "*****6789")]
         public void Then_the_PaymentLineDescription_is_constructed_with_uln_obfuscated(long uln, string expected)
         {
-            _sut = new BusinessCentralFinancePaymentsService(_httpClient, 3, "XXX", true);
+            var options = Options.Create(
+              new BusinessCentralApiClient()
+              {
+                  ApiVersion = "XXX",
+                  PaymentRequestsLimit = 3,
+                  ObfuscateSensitiveData = true
+              });
+
+            _sut = new BusinessCentralFinancePaymentsService(_httpClient, options);
 
             var payment = _fixture.Build<Payment>()
                 .With(x => x.EarningType, EarningType.FirstPayment)

@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -7,6 +8,7 @@ using SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.Factories;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.UnitTests.Shared;
 using System;
 using System.Net.Http;
@@ -23,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         private Learner _learner;
         private readonly string _version = "1.0";
         private Fixture _fixture;
+        private IOptions<MatchedLearnerApi> _options;
 
         [SetUp]
         public void Arrange()
@@ -32,9 +35,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             _baseAddress = new Uri(@"http://localhost");
             _httpClient = new TestHttpClient(_baseAddress);
 
+            _options = Options.Create(
+                new MatchedLearnerApi()
+                {
+                    Version = _version
+                });
+
             _learner = new LearnerFactory().GetExisting(_fixture.Create<LearnerModel>());
 
-            _sut = new LearnerSubmissionService(_httpClient, _version);
+            _sut = new LearnerSubmissionService(_httpClient, _options);
         }
 
         [Test]

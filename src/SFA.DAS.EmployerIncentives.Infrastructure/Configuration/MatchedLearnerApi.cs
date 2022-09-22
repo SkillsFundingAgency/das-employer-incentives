@@ -1,11 +1,8 @@
-﻿using SFA.DAS.Http.Configuration;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.API;
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
-    public class MatchedLearnerApi : IManagedIdentityClientConfiguration
+    public class MatchedLearnerApi : ManagedIdentityApiBase
     {
-        public virtual string ApiBaseUrl { get; set; }
-        public string Identifier { get; set; }
-        public string Version { get; set; }
     }
 }
