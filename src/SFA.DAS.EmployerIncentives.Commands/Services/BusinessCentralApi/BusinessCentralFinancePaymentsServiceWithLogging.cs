@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 {
@@ -16,11 +18,11 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         public BusinessCentralFinancePaymentsServiceWithLogging(
             IBusinessCentralFinancePaymentsService businessCentralFinancePaymentsService,
             ILogger<BusinessCentralFinancePaymentsServiceWithLogging> logger,
-            bool obfuscateSensitiveData)
+            IOptions<BusinessCentralApiClient> options)
         {
             _businessCentralFinancePaymentsService = businessCentralFinancePaymentsService;
             _logger = logger;
-            _obfuscateSensitiveData = obfuscateSensitiveData;
+            _obfuscateSensitiveData = options.Value.ObfuscateSensitiveData;
         }
 
         public int PaymentRequestsLimit => _businessCentralFinancePaymentsService.PaymentRequestsLimit;

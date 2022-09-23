@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using NServiceBus.Persistence;
 using Polly;
-using Polly.Extensions.Http;
+using SFA.DAS.EmployerIncentives.Abstractions.API;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CalculateDaysInLearning;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.CreatePayment;
@@ -33,6 +32,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Data;
+using SFA.DAS.EmployerIncentives.Data.Account;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.IncentiveApplication;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -42,8 +42,6 @@ using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
 using SFA.DAS.HashingService;
-using SFA.DAS.Http;
-using SFA.DAS.Http.TokenGenerators;
 using SFA.DAS.NServiceBus.Configuration;
 using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
 using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
@@ -59,9 +57,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Data.Account;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -74,7 +70,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddDistributedLockProvider()
                 .AddHashingService()
                 .AddLearnerService()
-                .AddEmploymentCheckService();
+                .AddEmploymentCheckService()
+                .BusinessCentralFinancePaymentsService();
 
             serviceCollection
                 .AddCommandHandlers(addDecorators: AddCommandHandlerDecorators)
@@ -98,9 +95,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<ICommandPublisher, CommandPublisher>();
             serviceCollection.AddScoped<IScheduledCommandPublisher, ScheduledCommandPublisher>();
-
-            serviceCollection.AddBusinessCentralClient<IBusinessCentralFinancePaymentsService>((c, s, version, limit, obfuscateSensitiveData) =>
-                new BusinessCentralFinancePaymentsServiceWithLogging(new BusinessCentralFinancePaymentsService(c, limit, version, obfuscateSensitiveData), s.GetRequiredService<ILogger<BusinessCentralFinancePaymentsServiceWithLogging>>(), obfuscateSensitiveData));
 
             return serviceCollection;
         }
@@ -131,7 +125,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         public static IServiceCollection AddPersistenceServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IAccountDataRepository, AccountDataRepository>();
-            serviceCollection.AddScoped<IPaymentDataRepository, PaymentDataRepository>();            
+            serviceCollection.AddScoped<IPaymentDataRepository, PaymentDataRepository>();
             serviceCollection.AddScoped<IAccountDomainRepository, AccountDomainRepository>();
             serviceCollection.AddScoped<IApprenticeApplicationDataRepository, ApprenticeApplicationDataRepository>();
 
@@ -149,7 +143,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IIncentiveApplicationStatusAuditDataRepository, IncentiveApplicationStatusAuditDataRepository>();
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
-            serviceCollection.AddScoped<IChangeOfCircumstancesDataRepository, ChangeOfCircumstancesDataRepository>();            
+            serviceCollection.AddScoped<IChangeOfCircumstancesDataRepository, ChangeOfCircumstancesDataRepository>();
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
             serviceCollection.AddScoped<IEmploymentCheckAuditRepository, EmploymentCheckAuditRepository>();
@@ -157,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IValidationOverrideAuditRepository, ValidationOverrideAuditRepository>();
             serviceCollection.AddScoped<IRevertedPaymentAuditRepository, RevertedPaymentAuditRepository>();
-            
+
             return serviceCollection;
         }
 
@@ -175,7 +169,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             return serviceCollection;
         }
-             
+
         public static IServiceCollection AddDomainCommandHandlerValidators(this IServiceCollection serviceCollection)
         {
             serviceCollection
@@ -196,7 +190,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SetSuccessfulLearnerMatchCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<CompleteCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
+                .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentChecksCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
@@ -227,84 +221,42 @@ namespace SFA.DAS.EmployerIncentives.Commands
             return serviceCollection;
         }
 
-        private static IServiceCollection AddBusinessCentralClient<T>(this IServiceCollection serviceCollection, Func<HttpClient, IServiceProvider, string, int, bool, T> instance) where T : class
+        private static IServiceCollection BusinessCentralFinancePaymentsService(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient(s =>
-            {
-                var settings = s.GetService<IOptions<BusinessCentralApiClient>>().Value;
+            serviceCollection
+               .AddHttpClient<IBusinessCentralFinancePaymentsService, BusinessCentralFinancePaymentsService>()
+               .WithBaseUrl<IOptions<BusinessCentralApiClient>>()
+               .WithDefaultHeaders()
+               .WithLogging()
+               .WithApimAuthorisationHeader<IOptions<BusinessCentralApiClient>>()
+               .WithHandler(s => new TransientRetryHandler(p => p.RetryAsync(3)));
 
-                var clientBuilder = new HttpClientBuilder()
-                    .WithDefaultHeaders()
-                    .WithApimAuthorisationHeader(settings)
-                    .WithLogging(s.GetService<ILoggerFactory>())
-                    .WithHandler(new TransientRetryHandler(p => p.RetryAsync(3)));
-
-                var httpClient = clientBuilder.Build();
-
-                if (!settings.ApiBaseUrl.EndsWith("/"))
-                {
-                    settings.ApiBaseUrl += "/";
-                }
-                httpClient.BaseAddress = new Uri(settings.ApiBaseUrl);
-
-                return instance.Invoke(httpClient, s, settings.ApiVersion, settings.PaymentRequestsLimit, settings.ObfuscateSensitiveData);
-            });
+            serviceCollection.Decorate<IBusinessCentralFinancePaymentsService, BusinessCentralFinancePaymentsServiceWithLogging>();
 
             return serviceCollection;
         }
 
+
         private static IServiceCollection AddLearnerService(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<ILearnerSubmissionService>(s =>
-            {
-                var settings = s.GetService<IOptions<MatchedLearnerApi>>().Value;
-
-                var clientBuilder = new HttpClientBuilder()
-                    .WithDefaultHeaders()
-                    .WithLogging(s.GetService<ILoggerFactory>());
-
-                if (!string.IsNullOrEmpty(settings.Identifier))
-                {
-                    clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
-                }
-
-                var client = clientBuilder.Build();
-
-                if (!settings.ApiBaseUrl.EndsWith("/"))
-                {
-                    settings.ApiBaseUrl += "/";
-                }
-
-                client.BaseAddress = new Uri(settings.ApiBaseUrl);
-
-                return new LearnerSubmissionService(client, settings.Version);
-            });
+            serviceCollection
+                .AddHttpClient<ILearnerSubmissionService, LearnerSubmissionService>()
+                .WithBaseUrl<IOptions<MatchedLearnerApi>>()
+                .WithDefaultHeaders()
+                .WithLogging()
+                .WithManagedIdentityAuthorisationHeader<IOptions<MatchedLearnerApi>>();
 
             return serviceCollection;
         }
 
         private static IServiceCollection AddEmploymentCheckService(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<IEmploymentCheckService>(s =>
-            {
-                var settings = s.GetService<IOptions<EmployerIncentivesOuterApi>>().Value;
-
-                var clientBuilder = new HttpClientBuilder()
-                    .WithDefaultHeaders()
-                    .WithApimAuthorisationHeader(settings)
-                    .WithLogging(s.GetService<ILoggerFactory>());
-
-                var client = clientBuilder.Build();
-
-                if (!settings.ApiBaseUrl.EndsWith("/"))
-                {
-                    settings.ApiBaseUrl += "/";
-                }
-
-                client.BaseAddress = new Uri(settings.ApiBaseUrl);
-
-                return new EmploymentCheckService(client, settings.ApiVersion);
-            });
+            serviceCollection
+                .AddHttpClient<IEmploymentCheckService, EmploymentCheckService>()
+                .WithBaseUrl<IOptions<EmployerIncentivesOuterApi>>()
+                .WithDefaultHeaders()
+                .WithLogging()
+                .WithApimAuthorisationHeader<IOptions<EmployerIncentivesOuterApi>>();
 
             return serviceCollection;
         }
@@ -381,14 +333,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
                 return dbContext;
             });
-        }
-
-        public sealed class TransientRetryHandler : PolicyHttpMessageHandler
-        {
-            public TransientRetryHandler(Func<PolicyBuilder<HttpResponseMessage>, IAsyncPolicy<HttpResponseMessage>> configurePolicy)
-                : base(configurePolicy(HttpPolicyExtensions.HandleTransientHttpError()))
-            {
-            }
         }
     }
 }

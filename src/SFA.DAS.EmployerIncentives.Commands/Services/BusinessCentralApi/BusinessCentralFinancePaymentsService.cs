@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,12 +20,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
         private readonly string _apiVersion;
         public int PaymentRequestsLimit { get; }
 
-        public BusinessCentralFinancePaymentsService(HttpClient client, int paymentRequestsLimit, string apiVersion, bool obfuscateSensitiveData)
+        public BusinessCentralFinancePaymentsService(
+            HttpClient client,
+            IOptions<BusinessCentralApiClient> options)
         {
             _client = client;
-            _obfuscateSensitiveData = obfuscateSensitiveData;
-            _apiVersion = apiVersion ?? "2020-10-01";
-            PaymentRequestsLimit = paymentRequestsLimit <= 0 ? 1000 : paymentRequestsLimit;
+            var config = options.Value;
+            _obfuscateSensitiveData = config.ObfuscateSensitiveData;
+            _apiVersion = config.ApiVersion ?? "2020-10-01";
+            PaymentRequestsLimit = config.PaymentRequestsLimit <= 0 ? 1000 : config.PaymentRequestsLimit;
         }
 
         public async Task SendPaymentRequests(IList<Payment> payments)
@@ -54,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.BusinessCentralApi
 
         private static HttpContent CreateErrorLogJsonContent(IEnumerable<BusinessCentralFinancePaymentRequest> payments)
         {
-            var body = new PaymentRequestContainer {PaymentRequests = payments.ToErrorLogOutput()};
+            var body = new PaymentRequestContainer { PaymentRequests = payments.ToErrorLogOutput() };
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()

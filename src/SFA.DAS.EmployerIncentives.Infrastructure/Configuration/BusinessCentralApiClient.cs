@@ -1,15 +1,12 @@
-﻿using SFA.DAS.Http.Configuration;
+﻿using SFA.DAS.EmployerIncentives.Abstractions.API;
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.Configuration
 {
-    public class BusinessCentralApiClient : IApimClientConfiguration
+    public class BusinessCentralApiClient : ApimBase
     {
         public const string BusinessCentralApi = "BusinessCentralApi";
-        public string ApiBaseUrl { get; set; }
-        public string SubscriptionKey { get; set; }
-        public string ApiVersion { get; set; }
         public int PaymentRequestsLimit { get; set; }
         public bool ObfuscateSensitiveData { get; set; }
     }
-    
+
 }

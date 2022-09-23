@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -12,10 +14,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         public LearnerSubmissionService(
             HttpClient client,
-            string serviceVersion)
-        {
+            IOptions<MatchedLearnerApi> config)
+        {            
             _client = client;
-            _serviceVersion = serviceVersion;
+            _serviceVersion = config.Value.Version;
         }
 
         public async Task<LearnerSubmissionDto> Get(Learner learner)
