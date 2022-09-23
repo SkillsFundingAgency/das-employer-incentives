@@ -55,8 +55,7 @@ namespace SFA.DAS.EmployerIncentives.Abstractions.API
                 }
 
                 return new DummyHandler();
-            }
-            );
+            });
         }
 
         public static IHttpClientBuilder WithApimAuthorisationHeader<T>(
