@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.RevertedPaymentAuditReposito
         }
 
         [Test]
-        public async Task Then_the_validation_override_audit_is_added_to_the_data_store()
+        public async Task Then_the_reverted_payment_audit_is_added_to_the_data_store()
         {
             // Arrange
             var testAudit = _fixture.Create<RevertedPaymentAudit>();
