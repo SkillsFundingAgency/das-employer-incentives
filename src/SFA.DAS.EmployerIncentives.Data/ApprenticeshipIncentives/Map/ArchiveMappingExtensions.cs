@@ -27,6 +27,23 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
         }
 
+        internal static PendingPaymentModel Map(this Models.Archive.PendingPayment model)
+        {
+            return new PendingPaymentModel
+            {
+                Id = model.PendingPaymentId,
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(model.AccountId, model.AccountLegalEntityId),
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                Amount = model.Amount,
+                DueDate = model.DueDate,
+                CalculatedDate = model.CalculatedDate,
+                CollectionPeriod = new Domain.ValueObjects.CollectionPeriod(model.PeriodNumber.Value, model.PaymentYear.Value),
+                PaymentMadeDate = model.PaymentMadeDate,
+                EarningType = model.EarningType,
+                ClawedBack = model.ClawedBack
+            };
+        }
+
         internal static Models.Archive.Payment Map(this PaymentModel model)
         {
             return new Models.Archive.Payment
