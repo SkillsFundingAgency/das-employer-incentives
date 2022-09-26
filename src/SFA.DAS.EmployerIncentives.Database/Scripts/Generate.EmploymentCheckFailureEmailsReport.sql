@@ -112,7 +112,7 @@ AND ((SELECT COUNT(1) FROM incentives.EmploymentCheck ec WHERE ec.Apprenticeship
 OR (SELECT COUNT(1) FROM archive.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL) = 2)
 
 -- Failed 365 day check
-SELECT DISTINCT x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], '2nd' AS 'CheckType' FROM
+SELECT DISTINCT x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], 'EmployedAt365Days' AS 'CheckType' FROM
 (SELECT ai.Id,
 	ai.AccountLegalEntityId,
 	ai.SubmittedByEmail,
