@@ -39,3 +39,9 @@ CREATE INDEX IX_ApprenticeshipIncentive_AccountLegalEntityId ON [incentives].[Ap
 GO
 CREATE INDEX IX_ApprenticeshipIncentive_ULN ON [incentives].[ApprenticeshipIncentive] ([ULN])
 GO
+CREATE NONCLUSTERED INDEX [nci_wi_ApprenticeshipIncentive_Status] ON [incentives].[ApprenticeshipIncentive] ([Status])
+INCLUDE ([ApprenticeshipId], [CourseName], [DateOfBirth], [EmployerType], [EmploymentStartDate], [FirstName], [HasPossibleChangeOfCircumstances], 
+[Id], [IncentiveApplicationApprenticeshipId], [LastName], [MinimumAgreementVersion], [PausePayments], [Phase], [RefreshedLearnerForEarnings], 
+[StartDate], [SubmittedByEmail], [SubmittedDate], [UKPRN], [ULN], [WithdrawnBy]) 
+WITH (ONLINE = ON)
+GO
