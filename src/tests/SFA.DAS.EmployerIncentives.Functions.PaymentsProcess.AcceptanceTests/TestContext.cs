@@ -1,7 +1,9 @@
 ﻿using Dapper.Contrib.Extensions;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
+using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public string InstanceId { get; private set; }
         public DirectoryInfo TestDirectory { get; set; }
         public TestFunction TestFunction { get; set; }
+        public TestDateTimeService DateTimeService { get; set; }
 
         public TestData TestData { get; set; }        
         public List<IHook> Hooks { get; set; }
@@ -38,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
             }
             TestData = new TestData();
             Hooks = new List<IHook>();
+            DateTimeService = new TestDateTimeService();
             ApplicationSettings = new ApplicationSettings
             {
                 DistributedLockStorage = "UseDevelopmentStorage=true",

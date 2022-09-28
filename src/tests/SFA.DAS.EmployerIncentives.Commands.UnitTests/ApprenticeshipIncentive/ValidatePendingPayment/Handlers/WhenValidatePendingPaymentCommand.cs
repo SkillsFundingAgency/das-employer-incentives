@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Mock<IDateTimeService> _mockDateTimeService;
         private List<CollectionCalendarPeriod> _collectionCalendarPeriods;
         private string _vrfVendorId;
         private Account _account;
@@ -48,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
+            _mockDateTimeService = new Mock<IDateTimeService>();
 
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
@@ -154,7 +156,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
                 _mockCollectionCalendarService.Object,
-                _mockLearnerDomainRepository.Object);
+                _mockLearnerDomainRepository.Object,
+                _mockDateTimeService.Object);
         }
 
         [Test]
