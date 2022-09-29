@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private Fixture _fixture;
         private EmployerIncentivesDbContext _dbContext;
         private long _accountLegalEntityId;
-
+        
         [SetUp]
         public void Arrange()
         {
