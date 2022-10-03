@@ -10,12 +10,6 @@ trigger:
       - "master"
 
 variables:
-  dockerRegistryServiceConnection: '4c4928e1-1b5d-44df-8663-61f102ed1259'
-  imageRepository: 'stephekdockertest'
-  containerRegistry: 'stephek.azurecr.io'
-  container: stephekdockertest:$(Build.BuildId)
-  dockerfilePath: '$(Build.SourcesDirectory)/DockerTest/Dockerfile'
-  tag: '$(Build.BuildId)'
 - name: SolutionBaseName
   value: 'SFA.DAS.EmployerIncentives'
 - name: BuildPlatform
@@ -76,13 +70,6 @@ stages:
           src\**\*.dacpac
         TargetFolder: '$(build.artifactstagingdirectory)/publish'
 
-        - task: CopyFiles@2
-      displayName: 'Copy dockerfile to: $(build.artifactstagingdirectory)'
-      inputs:
-        Contents: |
-          src\**\Dockerfile
-        TargetFolder: '$(build.artifactstagingdirectory)/publish'
-
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifact: dacpac'
       inputs:
@@ -136,11 +123,11 @@ stages:
     #      src/**/*.UnitTests.csproj
     #    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    #- task: DockerInstaller@0
-    #  displayName: Docker Installer
-    #  inputs:
-    #    dockerVersion: '20.10.9'
-    #    releaseType: stable
+    - task: DockerInstaller@0
+      displayName: Docker Installer
+      inputs:
+        dockerVersion: '20.10.9'
+        releaseType: stable
 
     #- task: CmdLine@2
     #  displayName: Test command
@@ -158,10 +145,10 @@ stages:
     #  inputs:
     #    script: 'newgrp docker'    
         
-    #- task: CmdLine@2
-    #  displayName: Start Docker
-    #  inputs:
-    #    script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
+    - task: CmdLine@2
+      displayName: Start Docker
+      inputs:
+        script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
 
     #- task: CmdLine@2
     #  displayName: Start Docker
@@ -186,23 +173,6 @@ stages:
       inputs:
         artifactName: dacpac
         targetPath: $(Build.SourcesDirectory)
-
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(Build.SourcesDirectory)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
-
-    - task: CmdLine@2
-      inputs:
-        script: docker run --name sqlImage -p 127.0.0.1:1433:1433 -d -t stephek.azurecr.io/stephekdockertest:$(Build.BuildId)               
-    - task: CmdLine@2
-      inputs:
-        script: docker logs -f sqlImage 2>&1 | grep -m 1 'Service Broker manager has started.'
 
     - task: DotNetCoreCLI@2
       displayName: Run Acceptance Tests
