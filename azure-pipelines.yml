@@ -123,11 +123,11 @@ stages:
     #      src/**/*.UnitTests.csproj
     #    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    - task: DockerInstaller@0
-      displayName: Docker Installer
-      inputs:
-        dockerVersion: '20.10.9'
-        releaseType: stable
+    #- task: DockerInstaller@0
+    #  displayName: Docker Installer
+    #  inputs:
+    #    dockerVersion: '20.10.9'
+    #    releaseType: stable
 
     #- task: CmdLine@2
     #  displayName: Test command
@@ -145,10 +145,10 @@ stages:
     #  inputs:
     #    script: 'newgrp docker'    
         
-    - task: CmdLine@2
-      displayName: Start Docker
-      inputs:
-        script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
+    #- task: CmdLine@2
+    #  displayName: Start Docker
+    #  inputs:
+    #    script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
 
     #- task: CmdLine@2
     #  displayName: Start Docker
@@ -173,6 +173,16 @@ stages:
       inputs:
         artifactName: dacpac
         targetPath: $(Build.SourcesDirectory)
+
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: 'stephekdockertest'
+        dockerfile: '$(Build.SourcesDirectory)/**/Dockerfile'
+        containerRegistry: '4c4928e1-1b5d-44df-8663-61f102ed1259'
+        tags: |
+          $(tag)
 
     - task: DotNetCoreCLI@2
       displayName: Run Acceptance Tests
