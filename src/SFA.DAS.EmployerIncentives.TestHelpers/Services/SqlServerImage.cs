@@ -4,6 +4,7 @@ using FluentAssertions;
 using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net;
 
 namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
 {
@@ -22,11 +23,12 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
 
         private SqlServerImage()
         {
-            SetDacpacLocation();
-            EnsureDockerIsRunning();
-            SetDockerFileLocation();
-            BuildSourceImage();
-            StartContainer();
+            SqlServerImageInfo = new SqlServerImageInfo("127.0.0.1", 1433);
+            //SetDacpacLocation();
+            //EnsureDockerIsRunning();
+            //SetDockerFileLocation();
+            //BuildSourceImage();
+            //StartContainer();
         }
 
         public static async Task<SqlServerImage> Create()

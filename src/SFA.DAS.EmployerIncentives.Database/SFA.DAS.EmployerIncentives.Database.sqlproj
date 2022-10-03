@@ -121,6 +121,7 @@
     <Build Include="Views\ApprenticeApplications.sql" />
     <Build Include="Views\ApprenticeApplications.sql" />
     <Build Include="Tables\Audit.RevertedPayment.sql" />
+    <Build Include="Dockerfile" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SFA.DAS.EmployerIncentives.Database.refactorlog" />
@@ -136,7 +137,7 @@
     <None Include="Scripts\Update.MinimumAgreementVersion.sql" />
     <None Include="Scripts\Generate.MonthEndMetrics.sql" />
     <None Include="Scripts\Metrics Template.xlsx" />
-	<None Include="Scripts\Update.ReinstatedAuditRecords.sql" />
+    <None Include="Scripts\Update.ReinstatedAuditRecords.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Script.PreDeployment1.sql" />
