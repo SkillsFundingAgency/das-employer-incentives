@@ -179,10 +179,8 @@ stages:
       inputs:
         command: buildAndPush
         repository: 'stephekdockertest'
-        dockerfile: '$(Build.SourcesDirectory)/**/Dockerfile'
+        dockerfile: 'src/**/Dockerfile'
         containerRegistry: '4c4928e1-1b5d-44df-8663-61f102ed1259'
-        tags: |
-          $(tag)
 
     - task: DotNetCoreCLI@2
       displayName: Run Acceptance Tests
