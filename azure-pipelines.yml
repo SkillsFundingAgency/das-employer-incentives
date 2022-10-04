@@ -145,12 +145,10 @@ stages:
     #  inputs:
     #    script: 'newgrp docker'    
 
-     - task: CmdLine@2
+    - task: CmdLine@2
       displayName: Test run docker
       inputs:
         script: docker
-
- 
         
     #- task: CmdLine@2
     #  displayName: Start Docker
