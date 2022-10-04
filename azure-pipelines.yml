@@ -26,9 +26,6 @@ resources:
     name: SkillsFundingAgency/das-platform-building-blocks
     ref: refs/tags/0.4.63
     endpoint: SkillsFundingAgency
-  containers:
-    - container: builder
-      image: ubuntu:18.04
 
 stages:
 - stage: BuildAndTest
@@ -89,81 +86,45 @@ stages:
         useConfigFile: true
         configFilePath: GitVersion.yml
 
-    #- task: SonarCloudPrepare@1
-    #  displayName: Prepare SonarCloud analysis configuration
-    #  condition: and(succeeded(), or(in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main'), eq(variables['Build.Reason'], 'PullRequest')))
-    #  inputs:
-    #    SonarCloud: ESFA - SonarCloud
-    #    organization: $(SonarCloudOrganisationKey)
-    #    scannerMode: MSBuild
-    #    projectName: "$(Build.DefinitionName)"
-    #    projectKey: SkillsFundingAgency_das-employer-incentives
-    #    extraProperties: sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/CoverageResults/coverage.opencover.xml
-
-    #- task: DotNetCoreCLI@2
-    #  displayName: Restore
-    #  inputs:
-    #    command: restore
-    #    projects: 'src/**/*.csproj'
-    #    noCache: true
-
-    #- task: DotNetCoreCLI@2
-    #  displayName: Build UnitTests
-    #  inputs:
-    #    command: 'build'
-    #    projects: |
-    #      src/**/*.UnitTests.csproj
-    #    arguments: '--configuration $(buildConfiguration) --no-restore'
-
-    #- task: DotNetCoreCLI@2
-    #  displayName: UnitTest
-    #  inputs:
-    #    command: test
-    #    projects: |
-    #      src/**/*.UnitTests.csproj
-    #    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
-
-    #- task: DockerInstaller@0
-    #  displayName: Docker Installer
-    #  inputs:
-    #    dockerVersion: '20.10.9'
-    #    releaseType: stable
-
-    #- task: CmdLine@2
-    #  displayName: Test command
-    #  inputs:
-    #    script: 'sudo groupadd docker'
-
-        
-    #- task: CmdLine@2
-    #  displayName: Test command
-    #  inputs:
-    #    script: 'sudo gpasswd -a $USER docker'    
-
-    #- task: CmdLine@2
-    #  displayName: Test command
-    #  inputs:
-    #    script: 'newgrp docker'    
-
-    - task: CmdLine@2
-      displayName: Test run docker
+    - task: SonarCloudPrepare@1
+      displayName: Prepare SonarCloud analysis configuration
+      condition: and(succeeded(), or(in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main'), eq(variables['Build.Reason'], 'PullRequest')))
       inputs:
-        script: docker
-        
-    #- task: CmdLine@2
-    #  displayName: Start Docker
-    #  inputs:
-    #    script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
+        SonarCloud: ESFA - SonarCloud
+        organization: $(SonarCloudOrganisationKey)
+        scannerMode: MSBuild
+        projectName: "$(Build.DefinitionName)"
+        projectKey: SkillsFundingAgency_das-employer-incentives
+        extraProperties: sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/CoverageResults/coverage.opencover.xml
 
-    #- task: CmdLine@2
-    #  displayName: Start Docker
-    #  inputs:
-    #    script: 'sudo service docker restart'
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: 'src/**/*.csproj'
+        noCache: true
 
-    #- task: Docker@2
-    #  inputs:
-    #    command: start
-    #    container: builder
+    - task: DotNetCoreCLI@2
+      displayName: Build UnitTests
+      inputs:
+        command: 'build'
+        projects: |
+          src/**/*.UnitTests.csproj
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+
+    - task: DotNetCoreCLI@2
+      displayName: UnitTest
+      inputs:
+        command: test
+        projects: |
+          src/**/*.UnitTests.csproj
+        arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
+
+    - task: DockerInstaller@0
+      displayName: Docker Installer
+      inputs:
+        dockerVersion: '20.10.9'
+        releaseType: stable
 
     - task: DotNetCoreCLI@2
       displayName: Build Acceptance Tests
@@ -174,7 +135,6 @@ stages:
         arguments: '--configuration $(buildConfiguration) --no-restore'
 
     - task: DownloadPipelineArtifact@2
-      displayName: 'Download Artifact: dacpac'
       inputs:
         artifactName: dacpac
         targetPath: $(Build.SourcesDirectory)
@@ -213,7 +173,6 @@ stages:
           if ("$(GitVersion.PreReleaseLabel)" -ne "") { $NuGetPackageVersion = "$(GitVersion.SemVer)-prerelease" } else { $NuGetPackageVersion = "$(GitVersion.SemVer)" }
           Write-Host "NuGetPackageVersion: $NuGetPackageVersion"
           Write-Host "##vso[task.setvariable variable=NuGetPackageVersion]$NuGetPackageVersion"
-
     - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
       inputs:
