@@ -171,8 +171,15 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
         {
             for (var i = 0; i < periods.Count-1; i++)
             {
-                var gap = (periods[i + 1].StartDate - periods[i].EndDate).Days;
-                if (gap <= 1)
+                // merge learning periods if:
+                // periods are adjacent
+                // periods overlap
+                // periods are inclusive
+                var gap = Math.Abs((periods[i + 1].StartDate - periods[i].EndDate).Days);
+                if ((gap >= 0 && gap <= 1) ||
+                    ((periods[i + 1].StartDate > periods[i].StartDate) && (periods[i + 1].EndDate < periods[i].EndDate)) ||
+                    ((periods[i].StartDate > periods[i + 1].StartDate) && (periods[i].EndDate < periods[i + 1].EndDate)) ||
+                    ((periods[i + 1].StartDate > periods[i].StartDate) && (periods[i].EndDate > periods[i + 1].StartDate))) 
                 {
                     var start = MinDate(periods[i].StartDate, periods[i+1].StartDate);
                     var end = MaxDate(periods[i].EndDate, periods[i + 1].EndDate);
@@ -184,7 +191,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 }
             }
 
-            return periods;
+            return periods.OrderBy(x => x.StartDate).ToList();
         }
 
         private static DateTime MinDate(DateTime a, DateTime b)
