@@ -97,6 +97,11 @@ stages:
         projectKey: SkillsFundingAgency_das-employer-incentives
         extraProperties: sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/CoverageResults/coverage.opencover.xml
 
+    - task: CmdLine@2
+      displayName: Test docker command
+      inputs:
+        script: docker
+ 
     - task: DotNetCoreCLI@2
       displayName: Restore
       inputs:
