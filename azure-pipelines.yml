@@ -103,7 +103,7 @@ stages:
         dockerVersion: '20.10.9'
         releaseType: stable
 
- - task: CmdLine@2
+    - task: CmdLine@2
       displayName: Test start docker
       inputs:
         script: systemctl start docker
