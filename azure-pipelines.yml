@@ -123,11 +123,11 @@ stages:
     #      src/**/*.UnitTests.csproj
     #    arguments: '--configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)/CoverageResults/ /p:MergeWith=$(Agent.TempDirectory)/CoverageResults/coverage.json /p:CoverletOutputFormat="opencover%2cjson"'
 
-    - task: DockerInstaller@0
-      displayName: Docker Installer
-      inputs:
-        dockerVersion: '20.10.9'
-        releaseType: stable
+    #- task: DockerInstaller@0
+    #  displayName: Docker Installer
+    #  inputs:
+    #    dockerVersion: '20.10.9'
+    #    releaseType: stable
 
     #- task: CmdLine@2
     #  displayName: Test command
@@ -144,11 +144,18 @@ stages:
     #  displayName: Test command
     #  inputs:
     #    script: 'newgrp docker'    
-        
-    - task: CmdLine@2
-      displayName: Start Docker
+
+     - task: CmdLine@2
+      displayName: Test run docker
       inputs:
-        script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
+        script: docker
+
+ 
+        
+    #- task: CmdLine@2
+    #  displayName: Start Docker
+    #  inputs:
+    #    script: 'sudo service /azp/agent/_work/_tool/docker-stable/20.10.9/x64/docker start'
 
     #- task: CmdLine@2
     #  displayName: Start Docker
