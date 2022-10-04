@@ -104,9 +104,9 @@ stages:
         releaseType: stable
 
     - task: CmdLine@2
-      displayName: Test docker command
+      displayName: Test pull SQL docker image from repository and start image
       inputs:
-        script: docker 
+        script: docker run --name sqlImage -p 127.0.0.1:1433:1433 mcr.microsoft.com/mssql/server:2019-latest
  
     - task: DotNetCoreCLI@2
       displayName: Restore
