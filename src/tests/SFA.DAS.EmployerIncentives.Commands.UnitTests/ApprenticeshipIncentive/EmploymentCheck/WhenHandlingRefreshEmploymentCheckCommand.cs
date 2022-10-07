@@ -448,6 +448,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     _fixture.Build<PendingPaymentModel>()
                         .With(x => x.EarningType, EarningType.SecondPayment)
                         .With(x => x.DueDate, new DateTime(2020, 10, 01).AddDays(365))
+                        .Without(x => x.PaymentMadeDate)
                         .Create()
                 })
                 .Create();
@@ -523,6 +524,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                     _fixture.Build<PendingPaymentModel>()
                         .With(x => x.EarningType, EarningType.SecondPayment)
                         .With(x => x.DueDate, new DateTime(2020, 10, 01).AddDays(365))
+                        .Without(x => x.PaymentMadeDate)
                         .Create()
                 })
                 .Create();
