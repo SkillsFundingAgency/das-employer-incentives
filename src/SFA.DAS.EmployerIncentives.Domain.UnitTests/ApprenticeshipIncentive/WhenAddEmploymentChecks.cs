@@ -139,6 +139,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -177,6 +178,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -312,6 +314,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -346,6 +349,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -380,6 +384,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -417,6 +422,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -455,6 +461,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -500,6 +507,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
                 .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
                 .With(pp => pp.EarningType, EarningType.SecondPayment)
                 .With(pp => pp.DueDate, paymentDueDate)
+                .Without(pp => pp.PaymentMadeDate)
                 .Create());
 
             _sut = Sut(_sutModel);
@@ -511,6 +519,81 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             var events = _sut.FlushEvents().ToList();
             var createdEvent = events.Single(e => e is EmploymentChecksCreated) as EmploymentChecksCreated;
             createdEvent.ApprenticeshipIncentiveId.Should().Be(_sut.Id);
+        }
+
+        [Test]
+        public void Then_a_new_EmploymentChecksCreated_event_is_not_created_if_the_first_365_day_check_has_not_been_triggered_and_the_second_payment_has_been_paid()
+        {
+            var paymentDueDate = _dateTimeService.UtcNow().AddMonths(-1).AddDays(-21);
+
+            _sutModel.EmploymentCheckModels = new List<EmploymentCheckModel>()
+            {
+                _fixture.Build<EmploymentCheckModel>()
+                    .With(c => c.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                    .With(c => c.Result, true)
+                    .Create(),
+                _fixture.Build<EmploymentCheckModel>()
+                    .With(c => c.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                    .With(c => c.Result, false)
+                    .Create()
+            };
+
+            _sutModel.PendingPaymentModels.Add(
+                _fixture.Build<PendingPaymentModel>()
+                    .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
+                    .With(pp => pp.EarningType, EarningType.SecondPayment)
+                    .With(pp => pp.DueDate, paymentDueDate)
+                    .With(pp => pp.PaymentMadeDate, _dateTimeService.UtcNow().AddMonths(-1))
+                    .Create());
+
+            _sut = Sut(_sutModel);
+
+            // act
+            _sut.AddEmploymentChecks(_dateTimeService);
+
+            // assert
+            var events = _sut.FlushEvents().ToList();
+            _ = events.Any().Should().BeFalse();
+        }
+
+
+        [Test]
+        public void Then_a_new_EmploymentChecksCreated_event_is_not_created_if_the_first_365_day_check_has_failed_and_the_second_payment_has_been_paid()
+        {
+            var paymentDueDate = _dateTimeService.UtcNow().AddMonths(-1).AddDays(-21);
+
+            _sutModel.EmploymentCheckModels = new List<EmploymentCheckModel>()
+            {
+                _fixture.Build<EmploymentCheckModel>()
+                    .With(c => c.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                    .With(c => c.Result, true)
+                    .Create(),
+                _fixture.Build<EmploymentCheckModel>()
+                    .With(c => c.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                    .With(c => c.Result, false)
+                    .Create(),
+                _fixture.Build<EmploymentCheckModel>()
+                    .With(c => c.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
+                    .With(c => c.Result, false)
+                    .Create()
+            };
+
+            _sutModel.PendingPaymentModels.Add(
+                _fixture.Build<PendingPaymentModel>()
+                    .With(pp => pp.ApprenticeshipIncentiveId, _sut.Id)
+                    .With(pp => pp.EarningType, EarningType.SecondPayment)
+                    .With(pp => pp.DueDate, paymentDueDate)
+                    .With(pp => pp.PaymentMadeDate, _dateTimeService.UtcNow().AddMonths(-1))
+                    .Create());
+
+            _sut = Sut(_sutModel);
+
+            // act
+            _sut.AddEmploymentChecks(_dateTimeService);
+
+            // assert
+            var events = _sut.FlushEvents().ToList();
+            _ = events.Any().Should().BeFalse();
         }
 
         private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)

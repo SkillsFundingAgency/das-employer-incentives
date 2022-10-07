@@ -733,8 +733,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             var secondPaymentDueDate = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack)?.DueDate;
+            var secondPaymentPaidDate = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack)?.PaymentMadeDate;
 
             if (secondPaymentDueDate != null &&
+                secondPaymentPaidDate == null &&
                 secondPaymentDueDate.Value.AddDays(21).Date <= dateTimeService.UtcNow().Date && 
                 HasSuccessfulChecks(new List<EmploymentCheckType> { EmploymentCheckType.EmployedAtStartOfApprenticeship, EmploymentCheckType.EmployedBeforeSchemeStarted }))
             {
