@@ -81,3 +81,15 @@ Examples:
 	| Phase1 |
 	| Phase2 |
 	| Phase3 |
+
+Scenario: 365 Employment check not requested when payment has been made
+	Given an apprenticeship incentive has been submitted in phase '<Phase>'
+	And start of apprenticeship employment checks have passed
+	And 3 weeks has elapsed since 365 days after the due date of the second payment which was previously paid
+	When an ILR submission is received for that learner
+	Then a 365 employment check is not requested
+Examples:
+	| Phase  |
+	| Phase1 |
+	| Phase2 |
+	| Phase3 |

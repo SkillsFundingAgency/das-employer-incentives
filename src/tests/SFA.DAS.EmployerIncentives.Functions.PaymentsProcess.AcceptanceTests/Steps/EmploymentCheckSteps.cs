@@ -154,6 +154,25 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await dbConnection.InsertWithEnumAsStringAsync(_secondPendingPayment);
         }
 
+        [Given(@"3 weeks has elapsed since 365 days after the due date of the second payment which was previously paid")]
+        public async Task GivenThreeWeeksHasElapsedSince365DaysAfterTheDueDateOfTheSecondPaymentWhichWasPreviouslyPaid()
+        {
+            _testContext.DateTimeService.SetUtcNow(_plannedStartDate.AddDays(365).AddDays(21));
+
+            _secondPendingPayment = _fixture.Build<PendingPayment>()
+                .With(p => p.AccountId, _accountModel.Id)
+                .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(p => p.DueDate, _plannedStartDate.AddDays(365))
+                .With(p => p.ClawedBack, false)
+                .With(p => p.EarningType, EarningType.SecondPayment)
+                .With(p => p.PaymentMadeDate, _plannedStartDate.AddDays(365))
+                .Create();
+
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            await dbConnection.InsertWithEnumAsStringAsync(_secondPendingPayment);
+        }
+
+
         [Given(@"6 weeks has elapsed since 365 days after the due date of the second payment")]
         public async Task GivenSixWeeksHasElapsedSince365DaysAfterTheDueDateOfTheSecondPayment()
         {

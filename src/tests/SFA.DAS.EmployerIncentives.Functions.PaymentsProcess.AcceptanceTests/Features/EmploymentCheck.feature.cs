@@ -407,6 +407,57 @@ this.ScenarioInitialize(scenarioInfo);
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 Employment check not requested when payment has been made")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public virtual void _365EmploymentCheckNotRequestedWhenPaymentHasBeenMade(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check not requested when payment has been made", null, tagsOfScenario, argumentsOfScenario);
+#line 85
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 86
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 87
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 88
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment which" +
+                        " was previously paid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 89
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 90
+ testRunner.Then("a 365 employment check is not requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore
