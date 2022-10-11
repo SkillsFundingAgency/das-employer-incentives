@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ReinstateWithdrawal
             var applications = await _domainRepository.Find(command.AccountLegalEntityId, command.ULN);
             if(applications == null || !applications.Any())
             {
-                throw new WithdrawalException($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for ULN {command.ULN}");
+                throw new WithdrawalException($"Unable to handle reinstate withdrawal command. No matching incentive applications found.");
             }
 
             var submittedApprenticeships = new List<SubmittedApprenticeship>();
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Withdrawals.ReinstateWithdrawal
             var submittedApprenticeshipToReinstate = submittedApprenticeships.OrderByDescending(x => x.DateSubmitted).FirstOrDefault();
             if (submittedApprenticeshipToReinstate == null)
             {
-                throw new WithdrawalException($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for ULN {command.ULN}");
+                throw new WithdrawalException($"Unable to handle reinstate withdrawal command. No matching incentive applications found.");
             }
 
             var applicationToReinstate = applications.Single(x => x.Id == submittedApprenticeshipToReinstate.IncentiveApplicationId);

@@ -127,7 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             //Assert
             action.Should()
                 .Throw<WithdrawalException>()
-                .WithMessage($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for ULN {command.ULN}*");
+                .WithMessage($"Unable to handle reinstate withdrawal command. No matching incentive applications found.");
         }
 
         [Test]
@@ -276,7 +276,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             //Assert
             action.Should()
                 .Throw<WithdrawalException>()
-                .WithMessage($"Unable to handle reinstate withdrawal command.  No matching incentive applications found for ULN {command.ULN}*");           
+                .WithMessage($"Unable to handle reinstate withdrawal command. No matching incentive applications found.");           
         }
     }
 }
