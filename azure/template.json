@@ -631,7 +631,7 @@
         },
         {
             "apiVersion": "2021-04-01",
-            "name": "[concat(parameters('paySubnetObject'), '-sql-firewall-rule-', parameters('utcValue'))]",
+            "name": "[concat(parameters('paySubnetObject').name, '-sql-firewall-rule-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
