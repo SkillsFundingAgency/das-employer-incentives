@@ -167,6 +167,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddSingleton<ISqlConnectionProvider, SqlConnectionProvider>();
 
+            serviceCollection.AddScoped<IReinstatedPendingPaymentAuditRepository, ReinstatedPendingPaymentAuditRepository>();
+            
             return serviceCollection;
         }
 
