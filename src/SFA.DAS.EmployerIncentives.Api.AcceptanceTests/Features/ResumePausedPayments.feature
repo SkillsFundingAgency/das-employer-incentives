@@ -1,5 +1,6 @@
 ﻿@database
 @api
+@activeCalendarPeriod
 Feature: ResumePausedPayments
 	In order to resume payments for a apprenticeship
 	As a employer incentives service

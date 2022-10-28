@@ -174,7 +174,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
             var content = await _response.Content.ReadAsStringAsync();
-            JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Resumed");
+            JsonConvert.SerializeObject(content).Should().Contain("Payment Resume Request(s) have been successfully queued");
         }
 
         [Then(@"the requester is informed the apprenticeship incentive is not paused")]
