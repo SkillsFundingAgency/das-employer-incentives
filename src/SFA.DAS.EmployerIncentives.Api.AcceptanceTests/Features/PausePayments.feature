@@ -1,5 +1,6 @@
 ﻿@database
 @api
+@activeCalendarPeriod
 Feature: PausePayments
 	In order to stop future payments for an apprenticeship
 	As a employer incentives service
@@ -34,4 +35,12 @@ Scenario: When multiple pause payment requests are made and one fails
 	When the multiple pause payments request is sent with one that is invalid
 	Then the requester is informed the request has failed
 	And the PausePayment status for all incentives remains as false
+	And Audit records are not created
+
+Scenario: When period end is in progess, pause payment requests are delayed
+	Given an apprenticeship incentive exists
+	And the active period month end processing is in progress
+	When the pause payments request is sent
+	Then the requester is informed the apprenticeship incentive pause request has been queued
+	And The PausePayment status for the incentive remains as false
 	And Audit records are not created

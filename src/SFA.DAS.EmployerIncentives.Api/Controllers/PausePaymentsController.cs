@@ -42,8 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                         ));
 
                 await SendCommandsAsync(commands);
-
-                return new OkObjectResult(new { Message = $"Payments have been successfully {request.Action}d" });
+                return new OkObjectResult(new { Message = $"Payment {request.Action} Request(s) have been successfully queued" });
             }
             catch (InvalidRequestException e)
             {
