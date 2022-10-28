@@ -100,6 +100,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeshipIncentive2);
         }
 
+        [Given(@"the active period month end processing is in progress")]
+        public async Task GivenTheActivePeriodMonthEndProcessingIsInProgress()
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            _testContext.ActivePeriod.PeriodEndInProgress = true;
+            await dbConnection.UpdateAsync(_testContext.ActivePeriod);
+        }
+
         [When(@"the resume payments request is sent")]
         public async Task WhenTheResumePausedPaymentsRequestIsSent()
         {
@@ -169,7 +177,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Then(@"the requester is informed the apprenticeship incentive has resumed")]
-        [Then(@"the requester is informed the apprenticeship incentives have resumed")]        
+        [Then(@"the requester is informed the apprenticeship incentives have resumed")]      
+        [Then(@"the requester is informed the apprenticeship incentive pause request has been queued")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveHasResumed()
         {
             _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
@@ -193,14 +202,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             JsonConvert.SerializeObject(content).Should().Contain("not set");
         }
 
-        [Then(@"the PausePayment status is set to false")]
-        public async Task ThenThePausePaymentStatusIsSetToFalse()
+        [Then(@"the PausePayment status is set to (.*)")]
+        public async Task ThenThePausePaymentStatusIsSetToFalse(bool status)
         {
             await using var dbConnection = new SqlConnection(_connectionString); 
             var incentives = dbConnection.GetAll<ApprenticeshipIncentive>();
 
             incentives.Count().Should().Be(1);
-            incentives.First().PausePayments.Should().BeFalse();
+            incentives.First().PausePayments.Should().Be(status);
         }
 
         [Then(@"the PausePayment status for all incentives is set to false")]
@@ -249,6 +258,15 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             statusAudit2.ServiceRequestCreatedDate.Should().Be(_pausePaymentsRequest.ServiceRequest.TaskCreatedDate.Value);
             statusAudit2.ServiceRequestDecisionReference.Should().Be(_pausePaymentsRequest.ServiceRequest.DecisionReference);
             statusAudit2.ServiceRequestTaskId.Should().Be(_pausePaymentsRequest.ServiceRequest.TaskId);
+        }
+
+        [Then(@"Audit records are not created")]
+        public void ThenAuditRecordsAreNotCreated()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var statusAudits = dbConnection.GetAll<IncentiveApplicationStatusAudit>();
+
+            statusAudits.Count().Should().Be(0);
         }
     }
 }
