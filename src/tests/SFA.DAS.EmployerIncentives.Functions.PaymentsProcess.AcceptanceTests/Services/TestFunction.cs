@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ApplicationSettings:NServiceBusConnectionString", _testContext.ApplicationSettings.NServiceBusConnectionString },
-                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory }
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory },
             };
 
             _testContext = testContext;
@@ -99,7 +99,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                c.ApiBaseUrl = _testContext.PaymentsApi.BaseAddress;
                                c.PaymentRequestsLimit = BusinessCentralPaymentRequestsLimit;
                            });
-
+                           s.Configure<PolicySettings>(a =>
+                           {
+                               a.RetryPolicies = new RetryPolicySettings
+                               {
+                                   LockedRetryAttempts = 10,
+                                   LockedRetryWaitInMilliSeconds = 5000,
+                                   QueryRetryWaitInMilliSeconds = 0,
+                                   QueryRetryAttempts = 0
+                               };
+                           });
                            s.Configure<ApplicationSettings>(a =>
                            {
                                a.DbConnectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;

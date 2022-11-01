@@ -34,7 +34,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
         public IncentiveStatus Status => Model.Status;
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
-
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.OrderBy(b => b.StartDate).ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
@@ -812,8 +811,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     AddEvent(new EmploymentChecksCreated(initial365Check.GetModel(), serviceRequest));
                 }
                 else if (existingCheck.MinimumDate != initial365Check.MinimumDate ||
-                       existingCheck.MaximumDate != initial365Check.MaximumDate ||
-                       existingCheck.Result != initial365Check.Result)
+                       existingCheck.MaximumDate != initial365Check.MaximumDate)
                 {
                     if (Model.EmploymentCheckModels.Remove(existingCheck))
                     {
@@ -844,8 +842,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     AddEvent(new EmploymentChecksCreated(second365Check.GetModel(), serviceRequest));
                 }
                 else if (existingCheck.MinimumDate != second365Check.MinimumDate ||
-                       existingCheck.MaximumDate != second365Check.MaximumDate ||
-                       existingCheck.Result != second365Check.Result)
+                       existingCheck.MaximumDate != second365Check.MaximumDate)
                 {
                     if (Model.EmploymentCheckModels.Remove(existingCheck))
                     {
