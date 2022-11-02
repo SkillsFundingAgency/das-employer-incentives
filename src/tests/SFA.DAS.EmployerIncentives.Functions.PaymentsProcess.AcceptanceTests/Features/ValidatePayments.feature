@@ -41,7 +41,7 @@ Scenario Outline: When at least one validation check fails
 	Given there are pending payments
 	And the '<ValidationStep>' will fail
 	When the payment process is run
-	Then the '<ValidationStep>' will have a failed validation result
+	Then the '<ValidationStep>' will have two failed validation results
 	And no payment records are created
 	And pending payments are not marked as paid
 
@@ -107,3 +107,10 @@ Scenario: Employed at 365 days validation check fails and is overriden
 	When the payment process is run
 	Then the validation result override for the 365 days check is recorded
 	And the 365 day pending payment is marked as paid
+
+Scenario: Second payment is due in pay run and Employed at 365 days validation has not yet been performed
+	Given an apprentice has a pending 365 day payment
+	And the employed at 365 days check has not been done
+	When the payment process is run
+	Then the 'EmployedAt365Days' will have a failed validation result
+	And no payment records are created	

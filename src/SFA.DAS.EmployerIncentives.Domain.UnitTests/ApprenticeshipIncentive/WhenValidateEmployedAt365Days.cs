@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_the_validation_is_not_run_if_the_payment_due_date_is_not_in_range()
+        public void Then_the_validation_is_false_if_the_payment_due_date_is_not_in_range()
         {
             // Arrange
             var currentDateTime = DateTime.UtcNow;
@@ -65,7 +65,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             
             // Assert
             var validationResult = _sut.PendingPayments.First().PendingPaymentValidationResults.FirstOrDefault(x => x.Step == ValidationStep.EmployedAt365Days);
-            validationResult.Should().BeNull();
+            validationResult.Should().NotBeNull();
+            validationResult.Result.Should().BeFalse();
         }
 
         [Test]
