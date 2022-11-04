@@ -110,3 +110,34 @@ INNER JOIN IncentiveApplication ia ON ia.Id = iaa.IncentiveApplicationId
 WHERE x.HasLearningRecord = 1 AND x.EmployedAtStartOfApprenticeship = 0 AND x.EmployedBeforeSchemeStarted = 1 AND x.PausePayments = 0
 AND ((SELECT COUNT(1) FROM incentives.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL) = 2
 OR (SELECT COUNT(1) FROM archive.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL) = 2)
+
+-- Failed 365 day check
+SELECT DISTINCT x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], 'EmployedAt365Days' AS 'CheckType' FROM
+(SELECT ai.Id,
+	ai.AccountLegalEntityId,
+	ai.SubmittedByEmail,
+	ai.IncentiveApplicationApprenticeshipId,
+	ai.PausePayments,
+	(
+	SELECT Result FROM incentives.PendingPaymentValidationResult ppvrEC1 
+	WHERE ppvrEC1.PendingPaymentId = pp.Id 
+	AND ppvrEC1.Step = 'EmployedAt365Days' 
+	AND ppvrEC1.PeriodNumber = @PeriodNumber 
+	AND ppvrEC1.PaymentYear = @PaymentYear
+	AND pp.Id NOT IN (SELECT PendingPaymentId FROM @EmployedAtStartOfApprenticeshipFailures)
+	) AS EmployedAt365Days,
+	(
+	SELECT Result FROM incentives.PendingPaymentValidationResult ppvrLearn 
+	WHERE ppvrLearn.PendingPaymentId = pp.Id 
+	AND ppvrLearn.Step = 'HasLearningRecord' 
+	AND ppvrLearn.PeriodNumber = @PeriodNumber 
+	AND ppvrLearn.PaymentYear = @PaymentYear
+	) AS HasLearningRecord
+FROM incentives.ApprenticeshipIncentive ai
+INNER JOIN incentives.PendingPayment pp ON pp.ApprenticeshipIncentiveId = ai.Id) x
+INNER JOIN Accounts a ON a.AccountLegalEntityId = x.AccountLegalEntityId
+INNER JOIN IncentiveApplicationApprenticeship iaa ON iaa.Id = x.IncentiveApplicationApprenticeshipId
+INNER JOIN IncentiveApplication ia ON ia.Id = iaa.IncentiveApplicationId
+WHERE x.HasLearningRecord = 1 AND x.EmployedAt365Days = 0 AND x.PausePayments = 0
+AND ((SELECT COUNT(1) FROM incentives.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL) = 4 -- ensure that initial and first and second 365 checks have been executed
+OR (SELECT COUNT(1) FROM archive.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL) = 4)
