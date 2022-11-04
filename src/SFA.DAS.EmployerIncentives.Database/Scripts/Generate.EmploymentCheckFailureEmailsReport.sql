@@ -1,11 +1,19 @@
 DECLARE @PeriodNumber TINYINT
 DECLARE @PaymentYear SMALLINT
+DECLARE @EmploymentCheckCreatedDate datetime2
 
 -- Update period & payment year here
 SET @PeriodNumber = 2
 SET @PaymentYear = 2223
+SET @EmploymentCheckCreatedDate = '2022-10-11'
 
 -- Update period & payment year here
+
+DECLARE @LearnersWithPreviousFailures TABLE 
+(
+	uln bigint,
+	Step VARCHAR(100)
+)
 
 DECLARE @EmployedAtStartOfApprenticeshipFailures TABLE 
 (
@@ -17,43 +25,46 @@ DECLARE @EmployedBeforeSchemeStartedFailures TABLE
 	uln bigint
 )
 
+DECLARE @EmployedAt365DaysFailures TABLE 
+(
+	uln bigint
+)
+
 -- Pending payments that have failed EC validation in previous runs
-INSERT INTO @EmployedAtStartOfApprenticeshipFailures
-SELECT DISTINCT ULN
+INSERT INTO @LearnersWithPreviousFailures
+SELECT DISTINCT ULN, Step
 FROM incentives.PendingPaymentValidationResult ppvr
 INNER JOIN [incentives].[PendingPayment] pp On ppvr.PendingPaymentId = pp.Id
 INNER JOIN [incentives].[Learner] as l on pp.ApprenticeshipIncentiveID = l.ApprenticeshipIncentiveID
-WHERE Step = 'EmployedAtStartOfApprenticeship' 
+WHERE Step in ('EmployedAtStartOfApprenticeship', 'EmployedBeforeSchemeStarted', 'EmployedAt365Days')  
 AND Result = 0 
 AND ppvr.PeriodNumber < @PeriodNumber 
 AND ppvr.PaymentYear = @PaymentYear
 union
-SELECT DISTINCT ULN
+SELECT DISTINCT ULN, Step
 FROM incentives.PendingPaymentValidationResult ppvr
 INNER JOIN [incentives].[PendingPayment] pp On ppvr.PendingPaymentId = pp.Id
 INNER JOIN [incentives].[Learner] as l on pp.ApprenticeshipIncentiveID = l.ApprenticeshipIncentiveID
-WHERE Step = 'EmployedAtStartOfApprenticeship' 
+WHERE Step in ('EmployedAtStartOfApprenticeship', 'EmployedBeforeSchemeStarted', 'EmployedAt365Days')  
 AND Result = 0 
 AND ppvr.PaymentYear < @PaymentYear
 
+
+INSERT INTO @EmployedAtStartOfApprenticeshipFailures
+SELECT DISTINCT ULN
+FROM @LearnersWithPreviousFailures
+WHERE Step = 'EmployedAtStartOfApprenticeship'
 
 INSERT INTO @EmployedBeforeSchemeStartedFailures
 SELECT DISTINCT ULN
-FROM incentives.PendingPaymentValidationResult ppvr
-INNER JOIN [incentives].[PendingPayment] pp On ppvr.PendingPaymentId = pp.Id
-INNER JOIN [incentives].[Learner] as l on pp.ApprenticeshipIncentiveID = l.ApprenticeshipIncentiveID
-WHERE Step = 'EmployedBeforeSchemeStarted' 
-AND Result = 0 
-AND ppvr.PeriodNumber < @PeriodNumber 
-AND ppvr.PaymentYear = @PaymentYear
-Union
+FROM @LearnersWithPreviousFailures
+WHERE Step = 'EmployedBeforeSchemeStarted'
+
+INSERT INTO @EmployedAt365DaysFailures
 SELECT DISTINCT ULN
-FROM incentives.PendingPaymentValidationResult ppvr
-INNER JOIN [incentives].[PendingPayment] pp On ppvr.PendingPaymentId = pp.Id
-INNER JOIN [incentives].[Learner] as l on pp.ApprenticeshipIncentiveID = l.ApprenticeshipIncentiveID
-WHERE Step = 'EmployedBeforeSchemeStarted' 
-AND Result = 0 
-AND ppvr.PaymentYear < @PaymentYear
+FROM @LearnersWithPreviousFailures
+WHERE Step = 'EmployedAt365Days' 
+
 
 -- Failed 1 or Both
 SELECT DISTINCT x.ULN, x.UKPRN, a.LegalEntityName, x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], '1OrBoth' AS 'CheckType' FROM
@@ -167,6 +178,6 @@ INNER JOIN Accounts a ON a.AccountLegalEntityId = x.AccountLegalEntityId
 INNER JOIN IncentiveApplicationApprenticeship iaa ON iaa.Id = x.IncentiveApplicationApprenticeshipId
 INNER JOIN IncentiveApplication ia ON ia.Id = iaa.IncentiveApplicationId
 WHERE x.HasLearningRecord = 1 AND x.EmployedAt365Days = 0 AND x.PausePayments = 0
-AND ((SELECT COUNT(1) FROM incentives.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL AND CreatedDateTime < '2022-10-11') = 4 -- ensure that initial and first and second 365 checks have been executed
-OR (SELECT COUNT(1) FROM archive.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL AND CreatedDateTime < '2022-10-11') = 4)
-AND x.ULN NOT IN (SELECT uln FROM @EmployedAtStartOfApprenticeshipFailures)
+AND ((SELECT COUNT(1) FROM incentives.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL AND CreatedDateTime < @EmploymentCheckCreatedDate) = 4 -- ensure that initial and first and second 365 checks have been executed
+OR (SELECT COUNT(1) FROM archive.EmploymentCheck ec WHERE ec.ApprenticeshipIncentiveId = x.Id AND ec.Result IS NOT NULL AND CreatedDateTime < @EmploymentCheckCreatedDate) = 4)
+AND x.ULN NOT IN (SELECT uln FROM @EmployedAt365DaysFailures)
