@@ -191,7 +191,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             employmentCheck.Result.Should().BeNull();
             employmentCheck.ErrorType.Should().Be(errorResult);
             employmentCheck.ResultDateTime.Should().Be(DateTime.Today);
-            employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
         }
 
         [Then(@"the apprenticeship incentive employment check result processing is delayed")]

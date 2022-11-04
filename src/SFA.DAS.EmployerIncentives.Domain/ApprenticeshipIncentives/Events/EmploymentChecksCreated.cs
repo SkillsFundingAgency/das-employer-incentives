@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Logging;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
@@ -7,16 +8,18 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
 {
     public class EmploymentChecksCreated : IDomainEvent, ILogWriter
     {
-        public Guid ApprenticeshipIncentiveId { get; set; }
+        public Guid ApprenticeshipIncentiveId { get; }
+        public EmploymentCheckModel Model { get; }
         public ServiceRequest ServiceRequest { get; set; }
 
-        public EmploymentChecksCreated(Guid apprenticeshipIncentiveId) : this(apprenticeshipIncentiveId, null)
+        public EmploymentChecksCreated(EmploymentCheckModel model) : this(model, null)
         {
         }
 
-        public EmploymentChecksCreated(Guid apprenticeshipIncentiveId, ServiceRequest serviceRequest)
+        public EmploymentChecksCreated(EmploymentCheckModel model, ServiceRequest serviceRequest)
         {
-            ApprenticeshipIncentiveId = apprenticeshipIncentiveId;
+            ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId;
+            Model = model;
             ServiceRequest = serviceRequest;
         }
 
@@ -26,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events
             {
 
                 var additionalMessage = ServiceRequest == null ? string.Empty : $", ServiceReqest {ServiceRequest.TaskId}";
-                var message = $"Employment Checks Created for Apprenticeship Incentive with ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} {additionalMessage}";
+                var message = $"Employment Check {Model.CheckType} Created for Apprenticeship Incentive with ApprenticeshipIncentiveId {ApprenticeshipIncentiveId} {additionalMessage}";
                 return new Log
                 {
                     OnProcessing = () => message,

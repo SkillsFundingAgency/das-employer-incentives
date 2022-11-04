@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -17,13 +18,19 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
     public class WhenHandlingRefreshEmploymentChecksCommand
     {
         private RefreshEmploymentChecksCommandHandler _sut;
-        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository;
+        private Mock<IApprenticeshipIncentiveDomainRepository> _mockIncentiveDomainRespository; 
+        private Mock<IDateTimeService> _mockDateTimeService;
         private Fixture _fixture;
 
         [SetUp]
         public void Arrange()
         {
-            _fixture = new Fixture(); 
+            _fixture = new Fixture();
+            
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
+
             _mockIncentiveDomainRespository = new Mock<IApprenticeshipIncentiveDomainRepository>();
         }
 
@@ -46,7 +53,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockDateTimeService.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());
@@ -62,7 +69,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Arrange
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(new List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>());
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockDateTimeService.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());
@@ -90,7 +97,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockDateTimeService.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());
@@ -117,7 +124,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
 
             _mockIncentiveDomainRespository.Setup(x => x.FindIncentivesWithLearningFound()).ReturnsAsync(incentives);
 
-            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object);
+            _sut = new RefreshEmploymentChecksCommandHandler(_mockIncentiveDomainRespository.Object, _mockDateTimeService.Object);
 
             // Act
             await _sut.Handle(new RefreshEmploymentChecksCommand());

@@ -4,13 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\BlockAccountLegalEntityForPayments.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\LegalEntityUpdated.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\PausePayments - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RecalculateEarnings.feature.cs" />
-  </ItemGroup>
  
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
@@ -43,6 +36,7 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     
+    
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
@@ -52,6 +46,9 @@
     </Compile>
     <Compile Update="Features\MonthEndInProgress.feature.cs">
       <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Features\ReinstatePayments.feature.cs">
+      <DependentUpon>ReinstatePayments.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\RevertPayments.feature.cs">
       <DependentUpon>RevertPayments.feature</DependentUpon>
@@ -107,6 +104,10 @@
     <SpecFlowFeatureFiles Update="Features\MonthEndInProgress.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>MonthEndInProgress.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ReinstatePayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\RevertPayments.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

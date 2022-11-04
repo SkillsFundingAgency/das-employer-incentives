@@ -651,7 +651,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
             breakInLearning.Single().StartDate.Should().Be(_periodEndDate.AddDays(1));
             breakInLearning.Single().EndDate.Should().Be(null);
-            breakInLearning.Single().CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            breakInLearning.Single().CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
             breakInLearning.Single().UpdatedDate.Should().BeNull();
 
         }
@@ -665,7 +665,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             breakInLearning.StartDate.Should().Be(_stoppedDate.AddDays(1));
             breakInLearning.EndDate.Should().Be(_resumedDate.AddDays(-1));
-            breakInLearning.CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            breakInLearning.CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
             breakInLearning.UpdatedDate.Should().BeNull();
         }
 
