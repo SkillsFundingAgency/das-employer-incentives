@@ -34,7 +34,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
         public IncentiveStatus Status => Model.Status;
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
-
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.OrderBy(b => b.StartDate).ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
@@ -439,23 +438,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            if (pendingPayment.DueDate.AddDays(21) > dateTimeService.UtcNow().Date)
-            {
-                return;
-            }
-
             var employedAt365DaysFirstCheck = EmploymentChecks.FirstOrDefault(x =>
                 x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
 
             var employedAt365DaysFirstCheckResult = employedAt365DaysFirstCheck?.Result != null &&
                                                         employedAt365DaysFirstCheck.Result.Value;
+
+            bool validationResult = true;
+
+            if (employedAt365DaysFirstCheck == null &&
+               pendingPayment.DueDate.AddDays(21) > dateTimeService.UtcNow().Date)
+            {
+                validationResult = false;
+            }
             
             pendingPayment.AddValidationResult(
                 PendingPaymentValidationResult.New(
                     Guid.NewGuid(),
                     collectionPeriod,
                     ValidationStep.EmployedAt365Days,
-                    true,
+                    validationResult,
                     GetOverrideStep(ValidationStep.EmployedAt365Days)));
 
             if (!employedAt365DaysFirstCheckResult)
@@ -809,8 +811,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     AddEvent(new EmploymentChecksCreated(initial365Check.GetModel(), serviceRequest));
                 }
                 else if (existingCheck.MinimumDate != initial365Check.MinimumDate ||
-                       existingCheck.MaximumDate != initial365Check.MaximumDate ||
-                       existingCheck.Result != initial365Check.Result)
+                       existingCheck.MaximumDate != initial365Check.MaximumDate)
                 {
                     if (Model.EmploymentCheckModels.Remove(existingCheck))
                     {
@@ -841,8 +842,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     AddEvent(new EmploymentChecksCreated(second365Check.GetModel(), serviceRequest));
                 }
                 else if (existingCheck.MinimumDate != second365Check.MinimumDate ||
-                       existingCheck.MaximumDate != second365Check.MaximumDate ||
-                       existingCheck.Result != second365Check.Result)
+                       existingCheck.MaximumDate != second365Check.MaximumDate)
                 {
                     if (Model.EmploymentCheckModels.Remove(existingCheck))
                     {
