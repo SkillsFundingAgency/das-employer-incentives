@@ -230,7 +230,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ChangeStatus(IncentiveStatus.Stopped);
                 StartBreakInLearning(stoppedStatus.DateStopped.Value);
                 
-                RemoveAll365Checks();
                 CalculateEarnings(collectionCalendar, learner);
 
                 AddEvent(new LearningStopped(
@@ -255,7 +254,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             else if (Model.Status == IncentiveStatus.Stopped && stoppedStatus.LearningStopped)
             {
                 ChangeStatus(IncentiveStatus.Stopped);
-                RemoveAll365Checks();
                 CalculateEarnings(collectionCalendar, learner);
             }
         }
