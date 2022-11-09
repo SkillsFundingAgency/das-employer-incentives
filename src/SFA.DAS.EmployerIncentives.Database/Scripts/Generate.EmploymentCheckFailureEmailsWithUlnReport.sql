@@ -69,7 +69,7 @@ WHERE Step = 'EmployedAt365Days'
 
 
 -- Failed 1 or Both
-SELECT DISTINCT x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], '1OrBoth' AS 'CheckType' FROM
+SELECT DISTINCT x.ULN, x.UKPRN, a.LegalEntityName, x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], '1OrBoth' AS 'CheckType' FROM
 (SELECT 
 	ai.UKPRN,
 	ai.ULN,
@@ -110,7 +110,7 @@ OR (SELECT COUNT(1) FROM archive.EmploymentCheck ec WHERE ec.ApprenticeshipIncen
 AND x.ULN NOT IN (SELECT uln FROM @EmployedAtStartOfApprenticeshipFailures UNION SELECT uln FROM @EmployedBeforeSchemeStartedFailures)
 
 -- Failed check 2
-SELECT DISTINCT x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], '2nd' AS 'CheckType' FROM
+SELECT DISTINCT x.ULN, x.UKPRN, a.LegalEntityName, x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], '2nd' AS 'CheckType' FROM
 (SELECT 
 	ai.UKPRN,
 	ai.ULN,
@@ -151,7 +151,7 @@ OR (SELECT COUNT(1) FROM archive.EmploymentCheck ec WHERE ec.ApprenticeshipIncen
 AND x.ULN NOT IN (SELECT uln FROM @EmployedAtStartOfApprenticeshipFailures UNION SELECT uln FROM @EmployedBeforeSchemeStartedFailures)
 
 --EmployedAt365Days
-SELECT DISTINCT x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], 'EmployedAt365Days' AS 'CheckType' FROM
+SELECT DISTINCT x.ULN, x.UKPRN, a.LegalEntityName, x.SubmittedByEmail, SUBSTRING(ia.SubmittedByName, 0, CHARINDEX(' ', ia.SubmittedByName)) as [First Name], TRIM(SUBSTRING(ia.SubmittedByName, CHARINDEX(' ', ia.SubmittedByName), LEN(ia.SubmittedByName)-CHARINDEX(' ', ia.SubmittedByName)+1)) AS [Last Name], 'EmployedAt365Days' AS 'CheckType' FROM
 (SELECT  
 	ai.UKPRN,
 	ai.ULN,
