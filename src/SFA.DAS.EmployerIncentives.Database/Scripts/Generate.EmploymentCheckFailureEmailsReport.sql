@@ -50,7 +50,23 @@ INNER JOIN [incentives].[Learner] as l on pp.ApprenticeshipIncentiveID = l.Appre
 WHERE Step in ('EmployedAtStartOfApprenticeship', 'EmployedBeforeSchemeStarted', 'EmployedAt365Days')  
 AND Result = 0 
 AND ppvr.PaymentYear < @PaymentYear
-
+UNION
+SELECT DISTINCT ULN, Step
+FROM Archive.PendingPaymentValidationResult ppvr
+INNER JOIN [Archive].[PendingPayment] pp On ppvr.PendingPaymentId = pp.PendingPaymentId
+INNER JOIN [incentives].[Learner] as l on pp.ApprenticeshipIncentiveID = l.ApprenticeshipIncentiveID
+WHERE Step in ('EmployedAtStartOfApprenticeship', 'EmployedBeforeSchemeStarted', 'EmployedAt365Days')  
+AND Result = 0 
+AND ppvr.PeriodNumber < @PeriodNumber 
+AND ppvr.PaymentYear = @PaymentYear
+union
+SELECT DISTINCT ULN, Step
+FROM Archive.PendingPaymentValidationResult ppvr
+INNER JOIN [Archive].[PendingPayment] pp On ppvr.PendingPaymentId = pp.PendingPaymentId
+INNER JOIN [incentives].[Learner] as l on pp.ApprenticeshipIncentiveID = l.ApprenticeshipIncentiveID
+WHERE Step in ('EmployedAtStartOfApprenticeship', 'EmployedBeforeSchemeStarted', 'EmployedAt365Days')  
+AND Result = 0 
+AND ppvr.PaymentYear < @PaymentYear
 
 INSERT INTO @EmployedAtStartOfApprenticeshipFailures
 SELECT DISTINCT ULN
