@@ -169,12 +169,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
 
         private static IList<LearningPeriod> MergeLearningPeriods(IList<LearningPeriod> periods)
         {
-            for (var i = 0; i < periods.Count-1; i++)
+            for (var i = 0; i < periods.Count - 1; i++)
             {
-                var gap = (periods[i + 1].StartDate - periods[i].EndDate).Days;
-                if (gap <= 1)
+                if (PeriodsAreAdjacent(periods[i], periods[i + 1]) ||
+                    PeriodsOverlap(periods[i], periods[i + 1]) ||
+                    PeriodsAreInclusive(periods[i], periods[i + 1]))
                 {
-                    var start = MinDate(periods[i].StartDate, periods[i+1].StartDate);
+                    var start = MinDate(periods[i].StartDate, periods[i + 1].StartDate);
                     var end = MaxDate(periods[i].EndDate, periods[i + 1].EndDate);
                     periods.Add(new LearningPeriod(start, end));
                     periods.RemoveAt(i);
@@ -184,7 +185,28 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.LearnerMatchApi
                 }
             }
 
-            return periods;
+            return periods.OrderBy(x => x.StartDate).ToList();
+        }
+
+        private static bool PeriodsAreAdjacent(LearningPeriod firstPeriod, LearningPeriod secondPeriod)
+        {
+            var gap = Math.Abs((secondPeriod.StartDate - firstPeriod.EndDate).Days);
+
+            return gap <= 1;
+        }
+
+        private static bool PeriodsAreInclusive(LearningPeriod firstPeriod, LearningPeriod secondPeriod)
+        {
+            return ((secondPeriod.StartDate > firstPeriod.StartDate) &&
+                    (secondPeriod.EndDate < firstPeriod.EndDate)) ||
+                   ((firstPeriod.StartDate > secondPeriod.StartDate) &&
+                    (firstPeriod.EndDate < secondPeriod.EndDate));
+        }
+
+        private static bool PeriodsOverlap(LearningPeriod firstPeriod, LearningPeriod secondPeriod)
+        {
+            return ((secondPeriod.StartDate > firstPeriod.StartDate) &&
+                    (firstPeriod.EndDate > secondPeriod.StartDate));
         }
 
         private static DateTime MinDate(DateTime a, DateTime b)
