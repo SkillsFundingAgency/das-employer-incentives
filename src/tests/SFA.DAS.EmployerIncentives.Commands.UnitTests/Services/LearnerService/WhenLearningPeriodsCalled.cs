@@ -255,5 +255,56 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
             learningPeriods.First().StartDate.Should().Be(episode1.StartDate);
             learningPeriods.First().EndDate.Should().Be(episode1.EndDate.Value);
         }
+
+        [Test]
+        public void Then_periods_with_breaks_in_learning_across_academic_years_are_correctly_merged()
+        {
+            //Arrange  
+            var periods = new List<PeriodDto> { new PeriodDto { ApprenticeshipId = _apprenticeshipId } };
+
+            var episode1 = _fixture.Build<PriceEpisodeDto>()
+                .With(x => x.AcademicYear, "2021")
+                .With(x => x.StartDate, new DateTime(2021, 5, 25))
+                .With(x => x.EndDate, new DateTime(2021, 7, 31))
+                .With(x => x.Periods, periods)
+                .Create();
+
+            var episode2 = _fixture.Build<PriceEpisodeDto>()
+                .With(pe => pe.AcademicYear, "2223")
+                .With(pe => pe.StartDate, new DateTime(2022, 8, 16))
+                .Without(pe => pe.EndDate)
+                .With(pe => pe.Periods, periods)
+                .Create();
+
+            var episode3 = _fixture.Build<PriceEpisodeDto>()
+                .With(x => x.AcademicYear, "2021")
+                .With(x => x.StartDate, new DateTime(2021, 8, 1))
+                .With(x => x.EndDate, new DateTime(2022, 3, 10))
+                .With(x => x.Periods, periods)
+                .Create();
+
+            _sut.Training.First().PriceEpisodes.Clear();
+            _sut.Training.First().PriceEpisodes.Add(episode1);
+            _sut.Training.First().PriceEpisodes.Add(episode2);
+            _sut.Training.First().PriceEpisodes.Add(episode3);
+
+            var academicYears = new List<AcademicYear>
+            {
+                new AcademicYear("2021", new DateTime(2021, 7, 31)),
+                new AcademicYear("2122", new DateTime(2022, 7, 31)),
+                new AcademicYear("2223", new DateTime(2023, 7, 31))
+            };
+            _collectionCalendar = new Domain.ValueObjects.CollectionCalendar(academicYears, new List<CollectionCalendarPeriod>());
+
+            // Act
+            var learningPeriods = _sut.LearningPeriods(_incentive, _collectionCalendar);
+
+            // Assert
+            learningPeriods.Count.Should().Be(2);
+            learningPeriods[0].StartDate.Should().Be(new DateTime(2021, 5, 25));
+            learningPeriods[0].EndDate.Should().Be(new DateTime(2022, 3, 10));
+            learningPeriods[1].StartDate.Should().Be(new DateTime(2022, 8, 16));
+            learningPeriods[1].EndDate.Should().Be(new DateTime(2023, 7, 31));
+        }
     }
 }
