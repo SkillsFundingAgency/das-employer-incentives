@@ -78,83 +78,63 @@ AS [(Paste into cell E23) Invalid YTD]
   FROM [incentives].[ClawbackPayment]
   WHERE [DateClawbackSent] is  null
 
-  -- Validations (Current period) (Paste into cell A3 on tab [YTD Validation])
+-- Validations (Current period) (Paste into cell A3 on tab [YTD Validation])
 ;with LatestPeriod as (
   select top 1 PeriodNumber, PaymentYear from [BusinessGetMonthEndRuntimes] order by [LastValidation] desc)
 ,PendingPaymentValidations as (
- select PendingPaymentId [PendingPaymentId], 
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='HasIlrSubmission',1,0)) 
-	END
-   as HasIlrSubmission,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='HasLearningRecord',1,0))
-	END
-    as HasLearningRecord,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='IsInLearning',1,0)) 
-	END
-   as IsInLearning,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='HasDaysInLearning',1,0)) 
-	END
-   as HasDaysInLearning,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='HasNoDataLocks',1,0)) 
-	END
-   as HasNoDataLocks,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='HasBankDetails',1,0)) 
-	END
-   as HasBankDetails,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='PaymentsNotPaused',1,0)) 
-	END
-   as PaymentsNotPaused,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='HasSignedMinVersion',1,0)) 
-	END
-   as HasSignedMinVersion,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='LearnerMatchSuccessful',1,0)) 
-	END
-   as LearnerMatchSuccessful,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='EmployedAtStartOfApprenticeship',1,0))
-	END
-    as EmployedAtStartOfApprenticeship,
-	CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='EmployedBeforeSchemeStarted',1,0)) 
-	END
-   as EmployedBeforeSchemeStarted,
-   CASE OverrideResult
-	WHEN 1 THEN 1
-	ELSE max(iif(step='BlockedForPayments',1,0)) 
-	END
-   as BlockedForPayments,
-   CASE OverrideResult
-   WHEN 1 THEN 1
-   ELSE max(iif(step='EmployedAt365Days',1,0))
-   END 
-   as EmployedAt365Days, 
-   Result,
-   ppvr.PeriodNumber, 
-   ppvr.PaymentYear
- from [incentives].[PendingPaymentValidationResult] ppvr
- inner join LatestPeriod on ppvr.PeriodNumber = LatestPeriod.PeriodNumber and ppvr.PaymentYear = LatestPeriod.PaymentYear
- and result = 1 
- group by PendingPaymentId, ppvr.Result, ppvr.OverrideResult, ppvr.PeriodNumber, ppvr.PaymentYear 
+select 
+	PendingPaymentId,
+	PeriodNumber, 
+    PaymentYear,
+	ISNULL(HasLearningRecord, 0) AS HasLearningRecord,
+	ISNULL(IsInLearning, 0) AS IsInLearning,
+	ISNULL(HasDaysInLearning, 0) AS HasDaysInLearning,
+	ISNULL(HasNoDataLocks, 0) AS HasNoDataLocks,
+	ISNULL(HasBankDetails, 0) AS HasBankDetails,
+	ISNULL(PaymentsNotPaused, 0) AS PaymentsNotPaused,	
+	ISNULL(HasIlrSubmission, 0) AS HasIlrSubmission,
+	ISNULL(HasSignedMinVersion, 0) AS HasSignedMinVersion,
+	ISNULL(LearnerMatchSuccessful, 0) AS LearnerMatchSuccessful,
+	ISNULL(EmployedAtStartOfApprenticeship, 0) AS EmployedAtStartOfApprenticeship,
+	ISNULL(EmployedBeforeSchemeStarted, 0) AS EmployedBeforeSchemeStarted,
+	ISNULL(BlockedForPayments, 0) AS BlockedForPayments,
+	IIF(EarningType = 'FirstPayment' , 1, ISNULL(EmployedAt365Days, 0)) AS EmployedAt365Days
+from
+(
+  select 
+	PendingPaymentId,
+	ppvr.PeriodNumber,
+	ppvr.PaymentYear,
+	step,  
+	CASE ISNULL(OverrideResult, 0)
+		WHEN 1 THEN 1
+		ELSE result
+	END AS result,
+	pp.EarningType
+	from [incentives].[PendingPaymentValidationResult] ppvr inner join LatestPeriod 
+		on ppvr.PeriodNumber = LatestPeriod.PeriodNumber and ppvr.PaymentYear = LatestPeriod.PaymentYear		
+	inner join [incentives].[PendingPayment] pp 		
+			on pp.id=ppvr.PendingPaymentId
+) d
+pivot
+(
+  max(result)
+  for step in (
+	HasBankDetails,
+	BlockedForPayments,
+	LearnerMatchSuccessful,
+	HasIlrSubmission,
+	HasLearningRecord,
+	IsInLearning,
+	HasNoDataLocks,
+	HasDaysInLearning,
+	PaymentsNotPaused,
+	HasSignedMinVersion,
+	EmployedAtStartOfApprenticeship,
+	EmployedBeforeSchemeStarted,
+	EmployedAt365Days,
+	HasNoUnsentClawbacks)
+) piv
 )
 select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Validation}) CountOfPayments], 
   HasLearningRecord,
@@ -163,7 +143,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Vali
   HasNoDataLocks, 
   HasBankDetails, 
   PaymentsNotPaused,
-  '' as HasNoUnsentClawbacks, --Just used to space out the putput in the excel template,
+  '' as HasNoUnsentClawbacks, --Just used to space out the output in the excel template,
   HasIlrSubmission,
   HasSignedMinVersion,
   LearnerMatchSuccessful,
@@ -171,26 +151,29 @@ select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Vali
   EmployedBeforeSchemeStarted,
   BlockedForPayments,
   EmployedAt365Days,
-  count(distinct a.[AccountLegalEntityId]) as [AccountLegalEntityId],
-  sum(pp.amount) as EarningAmount
+  count(distinct a.[AccountLegalEntityId]) as [AccountLegalEntityId],  
+  SUM(IIF(pp.EarningType = 'FirstPayment', pp.amount, 0)) AS FirstEarningAmount,
+  SUM(IIF(pp.EarningType = 'SecondPayment', pp.amount, 0)) AS SecondEarningAmount,
+  SUM(ISNULL(pp.amount, 0)) as TottalEarningAmount
 from PendingPaymentValidations ppv
-left join [incentives].[PendingPayment] pp on pp.id=ppv.PendingPaymentId
-left join [dbo].[Accounts] a on pp.AccountLegalEntityId=a.AccountLegalEntityId
-group by HasIlrSubmission, 
+	inner join [incentives].[PendingPayment] pp 
+		on pp.id=ppv.PendingPaymentId
+	inner join [dbo].[Accounts] a on pp.AccountLegalEntityId=a.AccountLegalEntityId
+group by   
   HasLearningRecord, 
   IsInLearning, 
   HasDaysInLearning, 
   HasNoDataLocks, 
   HasBankDetails, 
   PaymentsNotPaused, 
+  HasIlrSubmission,   
   HasSignedMinVersion,
   LearnerMatchSuccessful,
   EmployedAtStartOfApprenticeship,
   EmployedBeforeSchemeStarted,
   BlockedForPayments,
-  EmployedAt365Days,
-  Result
-    order by 
+  EmployedAt365Days
+ order by 
   HasLearningRecord desc, 
   IsInLearning desc, 
   HasDaysInLearning desc, 
@@ -204,6 +187,9 @@ group by HasIlrSubmission,
   EmployedBeforeSchemeStarted desc,
   BlockedForPayments desc,
   EmployedAt365Days desc
+  
+  
+ /*  This report has been commented out because it isnlt correct and also the requirement of what it is to show is not clear. 
 -- YTD Validation (Paste underneath the Period Validation table on the [YTD Validation] tab) 
 ;with latestValidations as (
 select max(ppv.periodnumber) MaxPeriod, 
@@ -333,3 +319,4 @@ order by
   EmployedBeforeSchemeStarted desc,
   BlockedForPayments desc,
   EmployedAt365Days desc
+  */
