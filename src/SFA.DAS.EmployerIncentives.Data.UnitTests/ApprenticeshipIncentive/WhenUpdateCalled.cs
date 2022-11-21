@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
+    [NonParallelizable]
     public class WhenUpdateCalled
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;

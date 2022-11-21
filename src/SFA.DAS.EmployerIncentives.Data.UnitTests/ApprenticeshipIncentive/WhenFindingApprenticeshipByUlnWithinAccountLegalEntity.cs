@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
+    [NonParallelizable]
     public class WhenFindingApprenticeshipByUlnWithinAccountLegalEntity
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;

@@ -262,63 +262,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel.ClawbackPaymentModels.Count.Should().Be(1);
         }
 
-        [Test, Ignore("Earnings for Phase 3 applications do not differ for different age ranges so this test is invalid")]
-        public void Then_earnings_with_sent_payments_are_clawed_back_when_the_earning_amount_has_changed()
-        {
-            // arrange
-            _sut.CalculateEarnings(_collectionCalendar);
-            byte collectionPeriod = 6;
-            short collectionYear = 2020;
-            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create());
-            _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
-            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
-
-            _collectionPeriods.Add(new CollectionCalendarPeriod(new CollectionPeriod(4, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(3).Month, (short)_collectionPeriod.AddMonths(3).Year, _collectionPeriod.AddMonths(3).AddDays(1), _fixture.Create<DateTime>(), true, false));
-
-            // act
-            var apprenticeshipDob = DateTime.Now.AddYears(-26);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate, _apprenticehip.Provider);
-            _sut.CalculateEarnings(_collectionCalendar);
-
-            // assert
-            pendingPayment.ClawedBack.Should().BeTrue();
-            _sutModel.PendingPaymentModels.Count(x => x.EarningType == EarningType.FirstPayment).Should().Be(2);
-        }
-
-        [Test, Ignore("A change of date of birth does not trigger a clawback and new payment for Phase 3 applications")]
-        public void Then_clawback_payment_is_created_when_earnings_with_sent_payments_are_clawed_back_and_the_earning_amount_has_changed()
-        {
-            // arrange
-            _sut.CalculateEarnings(_collectionCalendar);
-            byte collectionPeriod = 6;
-            short collectionYear = 2020;
-            var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create());
-            _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
-            _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
-
-            var activePeriod = new CollectionCalendarPeriod(new CollectionPeriod(4, _fixture.Create<short>()), (byte)_collectionPeriod.AddMonths(3).Month, (short)_collectionPeriod.AddMonths(3).Year, _collectionPeriod.AddMonths(3).AddDays(1), _fixture.Create<DateTime>(), true, false);
-            _collectionPeriods.Add(activePeriod);
-
-            // act
-            var apprenticeshipDob = DateTime.Now.AddYears(-26);
-            _sutModel.Apprenticeship = new Apprenticeship(_apprenticehip.Id, _apprenticehip.FirstName, _apprenticehip.LastName, apprenticeshipDob, _apprenticehip.UniqueLearnerNumber, _apprenticehip.EmployerType, _apprenticehip.CourseName, _apprenticehip.EmploymentStartDate, _apprenticehip.Provider);
-            _sut.CalculateEarnings(_collectionCalendar);
-
-            // assert
-            var clawback = _sutModel.ClawbackPaymentModels.Single();
-            clawback.ApprenticeshipIncentiveId.Should().Be(_sutModel.Id);
-            clawback.PendingPaymentId.Should().Be(pendingPayment.Id);
-            clawback.PaymentId.Should().Be(_sutModel.PaymentModels.First().Id);
-            clawback.Account.Should().Be(_sutModel.Account);
-            clawback.Amount.Should().Be(-1 * pendingPayment.Amount);
-            clawback.SubnominalCode.Should().Be(_sutModel.PaymentModels.First().SubnominalCode);
-            clawback.CollectionPeriod.Should().Be(activePeriod.CollectionPeriod);
-        }
-
         [Test]
         public void Then_paid_earnings_are_clawed_back_if_the_apprenticeship_is_no_longer_eligible()
         {
