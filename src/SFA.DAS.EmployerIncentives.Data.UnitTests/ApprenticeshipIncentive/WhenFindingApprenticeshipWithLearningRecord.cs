@@ -12,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
     [TestFixture]
+    [NonParallelizable]
     public class WhenFindingApprenticeshipWithLearningRecord
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
