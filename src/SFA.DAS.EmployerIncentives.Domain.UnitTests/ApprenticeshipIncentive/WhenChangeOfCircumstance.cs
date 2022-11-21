@@ -11,6 +11,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 
 namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTests
 {
@@ -127,8 +128,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             };            
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
             
-            var expectedPaymentHashCode = _sutModel.PendingPaymentModels.First().GetHashCode();
-
             //Act
             _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
 
@@ -526,6 +525,93 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             //Assert
             _sutModel.EmploymentCheckModels.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void Then_learning_stopped_event_triggered_if_the_status_changes_from_active_to_stopped()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(false, _sutModel.StartDate.AddDays(366)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(87)));
+            submissionData.SetLearningData(learningData);
+            _learner.SetSubmissionData(submissionData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+            var events = _sut.FlushEvents();
+
+            // Assert
+            var learningStoppedEvent = events.FirstOrDefault(x => x.GetType() == typeof(LearningStopped)) as LearningStopped;
+            learningStoppedEvent.Should().NotBeNull();
+            learningStoppedEvent.ApprenticeshipIncentiveId.Should().Be(_learner.ApprenticeshipIncentiveId);
+            learningStoppedEvent.StoppedDate.Should().Be(learningData.StoppedStatus.DateStopped.Value);
+        }
+
+        [Test]
+        public void Then_learning_resumed_event_triggered_if_the_status_changes_from_stopped_to_active()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(87)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+            learningData.SetIsStopped(new LearningStoppedStatus(false, _sutModel.StartDate.AddDays(366)));
+            submissionData.SetLearningData(learningData);
+            _learner.SetSubmissionData(submissionData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+            var events = _sut.FlushEvents();
+
+            // Assert
+            var learningResumedEvent = events.FirstOrDefault(x => x.GetType() == typeof(LearningResumed)) as LearningResumed;
+            learningResumedEvent.Should().NotBeNull();
+            learningResumedEvent.ApprenticeshipIncentiveId.Should().Be(_learner.ApprenticeshipIncentiveId);
+            learningResumedEvent.ResumedDate.Should().Be(learningData.StoppedStatus.DateResumed.Value);
+        }
+        
+        [Test]
+        public void Then_learning_stopped_event_triggered_if_the_stopped_date_changes()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(87)));
+            var submissionData = new SubmissionData();
+            submissionData.SetSubmissionDate(DateTime.Now);
+            submissionData.SetLearningData(learningData);
+            _learner = Learner.New(_fixture.Create<Guid>(), _sutModel.Id, _fixture.Create<long>(), _fixture.Create<long>(), _fixture.Create<long>());
+            _learner.SetSubmissionData(submissionData);
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+            var originalLearningStoppedDate = learningData.StoppedStatus.DateStopped;
+            learningData.SetIsStopped(new LearningStoppedStatus(true, _sutModel.StartDate.AddDays(90)));
+            submissionData.SetLearningData(learningData);
+            _learner.SetSubmissionData(submissionData);
+
+            // Act
+            _sut.SetLearningStoppedChangeOfCircumstance(_learner, _collectionCalendar);
+            var events = _sut.FlushEvents();
+
+            // Assert
+            var learningStoppedEvents = events.Where(x => x.GetType() == typeof(LearningStopped));
+            learningStoppedEvents.Should().NotBeNull();
+            learningStoppedEvents.Count().Should().Be(2);
+            var firstStoppedEvent = learningStoppedEvents.First() as LearningStopped;
+            var secondStoppedEvent = learningStoppedEvents.Last() as LearningStopped;
+            firstStoppedEvent.ApprenticeshipIncentiveId.Should().Be(_learner.ApprenticeshipIncentiveId);
+            firstStoppedEvent.StoppedDate.Should().Be(originalLearningStoppedDate.Value);
+            secondStoppedEvent.ApprenticeshipIncentiveId.Should().Be(_learner.ApprenticeshipIncentiveId);
+            secondStoppedEvent.StoppedDate.Should().Be(learningData.StoppedStatus.DateStopped.Value);
         }
 
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
