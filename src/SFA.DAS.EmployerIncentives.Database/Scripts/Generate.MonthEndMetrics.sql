@@ -153,7 +153,7 @@ select count(distinct pendingpaymentId) as [(Paste into cell A3 on tab {YTD Vali
   count(distinct a.[AccountLegalEntityId]) as [AccountLegalEntityId],  
   SUM(IIF(pp.EarningType = 'FirstPayment', pp.amount, 0)) AS FirstEarningAmount,
   SUM(IIF(pp.EarningType = 'SecondPayment', pp.amount, 0)) AS SecondEarningAmount,
-  SUM(ISNULL(pp.amount, 0)) as TottalEarningAmount
+  SUM(ISNULL(pp.amount, 0)) as TotalEarningAmount
 from PendingPaymentValidations ppv
 	inner join [incentives].[PendingPayment] pp 
 		on pp.id=ppv.PendingPaymentId
