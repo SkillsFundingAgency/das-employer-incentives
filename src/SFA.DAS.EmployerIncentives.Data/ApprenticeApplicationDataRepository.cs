@@ -104,6 +104,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                         ClawbackDate = data.SecondClawbackCreated,
                         OriginalPaymentDate = data.SecondPaymentDate
                     },
+                    IncentiveCompleted = data.IsIncentiveCompleted(_dateTimeService)
                 };
 
                 if (data.Status == IncentiveStatus.Stopped)
