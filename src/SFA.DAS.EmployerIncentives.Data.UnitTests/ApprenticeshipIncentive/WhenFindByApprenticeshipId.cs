@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
+    [NonParallelizable]
     public class WhenFindByApprenticeshipId
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
