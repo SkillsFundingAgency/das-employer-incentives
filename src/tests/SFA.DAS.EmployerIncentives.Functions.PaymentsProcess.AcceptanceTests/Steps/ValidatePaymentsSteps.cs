@@ -107,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         {
             _validatePaymentData.PendingPaymentModel1.PaymentMadeDate = _validatePaymentData.ApprenticeshipIncentiveModel.StartDate.AddDays(100);
             _validatePaymentData.PendingPaymentModel2.EarningType = EarningType.SecondPayment;
-            _validatePaymentData.PendingPaymentModel2.DueDate = DateTime.Today.AddDays(-22);
+            _validatePaymentData.PendingPaymentModel2.DueDate = DateTime.Today.AddDays(-20);
             _validatePaymentData.PendingPaymentModel2.PaymentMadeDate = null;
             _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 365;
         }
@@ -118,6 +118,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _validatePaymentData.EmploymentChecks.Single(x =>
                 x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id
                 && x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck).Result = false;
+        }
+
+        [Given(@"the employed at 365 days check has not been done")]
+        public void GivenTheEmployedAt365DaysCheckHasNotBeenDone()
+        {
+            var check = _validatePaymentData.EmploymentChecks.SingleOrDefault(c => c.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+            if(check != null)
+            {
+                _validatePaymentData.EmploymentChecks.Remove(check);
+            }
         }
 
         [When(@"the payment process is run")]
@@ -150,6 +160,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         [Then(@"the '(.*)' will have a failed validation result")]
         public async Task ThenTheValidationStepWillHaveAFailedValidationResult(string step)
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
+            results.Should().HaveCount(1);
+            results.All(r => !r.Result).Should().BeTrue($"{step} validation step should have failed");
+            results.All(r => r.CreatedDateUtc == DateTime.Today).Should().BeTrue();
+        }
+
+        [Then(@"the '(.*)' will have two failed validation results")]
+        public async Task ThenTheValidationStepWillHaveTwoFailedValidationResult(string step)
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
@@ -292,13 +312,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"the ILR Submission check will have a failed validation result")]
         public async Task ThenTheIlrSubmissionCheckWillHaveAFailedValidationResult()
         {
-            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.HasIlrSubmission);
+            await ThenTheValidationStepWillHaveTwoFailedValidationResult(ValidationStep.HasIlrSubmission);
         }
 
         [Then(@"the Learner Match Successful check will have a failed validation result")]
         public async Task ThenTheLearnerMatchSuccessfulCheckWillHaveAFailedValidationResult()
         {
-            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.LearnerMatchSuccessful);
+            await ThenTheValidationStepWillHaveTwoFailedValidationResult(ValidationStep.LearnerMatchSuccessful);
         }
 
         [Then(@"no further ILR validation is performed")]
