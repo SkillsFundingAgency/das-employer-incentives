@@ -49,11 +49,18 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             {
                 new Types.Application { AccountLegalEntityId = accountLegalEntityId, ULN = uln }
             };
+            var requests = new List<EmploymentCheckRefreshRequest>
+            {
+                new EmploymentCheckRefreshRequest
+                {
+                    Applications = applications.ToArray(),
+                    ServiceRequest = serviceRequest,
+                    CheckType = checkType
+                }
+            };
             var data = new Dictionary<string, object>
             {
-                { "CheckType", checkType },
-                { "Applications", JsonConvert.SerializeObject(applications) },
-                { "ServiceRequest", JsonConvert.SerializeObject(serviceRequest) }
+                { "Requests", JsonConvert.SerializeObject(requests) }
             };
 
             var request = _fixture.Build<JobRequest>()
@@ -83,6 +90,79 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
         }
 
         [Test]
+        public async Task Then_multiple_refresh_employment_check_commands_are_dispatched()
+        {
+            // Arrange
+            var serviceRequest1 = _fixture.Create<ServiceRequest>();
+            var serviceRequest2 = _fixture.Create<ServiceRequest>();
+            var accountLegalEntityId1 = _fixture.Create<long>();
+            var accountLegalEntityId2 = _fixture.Create<long>();
+            var uln1 = _fixture.Create<long>();
+            var uln2 = _fixture.Create<long>();
+            var checkType1 = RefreshEmploymentCheckType.InitialEmploymentChecks.ToString();
+            var checkType2 = RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString();
+            var applications1 = new List<Types.Application>
+            {
+                new Types.Application { AccountLegalEntityId = accountLegalEntityId1, ULN = uln1 }
+            };
+            var applications2 = new List<Types.Application>
+            {
+                new Types.Application { AccountLegalEntityId = accountLegalEntityId2, ULN = uln2 }
+            };
+            var requests = new List<EmploymentCheckRefreshRequest>
+            {
+                new EmploymentCheckRefreshRequest
+                {
+                    Applications = applications1.ToArray(),
+                    ServiceRequest = serviceRequest1,
+                    CheckType = checkType1
+                },
+                new EmploymentCheckRefreshRequest
+                {
+                    Applications = applications2.ToArray(),
+                    ServiceRequest = serviceRequest2,
+                    CheckType = checkType2
+                }
+            };
+            var data = new Dictionary<string, object>
+            {
+                { "Requests", JsonConvert.SerializeObject(requests) }
+            };
+
+            var request = _fixture.Build<JobRequest>()
+                    .With(r => r.Type, JobType.RefreshEmploymentChecks)
+                    .With(r => r.Data, data)
+                    .Create();
+
+            RefreshEmploymentCheckCommand firstCommand = null;
+            RefreshEmploymentCheckCommand secondCommand = null;
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ICommand>, CancellationToken>((c, t) =>
+                {
+                    firstCommand = c.First() as RefreshEmploymentCheckCommand;
+                    secondCommand = c.Last() as RefreshEmploymentCheckCommand;
+                });
+
+            // Act
+            await _sut.AddJob(request);
+
+            // Assert
+            _mockCommandDispatcher.Verify(m => m.SendMany(It.IsAny<IEnumerable<RefreshEmploymentCheckCommand>>(), It.IsAny<CancellationToken>()), Times.Once);
+            firstCommand.ULN.Should().Be(uln1);
+            firstCommand.AccountLegalEntityId.Should().Be(accountLegalEntityId1);
+            firstCommand.ServiceRequestTaskId.Should().Be(serviceRequest1.TaskId);
+            firstCommand.DecisionReference.Should().Be(serviceRequest1.DecisionReference);
+            firstCommand.ServiceRequestCreated.Should().Be(serviceRequest1.TaskCreatedDate.Value);
+            secondCommand.ULN.Should().Be(uln2);
+            secondCommand.AccountLegalEntityId.Should().Be(accountLegalEntityId2);
+            secondCommand.ServiceRequestTaskId.Should().Be(serviceRequest2.TaskId);
+            secondCommand.DecisionReference.Should().Be(serviceRequest2.DecisionReference);
+            secondCommand.ServiceRequestCreated.Should().Be(serviceRequest2.TaskCreatedDate.Value);
+        }
+
+        [Test]
         public async Task Then_a_NoContent_response_is_returned()
         {
             // Arrange
@@ -94,11 +174,18 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             {
                 new Types.Application { AccountLegalEntityId = accountLegalEntityId, ULN = uln }
             };
+            var requests = new List<EmploymentCheckRefreshRequest>
+            {
+                new EmploymentCheckRefreshRequest
+                {
+                    Applications = applications.ToArray(),
+                    ServiceRequest = serviceRequest,
+                    CheckType = checkType
+                }
+            };
             var data = new Dictionary<string, object>
             {
-                { "CheckType", checkType },
-                { "Applications", JsonConvert.SerializeObject(applications) },
-                { "ServiceRequest", JsonConvert.SerializeObject(serviceRequest) }
+                { "Requests", JsonConvert.SerializeObject(requests) }
             };
 
             var request = _fixture.Build<JobRequest>()
@@ -125,11 +212,18 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             {
                 new Types.Application { AccountLegalEntityId = accountLegalEntityId, ULN = uln }
             };
+            var requests = new List<EmploymentCheckRefreshRequest>
+            {
+                new EmploymentCheckRefreshRequest
+                {
+                    Applications = applications.ToArray(),
+                    ServiceRequest = serviceRequest,
+                    CheckType = checkType
+                }
+            };
             var data = new Dictionary<string, object>
             {
-                { "CheckType", checkType },
-                { "Applications", JsonConvert.SerializeObject(applications) },
-                { "ServiceRequest", JsonConvert.SerializeObject(serviceRequest) }
+                { "Requests", JsonConvert.SerializeObject(requests) }
             };
 
             var request = _fixture.Build<JobRequest>()
@@ -164,11 +258,18 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
             {
                 new Types.Application { AccountLegalEntityId = accountLegalEntityId, ULN = uln }
             };
+            var requests = new List<EmploymentCheckRefreshRequest>
+            {
+                new EmploymentCheckRefreshRequest
+                {
+                    Applications = applications.ToArray(),
+                    ServiceRequest = serviceRequest,
+                    CheckType = checkType
+                }
+            };
             var data = new Dictionary<string, object>
             {
-                { "CheckType", checkType },
-                { "Applications", JsonConvert.SerializeObject(applications) },
-                { "ServiceRequest", JsonConvert.SerializeObject(serviceRequest) }
+                { "Requests", JsonConvert.SerializeObject(requests) }
             };
 
             var request = _fixture.Build<JobRequest>()
