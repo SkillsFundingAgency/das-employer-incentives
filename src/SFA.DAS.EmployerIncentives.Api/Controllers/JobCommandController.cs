@@ -77,9 +77,9 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                             employmentCheckRefreshRequest.CheckType,
                             application.AccountLegalEntityId,
                             application.ULN,
-                            employmentCheckRefreshRequest.ServiceRequest.TaskId,
-                            employmentCheckRefreshRequest.ServiceRequest.DecisionReference,
-                            employmentCheckRefreshRequest.ServiceRequest.TaskCreatedDate)
+                            application.ServiceRequest?.TaskId ?? employmentCheckRefreshRequest.ServiceRequest.TaskId,
+                            application.ServiceRequest?.DecisionReference ?? employmentCheckRefreshRequest.ServiceRequest.DecisionReference,
+                            application.ServiceRequest?.TaskCreatedDate ?? employmentCheckRefreshRequest.ServiceRequest.TaskCreatedDate)
                     );
                 }
             }

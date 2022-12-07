@@ -163,6 +163,63 @@ namespace SFA.DAS.EmployerIncentives.Api.UnitTests.Job
         }
 
         [Test]
+        public async Task Then_the_application_service_request_overrides_the_request_level_service_request()
+        {
+            // Arrange
+            var serviceRequest = _fixture.Create<ServiceRequest>();
+            var accountLegalEntityId = _fixture.Create<long>();
+            var uln = _fixture.Create<long>();
+            var checkType = RefreshEmploymentCheckType.InitialEmploymentChecks.ToString();
+            var applications = new List<Types.Application>
+            {
+                new Types.Application 
+                {
+                    AccountLegalEntityId = accountLegalEntityId, 
+                    ULN = uln,
+                    ServiceRequest = _fixture.Create<ServiceRequest>()
+                }
+            };
+            var requests = new List<EmploymentCheckRefreshRequest>
+            {
+                new EmploymentCheckRefreshRequest
+                {
+                    Applications = applications.ToArray(),
+                    ServiceRequest = serviceRequest,
+                    CheckType = checkType
+                }
+            };
+            var data = new Dictionary<string, object>
+            {
+                { "Requests", JsonConvert.SerializeObject(requests) }
+            };
+
+            var request = _fixture.Build<JobRequest>()
+                    .With(r => r.Type, JobType.RefreshEmploymentChecks)
+                    .With(r => r.Data, data)
+                    .Create();
+
+            RefreshEmploymentCheckCommand sentCommand = null;
+
+            _mockCommandDispatcher
+                .Setup(m => m.SendMany(It.IsAny<IEnumerable<ICommand>>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ICommand>, CancellationToken>((c, t) =>
+                {
+                    sentCommand = c.Single() as RefreshEmploymentCheckCommand;
+                });
+
+            // Act
+            await _sut.AddJob(request);
+
+            // Assert
+            _mockCommandDispatcher.Verify(m => m.SendMany(It.IsAny<IEnumerable<RefreshEmploymentCheckCommand>>(), It.IsAny<CancellationToken>()), Times.Once);
+            sentCommand.ULN.Should().Be(uln);
+            sentCommand.AccountLegalEntityId.Should().Be(accountLegalEntityId);
+            sentCommand.ServiceRequestTaskId.Should().Be(applications[0].ServiceRequest.TaskId);
+            sentCommand.DecisionReference.Should().Be(applications[0].ServiceRequest.DecisionReference);
+            sentCommand.ServiceRequestCreated.Should().Be(applications[0].ServiceRequest.TaskCreatedDate.Value);
+        } 
+
+        [Test]
         public async Task Then_a_NoContent_response_is_returned()
         {
             // Arrange
