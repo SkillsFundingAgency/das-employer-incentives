@@ -12,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
+    [NonParallelizable]
     public class WhenFindApprenticeshipIncentivesWithoutPendingPayments
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
