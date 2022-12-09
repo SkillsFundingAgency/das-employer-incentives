@@ -50,6 +50,29 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             };
             _sutModel.PaymentModels = new List<PaymentModel>();
             _sutModel.ClawbackPaymentModels = new List<ClawbackPaymentModel>();
+            _sutModel.EmploymentCheckModels = new List<EmploymentCheckModel>()
+            {
+                _fixture
+                    .Build<EmploymentCheckModel>()
+                    .With(x => x.ApprenticeshipIncentiveId, _sutModel.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                    .Create(),
+                _fixture
+                    .Build<EmploymentCheckModel>()
+                    .With(x => x.ApprenticeshipIncentiveId, _sutModel.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
+                    .Create(),
+                _fixture
+                    .Build<EmploymentCheckModel>()
+                    .With(x => x.ApprenticeshipIncentiveId, _sutModel.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
+                    .Create(),
+                _fixture
+                    .Build<EmploymentCheckModel>()
+                    .With(x => x.ApprenticeshipIncentiveId, _sutModel.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck)
+                    .Create(),
+            };
             _sutModel.Phase = new IncentivePhase(Phase.Phase2);
             _sutModel.StartDate = new DateTime(2021, 7, 1);
             _sut = ApprenticeshipIncentive.Get(_sutModel.Id, _sutModel);
@@ -136,6 +159,33 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
 
             // Assert
             _sut.FlushEvents().Any(e => e is EarningsCalculated).Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_EmploymentChecks_are_Refreshed()
+        {
+            // Arrange                        
+            var periods = new List<LearningPeriod>
+            {
+                new LearningPeriod(new DateTime(2021, 1, 3), new DateTime(2021, 3, 31)),
+                new LearningPeriod(new DateTime(2021, 6, 10), new DateTime(2021, 8, 25)),
+                new LearningPeriod(new DateTime(2021, 10, 2), new DateTime(2021, 12, 31)),
+            };
+            _learner.SetLearningPeriods(periods);
+
+            // Act
+            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar, _mockDateTimeService.Object);
+
+            // Assert
+            _sut.EmploymentChecks.Count().Should().Be(2);
+
+            var @events = _sut.FlushEvents();
+
+            var deletedEvents = @events.Where(e => e  is EmploymentCheckDeleted).ToList();
+            deletedEvents.Count.Should().Be(4);
+
+            var createdEvents = @events.Where(e => e is EmploymentChecksCreated).ToList();
+            createdEvents.Count.Should().Be(2);
         }
     }
 }
