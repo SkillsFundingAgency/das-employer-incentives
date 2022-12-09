@@ -1,10 +1,12 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
@@ -21,11 +23,16 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         private Fixture _fixture;
         private Learner _learner;
         private CollectionCalendar _collectionCalendar;
+        private Mock<IDateTimeService> _mockDateTimeService;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             var collectionPeriods = new List<CollectionCalendarPeriod>()
             {
@@ -76,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar);
+            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar, _mockDateTimeService.Object);
 
             // Assert
             _sut.BreakInLearnings.Should().BeEquivalentTo(expected);
@@ -95,7 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar);
+            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar, _mockDateTimeService.Object);
 
             // Assert
             var @event = _sut.FlushEvents().Single(e => e is EarningsCalculated) as EarningsCalculated;
@@ -125,7 +132,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _learner.SetLearningPeriods(periods);
 
             // Act
-            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar);
+            _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar, _mockDateTimeService.Object);
 
             // Assert
             _sut.FlushEvents().Any(e => e is EarningsCalculated).Should().BeFalse();
