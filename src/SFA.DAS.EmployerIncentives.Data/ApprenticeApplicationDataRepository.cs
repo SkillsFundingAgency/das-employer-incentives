@@ -227,8 +227,13 @@ namespace SFA.DAS.EmployerIncentives.Data
             bool? employedAt365DayValidation)
         {
             if (!first365DaysCheck.HasValue
-                || !employedAt365DayValidation.HasValue || !second365DaysCheck.HasValue
+                || !employedAt365DayValidation.HasValue
                )
+            {
+                return null;
+            }
+
+            if (!first365DaysCheck.Value && !second365DaysCheck.HasValue)
             {
                 return null;
             }

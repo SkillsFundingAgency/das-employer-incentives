@@ -1321,7 +1321,7 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Employment check status with 365 day check")]
-        [NUnit.Framework.TestCaseAttribute("true", "true", "null", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "null", "true", null)]
         [NUnit.Framework.TestCaseAttribute("false", "false", "null", "null", null)]
         [NUnit.Framework.TestCaseAttribute("false", "false", "false", "false", null)]
         [NUnit.Framework.TestCaseAttribute("true", "false", "true", "true", null)]

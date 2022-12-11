@@ -267,7 +267,7 @@ Scenario: Employment check status with 365 day check
 	Then the apprenticeship is returned with second payment employment check status of '<Employment Check Status>'
 Examples:
 | Employed At 365 Days | 365 Days Employment First Check Result | 365 Days Employment Second Check Result | Employment Check Status |
-| true                 | true                                   | null                                    | null                    |
+| true                 | true                                   | null                                    | true                    |
 | false                | false                                  | null                                    | null                    |
 | false                | false                                  | false                                   | false                   |
 | true                 | false                                  | true                                    | true                    |
