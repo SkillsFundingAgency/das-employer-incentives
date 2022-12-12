@@ -81,7 +81,23 @@ namespace SFA.DAS.EmployerIncentives.Data
                         ClawbackDate = data.FirstClawbackCreated,
                         OriginalPaymentDate = data.FirstPaymentDate
                     },
-                    SecondPaymentStatus = data.SecondPendingPaymentAmount == default ? null : new PaymentStatus(),
+                    SecondPaymentStatus = data.SecondPendingPaymentAmount == default ? null : new PaymentStatus
+                    {
+                        PaymentDate = PaymentDate(data.SecondPendingPaymentDueDate, data.SecondPaymentDate, data.SecondPaymentCalculatedDate, nextActivePeriod),
+                        LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value,
+                        PaymentAmount = PaymentAmount(data.SecondPendingPaymentAmount, data.SecondPaymentAmount),
+                        HasDataLock = HasDataLockOverride(validationOverrides, data.HasDataLock.HasValue && data.HasDataLock.Value),
+                        InLearning = IsInLearningOverride(validationOverrides, data.InLearning.HasValue && data.InLearning.Value),
+                        PausePayments = data.PausePayments,
+                        PaymentSent = data.SecondPaymentDate.HasValue,
+                        PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.SecondPayment, _dateTimeService),
+                        RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion,
+                        EmploymentCheckPassed = EmploymentCheckResult(
+                                        EarningType.SecondPayment,
+                                        EmployedAtStartOfApprenticeshipOverride(data.FirstEmploymentCheckOverrideResult, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
+                                        EmployedBeforeSchemeStartedOverride(data.SecondEmploymentCheckOverrideResult, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted),
+                                        EmployedAt365DaysOverride(data.EmployedAt365DaysCheckOverrideResult, data.EmployedAt365DaysFirstCheck, data.EmployedAt365DaysSecondCheck,  data.EmployedAt365DaysValidation, EmployedAt365Days))
+                    },
                     SecondClawbackStatus = data.SecondClawbackAmount == default ? null : new ClawbackStatus
                     {
                         ClawbackAmount = data.SecondClawbackAmount.Value,
@@ -91,24 +107,6 @@ namespace SFA.DAS.EmployerIncentives.Data
                     IncentiveCompleted = data.IsIncentiveCompleted(_dateTimeService)
                 };
 
-                if (apprenticeApplicationDto.SecondPaymentStatus != null)
-                {
-                    apprenticeApplicationDto.SecondPaymentStatus.PaymentDate = PaymentDate(data.SecondPendingPaymentDueDate, data.SecondPaymentDate, data.SecondPaymentCalculatedDate, nextActivePeriod);
-                    apprenticeApplicationDto.SecondPaymentStatus.LearnerMatchFound = data.LearningFound.HasValue && data.LearningFound.Value;
-                    apprenticeApplicationDto.SecondPaymentStatus.PaymentAmount = PaymentAmount(data.SecondPendingPaymentAmount, data.SecondPaymentAmount);
-                    apprenticeApplicationDto.SecondPaymentStatus.HasDataLock = HasDataLockOverride(validationOverrides, data.HasDataLock.HasValue && data.HasDataLock.Value);
-                    apprenticeApplicationDto.SecondPaymentStatus.InLearning = IsInLearningOverride(validationOverrides, data.InLearning.HasValue && data.InLearning.Value);
-                    apprenticeApplicationDto.SecondPaymentStatus.PausePayments = data.PausePayments;
-                    apprenticeApplicationDto.SecondPaymentStatus.PaymentSent = data.SecondPaymentDate.HasValue;
-                    apprenticeApplicationDto.SecondPaymentStatus.PaymentSentIsEstimated = data.IsPaymentEstimated(EarningType.SecondPayment, _dateTimeService);
-                    apprenticeApplicationDto.SecondPaymentStatus.RequiresNewEmployerAgreement = !data.SignedAgreementVersion.HasValue || data.SignedAgreementVersion < data.MinimumAgreementVersion;
-                    apprenticeApplicationDto.SecondPaymentStatus.EmploymentCheckPassed = EmploymentCheckResult(
-                                    EarningType.SecondPayment,
-                                    EmployedAtStartOfApprenticeshipOverride(data.FirstEmploymentCheckOverrideResult, data.FirstEmploymentCheckResult, data.FirstEmploymentCheckValidation, EmployedAtStartOfApprenticeship),
-                                    EmployedBeforeSchemeStartedOverride(data.SecondEmploymentCheckOverrideResult, data.SecondEmploymentCheckResult, data.SecondEmploymentCheckValidation, EmployedBeforeSchemeStarted),
-                                    EmployedAt365DaysOverride(data.EmployedAt365DaysCheckOverrideResult, data.EmployedAt365DaysFirstCheck, data.EmployedAt365DaysSecondCheck,  data.EmployedAt365DaysValidation, EmployedAt365Days));
-                }
-                
                 if (data.Status == IncentiveStatus.Stopped)
                 {
                     SetStoppedStatus(apprenticeApplicationDto);
