@@ -110,7 +110,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                 if (data.Status == IncentiveStatus.Stopped)
                 {
                     SetStoppedStatus(apprenticeApplicationDto);
-                } 
+                }
                 else if (data.Status == IncentiveStatus.Withdrawn)
                 {
                     SetWithdrawnStatus(apprenticeApplicationDto, data.WithdrawnBy.Value);
@@ -274,7 +274,22 @@ namespace SFA.DAS.EmployerIncentives.Data
         private static void SetStoppedStatus(ApprenticeApplication model)
         {
             var paymentStatus = new PaymentStatus { PaymentIsStopped = true };
-            SetIncentiveStatus(paymentStatus, model);
+            if (model.FirstPaymentStatus == null)
+            {
+                if (model.SecondPaymentStatus == null)
+                {
+                    model.FirstPaymentStatus = paymentStatus;
+                    model.SecondPaymentStatus = paymentStatus;
+                }
+            }
+            else if (model.SecondPaymentStatus == null)
+            {
+                model.SecondPaymentStatus = paymentStatus;
+            }
+            else
+            {
+                model.SecondPaymentStatus.PaymentIsStopped = true;
+            }
         }
 
         private static void SetWithdrawnStatus(ApprenticeApplication model, WithdrawnBy withdrawnBy)
