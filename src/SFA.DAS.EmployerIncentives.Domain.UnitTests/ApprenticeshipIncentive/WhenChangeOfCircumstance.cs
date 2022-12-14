@@ -616,6 +616,142 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             secondStoppedEvent.StoppedDate.Should().Be(learningData.StoppedStatus.DateStopped.Value);
         }
 
+        [Test]
+        public void Then_has_change_of_circumstances_is_true_if_start_date_changes()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetStartDate(new DateTime(2022, 1, 1));
+            var sut = new SubmissionData();
+            sut.SetLearningData(learningData);
+
+            var submissionData = new SubmissionData();
+            var updatedLearningData = new LearningData(true);
+            updatedLearningData.SetStartDate(new DateTime(2022, 2, 2));
+            submissionData.SetLearningData(updatedLearningData);
+
+            // Act
+            var hasChangeOfCircs = sut.HasChangeOfCircumstances(submissionData);
+
+            // Assert
+            hasChangeOfCircs.Should().BeTrue();
+        }
+
+        [Test]
+        public void Then_has_change_of_circumstances_is_true_if_stopped_status_changes()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetStartDate(new DateTime(2022, 1, 1));
+            learningData.SetIsStopped(new LearningStoppedStatus(false));
+            var sut = new SubmissionData();
+            sut.SetLearningData(learningData);
+
+            var submissionData = new SubmissionData();
+            var updatedLearningData = new LearningData(true);
+            updatedLearningData.SetStartDate(new DateTime(2022, 1, 1));
+            updatedLearningData.SetIsStopped(new LearningStoppedStatus(true, new DateTime(2022, 3, 3)));
+            submissionData.SetLearningData(updatedLearningData);
+
+            // Act
+            var hasChangeOfCircs = sut.HasChangeOfCircumstances(submissionData);
+
+            // Assert
+            hasChangeOfCircs.Should().BeTrue();
+        }
+
+        [Test]
+        public void Then_has_change_of_circumstance_is_true_if_stopped_date_changes()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetStartDate(new DateTime(2022, 1, 1));
+            learningData.SetIsStopped(new LearningStoppedStatus(true, new DateTime(2022, 2, 2)));
+            var sut = new SubmissionData();
+            sut.SetLearningData(learningData);
+
+            var submissionData = new SubmissionData();
+            var updatedLearningData = new LearningData(true);
+            updatedLearningData.SetStartDate(new DateTime(2022, 1, 1));
+            updatedLearningData.SetIsStopped(new LearningStoppedStatus(true, new DateTime(2022, 3, 3)));
+            submissionData.SetLearningData(updatedLearningData);
+
+            // Act
+            var hasChangeOfCircs = sut.HasChangeOfCircumstances(submissionData);
+
+            // Assert
+            hasChangeOfCircs.Should().BeTrue();
+        }
+
+        [Test]
+        public void Then_has_change_of_circumstance_is_false_if_no_changes_to_start_date()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetStartDate(new DateTime(2022, 1, 1));
+            learningData.SetIsStopped(new LearningStoppedStatus(false));
+            var sut = new SubmissionData();
+            sut.SetLearningData(learningData);
+
+            var submissionData = new SubmissionData();
+            var updatedLearningData = new LearningData(true);
+            updatedLearningData.SetStartDate(new DateTime(2022, 1, 1));
+            updatedLearningData.SetIsStopped(new LearningStoppedStatus(false));
+            submissionData.SetLearningData(updatedLearningData);
+
+            // Act
+            var hasChangeOfCircs = sut.HasChangeOfCircumstances(submissionData);
+
+            // Assert
+            hasChangeOfCircs.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_has_change_of_circumstance_is_false_if_no_changes_to_stopped_status_or_stopped_date()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetStartDate(new DateTime(2022, 1, 1));
+            learningData.SetIsStopped(new LearningStoppedStatus(true, new DateTime(2022, 1, 2)));
+            var sut = new SubmissionData();
+            sut.SetLearningData(learningData);
+
+            var submissionData = new SubmissionData();
+            var updatedLearningData = new LearningData(true);
+            updatedLearningData.SetStartDate(new DateTime(2022, 1, 1));
+            updatedLearningData.SetIsStopped(new LearningStoppedStatus(true, new DateTime(2022, 1, 2)));
+            submissionData.SetLearningData(updatedLearningData);
+
+            // Act
+            var hasChangeOfCircs = sut.HasChangeOfCircumstances(submissionData);
+
+            // Assert
+            hasChangeOfCircs.Should().BeFalse();
+        }
+
+        [Test]
+        public void Then_has_change_of_circumstance_is_true_if_changes_from_stopped_to_resumed()
+        {
+            // Arrange
+            var learningData = new LearningData(true);
+            learningData.SetStartDate(new DateTime(2022, 1, 1));
+            learningData.SetIsStopped(new LearningStoppedStatus(true, new DateTime(2022, 1, 2)));
+            var sut = new SubmissionData();
+            sut.SetLearningData(learningData);
+
+            var submissionData = new SubmissionData();
+            var updatedLearningData = new LearningData(true);
+            updatedLearningData.SetStartDate(new DateTime(2022, 1, 1));
+            updatedLearningData.SetIsStopped(new LearningStoppedStatus(false, new DateTime(2022, 1, 4)));
+            submissionData.SetLearningData(updatedLearningData);
+
+            // Act
+            var hasChangeOfCircs = sut.HasChangeOfCircumstances(submissionData);
+
+            // Assert
+            hasChangeOfCircs.Should().BeTrue();
+        }
+
         private ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentive.Get(model.Id, model);
