@@ -101,7 +101,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var response = await EmployerIncentiveApi.Put(
                     "/jobs",
-                   new JobRequest { Type = JobType.RefreshEmploymentChecks });
+                   new JobRequest { Type = JobType.RefreshAllEmploymentChecks });
             response.EnsureSuccessStatusCode();
         }
 
@@ -112,7 +112,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     c.IsPublished &&
                     c.Command is SendEmploymentCheckRequestsCommand)
                 .Select(c => c.Command)
-                .Count().Should().Be(1);
+                .Count().Should().Be(2);
+
+            TestContext.CommandsPublished.Count(c => c.IsDomainCommand && c.IsPublished && c.Command is SendEmploymentCheckRequestsCommand command && command.CheckType == EmploymentCheckType.EmployedBeforeSchemeStarted).Should().Be(1);
+            TestContext.CommandsPublished.Count(c => c.IsDomainCommand && c.IsPublished && c.Command is SendEmploymentCheckRequestsCommand command && command.CheckType == EmploymentCheckType.EmployedAtStartOfApprenticeship).Should().Be(1);
         }
 
 

@@ -78,6 +78,7 @@ SELECT
      MAX(IIF(ppv.step='EmployedAtStartOfApprenticeship' and ppv.result=1,1,0)) as EmployedAtStartOfApprenticeship,
      MAX(IIF(ppv.step='EmployedBeforeSchemeStarted' and ppv.result=1,1,0)) as EmployedBeforeSchemeStarted,
      MAX(IIF(ppv.step='BlockedForPayments' and ppv.result=1,1,0)) as BlockedForPayments,
+	 MAX(IIF(ppv.step='EmployedAt365Days' and ppv.result=1,1,0)) as EmployedAt365Days,
 	 pp.amount,
 	 pp.PeriodNumber AS PaymentPeriod,
 	 pp.PaymentYear,
@@ -113,6 +114,7 @@ SELECT
     EmployedAtStartOfApprenticeship,
     EmployedBeforeSchemeStarted,
     BlockedForPayments,
+	EmployedAt365Days,
 	Amount
 FROM
 	validationsFailures vf

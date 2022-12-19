@@ -17,6 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public string TestName { get; private set; }
         public CancellationToken CancellationToken { get; set; }
         public DirectoryInfo TestDirectory { get; set; }
+        public TestDateTimeService DateTimeService { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
@@ -53,6 +54,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             EventsPublished = new List<object>();
             PublishedEvents = new List<PublishedEvent>();
             CommandsPublished = new List<PublishedCommand>();
+            DateTimeService = new TestDateTimeService();
         }
 
         public void Initialise(SqlServerImageInfo sqlServerImageInfo, string testName)

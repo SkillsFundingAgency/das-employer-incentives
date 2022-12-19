@@ -76,12 +76,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Employment checks requested on first ILR submission (phase 1)")]
-        public void EmploymentChecksRequestedOnFirstILRSubmissionPhase1()
+        [NUnit.Framework.DescriptionAttribute("Employment checks requested on first ILR submission")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void EmploymentChecksRequestedOnFirstILRSubmission(string phase, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment checks requested on first ILR submission (phase 1)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment checks requested on first ILR submission", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -93,7 +97,7 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 5
- testRunner.Given("an apprenticeship incentive has been submitted in phase 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 6
  testRunner.And("we have not previously requested an employment check for the learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -105,66 +109,32 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 9
- testRunner.Then("a new employment check is requested to ensure the apprentice was not employed in " +
-                        "the 6 months prior to phase 1 starting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then(string.Format("a new employment check is requested to ensure the apprentice was not employed in " +
+                            "the 6 months prior to phase \'{0}\' starting", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 10
  testRunner.And("a new employment check is requested to ensure the apprentice was employed in the " +
                         "six weeks following their start date", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
+#line 11
+ testRunner.And("a 365 employment check is not requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Employment checks requested on first ILR submission (phase 2)")]
-        public void EmploymentChecksRequestedOnFirstILRSubmissionPhase2()
+        [NUnit.Framework.DescriptionAttribute("Employment checks requested on Start date change of circumstance")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void EmploymentChecksRequestedOnStartDateChangeOfCircumstance(string phase, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment checks requested on first ILR submission (phase 2)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 12
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 13
- testRunner.Given("an apprenticeship incentive has been submitted in phase 2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 14
- testRunner.And("we have not previously requested an employment check for the learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 15
- testRunner.And("6 weeks has elapsed since the start date of the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 16
- testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 17
- testRunner.Then("a new employment check is requested to ensure the apprentice was not employed in " +
-                        "the 6 months prior to phase 2 starting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment checks requested on Start date change of circumstance", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 18
- testRunner.And("a new employment check is requested to ensure the apprentice was employed in the " +
-                        "six weeks following their start date", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Employment checks requested on Start date change of circumstance (phase 1)")]
-        public void EmploymentChecksRequestedOnStartDateChangeOfCircumstancePhase1()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment checks requested on Start date change of circumstance (phase 1)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 20
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -174,41 +144,48 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
+#line 19
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 20
+ testRunner.And("we have previously requested an employment check for the learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
 #line 21
- testRunner.Given("an apprenticeship incentive has been submitted in phase 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.And(string.Format("the learner data is updated with new valid start date for phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 22
- testRunner.And("we have previously requested an employment check for the learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 23
- testRunner.And("the learner data is updated with new valid start date for phase 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 24
  testRunner.And("6 weeks has elapsed since the start date of the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 25
+#line 23
  testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
- testRunner.Then("a new employment check is requested to ensure the apprentice was not employed in " +
-                        "the 6 months prior to phase 1 starting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 24
+ testRunner.Then(string.Format("a new employment check is requested to ensure the apprentice was not employed in " +
+                            "the 6 months prior to phase \'{0}\' starting", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 27
+#line 25
  testRunner.And("a new employment check is requested to ensure the apprentice was employed in the " +
                         "six weeks following their start date", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 26
+ testRunner.And("a 365 employment check is not requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Employment checks requested on Start date change of circumstance (phase 2)")]
-        public void EmploymentChecksRequestedOnStartDateChangeOfCircumstancePhase2()
+        [NUnit.Framework.DescriptionAttribute("365 Employment check requested for Phase")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365EmploymentCheckRequestedForPhase(string phase, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment checks requested on Start date change of circumstance (phase 2)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 29
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check requested for Phase", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 33
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -218,28 +195,420 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 30
- testRunner.Given("an apprenticeship incentive has been submitted in phase 2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 31
- testRunner.And("we have previously requested an employment check for the learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 32
- testRunner.And("the learner data is updated with new valid start date for phase 2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 33
- testRunner.And("6 weeks has elapsed since the start date of the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
 #line 34
- testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 35
- testRunner.Then("a new employment check is requested to ensure the apprentice was not employed in " +
-                        "the 6 months prior to phase 2 starting", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 36
- testRunner.And("a new employment check is requested to ensure the apprentice was employed in the " +
-                        "six weeks following their start date", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 37
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 38
+ testRunner.Then(string.Format("a new 365 employment check is requested to ensure the apprentice was employed whe" +
+                            "n the second payment was due for the phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 Employment check not re-requested for Phase after initial failure")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365EmploymentCheckNotRe_RequestedForPhaseAfterInitialFailure(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check not re-requested for Phase after initial failure", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 45
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 46
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 47
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 48
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 49
+ testRunner.And("the initial 365 check has failed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 50
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 51
+ testRunner.Then("a re-request 365 employment check is not requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 Employment check re-requested for Phase after initial failure")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365EmploymentCheckRe_RequestedForPhaseAfterInitialFailure(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check re-requested for Phase after initial failure", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 58
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 59
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 60
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 61
+ testRunner.And("6 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 62
+ testRunner.And("the initial 365 check has failed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 63
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 64
+ testRunner.Then(string.Format("a re-request 365 employment check is requested for the phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 Employment check not requested for Phase when learner stopped")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365EmploymentCheckNotRequestedForPhaseWhenLearnerStopped(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check not requested for Phase when learner stopped", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 71
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 72
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 73
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 74
+ testRunner.And("the learner data identifies the learner as not in learning anymore", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 75
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 76
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 77
+ testRunner.Then("the incentive is updated to stopped", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 78
+ testRunner.And("a re-request 365 employment check is not requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 Employment check not reinspired for Phase when stopped change of circumstance" +
+            " received")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365EmploymentCheckNotReinspiredForPhaseWhenStoppedChangeOfCircumstanceReceived(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check not reinspired for Phase when stopped change of circumstance" +
+                    " received", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 85
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 86
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 87
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 88
+ testRunner.And("a 365 first check has been requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 89
+ testRunner.And("the learner data identifies the learner as not in learning anymore", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 90
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 91
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 92
+ testRunner.Then("a re-request 365 employment check is not requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 93
+ testRunner.And("the 365 employment check is not reinspired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 and 365 re-request Employment checks not reinspired for Phase when stopped ch" +
+            "ange of circumstance received")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365And365Re_RequestEmploymentChecksNotReinspiredForPhaseWhenStoppedChangeOfCircumstanceReceived(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 and 365 re-request Employment checks not reinspired for Phase when stopped ch" +
+                    "ange of circumstance received", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 100
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 101
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 102
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 103
+ testRunner.And("a 365 first check has been requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 104
+ testRunner.And("a 365 second check has been requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 105
+ testRunner.And("the learner data identifies the learner as not in learning anymore", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 106
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 107
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 108
+ testRunner.Then("the 365 employment check is not reinspired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 109
+ testRunner.And("the 365 second employment check is not reinspired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 Employment check not reinspired for Phase when stopped change of circumstance" +
+            " date change received on a stopped incentive")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365EmploymentCheckNotReinspiredForPhaseWhenStoppedChangeOfCircumstanceDateChangeReceivedOnAStoppedIncentive(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check not reinspired for Phase when stopped change of circumstance" +
+                    " date change received on a stopped incentive", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 116
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 117
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 118
+ testRunner.And("the apprenticeship incentive is in a stopped state", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 119
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 120
+ testRunner.And("a 365 first check has been requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 121
+ testRunner.And("the learner data identifies the learner as not in learning anymore", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 122
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 123
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 124
+ testRunner.Then("a re-request 365 employment check is not requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 125
+ testRunner.And("the 365 employment check is not reinspired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 and 365 re-request Employment check not reinspired for Phase when stopped cha" +
+            "nge of circumstance date change received on a stopped incentive")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365And365Re_RequestEmploymentCheckNotReinspiredForPhaseWhenStoppedChangeOfCircumstanceDateChangeReceivedOnAStoppedIncentive(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 and 365 re-request Employment check not reinspired for Phase when stopped cha" +
+                    "nge of circumstance date change received on a stopped incentive", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 132
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 133
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 134
+ testRunner.And("the apprenticeship incentive is in a stopped state", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 135
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 136
+ testRunner.And("a 365 first check has been requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 137
+ testRunner.And("a 365 second check has been requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 138
+ testRunner.And("the learner data identifies the learner as not in learning anymore", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 139
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 140
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 141
+ testRunner.Then("the 365 employment check is not reinspired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 142
+ testRunner.And("the 365 second employment check is not reinspired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("365 Employment check reinspired for Phase when resume change of circumstance date" +
+            " change received on a stopped incentive")]
+        [NUnit.Framework.TestCaseAttribute("Phase1", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase2", null)]
+        [NUnit.Framework.TestCaseAttribute("Phase3", null)]
+        public void _365EmploymentCheckReinspiredForPhaseWhenResumeChangeOfCircumstanceDateChangeReceivedOnAStoppedIncentive(string phase, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Phase", phase);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("365 Employment check reinspired for Phase when resume change of circumstance date" +
+                    " change received on a stopped incentive", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 149
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 150
+ testRunner.Given(string.Format("an apprenticeship incentive has been submitted in phase \'{0}\'", phase), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 151
+ testRunner.And("the apprenticeship incentive is in a stopped state", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 152
+ testRunner.And("start of apprenticeship employment checks have passed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 153
+ testRunner.And("a 365 first check has been requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 154
+ testRunner.And("the learner data identifies the learner as in learning", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 155
+ testRunner.And("3 weeks has elapsed since 365 days after the due date of the second payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 156
+ testRunner.When("an ILR submission is received for that learner", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 157
+ testRunner.Then("the 365 employment check is reinspired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

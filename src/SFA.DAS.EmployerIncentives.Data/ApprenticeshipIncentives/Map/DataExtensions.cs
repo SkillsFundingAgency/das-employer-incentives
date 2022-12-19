@@ -7,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using ChangeOfCircumstance = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ChangeOfCircumstance;
 using LearningPeriod = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.LearningPeriod;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
+using ReinstatedPendingPaymentAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ReinstatedPendingPaymentAudit;
 using RevertedPaymentAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.RevertedPaymentAudit;
 using VendorBlockAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.VendorBlockAudit;
 
@@ -503,6 +504,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             {
                 Id = entity.Id,
                 ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                CheckType = entity.CheckType.ToString(),
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
@@ -542,6 +544,21 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestTaskId = model.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = model.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = model.ServiceRequest.Created,
+                CreatedDateTime = model.CreatedDateTime
+            };
+        }
+
+        internal static ReinstatedPendingPaymentAudit Map(this Domain.ApprenticeshipIncentives.ValueTypes.ReinstatedPendingPaymentAudit model)
+        {
+            return new ReinstatedPendingPaymentAudit
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                PendingPaymentId = model.PendingPaymentId,
+                ServiceRequestTaskId = model.ReinstatePaymentRequest.TaskId,
+                ServiceRequestDecisionReference = model.ReinstatePaymentRequest.DecisionReference,
+                ServiceRequestCreatedDate = model.ReinstatePaymentRequest.Created,
+                Process = model.ReinstatePaymentRequest.Process,
                 CreatedDateTime = model.CreatedDateTime
             };
         }

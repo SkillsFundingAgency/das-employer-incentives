@@ -5,7 +5,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <ItemGroup>        
+  <ItemGroup>    
     <PackageReference Include="Ductus.FluentDocker" Version="2.10.56" />        
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.7" />        
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />        
@@ -28,6 +28,7 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.TestHelpers\SFA.DAS.EmployerIncentives.TestHelpers.csproj" />
     
+    
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
@@ -37,6 +38,9 @@
     </Compile>
     <Compile Update="Features\MonthEndInProgress.feature.cs">
       <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Features\ReinstatePayments.feature.cs">
+      <DependentUpon>ReinstatePayments.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\RevertPayments.feature.cs">
       <DependentUpon>RevertPayments.feature</DependentUpon>
@@ -92,6 +96,10 @@
     <SpecFlowFeatureFiles Update="Features\MonthEndInProgress.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>MonthEndInProgress.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ReinstatePayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\RevertPayments.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

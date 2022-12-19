@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
             return _auditRepository.Add(new EmploymentCheckRequestAudit(                
                 Guid.NewGuid(),
                 @event.ApprenticeshipIncentiveId,
+                @event.Model.CheckType,
                 @event.ServiceRequest));
         }
     }

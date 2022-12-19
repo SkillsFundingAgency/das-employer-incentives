@@ -10,6 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         [Dapper.Contrib.Extensions.ExplicitKey]
         public Guid Id { get; set; }
         public Guid ApprenticeshipIncentiveId { get; set; }
+        public string CheckType { get; set; }
         public string ServiceRequestTaskId { get; set; }
         public string ServiceRequestDecisionReference { get; set; }
         public DateTime ServiceRequestCreatedDate { get; set; }

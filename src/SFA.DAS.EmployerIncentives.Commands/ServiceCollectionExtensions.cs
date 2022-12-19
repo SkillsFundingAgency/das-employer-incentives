@@ -157,6 +157,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IValidationOverrideAuditRepository, ValidationOverrideAuditRepository>();
             serviceCollection.AddScoped<IRevertedPaymentAuditRepository, RevertedPaymentAuditRepository>();
+            serviceCollection.AddScoped<IReinstatedPendingPaymentAuditRepository, ReinstatedPendingPaymentAuditRepository>();
             
             return serviceCollection;
         }

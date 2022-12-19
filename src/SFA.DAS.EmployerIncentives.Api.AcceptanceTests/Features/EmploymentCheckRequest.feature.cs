@@ -111,7 +111,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("the employment checks feature toggle is set to True", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 15
- testRunner.When("an employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("an \'InitialEmploymentChecks\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 16
  testRunner.Then("a request is made to refresh the employment checks for the incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -144,7 +144,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("the employment checks feature toggle is set to True", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 21
- testRunner.When("an employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("an \'InitialEmploymentChecks\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 22
  testRunner.Then("a request is not made to refresh the employment checks for the incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -180,7 +180,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("the active period month end processing is in progress", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 28
- testRunner.When("an employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("an \'InitialEmploymentChecks\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 29
  testRunner.Then("the request to refresh the employment checks for the incentive is delayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -251,10 +251,193 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("the employment checks feature toggle is set to False", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 41
- testRunner.When("an employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When("an \'InitialEmploymentChecks\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 42
  testRunner.Then("a request is not made to the employment checks API", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employed at 365 days check is not processed if initial employment checks not run")]
+        public void EmployedAt365DaysCheckIsNotProcessedIfInitialEmploymentChecksNotRun()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employed at 365 days check is not processed if initial employment checks not run", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 44
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 45
+ testRunner.Given("an apprenticeship incentive has been submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 46
+ testRunner.And("the employment checks feature toggle is set to True", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 47
+ testRunner.And("the apprenticeship incentive has a second earning due for payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 48
+ testRunner.And("the initial employment checks have not been run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 49
+ testRunner.When("an \'EmployedAt365DaysCheck\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 50
+ testRunner.Then("a request is not made to refresh the employment checks for the incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employed at 365 days check is not processed if initial employment checks not pass" +
+            "ed")]
+        [NUnit.Framework.TestCaseAttribute("EmployedBeforeSchemeStarted", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("EmployedAtStartOfApprenticeship", "false", null)]
+        public void EmployedAt365DaysCheckIsNotProcessedIfInitialEmploymentChecksNotPassed(string employmentCheckType, string employmentCheckResult, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("EmploymentCheckType", employmentCheckType);
+            argumentsOfScenario.Add("EmploymentCheckResult", employmentCheckResult);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employed at 365 days check is not processed if initial employment checks not pass" +
+                    "ed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 52
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 53
+ testRunner.Given("an apprenticeship incentive has been submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 54
+ testRunner.And("the employment checks feature toggle is set to True", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 55
+ testRunner.And("the apprenticeship incentive has a second earning due for payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 56
+ testRunner.And(string.Format("the \'{0}\' employment check has a result of \'{1}\'", employmentCheckType, employmentCheckResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 57
+ testRunner.When("an \'EmployedAt365DaysCheck\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 58
+ testRunner.Then("a request is not made to refresh the employment checks for the incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employed at 365 days check is not processed if initial checks passed and 365 day " +
+            "check not previously run")]
+        public void EmployedAt365DaysCheckIsNotProcessedIfInitialChecksPassedAnd365DayCheckNotPreviouslyRun()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employed at 365 days check is not processed if initial checks passed and 365 day " +
+                    "check not previously run", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 64
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 65
+ testRunner.Given("an apprenticeship incentive has been submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 66
+ testRunner.And("the employment checks feature toggle is set to True", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 67
+ testRunner.And("the apprenticeship incentive has a second earning due for payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 68
+ testRunner.And("the \'EmployedBeforeSchemeStarted\' employment check has a result of \'false\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 69
+ testRunner.And("the \'EmployedAtStartOfApprenticeship\' employment check has a result of \'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 70
+ testRunner.And("the 365 day checks have not previously been processed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 71
+ testRunner.When("an \'EmployedAt365DaysCheck\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 72
+ testRunner.Then("a request is not made to refresh the employment checks for the incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employed at 365 days check is processed if initial checks passed and 365 day chec" +
+            "k previously run")]
+        public void EmployedAt365DaysCheckIsProcessedIfInitialChecksPassedAnd365DayCheckPreviouslyRun()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employed at 365 days check is processed if initial checks passed and 365 day chec" +
+                    "k previously run", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 74
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 75
+ testRunner.Given("an apprenticeship incentive has been submitted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 76
+ testRunner.And("the employment checks feature toggle is set to True", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 77
+ testRunner.And("the apprenticeship incentive has a second earning due for payment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 78
+ testRunner.And("the \'EmployedBeforeSchemeStarted\' employment check has a result of \'false\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 79
+ testRunner.And("the \'EmployedAtStartOfApprenticeship\' employment check has a result of \'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 80
+ testRunner.And("the \'EmployedAt365PaymentDueDateFirstCheck\' employment check has a result of \'fal" +
+                        "se\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 81
+ testRunner.And("the \'EmployedAt365PaymentDueDateSecondCheck\' employment check has a result of \'fa" +
+                        "lse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 82
+ testRunner.When("an \'EmployedAt365DaysCheck\' employment check refresh is requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 83
+ testRunner.Then("a request is made to refresh the 365 day employment check for the incentive", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

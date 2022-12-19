@@ -660,15 +660,15 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("EmployedAtStartOfApprenticeship Employment check status with override")]
-        [NUnit.Framework.TestCaseAttribute("true", "true", "false", "true", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("false", "true", "false", "true", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("true", "true", "true", "true", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("false", "true", "true", "true", "false", "true", null)]
         [NUnit.Framework.TestCaseAttribute("true", "true", "false", "true", "true", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("false", "true", "false", "true", "true", "false", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "true", "false", "true", "true", "true", null)]
         [NUnit.Framework.TestCaseAttribute("true", "true", "true", "true", "true", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("false", "true", "true", "true", "true", "false", null)]
-        public void EmployedAtStartOfApprenticeshipEmploymentCheckStatusWithOverride(string employedAtStartOfApprenticeship, string employedBeforeSchemeStarted, string firstEmploymentCheckResult, string secondEmploymentCheckResult, string hasExpired, string employmentCheckStatus, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("false", "true", "true", "true", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "false", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "true", "false", "true", "false", "false", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "true", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "true", "true", "true", "false", "false", null)]
+        public void EmployedAtStartOfApprenticeshipEmploymentCheckStatusWithOverride(string employedAtStartOfApprenticeship, string employedBeforeSchemeStarted, string firstEmploymentCheckResult, string secondEmploymentCheckResult, string validationOverrideResult, string employmentCheckStatus, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
@@ -676,7 +676,7 @@ this.ScenarioInitialize(scenarioInfo);
             argumentsOfScenario.Add("Employed Before Scheme Started", employedBeforeSchemeStarted);
             argumentsOfScenario.Add("First Employment Check Result", firstEmploymentCheckResult);
             argumentsOfScenario.Add("Second Employment Check Result", secondEmploymentCheckResult);
-            argumentsOfScenario.Add("HasExpired", hasExpired);
+            argumentsOfScenario.Add("Validation Override Result", validationOverrideResult);
             argumentsOfScenario.Add("Employment Check Status", employmentCheckStatus);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("EmployedAtStartOfApprenticeship Employment check status with override", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 153
@@ -693,7 +693,8 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 155
- testRunner.When(string.Format("there is an \'EmployedAtStartOfApprenticeship\' payment validation status of \'{0}\'", employedAtStartOfApprenticeship), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.When(string.Format("there is a validation override result of \'{0}\' and an \'EmployedAtStartOfApprentic" +
+                            "eship\' payment validation status of \'{1}\'", validationOverrideResult, employedAtStartOfApprenticeship), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 156
  testRunner.And(string.Format("there is an \'EmployedBeforeSchemeStarted\' payment validation status of \'{0}\'", employedBeforeSchemeStarted), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -705,13 +706,9 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And(string.Format("there is an \'EmployedBeforeSchemeStarted\' employment check result of \'{0}\'", secondEmploymentCheckResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 159
- testRunner.And(string.Format("there is an EmployedAtStartOfApprenticeship validation override and expiry of \'{0" +
-                            "}\'", hasExpired), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 160
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 161
+#line 160
  testRunner.Then(string.Format("the apprenticeship is returned with employment check status of \'{0}\'", employmentCheckStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -720,15 +717,15 @@ this.ScenarioInitialize(scenarioInfo);
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("EmployedBeforeSchemeStarted Employment check status with override")]
-        [NUnit.Framework.TestCaseAttribute("true", "true", "true", "false", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "false", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("true", "true", "true", "true", "false", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "true", "false", "true", null)]
         [NUnit.Framework.TestCaseAttribute("true", "true", "true", "false", "true", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "false", "true", "false", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "false", "true", "true", null)]
         [NUnit.Framework.TestCaseAttribute("true", "true", "true", "true", "true", "true", null)]
-        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "true", "true", "false", null)]
-        public void EmployedBeforeSchemeStartedEmploymentCheckStatusWithOverride(string employedAtStartOfApprenticeship, string employedBeforeSchemeStarted, string firstEmploymentCheckResult, string secondEmploymentCheckResult, string hasExpired, string employmentCheckStatus, string[] exampleTags)
+        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "true", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "true", "false", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "false", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "false", "false", "false", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "true", "false", "false", null)]
+        public void EmployedBeforeSchemeStartedEmploymentCheckStatusWithOverride(string employedAtStartOfApprenticeship, string employedBeforeSchemeStarted, string firstEmploymentCheckResult, string secondEmploymentCheckResult, string validationOverrideResult, string employmentCheckStatus, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
@@ -736,10 +733,10 @@ this.ScenarioInitialize(scenarioInfo);
             argumentsOfScenario.Add("Employed Before Scheme Started", employedBeforeSchemeStarted);
             argumentsOfScenario.Add("First Employment Check Result", firstEmploymentCheckResult);
             argumentsOfScenario.Add("Second Employment Check Result", secondEmploymentCheckResult);
-            argumentsOfScenario.Add("HasExpired", hasExpired);
+            argumentsOfScenario.Add("Validation Override Result", validationOverrideResult);
             argumentsOfScenario.Add("Employment Check Status", employmentCheckStatus);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("EmployedBeforeSchemeStarted Employment check status with override", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 173
+#line 172
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -749,28 +746,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 174
+#line 173
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 175
+#line 174
  testRunner.When(string.Format("there is an \'EmployedAtStartOfApprenticeship\' payment validation status of \'{0}\'", employedAtStartOfApprenticeship), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 176
- testRunner.And(string.Format("there is an \'EmployedBeforeSchemeStarted\' payment validation status of \'{0}\'", employedBeforeSchemeStarted), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 175
+ testRunner.And(string.Format("there is a validation override result of \'{0}\' and an \'EmployedBeforeSchemeStarte" +
+                            "d\' payment validation status of \'{1}\'", validationOverrideResult, employedBeforeSchemeStarted), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 177
+#line 176
  testRunner.And(string.Format("there is an \'EmployedAtStartOfApprenticeship\' employment check result of \'{0}\'", firstEmploymentCheckResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 178
+#line 177
  testRunner.And(string.Format("there is an \'EmployedBeforeSchemeStarted\' employment check result of \'{0}\'", secondEmploymentCheckResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 179
- testRunner.And(string.Format("there is an EmployedBeforeSchemeStarted validation override and expiry of \'{0}\'", hasExpired), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 180
+#line 178
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 181
+#line 179
  testRunner.Then(string.Format("the apprenticeship is returned with employment check status of \'{0}\'", employmentCheckStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -784,7 +779,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Multiple employment check payment validation statuses", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 193
+#line 191
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -794,22 +789,22 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 194
+#line 192
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 195
+#line 193
  testRunner.When("there are failed employment check payment validations for the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 196
+#line 194
  testRunner.And("new employment check results have been recorded", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 197
+#line 195
  testRunner.And("new employment check payment validations are recorded", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 198
+#line 196
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 199
+#line 197
  testRunner.Then("the most recent employment check payment validation results are reflected in the " +
                         "payment statuses", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -824,7 +819,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Payment validation results do not include employment check", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 201
+#line 199
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -834,19 +829,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 202
+#line 200
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 203
+#line 201
  testRunner.When("new employment check results have been recorded", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 204
+#line 202
  testRunner.And("there are no payment validations for the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 205
+#line 203
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 206
+#line 204
  testRunner.Then("the employment check payment statuses are not set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -860,7 +855,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check has no payment validation results", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 208
+#line 206
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -870,19 +865,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 209
+#line 207
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 210
+#line 208
  testRunner.When("new employment check results have been recorded", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 211
+#line 209
  testRunner.And("there are no employment check payment validations for the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 212
+#line 210
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 213
+#line 211
  testRunner.Then("the employment check payment statuses are not set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -896,7 +891,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check payment validation fails due to no employment check record", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 215
+#line 213
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -906,19 +901,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 216
+#line 214
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 217
+#line 215
  testRunner.When("there are no employment check results for the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 218
+#line 216
  testRunner.And("there are failed employment check payment validations for the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 219
+#line 217
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 220
+#line 218
  testRunner.Then("the employment check payment statuses are not set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -932,7 +927,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check payment validation fails due to null employment check records", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 222
+#line 220
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -942,19 +937,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 223
+#line 221
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 224
+#line 222
  testRunner.When("there are employment check results for the apprenticeship with null values", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 225
+#line 223
  testRunner.And("there are failed employment check payment validations for the apprenticeship", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 226
+#line 224
  testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 227
+#line 225
  testRunner.Then("the employment check payment statuses are not set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -972,7 +967,7 @@ this.ScenarioInitialize(scenarioInfo);
             argumentsOfScenario.Add("Incentive Status", incentiveStatus);
             argumentsOfScenario.Add("Payment Stopped Status", paymentStoppedStatus);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Payment stopped", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 229
+#line 227
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -982,16 +977,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 230
+#line 228
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 231
+#line 229
  testRunner.When(string.Format("the incentive has a status of \'{0}\'", incentiveStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 232
+#line 230
  testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 233
+#line 231
  testRunner.Then(string.Format("the payment statuses reflect the stopped status of \'{0}\'", paymentStoppedStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1008,7 +1003,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("Earning Type", earningType);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Payment clawed back", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 239
+#line 237
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1018,16 +1013,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 240
+#line 238
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 241
+#line 239
  testRunner.When(string.Format("the \'{0}\' payment has been clawed back", earningType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 242
+#line 240
  testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 243
+#line 241
  testRunner.Then(string.Format("the \'{0}\' clawback status reflects the amount clawed back and date", earningType), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1044,7 +1039,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("Withdrawn By", withdrawnBy);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Application withdrawn", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 249
+#line 247
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1054,18 +1049,253 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 250
+#line 248
  testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 251
+#line 249
  testRunner.When(string.Format("the application has been withdrawn by \'{0}\'", withdrawnBy), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 252
+#line 250
  testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 253
+#line 251
  testRunner.Then(string.Format("the payment statuses reflect that the application withdrawal was requested by \'{0" +
                             "}\'", withdrawnBy), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employment check status with 365 day check")]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "null", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "false", "null", "null", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "false", "false", "false", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "false", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("null", "null", "null", "null", null)]
+        public void EmploymentCheckStatusWith365DayCheck(string employedAt365Days, string _365DaysEmploymentFirstCheckResult, string _365DaysEmploymentSecondCheckResult, string employmentCheckStatus, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Employed At 365 Days", employedAt365Days);
+            argumentsOfScenario.Add("365 Days Employment First Check Result", _365DaysEmploymentFirstCheckResult);
+            argumentsOfScenario.Add("365 Days Employment Second Check Result", _365DaysEmploymentSecondCheckResult);
+            argumentsOfScenario.Add("Employment Check Status", employmentCheckStatus);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employment check status with 365 day check", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 257
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 258
+ testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 259
+ testRunner.When("there is an \'EmployedAtStartOfApprenticeship\' payment validation status of \'true\'" +
+                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 260
+ testRunner.And("there is an \'EmployedBeforeSchemeStarted\' payment validation status of \'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 261
+ testRunner.And("there is an \'EmployedAtStartOfApprenticeship\' employment check result of \'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 262
+ testRunner.And("there is an \'EmployedBeforeSchemeStarted\' employment check result of \'false\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 263
+ testRunner.And(string.Format("there is an \'EmployedAt365Days\' second payment validation status of \'{0}\'", employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 264
+ testRunner.And(string.Format("there is an \'EmployedAt365PaymentDueDateFirstCheck\' employment check result of \'{" +
+                            "0}\'", _365DaysEmploymentFirstCheckResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 265
+ testRunner.And(string.Format("there is an \'EmployedAt365PaymentDueDateSecondCheck\' employment check result of \'" +
+                            "{0}\'", _365DaysEmploymentSecondCheckResult), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 266
+ testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 267
+ testRunner.Then(string.Format("the apprenticeship is returned with second payment employment check status of \'{0" +
+                            "}\'", employmentCheckStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("EmployedAt365Days Employment check status with override")]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "true", "false", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("true", "true", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "true", "true", "true", null)]
+        [NUnit.Framework.TestCaseAttribute("false", "false", "true", "false", null)]
+        public void EmployedAt365DaysEmploymentCheckStatusWithOverride(string employedAt365Days, string employedAt365DaysOverride, string hasExpired, string employmentCheckStatus, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("Employed At 365 Days", employedAt365Days);
+            argumentsOfScenario.Add("Employed At 365 Days Override", employedAt365DaysOverride);
+            argumentsOfScenario.Add("HasExpired", hasExpired);
+            argumentsOfScenario.Add("Employment Check Status", employmentCheckStatus);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("EmployedAt365Days Employment check status with override", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 276
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 277
+ testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 278
+ testRunner.When("there is an \'EmployedAtStartOfApprenticeship\' payment validation status of \'true\'" +
+                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 279
+ testRunner.And("there is an \'EmployedBeforeSchemeStarted\' payment validation status of \'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 280
+ testRunner.And("there is an \'EmployedAtStartOfApprenticeship\' employment check result of \'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 281
+ testRunner.And("there is an \'EmployedBeforeSchemeStarted\' employment check result of \'false\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 282
+ testRunner.When(string.Format("there is an override result of \'{0}\' and an \'EmployedAt365Days\' second payment va" +
+                            "lidation status of \'{1}\'", employedAt365DaysOverride, employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 283
+ testRunner.And("there is an \'EmployedAt365PaymentDueDateFirstCheck\' employment check result of \'f" +
+                        "alse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 284
+ testRunner.And(string.Format("there is an \'EmployedAt365PaymentDueDateSecondCheck\' employment check result of \'" +
+                            "{0}\'", employedAt365Days), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 285
+ testRunner.And(string.Format("there is a validation override for validation step \'EmployedAt365Days\' and expiry" +
+                            " of \'{0}\'", hasExpired), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 286
+ testRunner.When("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 287
+ testRunner.Then(string.Format("the apprenticeship is returned with second payment employment check status of \'{0" +
+                            "}\'", employmentCheckStatus), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Learner record with stopped date before the second payment is paid")]
+        public void LearnerRecordWithStoppedDateBeforeTheSecondPaymentIsPaid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Learner record with stopped date before the second payment is paid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 296
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 297
+ testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 298
+ testRunner.When("there is an incentive with a learning stopped date before the second payment is p" +
+                        "aid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 299
+ testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 300
+ testRunner.Then("the apprenticeship is returned with incentive completed set to \'False\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Learner record with stopped date after the second payment is paid")]
+        public void LearnerRecordWithStoppedDateAfterTheSecondPaymentIsPaid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Learner record with stopped date after the second payment is paid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 302
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 303
+ testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 304
+ testRunner.When("there is an incentive with a learning stopped date after the second payment is pa" +
+                        "id", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 305
+ testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 306
+ testRunner.Then("the apprenticeship is returned with incentive completed set to \'True\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Learner record with stopped date and the second payment is not paid")]
+        public void LearnerRecordWithStoppedDateAndTheSecondPaymentIsNotPaid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Learner record with stopped date and the second payment is not paid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 308
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 309
+ testRunner.Given("an account that is in employer incentives", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 310
+ testRunner.When("there is an incentive with a learning stopped date and the second payment is not " +
+                        "paid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 311
+ testRunner.And("a client requests the apprenticeships for the account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 312
+ testRunner.Then("the apprenticeship is returned with incentive completed set to \'False\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -18,7 +18,6 @@ using AutoFixture;
 using SFA.DAS.EmployerIncentives.Enums;
 using EmploymentCheck = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.EmploymentCheck;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
-using NUnit.Framework;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Steps
 {
@@ -27,8 +26,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     public partial class ValidatePaymentsSteps
     {
         private readonly TestContext _testContext;
-        private const short CollectionPeriodYear = 2021;
-        private const byte CollectionPeriod = 6;
+        protected static short CollectionPeriodYear = 2021;
+        protected static byte CollectionPeriod = 6;
         private Fixture _fixture;
 
         private ValidatePaymentData _validatePaymentData;
@@ -103,6 +102,34 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
+        [Given(@"an apprentice has a pending 365 day payment")]
+        public void GivenAnApprenticeHasAPending365DayPayment()
+        {
+            _validatePaymentData.PendingPaymentModel1.PaymentMadeDate = _validatePaymentData.ApprenticeshipIncentiveModel.StartDate.AddDays(100);
+            _validatePaymentData.PendingPaymentModel2.EarningType = EarningType.SecondPayment;
+            _validatePaymentData.PendingPaymentModel2.DueDate = DateTime.Today.AddDays(-20);
+            _validatePaymentData.PendingPaymentModel2.PaymentMadeDate = null;
+            _validatePaymentData.DaysInLearning.NumberOfDaysInLearning = 365;
+        }
+
+        [Given(@"the employed at 365 days check will fail")]
+        public void GivenTheEmployedAt365DaysCheckWillFail()
+        {
+            _validatePaymentData.EmploymentChecks.Single(x =>
+                x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id
+                && x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck).Result = false;
+        }
+
+        [Given(@"the employed at 365 days check has not been done")]
+        public void GivenTheEmployedAt365DaysCheckHasNotBeenDone()
+        {
+            var check = _validatePaymentData.EmploymentChecks.SingleOrDefault(c => c.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+            if(check != null)
+            {
+                _validatePaymentData.EmploymentChecks.Remove(check);
+            }
+        }
+
         [When(@"the payment process is run")]
         public async Task WhenThePaymentProcessIsRun()
         {
@@ -130,6 +157,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         [Then(@"the '(.*)' will have a failed validation result")]
         public async Task ThenTheValidationStepWillHaveAFailedValidationResult(string step)
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
+            results.Should().HaveCount(1);
+            results.All(r => !r.Result).Should().BeTrue($"{step} validation step should have failed");
+            results.All(r => r.CreatedDateUtc == DateTime.Today).Should().BeTrue();
+        }
+
+        [Then(@"the '(.*)' will have two failed validation results")]
+        public async Task ThenTheValidationStepWillHaveTwoFailedValidationResult(string step)
         {
             await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == step).ToList();
@@ -219,6 +256,44 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             results.All(x => x.PaymentMadeDate.HasValue).Should().BeFalse();
         }
 
+        [Then(@"the employed at 365 days check will have a failed validation result")]
+        public async Task ThenTheEmployedAt365DaysCheckWillHaveAFailedValidationResult()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == ValidationStep.EmployedAt365Days).ToList();
+            results.Count.Should().Be(1);
+            results[0].Result.Should().BeFalse();
+        }
+
+        [Then(@"the validation result override for the 365 days check is recorded")]
+        public async Task ThenTheValidationResultOverrideForThe365DaysCheckIsRecorded() 
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPaymentValidationResult>().Result.Where(x => x.Step == ValidationStep.EmployedAt365Days).ToList();
+            results.Count.Should().Be(1);
+            results[0].OverrideResult.Should().BeTrue();
+        }
+
+        [Then(@"the 365 day pending payment is not marked as paid")]
+        public async Task ThenThe365DayPendingPaymentIsNotMarkedAsPaid()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPayment>().Result.Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id 
+                                                                                && x.EarningType == EarningType.SecondPayment).ToList();
+            results.Count.Should().Be(1);
+            results.Single().PaymentMadeDate.Should().BeNull();
+        }
+
+        [Then(@"the 365 day pending payment is marked as paid")]
+        public async Task ThenThe365DayPendingPaymentIsMarkedAsPaid()
+        {
+            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var results = connection.GetAllAsync<PendingPayment>().Result.Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id
+                && x.EarningType == EarningType.SecondPayment).ToList();
+            results.Count.Should().Be(1);
+            results.Single().PaymentMadeDate.Should().NotBeNull();
+        }
+
         [Given(@"the ILR submission validation step will fail")]
         public void GivenTheIlrSubmissionValidationStepWillFail()
         {
@@ -234,13 +309,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         [Then(@"the ILR Submission check will have a failed validation result")]
         public async Task ThenTheIlrSubmissionCheckWillHaveAFailedValidationResult()
         {
-            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.HasIlrSubmission);
+            await ThenTheValidationStepWillHaveTwoFailedValidationResult(ValidationStep.HasIlrSubmission);
         }
 
         [Then(@"the Learner Match Successful check will have a failed validation result")]
         public async Task ThenTheLearnerMatchSuccessfulCheckWillHaveAFailedValidationResult()
         {
-            await ThenTheValidationStepWillHaveAFailedValidationResult(ValidationStep.LearnerMatchSuccessful);
+            await ThenTheValidationStepWillHaveTwoFailedValidationResult(ValidationStep.LearnerMatchSuccessful);
         }
 
         [Then(@"no further ILR validation is performed")]

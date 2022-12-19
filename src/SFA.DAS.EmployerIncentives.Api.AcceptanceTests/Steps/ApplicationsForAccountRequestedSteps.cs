@@ -149,13 +149,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await SetUpValidationOverrides(_validationOverrides);
         }
 
-        [When(@"there is an EmployedBeforeSchemeStarted validation override and expiry of '(.*)'")]
-        public async Task WhenThereIsAnEmployedBeforeSchemeStartedValidationOverrideAndExpiryOf(bool hasExpired)
+        [When(@"there is a validation override for validation step '(.*)' and expiry of '(.*)'")]
+        public async Task WhenThereIsAnEmployedBeforeSchemeStartedValidationOverrideAndExpiryOf(string step, bool hasExpired)
         {
             var validationOverride = Fixture
                   .Build<Data.ApprenticeshipIncentives.Models.ValidationOverride>()
                    .With(p => p.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
-                   .With(p => p.Step, ValidationStep.EmployedBeforeSchemeStarted)
+                   .With(p => p.Step, step)
                    .With(p => p.ExpiryDate, hasExpired ? DateTime.UtcNow.Date : DateTime.UtcNow.AddDays(1).Date)
                    .With(p => p.CreatedDateTime, DateTime.Today.AddDays(-1))
                    .Create();
@@ -268,18 +268,73 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
                 .With(x => x.Step, validationStep)
                 .With(x => x.Result, validationResult)
+                .Without(x => x.OverrideResult)
+                .Create();
+            await SetupPaymentValidationResult(paymentValidationResult);
+        }
+
+        [When(@"there is a validation override result of '(.*)' and an '(.*)' payment validation status of '(.*)'")]
+        public async Task WhenThereIsAnEmploymentCheckPaymentValidationStatusWithAValidationOverride( string overrideResult, string validationStep, string validationResult)
+        {
+            bool.TryParse(validationResult, out var validationResultValue);
+            bool.TryParse(overrideResult, out var overrideResultValue);
+
+            var paymentValidationResult = Fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First().Id)
+                .With(x => x.Step, validationStep)
+                .With(x => x.Result, validationResultValue)
+                .With(x => x.OverrideResult, overrideResultValue)
+                .Create();
+            await SetupPaymentValidationResult(paymentValidationResult);
+        }
+
+        [When(@"there is an '(.*)' second payment validation status of '(.*)'")]
+        public async Task WhenThereIsAnEmploymentCheckSecondPaymentValidationStatus(string validationStep, string validationResult)
+        {
+            if (validationResult != "null")
+            {
+                bool.TryParse(validationResult, out var result);
+                var paymentValidationResult = Fixture.Build<PendingPaymentValidationResult>()
+                    .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.Last().Id)
+                    .With(x => x.Step, validationStep)
+                    .With(x => x.Result, result)
+                    .Without(x => x.OverrideResult)
+                    .Create();
+                await SetupPaymentValidationResult(paymentValidationResult);
+            }
+        }
+
+        [When(@"there is an override result of '(.*)' and an '(.*)' second payment validation status of '(.*)'")]
+        public async Task WhenThereIsAnEmploymentCheckSecondPaymentValidationStatusAndValidationOverrideResult(string overrideResult, string validationStep,  string validationResult)
+        {
+            bool.TryParse(validationResult, out var validationResultValue);
+            bool.TryParse(overrideResult, out var overrideResultValue);
+
+            var paymentValidationResult = Fixture.Build<PendingPaymentValidationResult>()
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.Last().Id)
+                .With(x => x.Step, validationStep)
+                .With(x => x.Result, validationResultValue)
+                .With(x => x.OverrideResult, overrideResultValue)
                 .Create();
             await SetupPaymentValidationResult(paymentValidationResult);
         }
 
         [When(@"there is an '(.*)' employment check result of '(.*)'")]
-        public async Task WhenThereIsAnEmploymentCheckResult(EmploymentCheckType employmentCheckType, bool checkResult)
+        public async Task WhenThereIsAnEmploymentCheckResult(EmploymentCheckType employmentCheckType, string checkResult)
         {
             var employmentCheck = Fixture.Build<EmploymentCheck>()
                 .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
                 .With(x => x.CheckType, employmentCheckType)
-                .With(x => x.Result, checkResult)
+                .Without(x => x.Result)
                 .Create();
+
+            if (checkResult != "null")
+            {
+                bool result;
+                bool.TryParse(checkResult, out result);
+                employmentCheck.Result = result;
+            }
+
             await SetupEmploymentCheck(employmentCheck);
         }
 
@@ -426,6 +481,63 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {          
             // Empty
         }
+        
+        [When(@"there is an incentive with a learning stopped date before the second payment is paid")]
+        public async Task WhenTheIncentiveLearningStoppedDateBeforeTheSecondPaymentIsPaid()
+        {
+            _payment = Fixture.Build<Payment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == EarningType.SecondPayment).Id)
+                .With(x => x.PaidDate, _apprenticeshipIncentive.PendingPayments.First().DueDate.AddDays(1))
+                .Create();
+
+            _learner = TestContext.TestData.GetOrCreate<Learner>();
+            _learner.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+            _learner.LearningStoppedDate = _payment.PaidDate.Value.AddDays(-1);
+
+            await SetupPayment();
+            await SetupLearner();
+        }
+
+        [When(@"there is an incentive with a learning stopped date after the second payment is paid")]
+        public async Task WhenTheIncentiveLearningStoppedDateAfterTheSecondPaymentIsPaid()
+        {
+            _payment = Fixture.Build<Payment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == EarningType.SecondPayment).Id)
+                .With(x => x.PaidDate, _apprenticeshipIncentive.PendingPayments.First().DueDate.AddDays(1))
+                .Create();
+
+            _learner = TestContext.TestData.GetOrCreate<Learner>();
+            _learner.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+            _learner.LearningStoppedDate = _payment.PaidDate.Value.AddDays(1);
+
+            await SetupPayment();
+            await SetupLearner();
+        }
+
+        [When(@"there is an incentive with a learning stopped date and the second payment is not paid")]
+        public async Task WhenTheIncentiveLearningStoppedDateAndTheSecondPaymentIsNotPaid()
+        {
+            _payment = Fixture.Build<Payment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == EarningType.SecondPayment).Id)
+                .Without(x => x.PaidDate)
+                .Create();
+
+            _learner = TestContext.TestData.GetOrCreate<Learner>();
+            _learner.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+            _learner.LearningStoppedDate = _apprenticeshipIncentive.PendingPayments.First().DueDate;
+
+            await SetupPayment();
+            await SetupLearner();
+        }
 
         [When(@"a client requests the apprenticeships for the account")]
         public async Task WhenAClientRequestsTheApprenticeshipApplicationsForTheAccount()
@@ -438,7 +550,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             _apiResponse = data;
         }
-
+        
         [Then(@"the apprenticeships are returned")]
         public void ThenTheApprenticeshipApplicationsAreReturned()
         {
@@ -602,11 +714,26 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Then(@"the apprenticeship is returned with employment check status of '(.*)'")]
-        public void ThenTheEmploymentCheckStatusIsSet(bool employmentCheckStatus)
+        public void ThenTheEmploymentCheckStatusIsSet(bool? employmentCheckStatus)
         {
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
             apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
-            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatus);
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
+        }
+
+        [Then(@"the apprenticeship is returned with second payment employment check status of '(.*)'")]
+        public void ThenTheSecondPaymentEmploymentCheckStatusIsSet(string employmentCheckStatus)
+        {
+            bool? employmentCheckStatusValue = null;
+            if (employmentCheckStatus != "null")
+            {
+                bool result;
+                bool.TryParse(employmentCheckStatus, out result);
+                employmentCheckStatusValue = result;
+            }
+
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().Be(employmentCheckStatusValue);
         }
 
         [Then(@"the most recent employment check payment validation results are reflected in the payment statuses")]
@@ -614,7 +741,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {
             var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
             apprenticeshipApplication.FirstPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
-            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeTrue();
+            apprenticeshipApplication.SecondPaymentStatus.EmploymentCheckPassed.Should().BeNull();
         }
 
         [Then(@"the employment check payment statuses are not set")]
@@ -656,6 +783,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 apprenticeshipApplication.SecondPaymentStatus.WithdrawnByCompliance.Should().BeFalse();
                 apprenticeshipApplication.SecondPaymentStatus.WithdrawnByEmployer.Should().BeTrue();
             }
+        }
+
+        [Then(@"the apprenticeship is returned with incentive completed set to '(.*)'")]
+        public void ThenTheApprenticeshipIsReturnedWithIncentiveCompletedSetTo(bool expectation)
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.IncentiveCompleted.Should().Be(expectation);
         }
 
         private async Task SetupApprenticeshipIncentive()
