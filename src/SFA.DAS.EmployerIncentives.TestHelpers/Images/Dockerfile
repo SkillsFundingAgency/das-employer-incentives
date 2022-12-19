@@ -31,5 +31,5 @@ ENV DB_NAME=Model
 # Launch SQL Server, confirm startup is complete, deploy the DACPAC, then terminate SQL Server.
 # See https://stackoverflow.com/a/51589787/488695
 RUN ( /opt/mssql/bin/sqlservr --accept-eula & ) | grep -q "Service Broker manager has started" \
-    && /opt/sqlpackage/sqlpackage /a:Publish /tsn:localhost /tdn:$DB_NAME /tu:sa /tp:$SA_PASSWORD /sf:/tmp/db/db.dacpac \
+    && /opt/sqlpackage/sqlpackage /a:Publish /tsn:localhost /tdn:$DB_NAME /tu:sa /tp:$SA_PASSWORD /TargetTrustServerCertificate:True /sf:/tmp/db/db.dacpac \
     && pkill sqlservr 
