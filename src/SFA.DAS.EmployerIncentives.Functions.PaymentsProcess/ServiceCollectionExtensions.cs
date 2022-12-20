@@ -46,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 #if DEBUG
                 options.AddFilter("SFA.DAS", LogLevel.Debug); // this is because all logging is filtered out by default
 #else
-                options.AddFilter("SFA.DAS", LogLevel.Infomation);
+                options.AddFilter("SFA.DAS", LogLevel.Information);
 #endif
                 options.SetMinimumLevel(LogLevel.Trace);
                 options.SetMinimumLevel(LogLevel.Trace);
