@@ -41,6 +41,9 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
 
             //Act
             await _sut.SendPaymentRequests(new List<Payment> { payment });
+
+            // Assert
+            Assert.Pass();
         }
 
         [Test]
@@ -104,7 +107,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.BusinessCentral
             {
                 exception.Message.Should().StartWith("Business Central API is unavailable and returned an internal");
                 var delimiter = "Data sent: ";
-                var json = exception.Message.Substring(exception.Message.IndexOf(delimiter) + delimiter.Length - 1);
+                var json = exception.Message[(exception.Message.IndexOf(delimiter) + delimiter.Length - 1)..];
                 var paymentRequests = JsonConvert.DeserializeObject<PaymentRequestContainer>(json);
                 foreach(var paymentRequest in paymentRequests.PaymentRequests)
                 {

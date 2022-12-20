@@ -31,7 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();
-            payments.Count().Should().Be(2);
+            payments.Count.Should().Be(2);
             payments[0].Amount.Should().Be(expectedAmount1);
             payments[0].PaymentDate.Should().Be(date.AddDays(expectedDays1));
             payments[0].EarningType.Should().Be(EarningType.FirstPayment);
@@ -59,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ValueObjects
 
             result.IsEligible.Should().BeTrue();
             var payments = result.Payments.ToList();
-            payments.Count().Should().Be(2);
+            payments.Count.Should().Be(2);
             payments[0].Amount.Should().Be(expectedAmount1);
             payments[0].PaymentDate.Should().Be(date.AddDays(expectedDays1));
             payments[0].EarningType.Should().Be(EarningType.FirstPayment);

@@ -212,8 +212,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create());
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
+            {
+                _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create()
+            };
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
             _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
 
@@ -243,8 +245,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create());
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
+            {
+                _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create()
+            };
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
             _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
             _sutModel.ClawbackPaymentModels.Add(
@@ -271,8 +275,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create());
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
+            {
+                _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create()
+            };
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
             _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
 
@@ -356,8 +362,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             byte collectionPeriod = 6;
             short collectionYear = 2020;
             var pendingPayment = _sutModel.PendingPaymentModels.Single(x => x.EarningType == EarningType.FirstPayment);
-            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>();
-            pendingPayment.PendingPaymentValidationResultModels.Add(_fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create());
+            pendingPayment.PendingPaymentValidationResultModels = new List<PendingPaymentValidationResultModel>
+            {
+                _fixture.Build<PendingPaymentValidationResultModel>().With(x => x.CollectionPeriod, new CollectionPeriod(collectionPeriod, collectionYear)).With(x => x.ValidationResult, true).Create()
+            };
             _sut.CreatePayment(pendingPayment.Id, new CollectionPeriod(collectionPeriod, collectionYear));
             _sutModel.PaymentModels.First().PaidDate = DateTime.Now;
 
@@ -499,7 +507,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.PendingPayments.Single(x => x.EarningType == EarningType.FirstPayment).DueDate.Date.Should().Be(expectedDueDate.Date);
         }
 
-        private ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
+        private static ApprenticeshipIncentives.ApprenticeshipIncentive Sut(ApprenticeshipIncentiveModel model)
         {
             return ApprenticeshipIncentives.ApprenticeshipIncentive.Get(model.Id, model);
         }

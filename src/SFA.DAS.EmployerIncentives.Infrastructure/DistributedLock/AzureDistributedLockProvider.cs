@@ -12,14 +12,13 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
 {
+#pragma warning disable CA2254 // Template should be a static expression
     [ExcludeFromCodeCoverage]
     public class AzureDistributedLockProvider : IDistributedLockProvider
     {
         private readonly ILogger<AzureDistributedLockProvider> _log;
         private readonly List<ControlledLock> _locks = new();
         private readonly AutoResetEvent _mutex = new(true);
-        private readonly string _containerName;
-        private readonly string _connectionString;
         private readonly BlobContainerClient _container;
         private Timer _renewTimer;
         private static TimeSpan LockTimeout => TimeSpan.FromMinutes(1);
@@ -31,9 +30,9 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
             string containerName)
         {
             _log = log;
-            _connectionString = options?.Value.DistributedLockStorage;
-            _containerName = containerName ?? "distributed-locks";
-            _container = new BlobContainerClient(_connectionString, _containerName);
+            _container = new BlobContainerClient(
+                options?.Value.DistributedLockStorage, 
+                containerName ?? "distributed-locks");
         }
 
         public async Task<bool> AcquireLock(string Id, CancellationToken cancellationToken)
@@ -44,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
             {
                 try
                 {
-                    await blob.UploadAsync(string.Empty);
+                    await blob.UploadAsync(string.Empty, cancellationToken);
                 }
                 catch (Azure.RequestFailedException ex)
                 {
@@ -60,7 +59,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
                 try
                 {
                     var leaseClient = blob.GetBlobLeaseClient();
-                    var leaseResponse = await leaseClient.AcquireAsync(LockTimeout, cancellationToken: cancellationToken);
+                    await leaseClient.AcquireAsync(LockTimeout, cancellationToken: cancellationToken);
                     _locks.Add(new ControlledLock(Id, leaseClient));
                     return true;
                 }
@@ -156,4 +155,5 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
             }
         }
     }
+#pragma warning restore CA2254 // Template should be a static expression
 }

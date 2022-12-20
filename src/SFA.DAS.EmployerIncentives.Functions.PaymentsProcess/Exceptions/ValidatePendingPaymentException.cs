@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions
         {
             if (info == null)
             {
-                throw new ArgumentNullException("info");
+                throw new ArgumentNullException(nameof(info));
             }
 
             info.AddValue(nameof(ApprenticeshipIncentiveId), ApprenticeshipIncentiveId.ToString());
