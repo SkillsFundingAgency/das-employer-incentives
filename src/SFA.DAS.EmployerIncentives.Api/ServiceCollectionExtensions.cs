@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             serviceCollection.AddLogging((options) =>
             {
-                options.AddFilter("SFA.DAS", LogLevel.Debug); // this is because all logging is filtered out by default
+                options.AddFilter("SFA.DAS", LogLevel.Information); // this is because all logging is filtered out by default
                 options.SetMinimumLevel(LogLevel.Trace);
                 options.SetMinimumLevel(LogLevel.Trace);
                 options.AddNLog(new NLogProviderOptions
@@ -38,7 +38,9 @@ namespace SFA.DAS.EmployerIncentives.Api
                     CaptureMessageTemplates = true,
                     CaptureMessageProperties = true
                 });
+#if DEBUG
                 options.AddConsole();
+#endif
             });
 
             return serviceCollection;
