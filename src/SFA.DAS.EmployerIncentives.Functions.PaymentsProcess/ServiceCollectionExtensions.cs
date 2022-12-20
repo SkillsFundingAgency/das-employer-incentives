@@ -43,7 +43,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 
             serviceCollection.AddLogging((options) =>
             {
+#if DEBUG
                 options.AddFilter("SFA.DAS", LogLevel.Debug); // this is because all logging is filtered out by default
+#else
+                options.AddFilter("SFA.DAS", LogLevel.Infomation);
+#endif
                 options.SetMinimumLevel(LogLevel.Trace);
                 options.SetMinimumLevel(LogLevel.Trace);
                 options.AddNLog(new NLogProviderOptions
@@ -51,7 +55,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                     CaptureMessageTemplates = true,
                     CaptureMessageProperties = true
                 });
+#if DEBUG
                 options.AddConsole();
+#endif
             });
 
             return serviceCollection;
