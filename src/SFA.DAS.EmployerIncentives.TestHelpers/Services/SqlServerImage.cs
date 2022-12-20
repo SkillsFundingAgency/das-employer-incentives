@@ -4,6 +4,7 @@ using FluentAssertions;
 using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net;
 
 namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
 {
@@ -15,13 +16,14 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
 
         public SqlServerImageInfo SqlServerImageInfo { get; private set; }
 
-        private IContainerService _dockerContainer;
+        private IContainerService? _dockerContainer;
         private string _dacpacFileLocation = "";
         private string _dockerFileLocation = "";
         private bool isDisposed;
 
         private SqlServerImage()
         {
+            SqlServerImageInfo = new SqlServerImageInfo();
             SetDacpacLocation();
             EnsureDockerIsRunning();
             SetDockerFileLocation();
@@ -44,8 +46,7 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
             const string environment = "release";
 #endif
             _dacpacFileLocation = Path.Combine(
-                Directory.GetCurrentDirectory().Substring(0,
-                    Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
+                Directory.GetCurrentDirectory()[..Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)],
                 $"src/{DatabaseProjectName}/bin/{environment}/{DatabaseProjectName}.dacpac");
 
             if (!File.Exists(_dacpacFileLocation))
@@ -66,8 +67,7 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
         private void SetDockerFileLocation()
         {
             _dockerFileLocation = Path.Combine(
-                Directory.GetCurrentDirectory().Substring(0,
-                    Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)),
+                Directory.GetCurrentDirectory()[..Directory.GetCurrentDirectory().IndexOf("src", StringComparison.Ordinal)],
                 $"src/{DockerProjectLocation}/Images/Dockerfile");
 
             if (!File.Exists(_dockerFileLocation))

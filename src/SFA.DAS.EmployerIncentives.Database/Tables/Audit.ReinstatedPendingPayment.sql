@@ -1,4 +1,4 @@
-﻿CREATE TABLE [Audit].[ReinstatedPendingPayment]
+﻿CREATE TABLE [audit].[ReinstatedPendingPayment]
 (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
 	[ApprenticeshipIncentiveId] UNIQUEIDENTIFIER NOT NULL,

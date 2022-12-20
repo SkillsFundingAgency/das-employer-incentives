@@ -1,4 +1,4 @@
-﻿CREATE TABLE [Audit].[VendorBlockAudit]
+﻿CREATE TABLE [audit].[VendorBlockAudit]
 (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
 	[VrfVendorId] NVARCHAR(100) NOT NULL,

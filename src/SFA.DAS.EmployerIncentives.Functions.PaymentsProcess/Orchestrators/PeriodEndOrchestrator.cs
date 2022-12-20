@@ -24,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger.LogInformation("Calling Learner Matching Orchestrator");
             await context.CallSubOrchestratorAsync(nameof(LearnerMatchingOrchestrator), null);
 
-            var paymentOrchestratorInstanceId = Guid.NewGuid().ToString();
+            var paymentOrchestratorInstanceId = context.NewGuid().ToString();
             if(!context.IsReplaying)
                 _logger.LogInformation("Calling Incentive Payment Orchestrator with instance id = {paymentOrchestratorInstanceId}", paymentOrchestratorInstanceId);
             await context.CallSubOrchestratorAsync(nameof(IncentivePaymentOrchestrator), paymentOrchestratorInstanceId, null);

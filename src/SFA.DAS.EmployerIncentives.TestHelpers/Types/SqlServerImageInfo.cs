@@ -6,6 +6,10 @@
         public string ServerName { get; private set; }
         public int Port { get; private set; }
 
+        public SqlServerImageInfo() : this("localhost", 1433)
+        {
+        }
+
         public SqlServerImageInfo(string serverName, int port)
         {
             ServerName = serverName;
