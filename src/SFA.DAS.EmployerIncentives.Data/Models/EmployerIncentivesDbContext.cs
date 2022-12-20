@@ -14,6 +14,12 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         {
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging();
+            base.OnConfiguring(optionsBuilder);
+        }
+
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<IncentiveApplication> Applications { get; set; }
         public virtual DbSet<IncentiveApplicationApprenticeship> ApplicationApprenticeships { get; set; }
