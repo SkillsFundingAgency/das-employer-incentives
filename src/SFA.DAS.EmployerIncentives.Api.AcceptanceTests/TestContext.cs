@@ -41,6 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             if (!TestDirectory.Exists)
             {
                 Directory.CreateDirectory(TestDirectory.FullName);
+                Directory.CreateDirectory($"{TestDirectory.FullName}/.learningtransport");
             }
             TestData = new TestData();
             TestData.GetOrCreate("ThrowErrorAfterPublishCommand", () => false);
