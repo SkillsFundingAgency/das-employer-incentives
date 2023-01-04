@@ -1,10 +1,11 @@
-﻿using SFA.DAS.EmployerIncentives.TestHelpers.Types;
+﻿using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
+using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
 {
-    public class SqlDatabase : IDisposable
+    public class SqlDatabase : ISqlDatabase
     {
         public DatabaseInfo DatabaseInfo { get; private set; }
 

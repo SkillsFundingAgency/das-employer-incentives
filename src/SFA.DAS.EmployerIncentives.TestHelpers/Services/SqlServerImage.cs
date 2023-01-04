@@ -1,10 +1,10 @@
-﻿using Ductus.FluentDocker.Services;
+﻿using Ductus.FluentDocker.Commands;
+using Ductus.FluentDocker.Services;
 using Ductus.FluentDocker.Services.Extensions;
 using FluentAssertions;
 using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using System.Data;
 using System.Data.SqlClient;
-using System.Net;
 
 namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
 {
@@ -36,8 +36,27 @@ namespace SFA.DAS.EmployerIncentives.TestHelpers.Services
             var sqlImage = new SqlServerImage();
             await sqlImage.WaitForServerStartUp();
             return sqlImage;
-        }        
-    
+        }
+
+        public static bool DockerIsRunning()
+        {
+            var hosts = new Hosts().Discover();
+            var _docker = hosts.FirstOrDefault(x => x.IsNative) ?? hosts.FirstOrDefault(x => x.Name == "default");
+
+            if (_docker == null)
+            {
+                return false;
+            }
+
+            var result = _docker.Host.Version(_docker.Certificates);
+            if (result.Error.Contains("the docker client must be run with elevated privileges to connect"))
+            {
+                return false;
+            }
+            
+            return true;            
+        }
+
         private void SetDacpacLocation()
         {
 #if DEBUG

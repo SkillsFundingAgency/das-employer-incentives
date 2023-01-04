@@ -1,4 +1,4 @@
-﻿using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
+﻿using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.TestHelpers.Services;
 using System;
 using System.Diagnostics;
@@ -17,8 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            _sqlImage = await SqlServerImage.Create();
-            TestRunContext.SqlServerImageInfo = _sqlImage.SqlServerImageInfo;
+            await CreateDatabaseModel();
             stopwatch.Stop();            
             Console.WriteLine($@"[{nameof(DatabasePerTestRunHook)}] time it took to update `model` database: {stopwatch.Elapsed.Seconds} seconds");
             Console.WriteLine($"Sql server created at ServerName : {TestRunContext.SqlServerImageInfo.ServerName}, Port {TestRunContext.SqlServerImageInfo.Port}");
@@ -28,6 +27,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
         public static void Dispose()
         {
             _sqlImage?.Dispose();
+        }
+
+        private static async Task CreateDatabaseModel()
+        {
+            if (SqlServerImage.DockerIsRunning())
+            {
+                _sqlImage = await SqlServerImage.Create();
+                TestRunContext.SqlServerImageInfo = _sqlImage.SqlServerImageInfo;
+            }
+            else
+            {
+                SqlDatabaseModel.Update();
+            }
         }
     }
 }

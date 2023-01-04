@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using TechTalk.SpecFlow;
+using SqlDatabase = SFA.DAS.EmployerIncentives.TestHelpers.Services.SqlDatabase;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
 {
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            context.SqlDatabase = new SqlDatabase(TestRunContext.SqlServerImageInfo, context.InstanceId);
+            Create(context);
             stopwatch.Stop();
             Console.WriteLine($"TESTRUN: SqlDataSource = {context.SqlDataSource}, DatabaseName = {context.SqlDatabase.DatabaseInfo.DatabaseName}");
             Console.WriteLine($"TESTRUN: [{nameof(DatabasePerScenarioHook)}] time it took to deploy test database: {stopwatch.Elapsed.Seconds} seconds");
@@ -25,6 +26,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
         {
             Console.WriteLine($"TESTRUN: SqlDatabase Dispose");
             context.SqlDatabase?.Dispose();
+        }
+
+        private static void Create(TestContext context)
+        {
+            if (SqlServerImage.DockerIsRunning())
+            {
+                context.SqlDatabase = new SqlDatabase(TestRunContext.SqlServerImageInfo, context.InstanceId);
+            }
+            else
+            {
+
+                context.SqlDatabase = new Data.UnitTests.TestHelpers.SqlDatabase(context.InstanceId);
+            }
         }
     }
 }

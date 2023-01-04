@@ -6,7 +6,7 @@ using System.IO;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
 {
-    public class SqlDatabase : IDisposable
+    public class SqlDatabase : ISqlDatabase
     {
         private bool _isDisposed;
         public DatabaseInfo DatabaseInfo { get; } = new DatabaseInfo();

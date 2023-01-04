@@ -1,6 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
+using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.EmployerIncentives.TestHelpers.Services;
 using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using SFA.DAS.HashingService;
 using System;
@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public CancellationToken CancellationToken { get; set; }
         public DirectoryInfo TestDirectory { get; set; }
         public TestDateTimeService DateTimeService { get; set; }
-        public SqlDatabase SqlDatabase { get; set; }
+        public ISqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
         public TestAccountApi AccountApi { get; set; }
         public TestLearnerMatchApi LearnerMatchApi { get; set; }

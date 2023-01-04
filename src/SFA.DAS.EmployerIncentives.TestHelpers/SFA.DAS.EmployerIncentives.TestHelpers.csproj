@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Images\Dockerfile">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

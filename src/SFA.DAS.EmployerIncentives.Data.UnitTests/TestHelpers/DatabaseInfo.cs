@@ -6,13 +6,14 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers
         public string ConnectionString { get; private set; }
         public string DatabaseName { get; private set; }
 
-        public DatabaseInfo(string connectionString = null)
+        public DatabaseInfo(string connectionString, string databaseName)
         {
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                return;
-            }
             SetConnectionString(connectionString);
+            DatabaseName = databaseName;
+        }
+
+        public DatabaseInfo(string connectionString = null) : this(connectionString, null)
+        {        
         }
 
         public void SetConnectionString(string connectionString)

@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.Services;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
@@ -32,7 +33,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 
         public TestData TestData { get; set; }        
         public List<IHook> Hooks { get; set; }
-        public SqlDatabase SqlDatabase { get; set; }
+        public ISqlDatabase SqlDatabase { get; set; }
         public ApplicationSettings ApplicationSettings { get; set; }        
 
         public MockApi LearnerMatchApi { get; set; }
