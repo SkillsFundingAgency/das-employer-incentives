@@ -26,5 +26,25 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
             }
             return false;
         }
+
+        public static bool IsIncentiveCompleted(this ApprenticeApplication apprenticeApplication, IDateTimeService dateTimeService)
+        {
+            if (!apprenticeApplication.SecondPaymentDate.HasValue || !apprenticeApplication.LearningStoppedDate.HasValue)
+            {
+                return false;
+            }
+
+            if (apprenticeApplication.LearningStoppedDate > dateTimeService.Now())
+            {
+                return false;
+            }
+
+            if (apprenticeApplication.LearningStoppedDate < apprenticeApplication.SecondPaymentDate)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -44,7 +44,8 @@ ppvr2.OverrideResult AS SecondEmploymentCheckOverrideResult,
 ppvr3.Result AS EmployedAt365DaysValidation,
 ec3.Result AS EmployedAt365DaysFirstCheck,
 ec4.Result AS EmployedAt365DaysSecondCheck,
-ppvr3.OverrideResult AS EmployedAt365DaysCheckOverrideResult
+ppvr3.OverrideResult AS EmployedAt365DaysCheckOverrideResult,
+l.LearningStoppedDate
 FROM incentives.ApprenticeshipIncentive ai
 INNER JOIN dbo.Accounts a
 ON ai.AccountLegalEntityId = a.AccountLegalEntityId
