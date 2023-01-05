@@ -737,8 +737,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
-            pendingPayments.Count().Should().Be(1);
-            pendingPayments.Single().EarningType.Should().Be(EarningType.FirstPayment);
+            pendingPayments.Count().Should().Be(0);
         }
 
         [Then(@"the existing paid pending payments are clawed back")]

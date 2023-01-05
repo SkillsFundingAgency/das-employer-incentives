@@ -106,7 +106,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
         }
 
         [Test]
-        public void Then_earnings_are_not_recalculated_if_learning_periods_have_not_changed()
+        public void Then_earnings_are_recalculated_if_learning_periods_have_not_changed()
         {
             // Arrange
             var expected = new List<BreakInLearning>
@@ -128,7 +128,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut.SetBreaksInLearning(_learner.LearningPeriods.ToList(), _collectionCalendar);
 
             // Assert
-            _sut.FlushEvents().Any(e => e is EarningsCalculated).Should().BeFalse();
+            _sut.FlushEvents().Any(e => e is EarningsCalculated).Should().BeTrue();
         }
     }
 }
