@@ -206,6 +206,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 breaks.Add(BreakInLearning.Create(start, end));
             }
 
+            if (breaks.SequenceEqual(BreakInLearnings)) return;
+
             Model.BreakInLearnings = breaks;
 
             CalculateEarnings(collectionCalendar);
