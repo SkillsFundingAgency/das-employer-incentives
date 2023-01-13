@@ -18,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.DataTransferObjects.Queries
         public PaymentStatus SecondPaymentStatus { get; set; }
         public ClawbackStatus FirstClawbackStatus { get; set; }
         public ClawbackStatus SecondClawbackStatus { get; set; }
+        public bool IncentiveCompleted { get; set; }
     }
 
 }

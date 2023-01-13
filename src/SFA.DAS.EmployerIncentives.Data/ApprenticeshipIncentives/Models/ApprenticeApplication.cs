@@ -54,5 +54,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models
         public bool? EmployedAt365DaysFirstCheck { get; set; }
         public bool? EmployedAt365DaysSecondCheck { get; set; }
         public bool? EmployedAt365DaysCheckOverrideResult { get; set; }
+        public DateTime? LearningStoppedDate { get; set; }
     }
 }

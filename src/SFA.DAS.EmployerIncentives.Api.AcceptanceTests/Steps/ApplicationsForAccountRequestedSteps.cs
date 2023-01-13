@@ -481,6 +481,63 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         {          
             // Empty
         }
+        
+        [When(@"there is an incentive with a learning stopped date before the second payment is paid")]
+        public async Task WhenTheIncentiveLearningStoppedDateBeforeTheSecondPaymentIsPaid()
+        {
+            _payment = Fixture.Build<Payment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == EarningType.SecondPayment).Id)
+                .With(x => x.PaidDate, _apprenticeshipIncentive.PendingPayments.First().DueDate.AddDays(1))
+                .Create();
+
+            _learner = TestContext.TestData.GetOrCreate<Learner>();
+            _learner.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+            _learner.LearningStoppedDate = _payment.PaidDate.Value.AddDays(-1);
+
+            await SetupPayment();
+            await SetupLearner();
+        }
+
+        [When(@"there is an incentive with a learning stopped date after the second payment is paid")]
+        public async Task WhenTheIncentiveLearningStoppedDateAfterTheSecondPaymentIsPaid()
+        {
+            _payment = Fixture.Build<Payment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == EarningType.SecondPayment).Id)
+                .With(x => x.PaidDate, _apprenticeshipIncentive.PendingPayments.First().DueDate.AddDays(1))
+                .Create();
+
+            _learner = TestContext.TestData.GetOrCreate<Learner>();
+            _learner.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+            _learner.LearningStoppedDate = _payment.PaidDate.Value.AddDays(1);
+
+            await SetupPayment();
+            await SetupLearner();
+        }
+
+        [When(@"there is an incentive with a learning stopped date and the second payment is not paid")]
+        public async Task WhenTheIncentiveLearningStoppedDateAndTheSecondPaymentIsNotPaid()
+        {
+            _payment = Fixture.Build<Payment>()
+                .With(x => x.AccountId, _account.Id)
+                .With(x => x.AccountLegalEntityId, _account.AccountLegalEntityId)
+                .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                .With(x => x.PendingPaymentId, _apprenticeshipIncentive.PendingPayments.First(x => x.EarningType == EarningType.SecondPayment).Id)
+                .Without(x => x.PaidDate)
+                .Create();
+
+            _learner = TestContext.TestData.GetOrCreate<Learner>();
+            _learner.ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id;
+            _learner.LearningStoppedDate = _apprenticeshipIncentive.PendingPayments.First().DueDate;
+
+            await SetupPayment();
+            await SetupLearner();
+        }
 
         [When(@"a client requests the apprenticeships for the account")]
         public async Task WhenAClientRequestsTheApprenticeshipApplicationsForTheAccount()
@@ -493,7 +550,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             _apiResponse = data;
         }
-
+        
         [Then(@"the apprenticeships are returned")]
         public void ThenTheApprenticeshipApplicationsAreReturned()
         {
@@ -726,6 +783,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 apprenticeshipApplication.SecondPaymentStatus.WithdrawnByCompliance.Should().BeFalse();
                 apprenticeshipApplication.SecondPaymentStatus.WithdrawnByEmployer.Should().BeTrue();
             }
+        }
+
+        [Then(@"the apprenticeship is returned with incentive completed set to '(.*)'")]
+        public void ThenTheApprenticeshipIsReturnedWithIncentiveCompletedSetTo(bool expectation)
+        {
+            var apprenticeshipApplication = _apiResponse.ApprenticeApplications.First();
+            apprenticeshipApplication.IncentiveCompleted.Should().Be(expectation);
         }
 
         private async Task SetupApprenticeshipIncentive()
