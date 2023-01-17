@@ -104,12 +104,13 @@ namespace SFA.DAS.EmployerIncentives.Data
                         ClawbackDate = data.SecondClawbackCreated,
                         OriginalPaymentDate = data.SecondPaymentDate
                     },
+                    IncentiveCompleted = data.IsIncentiveCompleted(_dateTimeService)
                 };
 
                 if (data.Status == IncentiveStatus.Stopped)
                 {
                     SetStoppedStatus(apprenticeApplicationDto);
-                } 
+                }
                 else if (data.Status == IncentiveStatus.Withdrawn)
                 {
                     SetWithdrawnStatus(apprenticeApplicationDto, data.WithdrawnBy.Value);
@@ -226,8 +227,13 @@ namespace SFA.DAS.EmployerIncentives.Data
             bool? employedAt365DayValidation)
         {
             if (!first365DaysCheck.HasValue
-                || !employedAt365DayValidation.HasValue || !second365DaysCheck.HasValue
+                || !employedAt365DayValidation.HasValue
                )
+            {
+                return null;
+            }
+
+            if (!first365DaysCheck.Value && !second365DaysCheck.HasValue)
             {
                 return null;
             }
@@ -268,7 +274,22 @@ namespace SFA.DAS.EmployerIncentives.Data
         private static void SetStoppedStatus(ApprenticeApplication model)
         {
             var paymentStatus = new PaymentStatus { PaymentIsStopped = true };
-            SetIncentiveStatus(paymentStatus, model);
+            if (model.FirstPaymentStatus == null)
+            {
+                if (model.SecondPaymentStatus == null)
+                {
+                    model.FirstPaymentStatus = paymentStatus;
+                    model.SecondPaymentStatus = paymentStatus;
+                }
+            }
+            else if (model.SecondPaymentStatus == null)
+            {
+                model.SecondPaymentStatus = paymentStatus;
+            }
+            else
+            {
+                model.SecondPaymentStatus.PaymentIsStopped = true;
+            }
         }
 
         private static void SetWithdrawnStatus(ApprenticeApplication model, WithdrawnBy withdrawnBy)

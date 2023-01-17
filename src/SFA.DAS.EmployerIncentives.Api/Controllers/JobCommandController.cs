@@ -64,24 +64,24 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         private static List<RefreshEmploymentCheckCommand> ParseJobRequestToRefreshEmploymentCheckCommands(JobRequest request)
         {
-            request.Data.TryGetValue("CheckType", out object checkTypeRequest);
-            request.Data.TryGetValue("Applications", out object applicationsRequest);
-            request.Data.TryGetValue("ServiceRequest", out object serviceRequestRequest);
-            var applications = JsonConvert.DeserializeObject<Application[]>(applicationsRequest.ToString());            
-            var serviceRequest = JsonConvert.DeserializeObject<ServiceRequest>(serviceRequestRequest.ToString());
-
+            request.Data.TryGetValue("Requests", out object requests);
+            var employmentCheckRefreshRequests = JsonConvert.DeserializeObject<IEnumerable<EmploymentCheckRefreshRequest>>(requests.ToString());
+            
             var commands = new List<RefreshEmploymentCheckCommand>();
-            foreach (var application in applications) 
+            foreach(var employmentCheckRefreshRequest in employmentCheckRefreshRequests)
             {
-                commands.Add(
+                foreach (var application in employmentCheckRefreshRequest.Applications)
+                {
+                    commands.Add(
                         new RefreshEmploymentCheckCommand(
-                            checkTypeRequest.ToString(), 
-                            application.AccountLegalEntityId, 
-                            application.ULN, 
-                            serviceRequest.TaskId, 
-                            serviceRequest.DecisionReference, 
-                            serviceRequest.TaskCreatedDate)
+                            employmentCheckRefreshRequest.CheckType,
+                            application.AccountLegalEntityId,
+                            application.ULN,
+                            application.ServiceRequest?.TaskId ?? employmentCheckRefreshRequest.ServiceRequest.TaskId,
+                            application.ServiceRequest?.DecisionReference ?? employmentCheckRefreshRequest.ServiceRequest.DecisionReference,
+                            application.ServiceRequest?.TaskCreatedDate ?? employmentCheckRefreshRequest.ServiceRequest.TaskCreatedDate)
                     );
+                }
             }
 
             return commands;
