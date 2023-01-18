@@ -195,7 +195,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetBreaksInLearning(
             IList<LearningPeriod> periods,
-            CollectionCalendar collectionCalendar)
+            CollectionCalendar collectionCalendar,
+            IDateTimeService dateTimeService)
         {
             var breaks = new List<BreakInLearning>();
             for (var i = 0; i < periods.Count - 1; i++)
@@ -211,6 +212,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.BreakInLearnings = breaks;
 
             CalculateEarnings(collectionCalendar);
+
+            RefreshEmploymentChecks(dateTimeService);
         }   
 
         private void StartBreakInLearning(DateTime startDate)
@@ -230,7 +233,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 ChangeStatus(IncentiveStatus.Stopped);
                 StartBreakInLearning(stoppedStatus.DateStopped.Value);
                 
-                RemoveAll365Checks();
                 CalculateEarnings(collectionCalendar, learner);
 
                 AddEvent(new LearningStopped(
@@ -255,7 +257,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             else if (Model.Status == IncentiveStatus.Stopped && stoppedStatus.LearningStopped)
             {
                 ChangeStatus(IncentiveStatus.Stopped);
-                RemoveAll365Checks();
                 CalculateEarnings(collectionCalendar, learner);
             }
         }
@@ -438,23 +439,26 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return;
             }
 
-            if (pendingPayment.DueDate.AddDays(21) > dateTimeService.UtcNow().Date)
-            {
-                return;
-            }
-
             var employedAt365DaysFirstCheck = EmploymentChecks.FirstOrDefault(x =>
                 x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
 
             var employedAt365DaysFirstCheckResult = employedAt365DaysFirstCheck?.Result != null &&
                                                         employedAt365DaysFirstCheck.Result.Value;
+
+            bool validationResult = true;
+
+            if (employedAt365DaysFirstCheck == null &&
+               pendingPayment.DueDate.AddDays(21) > dateTimeService.UtcNow().Date)
+            {
+                validationResult = false;
+            }
             
             pendingPayment.AddValidationResult(
                 PendingPaymentValidationResult.New(
                     Guid.NewGuid(),
                     collectionPeriod,
                     ValidationStep.EmployedAt365Days,
-                    true,
+                    validationResult,
                     GetOverrideStep(ValidationStep.EmployedAt365Days)));
 
             if (!employedAt365DaysFirstCheckResult)
