@@ -114,6 +114,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _pendingPayment.DueDate = _plannedStartDate.AddDays(1);
             _apprenticeshipIncentive.StartDate = _plannedStartDate;
             _apprenticeshipIncentive.Phase = phase;
+
             await CreateIncentive();
         }
 
