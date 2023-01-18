@@ -191,12 +191,19 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     ULN = _apprenticeshipIncentive.ULN
                 }
             };
+            var requests = new List<EmploymentCheckRefreshRequest>
+            {
+                new EmploymentCheckRefreshRequest
+                {
+                    CheckType = checkType,
+                    Applications = applications.ToArray(),
+                    ServiceRequest = _serviceRequest
+                }
+            };
 
             var data = new Dictionary<string, object>
             {
-                { "CheckType", checkType },
-                { "Applications", JsonConvert.SerializeObject(applications) },
-                { "ServiceRequest", JsonConvert.SerializeObject(_serviceRequest) }
+                { "Requests", requests }
             };
 
             _response = await EmployerIncentiveApi.Put("/jobs",  new JobRequest { Type = JobType.RefreshEmploymentChecks, Data = data });
