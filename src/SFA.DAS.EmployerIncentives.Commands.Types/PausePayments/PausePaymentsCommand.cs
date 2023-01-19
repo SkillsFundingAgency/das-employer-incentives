@@ -5,7 +5,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types.PausePayments
 {
-    public class PausePaymentsCommand : ICommand, ILogWriter, IPeriodEndIncompatible
+    public class PausePaymentsCommand : DomainCommand, ILogWriter, IPeriodEndIncompatible
     {
         public long ULN { get; }
         public long AccountLegalEntityId { get; }
