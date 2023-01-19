@@ -6,6 +6,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.Types.PausePayments;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments
 {

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using System.Linq;
 using System;
+using SFA.DAS.EmployerIncentives.Commands.Types.PausePayments;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
