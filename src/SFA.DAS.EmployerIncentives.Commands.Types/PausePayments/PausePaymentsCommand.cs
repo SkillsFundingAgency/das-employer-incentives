@@ -3,9 +3,9 @@ using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Abstractions.Logging;
 using SFA.DAS.EmployerIncentives.Enums;
 
-namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments
+namespace SFA.DAS.EmployerIncentives.Commands.Types.PausePayments
 {
-    public class PausePaymentsCommand : ICommand, ILogWriter
+    public class PausePaymentsCommand : DomainCommand, ILogWriter, IPeriodEndIncompatible
     {
         public long ULN { get; }
         public long AccountLegalEntityId { get; }
@@ -37,5 +37,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayme
                 };
             }
         }
+
+        public TimeSpan CommandDelay => TimeSpan.FromMinutes(15);
+        public bool CancelCommand => false;
     }
 }
