@@ -267,7 +267,7 @@ Scenario: Employment check status with 365 day check
 	Then the apprenticeship is returned with second payment employment check status of '<Employment Check Status>'
 Examples:
 | Employed At 365 Days | 365 Days Employment First Check Result | 365 Days Employment Second Check Result | Employment Check Status |
-| true                 | true                                   | null                                    | null                    |
+| true                 | true                                   | null                                    | true                    |
 | false                | false                                  | null                                    | null                    |
 | false                | false                                  | false                                   | false                   |
 | true                 | false                                  | true                                    | true                    |
@@ -292,3 +292,21 @@ Examples:
 | true                 | true                          | true       | true                    |
 | false                | true                          | true       | true                    |
 | false                | false                         | true       | false                   |
+
+Scenario: Learner record with stopped date before the second payment is paid
+	Given an account that is in employer incentives
+	When there is an incentive with a learning stopped date before the second payment is paid
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with incentive completed set to 'False'
+
+Scenario: Learner record with stopped date after the second payment is paid
+	Given an account that is in employer incentives
+	When there is an incentive with a learning stopped date after the second payment is paid
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with incentive completed set to 'True'
+
+Scenario: Learner record with stopped date and the second payment is not paid
+	Given an account that is in employer incentives
+	When there is an incentive with a learning stopped date and the second payment is not paid
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with incentive completed set to 'False'

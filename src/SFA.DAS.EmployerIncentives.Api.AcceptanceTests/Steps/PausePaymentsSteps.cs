@@ -104,6 +104,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_apprenticeshipIncentive);
         }
 
+        [Given(@"the active period month end processing is in progress")]
+        public async Task GivenTheActivePeriodMonthEndProcessingIsInProgress()
+        {
+            await using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            _testContext.ActivePeriod.PeriodEndInProgress = true;
+            await dbConnection.UpdateAsync(_testContext.ActivePeriod);
+        }
+
         [When(@"the pause payments request is sent")]
         public async Task WhenThePausePaymentsRequestIsSent()
         {
@@ -181,12 +189,13 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Then(@"the requester is informed the apprenticeship incentive is paused")]
-        [Then(@"the requester is informed the apprenticeship incentives are paused")]        
+        [Then(@"the requester is informed the apprenticeship incentives are paused")]      
+        [Then(@"the requester is informed the apprenticeship incentive pause request has been queued")]
         public async Task ThenTheRequesterIsInformedTheApprenticeshipIncentiveIsPaused()
         {
             _response.StatusCode.Should().Be((int)HttpStatusCode.OK);
             var content = await _response.Content.ReadAsStringAsync();
-            JsonConvert.SerializeObject(content).Should().Contain("Payments have been successfully Paused");
+            JsonConvert.SerializeObject(content).Should().Contain("Payment Pause Request(s) have been successfully queued");
         }
 
         [Then(@"the requester is informed the request has failed")]
@@ -223,6 +232,16 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             incentives.First().PausePayments.Should().BeFalse();
             incentives.First(i => i.Id != incentives.First().Id).PausePayments.Should().BeFalse();
         }        
+
+        [Then(@"The PausePayment status for the incentive remains as false")]
+        public async Task ThenThePausePaymentStatusForTheIncentiveRemainsAsFalse()
+        {
+            await using var dbConnection = new SqlConnection(_connectionString);
+            var incentives = dbConnection.GetAll<ApprenticeshipIncentive>();
+
+            incentives.Count().Should().Be(1);
+            incentives.First().PausePayments.Should().BeFalse();
+        }
 
         [Then(@"the PausePayment status for all incentives is set to true")]
         public async Task ThenThePausePaymentStatusForAllIncentivesIsSetToTrue()
