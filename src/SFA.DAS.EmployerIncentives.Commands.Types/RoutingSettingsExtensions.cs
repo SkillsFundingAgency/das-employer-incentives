@@ -5,6 +5,7 @@ using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 using SFA.DAS.EmployerIncentives.Commands.Types.IncentiveApplications;
 using SFA.DAS.EmployerIncentives.Commands.Types.LegalEntity;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
+using SFA.DAS.EmployerIncentives.Commands.Types.PausePayments;
 using SFA.DAS.EmployerIncentives.Infrastructure;
 
 namespace SFA.DAS.EmployerIncentives.Commands.Types
@@ -29,6 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Types
             routingSettings.RouteToEndpoint(typeof(RefreshEmploymentCheckCommand), QueueNames.RefreshEmploymentCheckCommand);
             routingSettings.RouteToEndpoint(typeof(RecalculateEarningsCommand), QueueNames.RecalculateEarningsCommand);
             routingSettings.RouteToEndpoint(typeof(ValidationOverrideCommand), QueueNames.ValidationOverride);
+            routingSettings.RouteToEndpoint(typeof(PausePaymentsCommand), QueueNames.PausePaymentsCommand);
         }
     }
 }
