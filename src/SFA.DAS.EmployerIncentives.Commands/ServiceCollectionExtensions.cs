@@ -377,9 +377,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 try
                 {
                     var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
-                    var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();                    
-                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                    .UseSqlServer(p.GetService<ISqlConnectionProvider>().Get(sqlStorageSession.Connection.ConnectionString));
+                    var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
+                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseSqlServer(sqlStorageSession.Connection);
 
                     dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
                     dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
