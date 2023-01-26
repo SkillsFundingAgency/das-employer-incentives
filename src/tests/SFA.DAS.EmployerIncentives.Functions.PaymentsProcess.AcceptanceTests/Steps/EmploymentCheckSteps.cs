@@ -28,6 +28,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly ApprenticeshipIncentive _apprenticeshipIncentive;
         private readonly Account _accountModel;
         private DateTime _plannedStartDate;
+        private DateTime _plannedEndDate;
         private DateTime? _periodEndDate;
         private readonly PendingPayment _pendingPayment;
         private PendingPayment _secondPendingPayment;
@@ -82,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                     .Create()
                             })
                             .With(pe => pe.StartDate, _plannedStartDate)
-                            .With(pe => pe.EndDate, _periodEndDate.HasValue ? _periodEndDate.Value : _plannedStartDate.AddYears(3))
+                            .With(pe => pe.EndDate, _periodEndDate.HasValue ? _periodEndDate.Value : _plannedEndDate)
                             .Create() }
                         )
                         .Create()}
@@ -90,30 +91,44 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
         }
 
-
-            [Given(@"an apprenticeship incentive has been submitted in phase '(.*)'")]
+        [Given(@"an apprenticeship incentive has been submitted in phase '(.*)'")]
         public async Task GivenAnApprenticeshipIncentiveExists(Phase phase)
-        {
-            switch(phase)
+        {   
+            switch (phase)
             {
                 case Phase.Phase1:
                     _plannedStartDate = new DateTime(2020, 8, 1);
+                    _plannedEndDate = new DateTime(2021, 5, 31);
                     break;
 
                 case Phase.Phase2:
                     _plannedStartDate = new DateTime(2021, 8, 1);
+                    _plannedEndDate = new DateTime(2021, 11, 30);
                     break;
 
                 case Phase.Phase3:
                     _plannedStartDate = new DateTime(2021, 11, 1);
+                    _plannedEndDate = new DateTime(2022, 03, 31);
                     break;
-            }
-            _plannedStartDate = new DateTime(2020, 8, 1);
+            }            
             _pendingPayment.DueDate = _plannedStartDate.AddDays(1);
             _apprenticeshipIncentive.StartDate = _plannedStartDate;
             _apprenticeshipIncentive.Phase = phase;
+
             await CreateIncentive();
-        }        
+        }
+
+
+        [Given(@"the apprenticeship incentive is in a stopped state")]
+        public async Task GivenTheApprenticeshipIncentiveIsInAStoppedState()
+        {
+            _apprenticeshipIncentive.Status = IncentiveStatus.Stopped;
+            using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
+            {
+                await dbConnection.UpdateAsync(_apprenticeshipIncentive);
+            }
+        }
+
         private async Task CreateIncentive()
         {
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
@@ -137,7 +152,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         }
 
         [Given(@"3 weeks has elapsed since 365 days after the due date of the second payment")]
-        public async Task GivenTHreeWeeksHasElapsedSince365DaysAfterTheDueDateOfTheSecondPayment()
+        public async Task GivenThreeWeeksHasElapsedSince365DaysAfterTheDueDateOfTheSecondPayment()
         {
             _testContext.DateTimeService.SetUtcNow(_plannedStartDate.AddDays(365).AddDays(21));
 
@@ -211,10 +226,54 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             }
         }
 
+        [Given(@"a 365 first check has been requested")]
+        public async Task GivenA365FirstCheckHasBeenRequested()
+        {
+            var employmentChecks = new List<EmploymentCheck>()
+            {
+                _fixture.Build<EmploymentCheck>()
+                    .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
+                    .Without(x => x.Result)
+                    .Create(),
+            };
+
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            foreach (var employmentCheck in employmentChecks)
+            {
+                await dbConnection.InsertWithEnumAsStringAsync(employmentCheck);
+            }
+        }
+
+        [Given(@"a 365 second check has been requested")]
+        public async Task GivenA365SecondCheckHasBeenRequested()
+        {
+            var employmentChecks = new List<EmploymentCheck>()
+            {
+                _fixture.Build<EmploymentCheck>()
+                    .With(x => x.ApprenticeshipIncentiveId, _apprenticeshipIncentive.Id)
+                    .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck)
+                    .Without(x => x.Result)
+                    .Create(),
+            };
+
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            foreach (var employmentCheck in employmentChecks)
+            {
+                await dbConnection.InsertWithEnumAsStringAsync(employmentCheck);
+            }
+        }
+
         [Given(@"the learner data identifies the learner as not in learning anymore")]
         public void GivenTheIncentiveLearnerDataIdentifiesTheLearnerAsNotInLearningAnymore()
         {
             _periodEndDate = GetPastEndDate(-10);
+        }
+
+        [Given(@"the learner data identifies the learner as in learning")]
+        public void GivenTheIncentiveLearnerDataIdentifiesTheLearnerAsInLearning()
+        {
+            // no change
         }
 
         [Given(@"the initial 365 check has failed")]
@@ -340,15 +399,57 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _secondPendingPayment.DueDate = payment.Single(p => p.EarningType == EarningType.SecondPayment).DueDate;            
         }
 
-        [Then(@"a re-request 365 employment check is not requested for the phase '(.*)'")]
-        public void ThenAReRequest365EmploymentCheckOnSecondPaymentIsNotRequestedForPhase(Phase phase = Phase.NotSet)
+        [Then(@"a re-request 365 employment check is not requested")]
+        public void ThenAReRequest365EmploymentCheckOnSecondPaymentIsNotRequested()
         {
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
                 .SingleOrDefault(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
 
             employmentCheck.Should().BeNull();
-        }        
+        }
+
+        [Then(@"the 365 employment check is not reinspired")]
+        public void ThenThe365EmploymentCheckIsNotReInspired()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
+                .SingleOrDefault(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+
+            var HasArchiveEmploymentCheck = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.EmploymentCheck>()
+                .Any(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck.ToString());
+
+            employmentCheck.Should().NotBeNull();
+            HasArchiveEmploymentCheck.Should().BeFalse();
+        }
+
+        [Then(@"the 365 employment check is reinspired")]
+        public void ThenThe365EmploymentCheckIsReInspired()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
+                .SingleOrDefault(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+
+            var HasArchiveEmploymentCheck = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.EmploymentCheck>()
+                .Any(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck.ToString());
+
+            employmentCheck.Should().NotBeNull();
+            HasArchiveEmploymentCheck.Should().BeTrue();
+        }
+
+        [Then(@"the 365 second employment check is not reinspired")]
+        public void ThenThe365SecondEmploymentCheckIsNotReInspired()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentCheck = dbConnection.GetAll<EmploymentCheck>()
+                .SingleOrDefault(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
+
+            var HasArchiveEmploymentCheck = dbConnection.GetAll<Data.ApprenticeshipIncentives.Models.Archive.EmploymentCheck>()
+                .Any(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck.ToString());
+
+            employmentCheck.Should().NotBeNull();
+            HasArchiveEmploymentCheck.Should().BeFalse();
+        }
 
         [Then(@"a re-request 365 employment check is requested for the phase '(.*)'")]
         public void ThenAReRequest365EmploymentCheckOnSecondPaymentIsRequestedForPhase(Phase phase = Phase.NotSet)
@@ -401,7 +502,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 employmentCheck.Result.Should().BeNull();
             }
 
-            dbConnection.GetAll<EmploymentCheck>().Any(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck).Should().BeFalse();
+            dbConnection.GetAll<EmploymentCheck>().Single(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck).Result.Should().BeFalse();
         }
 
         private void VerifyEmployedPriorToPhaseCheck(DateTime minDate, DateTime maxDate)

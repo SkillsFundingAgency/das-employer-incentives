@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using System.Linq;
 using System;
+using SFA.DAS.EmployerIncentives.Commands.Types.PausePayments;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -42,8 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                         ));
 
                 await SendCommandsAsync(commands);
-
-                return new OkObjectResult(new { Message = $"Payments have been successfully {request.Action}d" });
+                return new OkObjectResult(new { Message = $"Payment {request.Action} Request(s) have been successfully queued" });
             }
             catch (InvalidRequestException e)
             {

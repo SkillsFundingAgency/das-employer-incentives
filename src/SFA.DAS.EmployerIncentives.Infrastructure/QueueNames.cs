@@ -23,5 +23,6 @@
         public const string UpdateEmploymentCheck = "SFA.DAS.EmployerIncentives.UpdateEmploymentCheck";
         public const string RefreshEmploymentCheckCommand = "SFA.DAS.EmployerIncentives.RefreshEmploymentCheck";
         public const string RecalculateEarningsCommand = "SFA.DAS.EmploymentIncentives.RecalculateEarnings";
+        public const string PausePaymentsCommand = "SFA.DAS.EmployerIncentives.PausePayments";
     }
 }
