@@ -53,17 +53,17 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.Configure<EmployerIncentivesOuterApi>(config.GetSection("EmployerIncentivesOuterApi"));
 
             builder.Services.AddNLog(config);
+            builder.Services.AddPersistenceServices();
 
             builder.Services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();
 
-            builder.Services.AddPersistenceServices();
             builder.Services.AddQueryServices();
             builder.Services.AddCommandServices();
             builder.Services.AddEventServices();
 
-            builder.Services.AddNServiceBus(config);            
+            builder.Services.AddNServiceBus(config);
         }
     }
 }
