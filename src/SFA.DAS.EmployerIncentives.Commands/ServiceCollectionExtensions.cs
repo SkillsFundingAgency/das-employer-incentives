@@ -61,6 +61,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Data.Account;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -152,8 +153,11 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IApprenticeshipIncentiveArchiveRepository, ApprenticeshipIncentiveArchiveRepository>();
             serviceCollection.AddScoped<IEmploymentCheckAuditRepository, EmploymentCheckAuditRepository>();
+            serviceCollection.AddScoped<IVendorBlockAuditRepository, VendorBlockAuditRepository>();
 
             serviceCollection.AddScoped<IValidationOverrideAuditRepository, ValidationOverrideAuditRepository>();
+            serviceCollection.AddScoped<IRevertedPaymentAuditRepository, RevertedPaymentAuditRepository>();
+            serviceCollection.AddScoped<IReinstatedPendingPaymentAuditRepository, ReinstatedPendingPaymentAuditRepository>();
             
             return serviceCollection;
         }
@@ -195,7 +199,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<RefreshEmploymentChecksCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendMetricsReportCommand>), new NullValidator())
                 ;

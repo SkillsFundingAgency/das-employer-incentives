@@ -15,6 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public DateTime? PaidDate => Model.PaidDate;
         public SubnominalCode SubnominalCode => Model.SubnominalCode;
         public string VrfVendorId => Model.VrfVendorId;
+        public Guid PendingPaymentId => Model.PendingPaymentId;
 
         internal static Payment New(
             Guid id,

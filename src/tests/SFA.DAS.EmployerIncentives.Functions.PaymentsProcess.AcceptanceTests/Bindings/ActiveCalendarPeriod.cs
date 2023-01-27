@@ -19,6 +19,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             await using var dbConnection = new SqlConnection(context.SqlDatabase.DatabaseInfo.ConnectionString);
 
             var calendar = await dbConnection.GetAllAsync<Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod>();
+
+            calendar.ToList().ForEach(c =>
+            {
+                c.Active = false;
+                c.PeriodEndInProgress = false;
+            });
+
+            await dbConnection.UpdateAsync(calendar);
+
             var period = calendar.Single(x => x.CalendarYear == 2020 && x.CalendarMonth == 8);
             period.Active = true;
             period.PeriodEndInProgress = false;

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
+    [TestFixture]
     public class WhenUpdateCalled
     {
         private Data.AccountDataRepository _sut;
@@ -59,6 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             storedAccount.LegalEntityName.Should().Be(testLegalEntity.Name);
             storedAccount.SignedAgreementVersion.Should().Be(testLegalEntity.SignedAgreementVersion);
             storedAccount.HashedLegalEntityId.Should().Be(testLegalEntity.HashedLegalEntityId);
+            storedAccount.VendorBlockEndDate.Should().Be(testLegalEntity.VendorBlockEndDate);
         }
 
         [Test]
@@ -100,6 +102,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
             addedAccount.VrfVendorId.Should().Be(testAccount.VrfVendorId);
             addedAccount.VrfCaseStatusLastUpdatedDateTime.Should().Be(testAccount.VrfCaseStatusLastUpdatedDateTime);
             addedAccount.HashedLegalEntityId.Should().Be(testAccount.HashedLegalEntityId);
+            addedAccount.VendorBlockEndDate.Should().Be(testAccount.VendorBlockEndDate);
         }
 
         [Test]

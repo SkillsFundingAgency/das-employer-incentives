@@ -43,6 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 var startDate = DateTime.Today.AddDays(1);
                 var dueDate = startDate.AddDays(90);
                 AccountModel.SignedAgreementVersion = 5;
+                AccountModel.VendorBlockEndDate = null;
 
                 IncentiveApplicationModel = _fixture.Build<IncentiveApplication>()
                 .With(p => p.Status, IncentiveApplicationStatus.InProgress)
@@ -81,6 +82,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         .With(x => x.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
                         .With(x => x.CheckType, EmploymentCheckType.EmployedBeforeSchemeStarted)
                         .With(x => x.Result, false)
+                        .Create(),
+                    _fixture.Build<EmploymentCheck>()
+                        .With(x => x.ApprenticeshipIncentiveId, ApprenticeshipIncentiveModel.Id)
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck)
+                        .With(x => x.Result, true)
                         .Create()
                 };
 

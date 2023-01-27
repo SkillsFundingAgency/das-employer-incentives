@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PausePayments;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
+using SFA.DAS.EmployerIncentives.Commands.Types.PausePayments;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;

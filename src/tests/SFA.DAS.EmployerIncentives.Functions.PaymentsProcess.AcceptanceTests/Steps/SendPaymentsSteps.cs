@@ -70,12 +70,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             await ApprovePayments();
         }
 
-        [When(@"the payments have been rejected")]
-        public async Task WhenPaymentsAreRejected()
-        {            
-            await RejectPayments();
-        }
-
         [Then(@"the payments are sent to Business Central")]
         public async Task ThenThePaymentsAreSent()
         {
@@ -106,34 +100,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             results.Count.Should().Be(1);
             results.Any(x => !x.DateClawbackSent.HasValue).Should().BeFalse();
             results.Any(x => String.IsNullOrEmpty(x.VrfVendorId)).Should().BeFalse();
-        }
-
-        [Then(@"the payments are not sent to Business Central")]
-        public async Task ThenThePaymentsAreNotSent()
-        {
-            var paymentRequestCount = _testContext.PaymentsApi.MockServer.LogEntries.Count();
-            paymentRequestCount.Should().Be(0);
-
-            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var payments = await connection.GetAllAsync<Payment>();
-            var results = payments
-                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.PaymentPeriod <= CollectionPeriod).ToList();
-            results.Count.Should().Be(2);
-            results.Any(x => x.PaidDate.HasValue).Should().BeFalse();
-        }
-
-        [Then(@"the clawbacks are not sent to Business Central")]
-        public async Task ThenTheClawbacksAreNotSent()
-        {
-            var paymentRequestCount = _testContext.PaymentsApi.MockServer.LogEntries.Count();
-            paymentRequestCount.Should().Be(0);
-
-            await using var connection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
-            var clawbacks = await connection.GetAllAsync<ClawbackPayment>();
-            var results = clawbacks
-                .Where(x => x.ApprenticeshipIncentiveId == _validatePaymentData.ApprenticeshipIncentiveModel.Id && x.CollectionPeriod <= CollectionPeriod).ToList();
-            results.Count.Should().Be(1);
-            results.Any(x => x.DateClawbackSent.HasValue).Should().BeFalse();
         }
 
         private async Task ThenTheActivePeriodIsUpdatedToTheNextPeriod()
@@ -187,24 +153,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                         ["req"] = new DummyHttpRequest
                         {
                             Path = $"/api/orchestrators/approvePayments/{_orchestratorInstanceId}"
-                        },
-                        ["instanceId"] = _orchestratorInstanceId
-                    }
-                ));
-
-            _testContext.TestFunction.LastResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
-        private async Task RejectPayments()
-        {
-            await _testContext.TestFunction.Start(
-                new OrchestrationStarterInfo(
-                    "PaymentRejection_HttpStart",
-                    nameof(IncentivePaymentOrchestrator),
-                    new Dictionary<string, object>
-                    {
-                        ["req"] = new DummyHttpRequest
-                        {
-                            Path = $"/api/orchestrators/rejectPayments/{_orchestratorInstanceId}"
                         },
                         ["instanceId"] = _orchestratorInstanceId
                     }

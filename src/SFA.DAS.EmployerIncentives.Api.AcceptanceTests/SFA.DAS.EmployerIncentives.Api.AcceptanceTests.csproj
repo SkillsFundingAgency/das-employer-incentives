@@ -4,11 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\LegalEntityUpdated.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\RecalculateEarnings.feature.cs" />
-  </ItemGroup>
  
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
@@ -22,7 +17,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.4.0" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="Moq" Version="4.14.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
@@ -41,6 +36,7 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Data.UnitTests\SFA.DAS.EmployerIncentives.Data.UnitTests.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers\SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers.csproj" />
     
+    
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.UnitTests.Shared\SFA.DAS.EmployerIncentives.UnitTests.Shared.csproj" />
   </ItemGroup>
 
@@ -50,6 +46,12 @@
     </Compile>
     <Compile Update="Features\MonthEndInProgress.feature.cs">
       <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Features\ReinstatePayments.feature.cs">
+      <DependentUpon>ReinstatePayments.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\RevertPayments.feature.cs">
+      <DependentUpon>RevertPayments.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\UpdateCollectionCalendarPeriod.feature.cs">
       <DesignTime>True</DesignTime>
@@ -92,7 +94,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LegalEntityAgreementSigned.feature</DependentUpon>
     </Compile>
-    
   </ItemGroup>
 
   <ItemGroup>
@@ -103,6 +104,14 @@
     <SpecFlowFeatureFiles Update="Features\MonthEndInProgress.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>MonthEndInProgress.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\ReinstatePayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\RevertPayments.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\UpdateCollectionCalendarPeriod.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>

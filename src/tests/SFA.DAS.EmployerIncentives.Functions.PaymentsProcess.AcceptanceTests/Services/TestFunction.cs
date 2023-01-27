@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
@@ -48,6 +49,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
+                    { "ApplicationSettings:NServiceBusConnectionString", _testContext.ApplicationSettings.NServiceBusConnectionString },
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory },
                     { "ApplicationSettings:ReportsContainerName", _testContext.InstanceId }
             };
 
@@ -97,7 +100,16 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                c.ApiBaseUrl = _testContext.PaymentsApi.BaseAddress;
                                c.PaymentRequestsLimit = BusinessCentralPaymentRequestsLimit;
                            });
-
+                           s.Configure<PolicySettings>(a =>
+                           {
+                               a.RetryPolicies = new RetryPolicySettings
+                               {
+                                   LockedRetryAttempts = 10,
+                                   LockedRetryWaitInMilliSeconds = 5000,
+                                   QueryRetryWaitInMilliSeconds = 0,
+                                   QueryRetryAttempts = 0
+                               };
+                           });
                            s.Configure<ApplicationSettings>(a =>
                            {
                                a.DbConnectionString = _testContext.SqlDatabase.DatabaseInfo.ConnectionString;
@@ -121,6 +133,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();
                            s.AddSingleton(typeof(IOrchestrationData), _orchestrationData);
+                           s.AddSingleton(typeof(IDateTimeService), _testContext.DateTimeService);
                            s.Decorate(typeof(ICommandHandler<>), typeof(CommandHandlerWithTimings<>));                        
                        })
                        )

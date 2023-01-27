@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                     .Without(x => x.VrfCaseId)
                     .Without(x => x.VrfCaseStatus)
                     .Without(x => x.VrfCaseStatusLastUpdatedDateTime)
+                    .Without(x => x.VendorBlockEndDate)
                     .Without(x => x.VrfVendorId).Create());
         }
 
@@ -58,7 +59,10 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var account = accounts.Single(a => a.Id == _account.Id && a.AccountLegalEntityId == _account.AccountLegalEntityId);
 
             account.Should().BeEquivalentTo(_account,
-                opts => opts.Excluding(x => x.HashedLegalEntityId).Excluding(x => x.VrfCaseStatusLastUpdatedDateTime).Excluding(x => x.HasBeenDeleted));
+            opts => opts.Excluding(x => x.HashedLegalEntityId)
+                    .Excluding(x => x.VrfCaseStatusLastUpdatedDateTime)
+                    .Excluding(x => x.HasBeenDeleted)
+                    .Excluding(x => x.VendorBlockEndDate));
             account.HashedLegalEntityId.Should().NotBeNullOrEmpty();
         }
     }
