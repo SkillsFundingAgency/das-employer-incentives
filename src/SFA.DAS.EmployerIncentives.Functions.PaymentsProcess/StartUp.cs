@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Commands;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -9,17 +10,9 @@ using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
+using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
-using Microsoft.Azure.WebJobs.Hosting;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host.Config;
-using Microsoft.Azure.WebJobs.Description;
-using Microsoft.EntityFrameworkCore;
-using SFA.DAS.EmployerIncentives.Data;
-using Microsoft.Extensions.Options;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess

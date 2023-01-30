@@ -162,8 +162,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
             serviceCollection.AddSingleton<IAzureCredential, AzureCredentialProvider>();
 
             serviceCollection
-                .AddSingleton<ISqlAzureIdentityTokenProvider, SqlAzureIdentityTokenProvider>()
-                .Decorate<ISqlAzureIdentityTokenProvider, SqlAzureIdentityTokenProviderWithLogging>();
+                .AddSingleton<ISqlAzureIdentityTokenProvider, SqlAzureIdentityTokenProvider>();
+                //.Decorate<ISqlAzureIdentityTokenProvider, SqlAzureIdentityTokenProviderWithLogging>();
 
             serviceCollection.AddSingleton<ISqlConnectionProvider, SqlConnectionProvider>();
 
