@@ -1,17 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SFA.DAS.EmployerIncentives.Data.Models
 {
     public partial class EmployerIncentivesDbContext : DbContext
     {
+        private readonly IServiceProvider _serviceProvider;
+
         public EmployerIncentivesDbContext()
         {
         }
 
-        public EmployerIncentivesDbContext(DbContextOptions<EmployerIncentivesDbContext> options)
+        public EmployerIncentivesDbContext(DbContextOptions<EmployerIncentivesDbContext> options, 
+                    IServiceProvider serviceProvider= null)
             : base(options)
         {
+            _serviceProvider = serviceProvider;
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
@@ -42,6 +50,19 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<ApprenticeApplication> ApprenticeApplications { get; set; }
         public virtual DbSet<RevertedPaymentAudit> RevertedPaymentAudits { get; set; }
         public virtual DbSet<ReinstatedPendingPaymentAudit> ReinstatedPendingPaymentAudits { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (_serviceProvider != null)
+            {
+                var sqlConnectionProvider = _serviceProvider.GetService<ISqlConnectionProvider>();
+                if (sqlConnectionProvider != null)
+                {
+                    var settings = _serviceProvider.GetService<IOptions<ApplicationSettings>>();
+                    optionsBuilder.UseSqlServer(_serviceProvider.GetService<ISqlConnectionProvider>().Get(settings.Value.DbConnectionString));
+                }
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

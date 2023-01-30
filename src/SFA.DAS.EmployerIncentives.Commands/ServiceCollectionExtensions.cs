@@ -386,10 +386,8 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 catch (KeyNotFoundException)
                 {
                     var settings = p.GetService<IOptions<ApplicationSettings>>();
-                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
-                    .UseSqlServer(p.GetService<ISqlConnectionProvider>().Get(settings.Value.DbConnectionString));
-
-                    dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options);
+                    var optionsBuilder = new DbContextOptionsBuilder<EmployerIncentivesDbContext>();
+                    dbContext = new EmployerIncentivesDbContext(optionsBuilder.Options, p);
                 }
 
                 return dbContext;

@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
@@ -16,15 +17,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
         private IAccountDataRepository _sut;
+        private Mock<IServiceProvider> _mockServiceProvider;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+            _mockServiceProvider = new Mock<IServiceProvider>();
 
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _context = new EmployerIncentivesDbContext(options);
+            _context = new EmployerIncentivesDbContext(options, _mockServiceProvider.Object);
 
             _sut = new Data.AccountDataRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }

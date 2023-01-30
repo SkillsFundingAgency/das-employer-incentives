@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
 using SFA.DAS.EmployerIncentives.Data.Models;
@@ -16,12 +17,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.CollectionPeriodDataReposito
         private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
         private CollectionCalendarPeriod[] _collectionPeriod;
+        private Mock<IServiceProvider> _mockServiceProvider;
 
         [SetUp]
         public void Setup()
         {
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _dbContext = new EmployerIncentivesDbContext(options);
+
+            _mockServiceProvider = new Mock<IServiceProvider>();
+
+            _dbContext = new EmployerIncentivesDbContext(options, _mockServiceProvider.Object);
             _sut = new ApprenticeshipIncentives.CollectionPeriodDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 

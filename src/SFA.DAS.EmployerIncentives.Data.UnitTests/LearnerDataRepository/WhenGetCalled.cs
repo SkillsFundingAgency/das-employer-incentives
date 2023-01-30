@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
@@ -15,13 +16,16 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LearnerDataRepository
         private ApprenticeshipIncentives.LearnerDataRepository _sut;
         private readonly Fixture _fixture = new Fixture();
         private EmployerIncentivesDbContext _dbContext;
+        private Mock<IServiceProvider> _mockServiceProvider;
 
         [SetUp]
         public void Arrange()
         {
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
+            _mockServiceProvider = new Mock<IServiceProvider>();
+
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _dbContext = new EmployerIncentivesDbContext(options);
+            _dbContext = new EmployerIncentivesDbContext(options, _mockServiceProvider.Object);
             _sut = new ApprenticeshipIncentives.LearnerDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 

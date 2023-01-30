@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using Moq;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
 {
@@ -16,15 +17,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.AccountDataRepository
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
         private IQueryRepository<LegalEntity> _sut;
+        private Mock<IServiceProvider> _mockServiceProvider;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+            _mockServiceProvider = new Mock<IServiceProvider>();
 
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _context = new EmployerIncentivesDbContext(options);
+            _context = new EmployerIncentivesDbContext(options, _mockServiceProvider.Object);
 
             _sut = new AccountQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }

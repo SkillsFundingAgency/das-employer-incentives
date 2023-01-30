@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Enums;
+using Moq;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
@@ -20,12 +21,15 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         private EmployerIncentivesDbContext _dbContext;
         private List<ApprenticeshipIncentives.Models.ApprenticeshipIncentive> _incentives;
         private (Guid IncentiveWithPendingPayments, ApprenticeshipIncentives.Models.ApprenticeshipIncentive[] IncentivesWithoutPendingPyaments) _expected;
+        private Mock<IServiceProvider> _mockServiceProvider;
 
         [SetUp]
         public async Task SetUp()
         {
+            _mockServiceProvider = new Mock<IServiceProvider>();
+
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _dbContext = new EmployerIncentivesDbContext(options);
+            _dbContext = new EmployerIncentivesDbContext(options, _mockServiceProvider.Object);
 
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
 
