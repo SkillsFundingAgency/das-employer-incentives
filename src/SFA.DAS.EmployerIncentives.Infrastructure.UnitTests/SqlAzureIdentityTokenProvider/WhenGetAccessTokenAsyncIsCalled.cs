@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.UnitTests.SqlAzureIdentityTo
         private SqlAzureIdentityTokenProvider _sut;
         private Mock<IAzureCredential> _mockAzureCredential;
         private Mock<TokenCredential> _mockTokenCredential;
-        private Mock<IMemoryCache> _mockMemoryCache;
+        private IMemoryCache _memoryCache;
 
         private string _token;
         private Fixture _fixture;
@@ -29,7 +29,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.UnitTests.SqlAzureIdentityTo
             _token = _fixture.Create<string>();
 
             _mockTokenCredential = new Mock<TokenCredential>();
-            _mockMemoryCache = new Mock<IMemoryCache>();
+            _memoryCache = new TestMemoryCache("SqlAzureIdentityAuthenticationKey", null);
 
             _mockTokenCredential
                 .Setup(m => m.GetTokenAsync(It.IsAny<TokenRequestContext>(), It.IsAny<CancellationToken>()))
@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.UnitTests.SqlAzureIdentityTo
             _mockAzureCredential = new Mock<IAzureCredential>();
             _mockAzureCredential.Setup(m => m.Get()).Returns(_mockTokenCredential.Object);
 
-            _sut = new SqlAzureIdentityTokenProvider(_mockAzureCredential.Object, _mockMemoryCache.Object);
+            _sut = new SqlAzureIdentityTokenProvider(_mockAzureCredential.Object, _memoryCache);
         }
 
         [Test]
