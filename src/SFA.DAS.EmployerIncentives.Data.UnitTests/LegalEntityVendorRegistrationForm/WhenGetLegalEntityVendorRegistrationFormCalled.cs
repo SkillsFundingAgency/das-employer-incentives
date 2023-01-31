@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.LegalEntityVendorRegistrationForm;
 using SFA.DAS.EmployerIncentives.Data.Models;
-using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LegalEntityVendorRegistrationForm
 {
@@ -16,15 +16,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.LegalEntityVendorRegistratio
         private EmployerIncentivesDbContext _context;
         private Fixture _fixture;
         private IQueryRepository<DataTransferObjects.Queries.LegalEntityVendorRegistrationForm> _sut;
+        private Mock<IServiceProvider> _mockServiceProvider;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+            _mockServiceProvider = new Mock<IServiceProvider>();
 
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _context = new EmployerIncentivesDbContext(options);
+            _context = new EmployerIncentivesDbContext(options, _mockServiceProvider.Object);
 
             _sut = new LegalEntityVendorRegistrationFormQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
         }

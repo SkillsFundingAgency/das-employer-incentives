@@ -80,7 +80,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TEST", "TEST", "{1BBE41D6-1
 		Reports\TEST\EI Metrics - Payments - Recovery-Test-1637681951869.json = Reports\TEST\EI Metrics - Payments - Recovery-Test-1637681951869.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.EmployerIncentives.DataTransferObjects", "SFA.DAS.EmployerIncentives.DataTransferObjects\SFA.DAS.EmployerIncentives.DataTransferObjects.csproj", "{4444AA37-45C2-40E6-A332-C5296F210C23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.DataTransferObjects", "SFA.DAS.EmployerIncentives.DataTransferObjects\SFA.DAS.EmployerIncentives.DataTransferObjects.csproj", "{4444AA37-45C2-40E6-A332-C5296F210C23}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.EmployerIncentives.Infrastructure.UnitTests", "SFA.DAS.EmployerIncentives.Infrastructure.UnitTests\SFA.DAS.EmployerIncentives.Infrastructure.UnitTests.csproj", "{CC572035-0D1A-492D-A238-B96FE9857802}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -210,6 +212,10 @@ Global
 		{4444AA37-45C2-40E6-A332-C5296F210C23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4444AA37-45C2-40E6-A332-C5296F210C23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4444AA37-45C2-40E6-A332-C5296F210C23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC572035-0D1A-492D-A238-B96FE9857802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC572035-0D1A-492D-A238-B96FE9857802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC572035-0D1A-492D-A238-B96FE9857802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC572035-0D1A-492D-A238-B96FE9857802}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -241,6 +247,7 @@ Global
 		{B07C71D0-B6B2-44E8-8EBD-C5B46CAC2045} = {19B5E22A-31B8-4F4A-B759-F82B368F81A9}
 		{AE46BF8B-2ECD-4250-8398-AE3291353BDF} = {029DDE18-BCD5-4FCA-8C3D-4903F42FF38A}
 		{1BBE41D6-1074-4EE3-A7DA-44C3F6765055} = {AE46BF8B-2ECD-4250-8398-AE3291353BDF}
+		{CC572035-0D1A-492D-A238-B96FE9857802} = {9517C39E-1329-48E8-91A6-4F2B7543837D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3E3FB6-A534-4F3A-AC5E-BD27EF68874D}

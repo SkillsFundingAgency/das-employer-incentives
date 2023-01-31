@@ -83,6 +83,8 @@ namespace SFA.DAS.EmployerIncentives.Api
 
             services.AddNLog(Configuration);
 
+            services.AddMemoryCache();
+
             services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
                 .AddNServiceBusClientUnitOfWork();

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models;
@@ -22,15 +23,17 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.PaymentsQueryRepository
         private PendingPayment _pendingPayment1;
         private Models.Account _account1;
         private ApprenticeshipIncentives.Models.ApprenticeshipIncentive _apprenticeshipIncentive1;
+        private Mock<IServiceProvider> _mockServiceProvider;
 
         [SetUp]
         public void Arrange()
         {
             _fixture = new Fixture();
+            _mockServiceProvider = new Mock<IServiceProvider>();
 
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>()
                 .UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
-            _context = new EmployerIncentivesDbContext(options);
+            _context = new EmployerIncentivesDbContext(options, _mockServiceProvider.Object);
 
             _sut = new ApprenticeshipIncentives.PaymentsQueryRepository(new Lazy<EmployerIncentivesDbContext>(_context));
 

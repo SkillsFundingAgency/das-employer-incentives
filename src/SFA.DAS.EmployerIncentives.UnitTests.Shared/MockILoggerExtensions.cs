@@ -2,7 +2,7 @@
 using Moq;
 using System;
 
-namespace SFA.DAS.EmployerIncentives.Application.UnitTests
+namespace SFA.DAS.EmployerIncentives.UnitTests.Shared
 {
     public static class MockILoggerExtensions
     {
