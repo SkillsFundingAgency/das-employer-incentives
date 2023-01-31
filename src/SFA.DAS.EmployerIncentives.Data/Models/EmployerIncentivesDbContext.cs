@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Models
         public virtual DbSet<ApprenticeApplication> ApprenticeApplications { get; set; }
         public virtual DbSet<RevertedPaymentAudit> RevertedPaymentAudits { get; set; }
         public virtual DbSet<ReinstatedPendingPaymentAudit> ReinstatedPendingPaymentAudits { get; set; }
-
+    
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (_serviceProvider != null)
