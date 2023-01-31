@@ -52,7 +52,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.Configure<BusinessCentralApiClient>(config.GetSection("BusinessCentralApi"));
             builder.Services.Configure<EmployerIncentivesOuterApi>(config.GetSection("EmployerIncentivesOuterApi"));
 
-            builder.Services.AddNLog(config);            
+            builder.Services.AddNLog(config);
+
+            builder.Services.AddMemoryCache();
 
             builder.Services.AddEntityFrameworkForEmployerIncentives()
                 .AddEntityFrameworkUnitOfWork<EmployerIncentivesDbContext>()
