@@ -155,6 +155,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
 
             serviceCollection.AddScoped<IValidationOverrideAuditRepository, ValidationOverrideAuditRepository>();
             serviceCollection.AddScoped<IRevertedPaymentAuditRepository, RevertedPaymentAuditRepository>();
+            serviceCollection.AddScoped<IReinstatedPendingPaymentAuditRepository, ReinstatedPendingPaymentAuditRepository>();
             
             return serviceCollection;
         }
@@ -196,7 +197,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<RefreshEmploymentChecksCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
                 ;
 

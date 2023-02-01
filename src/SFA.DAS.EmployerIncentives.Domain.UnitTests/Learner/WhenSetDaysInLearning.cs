@@ -146,7 +146,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
         }
 
         [Test()]
-        public void Then_the_existing_daya_in_learning_is_updated_for_the_collection_period()
+        public void Then_the_existing_days_in_learning_is_updated_for_the_collection_period()
         {
             // arrange             
             _sutModel.DaysInLearnings.Add(new DaysInLearning(_collectionCalendarPeriod.CollectionPeriod, 5));
@@ -160,6 +160,29 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.LearnerTests
             // assert            
             var daysInLearning = _sut.GetModel().DaysInLearnings.Single();
             daysInLearning.CollectionPeriod.Should().Be(_collectionCalendarPeriod.CollectionPeriod);
+            daysInLearning.NumberOfDays.Should().Be(expectedDays);
+        }
+
+        [Test]
+        public void Then_the_days_in_learning_count_accounts_for_a_break_in_learning_across_academic_years()
+        {
+            // Arrange
+            _sutModel.DaysInLearnings.Clear();
+            _sutModel.LearningPeriods.Clear();
+            _sutModel.LearningPeriods.Add(new LearningPeriod(new DateTime(2021, 05, 25), new DateTime(2021, 07, 31)));
+            _sutModel.LearningPeriods.Add(new LearningPeriod(new DateTime(2022, 08, 16), new DateTime(2023, 07, 31)));
+            _sutModel.LearningPeriods.Add(new LearningPeriod(new DateTime(2021, 08, 01), new DateTime(2022, 03, 10)));
+
+            int expectedDays = 68 + 46 + 222;
+            _sut = Sut(_sutModel);
+
+            // Act
+            var collectionCalendarPeriod = new CollectionCalendarPeriod(new CollectionPeriod(1, 2022), 9, 2022, new DateTime(2022, 09, 30), new DateTime(2022, 09, 30), true, false);
+
+            _sut.SetDaysInLearning(collectionCalendarPeriod);
+
+            // Assert            
+            var daysInLearning = _sut.GetModel().DaysInLearnings.Single();
             daysInLearning.NumberOfDays.Should().Be(expectedDays);
         }
 
