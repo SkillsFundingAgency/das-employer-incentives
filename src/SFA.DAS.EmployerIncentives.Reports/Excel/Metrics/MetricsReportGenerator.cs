@@ -55,9 +55,8 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
             new ValidationTable(context).Create(report);
             context.RowNumber++;
-            new ValidationTable(context).Create(report, true);
 
-            validationSheet.SetColumnWidths(0, 11, 22);
+            validationSheet.SetColumnWidths(0, 18, 22);
         }
 
         private static IDictionary<Style, ICellStyle> CreateStyles(IWorkbook workbook)

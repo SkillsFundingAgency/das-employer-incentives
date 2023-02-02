@@ -31,8 +31,7 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports
                 PaymentsMade = results.Read<PaymentsMade>().ToList(),
                 Earnings = results.Read<Earning>().ToList(),
                 Clawbacks = results.Read<Clawbacks>().SingleOrDefault(),
-                PeriodValidations = results.Read<Validation>().ToList(),
-                YtdValidations = results.Read<Validation>().ToList(),
+                PeriodValidations = results.Read<Validation>().ToList(),                
                 ValidationSummary = new PeriodValidationSummary
                 {
                     ValidRecords = results.Read<PeriodValidationSummary.ValidationSummaryRecord>().SingleOrDefault(),

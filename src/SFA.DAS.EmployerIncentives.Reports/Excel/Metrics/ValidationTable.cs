@@ -12,22 +12,22 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             _context = context;
         }
 
-        public void Create(MetricsReport report, bool isYtd = false)
+        public void Create(MetricsReport report)
         {
-            AddSectionHeaderRow(isYtd);
+            AddSectionHeaderRow();
             AddHeaderRow();
-            AddRows(isYtd ? report.YtdValidations : report.PeriodValidations);
+            AddRows(report.PeriodValidations);
             _context.RowNumber++;
         }
 
-        private void AddSectionHeaderRow(bool isYtd)
+        private void AddSectionHeaderRow()
         {
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
 
             var cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.Bold];
-            cell.SetCellValue(isYtd ? "YTD validation" : "This period validation");
+            cell.SetCellValue("This period validation");
         }
 
         private void AddHeaderRow()
@@ -66,10 +66,31 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue("HasSignedMinVersion");
 
             cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue("LearnerMatchSuccessful");
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue("EmployedAtStartOfApprenticeship");
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue("EmployedBeforeSchemeStarted");
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue("BlockedForPayments");
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue("EmployedAt365Days");
+
+            cell = currentRow.CreateCell(cellNumber++);
             cell.SetCellValue("Num Legal Entity IDs");
 
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue("FirstEarningAmount");
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue("SecondEarningAmount");
+
             cell = currentRow.CreateCell(cellNumber);
-            cell.SetCellValue("EarningAmount");
+            cell.SetCellValue("TotalEarningAmount");
 
             _context.Sheet.SetAutoFilter(new NPOI.SS.Util.CellRangeAddress(_context.RowNumber - 1, _context.RowNumber - 1, _context.StartCellNumber, cellNumber));
         }
@@ -115,10 +136,33 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue(ytdValidation.HasSignedMinVersion.ToInt());
 
             cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue(ytdValidation.LearnerMatchSuccessful.ToInt());
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue(ytdValidation.EmployedAtStartOfApprenticeship.ToInt());
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue(ytdValidation.EmployedBeforeSchemeStarted.ToInt());
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue(ytdValidation.BlockedForPayments.ToInt());
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue(ytdValidation.EmployedAt365Days.ToInt());
+
+            cell = currentRow.CreateCell(cellNumber++);
             cell.SetCellValue(ytdValidation.NumberOfAccountLegalEntityIds);
 
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue(ytdValidation.FirstEarningAmount);
+            cell.CellStyle = _context.Styles[Style.Currency];
+
+            cell = currentRow.CreateCell(cellNumber++);
+            cell.SetCellValue(ytdValidation.SecondEarningAmount);
+            cell.CellStyle = _context.Styles[Style.Currency];
+
             cell = currentRow.CreateCell(cellNumber);
-            cell.SetCellValue(ytdValidation.EarningAmount);
+            cell.SetCellValue(ytdValidation.TotalEarningAmount);
             cell.CellStyle = _context.Styles[Style.Currency];
         }
     }

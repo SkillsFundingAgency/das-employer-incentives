@@ -70,71 +70,64 @@ AS
 
 	-- Validations (Current Period)
 	;WITH LatestPeriod AS (
-	SELECT TOP 1 
-		PeriodNumber, 
-		PaymentYear FROM [BusinessGetMonthEndRuntimes] ORDER BY [LastValidation] DESC),
-		PendingPaymentValidations AS (
-			SELECT
-				PendingPaymentId [PendingPaymentId], 				
-				CASE OverrideResult
+	SELECT TOP 1 PeriodNumber, PaymentYear FROM [BusinessGetMonthEndRuntimes] ORDER BY [LastValidation] DESC)
+	,PendingPaymentValidations AS (
+		SELECT 
+			PendingPaymentId,
+			PeriodNumber, 
+			PaymentYear,
+			ISNULL(HasLearningRecord, 0) AS HasLearningRecord,
+			ISNULL(IsInLearning, 0) AS IsInLearning,
+			ISNULL(HasDaysInLearning, 0) AS HasDaysInLearning,
+			ISNULL(HasNoDataLocks, 0) AS HasNoDataLocks,
+			ISNULL(HasBankDetails, 0) AS HasBankDetails,
+			ISNULL(PaymentsNotPaused, 0) AS PaymentsNotPaused,	
+			ISNULL(HasIlrSubmission, 0) AS HasIlrSubmission,
+			ISNULL(HasSignedMinVersion, 0) AS HasSignedMinVersion,
+			ISNULL(LearnerMatchSuccessful, 0) AS LearnerMatchSuccessful,
+			ISNULL(EmployedAtStartOfApprenticeship, 0) AS EmployedAtStartOfApprenticeship,
+			ISNULL(EmployedBeforeSchemeStarted, 0) AS EmployedBeforeSchemeStarted,
+			ISNULL(BlockedForPayments, 0) AS BlockedForPayments,
+			IIF(EarningType = 'FirstPayment' , 1, ISNULL(EmployedAt365Days, 0)) AS EmployedAt365Days
+		FROM
+		(
+			SELECT 
+				PendingPaymentId,
+				ppvr.PeriodNumber,
+				ppvr.PaymentYear,
+				step,  
+				CASE ISNULL(OverrideResult, 0)
 					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='HasIlrSubmission',1,0)) 
-				END AS HasIlrSubmission,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='HasLearningRecord',1,0)) 
-				END AS HasLearningRecord,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='IsInLearning',1,0)) 
-				END AS IsInLearning,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='HasDaysInLearning',1,0)) 
-				END AS HasDaysInLearning,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='HasNoDataLocks',1,0)) 
-				END AS HasNoDataLocks,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='HasBankDetails',1,0)) 
-				END AS HasBankDetails,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='PaymentsNotPaused',1,0)) 
-				END AS PaymentsNotPaused,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='HasSignedMinVersion',1,0)) 
-				END AS HasSignedMinVersion,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='LearnerMatchSuccessful',1,0)) 
-				END AS LearnerMatchSuccessful,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='EmployedAtStartOfApprenticeship',1,0)) 
-				END AS EmployedAtStartOfApprenticeship,				
-				CASE OverrideResult
-					WHEN 1 THEN 1
-					ELSE MAX(IIF(step='EmployedBeforeSchemeStarted',1,0)) 
-				END AS EmployedBeforeSchemeStarted,				
-				Result,
-				ppvr.PeriodNumber, 
-				ppvr.PaymentYear
-			FROM
-				[incentives].[PendingPaymentValidationResult] ppvr INNER JOIN LatestPeriod 
-					ON ppvr.PeriodNumber = LatestPeriod.PeriodNumber
-					AND ppvr.PaymentYear = LatestPeriod.PaymentYear
-					AND result = 1 
-			GROUP BY
-				PendingPaymentId, 
-				ppvr.Result, 
-				ppvr.OverrideResult,
-				ppvr.PeriodNumber, 
-				ppvr.PaymentYear
-			)
+					ELSE result
+				END AS result,
+				pp.EarningType
+			FROM [incentives].[PendingPaymentValidationResult] ppvr 
+				INNER JOIN LatestPeriod 
+					ON ppvr.PeriodNumber = LatestPeriod.PeriodNumber 
+					AND ppvr.PaymentYear = LatestPeriod.PaymentYear		
+				INNER JOIN [incentives].[PendingPayment] pp 		
+					ON pp.id=ppvr.PendingPaymentId
+		) d
+	PIVOT
+	(
+		MAX(result)
+		FOR step IN (
+			HasBankDetails,
+			BlockedForPayments,
+			LearnerMatchSuccessful,
+			HasIlrSubmission,
+			HasLearningRecord,
+			IsInLearning,
+			HasNoDataLocks,
+			HasDaysInLearning,
+			PaymentsNotPaused,
+			HasSignedMinVersion,
+			EmployedAtStartOfApprenticeship,
+			EmployedBeforeSchemeStarted,
+			EmployedAt365Days,
+			HasNoUnsentClawbacks)
+	) piv
+	)
 	SELECT
 		ISNULL(NULL, 'PeriodValidations'),
 		ROW_NUMBER() OVER (ORDER BY
@@ -148,7 +141,9 @@ AS
 			HasSignedMinVersion DESC,
 			LearnerMatchSuccessful DESC,
 			EmployedAtStartOfApprenticeship DESC,
-			EmployedBeforeSchemeStarted DESC)	AS 'Order',
+			EmployedBeforeSchemeStarted DESC,
+			BlockedForPayments DESC,
+			EmployedAt365Days DESC)	AS 'Order',
 		COUNT(DISTINCT pendingpaymentId) AS 'CountOfPayments', 
 		HasLearningRecord,
 		IsInLearning, 
@@ -162,144 +157,32 @@ AS
 		LearnerMatchSuccessful,
 		EmployedAtStartOfApprenticeship,
 		EmployedBeforeSchemeStarted,
+		BlockedForPayments,
+		EmployedAt365Days,
 		COUNT(DISTINCT a.[AccountLegalEntityId]) AS [AccountLegalEntityId],
-		SUM(pp.amount) AS EarningAmount
+		SUM(IIF(pp.EarningType = 'FirstPayment', pp.amount, 0)) AS FirstEarningAmount,
+		SUM(IIF(pp.EarningType = 'SecondPayment', pp.amount, 0)) AS SecondEarningAmount,
+		SUM(ISNULL(pp.amount, 0)) as TotalEarningAmount
 	FROM
 		PendingPaymentValidations ppv LEFT JOIN [incentives].[PendingPayment] pp 
-			ON pp.id=ppv.PendingPaymentId
-		LEFT JOIN [dbo].[Accounts] a 
-			ON pp.AccountLegalEntityId=a.AccountLegalEntityId
+				ON pp.id=ppv.PendingPaymentId
+			LEFT JOIN [dbo].[Accounts] a 
+				ON pp.AccountLegalEntityId=a.AccountLegalEntityId
 	GROUP BY
-		HasIlrSubmission, 
 		HasLearningRecord, 
 		IsInLearning, 
 		HasDaysInLearning, 
 		HasNoDataLocks, 
 		HasBankDetails, 
 		PaymentsNotPaused, 
+		HasIlrSubmission,   
 		HasSignedMinVersion,
 		LearnerMatchSuccessful,
 		EmployedAtStartOfApprenticeship,
 		EmployedBeforeSchemeStarted,
-		Result
-
-
-	-- Validations (YTD)
-	;WITH latestValidations AS (
-		SELECT 
-			MAX(ppv.periodnumber) MaxPeriod, 
-			PendingPaymentId, 
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE max(IIF(step='HasIlrSubmission' AND result=1,1,0))
-			END AS HasIlrSubmission,			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE max(IIF(step='HasLearningRecord' AND result=1,1,0))
-			END AS HasLearningRecord,			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE max(IIF(step='IsInLearning' AND result=1,1,0))
-			END AS IsInLearning,			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE max(IIF(step='HasDaysInLearning' AND result=1,1,0))
-			END AS HasDaysInLearning,			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE max(IIF(step='HasNoDataLocks' AND result=1,1,0))
-			END AS HasNoDataLocks,			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE max(IIF(step='HasBankDetails' AND result=1,1,0))
-			END AS HasBankDetails,			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE max(IIF(step='PaymentsNotPaused' AND result=1,1,0))
-			END AS PaymentsNotPaused,			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE MAX((CASE WHEN ppv.periodnumber <> 6 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='HasNoUnsentClawbacks' AND result=1,1,0) END))
-			END AS HasNoUnsentClawbacks,
-			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE MAX((CASE WHEN ppv.periodnumber < 9 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='HasSignedMinVersion' AND result=1,1,0) END))
-			END AS HasSignedMinVersion,
-			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE MAX((CASE WHEN ppv.periodnumber < 12 AND ppv.paymentyear = 2021 THEN 1 ELSE IIF(step='LearnerMatchSuccessful' AND result=1,1,0) END))
-			END AS LearnerMatchSuccessful,
-			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE MAX((CASE WHEN ppv.periodnumber < 5 AND ppv.paymentyear <= 2122 THEN 1 ELSE IIF(step='EmployedAtStartOfApprenticeship' AND result=1,1,0) END))
-			END AS EmployedAtStartOfApprenticeship,
-			
-			CASE OverrideResult
-				WHEN 1 THEN 1
-				ELSE MAX((CASE WHEN ppv.periodnumber < 5 AND ppv.paymentyear <= 2122 THEN 1 ELSE IIF(step='EmployedBeforeSchemeStarted' AND result=1,1,0) END))
-			END AS EmployedBeforeSchemeStarted,
-			ISNULL(Amount, 0) AS 'Amount',
-			a.[AccountLegalEntityId] --Should only be one
-		FROM [incentives].[PendingPaymentValidationResult] ppv LEFT JOIN [incentives].[PendingPayment] pp 
-			ON pp.id=ppv.PendingPaymentId
-		LEFT JOIN [dbo].[Accounts] a 
-			ON pp.AccountLegalEntityId=a.AccountLegalEntityId
-	GROUP BY
-		PendingPaymentId, 
-		amount, 
-		a.[AccountLegalEntityId],
-		OverrideResult
-	)
-	SELECT
-		ISNULL(NULL, 'YtdValidations'),
-		ROW_NUMBER() OVER (ORDER BY
-			HasLearningRecord DESC, 
-			IsInLearning DESC, 
-			HasDaysInLearning DESC, 
-			HasNoDataLocks DESC, 
-			HasBankDetails DESC, 
-			PaymentsNotPaused DESC,
-			HasNoUnsentClawbacks DESC,
-			HasIlrSubmission DESC,
-			HasSignedMinVersion DESC,
-			LearnerMatchSuccessful DESC,
-			EmployedAtStartOfApprenticeship DESC,
-			EmployedBeforeSchemeStarted DESC) AS 'Order',
-		COUNT(DISTINCT pendingpaymentId) AS 'CountOfPayments', 
-		HasLearningRecord, 
-		IsInLearning, 
-		HasDaysInLearning, 
-		HasNoDataLocks, 
-		HasBankDetails, 
-		PaymentsNotPaused,
-		HasNoUnsentClawbacks,
-		HasIlrSubmission,
-		HasSignedMinVersion,
-		LearnerMatchSuccessful,
-		EmployedAtStartOfApprenticeship,
-		EmployedBeforeSchemeStarted,
-		ISNULL(COUNT(DISTINCT [AccountLegalEntityId]), 0) AS 'NumberOfAccountLegalEntityIds',
-		ISNULL(SUM(Amount), 0) AS 'EarningAmount'
-	FROM
-		latestValidations
-	GROUP BY
-		HasLearningRecord, 
-		IsInLearning, 
-	  HasDaysInLearning, 
-	  HasNoDataLocks, 
-	  HasBankDetails, 
-	  PaymentsNotPaused,
-	  HasNoUnsentClawbacks,
-	  HasIlrSubmission,
-	  HasSignedMinVersion,
-	  LearnerMatchSuccessful,
-	  EmployedAtStartOfApprenticeship,
-	  EmployedBeforeSchemeStarted
-
-
+		BlockedForPayments,
+		EmployedAt365Days
+	
 	-- Valid Validation records
 	  SELECT 
 		ISNULL(NULL, 'ValidValidation'),

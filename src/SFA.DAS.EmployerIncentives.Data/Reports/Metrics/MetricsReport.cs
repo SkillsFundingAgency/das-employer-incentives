@@ -12,7 +12,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports.Metrics
         public PeriodValidationSummary ValidationSummary { get; set; }
         public Clawbacks Clawbacks { get; set; }
         public List<Validation> PeriodValidations { get; set; }
-        public IEnumerable<Validation> YtdValidations { get; set; }
 
         public MetricsReport(string name = "Metrics")
         {
@@ -20,7 +19,6 @@ namespace SFA.DAS.EmployerIncentives.Data.Reports.Metrics
             PaymentsMade = new List<PaymentsMade>();
             Earnings = new List<Earning>();
             PeriodValidations = new List<Validation>();
-            YtdValidations = new List<Validation>();
         }
     }
 }

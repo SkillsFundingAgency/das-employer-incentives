@@ -16,7 +16,11 @@
         public bool LearnerMatchSuccessful { get; set; }
         public bool EmployedAtStartOfApprenticeship { get; set; }
         public bool EmployedBeforeSchemeStarted { get; set; }
+        public bool BlockedForPayments { get; set; }
+        public bool EmployedAt365Days { get; set; }
         public int NumberOfAccountLegalEntityIds { get; set; }
-        public double EarningAmount { get; set; }
+        public double FirstEarningAmount { get; set; }
+        public double SecondEarningAmount { get; set; }
+        public double TotalEarningAmount { get; set; }
     }
 }
