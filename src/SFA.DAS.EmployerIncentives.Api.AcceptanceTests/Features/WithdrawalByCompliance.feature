@@ -27,3 +27,9 @@ Scenario: Compliance withdrawal for an apprenticeship that has paid payments (ea
 	Given an apprenticeship incentive with paid payments exists as a result of an incentive application
 	When the apprenticeship application is withdrawn from the scheme
 	Then clawbacks are created for the apprenticeship incentive payments and it's pending payments are archived
+
+Scenario: Compliance withdrawal for a stopped apprenticeship that has paid payments (earnings)
+	Given an apprenticeship incentive with paid payments exists as a result of an incentive application
+	And the apprenticeship incentive status is Stopped
+	When the apprenticeship application is withdrawn from the scheme
+	Then clawbacks are created for the apprenticeship incentive payments and it's pending payments are archived
