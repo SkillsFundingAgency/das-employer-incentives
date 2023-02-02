@@ -305,7 +305,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             clawback.PendingPaymentId.Should().Be(pendingPaymentModel.Id);
             clawback.SubnominalCode.Should().Be(paymentModel.SubnominalCode);
             clawback.PaymentId.Should().Be(paymentModel.Id);
-            clawback.CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+            clawback.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             clawback.CollectionPeriod.Should().Be(_activePeriod.CollectionPeriod);
         }
 

@@ -12,6 +12,7 @@ using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
+    [NonParallelizable]
     public class WhenFindApprenticeshipIncentivesWithoutPendingPayments
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
@@ -25,6 +26,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         {
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
+
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
 
             var cpData = _fixture.Build<CollectionCalendarPeriod>()

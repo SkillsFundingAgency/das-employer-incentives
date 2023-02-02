@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
 {
+    [NonParallelizable]
     public class WhenFindByApprenticeshipId
     {
         private ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository _sut;
@@ -19,6 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeshipIncentive
         {
             var options = new DbContextOptionsBuilder<EmployerIncentivesDbContext>().UseInMemoryDatabase("EmployerIncentivesDbContext" + Guid.NewGuid()).Options;
             _dbContext = new EmployerIncentivesDbContext(options);
+
             _sut = new ApprenticeshipIncentives.ApprenticeshipIncentiveDataRepository(new Lazy<EmployerIncentivesDbContext>(_dbContext));
         }
 

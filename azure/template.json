@@ -128,6 +128,13 @@
         },
         "tags": {
             "type": "object"
+        },
+        "workerAccessRestrictions": {
+            "type": "array"
+        },
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow('yyMMddHHmmss')]"
         }
     },
     "variables": {
@@ -154,7 +161,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "apim-subscription",
+            "name": "[concat(variables('apiAppServiceName'), '-apim-subscription-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedApimResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -179,7 +186,7 @@
         {
             "condition": "[greater(length(parameters('apiCustomHostName')), 0)]",
             "apiVersion": "2020-06-01",
-            "name": "api-app-service-certificate",
+            "name": "[concat(variables('apiAppServiceName'), '-certificate-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -203,7 +210,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "api-application-insights",
+            "name": "[concat(variables('apiAppServiceName'), '-application-insights-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -224,7 +231,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "api-app-service",
+            "name": "[concat(variables('apiAppServiceName'), parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -255,7 +262,7 @@
                                 },
                                 {
                                     "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference('api-application-insights').outputs.InstrumentationKey.value]"
+                                    "value": "[reference(concat(variables('apiAppServiceName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                                 },
                                 {
                                     "name": "ConfigNames",
@@ -292,7 +299,7 @@
                         "value": "[parameters('apiCustomHostName')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference('api-app-service-certificate', '2018-11-01').outputs.certificateThumbprint.value, '')]"
+                        "value": "[if(greater(length(parameters('apiCustomHostName')), 0), reference(concat(variables('apiAppServiceName'), '-certificate-', parameters('utcValue')), '2018-11-01').outputs.certificateThumbprint.value, '')]"
                     },
                     "ipSecurityRestrictions": {
                         "value": "[parameters('backEndAccessRestrictions')]"
@@ -300,12 +307,12 @@
                 }
             },
             "dependsOn": [
-                "api-app-service-certificate"
+                "[concat(variables('apiAppServiceName'), '-certificate-', parameters('utcValue'))]"
             ]
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "api-app-service-sb-role-assignment",
+            "name": "[concat(variables('apiAppServiceName'), '-sb-role-assignment-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
@@ -316,7 +323,7 @@
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[reference('api-app-service').outputs.managedServiceIdentityId.value]"
+                        "value": "[reference(concat(variables('apiAppServiceName'), parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusSender"
@@ -327,7 +334,7 @@
                 }
             },
             "dependsOn": [
-                "api-app-service"
+                "[concat(variables('apiAppServiceName'), parameters('utcValue'))]"
             ]
         },
         {
@@ -357,7 +364,7 @@
         },
         {
             "apiVersion": "2019-05-01",
-            "name": "employer-incentives-sql-database",
+            "name": "[concat(variables('databaseName'), '-sql-database-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
@@ -396,7 +403,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "message-handler-function-subnet",
+            "name": "[concat(parameters('messageHandlerSubnetObject').name, '-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -426,7 +433,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "message-handler-function-app-service-plan",
+            "name": "[concat(variables('messageHandlerFunctionAppName'), '-app-service-plan-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -450,7 +457,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "message-handler-function-application-insights",
+            "name": "[concat(variables('messageHandlerFunctionAppName'), '-application-insights-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -471,7 +478,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "message-handler-function-app",
+            "name": "[concat(variables('messageHandlerFunctionAppName'), parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -491,7 +498,10 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('message-handler-function-subnet').outputs.SubnetResourceId.value]"
+                        "value": "[reference(concat(parameters('messageHandlerSubnetObject').name, '-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('workerAccessRestrictions')]"
                     },
                     "functionAppAppSettings": {
                         "value": {
@@ -518,7 +528,7 @@
                                 },
                                 {
                                     "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference('message-handler-function-application-insights').outputs.InstrumentationKey.value]"
+                                    "value": "[reference(concat(variables('messageHandlerFunctionAppName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -555,13 +565,13 @@
             },
 
             "dependsOn": [
-                "message-handler-function-app-service-plan",
-                "message-handler-function-application-insights"
+                "[concat(variables('messageHandlerFunctionAppName'), '-app-service-plan-', parameters('utcValue'))]",
+                "[concat(variables('messageHandlerFunctionAppName'), '-application-insights-', parameters('utcValue'))]"
             ]
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "message-handler-function-app-sb-role-assignment",
+            "name": "[concat(variables('messageHandlerFunctionAppName'), '-sb-role-assignment-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
@@ -572,7 +582,7 @@
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[reference('message-handler-function-app').outputs.managedServiceIdentityId.value]"
+                        "value": "[reference(concat(variables('messageHandlerFunctionAppName'), parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusOwner"
@@ -583,12 +593,12 @@
                 }
             },
             "dependsOn": [
-                "message-handler-function-app"
+                "[concat(variables('messageHandlerFunctionAppName'), parameters('utcValue'))]"
             ]
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "payment-process-function-subnet",
+            "name": "[concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -616,12 +626,12 @@
                 }
             },
             "dependsOn": [
-                "message-handler-function-subnet"
+                "[concat(parameters('messageHandlerSubnetObject').name, '-', parameters('utcValue'))]"
             ]
         },
         {
             "apiVersion": "2021-04-01",
-            "name": "payment-process-function-sql-firewall-rule",
+            "name": "[concat(parameters('paySubnetObject').name, '-sql-firewall-rule-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -635,14 +645,14 @@
                         "value": "[parameters('sharedSQLServerName')]"
                     },
                     "subnetResourceIdList": {
-                        "value": "[createArray(reference('payment-process-function-subnet').outputs.SubnetResourceId.value)]"
+                        "value": "[createArray(reference(concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))).outputs.SubnetResourceId.value)]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "payment-process-function-app-service-plan",
+            "name": "[concat(variables('paymentProcessFunctionAppName'), '-app-service-plan-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -663,7 +673,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "payment-process-function-application-insights",
+            "name": "[concat(variables('paymentProcessFunctionAppName'), '-application-insights-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -684,7 +694,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "payment-process-function-app",
+            "name": "[concat(variables('paymentProcessFunctionAppName'), parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -704,10 +714,13 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('payment-process-function-subnet').outputs.SubnetResourceId.value]"
+                        "value": "[reference(concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
                     },
                     "runtimeScaleMonitoringEnabled": {
                         "value": true
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('workerAccessRestrictions')]"
                     },
                     "functionAppAppSettings": {
                         "value": {
@@ -742,7 +755,7 @@
                                 },
                                 {
                                     "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference('payment-process-function-application-insights').outputs.InstrumentationKey.value]"
+                                    "value": "[reference(concat(variables('paymentProcessFunctionAppName'), '-application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -766,14 +779,14 @@
                 }
             },
             "dependsOn": [
-                "payment-process-function-app-service-plan",
-                "payment-process-function-application-insights",
-                "payment-process-function-subnet"
+                "[concat(variables('paymentProcessFunctionAppName'), '-app-service-plan-', parameters('utcValue'))]",
+                "[concat(variables('paymentProcessFunctionAppName'), '-application-insights-', parameters('utcValue'))]",
+                "[concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))]"
             ]
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "payment-process-function-app-sb-role-assignment",
+            "name": "[concat(variables('paymentProcessFunctionAppName'), '-sb-role-assignment-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
@@ -784,7 +797,7 @@
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[reference('payment-process-function-app').outputs.managedServiceIdentityId.value]"
+                        "value": "[reference(concat(variables('paymentProcessFunctionAppName'), parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusOwner"
@@ -795,7 +808,7 @@
                 }
             },
             "dependsOn": [
-                "payment-process-function-app"
+                "[concat(variables('paymentProcessFunctionAppName'), parameters('utcValue'))]"
             ]
         }
     ],

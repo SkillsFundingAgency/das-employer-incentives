@@ -7,6 +7,7 @@
         IsInLearning = 2,
         HasNoDataLocks = 3,
         EmployedBeforeSchemeStarted = 4,
-        EmployedAtStartOfApprenticeship = 5
+        EmployedAtStartOfApprenticeship = 5,
+        EmployedAt365Days = 6
     }
 }
