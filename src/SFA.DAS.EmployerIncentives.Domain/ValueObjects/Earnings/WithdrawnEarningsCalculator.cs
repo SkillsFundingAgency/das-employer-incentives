@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings
 
         public override void Calculate()
         {
-            if(Model.PreviousStatus == IncentiveStatus.Active)
+            if(Model.PreviousStatus == IncentiveStatus.Active || Model.PreviousStatus == IncentiveStatus.Stopped)
             {
                 if (HasPaidEarnings())
                 {
