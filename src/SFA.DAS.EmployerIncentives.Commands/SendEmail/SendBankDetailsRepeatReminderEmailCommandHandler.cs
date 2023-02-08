@@ -2,12 +2,12 @@
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.HashingService;
 using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 {
@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
         private readonly ICommandPublisher _commandPublisher;
         private readonly EmailTemplateSettings _emailTemplates;
         private readonly IAccountDomainRepository _accountDomainRepository;
-        private readonly IHashingService _hashingService;
+        private readonly IEncodingService _encodingService;
         private readonly ApplicationSettings _applicationSettings;
 
         private const string AddBankDetailsUrlToken = "bank details url";
@@ -25,13 +25,13 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
         public SendBankDetailsRepeatReminderEmailCommandHandler(ICommandPublisher commandPublisher,
                                                                IOptions<EmailTemplateSettings> emailTemplates,
                                                                IAccountDomainRepository accountDomainRepository,
-                                                               IHashingService hashingService,
+                                                               IEncodingService encodingService,
                                                                IOptions<ApplicationSettings> applicationSettings)
         {
             _commandPublisher = commandPublisher;
             _emailTemplates = emailTemplates.Value;
             _accountDomainRepository = accountDomainRepository;
-            _hashingService = hashingService;
+            _encodingService = encodingService;
             _applicationSettings = applicationSettings.Value;
         }
 
@@ -58,7 +58,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 
         private string GenerateBankDetailsUrl(SendBankDetailsRepeatReminderEmailCommand command)
         {
-            var hashedAccountId = _hashingService.HashValue(command.AccountId);
+            var hashedAccountId = _encodingService.Encode(command.AccountId, EncodingType.AccountId);
             var host = _applicationSettings.EmployerIncentivesWebBaseUrl;
             if (!host.EndsWith("/"))
             {

@@ -17,6 +17,17 @@ Licensed under the [MIT license](https://github.com/SkillsFundingAgency/das-empl
 
 ##### Config
 
+* In your Azure Storage Account, create a table called Configuration and add the following rows:
+
+PartitionKey: LOCAL  
+RowKey: SFA.DAS.EmployerIncentives_1.0  
+Data: Contents of   
+https://github.com/SkillsFundingAgency/das-employer-config/blob/master/das-employer-incentives/SFA.DAS.EmployerIncentives.json (private repo)  
+
+PartitionKey: LOCAL  
+RowKey: SFA.DAS.Encoding_1.0  
+Data: Contents of  
+https://github.com/SkillsFundingAgency/das-employer-config/blob/master/das-shared-config/SFA.DAS.Encoding.json (private repo)  
 
 #### To run a local copy you will also require 
 

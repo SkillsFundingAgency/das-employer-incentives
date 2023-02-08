@@ -3,19 +3,19 @@ using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
-using SFA.DAS.HashingService;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity
 {
     public class UpsertLegalEntityCommandHandler : ICommandHandler<UpsertLegalEntityCommand>
     {
         private readonly IAccountDomainRepository _domainRepository;
-        private readonly IHashingService _hashingService;
+        private readonly IEncodingService _encodingService;
 
-        public UpsertLegalEntityCommandHandler(IAccountDomainRepository domainRepository, IHashingService hashingService)
+        public UpsertLegalEntityCommandHandler(IAccountDomainRepository domainRepository, IEncodingService encodingService)
         {
             _domainRepository = domainRepository;
-            _hashingService = hashingService;
+            _encodingService = encodingService;
         }
 
         public async Task Handle(UpsertLegalEntityCommand command, CancellationToken cancellationToken = default)
@@ -29,12 +29,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity
             var legalEntity = account.GetLegalEntity(command.AccountLegalEntityId);
             if (account.GetLegalEntity(command.AccountLegalEntityId) != null)
             {
-                legalEntity.SetHashedLegalEntityId(_hashingService.HashValue(command.LegalEntityId));
+                legalEntity.SetHashedLegalEntityId(_encodingService.Encode(command.LegalEntityId, EncodingType.AccountId));
                 legalEntity.SetLegalEntityName(command.Name);
             }
             else
             {
-                account.AddLegalEntity(command.AccountLegalEntityId, LegalEntity.New(command.LegalEntityId, command.Name,_hashingService.HashValue(command.LegalEntityId)));
+                account.AddLegalEntity(command.AccountLegalEntityId, LegalEntity.New(command.LegalEntityId, command.Name,_encodingService.Encode(command.LegalEntityId, EncodingType.AccountId)));
             }
 
             await _domainRepository.Save(account);
