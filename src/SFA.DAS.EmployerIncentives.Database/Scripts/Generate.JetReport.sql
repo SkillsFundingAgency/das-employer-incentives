@@ -66,59 +66,98 @@ SELECT
   order by PaymentYear desc, PaymentPeriod desc, SentToBCDate desc  
 
 -- Validation Failures
-
-;WITH validationsFailures AS( 
-SELECT 
-	 a.Id as AccountId,
-	 a.AccountLegalEntityId,
-	 ai.ULN,
-	 MAX(IIF(ppv.step='HasBankDetails' and ppv.result=1,1,0)) as HasBankDetails,
-	 MAX(IIF(ppv.step='HasNoDataLocks' and ppv.result=1,1,0)) as HasNoDataLocks,
-	 MAX(IIF(ppv.step='PaymentsNotPaused' and ppv.result=1,1,0)) as PaymentsNotPaused,
-     MAX(IIF(ppv.step='EmployedAtStartOfApprenticeship' and ppv.result=1,1,0)) as EmployedAtStartOfApprenticeship,
-     MAX(IIF(ppv.step='EmployedBeforeSchemeStarted' and ppv.result=1,1,0)) as EmployedBeforeSchemeStarted,
-     MAX(IIF(ppv.step='BlockedForPayments' and ppv.result=1,1,0)) as BlockedForPayments,
-	 MAX(IIF(ppv.step='EmployedAt365Days' and ppv.result=1,1,0)) as EmployedAt365Days,
-	 pp.amount,
-	 pp.PeriodNumber AS PaymentPeriod,
-	 pp.PaymentYear,
-	 pp.DueDate AS PendingPaymentDueDate
-FROM
-	 [incentives].[PendingPaymentValidationResult] ppv
-LEFT JOIN [incentives].[PendingPayment] pp on pp.id=ppv.PendingPaymentId
-LEFT JOIN [incentives].[ApprenticeshipIncentive] ai on ai.Id=pp.ApprenticeshipIncentiveId
-left join [dbo].[Accounts] a on pp.AccountLegalEntityId=a.AccountLegalEntityId
-GROUP BY 
-	a.Id,
-	a.AccountLegalEntityId,
-	ai.ULN, 
-	pp.amount,
-	pp.PeriodNumber,
-	pp.PaymentYear,
-	pp.DueDate
-)
+;WITH LatestPeriod AS (
+  SELECT TOP 1 PeriodNumber, PaymentYear FROM [BusinessGetMonthEndRuntimes] ORDER BY [LastValidation] DESC)
+, ValidationsFailures as (
 SELECT
-	ULN,
-	AccountId,
-	AccountLegalEntityId,
-	PaymentPeriod,
-	PaymentYear,
-	CAST(PendingPaymentDueDate as date) as PendingPaymentDueDate,
+	PendingPaymentId,
+	PeriodNumber, 
+    PaymentYear,
+	ISNULL(HasBankDetails, 0) AS HasBankDetails,
+	ISNULL(HasNoDataLocks, 0) AS HasNoDataLocks,
+	ISNULL(PaymentsNotPaused, 0) AS PaymentsNotPaused,	
+	ISNULL(EmployedAtStartOfApprenticeship, 0) AS EmployedAtStartOfApprenticeship,
+	ISNULL(EmployedBeforeSchemeStarted, 0) AS EmployedBeforeSchemeStarted,
+	ISNULL(BlockedForPayments, 0) AS BlockedForPayments,
+	IIF(EarningType = 'FirstPayment' , 1, ISNULL(EmployedAt365Days, 0)) AS EmployedAt365Days
+FROM
+(
+	SELECT
+		PendingPaymentId,
+		ppvr.PeriodNumber,
+		ppvr.PaymentYear,
+		step,  
+		CASE ISNULL(OverrideResult, 0)
+			WHEN 1 THEN 1
+			ELSE result
+		END AS result,
+		pp.EarningType
+	FROM [incentives].[PendingPaymentValidationResult] ppvr 
+		INNER JOIN LatestPeriod 
+			ON ppvr.PeriodNumber = LatestPeriod.PeriodNumber 
+			AND ppvr.PaymentYear = LatestPeriod.PaymentYear		
+		INNER JOIN [incentives].[PendingPayment] pp 		
+			ON pp.id=ppvr.PendingPaymentId
+) d
+PIVOT
+(
+  MAX(result)
+  FOR step IN (
 	HasBankDetails,
 	HasNoDataLocks,
 	PaymentsNotPaused,
-	IIF(HasBankDetails=0 AND PaymentsNotPaused=0, 0, 1) AS HasBankDetailsAndPaymentsNotPaused,
-	IIF(HasBankDetails=0 AND HasNoDataLocks=0, 0, 1) AS HasBankDetailsAndHasNoDataLocks,
-	IIF(PaymentsNotPaused=0 AND HasNoDataLocks=0, 0, 1) AS PaymentsNotPausedAndHasNoDataLocks,
-	IIF(HasBankDetails=0 AND PaymentsNotPaused=0 AND HasNoDataLocks=0, 0, 1) AS HasBankDetailsAndPaymentsNotPausedAndHasNoDataLocks,
-    EmployedAtStartOfApprenticeship,
-    EmployedBeforeSchemeStarted,
-    BlockedForPayments,
-	EmployedAt365Days,
-	Amount
-FROM
-	validationsFailures vf
-WHERE
-	 HasBankDetails = 0 
-	OR HasNoDataLocks  = 0
-	OR PaymentsNotPaused = 0
+	EmployedAtStartOfApprenticeship,
+	EmployedBeforeSchemeStarted,
+	BlockedForPayments,
+	EmployedAt365Days)
+) piv
+)
+SELECT 
+  ai.ULN,
+  a.Id as AccountId,
+  a.AccountLegalEntityId,  
+  pp.PeriodNumber as PaymentPeriod,
+  pp.PaymentYear as PaymentYear,
+  CAST(pp.DueDate as date) as PendingPaymentDueDate,
+  HasBankDetails, 
+  HasNoDataLocks,   
+  PaymentsNotPaused,
+  IIF(HasBankDetails=0 AND PaymentsNotPaused=0, 0, 1) AS HasBankDetailsAndPaymentsNotPaused,
+  IIF(HasBankDetails=0 AND HasNoDataLocks=0, 0, 1) AS HasBankDetailsAndHasNoDataLocks,
+  IIF(PaymentsNotPaused=0 AND HasNoDataLocks=0, 0, 1) AS PaymentsNotPausedAndHasNoDataLocks,
+  IIF(HasBankDetails=0 AND PaymentsNotPaused=0 AND HasNoDataLocks=0, 0, 1) AS HasBankDetailsAndPaymentsNotPausedAndHasNoDataLocks,
+  EmployedAtStartOfApprenticeship,
+  EmployedBeforeSchemeStarted,
+  BlockedForPayments,
+  EmployedAt365Days,
+  SUM(ISNULL(pp.amount, 0)) as Amount
+FROM ValidationsFailures ppv
+	INNER JOIN [incentives].[PendingPayment] pp 
+		ON pp.id=ppv.PendingPaymentId
+	INNER JOIN [incentives].[ApprenticeshipIncentive] ai 
+		ON ai.Id=pp.ApprenticeshipIncentiveId
+	INNER JOIN [dbo].[Accounts] a 
+		ON pp.AccountLegalEntityId=a.AccountLegalEntityId	
+WHERE	
+	HasBankDetails = 0 
+OR	HasNoDataLocks  = 0
+OR	PaymentsNotPaused = 0
+GROUP BY
+  a.Id,
+  a.AccountLegalEntityId,
+  ai.ULN,
+  pp.PeriodNumber,
+  pp.PaymentYear,
+  pp.DueDate,
+  pp.EarningType,
+  HasNoDataLocks, 
+  HasBankDetails, 
+  PaymentsNotPaused, 
+  EmployedAtStartOfApprenticeship,
+  EmployedBeforeSchemeStarted,
+  BlockedForPayments,
+  EmployedAt365Days
+ORDER BY
+  a.Id,
+  a.AccountLegalEntityId,
+  ai.ULN
