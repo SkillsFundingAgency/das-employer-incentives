@@ -38,7 +38,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.LearnerCha
             var learner = await _learnerDomainRepository.GetOrCreate(incentive);
             var collectionCalendar = await _collectionCalendarService.Get();
 
-            incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), collectionCalendar);
+            incentive.SetBreaksInLearning(learner.LearningPeriods.ToList(), collectionCalendar, _dateTimeService);
 
             if (learner.HasFoundSubmission)
             {

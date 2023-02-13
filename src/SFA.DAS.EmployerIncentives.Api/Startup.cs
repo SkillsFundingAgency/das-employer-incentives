@@ -17,11 +17,15 @@ using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
+using Newtonsoft.Json;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Api
 {
     public class Startup
     {
+        private const string EncodingConfigKey = "SFA.DAS.Encoding";
+
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -41,6 +45,7 @@ namespace SFA.DAS.EmployerIncentives.Api
                     options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                     options.EnvironmentName = configuration["EnvironmentName"];
                     options.PreFixConfigurationKeys = false;
+                    options.ConfigurationKeysRawJsonResult = new[] { EncodingConfigKey };
                 });
             }
 #if DEBUG
@@ -79,6 +84,21 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.Configure<BusinessCentralApiClient>(Configuration.GetSection("BusinessCentralApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
             services.Configure<EmployerIncentivesOuterApi>(Configuration.GetSection("EmployerIncentivesOuterApi"));
+
+            if (!Configuration["EnvironmentName"]
+                    .Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var encodingConfigJson = Configuration.GetSection(EncodingConfigKey).Value;
+                var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
+                services.AddSingleton(encodingConfig);
+            }
+            else
+            {
+                var encodingConfigJson = File.ReadAllText(Directory.GetCurrentDirectory() + "\\local.encoding.json");
+                var encodingConfig = JsonConvert.DeserializeObject<EncodingConfig>(encodingConfigJson);
+                services.AddSingleton(encodingConfig);
+            }
+            services.AddSingleton<IEncodingService, EncodingService>();
 
             services.AddNLog(Configuration);
 

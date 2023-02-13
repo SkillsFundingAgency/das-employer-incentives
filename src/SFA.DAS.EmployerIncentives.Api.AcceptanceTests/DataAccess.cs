@@ -37,6 +37,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             return account;
         }
 
+        public IEnumerable<Account> GetAccountsById(long accountId)
+        {
+            using var dbConnection = new SqlConnection(_connectionString);
+            var accounts = dbConnection.Query<Account>("SELECT * FROM Accounts WHERE Id = @accountId", new { accountId });
+
+            return accounts;
+        }
+
         public IEnumerable<PendingPayment> GetPendingPayments(Guid apprenticeshipIncentiveId)
         {
             using var dbConnection = new SqlConnection(_connectionString);

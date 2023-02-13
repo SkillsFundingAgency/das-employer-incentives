@@ -1,11 +1,12 @@
 ﻿using SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Hooks;
 using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
-using SFA.DAS.HashingService;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
 {
@@ -23,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public TestDomainMessageHandlers DomainMessageHandlers { get; set; }
 
         public TestData TestData { get; set; }
-        public IHashingService HashingService { get; set; }
+        public IEncodingService EncodingService { get; set; }
         public List<IHook> Hooks { get; set; }
         public List<object> EventsPublished { get; set; }
         public List<PublishedEvent> PublishedEvents { get; set; }
@@ -45,7 +46,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
             TestData.GetOrCreate("ThrowErrorAfterPublishCommand", () => false);
             TestData.GetOrCreate("ThrowErrorAfterProcessedCommand", () => false);
             TestData.GetOrCreate("ThrowErrorAfterPublishEvent", () => false);
-            HashingService = new HashingService.HashingService("46789BCDFGHJKLMNPRSTVWXY", "SFA: digital apprenticeship service");
             Hooks = new List<IHook>();
             EventsPublished = new List<object>();
             PublishedEvents = new List<PublishedEvent>();

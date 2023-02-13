@@ -41,7 +41,6 @@ using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.Services;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock;
-using SFA.DAS.HashingService;
 using SFA.DAS.Http;
 using SFA.DAS.Http.TokenGenerators;
 using SFA.DAS.NServiceBus.Configuration;
@@ -72,7 +71,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
         {
             serviceCollection
                 .AddDistributedLockProvider()
-                .AddHashingService()
                 .AddLearnerService()
                 .AddEmploymentCheckService();
 
@@ -199,7 +197,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SetActivePeriodToInProgressCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
-                .AddSingleton(typeof(IValidator<RefreshEmploymentChecksCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
                 ;
 
@@ -213,17 +210,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                    s.GetRequiredService<IOptions<ApplicationSettings>>(),
                    s.GetRequiredService<ILogger<AzureDistributedLockProvider>>(),
                    "employer-incentives-distributed-locks"));
-
-            return serviceCollection;
-        }
-
-        public static IServiceCollection AddHashingService(this IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddSingleton<IHashingService>(c =>
-            {
-                var settings = c.GetService<IOptions<ApplicationSettings>>().Value;
-                return new HashingService.HashingService(settings.AllowedHashstringCharacters, settings.Hashstring);
-            });
 
             return serviceCollection;
         }

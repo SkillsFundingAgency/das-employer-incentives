@@ -100,7 +100,21 @@ namespace SFA.DAS.EmployerIncentives.Data
 
         public async Task<IEnumerable<AccountModel>> FindByVendorId(string vendorId)
         {
-            var accounts = await _dbContext.Accounts.Where(x => x.VrfVendorId == vendorId).ToListAsync();
+            var accounts = new List<Models.Account>();
+
+            var accountsForVendorId = await _dbContext.Accounts.Where(x => x.VrfVendorId == vendorId).ToArrayAsync();
+            if (accountsForVendorId.Any())
+            {
+                var accountId = accountsForVendorId.FirstOrDefault().Id;
+                var otherAccountLegalEntities = await _dbContext.Accounts.Where(x => x.Id == accountId && x.VrfVendorId != vendorId).ToArrayAsync();
+
+                accounts.AddRange(accountsForVendorId);
+                if (otherAccountLegalEntities.Any())
+                {
+                    accounts.AddRange(otherAccountLegalEntities);
+                }
+            }
+
             return accounts?.Map();
         }
     }
