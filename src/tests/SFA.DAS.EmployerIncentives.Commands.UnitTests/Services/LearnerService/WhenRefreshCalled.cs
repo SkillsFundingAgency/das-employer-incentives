@@ -72,7 +72,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Services.LearnerServiceT
         [Test]
         public void Then_an_exception_is_thrown_when_learner_response_is_invalid()
         {
-            _httpClient.SetUpGetAsAsync(new StringContent("{\"bad\": \"json\"}", Encoding.UTF8, "application/json"), System.Net.HttpStatusCode.OK);
+            _httpClient.SetUpGetAsAsync(new StringContent("{\"bad\": \"json\"}", System.Text.Encoding.UTF8, "application/json"), System.Net.HttpStatusCode.OK);
 
             Func<Task> action = async () => await _sut.Get(_learner);
             action.Should().Throw<InvalidLearnerMatchResponseException>();

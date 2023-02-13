@@ -32,7 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.Services.EmploymentCheckApi
                 MinDate = employmentCheck.MinimumDate, 
                 Uln = apprenticeshipIncentive.Apprenticeship.UniqueLearnerNumber
             };
-            var content = new StringContent(JsonConvert.SerializeObject(createEmploymentCheckRequest), Encoding.Default, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(createEmploymentCheckRequest), System.Text.Encoding.Default, "application/json");
             var response = await _client.PostAsync("employmentchecks", content);
 
             if (response.StatusCode == HttpStatusCode.OK)
