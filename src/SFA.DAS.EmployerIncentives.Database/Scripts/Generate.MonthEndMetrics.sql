@@ -22,15 +22,18 @@ SELECT PaymentYear as [(Paste into cell A6) PaymentYear],PaymentPeriod, count(*)
   group by paymentyear,PaymentPeriod 
   order by paymentyear,PaymentPeriod
 
--- Current Period Totals (Paste into cell C22)
   ;SELECT Passed as [(Paste into cell C22) Passed], SUM(Amount) as PeriodValidation FROM
 (SELECT [PendingPaymentId],
-      MIN(CAST((CASE OverrideResult
+      MIN(CAST((CASE ISNULL(OverrideResult, 0)
 WHEN 1 THEN 1
-ELSE Result
+ELSE IIF(EarningType = 'FirstPayment' AND Step = 'EmployedAt365Days', 1, Result)
 END) AS INT)) AS Passed
-  FROM [incentives].[PendingPaymentValidationResult]
-  WHERE PeriodNumber = @PERIOD AND PaymentYear = @AcademicYear
+  FROM [incentives].[PendingPaymentValidationResult] ppvr
+	INNER JOIN [incentives].[PendingPayment]  pp
+		on pp.Id = ppvr.PendingPaymentId
+  WHERE 
+		ppvr.PeriodNumber = @PERIOD
+  AND	ppvr.PaymentYear = @AcademicYear
   GROUP BY PendingPaymentId) x
   INNER JOIN incentives.PendingPayment pp ON pp.Id = x.PendingPaymentId
   GROUP By Passed order by passed desc
