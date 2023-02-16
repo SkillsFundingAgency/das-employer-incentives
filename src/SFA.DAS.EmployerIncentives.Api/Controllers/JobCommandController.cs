@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
@@ -7,10 +6,10 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentChec
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
