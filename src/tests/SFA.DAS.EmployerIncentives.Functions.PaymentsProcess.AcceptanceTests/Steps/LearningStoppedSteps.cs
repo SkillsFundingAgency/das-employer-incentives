@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly int _breakInLearning;
         private readonly DateTime _resumedDate;
         private readonly DateTime _stoppedDate;
+        private DateTime _updatedStoppedDate;
         private bool _dataIsInitialised = true;
 
         public LearningStoppedSteps(TestContext testContext)
@@ -249,6 +250,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 .Create();
 
             var plannedStartDate = new DateTime(2021, 08, 01);
+            _updatedStoppedDate = plannedStartDate.AddDays(91);
 
             _updatedStoppedLearnerMatchApiData = _fixture
                 .Build<LearnerSubmissionDto>()
@@ -271,7 +273,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                     .Create()
                             })
                             .With(pe => pe.StartDate, plannedStartDate)
-                            .With(pe => pe.EndDate, plannedStartDate.AddDays(91))
+                            .With(pe => pe.EndDate, _updatedStoppedDate)
                             .Create() }
                         )
                         .Create()}
@@ -485,6 +487,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
                 await dbConnection.InsertAsync(_learner);
                 await dbConnection.InsertAsync(_changeOfCircumstance);
+                await dbConnection.InsertAsync(_learningPeriod1);
             }
         }
 
@@ -656,6 +659,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         }
 
+        [Then(@"the learner start break in learning for the change in stopped date is stored")]
+        public void ThenTheLearnerStartBreakInLearningForTheChangeInStoppedDateIsStored()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var breakInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>();
+
+            breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            breakInLearning.Single().StartDate.Should().Be(_updatedStoppedDate.AddDays(1));
+            breakInLearning.Single().EndDate.Should().Be(null);
+            breakInLearning.Single().CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
+            breakInLearning.Single().UpdatedDate.Should().BeNull();
+
+        }
+
         [Then(@"the learner resume break in learning is stored")]
         public void ThenTheLearnerResumeBreakInLearningIsStored()
         {
@@ -737,8 +754,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
-            pendingPayments.Count().Should().Be(1);
-            pendingPayments.Single().EarningType.Should().Be(EarningType.FirstPayment);
+            pendingPayments.Count().Should().Be(0);
         }
 
         [Then(@"the existing paid pending payments are clawed back")]

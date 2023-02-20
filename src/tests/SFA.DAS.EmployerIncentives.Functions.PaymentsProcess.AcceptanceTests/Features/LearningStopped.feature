@@ -51,6 +51,7 @@ Scenario: Learning data contains a change to learning stopped date
 	When the incentive learner data is refreshed
 	Then the first payment is recalculated
 	And the stopped change of circumstance is updated
+	And the learner start break in learning for the change in stopped date is stored
 
 Scenario: Learning data contains a change to learning stopped date with a clawed back payment
 	Given an apprenticeship incentive exists that has stopped learning before the first payment is due
@@ -59,6 +60,7 @@ Scenario: Learning data contains a change to learning stopped date with a clawed
 	When the incentive learner data is refreshed
 	Then the previously clawed back payment is recalculated
 	And the stopped change of circumstance is updated
+	And the learner start break in learning for the change in stopped date is stored
 
 Scenario Outline: Retrospective stopped tests on stopped incentive
 	Given a stopped apprenticeship incentive exists 	
