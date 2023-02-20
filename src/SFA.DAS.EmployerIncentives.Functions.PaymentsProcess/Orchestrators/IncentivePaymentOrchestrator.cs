@@ -35,8 +35,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             var payableLegalEntities = await context.CallActivityAsync<List<PayableLegalEntity>>(nameof(GetPayableLegalEntities), collectionPeriod);
             context.SetCustomStatus("GettingUnsentClawbackLegalEntities");
             var clawbackLegalEntities = await context.CallActivityAsync<List<ClawbackLegalEntity>>(nameof(GetUnsentClawbacks), collectionPeriod);
-            
-            var accountLegalEntitiesToProcess = payableLegalEntities.Select(payableLegalEntity => new AccountLegalEntityCollectionPeriod {AccountId = payableLegalEntity.AccountId, AccountLegalEntityId = payableLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod}).ToList();
+
+            var accountLegalEntitiesToProcess = payableLegalEntities.Select(payableLegalEntity => new AccountLegalEntityCollectionPeriod { AccountId = payableLegalEntity.AccountId, AccountLegalEntityId = payableLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod }).ToList();
             foreach (var clawbackLegalEntity in clawbackLegalEntities.Where(clawbackLegalEntity => accountLegalEntitiesToProcess.FirstOrDefault(x => x.AccountId == clawbackLegalEntity.AccountId && x.AccountLegalEntityId == clawbackLegalEntity.AccountLegalEntityId) == null))
             {
                 accountLegalEntitiesToProcess.Add(new AccountLegalEntityCollectionPeriod { AccountId = clawbackLegalEntity.AccountId, AccountLegalEntityId = clawbackLegalEntity.AccountLegalEntityId, CollectionPeriod = collectionPeriod });
@@ -61,7 +61,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 }
             }
 
-            if(!context.IsReplaying)
+            if (!context.IsReplaying)
                 _logger.LogInformation("[IncentivePaymentOrchestrator] Setting status to WaitingForPaymentApproval.");
 
             context.SetCustomStatus("SendingMetricsReport");
@@ -76,7 +76,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
                 _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been rejected", collectionPeriod);
                 return;
             }
-            
+
             context.SetCustomStatus("SendingClawbacksAndPayments");
             _logger.LogInformation("[IncentivePaymentOrchestrator] Calculated payments for collection period {collectionPeriod} have been approved", collectionPeriod);
 

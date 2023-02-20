@@ -17,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
         {
             _connectionString = options.Value.ReportsConnectionString;
             _canSave = !string.IsNullOrEmpty(_connectionString);
-            _containerName = string.IsNullOrEmpty(options.Value.ReportsContainerName) ? "Reports" : options.Value.ReportsContainerName;
+            _containerName = string.IsNullOrEmpty(options.Value.ReportsContainerName) ? "reports" : options.Value.ReportsContainerName.ToLowerInvariant();
         }
 
         public async Task Save(ReportsFileInfo fileInfo, Stream stream)

@@ -18,7 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             AddSectionHeaderRow();
             AddHeaderRow();
             AddRows(report.PaymentsMade);
-            AddTotalRow(report.PaymentsMade);
+            AddTotalRow(report.CollectionPeriod, report.PaymentsMade);
             AddPercentagePaidRow(report.CollectionPeriod, report.PaymentsMade, report.ValidationSummary);
             _context.RowNumber++;
         }
@@ -83,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue(paymentsMade.Amount);
         }
 
-        private void AddTotalRow(IEnumerable<PaymentsMade> paymentsMade)
+        private void AddTotalRow(CollectionPeriod collectionPeriod, IEnumerable<PaymentsMade> paymentsMade)
         {
             var currentPeriodRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber + 1;
@@ -98,7 +98,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
             cell = currentPeriodRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.CurrencyBold];
-            cell.SetCellValue(paymentsMade.Sum(p => p.Amount));
+            cell.SetCellValue(paymentsMade.Where(p => p.Year == collectionPeriod.AcademicYear).Sum(p => p.Amount));
         }
 
         private void AddPercentagePaidRow(CollectionPeriod collectionPeriod, IEnumerable<PaymentsMade> paymentsMade, PeriodValidationSummary validationSummary)
