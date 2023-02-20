@@ -15,12 +15,12 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
         public void Create(MetricsReport report)
         {
-            AddHeaderRow(report.PaymentsMade, report.ValidationSummary);
+            AddHeaderRow(report.CollectionPeriod, report.PaymentsMade, report.ValidationSummary);
             AddDifferenceRow(report.PaymentsMade, report.ValidationSummary);
             _context.RowNumber++;
         }
 
-        private void AddHeaderRow(IEnumerable<PaymentsMade> paymentsMade, PeriodValidationSummary validationSummary)
+        private void AddHeaderRow(CollectionPeriod collectionPeriod, IEnumerable<PaymentsMade> paymentsMade, PeriodValidationSummary validationSummary)
         {
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
@@ -34,7 +34,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
             cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.CurrencyBold];
-            cell.SetCellValue(paymentsMade.Sum(p => p.Amount) + validationSummary.InvalidRecords.PeriodAmount);
+            cell.SetCellValue(paymentsMade.Where(p => p.Year == collectionPeriod.AcademicYear).Sum(p => p.Amount) + validationSummary.InvalidRecords.PeriodAmount);
 
             cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.CurrencyBold];
