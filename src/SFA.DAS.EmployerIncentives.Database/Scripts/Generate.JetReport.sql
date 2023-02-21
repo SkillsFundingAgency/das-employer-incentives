@@ -82,7 +82,8 @@ SELECT
 	 pp.amount,
 	 pp.PeriodNumber AS PaymentPeriod,
 	 pp.PaymentYear,
-	 pp.DueDate AS PendingPaymentDueDate
+	 pp.DueDate AS PendingPaymentDueDate,
+	 pp.EarningType	 
 FROM
 	 [incentives].[PendingPaymentValidationResult] ppv
 LEFT JOIN [incentives].[PendingPayment] pp on pp.id=ppv.PendingPaymentId
@@ -95,7 +96,8 @@ GROUP BY
 	pp.amount,
 	pp.PeriodNumber,
 	pp.PaymentYear,
-	pp.DueDate
+	pp.DueDate,
+	pp.EarningType
 )
 SELECT
 	ULN,
