@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
         public void Create(MetricsReport report)
         {
             AddHeaderRow(report.CollectionPeriod, report.PaymentsMade, report.ValidationSummary);
-            AddDifferenceRow(report.PaymentsMade, report.ValidationSummary);
+            AddDifferenceRow(report.CollectionPeriod, report.PaymentsMade, report.ValidationSummary);
             _context.RowNumber++;
         }
 
@@ -41,7 +41,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue(validationSummary.ValidRecords.YtdAmount + validationSummary.InvalidRecords.YtdAmount);
         }
 
-        private void AddDifferenceRow(IEnumerable<PaymentsMade> paymentsMade, PeriodValidationSummary validationSummary)
+        private void AddDifferenceRow(CollectionPeriod collectionPeriod, IEnumerable<PaymentsMade> paymentsMade, PeriodValidationSummary validationSummary)
         {
             var currentRow = _context.Sheet.GetOrCreateRow(_context.RowNumber++);
             var cellNumber = _context.StartCellNumber;
@@ -59,12 +59,12 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
             if ((validationSummary.ValidRecords.YtdAmount + validationSummary.InvalidRecords.YtdAmount) > 0)
             {
-                cell.SetCellValue((paymentsMade.Sum(p => p.Amount) + validationSummary.InvalidRecords.PeriodAmount) / (validationSummary.ValidRecords.YtdAmount + validationSummary.InvalidRecords.YtdAmount));
+                cell.SetCellValue((paymentsMade.Where(p => p.Year == collectionPeriod.AcademicYear).Sum(p => p.Amount) + validationSummary.InvalidRecords.PeriodAmount) / (validationSummary.ValidRecords.YtdAmount + validationSummary.InvalidRecords.YtdAmount));
             }
 
             cell = currentRow.CreateCell(cellNumber);
             cell.CellStyle = _context.Styles[Style.CurrencyBold];
-            cell.SetCellValue((validationSummary.ValidRecords.YtdAmount + validationSummary.InvalidRecords.YtdAmount) - (paymentsMade.Sum(p => p.Amount) + validationSummary.InvalidRecords.PeriodAmount));
+            cell.SetCellValue((validationSummary.ValidRecords.YtdAmount + validationSummary.InvalidRecords.YtdAmount) - (paymentsMade.Where(p => p.Year == collectionPeriod.AcademicYear).Sum(p => p.Amount) + validationSummary.InvalidRecords.PeriodAmount));
         }
     }
 }
