@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ApplicationSettings:NServiceBusConnectionString", _testContext.ApplicationSettings.NServiceBusConnectionString },
-                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory },
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory }
             };
 
             _testContext = testContext;

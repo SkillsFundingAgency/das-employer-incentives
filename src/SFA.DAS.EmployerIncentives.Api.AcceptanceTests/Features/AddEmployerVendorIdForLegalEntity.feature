@@ -1,6 +1,5 @@
 ﻿@database
 @api
-@accountApi
 
 Feature: AddEmployerVendorIdForLegalEntity
 	When a new Employer Vendor Id is to be assigned to the Legal Entity
