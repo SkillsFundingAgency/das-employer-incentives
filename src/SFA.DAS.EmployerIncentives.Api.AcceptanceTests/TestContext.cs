@@ -18,7 +18,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         public TestDateTimeService DateTimeService { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
         public EmployerIncentiveApi EmployerIncentiveApi { get; set; }
-        public TestAccountApi AccountApi { get; set; }
         public TestLearnerMatchApi LearnerMatchApi { get; set; }
         public TestEmploymentCheckApi EmploymentCheckApi { get; set; }
         public TestMessageBus MessageBus { get; set; }
