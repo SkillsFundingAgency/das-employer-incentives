@@ -73,7 +73,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             var command = new SendMetricsReportCommand(_collectionPeriod);
-            var expectedFileInfo = new ReportsFileInfo($"{DateTime.Today:yyMMdd}_Metrics", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics");
+            var expectedFileInfo = new ReportsFileInfo($"{_collectionPeriod.AcademicYear}_R{_collectionPeriod.PeriodNumber.ToString().PadLeft(2,'0')}_Metrics", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics");
 
             // Act
             await _sut.Handle(command);
