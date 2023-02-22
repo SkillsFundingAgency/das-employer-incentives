@@ -119,7 +119,7 @@
     <Build Include="StoredProcedures\ImportEmploymentCheckResult.sql" />
     <Build Include="Tables\VendorBlockAudit.sql" />
     <Build Include="Views\ApprenticeApplications.sql" />
-    <Build Include="Views\ApprenticeApplications.sql" />    
+    <Build Include="Views\ApprenticeApplications.sql" />
     <Build Include="Tables\Audit.RevertedPayment.sql" />
     <Build Include="Tables\Audit.ReinstatedPendingPayment.sql" />
     <Build Include="StoredProcedures\Reports.MetricsReport.sql" />
@@ -136,9 +136,7 @@
     <None Include="update-model.publish.xml" />
     <Build Include="Views\BusinessApplicationsDashboard.sql" />
     <None Include="Scripts\Update.MinimumAgreementVersion.sql" />
-    <None Include="Scripts\Generate.MonthEndMetrics.sql" />
-    <None Include="Scripts\Metrics Template.xlsx" />
-	<None Include="Scripts\Update.ReinstatedAuditRecords.sql" />
+    <None Include="Scripts\Update.ReinstatedAuditRecords.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Script.PreDeployment1.sql" />
