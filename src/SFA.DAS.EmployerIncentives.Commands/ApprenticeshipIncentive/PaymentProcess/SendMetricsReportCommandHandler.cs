@@ -30,7 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
             var report = await _reportsDataRepository.Execute<MetricsReport>();
 
             await _reportsRepository.Save(
-                new ReportsFileInfo($"{DateTime.Today:yyMMdd}_{report.Name}", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics"), 
+                new ReportsFileInfo($"{command.CollectionPeriod.AcademicYear}_R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}_{report.Name}", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics"), 
                 _metricsExcelReportGenerator.Create(report));
         }
     }
