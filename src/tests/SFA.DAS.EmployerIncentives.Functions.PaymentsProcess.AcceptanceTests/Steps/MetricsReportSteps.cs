@@ -65,7 +65,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             await foreach (var blobItem in _testContext.BlobClient.GetBlobsAsync())
             {
-                blobItem.Name.Should().Be($"Metrics/2021_R06_Metrics.xlsx");
+                blobItem.Name.Should().Be($"Metrics/LOCAL_ACCEPTANCE_TESTS Metrics R06_2021.xlsx");
                 blobItem.Properties.ContentType.Should().Be("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             }
         }

@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Configuration;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess;
 using SFA.DAS.EmployerIncentives.Data.Reports;
@@ -6,6 +7,7 @@ using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using SFA.DAS.EmployerIncentives.Reports;
 using SFA.DAS.EmployerIncentives.Reports.Excel;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -16,6 +18,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private SendMetricsReportCommandHandler _sut;
         private Mock<IReportsDataRepository> _mockReportsDataRepository;
         private Mock<IReportsRepository> _mockReportsRepository;
+        private IConfiguration _configuration;
         private Mock<IExcelReportGenerator<MetricsReport>> _mockExcelReportGenerator;
         private MetricsReport _metricsReport;
         private Domain.ValueObjects.CollectionPeriod _collectionPeriod;
@@ -31,6 +34,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockReportsDataRepository = new Mock<IReportsDataRepository>();
             _mockReportsRepository = new Mock<IReportsRepository>();
             _mockExcelReportGenerator = new Mock<IExcelReportGenerator<MetricsReport>>();
+            _configuration = new ConfigurationBuilder()
+                        .AddInMemoryCollection(new Dictionary<string, string>
+                        {
+                            {"EnvironmentName", "UnitTest" }
+                        })
+                        .Build();
 
             _mockReportsDataRepository
                 .Setup(m => m.Execute<MetricsReport>())
@@ -39,7 +48,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _sut = new SendMetricsReportCommandHandler(
                 _mockReportsDataRepository.Object,
                 _mockReportsRepository.Object,
-                _mockExcelReportGenerator.Object);
+                _mockExcelReportGenerator.Object,
+                _configuration);
         }
 
         [Test]
@@ -73,7 +83,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         {
             //Arrange
             var command = new SendMetricsReportCommand(_collectionPeriod);
-            var expectedFileInfo = new ReportsFileInfo($"{_collectionPeriod.AcademicYear}_R{_collectionPeriod.PeriodNumber.ToString().PadLeft(2,'0')}_Metrics", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics");
+            var expectedFileInfo = new ReportsFileInfo($"UnitTest Metrics R{_collectionPeriod.PeriodNumber.ToString().PadLeft(2,'0')}_{_collectionPeriod.AcademicYear}", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics");
 
             // Act
             await _sut.Handle(command);
