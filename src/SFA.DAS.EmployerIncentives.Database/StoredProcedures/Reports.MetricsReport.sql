@@ -159,7 +159,7 @@ AS
 		EmployedBeforeSchemeStarted,
 		BlockedForPayments,
 		EmployedAt365Days,
-		COUNT(DISTINCT a.[AccountLegalEntityId]) AS [AccountLegalEntityId],
+		COUNT(DISTINCT a.[AccountLegalEntityId]) AS NumberOfAccountLegalEntityIds,
 		SUM(IIF(pp.EarningType = 'FirstPayment', pp.amount, 0)) AS FirstEarningAmount,
 		SUM(IIF(pp.EarningType = 'SecondPayment', pp.amount, 0)) AS SecondEarningAmount,
 		SUM(ISNULL(pp.amount, 0)) as TotalEarningAmount
