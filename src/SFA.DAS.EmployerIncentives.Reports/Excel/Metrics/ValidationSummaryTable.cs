@@ -63,11 +63,11 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue(validationSummary.ValidRecords.Count);
 
             cell = currentRow.CreateCell(cellNumber++);
-            cell.CellStyle = _context.Styles[Style.Default];
+            cell.CellStyle = _context.Styles[Style.Currency];
             cell.SetCellValue(validationSummary.ValidRecords.PeriodAmount);
 
             cell = currentRow.CreateCell(cellNumber);
-            cell.CellStyle = _context.Styles[Style.Default];
+            cell.CellStyle = _context.Styles[Style.Currency];
             cell.SetCellValue(validationSummary.ValidRecords.YtdAmount);
         }
 
@@ -84,14 +84,14 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
             cell = currentRow.CreateCell(cellNumber++);
             cell.CellStyle = _context.Styles[Style.Default];
-            cell.SetCellValue(validationSummary.InvalidRecords.Count);
+            cell.SetCellValue(0); // to not alarm the business!
 
             cell = currentRow.CreateCell(cellNumber++);
-            cell.CellStyle = _context.Styles[Style.Default];
+            cell.CellStyle = _context.Styles[Style.Currency];
             cell.SetCellValue(validationSummary.InvalidRecords.PeriodAmount);
 
             cell = currentRow.CreateCell(cellNumber);
-            cell.CellStyle = _context.Styles[Style.Default];
+            cell.CellStyle = _context.Styles[Style.Currency];
             cell.SetCellValue(validationSummary.InvalidRecords.YtdAmount);
         }
 

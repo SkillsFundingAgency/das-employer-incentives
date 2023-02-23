@@ -79,7 +79,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue(paymentsMade.Number);
 
             cell = currentRow.CreateCell(cellNumber);
-            cell.CellStyle = _context.Styles[Style.Default];
+            cell.CellStyle = _context.Styles[Style.Currency];
             cell.SetCellValue(paymentsMade.Amount);
         }
 

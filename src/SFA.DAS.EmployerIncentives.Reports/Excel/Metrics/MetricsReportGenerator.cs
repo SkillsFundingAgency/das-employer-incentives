@@ -50,7 +50,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
 
         private static void CreateYTDSheet(IWorkbook workbook, MetricsReport report, IDictionary<Style, ICellStyle> styles)
         {
-            var validationSheet = workbook.CreateSheet("YTD Validation");
+            var validationSheet = workbook.CreateSheet("Validation Summary");
             var context = new Context(validationSheet, styles);
 
             new ValidationTable(context).Create(report);
