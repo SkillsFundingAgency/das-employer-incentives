@@ -7,11 +7,11 @@ using SFA.DAS.EmployerIncentives.Commands.Persistence;
 using SFA.DAS.EmployerIncentives.Commands.SendEmail;
 using SFA.DAS.EmployerIncentives.Domain.Accounts;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
-using SFA.DAS.HashingService;
 using SFA.DAS.Notifications.Messages.Commands;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
 {
@@ -20,7 +20,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
     {
         private Mock<ICommandPublisher> _commandPublisher;
         private Mock<IAccountDomainRepository> _accountRepository;
-        private Mock<IHashingService> _hashingService;
+        private Mock<IEncodingService> _encodingService;
         private string _hashedAccountId;
         private Mock<IOptions<EmailTemplateSettings>> _emailSettings;
         private Mock<IOptions<ApplicationSettings>> _applicationSettings;
@@ -39,7 +39,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
             _emailSettings.Setup(x => x.Value).Returns(_templates);
             _accountRepository = new Mock<IAccountDomainRepository>();
             _applicationSettings = new Mock<IOptions<ApplicationSettings>>();
-            _hashingService = new Mock<IHashingService>();
+            _encodingService = new Mock<IEncodingService>();
         }
 
         [TestCase("https://test.com")]
@@ -54,12 +54,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
             account.AddLegalEntity(command.AccountLegalEntityId, legalEntity);
             _accountRepository.Setup(x => x.Find(It.Is<long>(x => x == command.AccountId))).ReturnsAsync(account);
             _hashedAccountId = _fixture.Create<string>();
-            _hashingService.Setup(x => x.HashValue(It.Is<long>(x => x == command.AccountId))).Returns(_hashedAccountId);
+            _encodingService.Setup(x => x.Encode(It.Is<long>(x => x == command.AccountId), EncodingType.AccountId)).Returns(_hashedAccountId);
 
             _configuration = new ApplicationSettings { EmployerIncentivesWebBaseUrl = baseUrl };
             _applicationSettings.Setup(x => x.Value).Returns(_configuration);
             _sut = new SendBankDetailsRepeatReminderEmailCommandHandler(_commandPublisher.Object, _emailSettings.Object, _accountRepository.Object,
-                                                            _hashingService.Object, _applicationSettings.Object);
+                                                            _encodingService.Object, _applicationSettings.Object);
 
             var expectedUrl = $"{_hashedAccountId}/bank-details/{command.ApplicationId}/add-bank-details";
             if (baseUrl.EndsWith("/"))

@@ -261,6 +261,45 @@ this.ScenarioInitialize(scenarioInfo);
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Employer withdrawal for a stopped apprenticeship that has a clawed back paid paym" +
+            "ent (earnings)")]
+        public void EmployerWithdrawalForAStoppedApprenticeshipThatHasAClawedBackPaidPaymentEarnings()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Employer withdrawal for a stopped apprenticeship that has a clawed back paid paym" +
+                    "ent (earnings)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 41
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 42
+ testRunner.Given("an apprenticeship incentive with a clawedback paid payment exists as a result of " +
+                        "an incentive application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 43
+ testRunner.And("the apprenticeship incentive status is Stopped", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 44
+ testRunner.When("the apprenticeship application is withdrawn from the scheme", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 45
+ testRunner.Then("the pending payments are archived", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 46
+ testRunner.And("an email notification is sent to confirm the employer withdrawal", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

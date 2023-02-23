@@ -51,7 +51,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
 
             foreach (var file in recentFiles)
             {
-                var contents = File.ReadAllText(file.FullName, Encoding.UTF8);
+                var contents = File.ReadAllText(file.FullName, System.Text.Encoding.UTF8);
 
                 if (contents.Contains(_request.EmailAddress) && contents.Contains(_request.AddBankDetailsUrl))
                 {

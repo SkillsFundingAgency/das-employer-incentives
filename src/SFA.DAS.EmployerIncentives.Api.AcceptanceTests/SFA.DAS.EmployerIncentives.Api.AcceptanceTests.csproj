@@ -5,6 +5,13 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+
+  <ItemGroup>
+    <Content Include="local.encoding.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
   <ItemGroup>    
     <PackageReference Include="Ductus.FluentDocker" Version="2.10.56" />        
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.7" />        

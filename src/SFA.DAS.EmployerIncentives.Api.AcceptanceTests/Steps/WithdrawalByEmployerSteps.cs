@@ -214,6 +214,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_payment);
         }
 
+        [Given(@"the apprenticeship incentive status is Stopped")]
+        public async Task GivenTheApprenticeshipIncentiveStatusIsStopped()
+        {
+            _apprenticeshipIncentive.Status = IncentiveStatus.Stopped;
+            using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.UpdateAsync(_apprenticeshipIncentive);
+        }
+
         [When(@"the apprenticeship application is withdrawn from the scheme")]
         public async Task WhenTheApprenticeshipApplicationIsWithdrawnFromTheScheme()
         {

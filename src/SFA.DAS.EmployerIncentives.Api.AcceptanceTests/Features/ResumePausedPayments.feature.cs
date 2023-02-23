@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.DescriptionAttribute("ResumePausedPayments")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
+    [NUnit.Framework.CategoryAttribute("activeCalendarPeriod")]
     public partial class ResumePausedPaymentsFeature
     {
         
@@ -30,7 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         private static string[] featureTags = new string[] {
                 "database",
-                "api"};
+                "api",
+                "activeCalendarPeriod"};
         
 #line 1 "ResumePausedPayments.feature"
 #line hidden
@@ -86,7 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an apprenticeship incentive exists and is already paused", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 8
+#line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -96,19 +98,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
  testRunner.Given("a paused apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 10
+#line 11
  testRunner.When("the resume payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 11
+#line 12
  testRunner.Then("the requester is informed the apprenticeship incentive has resumed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 12
+#line 13
  testRunner.And("the PausePayment status is set to false", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
+#line 14
  testRunner.And("an Audit record has been added to record this resume request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -122,7 +124,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an apprenticeship incentive exists, but it\'s not paused", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 15
+#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -132,13 +134,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 16
+#line 17
  testRunner.Given("a non paused apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 17
+#line 18
  testRunner.When("the resume payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 18
+#line 19
  testRunner.Then("the requester is informed the apprenticeship incentive is not paused", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -152,7 +154,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When an invalid request is sent", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 20
+#line 21
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -162,13 +164,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 21
+#line 22
  testRunner.Given("a paused apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 22
+#line 23
  testRunner.When("an invalid request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 23
+#line 24
  testRunner.Then("the requester is informed the request is invalid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -182,7 +184,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When multiple resume payment requests are made to existing paused incentives", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 25
+#line 26
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -192,20 +194,60 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 26
+#line 27
  testRunner.Given("multiple paused apprenticeship incentives exist", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 27
+#line 28
  testRunner.When("the multiple resume payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 28
+#line 29
  testRunner.Then("the requester is informed the apprenticeship incentives have resumed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 29
+#line 30
  testRunner.And("the PausePayment status for all incentives is set to false", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 30
+#line 31
  testRunner.And("an Audit record has been added to record all incentives the resume request", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("When period end is in progess, resume paused payment requests are delayed")]
+        public void WhenPeriodEndIsInProgessResumePausedPaymentRequestsAreDelayed()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When period end is in progess, resume paused payment requests are delayed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 33
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 34
+ testRunner.Given("a paused apprenticeship incentive exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 35
+ testRunner.And("the active period month end processing is in progress", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 36
+ testRunner.When("the resume payments request is sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 37
+ testRunner.Then("the requester is informed the apprenticeship incentive pause request has been que" +
+                        "ued", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 38
+ testRunner.And("the PausePayment status is set to true", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 39
+ testRunner.And("Audit records are not created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

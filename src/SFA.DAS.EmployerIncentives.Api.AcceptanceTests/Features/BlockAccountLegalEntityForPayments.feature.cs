@@ -109,6 +109,37 @@ this.ScenarioInitialize(scenarioInfo);
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Block account with multiple legal entity for payment on a single legal entity")]
+        public void BlockAccountWithMultipleLegalEntityForPaymentOnASingleLegalEntity()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Block account with multiple legal entity for payment on a single legal entity", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 13
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 14
+ testRunner.Given("there is an account with multiple legal entities that has been validated to recei" +
+                        "ve payments", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 15
+ testRunner.When("a request to block one of the account legal entities is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 16
+ testRunner.Then("the vendor block end date is set for the single legal entity requested", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

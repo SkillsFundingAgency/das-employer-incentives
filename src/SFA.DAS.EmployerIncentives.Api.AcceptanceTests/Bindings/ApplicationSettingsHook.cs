@@ -13,8 +13,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Bindings
             {
                 DbConnectionString = context.SqlDatabase.DatabaseInfo.ConnectionString,
                 DistributedLockStorage = "UseDevelopmentStorage=true",
-                AllowedHashstringCharacters = "46789BCDFGHJKLMNPRSTVWXY",
-                Hashstring = "Test Hashstring",
                 NServiceBusConnectionString = "UseLearningEndpoint=true",
                 MinimumAgreementVersion = 4
             };

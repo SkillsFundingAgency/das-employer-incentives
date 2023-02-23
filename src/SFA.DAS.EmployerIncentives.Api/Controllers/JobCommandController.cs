@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Api.Types;
@@ -7,10 +6,10 @@ using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.EmploymentChec
 using SFA.DAS.EmployerIncentives.Commands.RefreshLegalEntities;
 using SFA.DAS.EmployerIncentives.Commands.Services.AccountApi;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 
 namespace SFA.DAS.EmployerIncentives.Api.Controllers
 {
@@ -30,10 +29,6 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
                 {
                     var command = ParseJobRequestToRefreshCommand(request);
                     await SendCommandAsync(command);
-                }
-                else if (request.Type == JobType.RefreshAllEmploymentChecks)
-                {
-                    await SendCommandAsync(new RefreshEmploymentChecksCommand());
                 }
                 else if (request.Type == JobType.RefreshEmploymentChecks)
                 {
@@ -68,24 +63,24 @@ namespace SFA.DAS.EmployerIncentives.Api.Controllers
 
         private static List<RefreshEmploymentCheckCommand> ParseJobRequestToRefreshEmploymentCheckCommands(JobRequest request)
         {
-            request.Data.TryGetValue("CheckType", out object checkTypeRequest);
-            request.Data.TryGetValue("Applications", out object applicationsRequest);
-            request.Data.TryGetValue("ServiceRequest", out object serviceRequestRequest);
-            var applications = JsonConvert.DeserializeObject<Application[]>(applicationsRequest.ToString());            
-            var serviceRequest = JsonConvert.DeserializeObject<ServiceRequest>(serviceRequestRequest.ToString());
-
+            request.Data.TryGetValue("Requests", out object requests);
+            var employmentCheckRefreshRequests = JsonConvert.DeserializeObject<IEnumerable<EmploymentCheckRefreshRequest>>(requests.ToString());
+            
             var commands = new List<RefreshEmploymentCheckCommand>();
-            foreach (var application in applications) 
+            foreach(var employmentCheckRefreshRequest in employmentCheckRefreshRequests)
             {
-                commands.Add(
+                foreach (var application in employmentCheckRefreshRequest.Applications)
+                {
+                    commands.Add(
                         new RefreshEmploymentCheckCommand(
-                            checkTypeRequest.ToString(), 
-                            application.AccountLegalEntityId, 
-                            application.ULN, 
-                            serviceRequest.TaskId, 
-                            serviceRequest.DecisionReference, 
-                            serviceRequest.TaskCreatedDate)
+                            employmentCheckRefreshRequest.CheckType,
+                            application.AccountLegalEntityId,
+                            application.ULN,
+                            application.ServiceRequest?.TaskId ?? employmentCheckRefreshRequest.ServiceRequest.TaskId,
+                            application.ServiceRequest?.DecisionReference ?? employmentCheckRefreshRequest.ServiceRequest.DecisionReference,
+                            application.ServiceRequest?.TaskCreatedDate ?? employmentCheckRefreshRequest.ServiceRequest.TaskCreatedDate)
                     );
+                }
             }
 
             return commands;

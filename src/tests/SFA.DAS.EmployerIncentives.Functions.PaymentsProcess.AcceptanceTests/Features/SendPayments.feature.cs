@@ -107,12 +107,12 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("When payments are rejected they are not sent to Business Central")]
-        public void WhenPaymentsAreRejectedTheyAreNotSentToBusinessCentral()
+        [NUnit.Framework.DescriptionAttribute("When clawbacks are approved they are sent to Business Central")]
+        public void WhenClawbacksAreApprovedTheyAreSentToBusinessCentral()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When payments are rejected they are not sent to Business Central", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When clawbacks are approved they are sent to Business Central", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 12
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -124,73 +124,13 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 13
- testRunner.Given("payments exist for a legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("clawbacks exist for a legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 14
- testRunner.When("the payments have been rejected", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 15
- testRunner.Then("the payments are not sent to Business Central", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("When clawbacks are approved they are sent to Business Central")]
-        public void WhenClawbacksAreApprovedTheyAreSentToBusinessCentral()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When clawbacks are approved they are sent to Business Central", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 17
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 18
- testRunner.Given("clawbacks exist for a legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 19
  testRunner.When("the payments have been approved", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 20
+#line 15
  testRunner.Then("the clawbacks are sent to Business Central", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("When clawback payments are rejected they are not sent to Business Central")]
-        public void WhenClawbackPaymentsAreRejectedTheyAreNotSentToBusinessCentral()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When clawback payments are rejected they are not sent to Business Central", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 22
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 23
- testRunner.Given("clawbacks exist for a legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 24
- testRunner.When("the payments have been rejected", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 25
- testRunner.Then("the clawbacks are not sent to Business Central", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

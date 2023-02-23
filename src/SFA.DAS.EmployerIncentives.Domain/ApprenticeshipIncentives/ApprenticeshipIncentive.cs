@@ -195,7 +195,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetBreaksInLearning(
             IList<LearningPeriod> periods,
-            CollectionCalendar collectionCalendar)
+            CollectionCalendar collectionCalendar,
+            IDateTimeService dateTimeService)
         {
             var breaks = new List<BreakInLearning>();
             for (var i = 0; i < periods.Count - 1; i++)
@@ -211,6 +212,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             Model.BreakInLearnings = breaks;
 
             CalculateEarnings(collectionCalendar);
+
+            RefreshEmploymentChecks(dateTimeService);
         }   
 
         private void StartBreakInLearning(DateTime startDate)

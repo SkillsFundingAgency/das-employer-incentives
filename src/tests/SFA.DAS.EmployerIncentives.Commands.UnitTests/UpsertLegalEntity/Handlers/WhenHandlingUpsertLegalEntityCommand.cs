@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Commands.UpsertLegalEntity;
-using SFA.DAS.HashingService;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.EmployerIncentives.Application.UnitTests.UpsertLegalEntity.Handlers
 {
@@ -16,7 +16,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.UpsertLegalEntity.Han
     {
         private UpsertLegalEntityCommandHandler _sut;
         private Mock<IAccountDomainRepository> _mockDomainRespository;
-        private Mock<IHashingService> _mockHashingService;
+        private Mock<IEncodingService> _mockEncodingService;
         
         private Fixture _fixture;
 
@@ -26,9 +26,9 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.UpsertLegalEntity.Han
             _fixture = new Fixture();
 
             _mockDomainRespository = new Mock<IAccountDomainRepository>();
-            _mockHashingService = new Mock<IHashingService>();
+            _mockEncodingService = new Mock<IEncodingService>();
             
-            _sut = new UpsertLegalEntityCommandHandler(_mockDomainRespository.Object, _mockHashingService.Object);
+            _sut = new UpsertLegalEntityCommandHandler(_mockDomainRespository.Object, _mockEncodingService.Object);
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.UpsertLegalEntity.Han
             //Arrange
             var command = _fixture.Create<UpsertLegalEntityCommand>();
             var expectedHash = _fixture.Create<string>();
-            _mockHashingService.Setup(x => x.HashValue(command.LegalEntityId)).Returns(expectedHash);
+            _mockEncodingService.Setup(x => x.Encode(command.LegalEntityId, EncodingType.AccountId)).Returns(expectedHash);
 
             //Act
             await _sut.Handle(command);
@@ -52,7 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Application.UnitTests.UpsertLegalEntity.Han
             //Arrange
             var command = _fixture.Create<UpsertLegalEntityCommand>();
             var expectedHash = _fixture.Create<string>();
-            _mockHashingService.Setup(x => x.HashValue(command.LegalEntityId)).Returns(expectedHash);
+            _mockEncodingService.Setup(x => x.Encode(command.LegalEntityId, EncodingType.AccountId)).Returns(expectedHash);
 
             _mockDomainRespository
                 .Setup(m => m.Find(command.AccountId))

@@ -131,7 +131,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
 
             var json = body == null ? "{}" : JsonSerializer.Serialize(body);
 
-            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            var memoryStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json));
 
             var context = new DefaultHttpContext();
             var request = context.Request;

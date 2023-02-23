@@ -48,8 +48,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     a.DbConnectionString = _context.ApplicationSettings.DbConnectionString;
                     a.DistributedLockStorage = _context.ApplicationSettings.DistributedLockStorage;
-                    a.AllowedHashstringCharacters = _context.ApplicationSettings.AllowedHashstringCharacters;
-                    a.Hashstring = _context.ApplicationSettings.Hashstring;
                     a.NServiceBusConnectionString = _context.ApplicationSettings.NServiceBusConnectionString;
                     a.MinimumAgreementVersion = _context.ApplicationSettings.MinimumAgreementVersion;
                     a.EmploymentCheckEnabled = _context.ApplicationSettings.EmploymentCheckEnabled;
@@ -83,14 +81,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     l.SubscriptionKey = "";
                     l.ApiVersion = "1";
                 });
-                if (_context.AccountApi != null)
-                {
-                    s.Configure<AccountApi>(a =>
-                    {
-                        a.ApiBaseUrl = _context.AccountApi.BaseAddress;
-                        a.ClientId = "";
-                    });
-                }
 
                 Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
 

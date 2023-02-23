@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.EmployerIncentives.Data.UnitTests.TestHelpers;
 using SFA.DAS.EmployerIncentives.TestHelpers.Services;
+using SFA.DAS.EmployerIncentives.TestHelpers.Types;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.B
             else
             {
                 SqlDatabaseModel.Update();
+                TestRunContext.SqlServerImageInfo = new SqlServerImageInfo();
             }
         }
     }

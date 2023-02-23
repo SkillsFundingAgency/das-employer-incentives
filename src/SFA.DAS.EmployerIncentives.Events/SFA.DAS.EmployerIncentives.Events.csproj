@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Scrutor" Version="3.3.0" />
+    <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
     <PackageReference Include="SFA.DAS.HashingService" Version="1.0.183" />
     <PackageReference Include="SFA.DAS.Notifications.Messages" Version="3.0.0" />
   </ItemGroup>
