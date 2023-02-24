@@ -127,7 +127,7 @@ namespace SFA.DAS.EmployerIncentives.Reports.Excel.Metrics
             cell.SetCellValue(ytdValidation.PaymentsNotPaused.ToInt());
 
             cell = currentRow.CreateCell(cellNumber++);
-            cell.SetCellValue(ytdValidation.HasNoUnsentClawbacks.ToInt());
+            cell.SetCellValue(string.Empty);
 
             cell = currentRow.CreateCell(cellNumber++);
             cell.SetCellValue(ytdValidation.HasIlrSubmission.ToInt());
