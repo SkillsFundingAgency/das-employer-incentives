@@ -214,14 +214,24 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             await dbConnection.InsertAsync(_payment);
         }
 
+        [Given(@"the apprenticeship incentive status is Stopped")]
+        public async Task GivenTheApprenticeshipIncentiveStatusIsStopped()
+        {
+            _apprenticeshipIncentive.Status = IncentiveStatus.Stopped;
+            using var dbConnection = new SqlConnection(_connectionString);
+            await dbConnection.UpdateAsync(_apprenticeshipIncentive);
+        }
+
         [When(@"the apprenticeship application is withdrawn from the scheme")]
         public async Task WhenTheApprenticeshipApplicationIsWithdrawnFromTheScheme()
         {
             _withdrawApplicationRequest = _fixture
                 .Build<WithdrawApplicationRequest>()
                 .With(r => r.WithdrawalType, WithdrawalType.Employer)
-                .With(r => r.AccountLegalEntityId, _application.AccountLegalEntityId)
-                .With(r => r.ULN, _apprenticeship.ULN)
+                .With(r => r.Applications, new[]
+                {
+                    new Application { AccountLegalEntityId = _application.AccountLegalEntityId, ULN = _apprenticeshipIncentive.ULN }
+                })
                 .With(r => r.AccountId, _application.AccountId)
                 .With(r => r.EmailAddress, "test@email.com")
                 .Create();

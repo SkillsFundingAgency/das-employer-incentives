@@ -7,6 +7,9 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using ChangeOfCircumstance = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ChangeOfCircumstance;
 using LearningPeriod = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.LearningPeriod;
 using PendingPaymentValidationResult = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.PendingPaymentValidationResult;
+using ReinstatedPendingPaymentAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.ReinstatedPendingPaymentAudit;
+using RevertedPaymentAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.RevertedPaymentAudit;
+using VendorBlockAudit = SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Models.VendorBlockAudit;
 
 namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 {
@@ -84,12 +87,13 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 SubmittedDate = entity.SubmittedDate,
                 SubmittedByEmail = entity.SubmittedByEmail,
                 Status = entity.Status,
+                PreviousStatus = entity.Status,
                 BreakInLearnings = entity.BreakInLearnings.Map(),                
                 MinimumAgreementVersion = entity.MinimumAgreementVersion.HasValue ? new AgreementVersion(entity.MinimumAgreementVersion.Value) : AgreementVersion.Create(entity.Phase, entity.StartDate),
                 Phase = new Domain.ValueObjects.IncentivePhase(entity.Phase),
                 WithdrawnBy = entity.WithdrawnBy,
                 EmploymentCheckModels = entity.EmploymentChecks.Map(),
-                ValidationOverrideModels = entity.ValidationOverrides.Map()
+                ValidationOverrideModels = entity.ValidationOverrides.Map(),                
             };
         }
 
@@ -447,6 +451,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateTime = x.CreatedDateTime,
                 UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
+                ErrorType = x.ErrorType,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
         }
@@ -464,6 +469,7 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 CreatedDateTime = x.CreatedDateTime,
                 UpdatedDateTime = x.UpdatedDateTime,
                 Result = x.Result,
+                ErrorType = x.ErrorType,
                 ResultDateTime = x.ResultDateTime
             }).ToList();
         }
@@ -498,10 +504,11 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             {
                 Id = entity.Id,
                 ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                CheckType = entity.CheckType.ToString(),
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                CreatedDateTime = DateTime.Now
+                CreatedDateTime = DateTime.UtcNow
             };
         }
 
@@ -516,7 +523,57 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
                 ServiceRequestTaskId = entity.ServiceRequest.TaskId,
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
-                CreatedDateTime = DateTime.Now                
+                CreatedDateTime = DateTime.UtcNow                
+            };
+        }
+
+        internal static RevertedPaymentAudit Map(this Domain.ApprenticeshipIncentives.ValueTypes.RevertedPaymentAudit model)
+        {
+            return new RevertedPaymentAudit
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                PaymentId = model.PaymentId,
+                PendingPaymentId = model.PendingPaymentId,
+                PaymentPeriod = model.PaymentPeriod,
+                PaymentYear = model.PaymentYear,
+                Amount = model.Amount,
+                CalculatedDate = model.CalculatedDate,
+                PaidDate = model.PaidDate,
+                VrfVendorId = model.VrfVendorId,
+                ServiceRequestTaskId = model.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = model.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = model.ServiceRequest.Created,
+                CreatedDateTime = model.CreatedDateTime
+            };
+        }
+
+        internal static ReinstatedPendingPaymentAudit Map(this Domain.ApprenticeshipIncentives.ValueTypes.ReinstatedPendingPaymentAudit model)
+        {
+            return new ReinstatedPendingPaymentAudit
+            {
+                Id = model.Id,
+                ApprenticeshipIncentiveId = model.ApprenticeshipIncentiveId,
+                PendingPaymentId = model.PendingPaymentId,
+                ServiceRequestTaskId = model.ReinstatePaymentRequest.TaskId,
+                ServiceRequestDecisionReference = model.ReinstatePaymentRequest.DecisionReference,
+                ServiceRequestCreatedDate = model.ReinstatePaymentRequest.Created,
+                Process = model.ReinstatePaymentRequest.Process,
+                CreatedDateTime = model.CreatedDateTime
+            };
+        }
+
+        internal static VendorBlockAudit Map(this VendorBlockRequestAudit entity)
+        {
+            return new VendorBlockAudit
+            {
+                Id = entity.Id,
+                VrfVendorId = entity.VrfVendorId,
+                ServiceRequestTaskId = entity.ServiceRequest.TaskId,
+                ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
+                ServiceRequestCreatedDate = entity.ServiceRequest.Created,
+                VendorBlockEndDate = entity.VendorBlockEndDate,
+                CreatedDateTime = DateTime.UtcNow
             };
         }
 
@@ -544,5 +601,6 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
 
             return null;
         }
+
     }
 }

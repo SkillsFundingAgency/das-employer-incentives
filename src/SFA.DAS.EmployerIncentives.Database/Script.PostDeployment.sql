@@ -12,3 +12,5 @@ Post-Deployment Script Template
 :r .\Scripts\Data.CollectionCalendar.sql
 :r .\Scripts\Update.ApprenticeshipIncentives.sql
 :r .\Scripts\Update.SetPhaseForApplications.sql
+:r .\Scripts\Update.ReinstatedAuditRecords.sql
+:r .\Scripts\Update.SetCheckTypeForEmploymentCheckAudit.sql

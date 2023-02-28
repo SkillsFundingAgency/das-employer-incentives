@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.EmployerIncentives.Commands.Types.Withdrawals;
-using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ComplianceWithdrawal;
+using SFA.DAS.EmployerIncentives.Commands.Withdrawals.ReinstateWithdrawal;
 
 namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWithdrawal.Validators
 {
@@ -27,7 +28,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             //Arrange
             var command = new ReinstateWithdrawalCommand(
                 default, 
-                _fixture.Create<long>());
+                _fixture.Create<long>(),
+                _fixture.Create<string>(),
+                _fixture.Create<string>(),
+                _fixture.Create<DateTime>());
 
             //Act
             var result = await _sut.Validate(command);
@@ -42,7 +46,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.Withdrawals.ReinstateWit
             //Arrange
             var command = new ReinstateWithdrawalCommand(                
                 _fixture.Create<long>(),
-                default);
+                default,
+                _fixture.Create<string>(),
+                _fixture.Create<string>(),
+                _fixture.Create<DateTime>());
 
             //Act
             var result = await _sut.Validate(command);

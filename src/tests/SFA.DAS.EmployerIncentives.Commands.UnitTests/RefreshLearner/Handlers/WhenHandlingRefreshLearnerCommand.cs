@@ -25,6 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ILearnerSubmissionService> _mockLearnerSubmissionService;
         private Mock<ICollectionCalendarService> _collectionCalendarService;
+        private Mock<IDateTimeService> _mockDateTimeService;
         private List<CollectionCalendarPeriod> _collectionPeriods;
         private Fixture _fixture;
         private Guid _apprenticeshipIncentiveId;
@@ -45,6 +46,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             _testStartDate = new DateTime(2021, 01, 01);
             _censusDate = _testStartDate.AddDays(95);
 
+            _mockDateTimeService = new Mock<IDateTimeService>();
+            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
+            _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
+
             _mockApprenticeshipIncentiveDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
             _mockLearnerSubmissionService = new Mock<ILearnerSubmissionService>();
@@ -55,6 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
                 .With(p => p.Apprenticeship, apprenticeship)
                 .With(x => x.HasPossibleChangeOfCircumstances, false)
                 .With(p => p.RefreshedLearnerForEarnings, false)
+                .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
                 .Create();
 
             _apprenticeshipIncentiveId = _incentiveModel.Id;
@@ -100,7 +106,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             _sut = new RefreshLearnerCommandHandler(
                 _mockApprenticeshipIncentiveDomainRepository.Object,
-                _learnerService);
+                _learnerService,
+                _mockDateTimeService.Object);
         }
 
         [Test]
@@ -370,6 +377,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.PendingPaymentModels, new List<PendingPaymentModel> { pendingPaymentModel })
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -437,6 +445,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -533,6 +542,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
 
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -623,6 +633,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -704,6 +715,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Stopped)
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -787,6 +800,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -854,6 +869,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -930,6 +947,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                .With(p => p.Apprenticeship, apprenticeship)
                .With(p => p.Status, Enums.IncentiveStatus.Active)
+               .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
+               .Without(p => p.PendingPaymentModels)
                .Create();
 
             _mockApprenticeshipIncentiveDomainRepository
@@ -1016,7 +1035,10 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.RefreshLearner.Handlers
             var apprenticeshipIncentiveModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.StartDate, new DateTime(2021, 06, 01))
                 .With(p => p.Apprenticeship, apprenticeship)
+                .With(p => p.Status, Enums.IncentiveStatus.Active)
+                .With(p => p.PreviousStatus, Enums.IncentiveStatus.Active)
                 .With(p => p.PendingPaymentModels, new List<PendingPaymentModel> { pendingPaymentModel })
+                .With(p => p.Phase, new IncentivePhase(Enums.Phase.Phase2))
                 .Without(p => p.EmploymentCheckModels)
                 .Create();
 

@@ -2,6 +2,8 @@
 using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
@@ -19,6 +21,11 @@ namespace SFA.DAS.EmployerIncentives.Data.IncentiveApplication
         public async Task Add(IncentiveApplicationAudit incentiveApplicationAudit)
         {
             await _dbContext.AddAsync(incentiveApplicationAudit.Map());
+        }
+
+        public List<IncentiveApplicationStatusAudit> GetByApplicationApprenticeshipId(Guid incentiveApplicationApprenticeshipId)
+        {
+            return _dbContext.IncentiveApplicationStatusAudits.Where(x => x.IncentiveApplicationApprenticeshipId == incentiveApplicationApprenticeshipId).ToList();
         }
     }
 }

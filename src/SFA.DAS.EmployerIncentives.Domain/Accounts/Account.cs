@@ -44,6 +44,17 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             }
         }
 
+        public void MarkLegalEntityRemoved(LegalEntity legalEntity)
+        {
+            var accountLegalEntityId = legalEntity.GetModel().AccountLegalEntityId;
+            var legalEntityModel = Model.LegalEntityModels.SingleOrDefault(l => l.AccountLegalEntityId == accountLegalEntityId);
+            if (legalEntityModel != null)
+            {
+                legalEntityModel.HasBeenDeleted = true;
+                AddEvent(new AccountLegalEntityRemoved { AccountLegalEntityId = accountLegalEntityId });
+            }
+        }
+
         public void AddLegalEntity(long accountLegalEntityId, LegalEntity legalEntity)
         {
             if (Model.LegalEntityModels.Any(i => i.AccountLegalEntityId.Equals(accountLegalEntityId)))
@@ -64,6 +75,14 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
             }
 
             AddEvent(new BankDetailsApprovedForLegalEntity { HashedLegalEntityId = hashedLegalEntityId });
+        }
+
+        public void SetVendorBlockEndDate(string vendorId, DateTime vendorBlockEndDate)
+        {
+            foreach(var legalEntity in LegalEntities.Where(x => x.VrfVendorId == vendorId))
+            {
+                legalEntity.SetVendorBlockEndDate(vendorBlockEndDate);
+            }
         }
 
         private IEnumerable<LegalEntity> LegalEntitiesWithIncompleteVendorRegistration(string hashedLegalEntityId)

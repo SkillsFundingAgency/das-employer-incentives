@@ -48,8 +48,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 {
                     a.DbConnectionString = _context.ApplicationSettings.DbConnectionString;
                     a.DistributedLockStorage = _context.ApplicationSettings.DistributedLockStorage;
-                    a.AllowedHashstringCharacters = _context.ApplicationSettings.AllowedHashstringCharacters;
-                    a.Hashstring = _context.ApplicationSettings.Hashstring;
                     a.NServiceBusConnectionString = _context.ApplicationSettings.NServiceBusConnectionString;
                     a.MinimumAgreementVersion = _context.ApplicationSettings.MinimumAgreementVersion;
                     a.EmploymentCheckEnabled = _context.ApplicationSettings.EmploymentCheckEnabled;
@@ -83,14 +81,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                     l.SubscriptionKey = "";
                     l.ApiVersion = "1";
                 });
-                if (_context.AccountApi != null)
-                {
-                    s.Configure<AccountApi>(a =>
-                    {
-                        a.ApiBaseUrl = _context.AccountApi.BaseAddress;
-                        a.ClientId = "";
-                    });
-                }
 
                 Commands.ServiceCollectionExtensions.AddCommandHandlers(s, AddDecorators);
 
@@ -98,6 +88,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
                 s.Decorate<IEventPublisher>((handler, sp) => new TestEventPublisher(handler, _eventMessageHook));
                 s.Decorate<ICommandPublisher>((handler, sp) => new TestCommandPublisher(handler, _commandMessageHook));                
                 s.Decorate<IScheduledCommandPublisher>((handler, sp) => new TestScheduledCommandPublisher(handler, _commandMessageHook));
+                s.AddSingleton(typeof(IDateTimeService), _context.DateTimeService);
                 s.AddSingleton(_commandMessageHook);
             });
             builder.ConfigureAppConfiguration(a =>

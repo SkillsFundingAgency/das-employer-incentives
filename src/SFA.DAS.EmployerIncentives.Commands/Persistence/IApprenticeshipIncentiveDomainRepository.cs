@@ -15,6 +15,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.Persistence
 
         Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByEmploymentCheckId(Guid correlationId);
         Task<List<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive>> FindIncentivesWithLearningFound();
-
+        Task<Domain.ApprenticeshipIncentives.ApprenticeshipIncentive> FindByPaymentId(Guid paymentId);
     }
 }

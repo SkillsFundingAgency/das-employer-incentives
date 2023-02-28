@@ -151,44 +151,42 @@ Examples:
 | false									| false							 | false                         | true                           | false                   |
 
 Scenario Outline: EmployedAtStartOfApprenticeship Employment check status with override
-	Given an account that is in employer incentives
-	When there is an 'EmployedAtStartOfApprenticeship' payment validation status of '<Employed At Start Of Apprenticeship>'
+	Given an account that is in employer incentives	
+	When there is a validation override result of '<Validation Override Result>' and an 'EmployedAtStartOfApprenticeship' payment validation status of '<Employed At Start Of Apprenticeship>'
 	And there is an 'EmployedBeforeSchemeStarted' payment validation status of '<Employed Before Scheme Started>'
 	And there is an 'EmployedAtStartOfApprenticeship' employment check result of '<First Employment Check Result>'
-	And there is an 'EmployedBeforeSchemeStarted' employment check result of '<Second Employment Check Result>'
-	And there is an EmployedAtStartOfApprenticeship validation override and expiry of '<HasExpired>'
+	And there is an 'EmployedBeforeSchemeStarted' employment check result of '<Second Employment Check Result>'	
 	When a client requests the apprenticeships for the account
 	Then the apprenticeship is returned with employment check status of '<Employment Check Status>'
 Examples:
-| Employed At Start Of Apprenticeship | Employed Before Scheme Started | First Employment Check Result | Second Employment Check Result | HasExpired | Employment Check Status |
-| true                                | true                           | false                         | true                           | false      | true                    |
-| false                               | true                           | false                         | true                           | false      | true                    |
-| true                                | true                           | true                          | true                           | false      | true                    |
-| false                               | true                           | true                          | true                           | false      | true                    |
-| true                                | true                           | false                         | true                           | true       | true                    |
-| false                               | true                           | false                         | true                           | true       | false                   |
-| true                                | true                           | true                          | true                           | true       | true                    |
-| false                               | true                           | true                          | true                           | true       | false                   |
+| Employed At Start Of Apprenticeship | Employed Before Scheme Started | First Employment Check Result | Second Employment Check Result | Validation Override Result | Employment Check Status |
+| true                                | true                           | false                         | true                           | true						 | true                    |
+| false                               | true                           | false                         | true                           | true						 | true                    |
+| true                                | true                           | true                          | true                           | true						 | true                    |
+| false                               | true                           | true                          | true                           | true						 | true                    |
+| true                                | true                           | false                         | true                           | false						 | true                    |
+| false                               | true                           | false                         | true                           | false						 | false                   |
+| true                                | true                           | true                          | true                           | false						 | true                    |
+| false                               | true                           | true                          | true                           | false						 | false                   |
 
 Scenario Outline: EmployedBeforeSchemeStarted Employment check status with override
 	Given an account that is in employer incentives
 	When there is an 'EmployedAtStartOfApprenticeship' payment validation status of '<Employed At Start Of Apprenticeship>'
-	And there is an 'EmployedBeforeSchemeStarted' payment validation status of '<Employed Before Scheme Started>'
+	And there is a validation override result of '<Validation Override Result>' and an 'EmployedBeforeSchemeStarted' payment validation status of '<Employed Before Scheme Started>'
 	And there is an 'EmployedAtStartOfApprenticeship' employment check result of '<First Employment Check Result>'
-	And there is an 'EmployedBeforeSchemeStarted' employment check result of '<Second Employment Check Result>'
-	And there is an EmployedBeforeSchemeStarted validation override and expiry of '<HasExpired>'
+	And there is an 'EmployedBeforeSchemeStarted' employment check result of '<Second Employment Check Result>'	
 	When a client requests the apprenticeships for the account
 	Then the apprenticeship is returned with employment check status of '<Employment Check Status>'
 Examples:
-| Employed At Start Of Apprenticeship | Employed Before Scheme Started | First Employment Check Result | Second Employment Check Result | HasExpired | Employment Check Status |
-| true                                | true                           | true                          | false                          | false      | true                    |
-| true                                | false                          | true                          | false                          | false      | true                    |
-| true                                | true                           | true                          | true                           | false      | true                    |
-| true                                | false                          | true                          | true                           | false      | true                    |
-| true                                | true                           | true                          | false                          | true       | true                    |
-| true                                | false                          | true                          | false                          | true       | false                   |
-| true                                | true                           | true                          | true                           | true       | true                    |
-| true                                | false                          | true                          | true                           | true       | false                   |
+| Employed At Start Of Apprenticeship | Employed Before Scheme Started | First Employment Check Result | Second Employment Check Result | Validation Override Result | Employment Check Status |
+| true                                | true                           | true                          | false                          | true						 | true                    |
+| true                                | false                          | true                          | false                          | true						 | true                    |
+| true                                | true                           | true                          | true                           | true						 | true                    |
+| true                                | false                          | true                          | true                           | true						 | true                    |
+| true                                | true                           | true                          | false                          | false						 | true                    |
+| true                                | false                          | true                          | false                          | true						 | true                    |
+| true                                | false                          | true                          | false                          | false						 | false                   |
+| true                                | false                          | true                          | true                           | false						 | false                   |
 
 Scenario: Multiple employment check payment validation statuses
 	Given an account that is in employer incentives
@@ -256,3 +254,59 @@ Examples:
 | Employer		|
 | Compliance	|
 
+Scenario: Employment check status with 365 day check
+	Given an account that is in employer incentives
+	When there is an 'EmployedAtStartOfApprenticeship' payment validation status of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' payment validation status of 'true'
+	And there is an 'EmployedAtStartOfApprenticeship' employment check result of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' employment check result of 'false'
+	And there is an 'EmployedAt365Days' second payment validation status of '<Employed At 365 Days>'
+	And there is an 'EmployedAt365PaymentDueDateFirstCheck' employment check result of '<365 Days Employment First Check Result>'
+	And there is an 'EmployedAt365PaymentDueDateSecondCheck' employment check result of '<365 Days Employment Second Check Result>'
+	When a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with second payment employment check status of '<Employment Check Status>'
+Examples:
+| Employed At 365 Days | 365 Days Employment First Check Result | 365 Days Employment Second Check Result | Employment Check Status |
+| true                 | true                                   | null                                    | true                    |
+| false                | false                                  | null                                    | null                    |
+| false                | false                                  | false                                   | false                   |
+| true                 | false                                  | true                                    | true                    |
+| null                 | null                                   | null                                    | null                    |
+
+Scenario Outline: EmployedAt365Days Employment check status with override
+	Given an account that is in employer incentives
+	When there is an 'EmployedAtStartOfApprenticeship' payment validation status of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' payment validation status of 'true'
+	And there is an 'EmployedAtStartOfApprenticeship' employment check result of 'true'
+	And there is an 'EmployedBeforeSchemeStarted' employment check result of 'false'
+	When there is an override result of '<Employed At 365 Days Override>' and an 'EmployedAt365Days' second payment validation status of '<Employed At 365 Days>'	
+	And there is an 'EmployedAt365PaymentDueDateFirstCheck' employment check result of 'false'
+	And there is an 'EmployedAt365PaymentDueDateSecondCheck' employment check result of '<Employed At 365 Days>'
+	And there is a validation override for validation step 'EmployedAt365Days' and expiry of '<HasExpired>'
+	When a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with second payment employment check status of '<Employment Check Status>'
+Examples:
+| Employed At 365 Days | Employed At 365 Days Override | HasExpired | Employment Check Status |
+| true                 | true                          | false      | true                    |
+| false                | true                          | false      | true                    |
+| true                 | true                          | true       | true                    |
+| false                | true                          | true       | true                    |
+| false                | false                         | true       | false                   |
+
+Scenario: Learner record with stopped date before the second payment is paid
+	Given an account that is in employer incentives
+	When there is an incentive with a learning stopped date before the second payment is paid
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with incentive completed set to 'False'
+
+Scenario: Learner record with stopped date after the second payment is paid
+	Given an account that is in employer incentives
+	When there is an incentive with a learning stopped date after the second payment is paid
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with incentive completed set to 'True'
+
+Scenario: Learner record with stopped date and the second payment is not paid
+	Given an account that is in employer incentives
+	When there is an incentive with a learning stopped date and the second payment is not paid
+	And a client requests the apprenticeships for the account
+	Then the apprenticeship is returned with incentive completed set to 'False'

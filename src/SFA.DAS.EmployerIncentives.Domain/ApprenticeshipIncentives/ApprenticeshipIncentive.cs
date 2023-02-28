@@ -8,7 +8,9 @@ using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.ValueTypes;
 using SFA.DAS.EmployerIncentives.Domain.EarningsResilienceCheck.Events;
 using SFA.DAS.EmployerIncentives.Domain.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Extensions;
+using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using SFA.DAS.EmployerIncentives.Domain.ValueObjects;
+using SFA.DAS.EmployerIncentives.Domain.ValueObjects.Earnings;
 using SFA.DAS.EmployerIncentives.Enums;
 using System;
 using System.Collections.Generic;
@@ -32,7 +34,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         public IReadOnlyCollection<ClawbackPayment> Clawbacks => Model.ClawbackPaymentModels.Map().ToList().AsReadOnly();
         public IncentiveStatus Status => Model.Status;
         public AgreementVersion MinimumAgreementVersion => Model.MinimumAgreementVersion;
-        private bool HasPaidEarnings => Model.PaymentModels.Any(p => p.PaidDate.HasValue);
         public IReadOnlyCollection<BreakInLearning> BreakInLearnings => Model.BreakInLearnings.OrderBy(b => b.StartDate).ToList().AsReadOnly();
         public IncentivePhase Phase => Model.Phase;
         public WithdrawnBy? WithdrawnBy => Model.WithdrawnBy;
@@ -59,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Phase = phase
                 }, true);
         }
-        
+
         internal static ApprenticeshipIncentive Get(Guid id, ApprenticeshipIncentiveModel model)
         {
             return new ApprenticeshipIncentive(id, model);
@@ -67,220 +68,55 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void CalculateEarnings(CollectionCalendar collectionCalendar)
         {
-            if (Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
-            {
-                return;
-            }
-
-            var incentive = Incentive.Create(this);
-            if (!incentive.IsEligible)
-            {
-                ClawbackAllPayments(collectionCalendar.GetActivePeriod().CollectionPeriod);
-                return;
-            }
-
-            foreach (var payment in incentive.Payments)
-            {
-                AddPendingPaymentsAndClawbackWhereRequired(payment, collectionCalendar);
-            }
-
-            AddEvent(new EarningsCalculated
-            {
-                ApprenticeshipIncentiveId = Id,
-                AccountId = Account.Id,
-                ApprenticeshipId = Apprenticeship.Id,
-                ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
-            });
-
-            Model.RefreshedLearnerForEarnings = false;
+            CalculateEarnings(collectionCalendar, null);
         }
 
-        private void CalculateEarningsForStoppedLearner(CollectionCalendar collectionCalendar, int paymentsCount)
+        public void ReCalculateEarnings(CollectionCalendar collectionCalendar)
         {
-            var incentive = Incentive.Create(this);
+            var calculator = EarningsCalculator.Create(
+                this,
+                collectionCalendar,
+                e => AddEvent(e));
 
-            var payments = incentive.Payments.ToList();
-            if (!payments.Any())
-            {
-                return;
-            }
-
-            for(var index = 0; index < paymentsCount; index ++)
-            {
-                AddPendingPaymentsAndClawbackWhereRequired(payments[index], collectionCalendar);
-            }
-
-            if (paymentsCount < PendingPayments.Count)
-            {
-                Model.PendingPaymentModels.Remove(PendingPayments.Last().GetModel());
-            }
-
-            AddEvent(new EarningsCalculated
-            {
-                ApprenticeshipIncentiveId = Id,
-                AccountId = Account.Id,
-                ApprenticeshipId = Apprenticeship.Id,
-                ApplicationApprenticeshipId = Model.ApplicationApprenticeshipId
-            });
+            calculator.ReCalculate();
         }
 
-        public void RecalculateEarnings(CollectionCalendar collectionCalendar)
+        private void CalculateEarnings(CollectionCalendar collectionCalendar, Learner learner)
         {
-            if (Model.Status == IncentiveStatus.Withdrawn || Model.Status == IncentiveStatus.Stopped)
-            {
-                return;
-            }
+            var calculator = EarningsCalculator.Create(
+                this,
+                collectionCalendar,
+                e => AddEvent(e),
+                learner);
 
-            var pendingPaymentsHaveBeenPaid = false;
-            foreach(var pendingPayment in PendingPayments)
-            {
-                if (ExistingPendingPaymentHasBeenPaid(pendingPayment))
-                {
-                    pendingPaymentsHaveBeenPaid = true;
-                }
-            }
-
-            if (!pendingPaymentsHaveBeenPaid)
-            {
-                foreach(var pendingPayment in PendingPayments)
-                {
-                    var existingPendingPaymentModel = pendingPayment.GetModel();
-                    if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
-                    {
-                        AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
-                    }
-                }
-                CalculateEarnings(collectionCalendar);
-            }
-        }
-
-        private void AddPendingPaymentsAndClawbackWhereRequired(ValueObjects.Payment payment, CollectionCalendar collectionCalendar)
-        {
-            var pendingPayment = PendingPayment.New(
-                Guid.NewGuid(),
-                Model.Account,
-                Model.Id,
-                payment.Amount,
-                payment.PaymentDate,
-                DateTime.Now,
-                payment.EarningType);
-
-            pendingPayment.SetPaymentPeriod(collectionCalendar);
-
-            var existingPendingPayment = PendingPayments.SingleOrDefault(x => x.EarningType == pendingPayment.EarningType && !x.ClawedBack);
-            if (existingPendingPayment == null)
-            {
-                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
-                return;
-            }
-
-            if (ExistingPendingPaymentHasBeenPaid(existingPendingPayment))
-            {
-                if (!existingPendingPayment.RequiresNewPayment(pendingPayment))
-                {
-                    return;
-                }
-
-                AddClawback(existingPendingPayment, collectionCalendar.GetActivePeriod().CollectionPeriod);
-                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
-                return;
-            }
-
-            RemoveUnpaidPaymentIfExists(existingPendingPayment);
-            if (!existingPendingPayment.EquivalentTo(pendingPayment))
-            {
-                var existingPendingPaymentModel = existingPendingPayment.GetModel();
-                if (Model.PendingPaymentModels.Remove(existingPendingPaymentModel))
-                {
-                    AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPendingPaymentModel));
-                }
-                Model.PendingPaymentModels.Add(pendingPayment.GetModel());
-            }
-        }
-
-        private void AddClawback(PendingPayment pendingPayment, CollectionPeriod collectionPeriod)
-        {
-            pendingPayment.ClawBack();
-            var payment = Model.PaymentModels.Single(p => p.PendingPaymentId == pendingPayment.Id);
-
-            if (!Model.ClawbackPaymentModels.Any(c => c.PendingPaymentId == pendingPayment.Id))
-            {
-                var clawback = ClawbackPayment.New(
-                    Guid.NewGuid(),
-                    Model.Account,
-                    Model.Id,
-                    pendingPayment.Id,
-                    -pendingPayment.Amount,
-                    DateTime.Now,
-                    payment.SubnominalCode,
-                    payment.Id,
-                    payment.VrfVendorId);
-
-                clawback.SetPaymentPeriod(collectionPeriod);
-
-                Model.ClawbackPaymentModels.Add(clawback.GetModel());
-            }
-        }
-
-        private void RemoveUnpaidPaymentIfExists(PendingPayment existingPendingPayment)
-        {
-            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == existingPendingPayment.Id);
-            if (existingPayment != null)
-            {
-                if (Model.PaymentModels.Remove(existingPayment))
-                {
-                    AddEvent(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, existingPayment));
-                }
-            }
-        }
-
-        private bool ExistingPendingPaymentHasBeenPaid(PendingPayment existingPendingPayment)
-        {
-            if (existingPendingPayment.PaymentMadeDate == null)
-            {
-                return false;
-            }
-
-            var existingPayment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == existingPendingPayment.Id);
-            if (existingPayment == null || existingPayment.PaidDate == null)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private void ClawbackAllPayments(CollectionPeriod collectionPeriod)
-        {
-            RemoveUnpaidEarnings();
-            ClawbackPayments(PendingPayments, collectionPeriod);
+            calculator.Calculate();
         }
 
         public void CalculatePayments()
         {
             AddEvent(new PaymentsCalculationRequired(Model));
         }
-        
+
+        private void ChangeStatus(IncentiveStatus newStatus)
+        {
+            Model.PreviousStatus = Model.Status;
+            Model.Status = newStatus;
+        }
+
         public void Withdraw(WithdrawnBy withdrawnBy, CollectionCalendar collectionCalendar)
         {
-            Model.Status = IncentiveStatus.Withdrawn;
+            ChangeStatus(IncentiveStatus.Withdrawn);
+
+            CalculateEarnings(collectionCalendar);
+
             Model.WithdrawnBy = withdrawnBy;
-            if (HasPaidEarnings)
-            {
-                ClawbackAllPayments(collectionCalendar.GetActivePeriod().CollectionPeriod);
-                Model.PausePayments = false;
-            }
-            else
-            {
-                RemoveUnpaidEarnings();
-            }
         }
 
         public void Reinstate(CollectionCalendar collectionCalendar)
         {
             Model.WithdrawnBy = null;
             Model.PausePayments = true;
-            Model.Status = IncentiveStatus.Paused;
+            ChangeStatus(IncentiveStatus.Paused);
             CalculateEarnings(collectionCalendar);
         }
 
@@ -307,7 +143,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             {
                 AddPayment(pendingPaymentId, collectionPeriod, pendingPayment, paymentDate);
             }
-            
+
             pendingPayment.SetPaymentMadeDate(paymentDate);
         }
 
@@ -323,7 +159,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
         public void SetStartDateChangeOfCircumstance(
             DateTime startDate,
-            CollectionCalendar collectionCalendar)
+            CollectionCalendar collectionCalendar,
+            IDateTimeService dateTimeService)
         {
             var previousStartDate = Model.StartDate;
             SetStartDate(startDate);
@@ -337,8 +174,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                     Model.StartDate,
                     Model));
 
-                SetMinimumAgreementVersion(startDate);  
-                AddEmploymentChecks();
+                SetMinimumAgreementVersion(startDate);
+                RefreshEmploymentChecks(dateTimeService);
             }
         }
 
@@ -356,7 +193,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
         }
 
-        public void SetBreaksInLearning(IList<LearningPeriod> periods, CollectionCalendar collectionCalendar)
+        public void SetBreaksInLearning(
+            IList<LearningPeriod> periods,
+            CollectionCalendar collectionCalendar,
+            IDateTimeService dateTimeService)
         {
             var breaks = new List<BreakInLearning>();
             for (var i = 0; i < periods.Count - 1; i++)
@@ -370,8 +210,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             if (breaks.SequenceEqual(BreakInLearnings)) return;
 
             Model.BreakInLearnings = breaks;
+
             CalculateEarnings(collectionCalendar);
-        }
+
+            RefreshEmploymentChecks(dateTimeService);
+        }   
 
         private void StartBreakInLearning(DateTime startDate)
         {
@@ -380,98 +223,41 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
         }
 
         public void SetLearningStoppedChangeOfCircumstance(
-            LearningStoppedStatus learningStoppedStatus,
+            Learner learner,
             CollectionCalendar collectionCalendar)
         {
-            if (learningStoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
+            var stoppedStatus = learner.StoppedStatus;
+
+            if (stoppedStatus.LearningStopped && Model.Status != IncentiveStatus.Stopped)
             {
-                Model.Status = IncentiveStatus.Stopped;
-                StartBreakInLearning(learningStoppedStatus.DateStopped.Value);
-                RemoveEarningsAfterStopDate(learningStoppedStatus.DateStopped.Value, collectionCalendar);
+                ChangeStatus(IncentiveStatus.Stopped);
+                StartBreakInLearning(stoppedStatus.DateStopped.Value);
+                
+                CalculateEarnings(collectionCalendar, learner);
+
                 AddEvent(new LearningStopped(
                     Model.Id,
-                    learningStoppedStatus.DateStopped.Value));
+                    stoppedStatus.DateStopped.Value));
             }
-            else if (Model.Status == IncentiveStatus.Stopped && !learningStoppedStatus.LearningStopped &&
-                     learningStoppedStatus.DateResumed != null)
+            else if (Model.Status == IncentiveStatus.Stopped &&
+                !stoppedStatus.LearningStopped &&
+                stoppedStatus.DateResumed != null)
             {
-                Model.Status = IncentiveStatus.Active;
+                ChangeStatus(IncentiveStatus.Active);
 
                 AddEvent(new BreakInLearningDeleted(Model.Id));
-                CalculateEarnings(collectionCalendar);
+
+                RemoveAll365Checks();
+                CalculateEarnings(collectionCalendar, learner);
+
                 AddEvent(new LearningResumed(
                     Model.Id,
-                    learningStoppedStatus.DateResumed.Value));
+                    stoppedStatus.DateResumed.Value));
             }
-            else if (Model.Status == IncentiveStatus.Stopped && learningStoppedStatus.LearningStopped)
+            else if (Model.Status == IncentiveStatus.Stopped && stoppedStatus.LearningStopped)
             {
-                var incentive = Incentive.Create(this);
-                var paymentProfiles = incentive.PaymentProfiles.Where(x => x.IncentiveType == incentive.IncentiveType)
-                                                                .OrderBy(y => y.DaysAfterApprenticeshipStart).ToList();
-
-                for (var index = 2; index >= 1; index--)
-                {
-                    if (learningStoppedStatus.DateStopped.HasValue
-                        && learningStoppedStatus.DateStopped.Value >= StartDate.AddDays(paymentProfiles[index-1].DaysAfterApprenticeshipStart))
-                    {
-                        CalculateEarningsForStoppedLearner(collectionCalendar, index);
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void RemoveEarningsAfterStopDate(
-            DateTime dateStopped,
-            CollectionCalendar collectionCalendar)
-        {
-            RemoveUnpaidEarnings(Model.PendingPaymentModels.Where(x => x.DueDate >= dateStopped));
-            ClawbackPayments(PendingPayments.Where(x => x.DueDate >= dateStopped), collectionCalendar.GetActivePeriod().CollectionPeriod);
-        }
-
-        private void ClawbackPayments(IEnumerable<PendingPayment> pendingPayments, CollectionPeriod collectionPeriod)
-        {
-            foreach (var paidPendingPayment in pendingPayments)
-            {
-                AddClawback(paidPendingPayment, collectionPeriod);
-            }
-        }
-
-        private void RemoveUnpaidEarnings()
-        {
-            RemoveUnpaidEarnings(Model.PendingPaymentModels);
-        }
-
-        private void RemoveUnpaidEarnings(IEnumerable<PendingPaymentModel> pendingPayments)
-        {
-            pendingPayments.Where(x => x.PaymentMadeDate == null).ToList()
-                .ForEach(pp => {
-                    if (Model.PendingPaymentModels.Remove(pp))
-                    {
-                        AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, pp));
-                    }
-                });
-
-            var pendingPaymentsToDelete = new List<PendingPaymentModel>();
-            foreach (var paidPendingPayment in pendingPayments.Where(x => x.PaymentMadeDate != null))
-            {
-                var payment = Model.PaymentModels.SingleOrDefault(x => x.PendingPaymentId == paidPendingPayment.Id);
-                if (payment != null && payment.PaidDate == null)
-                {
-                    if(Model.PaymentModels.Remove(payment))
-                    {
-                        AddEvent(new PaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, payment));
-                    }
-                    pendingPaymentsToDelete.Add(paidPendingPayment);
-                }
-            }
-
-            foreach (var deletedPendingPayment in pendingPaymentsToDelete)
-            {
-                if (Model.PendingPaymentModels.Remove(deletedPendingPayment))
-                {
-                    AddEvent(new PendingPaymentDeleted(Model.Account.Id, Model.Account.AccountLegalEntityId, Model.Apprenticeship.UniqueLearnerNumber, deletedPendingPayment));
-                }
+                ChangeStatus(IncentiveStatus.Stopped);
+                CalculateEarnings(collectionCalendar, learner);
             }
         }
 
@@ -532,7 +318,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             return pendingPayment;
         }
-        
+
         public void ValidatePendingPaymentBankDetails(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
         {
             if (Account.Id != account.Id)
@@ -572,23 +358,46 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
             }
 
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
-                        
+
             var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
 
             var isValid = legalEntity.SignedAgreementVersion >= MinimumAgreementVersion.MinimumRequiredVersion;
 
             pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.HasSignedMinVersion, isValid));
         }
-        
-        public void ValidateEmploymentChecks(Guid pendingPaymentId, CollectionPeriod collectionPeriod)
+
+        public void ValidateEmploymentChecks(IDateTimeService dateTimeService, Guid pendingPaymentId, CollectionPeriod collectionPeriod)
         {
             var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
 
             ValidateEmployedAtStartOfApprenticeship(collectionPeriod, pendingPayment);
 
             ValidateNotEmployedBeforeSchemeStartDate(collectionPeriod, pendingPayment);
-        }
 
+            ValidateEmployedAt365Days(dateTimeService, collectionPeriod, pendingPayment);
+        } 
+
+        public void ValidatePaymentsNotBlockedForAccountLegalEntity(Guid pendingPaymentId, Accounts.Account account, CollectionPeriod collectionPeriod)
+        {
+            if (Account.Id != account.Id)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided Account record does not match the one against the incentive.");
+            }
+
+            var pendingPayment = GetPendingPaymentForValidationCheck(pendingPaymentId);
+
+            var legalEntity = account.GetLegalEntity(pendingPayment.Account.AccountLegalEntityId);
+
+            if (legalEntity == null)
+            {
+                throw new InvalidPendingPaymentException($"Unable to validate PendingPayment {pendingPaymentId} of ApprenticeshipIncentive {Model.Id} because the provided account legal entity does not exist.");
+            }
+
+            var isValid = (!legalEntity.VendorBlockEndDate.HasValue || legalEntity.VendorBlockEndDate < DateTime.Now);
+
+            pendingPayment.AddValidationResult(PendingPaymentValidationResult.New(Guid.NewGuid(), collectionPeriod, ValidationStep.BlockedForPayments, isValid));
+        }
+        
         private void ValidateNotEmployedBeforeSchemeStartDate(CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
         {
             var employedBeforeSchemeStartedCheck = EmploymentChecks.FirstOrDefault(x =>
@@ -599,7 +408,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(
                 PendingPaymentValidationResult.New(
-                    Guid.NewGuid(), 
+                    Guid.NewGuid(),
                     collectionPeriod,
                     ValidationStep.EmployedBeforeSchemeStarted,
                     employedBeforeSchemeStartedResult,
@@ -616,11 +425,58 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(
                 PendingPaymentValidationResult.New(
-                    Guid.NewGuid(), 
+                    Guid.NewGuid(),
                     collectionPeriod,
-                    ValidationStep.EmployedAtStartOfApprenticeship, 
+                    ValidationStep.EmployedAtStartOfApprenticeship,
                     employedAtStartOfApprenticeshipResult,
                     GetOverrideStep(ValidationStep.EmployedAtStartOfApprenticeship)));
+        }
+
+        private void ValidateEmployedAt365Days(IDateTimeService dateTimeService, CollectionPeriod collectionPeriod, PendingPayment pendingPayment)
+        {
+            if (pendingPayment.EarningType  == EarningType.FirstPayment)
+            {
+                return;
+            }
+
+            var employedAt365DaysFirstCheck = EmploymentChecks.FirstOrDefault(x =>
+                x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+
+            var employedAt365DaysFirstCheckResult = employedAt365DaysFirstCheck?.Result != null &&
+                                                        employedAt365DaysFirstCheck.Result.Value;
+
+            bool validationResult = true;
+
+            if (employedAt365DaysFirstCheck == null &&
+               pendingPayment.DueDate.AddDays(21) > dateTimeService.UtcNow().Date)
+            {
+                validationResult = false;
+            }
+            
+            pendingPayment.AddValidationResult(
+                PendingPaymentValidationResult.New(
+                    Guid.NewGuid(),
+                    collectionPeriod,
+                    ValidationStep.EmployedAt365Days,
+                    validationResult,
+                    GetOverrideStep(ValidationStep.EmployedAt365Days)));
+
+            if (!employedAt365DaysFirstCheckResult)
+            {
+                var employedAt365DaysSecondCheck = EmploymentChecks.FirstOrDefault(x =>
+                    x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
+
+                var employedAt365DaysSecondCheckResult = employedAt365DaysSecondCheck?.Result != null &&
+                                                         employedAt365DaysSecondCheck.Result.Value;
+
+                pendingPayment.AddValidationResult(
+                    PendingPaymentValidationResult.New(
+                        Guid.NewGuid(),
+                        collectionPeriod,
+                        ValidationStep.EmployedAt365Days,
+                        employedAt365DaysSecondCheckResult,
+                        GetOverrideStep(ValidationStep.EmployedAt365Days)));
+            }
         }
 
         private void ValidateSubmissionFound(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
@@ -649,12 +505,12 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(
                 PendingPaymentValidationResult.New(
-                    Guid.NewGuid(), 
-                    collectionPeriod, 
-                    ValidationStep.IsInLearning, 
+                    Guid.NewGuid(),
+                    collectionPeriod,
+                    ValidationStep.IsInLearning,
                     isInLearning,
                     GetOverrideStep(ValidationStep.IsInLearning)));
-        }        
+        }
 
         public void ValidateHasLearningRecord(Guid pendingPaymentId, Learner learner, CollectionPeriod collectionPeriod)
         {
@@ -682,9 +538,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(
                 PendingPaymentValidationResult.New(
-                    Guid.NewGuid(), 
-                    collectionPeriod, 
-                    ValidationStep.HasNoDataLocks, 
+                    Guid.NewGuid(),
+                    collectionPeriod,
+                    ValidationStep.HasNoDataLocks,
                     !hasDataLock,
                     GetOverrideStep(ValidationStep.HasNoDataLocks)));
         }
@@ -707,9 +563,9 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
 
             pendingPayment.AddValidationResult(
                 PendingPaymentValidationResult.New(
-                    Guid.NewGuid(), 
-                    collectionPeriod, 
-                    ValidationStep.HasDaysInLearning, 
+                    Guid.NewGuid(),
+                    collectionPeriod,
+                    ValidationStep.HasDaysInLearning,
                     hasEnoughDaysInLearning,
                     GetOverrideStep(ValidationStep.HasDaysInLearning)));
         }
@@ -798,87 +654,226 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return; // ignore superseded results
             }
 
-            if(employmentCheck.ResultDateTime.HasValue && employmentCheck.ResultDateTime > checkResult.DateChecked)
+            if (employmentCheck.ResultDateTime.HasValue && employmentCheck.ResultDateTime > checkResult.DateChecked)
             {
                 return; // ignore older changes
             }
 
-            employmentCheck.Result = false;
             employmentCheck.ResultDateTime = checkResult.DateChecked;
 
-            if (checkResult.Result == EmploymentCheckResultType.Employed)
+            switch (checkResult.Result)
             {
-                employmentCheck.Result = true;                
-            }
-        }
+                case EmploymentCheckResultType.Employed:
+                    employmentCheck.Result = true;
+                    break;
 
-        private void RequestEmploymentChecks(bool? isInLearning)
-        {
-            if (EmploymentChecks.Any())
-            {
-                return;
-            }
+                case EmploymentCheckResultType.NotEmployed:
+                    employmentCheck.Result = false;
+                    break;
 
-            if (!isInLearning.HasValue || !isInLearning.Value)
-            {
-                return;
-            }
-
-            AddEmploymentChecks();
-        }
-
-        public void AddEmploymentChecks(ServiceRequest serviceRequest = null)
-        {
-            Model.EmploymentCheckModels.ToList()
-                .ForEach(ec => {
-                    if (Model.EmploymentCheckModels.Remove(ec))
+                case EmploymentCheckResultType.Error:
                     {
-                        AddEvent(new EmploymentCheckDeleted(ec));
+                        employmentCheck.Result = null;
+                        if (checkResult.ErrorType.HasValue)
+                        {
+                            employmentCheck.ErrorType = checkResult.ErrorType;
+                        }
+                        else
+                        {
+                            throw new InvalidEmploymentCheckErrorTypeException("Value not set");
+                        }
                     }
-                });
+                    break;
+            }
+        }      
 
+        public void RefreshEmploymentChecks(IDateTimeService dateTimeService, ServiceRequest serviceRequest = null, string checkType = null)
+        {
+            if (checkType == RefreshEmploymentCheckType.EmployedAt365DaysCheck.ToString())
+            {
+                if (!HasSuccessfulChecks(new List<EmploymentCheckType> {
+                        EmploymentCheckType.EmployedAtStartOfApprenticeship,
+                        EmploymentCheckType.EmployedBeforeSchemeStarted
+                    }))
+                {
+                    throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if initial employment checks have not completed");
+                }
+
+                if (!CanRefreshEmploymentCheck(EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck))
+                {
+                    throw new InvalidOperationException("Employed at 365 days check cannot be refreshed if 365 day employment checks have not previously executed");
+                }
+
+                Model.EmploymentCheckModels.Where(x => x.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck).ToList()
+                    .ForEach(ec =>
+                    {
+                        if (Model.EmploymentCheckModels.Remove(ec))
+                        {
+                            AddEvent(new EmploymentCheckDeleted(ec));
+                        }
+                    });
+            }
+            else
+            {
+                Model.EmploymentCheckModels.ToList()
+                    .ForEach(ec =>
+                    {
+                        if (Model.EmploymentCheckModels.Remove(ec))
+                        {
+                            AddEvent(new EmploymentCheckDeleted(ec));
+                        }
+                    });
+            }
+
+            AddEmploymentChecks(dateTimeService, serviceRequest);
+        }
+
+        public void AddEmploymentChecks(IDateTimeService dateTimeService, ServiceRequest serviceRequest = null)
+        {
             if (Status == IncentiveStatus.Withdrawn)
             {
                 return;
             }
 
-            if (StartDate.AddDays(42) > DateTime.Now)
+            var secondPaymentDueDate = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack)?.DueDate;
+
+            if (secondPaymentDueDate != null &&
+                secondPaymentDueDate.Value.AddDays(21).Date <= dateTimeService.UtcNow().Date && 
+                HasSuccessfulChecks(new List<EmploymentCheckType> { EmploymentCheckType.EmployedAtStartOfApprenticeship, EmploymentCheckType.EmployedBeforeSchemeStarted }))
+            {
+                var existingFirstCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+                var existingSecondCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
+
+                if (existingFirstCheck == null && existingSecondCheck == null) // check never performed
+                {
+                    AddEmployedAt365PaymentDueDateFirstCheck(serviceRequest: serviceRequest);
+                }
+                else if (existingSecondCheck == null && existingFirstCheck.Result.HasValue && existingFirstCheck.Result.Value) // first check succeeded
+                {
+                    return;
+                }
+                else if(existingFirstCheck != null && (existingFirstCheck.Result.HasValue && !existingFirstCheck.Result.Value)
+                        || (existingFirstCheck != null && !existingFirstCheck.Result.HasValue && existingFirstCheck.ErrorType != null)) // first check failed or returned error code
+                {
+                    if (secondPaymentDueDate.Value.AddDays(42).Date <= dateTimeService.UtcNow().Date)
+                    {
+                        AddEmployedAt365PaymentDueDateSecondCheck(serviceRequest: serviceRequest);
+                    }
+                }
+
+                return;
+            }
+
+            if (StartDate.AddDays(42).Date > dateTimeService.UtcNow().Date) // has not started 6 weeks ago
+            {   
+                return;
+            }
+
+            if (EmploymentChecks.Any()) // already requested
             {
                 return;
             }
 
-            AddEmploymentBeforeSchemeCheck();
-            AddEmployedAtStartOfApprenticeshipCheck();
-
-            AddEvent(new EmploymentChecksCreated(Id, serviceRequest));
+            AddEmploymentBeforeSchemeCheck(serviceRequest: serviceRequest);
+            AddEmployedAtStartOfApprenticeshipCheck(serviceRequest: serviceRequest);            
         }
+        
 
-        private void AddEmployedAtStartOfApprenticeshipCheck()
+        private void AddEmployedAtStartOfApprenticeshipCheck(ServiceRequest serviceRequest = null)
         {
             var secondCheck = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAtStartOfApprenticeship, StartDate, StartDate.AddDays(42));
             Model.EmploymentCheckModels.Add(secondCheck.GetModel());
+
+            AddEvent(new EmploymentChecksCreated(secondCheck.GetModel(), serviceRequest));
         }
 
-        private void AddEmploymentBeforeSchemeCheck()
+        private void AddEmploymentBeforeSchemeCheck(ServiceRequest serviceRequest = null)
         {
             var phaseStartDate = GetPhaseStartDate();
             var firstCheck = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedBeforeSchemeStarted, phaseStartDate.AddMonths(-6), phaseStartDate.AddDays(-1));
             Model.EmploymentCheckModels.Add(firstCheck.GetModel());
+
+            AddEvent(new EmploymentChecksCreated(firstCheck.GetModel(), serviceRequest));
         }
 
-        public void RefreshLearner(Learner learner)
+        private void AddEmployedAt365PaymentDueDateFirstCheck(double checkWindowInDays = 21, ServiceRequest serviceRequest = null)
+        {
+            var secondPayment = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack);
+            if (secondPayment != null)
+            {
+                var initial365Check = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck, secondPayment.DueDate, secondPayment.DueDate.AddDays(checkWindowInDays));
+
+                var existingCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck);
+
+                if (existingCheck == null)
+                {
+                    Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+
+                    AddEvent(new EmploymentChecksCreated(initial365Check.GetModel(), serviceRequest));
+                }
+                else if (existingCheck.MinimumDate != initial365Check.MinimumDate ||
+                       existingCheck.MaximumDate != initial365Check.MaximumDate)
+                {
+                    if (Model.EmploymentCheckModels.Remove(existingCheck))
+                    {
+                        AddEvent(new EmploymentCheckDeleted(existingCheck));
+                    }
+
+                    Model.EmploymentCheckModels.Add(initial365Check.GetModel());
+
+                    AddEvent(new EmploymentChecksCreated(initial365Check.GetModel(), serviceRequest));
+                }
+            }
+        }
+
+        private void AddEmployedAt365PaymentDueDateSecondCheck(double checkWindowInDays = 42, ServiceRequest serviceRequest = null)
+        {
+            var secondPayment = Model.PendingPaymentModels.SingleOrDefault(pp => pp.EarningType == EarningType.SecondPayment && !pp.ClawedBack);
+
+            if (secondPayment != null)
+            {
+                var second365Check = EmploymentCheck.New(Guid.NewGuid(), Id, EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck, secondPayment.DueDate, secondPayment.DueDate.AddDays(checkWindowInDays));
+
+                var existingCheck = Model.EmploymentCheckModels.SingleOrDefault(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck);
+
+                if (existingCheck == null)
+                {
+                    Model.EmploymentCheckModels.Add(second365Check.GetModel());
+
+                    AddEvent(new EmploymentChecksCreated(second365Check.GetModel(), serviceRequest));
+                }
+                else if (existingCheck.MinimumDate != second365Check.MinimumDate ||
+                       existingCheck.MaximumDate != second365Check.MaximumDate)
+                {
+                    if (Model.EmploymentCheckModels.Remove(existingCheck))
+                    {
+                        AddEvent(new EmploymentCheckDeleted(existingCheck));
+                    }
+
+                    Model.EmploymentCheckModels.Add(second365Check.GetModel());
+
+                    AddEvent(new EmploymentChecksCreated(second365Check.GetModel(), serviceRequest));
+                }
+            }
+        }
+
+        public void RefreshLearner(Learner learner, IDateTimeService dateTimeService)
         {
             SetHasPossibleChangeOfCircumstances(learner.HasPossibleChangeOfCircumstances);
             LearnerRefreshCompleted();
-            RequestEmploymentChecks(learner.SubmissionData.LearningData.LearningFound);
+            
+            if (learner.SubmissionData.LearningData.LearningFound)
+            {
+                AddEmploymentChecks(dateTimeService);
+            }
         }
-                
+
         public void AddValidationOverride(ValidationOverrideStep validationOverrideStep, ServiceRequest serviceRequest)
         {
             RemoveValidationOverride(validationOverrideStep, serviceRequest);
 
             var validationOverride = ValidationOverride.New(Guid.NewGuid(), Model.Id, validationOverrideStep.ValidationType, validationOverrideStep.ExpiryDate);
-            
+
             Model.ValidationOverrideModels.Add(validationOverride.GetModel());
             AddEvent(new ValidationOverrideCreated(validationOverride.Id, Model.Id, validationOverrideStep, serviceRequest));
         }
@@ -906,12 +901,44 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 });
         }
 
+        public void RevertPayment(Guid paymentId, ServiceRequest serviceRequest)
+        {
+            var payment = Model.PaymentModels.FirstOrDefault(x => x.Id == paymentId);
+            if (payment == null)
+            {
+                return;
+            }
+            
+            var pendingPayment = Model.PendingPaymentModels.FirstOrDefault(x => x.Id == payment.PendingPaymentId);
+            if (pendingPayment == null)
+            {
+                return;
+            }
+
+            pendingPayment.PaymentMadeDate = null;
+
+            Model.PaymentModels.Remove(payment);
+
+            AddEvent(new PaymentReverted(payment, serviceRequest));
+        }
+
+        public void ReinstatePendingPayment(PendingPaymentModel pendingPaymentModel, ReinstatePaymentRequest reinstatePaymentRequest)
+        {
+            pendingPaymentModel.ClawedBack = false;
+            pendingPaymentModel.PaymentMadeDate = null;
+            pendingPaymentModel.CalculatedDate = DateTime.UtcNow;
+
+            Model.PendingPaymentModels.Add(pendingPaymentModel);
+
+            AddEvent(new PendingPaymentReinstated(pendingPaymentModel, reinstatePaymentRequest));
+        }
+
         private DateTime GetPhaseStartDate()
         {
             if (Phase.Identifier == Enums.Phase.Phase1)
             {
                 return Phase1Incentive.EligibilityStartDate;
-            } 
+            }
             if (Phase.Identifier == Enums.Phase.Phase2)
             {
                 return Phase2Incentive.EligibilityStartDate;
@@ -932,6 +959,89 @@ namespace SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives
                 return null;
             }
             return new ValidationOverrideStep(validationOverride.Step, validationOverride.ExpiryDate);
+        }
+
+        private void RemoveAll365Checks()
+        {
+            var existingChecks = Model.EmploymentCheckModels.Where(ec => ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck ||
+                                                    ec.CheckType == EmploymentCheckType.EmployedAt365PaymentDueDateSecondCheck).ToList();
+
+            foreach (var existingCheck in existingChecks)
+            {
+                if (Model.EmploymentCheckModels.Remove(existingCheck))
+                {
+                    AddEvent(new EmploymentCheckDeleted(existingCheck));
+                }
+            }
+        }
+        private bool HasSuccessfulChecks(IList<EmploymentCheckType> checkTypes)
+        {
+            var checks = new List<bool>();
+
+            foreach (var checkType in checkTypes)
+            {
+                switch (checkType)
+                {
+                    case EmploymentCheckType.EmployedAtStartOfApprenticeship:
+
+                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && c.Result.Value))
+                        {
+                            checks.Add(true);
+                        }
+                        else
+                        {
+                            checks.Add(false);
+                        }
+                        break;
+
+                    case EmploymentCheckType.EmployedBeforeSchemeStarted:
+
+                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && !c.Result.Value))
+                        {
+                            checks.Add(true);
+                        }
+                        else
+                        {
+                            checks.Add(false);
+                        }
+                        break;
+
+                    case EmploymentCheckType.EmployedAt365PaymentDueDateFirstCheck:
+
+                        if (Model.EmploymentCheckModels.Any(c => c.CheckType == checkType && c.Result.HasValue && c.Result.Value))
+                        {
+                            checks.Add(true);
+                        }
+                        else
+                        {
+                            checks.Add(false);
+                        }
+                        break;
+                }
+            }
+
+            return checks.All(c => c);
+        }
+
+        private bool CanRefreshEmploymentCheck(EmploymentCheckType employmentCheckType)
+        {
+            var employmentCheck = Model.EmploymentCheckModels.FirstOrDefault(c => c.CheckType == employmentCheckType);
+            if (employmentCheck == null)
+            {
+                return false;
+            }
+
+            if (employmentCheck.Result.HasValue)
+            {
+                return true;
+            }
+            
+            if (!employmentCheck.Result.HasValue && employmentCheck.ErrorType != null)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -7,6 +7,7 @@
         EmployerWithdrawn,
         ComplianceWithdrawn,
         PaymentsPaused,
-        PaymentsResumed
+        PaymentsResumed,
+        Reinstated // just for audit purposes
     }
 }

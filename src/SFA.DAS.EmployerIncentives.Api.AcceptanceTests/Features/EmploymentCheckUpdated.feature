@@ -14,12 +14,31 @@ Scenario Outline: Employment check is updated
 	Then the apprenticeship incentive employment check result is updated to <hasPassed>
 
 Examples:
-    | checkResultType | hasPassed |
-    | Employed        | true      |
-    | NotEmployed     | false     |
-    | HMRCUnknown     | false     |
-    | NoNINOFound     | false     |
-    | NoAccountFound  | false     |
+    | checkResultType     | hasPassed |
+    | Employed            | true      |
+    | NotEmployed         | false     |
+    | NinoFailure         | null      |
+    | NinoInvalid         | null      |
+    | PAYENotFound        | null      |
+    | PAYEFailure         | null      |
+    | NinoAndPAYENotFound | null      |
+    | HmrcFailure         | null      |
+
+Scenario Outline: Employment check error is stored
+	Given an apprenticeship incentive has submitted a new employment check
+	When the employment check result is returned with an error result of <checkResultType>
+	Then the apprenticeship incentive employment check result error type is stored as <checkResultType>
+
+Examples:
+    | checkResultType     |
+    | NinoNotFound        |
+    | NinoFailure         |
+    | NinoInvalid         |
+    | PAYENotFound        |
+    | PAYEFailure         |
+    | NinoAndPAYENotFound |
+    | HmrcFailure         |
+
 
 Scenario: Employment check result procesing is delayed during month end processing
 	Given an apprenticeship incentive has submitted a new employment check

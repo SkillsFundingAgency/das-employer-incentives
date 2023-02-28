@@ -42,6 +42,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests
         }
 
         public static StringContent GetStringContent(this object obj)
-            => new StringContent(JsonConvert.SerializeObject(obj), Encoding.Default, "application/json");
+            => new StringContent(JsonConvert.SerializeObject(obj), System.Text.Encoding.Default, "application/json");
     }
 }

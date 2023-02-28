@@ -13,5 +13,7 @@
         public const string LearnerMatchSuccessful = "LearnerMatchSuccessful";
         public const string EmployedAtStartOfApprenticeship = "EmployedAtStartOfApprenticeship";
         public const string EmployedBeforeSchemeStarted = "EmployedBeforeSchemeStarted";
+        public const string BlockedForPayments = "BlockedForPayments";
+        public const string EmployedAt365Days = "EmployedAt365Days";
     }
 }

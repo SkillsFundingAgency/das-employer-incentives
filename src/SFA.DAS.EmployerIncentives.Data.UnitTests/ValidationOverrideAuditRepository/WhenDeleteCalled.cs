@@ -60,7 +60,7 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ValidationOverrideAuditRepos
             storedAudit.Step.Should().Be(testAudit.ValidationOverrideStep.ValidationType);
             storedAudit.ExpiryDate.Should().Be(testAudit.ValidationOverrideStep.ExpiryDate);
             storedAudit.CreatedDateTime.Should().Be(createdDate);
-            storedAudit.DeletedDateTime.Should().BeCloseTo(DateTime.Now, new TimeSpan(0, 1, 0));
+            storedAudit.DeletedDateTime.Should().BeCloseTo(DateTime.UtcNow, new TimeSpan(0, 1, 0));
             storedAudit.ServiceRequestTaskId.Should().Be(testAudit.ServiceRequest.TaskId);
             storedAudit.ServiceRequestDecisionReference.Should().Be(testAudit.ServiceRequest.DecisionReference);
             storedAudit.ServiceRequestCreatedDate.Should().Be(testAudit.ServiceRequest.Created);

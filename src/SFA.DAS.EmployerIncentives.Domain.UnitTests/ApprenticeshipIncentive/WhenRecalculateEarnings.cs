@@ -44,7 +44,10 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .With(x => x.Status, IncentiveStatus.Active)
+                .With(x => x.StartDate, new DateTime(2021, 09, 30))
                 .Create();
+
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(
                 _fixture.Build<PendingPaymentModel>()
                     .Without(x => x.PaymentMadeDate)
@@ -53,7 +56,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // Act
-            _sut.RecalculateEarnings(_collectionCalendar);
+            _sut.ReCalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.GetModel().PendingPaymentModels.Count.Should().Be(0);
@@ -67,6 +70,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
                 .With(x => x.Status, status)
+                .With(x => x.PreviousStatus, status)
                 .With(x => x.PendingPaymentModels, new List<PendingPaymentModel>(
                     _fixture.Build<PendingPaymentModel>()
                         .Without(x => x.PaymentMadeDate)
@@ -76,7 +80,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // Act
-            _sut.RecalculateEarnings(_collectionCalendar);
+            _sut.ReCalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.GetModel().PendingPaymentModels.Count.Should().Be(2);
@@ -88,6 +92,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .With(x => x.Status, IncentiveStatus.Active)
                 .Create();
             _sutModel.PendingPaymentModels = new List<PendingPaymentModel>(
                 _fixture.Build<PendingPaymentModel>()
@@ -108,7 +113,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // Act
-            _sut.RecalculateEarnings(_collectionCalendar);
+            _sut.ReCalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.GetModel().PendingPaymentModels.Count.Should().Be(2);
@@ -120,6 +125,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             // Arrange
             _sutModel = _fixture.Build<ApprenticeshipIncentiveModel>()
                 .With(x => x.Phase, new IncentivePhase(Phase.Phase3))
+                .With(x => x.Status, IncentiveStatus.Active)
                 .Create();
 
             var pendingPayments = new List<PendingPaymentModel>();
@@ -145,7 +151,7 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _sut = Sut(_sutModel);
 
             // Act
-            _sut.RecalculateEarnings(_collectionCalendar);
+            _sut.ReCalculateEarnings(_collectionCalendar);
 
             // Assert
             _sut.GetModel().PendingPaymentModels.Count.Should().Be(2);

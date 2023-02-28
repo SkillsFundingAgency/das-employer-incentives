@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Commands.Types.PausePayments;
 
 namespace SFA.DAS.EmployerIncentives.Api.UnitTests.PausePayments
 {

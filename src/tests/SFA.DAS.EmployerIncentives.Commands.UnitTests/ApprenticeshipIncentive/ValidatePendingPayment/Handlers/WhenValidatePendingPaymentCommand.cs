@@ -27,6 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
         private Mock<IAccountDomainRepository> _mockAccountDomainRepository;
         private Mock<ILearnerDomainRepository> _mockLearnerDomainRepository;
         private Mock<ICollectionCalendarService> _mockCollectionCalendarService;
+        private Mock<IDateTimeService> _mockDateTimeService;
         private List<CollectionCalendarPeriod> _collectionCalendarPeriods;
         private string _vrfVendorId;
         private Account _account;
@@ -48,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _mockCollectionCalendarService = new Mock<ICollectionCalendarService>();
             _mockAccountDomainRepository = new Mock<IAccountDomainRepository>();
             _mockLearnerDomainRepository = new Mock<ILearnerDomainRepository>();
+            _mockDateTimeService = new Mock<IDateTimeService>();
 
             _startDate = DateTime.Today;
             _payment1DueDate = _startDate.AddDays(10);
@@ -72,6 +74,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             var legalEntity = _fixture.Build<LegalEntityModel>()
                 .With(l => l.VrfVendorId, _vrfVendorId)
                 .With(l => l.SignedAgreementVersion, 5)
+                .Without(l => l.VendorBlockEndDate)
                 .Create();
 
             var accountModel = _fixture.Build<AccountModel>()
@@ -153,7 +156,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 _mockIncentiveDomainRespository.Object,
                 _mockAccountDomainRepository.Object,
                 _mockCollectionCalendarService.Object,
-                _mockLearnerDomainRepository.Object);
+                _mockLearnerDomainRepository.Object,
+                _mockDateTimeService.Object);
         }
 
         [Test]
@@ -256,6 +260,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                    _fixture.Build<LegalEntityModel>()
                    .With(l => l.VrfVendorId, Guid.NewGuid().ToString())
                    .With(l => l.AccountLegalEntityId, _account.AccountLegalEntityId)
+                   .Without(l => l.VendorBlockEndDate)
                    .Create()})
                 .Create();
 
@@ -305,7 +310,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 7)
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 8)
                 .PendingPaymentValidationResults.Single(x => x.Step == "HasIlrSubmission");
             validationResult.Result.Should().BeFalse();
         }
@@ -341,7 +346,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             await _sut.Handle(command);
 
             // Assert
-            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 6)
+            var validationResult = incentive.PendingPayments.Single(x => x.PendingPaymentValidationResults.Count == 7)
                 .PendingPaymentValidationResults.Single(x => x.Step == "LearnerMatchSuccessful");
             validationResult.Result.Should().BeFalse();
         }
@@ -482,5 +487,218 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             // Assert
             incentive.GetModel().ValidationOverrideModels.Count.Should().Be(0);
         }
+
+        [Test]
+        public async Task Then_a_failed_pendingPayment_validation_result_is_saved_when_the_account_has_a_vendor_block_end_date_in_the_future()
+        {
+            // Arrange
+            var legalEntity = _fixture.Build<LegalEntityModel>()
+                .With(l => l.VrfVendorId, _vrfVendorId)
+                .With(l => l.SignedAgreementVersion, 5)
+                .With(l => l.VendorBlockEndDate, DateTime.Now.AddDays(1))
+                .Create();
+
+            var accountModel = _fixture.Build<AccountModel>()
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() { legalEntity })
+                .Create();
+
+            var domainAccount = Domain.Accounts.Account.Create(accountModel);
+            var account = new Account(accountModel.Id, legalEntity.AccountLegalEntityId);
+
+            _mockAccountDomainRepository.Setup(x => x.Find(accountModel.Id)).ReturnsAsync(domainAccount);
+
+            var pendingPayment1 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, account)
+                .With(m => m.DueDate, _payment1DueDate)
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayment2 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, account)
+                .With(m => m.DueDate, _payment1DueDate.AddDays(2))
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
+
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(m => m.Account, account)
+                .With(m => m.StartDate, _startDate)
+                .With(m => m.PendingPaymentModels, pendingPayments)
+                .With(m => m.PausePayments, false)
+                .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
+                .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, false)
+                        .Create()
+                })
+                .Create();
+
+            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+
+            _mockIncentiveDomainRespository
+                .Setup(m => m.Find(incentive.Id))
+                .ReturnsAsync(incentive);
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(incentive))
+                .ReturnsAsync(_learner);
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
+                .PendingPaymentValidationResults.Single(x => x.Step == "BlockedForPayments");
+            validationResult.Result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task Then_a_passing_pendingPayment_validation_result_is_saved_when_the_account_has_no_vendor_block_end_date()
+        {
+            // Arrange
+            var legalEntity = _fixture.Build<LegalEntityModel>()
+                .With(l => l.VrfVendorId, _vrfVendorId)
+                .With(l => l.SignedAgreementVersion, 5)
+                .Without(l => l.VendorBlockEndDate)
+                .Create();
+
+            var accountModel = _fixture.Build<AccountModel>()
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() { legalEntity })
+                .Create();
+
+            var domainAccount = Domain.Accounts.Account.Create(accountModel);
+            var account = new Account(accountModel.Id, legalEntity.AccountLegalEntityId);
+
+            _mockAccountDomainRepository.Setup(x => x.Find(accountModel.Id)).ReturnsAsync(domainAccount);
+
+            var pendingPayment1 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, account)
+                .With(m => m.DueDate, _payment1DueDate)
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayment2 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, account)
+                .With(m => m.DueDate, _payment1DueDate.AddDays(2))
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
+
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(m => m.Account, account)
+                .With(m => m.StartDate, _startDate)
+                .With(m => m.PendingPaymentModels, pendingPayments)
+                .With(m => m.PausePayments, false)
+                .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
+                .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, false)
+                        .Create()
+                })
+                .Create();
+
+            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+
+            _mockIncentiveDomainRespository
+                .Setup(m => m.Find(incentive.Id))
+                .ReturnsAsync(incentive);
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(incentive))
+                .ReturnsAsync(_learner);
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
+                .PendingPaymentValidationResults.Single(x => x.Step == "BlockedForPayments");
+            validationResult.Result.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task Then_a_passing_pendingPayment_validation_result_is_saved_when_the_account_has_a_vendor_block_end_date_in_the_past()
+        {
+            // Arrange
+            var legalEntity = _fixture.Build<LegalEntityModel>()
+                .With(l => l.VrfVendorId, _vrfVendorId)
+                .With(l => l.SignedAgreementVersion, 5)
+                .With(l => l.VendorBlockEndDate, DateTime.Now.AddDays(-1))
+                .Create();
+
+            var accountModel = _fixture.Build<AccountModel>()
+                .With(a => a.LegalEntityModels, new List<LegalEntityModel>() { legalEntity })
+                .Create();
+
+            var domainAccount = Domain.Accounts.Account.Create(accountModel);
+            var account = new Account(accountModel.Id, legalEntity.AccountLegalEntityId);
+
+            _mockAccountDomainRepository.Setup(x => x.Find(accountModel.Id)).ReturnsAsync(domainAccount);
+
+            var pendingPayment1 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, account)
+                .With(m => m.DueDate, _payment1DueDate)
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayment2 = _fixture.Build<PendingPaymentModel>()
+                .With(m => m.Account, account)
+                .With(m => m.DueDate, _payment1DueDate.AddDays(2))
+                .With(m => m.PendingPaymentValidationResultModels, new List<PendingPaymentValidationResultModel>()).Create();
+
+            var pendingPayments = new List<PendingPaymentModel>() { pendingPayment1, pendingPayment2 };
+
+            var model = _fixture.Build<ApprenticeshipIncentiveModel>()
+                .With(m => m.Account, account)
+                .With(m => m.StartDate, _startDate)
+                .With(m => m.PendingPaymentModels, pendingPayments)
+                .With(m => m.PausePayments, false)
+                .With(m => m.MinimumAgreementVersion, new AgreementVersion(4))
+                .With(m => m.Phase, new IncentivePhase(Phase.Phase2))
+                .With(m => m.EmploymentCheckModels, new List<EmploymentCheckModel>
+                {
+                    _fixture.Build<EmploymentCheckModel>()
+                        .With(x => x.CheckType, EmploymentCheckType.EmployedAtStartOfApprenticeship)
+                        .With(x => x.Result, false)
+                        .Create()
+                })
+                .Create();
+
+            var incentive = new ApprenticeshipIncentiveFactory().GetExisting(model.Id, model);
+
+            _mockIncentiveDomainRespository
+                .Setup(m => m.Find(incentive.Id))
+                .ReturnsAsync(incentive);
+
+            _mockLearnerDomainRepository
+                .Setup(m => m.GetOrCreate(incentive))
+                .ReturnsAsync(_learner);
+
+            var pendingPayment = incentive.PendingPayments.First();
+            var collectionPeriod = _collectionCalendarPeriods.First().CollectionPeriod;
+
+            var command = new ValidatePendingPaymentCommand(incentive.Id, pendingPayment.Id, collectionPeriod.AcademicYear, collectionPeriod.PeriodNumber);
+
+            // Act
+            await _sut.Handle(command);
+
+            // Assert
+            var validationResult = incentive.PendingPayments.Single(x => x.Id == pendingPayment.Id)
+                .PendingPaymentValidationResults.Single(x => x.Step == "BlockedForPayments");
+            validationResult.Result.Should().BeTrue();
+        }        
     }
 }

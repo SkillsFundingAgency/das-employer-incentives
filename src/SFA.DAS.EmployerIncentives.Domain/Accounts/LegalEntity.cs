@@ -15,6 +15,8 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         public DateTime? VrfCaseStatusLastUpdatedDateTime => Model.VrfCaseStatusLastUpdatedDateTime;
         public int? SignedAgreementVersion => Model.SignedAgreementVersion;
 
+        public DateTime? VendorBlockEndDate => Model.VendorBlockEndDate;
+
         public static LegalEntity New(long id, string name)
         {
             var model = new LegalEntityModel
@@ -78,6 +80,11 @@ namespace SFA.DAS.EmployerIncentives.Domain.Accounts
         public void AddEmployerVendorId(string employerVendorId)
         {
             Model.VrfVendorId ??= employerVendorId;
+        }
+
+        public void SetVendorBlockEndDate(DateTime? vendorBlockEndDate)
+        {
+            Model.VendorBlockEndDate = vendorBlockEndDate;
         }
     }
 }

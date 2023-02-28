@@ -47,6 +47,7 @@ namespace SFA.DAS.EmployerIncentives.Data
                     legalEntity.VrfVendorId = item.VrfVendorId;
                     legalEntity.VrfCaseStatusLastUpdatedDateTime = item.VrfCaseStatusLastUpdatedDateTime;
                     legalEntity.HashedLegalEntityId = item.HashedLegalEntityId;
+                    legalEntity.VendorBlockEndDate = item.VendorBlockEndDate;
                 }
             }
         }
@@ -95,6 +96,26 @@ namespace SFA.DAS.EmployerIncentives.Data
         public async Task<DateTime?> GetLatestVendorRegistrationCaseUpdateDateTime()
         {
             return await _dbContext.Accounts.MaxAsync(a => a.VrfCaseStatusLastUpdatedDateTime);
+        }
+
+        public async Task<IEnumerable<AccountModel>> FindByVendorId(string vendorId)
+        {
+            var accounts = new List<Models.Account>();
+
+            var accountsForVendorId = await _dbContext.Accounts.Where(x => x.VrfVendorId == vendorId).ToArrayAsync();
+            if (accountsForVendorId.Any())
+            {
+                var accountId = accountsForVendorId.FirstOrDefault().Id;
+                var otherAccountLegalEntities = await _dbContext.Accounts.Where(x => x.Id == accountId && x.VrfVendorId != vendorId).ToArrayAsync();
+
+                accounts.AddRange(accountsForVendorId);
+                if (otherAccountLegalEntities.Any())
+                {
+                    accounts.AddRange(otherAccountLegalEntities);
+                }
+            }
+
+            return accounts?.Map();
         }
     }
 }

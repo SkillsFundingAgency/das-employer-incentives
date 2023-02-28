@@ -49,6 +49,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
                 .Without(p => p.Result)
                 .Without(p => p.ResultDateTime)
                 .Without(p => p.UpdatedDateTime)
+                .Without(p => p.ErrorType)
                 .Create();
             
             _apprenticeshipIncentive.EmploymentChecks.Add(_employmentCheck);
@@ -76,7 +77,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         
             await dbConnection.UpdateAsync(period);
 
-            await WhenTheEmploymentCheckResultIsReturnedWithTheResult(EmploymentCheckResultType.Employed);
+            await WhenTheEmploymentCheckResultIsReturnedWithTheResult(EmploymentCheckResultType.Employed.ToString());
         }
 
         [When(@"the employment check result processing resumes")]
@@ -87,8 +88,30 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [When(@"the employment check result is returned with a result of (.*)")]
-        public async Task WhenTheEmploymentCheckResultIsReturnedWithTheResult(EmploymentCheckResultType checkResultType)
+        public async Task WhenTheEmploymentCheckResultIsReturnedWithTheResult(string checkResultType)
         { 
+            await TestContext.WaitFor(
+                async (cancellationToken) =>
+                {
+                    _response = await EmployerIncentiveApi.Put(
+                    $"/employmentchecks/{_correlationId}",
+                    new UpdateEmploymentCheckRequest
+                    {
+                        CorrelationId = _correlationId,
+                        Result = checkResultType,
+                        DateChecked = DateTime.Today
+                    });
+                },
+                (context) => HasProcessedCommand(context),
+                assertOnError: false
+                );
+
+            _response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [When(@"the employment check result is returned with an error result of (.*)")]
+        public async Task WhenTheEmploymentCheckResultIsReturnedWithAnErrorResultOf(EmploymentCheckResultError checkResultType)
+        {
             await TestContext.WaitFor(
                 async (cancellationToken) =>
                 {
@@ -116,8 +139,14 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         }
 
         [Then(@"the apprenticeship incentive employment check result is updated to (.*)")]
-        public async Task ThenTheAprenticeshipIncentiveEmploymentCheckIsUpdatedTo(bool hasPassed)
+        public async Task ThenTheAprenticeshipIncentiveEmploymentCheckIsUpdatedTo(string hasPassedString)
         {
+            bool? hasPassed = null;
+            if(hasPassedString != "null")
+            {
+                hasPassed = bool.Parse(hasPassedString);
+            }
+
             TestContext.CommandsPublished.Count(c => c.IsDelayed &&
                    c.IsDomainCommand &&
                    c.Command is UpdateEmploymentCheckCommand).Should().Be(0);
@@ -129,10 +158,40 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
             var employmentCheck = employmentChecks.Single();
             
             employmentCheck.CorrelationId.Should().Be(_correlationId);
-            employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
-            employmentCheck.Result.Should().Be(hasPassed);
+            employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);            
+            if (hasPassed.HasValue)
+            {
+                employmentCheck.Result.Should().Be(hasPassed);
+                employmentCheck.ErrorType.Should().BeNull();
+            }
+            else
+            {
+                employmentCheck.Result.Should().BeNull();
+                employmentCheck.ErrorType.Should().NotBeNull();
+            }
             employmentCheck.ResultDateTime.Should().Be(DateTime.Today);
             employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+        }
+
+        [Then(@"the apprenticeship incentive employment check result error type is stored as (.*)")]
+        public async Task ThenTheAprenticeshipIncentiveEmploymentCheckErroTypeIsStoredAs(EmploymentCheckResultError errorResult)
+        {
+            TestContext.CommandsPublished.Count(c => c.IsDelayed &&
+                   c.IsDomainCommand &&
+                   c.Command is UpdateEmploymentCheckCommand).Should().Be(0);
+
+            await using var dbConnection = new SqlConnection(TestContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var employmentChecks = await dbConnection.GetAllAsync<EmploymentCheck>();
+
+            employmentChecks.Count().Should().Be(1);
+            var employmentCheck = employmentChecks.Single();
+
+            employmentCheck.CorrelationId.Should().Be(_correlationId);
+            employmentCheck.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            employmentCheck.Result.Should().BeNull();
+            employmentCheck.ErrorType.Should().Be(errorResult);
+            employmentCheck.ResultDateTime.Should().Be(DateTime.Today);
+            employmentCheck.UpdatedDateTime.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
         }
 
         [Then(@"the apprenticeship incentive employment check result processing is delayed")]
@@ -158,7 +217,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
         [Then(@"the apprenticeship incentive employment check result is processed")]
         public async Task ThenTheAprenticeshipIncentiveEmploymentCheckIsProcessed()
         {
-            await ThenTheAprenticeshipIncentiveEmploymentCheckIsUpdatedTo(true);
+            await ThenTheAprenticeshipIncentiveEmploymentCheckIsUpdatedTo(true.ToString());
         }
     }
 }

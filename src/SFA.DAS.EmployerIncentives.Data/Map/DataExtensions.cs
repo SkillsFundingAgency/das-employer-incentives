@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Models;
 using LegalEntity = SFA.DAS.EmployerIncentives.DataTransferObjects.LegalEntity;
 
 namespace SFA.DAS.EmployerIncentives.Data.Map
@@ -29,7 +30,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                                                             VrfCaseId = i.VrfCaseId,
                                                             VrfCaseStatus = i.VrfCaseStatus,
                                                             VrfVendorId = i.VrfVendorId,
-                                                            VrfCaseStatusLastUpdatedDateTime = i.VrfCaseStatusLastUpdatedDateTime
+                                                            VrfCaseStatusLastUpdatedDateTime = i.VrfCaseStatusLastUpdatedDateTime,
+                                                            VendorBlockEndDate = i.VendorBlockEndDate,
+                                                            HasBeenDeleted = i.HasBeenDeleted
                                                         }
             ));
 
@@ -54,6 +57,13 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
             return accounts;
         }
 
+        public static AccountModel Map(this Models.Account model)
+        {
+            var account = new AccountModel { Id = model.Id };
+            account.LegalEntityModels.Add(MapLegalEntity(model));
+            return account;
+        }
+
         private static LegalEntityModel MapLegalEntity(Models.Account model)
         {
             return new LegalEntityModel
@@ -67,7 +77,9 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 VrfVendorId = model.VrfVendorId,
                 VrfCaseStatus = model.VrfCaseStatus,
                 VrfCaseStatusLastUpdatedDateTime = model.VrfCaseStatusLastUpdatedDateTime,
-                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status
+                VendorBlockEndDate = model.VendorBlockEndDate,
+                BankDetailsStatus = (new VendorBankStatus(model.VrfVendorId, new VendorCase(model.VrfCaseId, model.VrfCaseStatus, model.VrfCaseStatusLastUpdatedDateTime))).Status,
+                HasBeenDeleted = model.HasBeenDeleted
             };
         }
 
@@ -208,6 +220,24 @@ namespace SFA.DAS.EmployerIncentives.Data.Map
                 ServiceRequestDecisionReference = entity.ServiceRequest.DecisionReference,
                 ServiceRequestCreatedDate = entity.ServiceRequest.Created,
                 CreatedDateTime = DateTime.Now
+            };
+        }
+
+        internal static PaymentModel Map(this ApprenticeshipIncentives.Models.Payment entity)
+        {
+            return new PaymentModel
+            {
+                Account = new Domain.ApprenticeshipIncentives.ValueTypes.Account(entity.AccountId, entity.AccountLegalEntityId),
+                Amount = entity.Amount,
+                ApprenticeshipIncentiveId = entity.ApprenticeshipIncentiveId,
+                CalculatedDate = entity.CalculatedDate,
+                Id = entity.Id,
+                PaidDate = entity.PaidDate,
+                PaymentPeriod = entity.PaymentPeriod,
+                PaymentYear = entity.PaymentYear,
+                PendingPaymentId = entity.PendingPaymentId,
+                SubnominalCode = entity.SubnominalCode,
+                VrfVendorId = entity.VrfVendorId
             };
         }
 

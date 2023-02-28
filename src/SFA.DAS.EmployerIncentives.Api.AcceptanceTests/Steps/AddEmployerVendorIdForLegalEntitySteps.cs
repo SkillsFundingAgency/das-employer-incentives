@@ -1,7 +1,7 @@
-﻿using FluentAssertions;
+﻿using AutoFixture;
+using FluentAssertions;
 using SFA.DAS.EmployerIncentives.Data.Models;
 using System.Threading.Tasks;
-using AutoFixture;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Steps
