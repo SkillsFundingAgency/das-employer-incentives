@@ -200,6 +200,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<UpdateEmploymentCheckCommand>), new NullValidator())                
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
+                .AddSingleton(typeof(IValidator<SendMetricsReportCommand>), new NullValidator())
                 ;
 
             return serviceCollection;
@@ -296,7 +297,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
             });
 
             return serviceCollection;
-        }
+        }        
 
         public static async Task<UpdateableServiceProvider> StartNServiceBus(
             this UpdateableServiceProvider serviceProvider,
