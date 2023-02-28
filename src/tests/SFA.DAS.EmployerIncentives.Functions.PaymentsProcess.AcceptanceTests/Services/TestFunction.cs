@@ -50,7 +50,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
                     { "ApplicationSettings:NServiceBusConnectionString", _testContext.ApplicationSettings.NServiceBusConnectionString },
-                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory }
+                    { "ApplicationSettings:UseLearningEndpointStorageDirectory", _testContext.ApplicationSettings.UseLearningEndpointStorageDirectory },
+                    { "ApplicationSettings:ReportsContainerName", _testContext.InstanceId }
             };
 
             _testContext = testContext;
@@ -124,6 +125,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.LogLevel = _testContext.ApplicationSettings.LogLevel;
                                a.EmploymentCheckEnabled = _testContext.ApplicationSettings.EmploymentCheckEnabled;
                                a.LearnerServiceCacheIntervalInMinutes = _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes;
+                               a.ReportsConnectionString = "UseDevelopmentStorage=true";
+                               a.ReportsContainerName = testContext.InstanceId;
                            });
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();

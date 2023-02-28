@@ -1,5 +1,4 @@
 ﻿using SFA.DAS.EmployerIncentives.Abstractions.Commands;
-using SFA.DAS.EmployerIncentives.Commands.Exceptions;
 using SFA.DAS.EmployerIncentives.Domain.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
