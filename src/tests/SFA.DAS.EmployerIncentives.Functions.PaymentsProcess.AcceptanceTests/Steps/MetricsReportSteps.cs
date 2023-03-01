@@ -1,8 +1,9 @@
 ﻿using FluentAssertions;
+using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators;
 using SFA.DAS.EmployerIncentives.Functions.TestHelpers;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
@@ -12,7 +13,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 {
     [Binding]
     [Scope(Feature = "MetricsReport")]
-    public partial class MetricsReportSteps
+    public partial class MetricsReportSteps : StepsBase
     {
         private readonly TestContext _testContext;
         private ValidatePaymentsSteps.ValidatePaymentData _validatePaymentData;
@@ -20,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private const short CollectionPeriodYear = 2021;
         private const byte CollectionPeriod = 6;
 
-        public MetricsReportSteps(TestContext testContext)
+        public MetricsReportSteps(TestContext testContext) : base(testContext)
         {
             _testContext = testContext;
         }
@@ -67,7 +68,18 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             {
                 blobItem.Name.Should().Be($"Metrics/LOCAL_ACCEPTANCE_TESTS Metrics R06_2021.xlsx");
                 blobItem.Properties.ContentType.Should().Be("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            }
+            }            
+        }
+
+        [Then(@"a Slack message is posted to notify the Metrics report generation")]
+        public void ThenASlackMessageIsPostedToNotityTheMetricsReportGeneration()
+        {
+            var command = TestContext.CommandsPublished.Single(c =>
+                    c.IsPublished &&
+                    c.Command is Commands.Types.PaymentProcess.SlackNotificationCommand).Command as Commands.Types.PaymentProcess.SlackNotificationCommand;
+
+            command.SlackMessage.Should().NotBeNull();
+            command.SlackMessage.Content.Should().Contain(nameof(MetricsReportGenerated));
         }
     }
 }

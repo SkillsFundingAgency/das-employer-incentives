@@ -24,5 +24,6 @@
         public const string RefreshEmploymentCheckCommand = "SFA.DAS.EmployerIncentives.RefreshEmploymentCheck";
         public const string RecalculateEarningsCommand = "SFA.DAS.EmploymentIncentives.RecalculateEarnings";
         public const string PausePaymentsCommand = "SFA.DAS.EmployerIncentives.PausePayments";
+        public const string SlackNotificationCommand = "SFA.DAS.EmployerIncentives.Notifications.Slack";
     }
 }

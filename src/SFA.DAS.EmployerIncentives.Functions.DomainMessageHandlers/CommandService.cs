@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             var commandType = command.GetType();
             EnsureIsValidType(commandType);
 
-            var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            var commandText = JsonConvert.SerializeObject(command, new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
             var response = await _client.PostAsJsonAsync($"commands/{commandType.FullName.Replace(allowedTypesPrefix, "")}", commandText);
             response.EnsureSuccessStatusCode();
         }

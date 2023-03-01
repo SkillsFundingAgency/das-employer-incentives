@@ -9,3 +9,4 @@ Scenario: When payment processing requires metrics approval
 	Given valid payments exist
 	When the payment process is run
 	Then the Metrics report is generated and sent
+	And a Slack message is posted to notify the Metrics report generation
