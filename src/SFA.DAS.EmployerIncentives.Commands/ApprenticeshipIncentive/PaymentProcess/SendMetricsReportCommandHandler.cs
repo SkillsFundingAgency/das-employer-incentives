@@ -36,7 +36,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
         public async Task Handle(SendMetricsReportCommand command, CancellationToken cancellationToken = default)
         {
             var report = await _reportsDataRepository.Execute<MetricsReport>();
-            _ = await _reportsRepository.Save(
+            await _reportsRepository.Save(
                 new ReportsFileInfo($"{_configuration["EnvironmentName"]} {report.Name} R{command.CollectionPeriod.PeriodNumber.ToString().PadLeft(2, '0')}_{command.CollectionPeriod.AcademicYear}", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Metrics"),
                 _metricsExcelReportGenerator.Create(report));
 
