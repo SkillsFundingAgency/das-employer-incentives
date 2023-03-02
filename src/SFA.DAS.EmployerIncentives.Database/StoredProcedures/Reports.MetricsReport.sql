@@ -184,7 +184,7 @@ AS
 		EmployedAt365Days
 	
 	-- Valid Validation records
-	  SELECT 
+	 SELECT 
 		ISNULL(NULL, 'ValidValidation'),
 		ISNULL(COUNT(pp.Id), 0)	AS 'Count',
 		ISNULL(SUM(pp.Amount), 0)	AS 'PeriodAmount',
@@ -196,15 +196,17 @@ AS
 	   incentives.PendingPayment pp INNER JOIN
 	  (SELECT 		
 			PendingPaymentId
-		FROM [incentives].[PendingPaymentValidationResult]
-		WHERE PeriodNumber = @Period
-		AND PaymentYear = @AcademicYear
+		FROM [incentives].[PendingPaymentValidationResult] ppvr
+			INNER JOIN  [incentives].[PendingPayment]  pp
+			ON pp.Id = ppvr.PendingPaymentId
+		WHERE ppvr.PeriodNumber = @Period
+		AND ppvr.PaymentYear = @AcademicYear
 		GROUP BY
 			PendingPaymentId	
-		HAVING MIN(CAST((CASE OverrideResult
-						WHEN 1 THEN 1
-						ELSE Result
-						END) AS INT)) = 1) As Passed		
+		HAVING MIN(CAST((CASE ISNULL(OverrideResult, 0)
+		WHEN 1 THEN 1
+		ELSE IIF(EarningType = 'FirstPayment' AND Step = 'EmployedAt365Days', 1, Result)
+		END) AS INT)) = 1) As Passed		
 		ON pp.Id = Passed.PendingPaymentId
 
 	-- Invalid Validation records
@@ -235,12 +237,17 @@ AS
 	   incentives.PendingPayment pp INNER JOIN
 	  (SELECT 		
 			PendingPaymentId
-		FROM [incentives].[PendingPaymentValidationResult]
-		WHERE PeriodNumber = @Period 
-		AND PaymentYear = @AcademicYear
+		FROM [incentives].[PendingPaymentValidationResult] ppvr
+			INNER JOIN  [incentives].[PendingPayment]  pp
+			ON pp.Id = ppvr.PendingPaymentId
+		WHERE ppvr.PeriodNumber = @Period 
+		AND ppvr.PaymentYear = @AcademicYear
 		GROUP BY
 			PendingPaymentId
-		HAVING MIN(CAST(Result AS INT)) = 0) As Failed
+		HAVING MIN(CAST((CASE ISNULL(OverrideResult, 0)
+		WHEN 1 THEN 1
+		ELSE IIF(EarningType = 'FirstPayment' AND Step = 'EmployedAt365Days', 1, Result)
+		END) AS INT)) = 0) AS Failed
 		ON pp.Id = Failed.PendingPaymentId
 
 
