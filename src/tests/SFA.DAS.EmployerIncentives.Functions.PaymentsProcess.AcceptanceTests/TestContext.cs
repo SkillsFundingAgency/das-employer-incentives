@@ -1,4 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using Azure.Storage.Blobs;
+using Dapper.Contrib.Extensions;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -14,7 +15,6 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using SqlDatabase = SFA.DAS.EmployerIncentives.TestHelpers.Services.SqlDatabase;
@@ -39,6 +39,9 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public MockApi LearnerMatchApi { get; set; }
         
         public MockApi PaymentsApi { get; set; }
+
+        public BlobContainerClient BlobClient { get; set; }
+        
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
 
         public static HttpRequest TestRequest(string path, object body = null) => CreateTestRequest(path, body);

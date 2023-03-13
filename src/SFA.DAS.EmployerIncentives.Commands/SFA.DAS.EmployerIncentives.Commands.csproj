@@ -20,6 +20,7 @@
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Domain\SFA.DAS.EmployerIncentives.Domain.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Events\SFA.DAS.EmployerIncentives.Events.csproj" />
     <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Messages\SFA.DAS.EmployerIncentives.Messages.csproj" />
+    <ProjectReference Include="..\SFA.DAS.EmployerIncentives.Reports\SFA.DAS.EmployerIncentives.Reports.csproj" />
   </ItemGroup>
 
 </Project>
