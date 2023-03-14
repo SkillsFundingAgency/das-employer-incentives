@@ -23,7 +23,6 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
     [NUnit.Framework.DescriptionAttribute("AddEmployerVendorIdForLegalEntity")]
     [NUnit.Framework.CategoryAttribute("database")]
     [NUnit.Framework.CategoryAttribute("api")]
-    [NUnit.Framework.CategoryAttribute("accountApi")]
     public partial class AddEmployerVendorIdForLegalEntityFeature
     {
         
@@ -31,8 +30,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
         
         private string[] _featureTags = new string[] {
                 "database",
-                "api",
-                "accountApi"};
+                "api"};
         
 #line 1 "AddEmployerVendorIdForLegalEntity.feature"
 #line hidden
@@ -44,8 +42,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "AddEmployerVendorIdForLegalEntity", "\tWhen a new Employer Vendor Id is to be assigned to the Legal Entity\r\n\tThen the l" +
                     "egal entities without an existing vendor are updated", ProgrammingLanguage.CSharp, new string[] {
                         "database",
-                        "api",
-                        "accountApi"});
+                        "api"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -92,7 +89,7 @@ namespace SFA.DAS.EmployerIncentives.Api.AcceptanceTests.Features
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A new Employer Vendor Id will be assigned to legal entities who do not already ha" +
                     "ve a vedor assigned", null, tagsOfScenario, argumentsOfScenario);
-#line 9
+#line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -112,19 +109,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 10
+#line 9
  testRunner.Given("a legal entity exists with a vendor assigned within an account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 11
+#line 10
  testRunner.And("a the same legal entity exists without a vendor assigned for a seperate account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 12
+#line 11
  testRunner.When("we add the employer vendor for this legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 13
+#line 12
  testRunner.Then("the vendor remains the same for first legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 14
+#line 13
  testRunner.And("the vendor is updated for the second legal entity", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

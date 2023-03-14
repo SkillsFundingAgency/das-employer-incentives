@@ -13,6 +13,7 @@ using SFA.DAS.EmployerIncentives.Data.Models;
 using SFA.DAS.EmployerIncentives.Events;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
+using SFA.DAS.EmployerIncentives.Reports;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
@@ -80,7 +81,6 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddOptions();
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             services.Configure<PolicySettings>(Configuration.GetSection("PolicySettings"));
-            services.Configure<AccountApi>(Configuration.GetSection("AccountApi"));
             services.Configure<MatchedLearnerApi>(Configuration.GetSection("MatchedLearnerApi"));
             services.Configure<BusinessCentralApiClient>(Configuration.GetSection("BusinessCentralApi"));
             services.Configure<EmailTemplateSettings>(Configuration.GetSection("EmailTemplates"));
@@ -111,6 +111,7 @@ namespace SFA.DAS.EmployerIncentives.Api
             services.AddCommandServices();
             services.AddQueryServices();
             services.AddEventServices();
+            services.AddReportServices();
 
             services
                 .AddMvc(o =>
