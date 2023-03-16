@@ -28,10 +28,10 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
         {
 
             var env = Environment.GetEnvironmentVariable("EnvironmentName");
-            var configFileName = "nlog.config";
+            var configFileName = "NLog.config";
             if (string.IsNullOrEmpty(env) || env.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
             {
-                configFileName = "nlog.local.config";
+                configFileName = "NLog.local.config";
             }
             var rootDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), ".."));
             var configFilePath = Directory.GetFiles(rootDirectory, configFileName, SearchOption.AllDirectories)[0];

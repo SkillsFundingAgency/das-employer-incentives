@@ -21,7 +21,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             {
                 logBuilder.AddFilter("SFA.DAS", LogLevel.Information); // this is because all logging is filtered out by defualt
                 var rootDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), ".."));
-                logBuilder.AddNLog(Directory.GetFiles(rootDirectory, "nlog.config", SearchOption.AllDirectories)[0]);
+                logBuilder.AddNLog(Directory.GetFiles(rootDirectory, "NLog.config", SearchOption.AllDirectories)[0]);
             });
 
             var serviceProvider = builder.Services.BuildServiceProvider();
