@@ -494,9 +494,12 @@
                     "appServicePlanName": {
                         "value": "[variables('messageHandlerFunctionAspName')]"
                     },
-                    "appServicePlanResourceGroup": {
+					"appServicePlanResourceGroup": {
                         "value": "[variables('resourceGroupName')]"
                     },
+					"netFrameworkVersion": {
+						"value": "v6.0"
+					},
                     "subnetResourceId": {
                         "value": "[reference(concat(parameters('messageHandlerSubnetObject').name, '-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
                     },
@@ -532,7 +535,7 @@
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "~3"
+                                    "value": "~4"
                                 },
                                 {
                                     "name": "LoggingRedisConnectionString",
@@ -713,6 +716,9 @@
                     "appServicePlanResourceGroup": {
                         "value": "[variables('resourceGroupName')]"
                     },
+					"netFrameworkVersion": {
+						"value": "v6.0"
+					},
                     "subnetResourceId": {
                         "value": "[reference(concat(parameters('paySubnetObject').name, '-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
                     },
@@ -759,7 +765,7 @@
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "~3"
+                                    "value": "~4"
                                 },
                                 {
                                     "name": "LoggingRedisConnectionString",
