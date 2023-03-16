@@ -4,16 +4,12 @@
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>    
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="NLog.config" />
-    <None Remove="NLog.local.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="NLog.config">
+    <Content Include="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="NLog.local.config">
+    <Content Include="nlog.local.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
