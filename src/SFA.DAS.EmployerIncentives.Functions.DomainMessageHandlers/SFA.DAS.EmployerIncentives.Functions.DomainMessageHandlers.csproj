@@ -14,7 +14,9 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="5.0.1" />
     <PackageReference Include="Scrutor" Version="3.3.0" />
     <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
-    <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="17.0.13" />
+    <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.21" />
+    <PackageReference Include="NLog" Version="5.0.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.9" />
   </ItemGroup>
 
   <ItemGroup>
