@@ -438,6 +438,22 @@ namespace SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives.Map
             };
         }
 
+        internal static Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance Map(this ChangeOfCircumstance model)
+        {
+            return new Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance(
+                model.Id,
+                model.ApprenticeshipIncentiveId,
+                model.ChangeType,
+                model.PreviousValue,
+                model.NewValue,
+                model.ChangedDate);
+        }
+
+        internal static List<Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance> Map(this List<ChangeOfCircumstance> models)
+        {
+            return models.Select(model => model.Map()).ToList();
+        }
+
         private static ICollection<EmploymentCheck> Map(this ICollection<EmploymentCheckModel> models)
         {
             return models.Select(x => new EmploymentCheck
