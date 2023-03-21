@@ -36,14 +36,14 @@ namespace SFA.DAS.EmployerIncentives.Infrastructure.DistributedLock
         }
 
         public async Task<bool> AcquireLock(string Id, CancellationToken cancellationToken)
-        {
+        {   
             var blob = _container.GetBlobClient(Id);
 
             if (!await blob.ExistsAsync(cancellationToken))
             {
                 try
                 {
-                    await blob.UploadAsync(string.Empty, cancellationToken);
+                    await blob.UploadAsync(new BinaryData(string.Empty), cancellationToken);
                 }
                 catch (Azure.RequestFailedException ex)
                 {
