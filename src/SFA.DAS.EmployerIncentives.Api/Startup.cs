@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.EmployerIncentives.Api.Extensions;
@@ -13,15 +14,11 @@ using SFA.DAS.EmployerIncentives.Events;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Queries;
 using SFA.DAS.EmployerIncentives.Reports;
+using SFA.DAS.Encoding;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.DependencyResolution.Microsoft;
 using System;
 using System.IO;
-using Newtonsoft.Json;
-using SFA.DAS.Encoding;
-using System.Linq;
-using SFA.DAS.NServiceBus.Features.ClientOutbox.Data;
-using SFA.DAS.EmployerIncentives.Api.NServiceBus;
 
 namespace SFA.DAS.EmployerIncentives.Api
 {
@@ -156,16 +153,6 @@ namespace SFA.DAS.EmployerIncentives.Api
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
         {
             serviceProvider.StartNServiceBus(Configuration).GetAwaiter().GetResult();
-
-            if (!ConfigurationIsLocalOrDevOrAcceptanceTests())
-            {
-                // Replacing ClientOutboxPersisterV2 with a local version to fix unit of work issue due to propogating Task up the chain rathert than awaiting on DB Command.
-                // not clear why this fixes the issue. Attempted to make the change in SFA.DAS.Nservicebus.SqlServer however it conflicts when upgraded with SFA.DAS.UnitOfWork.Nservicebus
-                // which would require upgrading to NET6 to resolve.
-                var serviceDescriptor = serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
-                serviceProvider.Remove(serviceDescriptor);
-                serviceProvider.AddScoped<IClientOutboxStorageV2, ClientOutboxPersisterV2>();
-            }
         }
 
         private bool ConfigurationIsAcceptanceTests()
