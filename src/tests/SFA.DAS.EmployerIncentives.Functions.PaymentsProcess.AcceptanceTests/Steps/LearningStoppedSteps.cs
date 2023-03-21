@@ -32,6 +32,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private PendingPayment _secondPendingPayment;
         private Payment _firstPayment;
         private Payment _secondPayment;
+        private ChangeOfCircumstance _changeOfCircumstance;
 
         private readonly Learner _learner;
         private readonly LearningPeriod _learningPeriod1;
@@ -39,12 +40,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
         private readonly LearnerSubmissionDto _resumedLearnerMatchApiData;
         private readonly LearnerSubmissionDto _resumedLearnerWithBreakInLearningMatchApiData;
         private readonly LearnerSubmissionDto _resumedLearnerWithIncorrectlyRecordedBreakInLearningMatchApiData;
+        private readonly LearnerSubmissionDto _updatedStoppedLearnerMatchApiData;
         private readonly ApprenticeshipBreakInLearning _apprenticeshipBreakInLearning;
         private readonly DateTime _plannedStartDate;
         private readonly DateTime _periodEndDate;
         private readonly int _breakInLearning;
         private readonly DateTime _resumedDate;
         private readonly DateTime _stoppedDate;
+        private DateTime _updatedStoppedDate;
         private bool _dataIsInitialised = true;
 
         public LearningStoppedSteps(TestContext testContext)
@@ -245,6 +248,38 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                     }
                 )
                 .Create();
+
+            var plannedStartDate = new DateTime(2021, 08, 01);
+            _updatedStoppedDate = plannedStartDate.AddDays(91);
+
+            _updatedStoppedLearnerMatchApiData = _fixture
+                .Build<LearnerSubmissionDto>()
+                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
+                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
+                .With(s => s.AcademicYear, "2021")
+                .With(l => l.Training, new List<TrainingDto> {
+                    _fixture
+                        .Build<TrainingDto>()
+                        .With(p => p.Reference, "ZPROG001")
+                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
+                            .With(x => x.AcademicYear,"2021")
+                            .With(x => x.StartDate, plannedStartDate)
+                            .With(x => x.EndDate, plannedStartDate.AddDays(91))
+                            .With(pe => pe.Periods, new List<PeriodDto>(){
+                                _fixture.Build<PeriodDto>()
+                                    .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
+                                    .With(period => period.IsPayable, true)
+                                    .With(period => period.Period, _pendingPayment.PeriodNumber)
+                                    .Create()
+                            })
+                            .With(pe => pe.StartDate, plannedStartDate)
+                            .With(pe => pe.EndDate, _updatedStoppedDate)
+                            .Create() }
+                        )
+                        .Create()}
+                )
+                .Create();
+
         }
 
         private DateTime GetPastEndDate(int daysFromEndDate)
@@ -436,11 +471,23 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _learner.LearningStoppedDate = _learner.StartDate.Value.AddDays(88);
             _learner.LearningResumedDate = null;
 
+            _changeOfCircumstance = new ChangeOfCircumstance
+            {
+                ApprenticeshipIncentiveId = _apprenticeshipIncentive.Id,
+                ChangeType = ChangeOfCircumstanceType.LearningStopped,
+                ChangedDate = DateTime.Today.AddDays(-1),
+                Id = Guid.NewGuid(),
+                PreviousValue = string.Empty,
+                NewValue = _learner.LearningStoppedDate.Value.ToString("yyyy-MM-dd")
+            };
+
             using (var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString))
             {
                 await dbConnection.InsertAsync(_accountModel);
                 await dbConnection.InsertAsync(_apprenticeshipIncentive);
                 await dbConnection.InsertAsync(_learner);
+                await dbConnection.InsertAsync(_changeOfCircumstance);
+                await dbConnection.InsertAsync(_learningPeriod1);
             }
         }
 
@@ -491,36 +538,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
             _testContext.ActivePeriod = currentPeriod;
 
-            var plannedStartDate = new DateTime(2021, 08, 01);
-
-            var updatedStoppedLearnerMatchApiData = _fixture
-                .Build<LearnerSubmissionDto>()
-                .With(s => s.Ukprn, _apprenticeshipIncentive.UKPRN)
-                .With(s => s.Uln, _apprenticeshipIncentive.ULN)
-                .With(s => s.AcademicYear, "2021")
-                .With(l => l.Training, new List<TrainingDto> {
-                    _fixture
-                        .Build<TrainingDto>()
-                        .With(p => p.Reference, "ZPROG001")
-                        .With(p => p.PriceEpisodes, new List<PriceEpisodeDto>(){_fixture.Build<PriceEpisodeDto>()
-                            .With(x => x.AcademicYear,"2021")
-                            .With(x => x.StartDate, plannedStartDate)
-                            .With(x => x.EndDate, plannedStartDate.AddDays(91))
-                            .With(pe => pe.Periods, new List<PeriodDto>(){
-                                _fixture.Build<PeriodDto>()
-                                    .With(period => period.ApprenticeshipId, _apprenticeshipIncentive.ApprenticeshipId)
-                                    .With(period => period.IsPayable, true)
-                                    .With(period => period.Period, _pendingPayment.PeriodNumber)
-                                    .Create()
-                            })
-                            .With(pe => pe.StartDate, plannedStartDate)
-                            .With(pe => pe.EndDate, plannedStartDate.AddDays(91))
-                            .Create() }
-                        )
-                        .Create()}
-                )
-                .Create();
-            SetupMockLearnerMatchResponse(updatedStoppedLearnerMatchApiData);
+            SetupMockLearnerMatchResponse(_updatedStoppedLearnerMatchApiData);
         }
 
         [Then(@"the most recent break in learning record is deleted")]
@@ -641,6 +659,20 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
 
         }
 
+        [Then(@"the learner start break in learning for the change in stopped date is stored")]
+        public void ThenTheLearnerStartBreakInLearningForTheChangeInStoppedDateIsStored()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var breakInLearning = dbConnection.GetAll<ApprenticeshipBreakInLearning>();
+
+            breakInLearning.Single().ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            breakInLearning.Single().StartDate.Should().Be(_updatedStoppedDate.AddDays(1));
+            breakInLearning.Single().EndDate.Should().Be(null);
+            breakInLearning.Single().CreatedDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(2));
+            breakInLearning.Single().UpdatedDate.Should().BeNull();
+
+        }
+
         [Then(@"the learner resume break in learning is stored")]
         public void ThenTheLearnerResumeBreakInLearningIsStored()
         {
@@ -722,8 +754,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
             var pendingPayments = dbConnection.GetAll<PendingPayment>();
 
-            pendingPayments.Count().Should().Be(1);
-            pendingPayments.Single().EarningType.Should().Be(EarningType.FirstPayment);
+            pendingPayments.Count().Should().Be(0);
         }
 
         [Then(@"the existing paid pending payments are clawed back")]
@@ -830,6 +861,21 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             pendingPayments.Count().Should().Be(2);
             pendingPayments.Count(x => x.EarningType == EarningType.FirstPayment && x.ClawedBack).Should().Be(1);
             pendingPayments.Count(x => x.EarningType == EarningType.FirstPayment && !x.ClawedBack).Should().Be(1);
+        }
+
+        [Then(@"the stopped change of circumstance is updated")]
+        public void ThenTheStoppedChangeOfCircumstanceIsUpdated()
+        {
+            using var dbConnection = new SqlConnection(_testContext.SqlDatabase.DatabaseInfo.ConnectionString);
+            var changesOfCircumstance = dbConnection.GetAll<ChangeOfCircumstance>().Where(coc => coc.ChangeType == ChangeOfCircumstanceType.LearningStopped).OrderByDescending(x => x.NewValue);
+
+            var updatedStoppedDate = _updatedStoppedLearnerMatchApiData.Training.First().PriceEpisodes.First().EndDate.Value.AddDays(1);
+
+            var change = changesOfCircumstance.First();
+            change.ApprenticeshipIncentiveId.Should().Be(_apprenticeshipIncentive.Id);
+            change.PreviousValue.Should().Be(_changeOfCircumstance.NewValue);
+            change.NewValue.Should().Be(updatedStoppedDate.ToString("yyyy-MM-dd"));
+            change.ChangedDate.Should().Be(DateTime.Today);
         }
 
         private async Task ClearActiveCollectionCalendar()
