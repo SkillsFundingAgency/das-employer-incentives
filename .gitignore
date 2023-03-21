@@ -284,3 +284,4 @@ SonarQube.Analysis.xml
 #Test generated nservicebus queues
 **/.learningtransport/**
 /src/choices.json
+/src/SFA.DAS.EmployerIncentives.Api/local.encoding.json
