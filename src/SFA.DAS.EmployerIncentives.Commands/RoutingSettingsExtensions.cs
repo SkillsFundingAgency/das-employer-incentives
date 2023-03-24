@@ -10,6 +10,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
         public static void AddRouting(this RoutingSettings routingSettings)
         {
             routingSettings.RouteToEndpoint(typeof(SendEmailCommand), NotificationsMessageHandler);
+            routingSettings.RouteToEndpoint(typeof(SendEmailWithAttachmentsCommand), NotificationsMessageHandler);
             Types.RoutingSettingsExtensions.AddRouting(routingSettings);
         }
     }

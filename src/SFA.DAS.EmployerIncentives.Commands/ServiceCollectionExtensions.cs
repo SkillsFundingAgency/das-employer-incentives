@@ -61,6 +61,9 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.Data.Account;
+using Azure.Storage.Blobs;
+using NServiceBus;
+using Microsoft.Azure.ServiceBus.Primitives;
 
 namespace SFA.DAS.EmployerIncentives.Commands
 {
@@ -199,7 +202,7 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .AddSingleton(typeof(IValidator<SendEmploymentCheckRequestsCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<RefreshEmploymentCheckCommand>), new NullValidator())
                 .AddSingleton(typeof(IValidator<SendMetricsReportCommand>), new NullValidator())
-                ;
+                .AddSingleton(typeof(IValidator<SendMetricsReportEmailCommand>), new NullValidator());
 
             return serviceCollection;
         }
@@ -315,6 +318,10 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
 
+            var blobServiceClient = new BlobServiceClient("UseDevelopmentStorage=true");
+            var dataBus = endpointConfiguration.UseDataBus<AzureDataBus>()
+                        .Container("testcontainer");
+
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
 
@@ -378,5 +385,19 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
             }
         }
+
+        //public static EndpointConfiguration UseAzureServiceBusTransport(this EndpointConfiguration config, string connectionString, Action<RoutingSettings> routing = null)
+        //{
+        //    TransportExtensions<AzureServiceBusTransport> transportExtensions = config.UseTransport<AzureServiceBusTransport>();
+        //    RuleNameShortener @object = new RuleNameShortener();
+        //    TokenProvider tokenProvider = TokenProvider.CreateManagedIdentityTokenProvider();
+        //    config.UseDataBus<AzureDataBus>
+        //    transportExtensions.CustomTokenProvider(tokenProvider);
+        //    transportExtensions.ConnectionString(connectionString);
+        //    transportExtensions.RuleNameShortener(@object.Shorten);
+        //    transportExtensions.Transactions(TransportTransactionMode.ReceiveOnly);
+        //    routing?.Invoke(transportExtensions.Routing());
+        //    return config;
+        //}
     }
 }

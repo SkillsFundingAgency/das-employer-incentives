@@ -22,6 +22,11 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
             _canSave = !string.IsNullOrEmpty(options.Value.ReportsConnectionString);
         }
 
+        public Task<byte[]> Get(ReportsFileInfo fileInfo)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task Save(ReportsFileInfo fileInfo, Stream stream)
         {
             if (!_canSave)

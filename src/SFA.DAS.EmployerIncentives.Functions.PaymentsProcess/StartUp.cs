@@ -52,6 +52,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             builder.Services.Configure<MatchedLearnerApi>(config.GetSection("MatchedLearnerApi"));
             builder.Services.Configure<BusinessCentralApiClient>(config.GetSection("BusinessCentralApi"));
             builder.Services.Configure<EmployerIncentivesOuterApi>(config.GetSection("EmployerIncentivesOuterApi"));
+            builder.Services.Configure<EmailTemplateSettings>(config.GetSection("EmailTemplates"));
 
             builder.Services.AddNLog(config);
 

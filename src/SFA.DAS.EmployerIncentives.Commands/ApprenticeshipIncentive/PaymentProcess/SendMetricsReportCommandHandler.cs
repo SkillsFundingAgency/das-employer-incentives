@@ -4,7 +4,6 @@ using SFA.DAS.EmployerIncentives.Data.Reports;
 using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using SFA.DAS.EmployerIncentives.Reports;
 using SFA.DAS.EmployerIncentives.Reports.Excel;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
