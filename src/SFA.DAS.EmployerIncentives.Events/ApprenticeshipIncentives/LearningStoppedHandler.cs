@@ -2,8 +2,10 @@
 using SFA.DAS.EmployerIncentives.Data.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Domain.ApprenticeshipIncentives.Events;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SFA.DAS.EmployerIncentives.Enums;
 
 namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
 {
@@ -16,17 +18,27 @@ namespace SFA.DAS.EmployerIncentives.Events.ApprenticeshipIncentives
             _repository = repository;
         }
 
-        public Task Handle(LearningStopped @event, CancellationToken cancellationToken = default)
+        public async Task Handle(LearningStopped @event, CancellationToken cancellationToken = default)
         {
+            var previousLearningStoppedDate = string.Empty;
+            var changeOfCircumstances = await _repository.GetList(x => x.ApprenticeshipIncentiveId == @event.ApprenticeshipIncentiveId);
+            
+            // LINQ expression does not match the enum values so have to filter separately
+            if (changeOfCircumstances.Any(y => y.Type == ChangeOfCircumstanceType.LearningStopped))
+            {
+                previousLearningStoppedDate = changeOfCircumstances.Where(x => x.Type == ChangeOfCircumstanceType.LearningStopped)
+                    .OrderByDescending(x => x.ChangedDate).First().NewValue;
+            }
+
             var change = new Domain.ApprenticeshipIncentives.ValueTypes.ChangeOfCircumstance(
                 Guid.NewGuid(),
                 @event.ApprenticeshipIncentiveId,
                 Enums.ChangeOfCircumstanceType.LearningStopped,
-                string.Empty,
+                previousLearningStoppedDate,
                 @event.StoppedDate.ToString("yyyy-MM-dd"),
                 DateTime.Today);
 
-            return _repository.Save(change);
+            await _repository.Save(change);
         }
     }
 }
