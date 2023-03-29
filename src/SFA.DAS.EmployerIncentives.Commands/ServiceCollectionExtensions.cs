@@ -317,11 +317,6 @@ namespace SFA.DAS.EmployerIncentives.Commands
                 .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
-
-            var blobServiceClient = new BlobServiceClient("UseDevelopmentStorage=true");
-            var dataBus = endpointConfiguration.UseDataBus<AzureDataBus>()
-                        .Container("testcontainer");
-
             if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
             {
 

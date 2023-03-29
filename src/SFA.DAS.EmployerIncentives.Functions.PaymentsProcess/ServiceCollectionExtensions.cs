@@ -75,30 +75,22 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["ApplicationSettings:DbConnectionString"]))
                 .UseUnitOfWork();
 
-            if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase))
+            if (configuration["ApplicationSettings:NServiceBusConnectionString"].Equals("UseLearningEndpoint=true", StringComparison.CurrentCultureIgnoreCase) ||
+                configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
             {
+                var directory = configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory()[..Directory.GetCurrentDirectory().IndexOf("src")], @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport"));
+
                 endpointConfiguration
                     .UseTransport<LearningTransport>()
-                    .StorageDirectory(configuration.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
+                    .StorageDirectory(directory); 
                 endpointConfiguration.UseLearningTransport(s => s.AddRouting());
             }
             else
             {
-                //endpointConfiguration
-                //    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => r.AddRouting());
+                endpointConfiguration
+                    .UseAzureServiceBusTransport(configuration["ApplicationSettings:NServiceBusConnectionString"], r => r.AddRouting());
 
-                const string NotificationsMessageHandler = "SFA.DAS.Notifications.MessageHandlers";
-                TransportExtensions<AzureServiceBusTransport> transportExtensions = endpointConfiguration.UseTransport<AzureServiceBusTransport>();
-                RuleNameShortener @object = new RuleNameShortener();
-                //TokenProvider tokenProvider = TokenProvider.CreateManagedIdentityTokenProvider();
-                //transportExtensions.CustomTokenProvider(tokenProvider);
-                transportExtensions.ConnectionString(configuration["ApplicationSettings:NServiceBusConnectionString"]);
-                transportExtensions.RuleNameShortener(@object.Shorten);
-                transportExtensions.Transactions(TransportTransactionMode.ReceiveOnly);
-                transportExtensions.Routing().RouteToEndpoint(typeof(SendEmailCommand), NotificationsMessageHandler);
-                transportExtensions.Routing().RouteToEndpoint(typeof(SendEmailWithAttachmentsCommand), NotificationsMessageHandler);
-
-                const string containerName = "databuscontainer";
+                const string containerName = "databus";
                 var blobServiceClient = new BlobServiceClient(configuration["ApplicationSettings:BlobStorageDataBusConnectionString"]);
                 var dataBus = endpointConfiguration.UseDataBus<AzureDataBus>()
                             .Container(containerName)
@@ -110,7 +102,6 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
                     return property.Name.EndsWith("DataBus");
                 });
             }
-
             
             if (!string.IsNullOrEmpty(configuration["ApplicationSettings:NServiceBusLicense"]))
             {

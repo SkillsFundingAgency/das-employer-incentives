@@ -1,8 +1,10 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +15,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
     public class IncentivePaymentOrchestrator
     {
         private readonly ILogger<IncentivePaymentOrchestrator> _logger;
+        private readonly IOptions<PaymentProcessSettings> _paymentProcessSettings;
 
-        public IncentivePaymentOrchestrator(ILogger<IncentivePaymentOrchestrator> logger)
+        public IncentivePaymentOrchestrator(ILogger<IncentivePaymentOrchestrator> logger,
+            IOptions<PaymentProcessSettings> paymentProcessSettings)
         {
             _logger = logger;
+            _paymentProcessSettings = paymentProcessSettings;
         }
 
         [FunctionName(nameof(IncentivePaymentOrchestrator))]
@@ -66,6 +71,15 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             context.SetCustomStatus("SendingMetricsReport");
             await context.CallActivityAsync(nameof(SendMetricsReport), new SendMetricsReportInput() { CollectionPeriod = collectionPeriod });
+
+            context.SetCustomStatus("SendingMetricsReportEmails");
+            var taskList = new List<Task>();
+            foreach (var email in _paymentProcessSettings.Value.MetricsReportEmailList.Where(t => !string.IsNullOrEmpty(t)))
+            {
+                taskList.Add(context.CallActivityAsync(nameof(SendMetricsReportEmail), new SendMetricsReportEmailInput { CollectionPeriod = collectionPeriod, EmailAddress = email}));
+            }
+
+            await Task.WhenAll(taskList);
 
             context.SetCustomStatus("WaitingForPaymentApproval");
 

@@ -21,25 +21,23 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
         private readonly ICommandPublisher _commandPublisher;
         private readonly EmailTemplateSettings _emailTemplates;
         
-
         private const string CollectionPeriodToken = "periodName";
         private const string AcademicYearToken = "academicYear";
         private const string AmountToBePaidToken = "amountToBePaid";
         private const string AmountFailingValidationToken = "amountFailingValidation";
-        private const string MetricsReportDownloadToken = "metricsReport";
+        private const string MetricsReportDownloadToken = "metricsReportDownloadLink";
 
 
-        public SendMetricsReportEmailCommandHandler(ICommandPublisher commandPublisher,
-                                                    IOptions<EmailTemplateSettings> emailTemplates,
-                                                    IOptions<ApplicationSettings> options,
-                                                    IReportsDataRepository reportsDataRepository,
+        public SendMetricsReportEmailCommandHandler(IReportsDataRepository reportsDataRepository,
                                                     IReportsRepository reportsRepository,
+                                                    ICommandPublisher commandPublisher,
+                                                    IOptions<EmailTemplateSettings> emailTemplates,
                                                     IConfiguration configuration)
         {
-            _emailTemplates = emailTemplates.Value;
-            _commandPublisher = commandPublisher;
             _reportsDataRepository = reportsDataRepository;
             _reportsRepository = reportsRepository;
+            _commandPublisher = commandPublisher;
+            _emailTemplates = emailTemplates.Value;
             _configuration = configuration;
         }
 
@@ -64,10 +62,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
 
             var reportBytes = await _reportsRepository.Get(reportFileInfo);
 
-            var attachments = new DataBusProperty<Dictionary<string,byte[]>>(new Dictionary<string, byte[]>
-            {
-                { MetricsReportDownloadToken, reportBytes },
-            });
+            var attachments = new Dictionary<string, byte[]>{{ MetricsReportDownloadToken, reportBytes }};
             
             var sendEmailCommand = new SendEmailWithAttachmentsCommand(templateId, command.EmailAddress, personalisationTokens, attachments);
 

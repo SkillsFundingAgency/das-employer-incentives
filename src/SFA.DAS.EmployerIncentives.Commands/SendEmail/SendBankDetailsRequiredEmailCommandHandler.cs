@@ -25,7 +25,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.SendEmail
 
         public async Task Handle(SendBankDetailsRequiredEmailCommand command, CancellationToken cancellationToken = default)
         {
-            var template = _emailTemplates.BankDetailsRequired;
+            var template = _emailTemplates.MetricsReport;
 
             var personalisationTokens = new Dictionary<string, string>
             {

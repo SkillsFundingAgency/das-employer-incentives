@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
     public class TestFunction : IDisposable
     {
         public const int BusinessCentralPaymentRequestsLimit = 1;
+        
         private readonly TestContext _testContext;
         private readonly Dictionary<string, string> _appConfig;
         private readonly IHost _host;
@@ -45,7 +46,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
             _appConfig = new Dictionary<string, string>{
                     { "EnvironmentName", "LOCAL_ACCEPTANCE_TESTS" },
                     { "AzureWebJobsStorage", "UseDevelopmentStorage=true" },
-                    { "NServiceBusConnectionString", "UseDevelopmentStorage=true" },
+                    { "NServiceBusConnectionString", "UseLearningEndpoint=true" },
                     { "ConfigNames", "SFA.DAS.EmployerIncentives" },
                     { "ApplicationSettings:LogLevel", "Info" },
                     { "ApplicationSettings:DbConnectionString", _testContext.SqlDatabase.DatabaseInfo.ConnectionString },
@@ -127,6 +128,14 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.S
                                a.LearnerServiceCacheIntervalInMinutes = _testContext.ApplicationSettings.LearnerServiceCacheIntervalInMinutes;
                                a.ReportsConnectionString = "UseDevelopmentStorage=true";
                                a.ReportsContainerName = testContext.InstanceId;
+                           });
+                           s.Configure<PaymentProcessSettings>(a =>
+                           {
+                               a.MetricsReportEmailList = _testContext.PaymentProcessSettings.MetricsReportEmailList;
+                           });
+                           s.Configure<EmailTemplateSettings>(a =>
+                           {
+                               a.MetricsReport = new EmailTemplate { TemplateId = _testContext.MetricsReportEmailGuid.ToString() };
                            });
 
                            s.AddSingleton<IDistributedLockProvider, TestDistributedLockProvider>();

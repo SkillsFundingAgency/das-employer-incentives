@@ -23,6 +23,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
     [NUnit.Framework.DescriptionAttribute("MetricsReport")]
     [NUnit.Framework.CategoryAttribute("activeCalendarPeriod")]
     [NUnit.Framework.CategoryAttribute("azureBlobStorage")]
+    [NUnit.Framework.CategoryAttribute("messageBus")]
     public partial class MetricsReportFeature
     {
         
@@ -30,7 +31,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
         
         private string[] _featureTags = new string[] {
                 "activeCalendarPeriod",
-                "azureBlobStorage"};
+                "azureBlobStorage",
+                "messageBus"};
         
 #line 1 "MetricsReport.feature"
 #line hidden
@@ -42,7 +44,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "MetricsReport", "\tIn order to make approve payments once they have been validated\r\n\tAs a employer " +
                     "incentives service\r\n\tI want to create a metrics report to be sent for approval", ProgrammingLanguage.CSharp, new string[] {
                         "activeCalendarPeriod",
-                        "azureBlobStorage"});
+                        "azureBlobStorage",
+                        "messageBus"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -87,7 +90,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests.F
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When payment processing requires metrics approval", null, tagsOfScenario, argumentsOfScenario);
-#line 8
+#line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -107,14 +110,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
  testRunner.Given("valid payments exist", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 10
+#line 11
  testRunner.When("the payment process is run", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 11
+#line 12
  testRunner.Then("the Metrics report is generated and sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 13
+ testRunner.And("the Metrics report emails are sent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

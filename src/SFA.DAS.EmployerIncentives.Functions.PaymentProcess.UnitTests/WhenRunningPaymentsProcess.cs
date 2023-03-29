@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.DataTransferObjects.Queries.ApprenticeshipIncentives;
 using CollectionPeriod = SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.CollectionPeriod;
+using Microsoft.Extensions.Options;
+using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 {
@@ -22,6 +24,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         private IncentivePaymentOrchestrator _orchestrator;
         private List<PayableLegalEntity> _payableLegalEntities;
         private List<ClawbackLegalEntity> _clawbackLegalEntities;
+        private Mock<IOptions<PaymentProcessSettings>> _mockPaymentProcessSettings;
+        private PaymentProcessSettings _paymentProcessSettings;
 
         private Mock<ILogger<IncentivePaymentOrchestrator>> _mockLogger;
 
@@ -46,7 +50,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
 
             _mockLogger = new Mock<ILogger<IncentivePaymentOrchestrator>>();
 
-            _orchestrator = new IncentivePaymentOrchestrator(_mockLogger.Object);
+            _paymentProcessSettings = new PaymentProcessSettings
+            {
+                MetricsReportEmailList = new List<string>
+                {
+                    "metricsApprover1@email.com",
+                    "metricsApprover2@email.com",
+                    "metricsApprover3@email.com"
+                }
+            };
+            _mockPaymentProcessSettings = new Mock<IOptions<PaymentProcessSettings>>();
+            _mockPaymentProcessSettings.Setup(x => x.Value).Returns(_paymentProcessSettings);
+
+            _orchestrator = new IncentivePaymentOrchestrator(_mockLogger.Object, _mockPaymentProcessSettings.Object);
         }
 
         [Test]
@@ -105,6 +121,19 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                         input.CollectionPeriod.Year == _collectionPeriod.Year)
 
                 ), Times.Once);
+            }
+        }
+
+        [Test]
+        public async Task Then_process_calls_the_activity_function_to_send_the_metrics_report_emails()
+        {
+            // act
+            await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
+
+            // assert
+            foreach(var email in _paymentProcessSettings.MetricsReportEmailList)
+            {
+                _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendMetricsReportEmail", It.Is<SendMetricsReportEmailInput>(x => x.EmailAddress == email)));
             }
         }
 

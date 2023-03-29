@@ -32,11 +32,6 @@ namespace SFA.DAS.EmployerIncentives.Reports.Respositories
 
             var blob = container.GetBlobClient($"{fileInfo.Folder}/{fileInfo.Name}.{fileInfo.Extension}");
 
-            using (var ms = new MemoryStream())
-            {
-                await blob.DownloadToAsync(ms);
-                var byteArray = ms.ToArray();
-            }
 
             stream.Position = 0;            
             await blob.UploadAsync(stream, new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders { ContentType = fileInfo.ContentType } });

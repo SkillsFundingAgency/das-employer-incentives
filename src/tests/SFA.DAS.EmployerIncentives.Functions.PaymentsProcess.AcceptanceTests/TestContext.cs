@@ -21,11 +21,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public DirectoryInfo TestDirectory { get; set; }
         public TestFunction TestFunction { get; set; }
         public TestDateTimeService DateTimeService { get; set; }
+        public TestMessageBus MessageBus { get; set; }
 
-        public TestData TestData { get; set; }        
+        public TestData TestData { get; set; }
         public List<IHook> Hooks { get; set; }
         public SqlDatabase SqlDatabase { get; set; }
-        public ApplicationSettings ApplicationSettings { get; set; }        
+        public ApplicationSettings ApplicationSettings { get; set; }
+        public PaymentProcessSettings PaymentProcessSettings { get; set; }
 
         public MockApi LearnerMatchApi { get; set; }
         
@@ -34,6 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.AcceptanceTests
         public BlobContainerClient BlobClient { get; set; }
         
         public Data.ApprenticeshipIncentives.Models.CollectionCalendarPeriod ActivePeriod { get; set; }
+
+        public readonly Guid MetricsReportEmailGuid = Guid.NewGuid();
 
         public TestContext()
         {
