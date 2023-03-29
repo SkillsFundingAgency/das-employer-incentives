@@ -380,19 +380,5 @@ namespace SFA.DAS.EmployerIncentives.Commands
             {
             }
         }
-
-        //public static EndpointConfiguration UseAzureServiceBusTransport(this EndpointConfiguration config, string connectionString, Action<RoutingSettings> routing = null)
-        //{
-        //    TransportExtensions<AzureServiceBusTransport> transportExtensions = config.UseTransport<AzureServiceBusTransport>();
-        //    RuleNameShortener @object = new RuleNameShortener();
-        //    TokenProvider tokenProvider = TokenProvider.CreateManagedIdentityTokenProvider();
-        //    config.UseDataBus<AzureDataBus>
-        //    transportExtensions.CustomTokenProvider(tokenProvider);
-        //    transportExtensions.ConnectionString(connectionString);
-        //    transportExtensions.RuleNameShortener(@object.Shorten);
-        //    transportExtensions.Transactions(TransportTransactionMode.ReceiveOnly);
-        //    routing?.Invoke(transportExtensions.Routing());
-        //    return config;
-        //}
     }
 }
