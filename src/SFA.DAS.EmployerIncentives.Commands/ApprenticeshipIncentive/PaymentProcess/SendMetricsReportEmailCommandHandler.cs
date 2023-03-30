@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using NServiceBus;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Data.Reports;
 using SFA.DAS.EmployerIncentives.Data.Reports.Metrics;
 using SFA.DAS.EmployerIncentives.Infrastructure.Configuration;
 using SFA.DAS.EmployerIncentives.Reports;
 using SFA.DAS.Notifications.Messages.Commands;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +44,12 @@ namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentPro
         public async Task Handle(SendMetricsReportEmailCommand command, CancellationToken cancellationToken = default)
         {
             var report = await _reportsDataRepository.Execute<MetricsReport>();
+
+            if (command.CollectionPeriod.PeriodNumber != report.CollectionPeriod.Period ||
+                command.CollectionPeriod.AcademicYear.ToString() != report.CollectionPeriod.AcademicYear)
+            {
+                throw new ArgumentException($"Metrics report AY:{command.CollectionPeriod.PeriodNumber} Period {command.CollectionPeriod.PeriodNumber} does not match command AY:{report.CollectionPeriod.AcademicYear} Period:{report.CollectionPeriod.Period}");
+            }
 
             var templateId = _emailTemplates.MetricsReport.TemplateId;
 

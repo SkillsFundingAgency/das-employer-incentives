@@ -5,13 +5,11 @@ using System;
 
 namespace SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess
 {
-    public class SendMetricsReportEmailCommand : DomainCommand, ILockIdentifier, ILogWriterWithArgs
+    public class SendMetricsReportEmailCommand : DomainCommand, ILogWriterWithArgs
     {
         public Domain.ValueObjects.CollectionPeriod CollectionPeriod { get; private set; }
 
         public string EmailAddress { get; private set; }
-
-        public string LockId { get => $"{nameof(Domain.ValueObjects.CollectionCalendar)}"; }
 
         public SendMetricsReportEmailCommand(Domain.ValueObjects.CollectionPeriod collectionPeriod,
                                              string emailAddress)
