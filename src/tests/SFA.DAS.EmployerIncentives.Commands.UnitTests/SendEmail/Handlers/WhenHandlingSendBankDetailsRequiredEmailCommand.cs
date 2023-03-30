@@ -27,7 +27,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
             _fixture = new Fixture();
             _commandPublisher = new Mock<ICommandPublisher>();
             _settings = new Mock<IOptions<EmailTemplateSettings>>();
-            _templates = new EmailTemplateSettings { MetricsReport = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() } };
+            _templates = new EmailTemplateSettings { BankDetailsRequired = new EmailTemplate { TemplateId = Guid.NewGuid().ToString() } };
             _settings.Setup(x => x.Value).Returns(_templates);
             _sut = new SendBankDetailsRequiredEmailCommandHandler(_commandPublisher.Object, _settings.Object);
         }
@@ -43,7 +43,7 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.SendEmail.Handlers
 
             // Assert
             _commandPublisher.Verify(x => x.Publish(It.Is<SendEmailCommand>(x => x.RecipientsAddress == command.EmailAddress &&
-                                                                       x.TemplateId == _templates.MetricsReport.TemplateId &&
+                                                                       x.TemplateId == _templates.BankDetailsRequired.TemplateId &&
                                                                        x.Tokens.ContainsKey("bank details url")), It.IsAny<CancellationToken>()), Times.Once());
         }
     }
