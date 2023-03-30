@@ -42,7 +42,8 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
                 {
                     ValidRecords = new PeriodValidationSummary.ValidationSummaryRecord { PeriodAmount = 42000 },
                     InvalidRecords = new PeriodValidationSummary.ValidationSummaryRecord { PeriodAmount = 84000 }
-                }
+                },
+                CollectionPeriod = new Data.Reports.Metrics.CollectionPeriod { AcademicYear = "2324", Period = 8}
             };
 
             _mockCommandPublisher = new Mock<ICommandPublisher>();
