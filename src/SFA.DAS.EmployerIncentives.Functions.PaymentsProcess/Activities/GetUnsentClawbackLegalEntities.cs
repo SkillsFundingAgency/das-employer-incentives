@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+﻿using Microsoft.Azure.Functions.Worker;
 using SFA.DAS.EmployerIncentives.Abstractions.Queries;
 using SFA.DAS.EmployerIncentives.Queries.ApprenticeshipIncentives.GetClawbackLegalEntities;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _queryDispatcher = queryDispatcher;        
         }
 
-        [FunctionName(nameof(GetUnsentClawbacks))]
+        [Function(nameof(GetUnsentClawbacks))]
         public async Task<List<ClawbackLegalEntity>> Get([ActivityTrigger]CollectionPeriod collectionPeriod)
         {
 			var clawbackLegalEntities = await _queryDispatcher.Send<GetClawbackLegalEntitiesRequest, GetClawbackLegalEntitiesResponse>(new GetClawbackLegalEntitiesRequest(new Domain.ValueObjects.CollectionPeriod(collectionPeriod.Period, collectionPeriod.Year), false));

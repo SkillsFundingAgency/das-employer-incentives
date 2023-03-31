@@ -77,11 +77,11 @@ namespace SFA.DAS.EmployerIncentives.Data.UnitTests.ApprenticeApplication
             // Arrange            
             if (_paymentDate.HasValue)
             {
-                _mockDateTimeService.Setup(m => m.Now()).Returns(new DateTime(_paymentDate.Value.Year, 1, day));
+                _mockDateTimeService.Setup(m => m.UtcNow()).Returns(new DateTime(_paymentDate.Value.Year, 1, day));
             }
             else
             {
-                _mockDateTimeService.Setup(m => m.Now()).Returns(new DateTime(DateTime.Now.Year, 1, day));
+                _mockDateTimeService.Setup(m => m.UtcNow()).Returns(new DateTime(DateTime.Now.Year, 1, day));
             }
 
             // Act

@@ -1,19 +1,19 @@
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.DurableTask.Client;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public static class PaymentApprovalHttpStart
     {
-        [FunctionName("PaymentApproval_HttpStart")]
-        public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/approvePayments/{instanceId}")] HttpRequestMessage req,
-            [DurableClient] IDurableOrchestrationClient starter,
+        [Function("PaymentApproval_HttpStart")]
+        public static async Task<HttpResponseData> HttpStart(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/approvePayments/{instanceId}")] HttpRequestData req,
+            [DurableClient] DurableTaskClient starter,
             string instanceId,
             ILogger log)
         {

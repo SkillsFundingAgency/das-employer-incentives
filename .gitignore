@@ -285,3 +285,4 @@ SonarQube.Analysis.xml
 **/.learningtransport/**
 /src/choices.json
 /src/SFA.DAS.EmployerIncentives.Api/local.encoding.json
+/src/SFA.DAS.EmployerIncentives.Functions.PaymentsProcess/Run.txt

@@ -30,7 +30,6 @@ namespace SFA.DAS.EmployerIncentives.Domain.UnitTests.ApprenticeshipIncentiveTes
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
 
             _mockDateTimeService = new Mock<IDateTimeService>();
-            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
             _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             var startDate = DateTime.Now.AddDays(-42);

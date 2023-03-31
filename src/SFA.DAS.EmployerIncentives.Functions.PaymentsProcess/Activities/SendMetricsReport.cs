@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+﻿using Microsoft.Azure.Functions.Worker;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.PaymentProcess;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
             _commandDispatcher = commandDispatcher;
         }
 
-        [FunctionName(nameof(SendMetricsReport))]
+        [Function(nameof(SendMetricsReport))]
         public async Task Complete([ActivityTrigger] SendMetricsReportInput input)
         {
             await _commandDispatcher.Send(new SendMetricsReportCommand(new Domain.ValueObjects.CollectionPeriod(input.CollectionPeriod.Period, input.CollectionPeriod.Year)));

@@ -1,5 +1,6 @@
 using AutoFixture;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.DurableTask;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
     public class WhenRunningLearnerMatchingOrchestrator
     {
         private Fixture _fixture;
-        private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
+        private Mock<TaskOrchestrationContext> _mockOrchestrationContext;
         private LearnerMatchingOrchestrator _orchestrator;
         private List<ApprenticeshipIncentiveOutput> _apprenticeshipIncentives;
         private CollectionPeriod _activeCollectionPeriod;
@@ -23,7 +24,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         public void Setup()
         {
             _fixture = new Fixture();
-            _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
+            _mockOrchestrationContext = new Mock<TaskOrchestrationContext>();
 
             _activeCollectionPeriod = new CollectionPeriod { IsInProgress = false };
 
@@ -67,7 +68,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
                     x => x.CallSubOrchestratorAsync(
                         nameof(LearnerMatchingApprenticeshipOrchestrator),
                         It.Is<ApprenticeshipIncentiveOutput>(
-                            input => input.Id == i.Id && input.ULN == i.ULN)), Times.Once);
+                            input => input.Id == i.Id && input.ULN == i.ULN),
+                       It.IsAny<TaskOptions>()), Times.Once);
             }
         }
     }

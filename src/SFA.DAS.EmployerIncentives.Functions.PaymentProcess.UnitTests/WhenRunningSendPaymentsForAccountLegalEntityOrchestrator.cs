@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using AutoFixture;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.DurableTask;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -14,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
     {
         private Fixture _fixture;
         private AccountLegalEntityCollectionPeriod _accountLegalEntityCollectionPeriodInput;
-        private Mock<IDurableOrchestrationContext> _mockOrchestrationContext;
+        private Mock<TaskOrchestrationContext> _mockOrchestrationContext;
         private SendPaymentsForAccountLegalEntityOrchestrator _orchestrator;
 
         [SetUp]
@@ -22,11 +23,11 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             _fixture = new Fixture();
             _accountLegalEntityCollectionPeriodInput = _fixture.Create<AccountLegalEntityCollectionPeriod>();
-            _mockOrchestrationContext = new Mock<IDurableOrchestrationContext>();
+            _mockOrchestrationContext = new Mock<TaskOrchestrationContext>();
             _mockOrchestrationContext.Setup(x => x.GetInput<AccountLegalEntityCollectionPeriod>()).Returns(_accountLegalEntityCollectionPeriodInput);
 
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<bool>("SendClawbacksForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput)).ReturnsAsync(true);
-            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<bool>("SendPaymentRequestsForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput)).ReturnsAsync(true);
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<bool>("SendClawbacksForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput, It.IsAny<TaskOptions>())).ReturnsAsync(true);
+            _mockOrchestrationContext.Setup(x => x.CallActivityAsync<bool>("SendPaymentRequestsForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput, It.IsAny<TaskOptions>())).ReturnsAsync(true);
             _orchestrator = new SendPaymentsForAccountLegalEntityOrchestrator(Mock.Of<ILogger<SendPaymentsForAccountLegalEntityOrchestrator>>());
         }
 
@@ -35,8 +36,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentProcess.UnitTests
         {
             await _orchestrator.RunOrchestrator(_mockOrchestrationContext.Object);
 
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendClawbacksForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput), Times.Once);
-            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendClawbacksForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput, It.IsAny<TaskOptions>()), Times.Once);
+            _mockOrchestrationContext.Verify(x => x.CallActivityAsync("SendPaymentRequestsForAccountLegalEntity", _accountLegalEntityCollectionPeriodInput, It.IsAny<TaskOptions>()), Times.Once);
         }
     }
 }

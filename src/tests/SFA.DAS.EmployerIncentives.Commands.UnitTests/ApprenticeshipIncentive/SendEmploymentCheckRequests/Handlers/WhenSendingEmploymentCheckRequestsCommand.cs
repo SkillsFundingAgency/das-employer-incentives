@@ -37,7 +37,6 @@ namespace SFA.DAS.EmployerIncentives.Commands.UnitTests.ApprenticeshipIncentive.
             _fixture.Customize<LearnerModel>(c => c.Without(x => x.LearningPeriods));
 
             _mockDateTimeService = new Mock<IDateTimeService>();
-            _mockDateTimeService.Setup(m => m.Now()).Returns(DateTime.Now);
             _mockDateTimeService.Setup(m => m.UtcNow()).Returns(DateTime.UtcNow);
 
             _mockDomainRepository = new Mock<IApprenticeshipIncentiveDomainRepository>();

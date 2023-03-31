@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+﻿using Microsoft.Azure.Functions.Worker;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.SendPaymentRequests;
 using System;
@@ -16,7 +15,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _commandDispatcher = commandDispatcher;
         }
 
-        [FunctionName(nameof(SendPaymentRequestsForAccountLegalEntity))]
+        [Function(nameof(SendPaymentRequestsForAccountLegalEntity))]
         public async Task<bool> Send([ActivityTrigger] AccountLegalEntityCollectionPeriod accountLegalEntityCollectionPeriod)
         {
             var collectionPeriod = accountLegalEntityCollectionPeriod.CollectionPeriod;

@@ -1,27 +1,32 @@
-using System.Net.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.DurableTask.Client;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 {
-    public static class LearnerMatchingOrchestratorStart
+    public class LearnerMatchingOrchestratorStart
     {
-        [FunctionName("LearnerMatchingOrchestrator_Start")]
-        public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/LearnerMatchingOrchestrator")] HttpRequestMessage req,
-            [DurableClient] IDurableOrchestrationClient starter,
-            ILogger log)
+        private readonly ILogger _logger;
+
+        public LearnerMatchingOrchestratorStart(ILoggerFactory loggerFactory)
         {
-            log.LogInformation("Manually Triggering LearnerMatchingOrchestrator");
+            _logger = loggerFactory.CreateLogger<LearnerMatchingOrchestratorStart>();
+        }
 
-            string instanceId = await starter.StartNewAsync(nameof(LearnerMatchingOrchestrator));
+        [Function("LearnerMatchingOrchestrator_Start")]
+        public async Task<HttpResponseData> HttpStart(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "orchestrators/LearnerMatchingOrchestrator")] HttpRequestData req,
+            [DurableClient] DurableTaskClient client)
+        {
+            _logger.LogInformation("Manually Triggering LearnerMatchingOrchestrator");
 
-            log.LogInformation($"Manually Started LearnerMatchingOrchestrator with ID = '{instanceId}'.");
+            string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(nameof(LearnerMatchingOrchestrator));
 
-            return starter.CreateCheckStatusResponse(req, instanceId);
+            _logger.LogInformation($"Manually Started LearnerMatchingOrchestrator with ID = '{instanceId}'.");
+
+            return client.CreateCheckStatusResponse(req, instanceId);
         }
     }
 }

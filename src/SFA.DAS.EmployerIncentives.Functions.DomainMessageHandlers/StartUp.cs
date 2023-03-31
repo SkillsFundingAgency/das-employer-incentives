@@ -30,9 +30,12 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             var configBuilder = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables()
+                .AddJsonFile("local.settings.json", optional: true);
 
-            if (!ConfigurationIsLocalOrAcceptanceTests(configuration))
+            var Configuration = configBuilder.Build();
+
+            if (!ConfigurationIsLocalOrAcceptanceTests(Configuration))
             {
                 configBuilder.AddAzureTableStorage(options =>
                 {
@@ -42,12 +45,13 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                     options.PreFixConfigurationKeys = false;
                 });
             }
-#if DEBUG
-            if (!configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
-            {
-                configBuilder.AddJsonFile($"local.settings.json", optional: true);
-            }
-#endif
+            
+//#if DEBUG
+//            if (!Configuration["EnvironmentName"].Equals("LOCAL_ACCEPTANCE_TESTS", StringComparison.CurrentCultureIgnoreCase))
+//            {
+//                configBuilder.AddJsonFile($"local.settings.json", optional: true);
+//            }
+//#endif
             var config = configBuilder.Build();
 
             builder.Services.AddOptions();            
@@ -71,7 +75,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                         {
                             options.EndpointConfiguration = (endpoint) =>
                             {
-                                endpoint.UseTransport<LearningTransport>().StorageDirectory(config.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport")));
+                                var learningDirectory = config.GetValue("ApplicationSettings:UseLearningEndpointStorageDirectory", Path.Combine(Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("src")), @"src\SFA.DAS.EmployerIncentives.Functions.TestConsole\.learningtransport"));
+                                endpoint.UseTransport<LearningTransport>().StorageDirectory(learningDirectory);
                                 Commands.Types.RoutingSettingsExtensions.AddRouting(endpoint.UseTransport<LearningTransport>().Routing());
                                 return endpoint;
                             };
@@ -79,7 +84,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
                     });
             }
         }
-
+         
         private bool ConfigurationIsLocalOrAcceptanceTests(IConfiguration configuration)
         {
             return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
@@ -98,10 +103,5 @@ namespace SFA.DAS.EmployerIncentives.Functions.DomainMessageHandlers
             return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
                    configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
-
-
     }
-
-
-
 }

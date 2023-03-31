@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+﻿using Microsoft.Azure.Functions.Worker;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.ApprenticeshipIncentive.RefreshLearner;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _commandDispatcher = commandDispatcher;        
         }
 
-        [FunctionName(nameof(LearnerMatchAndUpdate))]
+        [Function(nameof(LearnerMatchAndUpdate))]
         public async Task Create([ActivityTrigger] LearnerMatchInput input)
         {
             await _commandDispatcher.Send(new RefreshLearnerCommand(input.ApprenticeshipIncentiveId));

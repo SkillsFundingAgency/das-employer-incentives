@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Azure.Functions.Worker;
 using SFA.DAS.EmployerIncentives.Abstractions.Commands;
 using SFA.DAS.EmployerIncentives.Commands.Types.ApprenticeshipIncentive;
 
@@ -15,7 +14,7 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities
             _commandDispatcher = commandDispatcher;
         }
 
-        [FunctionName(nameof(CalculateEarningsActivity))]
+        [Function(nameof(CalculateEarningsActivity))]
         public async Task Update([ActivityTrigger] CalculateEarningsInput input)
         {
             await _commandDispatcher.Send(new CalculateEarningsCommand(input.ApprenticeshipIncentiveId));

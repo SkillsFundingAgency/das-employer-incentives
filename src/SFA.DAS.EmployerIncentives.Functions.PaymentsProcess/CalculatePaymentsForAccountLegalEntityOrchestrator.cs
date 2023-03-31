@@ -1,5 +1,3 @@
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Exceptions;
 using System;
@@ -7,13 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.EmployerIncentives.DataTransferObjects;
+using Microsoft.DurableTask;
+using Microsoft.Azure.Functions.Worker;
 
 namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess
 {
     public class CalculatePaymentsForAccountLegalEntityOrchestrator
     {
-        [FunctionName(nameof(CalculatePaymentsForAccountLegalEntityOrchestrator))]
-        public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
+        [Function(nameof(CalculatePaymentsForAccountLegalEntityOrchestrator))]
+        public async Task RunOrchestrator([OrchestrationTrigger] TaskOrchestrationContext context)
         {
             var accountLegalEntityCollectionPeriod = context.GetInput<AccountLegalEntityCollectionPeriod>();
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 
@@ -16,8 +16,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger = logger;
         }
 
-        [FunctionName(nameof(ChangeOfCircumstanceOrchestrator))]
-        public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
+        [Function(nameof(ChangeOfCircumstanceOrchestrator))]
+        public async Task RunOrchestrator([OrchestrationTrigger] TaskOrchestrationContext context)
         {
             var learnerChangeOfCircumstanceInput = context.GetInput<LearnerChangeOfCircumstanceInput>();
 
@@ -28,8 +28,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
 
             if(hasPossibleChangeOfCircs)
             {
-                await context.CallActivityAsync(nameof(LearnerChangeOfCircumstanceActivity), learnerChangeOfCircumstanceInput);
-                await context.CallActivityWithRetryAsync(nameof(LearnerMatchAndUpdate), new RetryOptions(TimeSpan.FromSeconds(1), 3), new LearnerMatchInput { ApprenticeshipIncentiveId = learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId });
+                await context.CallActivityAsync(nameof(LearnerChangeOfCircumstanceActivity), learnerChangeOfCircumstanceInput);                
+                await context.CallActivityAsync(nameof(LearnerMatchAndUpdate), new LearnerMatchInput { ApprenticeshipIncentiveId = learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId }, new TaskOptions(new TaskRetryOptions( new RetryPolicy(3, TimeSpan.FromSeconds(1)))));
             }
 
             _logger.LogDebug("Learner Change of Circumstances process completed for apprenticeship Incentive {apprenticeshipIncentiveId}, ULN: {uln}", learnerChangeOfCircumstanceInput.ApprenticeshipIncentiveId, learnerChangeOfCircumstanceInput.Uln);

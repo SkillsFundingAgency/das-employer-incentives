@@ -1,5 +1,5 @@
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.DurableTask;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Activities;
 using System.Collections.Generic;
@@ -16,8 +16,8 @@ namespace SFA.DAS.EmployerIncentives.Functions.PaymentsProcess.Orchestrators
             _logger = logger;
         }
 
-        [FunctionName(nameof(LearnerMatchingOrchestrator))]
-        public async Task RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context)
+        [Function(nameof(LearnerMatchingOrchestrator))]
+        public async Task RunOrchestrator([OrchestrationTrigger] TaskOrchestrationContext context)
         {
             if(!context.IsReplaying) _logger.LogInformation("[LearnerMatchingOrchestrator] Learner matching process started");
 
